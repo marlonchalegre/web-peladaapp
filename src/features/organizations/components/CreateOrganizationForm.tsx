@@ -1,5 +1,5 @@
-import React, { FormEvent } from 'react'
 import { Stack, TextField, Button } from '@mui/material'
+import type { FormEvent } from 'react'
 
 type Props = {
   onCreate: (name: string) => Promise<void>

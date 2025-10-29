@@ -1,4 +1,3 @@
-import React from 'react'
 import { Paper, Typography, TableContainer, Table, TableHead, TableRow, TableCell, TableBody } from '@mui/material'
 
 export type StandingRow = { teamId: number; name: string; wins: number; draws: number; losses: number }

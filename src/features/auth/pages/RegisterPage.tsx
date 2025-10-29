@@ -1,4 +1,5 @@
-import { FormEvent, useState } from 'react'
+import { useState } from 'react'
+import type { FormEvent } from 'react'
 import { Paper, TextField, Button, Stack, Typography, Alert, Link as MLink } from '@mui/material'
 import { register, login } from '../../../shared/api/client'
 import { useAuth } from '../../../app/providers/AuthContext'

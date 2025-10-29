@@ -4,7 +4,9 @@ export type ApiConfig = {
 
 function getBaseUrl(): string {
   if (typeof window !== 'undefined') return '' // use vite proxy in dev
-  return process.env.API_BASE_URL || ''
+  const globalAny = globalThis as { process?: { env?: Record<string, string | undefined> } } | undefined
+  const fromNode = globalAny?.process?.env?.API_BASE_URL
+  return fromNode ?? ''
 }
 
 export class ApiClient {

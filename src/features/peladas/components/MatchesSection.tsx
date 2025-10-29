@@ -1,11 +1,11 @@
-import React, { FormEvent } from 'react'
 import { Paper, Typography, Stack, TextField, Button, Box } from '@mui/material'
+import type { Dispatch, FormEvent, SetStateAction } from 'react'
 import type { Match } from '../../../shared/api/endpoints'
 
 type MatchesSectionProps = {
   matches: Match[]
   subsDraft: Record<number, { out?: number; in?: number; minute?: number }>
-  setSubsDraft: React.Dispatch<React.SetStateAction<Record<number, { out?: number; in?: number; minute?: number }>>>
+  setSubsDraft: Dispatch<SetStateAction<Record<number, { out?: number; in?: number; minute?: number }>>>
   updatingScores: Record<number, boolean>
   onUpdateScore: (matchId: number, home: number, away: number) => Promise<void>
   onCreateSubstitution: (matchId: number, outId: number, inId: number, minute?: number) => Promise<void>

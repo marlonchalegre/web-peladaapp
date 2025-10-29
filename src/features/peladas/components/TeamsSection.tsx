@@ -1,5 +1,7 @@
-import React, { DragEvent, useState } from 'react'
-import { Button, Paper, Typography, Stack, Grid } from '@mui/material'
+import { useState } from 'react'
+import type { DragEvent } from 'react'
+import { Button, Paper, Typography, Stack } from '@mui/material'
+import Grid from '@mui/material/Grid'
 import type { Player, Team, TeamPlayer } from '../../../shared/api/endpoints'
 
 export type TeamsSectionProps = {
@@ -93,10 +95,10 @@ export default function TeamsSection(props: TeamsSectionProps) {
         </Stack>
       )}
       <Grid container spacing={3} alignItems="flex-start">
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Grid container spacing={3} alignItems="stretch">
-          {teams.map((t) => (
-            <Grid item key={t.id} xs={12} sm={6} md={6} lg={4} xl={3} sx={{ display: 'flex' }}>
+            {teams.map((t) => (
+              <Grid key={t.id} size={{ xs: 12, sm: 6, md: 6, lg: 4, xl: 3 }} sx={{ display: 'flex' }}>
             <Paper elevation={1}
               onDragOver={locked ? undefined : (e) => e.preventDefault()}
               onDragEnter={locked ? undefined : (e) => (e.currentTarget.classList.add('droppable--over'))}
@@ -210,22 +212,22 @@ export default function TeamsSection(props: TeamsSectionProps) {
           ))}
           </Grid>
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Typography variant="h6">Disponíveis</Typography>
           <Grid
             container
             spacing={3}
             sx={{ mt: 1 }}
             alignItems="stretch"
-            onDragOver={locked ? undefined : (e) => e.preventDefault()}
-            onDragEnter={locked ? undefined : (e) => (e.currentTarget.classList.add('droppable--over'))}
-            onDragLeave={locked ? undefined : (e) => (e.currentTarget.classList.remove('droppable--over'))}
-            onDrop={locked ? undefined : async (e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              const target = e.currentTarget
+            onDragOver={locked ? undefined : (event: DragEvent<HTMLElement>) => event.preventDefault()}
+            onDragEnter={locked ? undefined : (event: DragEvent<HTMLElement>) => event.currentTarget.classList.add('droppable--over')}
+            onDragLeave={locked ? undefined : (event: DragEvent<HTMLElement>) => event.currentTarget.classList.remove('droppable--over')}
+            onDrop={locked ? undefined : async (event: DragEvent<HTMLElement>) => {
+              event.preventDefault()
+              event.stopPropagation()
+              const target = event.currentTarget
               try {
-                await dropToBench(e)
+                await dropToBench(event)
               } finally {
                 target.classList.remove('droppable--over')
               }
@@ -236,7 +238,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
             tabIndex={0}
           >
             {benchPlayers.map((p) => (
-              <Grid item key={p.id} xs={12} sm={6} md={6} lg={4} xl={3}>
+              <Grid key={p.id} size={{ xs: 12, sm: 6, md: 6, lg: 4, xl: 3 }}>
                 <Paper
                   draggable={!locked}
                   onDragStart={locked ? undefined : (e) => onDragStartPlayer(e, p.id, null)}

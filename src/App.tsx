@@ -14,7 +14,7 @@ import PeladaMatchesPage from './features/peladas/pages/PeladaMatchesPage'
 function Home() {
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
-      <Typography variant="h3" gutterBottom>100 Fôlego</Typography>
+      <Typography variant="h3" gutterBottom>Pelada App</Typography>
       <Typography variant="body1">Bem-vindo!</Typography>
     </Container>
   )
@@ -26,7 +26,7 @@ function AppLayout() {
     <BrowserRouter>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>100 Fôlego</Typography>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>Pelada App</Typography>
           <Button color="inherit" component={RouterLink} to="/">Home</Button>
           <Button color="inherit" component={RouterLink} to="/organizations">Organizações</Button>
           <Button color="inherit" onClick={() => signOut()}>Sair</Button>

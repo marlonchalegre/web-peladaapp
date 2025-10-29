@@ -1,6 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import { useParams, Link as RouterLink } from 'react-router-dom'
-import { Paper, Table, TableHead, TableRow, TableCell, TableBody, TableContainer, Button, Grid, Box, Stack, Typography, Alert } from '@mui/material'
+import { Paper, Table, TableHead, TableRow, TableCell, TableBody, TableContainer, Button, Box, Stack, Typography, Alert } from '@mui/material'
+import Grid from '@mui/material/Grid'
 import { api } from '../../../shared/api/client'
 import { createApi, type Match, type Team, type Pelada, type TeamPlayer, type Player, type MatchEvent, type PlayerStats } from '../../../shared/api/endpoints'
 import StandingsPanel from '../components/StandingsPanel'
@@ -59,7 +60,7 @@ export default function PeladaMatchesPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [closing, setClosing] = useState(false)
-  const [exp, setExp] = useState<Set<number>>(new Set())
+  const [exp, setExp] = useState<Set<number>>(() => new Set<number>())
   const [updatingScore, setUpdatingScore] = useState<Record<number, boolean>>({})
   const [statsMap, setStatsMap] = useState<Record<number, PlayerStatCounts>>({})
   const [statsRows, setStatsRows] = useState<PlayerStatRow[]>([])
@@ -255,7 +256,7 @@ export default function PeladaMatchesPage() {
     const newHome = team === 'home' ? currentHome + delta : currentHome
     const newAway = team === 'away' ? currentAway + delta : currentAway
     if (newHome < 0 || newAway < 0) {
-      setError('Placar não pode ficar negativo')
+      setError('Placar n?o pode ficar negativo')
       throw new Error('NEGATIVE_SCORE')
     }
     const status = (newHome + newAway) > 0 ? 'running' : 'scheduled'
@@ -297,7 +298,7 @@ export default function PeladaMatchesPage() {
       setStatsRows(buildRowsFromStatMap(sm, orgPlayerIdToUserId, userIdToName))
     } catch (error: unknown) {
       // keep UI; show error once
-      setError((prev) => prev || (error instanceof Error ? error.message : 'Erro ao carregar estatísticas'))
+      setError((prev) => prev || (error instanceof Error ? error.message : 'Erro ao carregar estat?sticas'))
     }
   }
 
@@ -354,7 +355,7 @@ export default function PeladaMatchesPage() {
         </Box>
       </Stack>
       <Grid container spacing={3} alignItems="flex-start">
-        <Grid item xs={12} md={8}>
+        <Grid size={{ xs: 12, md: 8 }}>
           {matches.length === 0 ? (
             <Typography>Nenhuma partida agendada.</Typography>
           ) : (
@@ -379,7 +380,7 @@ export default function PeladaMatchesPage() {
                       const benchPlayers = allOrgPlayers.filter((p) => !lineupIds.has(p.id))
                       const finished = (m.status || '').toLowerCase() === 'finished'
                       return (
-                        <React.Fragment key={m.id}>
+                        <Fragment key={m.id}>
                           <TableRow hover sx={{ cursor: 'pointer' }} onClick={() => toggleExpand(m.id)}>
                             <TableCell>{m.sequence}</TableCell>
                             <TableCell>{teamNameById[m.home_team_id] || `Time ${m.home_team_id}`}</TableCell>
@@ -416,14 +417,12 @@ export default function PeladaMatchesPage() {
                                     adjustScore={adjustScore}
                                     assignPlayerToTeam={(teamId, playerId) => assignPlayerToMatchTeam(m.id, teamId, playerId)}
                                     replacePlayerOnTeam={(teamId, outId, inId) => replacePlayerOnMatchTeam(m.id, teamId, outId, inId)}
-                                    onScoreGuardError={setError}
-                                    readOnly={isPeladaClosed}
                                   />
                                 </Box>
                               </TableCell>
                             </TableRow>
                           )}
-                        </React.Fragment>
+                        </Fragment>
                       )
                     })}
                   </TableBody>
@@ -432,7 +431,7 @@ export default function PeladaMatchesPage() {
             </Paper>
           )}
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <StandingsPanel standings={standings} />
           <PlayerStatsPanel playerStats={playerStats} playerSort={playerSort} onToggleSort={togglePlayerSort} />
         </Grid>

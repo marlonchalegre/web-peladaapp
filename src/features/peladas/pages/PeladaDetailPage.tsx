@@ -1,4 +1,5 @@
-import { DragEvent, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import type { DragEvent } from 'react'
 import { useParams, Link as RouterLink } from 'react-router-dom'
 import { Container, Typography, Alert, Button, Stack } from '@mui/material'
 import { api } from '../../../shared/api/client'
@@ -200,7 +201,6 @@ export default function PeladaDetailPage() {
         teams={teams}
         teamPlayers={teamPlayers}
         playersPerTeam={pelada.players_per_team ?? undefined}
-        availablePlayers={availablePlayers}
         benchPlayers={benchPlayers}
         creatingTeam={creatingTeam}
         locked={pelada.status !== 'open'}

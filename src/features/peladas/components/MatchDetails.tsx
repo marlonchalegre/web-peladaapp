@@ -1,5 +1,5 @@
-import React from 'react'
 import { List, ListItem, ListItemText, Stack, IconButton, Tooltip, Paper } from '@mui/material'
+import type { Dispatch, SetStateAction } from 'react'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import SportsSoccerIcon from '@mui/icons-material/SportsSoccer'
@@ -8,6 +8,8 @@ import ReportGmailerrorredIcon from '@mui/icons-material/ReportGmailerrorred'
 import type { Match, TeamPlayer, Player } from '../../../shared/api/endpoints'
 
 export type ActionKey = { key: string; type: 'assist' | 'goal' | 'own_goal' } | null
+
+type SelectMenuState = { teamId: number; forPlayerId?: number } | null
 
 type Props = {
   match: Match
@@ -19,9 +21,9 @@ type Props = {
   benchPlayers: Player[]
   playersPerTeam?: number | null
   openAction: ActionKey
-  setOpenAction: (v: ActionKey) => void
-  selectMenu: { teamId: number; forPlayerId?: number } | null
-  setSelectMenu: (v: { teamId: number; forPlayerId?: number } | null) => void
+  setOpenAction: Dispatch<SetStateAction<ActionKey>>
+  selectMenu: SelectMenuState
+  setSelectMenu: Dispatch<SetStateAction<SelectMenuState>>
   updating: boolean
   recordEvent: (matchId: number, playerId: number, type: 'assist' | 'goal' | 'own_goal') => Promise<void>
   deleteEventAndRefresh: (matchId: number, playerId: number, type: 'assist' | 'goal' | 'own_goal') => Promise<void>

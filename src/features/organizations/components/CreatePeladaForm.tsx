@@ -1,4 +1,5 @@
-import React, { FormEvent, useMemo } from 'react'
+import { useMemo } from 'react'
+import type { FormEvent } from 'react'
 import { Stack, TextField, Button } from '@mui/material'
 
 export type CreatePeladaPayload = {

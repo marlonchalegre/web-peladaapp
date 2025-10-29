@@ -1,4 +1,3 @@
-import React from 'react'
 import { Paper, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Link } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
 import type { Pelada } from '../../../shared/api/endpoints'

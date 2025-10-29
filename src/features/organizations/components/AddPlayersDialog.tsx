@@ -1,4 +1,3 @@
-import React from 'react'
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, List, ListItem, ListItemText, Checkbox, Stack } from '@mui/material'
 import type { User } from '../../../shared/api/endpoints'
 
