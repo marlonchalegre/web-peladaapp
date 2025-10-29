@@ -35,7 +35,7 @@ export function createApi(client: ApiClient) {
     listTeamPlayers: (teamId: number) => client.get<TeamPlayer[]>(`/api/teams/${teamId}/players`),
     createTeam: (payload: { pelada_id: number; name: string }) => client.post<Team>('/api/teams', payload),
     addPlayerToTeam: (teamId: number, playerId: number) => client.post(`/api/teams/${teamId}/players`, { player_id: playerId }),
-    removePlayerFromTeam: (teamId: number, playerId: number) => client.delete(`/api/teams/${teamId}/players`, { player_id: playerId } as any),
+    removePlayerFromTeam: (teamId: number, playerId: number) => client.delete<void>(`/api/teams/${teamId}/players`, { player_id: playerId }),
 
     // Matches
     listMatchesByPelada: (peladaId: number) => client.get<Match[]>(`/api/peladas/${peladaId}/matches`),
@@ -43,12 +43,12 @@ export function createApi(client: ApiClient) {
     listPlayerStatsByPelada: (peladaId: number) => client.get<PlayerStats[]>(`/api/peladas/${peladaId}/player-stats`),
     updateMatchScore: (id: number, home: number, away: number, status?: string) => client.put(`/api/matches/${id}/score`, { home_score: home, away_score: away, status }),
     createMatchEvent: (id: number, playerId: number, eventType: MatchEventType) => client.post(`/api/matches/${id}/events`, { player_id: playerId, event_type: eventType }),
-    deleteMatchEvent: (id: number, playerId: number, eventType: MatchEventType) => client.delete(`/api/matches/${id}/events`, { player_id: playerId, event_type: eventType } as any),
+    deleteMatchEvent: (id: number, playerId: number, eventType: MatchEventType) => client.delete<void>(`/api/matches/${id}/events`, { player_id: playerId, event_type: eventType }),
 
     // Match lineups (per-match players)
     listMatchLineups: (matchId: number) => client.get<Record<number, MatchLineupEntry[]>>(`/api/matches/${matchId}/lineups`),
     addMatchLineupPlayer: (matchId: number, teamId: number, playerId: number) => client.post(`/api/matches/${matchId}/lineups`, { team_id: teamId, player_id: playerId }),
-    removeMatchLineupPlayer: (matchId: number, teamId: number, playerId: number) => client.delete(`/api/matches/${matchId}/lineups`, { team_id: teamId, player_id: playerId } as any),
+    removeMatchLineupPlayer: (matchId: number, teamId: number, playerId: number) => client.delete<void>(`/api/matches/${matchId}/lineups`, { team_id: teamId, player_id: playerId }),
     replaceMatchLineupPlayer: (matchId: number, teamId: number, outPlayerId: number, inPlayerId: number) => client.post(`/api/matches/${matchId}/lineups/replace`, { team_id: teamId, out_player_id: outPlayerId, in_player_id: inPlayerId }),
 
     // Substitutions

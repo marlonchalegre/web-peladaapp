@@ -20,33 +20,39 @@ function Home() {
   )
 }
 
-export default function App() {
+function AppLayout() {
   const { signOut } = useAuth()
   return (
+    <BrowserRouter>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>100 Fôlego</Typography>
+          <Button color="inherit" component={RouterLink} to="/">Home</Button>
+          <Button color="inherit" component={RouterLink} to="/organizations">Organizações</Button>
+          <Button color="inherit" onClick={() => signOut()}>Sair</Button>
+        </Toolbar>
+      </AppBar>
+      <Container maxWidth="lg" sx={{ py: 3 }}>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/organizations" element={<OrganizationsPage />} />
+            <Route path="/organizations/:id" element={<OrganizationDetailPage />} />
+            <Route path="/peladas/:id" element={<PeladaDetailPage />} />
+            <Route path="/peladas/:id/matches" element={<PeladaMatchesPage />} />
+          </Route>
+        </Routes>
+      </Container>
+    </BrowserRouter>
+  )
+}
+
+export default function App() {
+  return (
     <AuthProvider>
-      <BrowserRouter>
-        <AppBar position="static">
-          <Toolbar>
-            <Typography variant="h6" sx={{ flexGrow: 1 }}>100 Fôlego</Typography>
-            <Button color="inherit" component={RouterLink} to="/">Home</Button>
-            <Button color="inherit" component={RouterLink} to="/organizations">Organizações</Button>
-            <Button color="inherit" onClick={() => signOut()}>Sair</Button>
-          </Toolbar>
-        </AppBar>
-        <Container maxWidth="lg" sx={{ py: 3 }}>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route element={<ProtectedRoute />}>
-              <Route path="/" element={<Home />} />
-              <Route path="/organizations" element={<OrganizationsPage />} />
-              <Route path="/organizations/:id" element={<OrganizationDetailPage />} />
-              <Route path="/peladas/:id" element={<PeladaDetailPage />} />
-              <Route path="/peladas/:id/matches" element={<PeladaMatchesPage />} />
-            </Route>
-          </Routes>
-        </Container>
-      </BrowserRouter>
+      <AppLayout />
     </AuthProvider>
   )
 }

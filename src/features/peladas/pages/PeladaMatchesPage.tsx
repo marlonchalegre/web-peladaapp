@@ -61,7 +61,6 @@ export default function PeladaMatchesPage() {
   const [closing, setClosing] = useState(false)
   const [exp, setExp] = useState<Set<number>>(new Set())
   const [updatingScore, setUpdatingScore] = useState<Record<number, boolean>>({})
-  const [events, setEvents] = useState<MatchEvent[]>([])
   const [statsMap, setStatsMap] = useState<Record<number, PlayerStatCounts>>({})
   const [statsRows, setStatsRows] = useState<PlayerStatRow[]>([])
   const [loadedPeladaId, setLoadedPeladaId] = useState<number | null>(null)
@@ -106,14 +105,13 @@ export default function PeladaMatchesPage() {
             endpoints.listMatchEventsByPelada(peladaId),
             endpoints.listPlayerStatsByPelada(peladaId).catch(() => null),
           ])
-          setEvents(evts)
           let sm = statsMapFromApi(statsOrNull)
           if (Object.keys(sm).length === 0 && evts.length > 0) {
             sm = aggregateStatsFromEvents(evts)
           }
           setStatsMap(sm)
           setStatsRows(buildRowsFromStatMap(sm, relMap, nameMap))
-        } catch (e) {
+        } catch {
           // ignore events/stats error, keep UI working
         }
         const usedTeamIds = new Set<number>()
@@ -137,7 +135,10 @@ export default function PeladaMatchesPage() {
         for (const [mid, group] of luEntries) luMap[mid] = group
         setLineupsByMatch(luMap)
       })
-      .catch((e: any) => setError(e?.message || 'Erro ao carregar partidas'))
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : 'Erro ao carregar partidas'
+        setError(message)
+      })
       .finally(() => setLoading(false))
   }, [peladaId, loadedPeladaId])
 
@@ -227,8 +228,9 @@ export default function PeladaMatchesPage() {
       await endpoints.addMatchLineupPlayer(matchId, teamId, playerId)
       const grouped = await endpoints.listMatchLineups(matchId)
       setLineupsByMatch((prev) => ({ ...prev, [matchId]: Object.fromEntries(Object.entries(grouped).map(([k, arr]) => [Number(k), (arr || []).map((e) => ({ team_id: e.team_id, player_id: e.player_id }))])) }))
-    } catch (e: any) {
-      setError(e?.message || 'Erro ao adicionar jogador na partida')
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao adicionar jogador na partida'
+      setError(message)
     } finally {
       setSelectMenu(null)
     }
@@ -239,8 +241,9 @@ export default function PeladaMatchesPage() {
       await endpoints.replaceMatchLineupPlayer(matchId, teamId, outPlayerId, inPlayerId)
       const grouped = await endpoints.listMatchLineups(matchId)
       setLineupsByMatch((prev) => ({ ...prev, [matchId]: Object.fromEntries(Object.entries(grouped).map(([k, arr]) => [Number(k), (arr || []).map((e) => ({ team_id: e.team_id, player_id: e.player_id }))])) }))
-    } catch (e: any) {
-      setError(e?.message || 'Erro ao trocar jogador na partida')
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao trocar jogador na partida'
+      setError(message)
     } finally {
       setSelectMenu(null)
     }
@@ -260,9 +263,10 @@ export default function PeladaMatchesPage() {
     try {
       await endpoints.updateMatchScore(match.id, newHome, newAway, status)
       setMatches((prev) => prev.map((m) => (m.id === match.id ? { ...m, home_score: newHome, away_score: newAway, status: status === 'scheduled' ? m.status : status } : m)))
-    } catch (e: any) {
-      setError(e?.message || 'Erro ao atualizar placar')
-      throw e
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao atualizar placar'
+      setError(message)
+      throw error
     } finally {
       setUpdatingScore((prev) => ({ ...prev, [match.id]: false }))
     }
@@ -272,8 +276,9 @@ export default function PeladaMatchesPage() {
     try {
       await endpoints.updateMatchScore(match.id, match.home_score, match.away_score, 'finished')
       setMatches((prev) => prev.map((m) => (m.id === match.id ? { ...m, status: 'finished' } : m)))
-    } catch (e: any) {
-      setError(e?.message || 'Erro ao finalizar partida')
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao finalizar partida'
+      setError(message)
     }
   }
 
@@ -284,16 +289,15 @@ export default function PeladaMatchesPage() {
         endpoints.listMatchEventsByPelada(peladaId),
         endpoints.listPlayerStatsByPelada(peladaId).catch(() => null),
       ])
-      setEvents(evts)
       let sm = statsMapFromApi(statsOrNull)
       if (Object.keys(sm).length === 0 && evts.length > 0) {
         sm = aggregateStatsFromEvents(evts)
       }
       setStatsMap(sm)
       setStatsRows(buildRowsFromStatMap(sm, orgPlayerIdToUserId, userIdToName))
-    } catch (e: any) {
+    } catch (error: unknown) {
       // keep UI; show error once
-      setError((prev) => prev || e?.message || 'Erro ao carregar estatísticas')
+      setError((prev) => prev || (error instanceof Error ? error.message : 'Erro ao carregar estatísticas'))
     }
   }
 
@@ -306,8 +310,9 @@ export default function PeladaMatchesPage() {
     try {
       await endpoints.createMatchEvent(matchId, playerId, type)
       await refreshStats()
-    } catch (e: any) {
-      setError(e?.message || 'Erro ao registrar evento')
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao registrar evento'
+      setError(message)
     }
   }
 
@@ -336,8 +341,9 @@ export default function PeladaMatchesPage() {
                   setPelada(updatedPelada)
                   setMatches(updatedMatches)
                   setExp(new Set())
-                } catch (e: any) {
-                  setError(e?.message || 'Erro ao encerrar pelada')
+                } catch (error: unknown) {
+                  const message = error instanceof Error ? error.message : 'Erro ao encerrar pelada'
+                  setError(message)
                 } finally {
                   setClosing(false)
                 }
