@@ -4,7 +4,7 @@ import type { Pelada } from '../../../shared/api/endpoints'
 
 export type PeladasTableProps = {
   peladas: Pelada[]
-  onDelete: (peladaId: number) => Promise<void>
+  onDelete?: (peladaId: number) => Promise<void>
 }
 
 export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
@@ -16,7 +16,7 @@ export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
           <TableHead>
             <TableRow>
               <TableCell>Nome</TableCell>
-              <TableCell>Ações</TableCell>
+              {onDelete && <TableCell>Ações</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -25,11 +25,13 @@ export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
                 <TableCell>
                   <Link href={`/peladas/${p.id}`} underline="hover">Pelada #{p.id}</Link>
                 </TableCell>
-                <TableCell>
-                  <IconButton aria-label={`Excluir Pelada #${p.id}`} onClick={() => onDelete(p.id)} size="small" color="error">
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                </TableCell>
+                {onDelete && (
+                  <TableCell>
+                    <IconButton aria-label={`Excluir Pelada #${p.id}`} onClick={() => onDelete(p.id)} size="small" color="error">
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>

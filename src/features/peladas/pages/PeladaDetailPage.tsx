@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { DragEvent } from 'react'
 import { useParams, Link as RouterLink } from 'react-router-dom'
-import { Container, Typography, Alert, Button, Stack } from '@mui/material'
+import { Container, Typography, Alert, Button, Stack, Box } from '@mui/material'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { api } from '../../../shared/api/client'
-import { createApi, type Pelada, type Team, type TeamPlayer, type Player } from '../../../shared/api/endpoints'
+import { createApi, type Pelada, type Team, type TeamPlayer, type Player, type VotingInfo } from '../../../shared/api/endpoints'
+import { useAuth } from '../../../app/providers/AuthContext'
 import PeladaActions from '../components/PeladaActions'
 import TeamsSection from '../components/TeamsSection'
 
@@ -11,6 +13,7 @@ const endpoints = createApi(api)
 
 export default function PeladaDetailPage() {
   const { id } = useParams()
+  const { user } = useAuth()
   const peladaId = Number(id)
   const [pelada, setPelada] = useState<Pelada | null>(null)
   const [teams, setTeams] = useState<Team[]>([])
@@ -25,6 +28,8 @@ export default function PeladaDetailPage() {
   const [changingStatus, setChangingStatus] = useState(false)
   const [live, setLive] = useState('')
   const [menu, setMenu] = useState<{ playerId: number; sourceTeamId: number | null } | null>(null)
+  const [votingInfo, setVotingInfo] = useState<VotingInfo | null>(null)
+  const [_currentPlayerOrgId, setCurrentPlayerOrgId] = useState<number | null>(null)
 
   const assignedIds = useMemo(() => new Set(Object.values(teamPlayers).flat().map((tp) => tp.player_id)), [teamPlayers])
   const benchPlayers = useMemo(() => availablePlayers.filter((p) => !assignedIds.has(p.id)), [availablePlayers, assignedIds])
@@ -159,18 +164,42 @@ export default function PeladaDetailPage() {
         const scoreMap: Record<number, number> = {}
         for (const [pid, s] of scorePairs) if (!Number.isNaN(s)) scoreMap[pid] = s
         setOrgPlayerIdToScore(scoreMap)
+        
+        // Get voting info if pelada is closed
+        if (p.status === 'closed' && user) {
+          try {
+            const currentPlayer = av.find(pl => pl.user_id === user.id)
+            if (currentPlayer) {
+              setCurrentPlayerOrgId(currentPlayer.id)
+              const vInfo = await endpoints.getVotingInfo(peladaId, currentPlayer.id)
+              setVotingInfo(vInfo)
+            }
+          } catch {
+            // Ignore voting info errors
+          }
+        }
       })
       .catch((error: unknown) => {
         const message = error instanceof Error ? error.message : 'Erro ao carregar pelada'
         setError(message)
       })
-  }, [peladaId])
+  }, [peladaId, user])
 
   if (error) return <Container><Alert severity="error">{error}</Alert></Container>
   if (!pelada) return <Container><Typography>Carregando...</Typography></Container>
 
   return (
     <Container>
+      <Box sx={{ mb: 2 }}>
+        <Button
+          component={RouterLink}
+          to={`/organizations/${pelada.organization_id}`}
+          startIcon={<ArrowBackIcon />}
+          variant="text"
+        >
+          Voltar para Organização
+        </Button>
+      </Box>
       <Typography variant="h4" gutterBottom>Pelada #{pelada.id}</Typography>
       <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">{live}</div>
       <PeladaActions
@@ -192,11 +221,26 @@ export default function PeladaDetailPage() {
           }
         }}
       />
-      <Stack direction="row" sx={{ mt: 2, mb: 2 }}>
+      <Stack direction="row" spacing={2} sx={{ mt: 2, mb: 2 }}>
         <Button component={RouterLink} to={`/peladas/${peladaId}/matches`} variant="outlined">
           Ver partidas da pelada
         </Button>
+        {votingInfo?.can_vote && (
+          <Button 
+            component={RouterLink} 
+            to={`/peladas/${peladaId}/voting`} 
+            variant="contained"
+            color={votingInfo.has_voted ? "success" : "primary"}
+          >
+            {votingInfo.has_voted ? 'Alterar Votos' : 'Votar nos Jogadores'}
+          </Button>
+        )}
       </Stack>
+      {pelada.status === 'closed' && votingInfo && !votingInfo.can_vote && votingInfo.message && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          {votingInfo.message}
+        </Alert>
+      )}
       <TeamsSection
         teams={teams}
         teamPlayers={teamPlayers}

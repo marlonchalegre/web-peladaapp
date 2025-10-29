@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Typography, Alert, Container } from '@mui/material'
 import { api } from '../../../shared/api/client'
-import { createApi, type User } from '../../../shared/api/endpoints'
+import { createApi, type User, type OrganizationAdmin } from '../../../shared/api/endpoints'
 import CreateOrganizationForm from '../components/CreateOrganizationForm'
 import OrganizationsTable from '../components/OrganizationsTable'
 import AddPlayersDialog from '../components/AddPlayersDialog'
+import ManageAdminsDialog from '../components/ManageAdminsDialog'
 
 type Organization = {
   id: number
@@ -18,8 +19,11 @@ export default function OrganizationsPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [addingPlayersOrgId, setAddingPlayersOrgId] = useState<number | null>(null)
+  const [managingAdminsOrg, setManagingAdminsOrg] = useState<Organization | null>(null)
   const [allUsers, setAllUsers] = useState<User[]>([])
   const [selectedUserIds, setSelectedUserIds] = useState<Set<number>>(new Set())
+  const [admins, setAdmins] = useState<OrganizationAdmin[]>([])
+  const [loadingAdmins, setLoadingAdmins] = useState(false)
 
   useEffect(() => {
     setLoading(true)
@@ -63,6 +67,23 @@ export default function OrganizationsPage() {
             setError(message)
           }
         }}
+        onManageAdmins={async (o) => {
+          try {
+            setLoadingAdmins(true)
+            const [users, orgAdmins] = await Promise.all([
+              endpoints.listUsers(),
+              endpoints.listAdminsByOrganization(o.id),
+            ])
+            setAllUsers(users)
+            setAdmins(orgAdmins)
+            setManagingAdminsOrg(o)
+          } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Erro ao carregar administradores'
+            setError(message)
+          } finally {
+            setLoadingAdmins(false)
+          }
+        }}
         onDelete={async (o) => {
           try {
             await endpoints.deleteOrganization(o.id)
@@ -98,6 +119,28 @@ export default function OrganizationsPage() {
         }}
         onClose={() => setAddingPlayersOrgId(null)}
       />
+
+      {managingAdminsOrg && (
+        <ManageAdminsDialog
+          open={!loadingAdmins}
+          organizationId={managingAdminsOrg.id}
+          organizationName={managingAdminsOrg.name}
+          admins={admins}
+          availableUsers={allUsers}
+          onClose={() => {
+            setManagingAdminsOrg(null)
+            setAdmins([])
+          }}
+          onAddAdmin={async (userId: number) => {
+            const newAdmin = await endpoints.addOrganizationAdmin(managingAdminsOrg.id, userId)
+            setAdmins((prev) => [...prev, newAdmin])
+          }}
+          onRemoveAdmin={async (userId: number) => {
+            await endpoints.removeOrganizationAdmin(managingAdminsOrg.id, userId)
+            setAdmins((prev) => prev.filter((a) => a.user_id !== userId))
+          }}
+        />
+      )}
     </Container>
   )
 }

@@ -1,9 +1,11 @@
 import { createContext, useContext } from 'react'
+import type { User } from '../../shared/api/client'
 
 export type AuthContextValue = {
   token: string | null
+  user: User | null
   isAuthenticated: boolean
-  signIn: (token: string) => void
+  signIn: (token: string, user: User) => void
   signOut: () => void
 }
 

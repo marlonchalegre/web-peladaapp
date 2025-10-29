@@ -3,7 +3,8 @@ import { ApiClient } from './client'
 export type Organization = { id: number; name: string }
 export type User = { id: number; name: string; email: string }
 export type Player = { id: number; user_id: number; organization_id: number; grade?: number | null; position_id?: number | null }
-export type Pelada = { id: number; organization_id: number; scheduled_at?: string | null; when?: string | null; num_teams?: number | null; players_per_team?: number | null; status?: string | null }
+export type OrganizationAdmin = { id: number; organization_id: number; user_id: number; user_name?: string; user_email?: string; organization_name?: string; created_at?: string }
+export type Pelada = { id: number; organization_id: number; scheduled_at?: string | null; when?: string | null; num_teams?: number | null; players_per_team?: number | null; status?: string | null; closed_at?: string | null }
 export type Team = { id: number; pelada_id: number; name: string }
 export type TeamPlayer = { team_id: number; player_id: number }
 export type Match = { id: number; pelada_id: number; sequence: number; status?: string | null; home_team_id: number; away_team_id: number; home_score: number; away_score: number }
@@ -13,6 +14,10 @@ export type MatchEventType = 'assist' | 'goal' | 'own_goal'
 export type MatchEvent = { id: number; match_id: number; player_id: number; event_type: MatchEventType; created_at?: string }
 export type PlayerStats = { player_id: number; goals: number; assists: number; own_goals: number }
 export type MatchLineupEntry = { team_id: number; player_id: number }
+export type Vote = { id: number; pelada_id: number; voter_id: number; target_id: number; stars: number; created_at?: string }
+export type VotingInfo = { can_vote: boolean; has_voted: boolean; eligible_players: number[]; message?: string }
+export type BatchVotePayload = { voter_id: number; votes: { target_id: number; stars: number }[] }
+export type BatchVoteResponse = { votes_cast: number }
 
 export function createApi(client: ApiClient) {
   return {
@@ -64,7 +69,19 @@ export function createApi(client: ApiClient) {
     // Users
     listUsers: () => client.get<User[]>('/api/users'),
 
+    // Organization Admins
+    listAdminsByOrganization: (organizationId: number) => client.get<OrganizationAdmin[]>(`/api/organizations/${organizationId}/admins`),
+    listUserAdminOrganizations: (userId: number) => client.get<OrganizationAdmin[]>(`/api/users/${userId}/admin-organizations`),
+    addOrganizationAdmin: (organizationId: number, userId: number) => client.post<OrganizationAdmin>(`/api/organizations/${organizationId}/admins`, { user_id: userId }),
+    removeOrganizationAdmin: (organizationId: number, userId: number) => client.delete(`/api/organizations/${organizationId}/admins/${userId}`),
+    checkIsAdmin: (organizationId: number, userId: number) => client.get<{ is_admin: boolean }>(`/api/organizations/${organizationId}/users/${userId}/is-admin`),
+
     // Scores
     getNormalizedScore: (peladaId: number, orgPlayerId: number) => client.get<NormalizedScore>(`/api/peladas/${peladaId}/players/${orgPlayerId}/normalized-score`),
+
+    // Voting
+    getVotingInfo: (peladaId: number, voterId: number) => client.get<VotingInfo>(`/api/peladas/${peladaId}/voters/${voterId}/voting-info`),
+    batchCastVotes: (peladaId: number, payload: BatchVotePayload) => client.post<BatchVoteResponse>(`/api/peladas/${peladaId}/votes/batch`, payload),
+    listVotesByPelada: (peladaId: number) => client.get<Vote[]>(`/api/peladas/${peladaId}/votes`),
   }
 }

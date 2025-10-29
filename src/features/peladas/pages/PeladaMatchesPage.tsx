@@ -256,7 +256,7 @@ export default function PeladaMatchesPage() {
     const newHome = team === 'home' ? currentHome + delta : currentHome
     const newAway = team === 'away' ? currentAway + delta : currentAway
     if (newHome < 0 || newAway < 0) {
-      setError('Placar n?o pode ficar negativo')
+      setError('Placar não pode ficar negativo')
       throw new Error('NEGATIVE_SCORE')
     }
     const status = (newHome + newAway) > 0 ? 'running' : 'scheduled'
@@ -298,7 +298,7 @@ export default function PeladaMatchesPage() {
       setStatsRows(buildRowsFromStatMap(sm, orgPlayerIdToUserId, userIdToName))
     } catch (error: unknown) {
       // keep UI; show error once
-      setError((prev) => prev || (error instanceof Error ? error.message : 'Erro ao carregar estat?sticas'))
+      setError((prev) => prev || (error instanceof Error ? error.message : 'Erro ao carregar estatísticas'))
     }
   }
 
