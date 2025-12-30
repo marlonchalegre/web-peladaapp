@@ -13,10 +13,11 @@ import PeladaDetailPage from './features/peladas/pages/PeladaDetailPage'
 import PeladaMatchesPage from './features/peladas/pages/PeladaMatchesPage'
 import PeladaVotingPage from './features/peladas/pages/PeladaVotingPage'
 import UserProfilePage from './features/user/pages/UserProfilePage'
+import UsersPage from './features/user/pages/UsersPage'
 
 function AppLayout() {
   const { isAuthenticated, signOut } = useAuth()
-  
+
   return (
     <BrowserRouter>
       {isAuthenticated && (
@@ -25,6 +26,7 @@ function AppLayout() {
             <Typography variant="h6" sx={{ flexGrow: 1 }}>Pelada App</Typography>
             <Button color="inherit" component={RouterLink} to="/">Home</Button>
             <Button color="inherit" component={RouterLink} to="/organizations">Organizações</Button>
+            <Button color="inherit" component={RouterLink} to="/users">Users</Button>
             <Button color="inherit" component={RouterLink} to="/profile">Perfil</Button>
             <Button color="inherit" onClick={() => signOut()}>Sair</Button>
           </Toolbar>
@@ -34,7 +36,7 @@ function AppLayout() {
         {/* Rotas públicas sem Container para permitir centralização própria */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        
+
         {/* Rotas protegidas com Container */}
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<HomePage />} />
@@ -66,6 +68,11 @@ function AppLayout() {
           <Route path="/profile" element={
             <Container maxWidth="lg" sx={{ py: 3 }}>
               <UserProfilePage />
+            </Container>
+          } />
+          <Route path="/users" element={
+            <Container maxWidth="lg" sx={{ py: 3 }}>
+              <UsersPage />
             </Container>
           } />
         </Route>
