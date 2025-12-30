@@ -41,7 +41,7 @@ function buildRowsFromStatMap(
   return Object.entries(statMap).map(([playerIdStr, counts]) => {
     const playerId = Number(playerIdStr)
     const userId = relMap[playerId]
-    const name = nameMap[userId] ?? `Player #${playerId}`
+    const name = (userId !== undefined && nameMap[userId]) ? nameMap[userId] : `Player #${playerId}`
     return { playerId, name, goals: counts.goals, assists: counts.assists, ownGoals: counts.ownGoals }
   })
 }
@@ -177,7 +177,7 @@ export default function PeladaMatchesPage() {
     const stats: PlayerStatRow[] = []
     for (const playerId of participatingIds) {
       const userId = orgPlayerIdToUserId[playerId]
-      const name = userIdToName[userId] ?? `Player #${playerId}`
+      const name = (userId !== undefined && userIdToName[userId]) ? userIdToName[userId] : `Player #${playerId}`
       const base = statsMap[playerId]
       stats.push({ playerId, name, goals: base?.goals || 0, assists: base?.assists || 0, ownGoals: base?.ownGoals || 0 })
     }
