@@ -30,10 +30,20 @@ export default function HomePage() {
         
         // Fetch organizations where user is admin
         const adminData = await endpoints.listUserAdminOrganizations(user.id)
+        if (!Array.isArray(adminData)) {
+          throw new Error('Formato inválido recebido ao buscar organizações administrativas')
+        }
         const adminOrgIds = new Set(adminData.map((a) => a.organization_id))
         
         // Fetch all organizations and their players
-        const allOrgs = await endpoints.listOrganizations()
+        const response = await endpoints.listOrganizations()
+        // @ts-ignore
+        const allOrgs = response.organizations || response
+
+        if (!Array.isArray(allOrgs)) {
+          console.error('Resposta inválida de listOrganizations:', response)
+          throw new Error('Formato inválido recebido ao buscar lista de organizações')
+        }
         
         // Build admin organizations list
         const adminOrgsList: OrganizationWithRole[] = allOrgs

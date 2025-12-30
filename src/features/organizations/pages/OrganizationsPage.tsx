@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Typography, Alert, Container } from '@mui/material'
+import { Typography, Alert, Container, Pagination } from '@mui/material'
 import { api } from '../../../shared/api/client'
 import { createApi, type User, type OrganizationAdmin } from '../../../shared/api/endpoints'
 import CreateOrganizationForm from '../components/CreateOrganizationForm'
@@ -10,6 +10,11 @@ import ManageAdminsDialog from '../components/ManageAdminsDialog'
 type Organization = {
   id: number
   name: string
+}
+
+type PagedOrgs = {
+  organizations: Organization[]
+  total: number
 }
 
 const endpoints = createApi(api)
@@ -24,17 +29,23 @@ export default function OrganizationsPage() {
   const [selectedUserIds, setSelectedUserIds] = useState<Set<number>>(new Set())
   const [admins, setAdmins] = useState<OrganizationAdmin[]>([])
   const [loadingAdmins, setLoadingAdmins] = useState(false)
+  const [page, setPage] = useState(1)
+  const [perPage, setPerPage] = useState(10)
+  const [total, setTotal] = useState(0)
 
   useEffect(() => {
     setLoading(true)
-    api.get<Organization[]>('/api/organizations')
-      .then(setOrgs)
+    api.get<PagedOrgs>('/api/organizations', { params: { page, per_page: perPage } })
+      .then((data) => {
+        setOrgs(data.organizations)
+        setTotal(data.total)
+      })
       .catch((error: unknown) => {
         const message = error instanceof Error ? error.message : 'Failed to load organizations'
         setError(message)
       })
       .finally(() => setLoading(false))
-  }, [])
+  }, [page, perPage])
 
   if (loading) return <Container><Typography>Carregando organizações...</Typography></Container>
   if (error) return <Container><Alert severity="error">{error}</Alert></Container>
@@ -93,6 +104,13 @@ export default function OrganizationsPage() {
             setError(message)
           }
         }}
+      />
+
+      <Pagination
+        count={Math.ceil(total / perPage)}
+        page={page}
+        onChange={(_, value) => setPage(value)}
+        sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}
       />
 
       <AddPlayersDialog
