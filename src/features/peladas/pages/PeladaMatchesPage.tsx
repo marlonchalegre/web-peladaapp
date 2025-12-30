@@ -82,58 +82,44 @@ export default function PeladaMatchesPage() {
     if (loadedPeladaId === peladaId) return
     setLoadedPeladaId(peladaId)
     setLoading(true)
-    Promise.all([
-      endpoints.getPelada(peladaId),
-      endpoints.listMatchesByPelada(peladaId),
-      endpoints.listTeamsByPelada(peladaId),
-      endpoints.listUsers(),
-    ])
-      .then(async ([p, ms, ts, users]) => {
-        setPelada(p)
-        setMatches(ms)
-        setTeams(ts)
+    endpoints.getPeladaDashboardData(peladaId)
+      .then((data) => {
+        setPelada(data.pelada)
+        setMatches(data.matches)
+        setTeams(data.teams)
+
         const nameMap: Record<number, string> = {}
-        for (const u of users) nameMap[u.id] = u.name
+        for (const u of data.users) nameMap[u.id] = u.name
         setUserIdToName(nameMap)
-        const av = await endpoints.listPlayersByOrg(p.organization_id)
+
         const relMap: Record<number, number> = {}
         const playerMap: Record<number, Player> = {}
-        for (const pl of av) { relMap[pl.id] = pl.user_id; playerMap[pl.id] = pl }
+        for (const pl of data.organization_players || []) { relMap[pl.id] = pl.user_id; playerMap[pl.id] = pl }
         setOrgPlayerIdToUserId(relMap)
         setOrgPlayerIdToPlayer(playerMap)
-        try {
-          const [evts, statsOrNull] = await Promise.all([
-            endpoints.listMatchEventsByPelada(peladaId),
-            endpoints.listPlayerStatsByPelada(peladaId).catch(() => null),
-          ])
-          let sm = statsMapFromApi(statsOrNull)
-          if (Object.keys(sm).length === 0 && evts.length > 0) {
-            sm = aggregateStatsFromEvents(evts)
-          }
-          setStatsMap(sm)
-          setStatsRows(buildRowsFromStatMap(sm, relMap, nameMap))
-        } catch {
-          // ignore events/stats error, keep UI working
+
+        let sm = statsMapFromApi(data.player_stats)
+        if (Object.keys(sm).length === 0 && data.match_events.length > 0) {
+          sm = aggregateStatsFromEvents(data.match_events)
         }
-        const usedTeamIds = new Set<number>()
-        for (const m of ms) { usedTeamIds.add(m.home_team_id); usedTeamIds.add(m.away_team_id) }
-        const playersByTeam: Record<number, TeamPlayer[]> = {}
-        await Promise.all(ts.filter(t => usedTeamIds.has(t.id)).map(async (t) => {
-          playersByTeam[t.id] = await endpoints.listTeamPlayers(t.id)
-        }))
-        setTeamPlayers(playersByTeam)
-        // Load per-match lineups (seeded from teamPlayers on first access)
-        const luEntries = await Promise.all(ms.map(async (m) => {
-          const grouped = await endpoints.listMatchLineups(m.id)
-          const asTeamPlayers: Record<number, TeamPlayer[]> = {}
-          for (const [teamIdStr, arr] of Object.entries(grouped || {})) {
-            const tid = Number(teamIdStr)
-            asTeamPlayers[tid] = (arr || []).map((e) => ({ team_id: e.team_id, player_id: e.player_id }))
-          }
-          return [m.id, asTeamPlayers] as const
-        }))
+        setStatsMap(sm)
+        setStatsRows(buildRowsFromStatMap(sm, relMap, nameMap))
+
+        const asTeamPlayers: Record<number, TeamPlayer[]> = {}
+        for (const [teamIdStr, arr] of Object.entries(data.team_players_map || {})) {
+          asTeamPlayers[Number(teamIdStr)] = (arr || []).map((e) => ({ team_id: e.team_id, player_id: e.player_id }))
+        }
+        setTeamPlayers(asTeamPlayers)
+
         const luMap: Record<number, Record<number, TeamPlayer[]>> = {}
-        for (const [mid, group] of luEntries) luMap[mid] = group
+        for (const [midStr, teamPlayersGroup] of Object.entries(data.match_lineups_map || {})) {
+          const mid = Number(midStr)
+          const asTeamPlayersForMatch: Record<number, TeamPlayer[]> = {}
+          for (const [teamIdStr, arr] of Object.entries(teamPlayersGroup || {})) {
+            asTeamPlayersForMatch[Number(teamIdStr)] = (arr || []).map((e) => ({ team_id: e.team_id, player_id: e.player_id }))
+          }
+          luMap[mid] = asTeamPlayersForMatch
+        }
         setLineupsByMatch(luMap)
       })
       .catch((error: unknown) => {
@@ -227,8 +213,7 @@ export default function PeladaMatchesPage() {
   async function assignPlayerToMatchTeam(matchId: number, teamId: number, playerId: number) {
     try {
       await endpoints.addMatchLineupPlayer(matchId, teamId, playerId)
-      const grouped = await endpoints.listMatchLineups(matchId)
-      setLineupsByMatch((prev) => ({ ...prev, [matchId]: Object.fromEntries(Object.entries(grouped).map(([k, arr]) => [Number(k), (arr || []).map((e) => ({ team_id: e.team_id, player_id: e.player_id }))])) }))
+      await refreshStats() 
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Erro ao adicionar jogador na partida'
       setError(message)
@@ -240,8 +225,7 @@ export default function PeladaMatchesPage() {
   async function replacePlayerOnMatchTeam(matchId: number, teamId: number, outPlayerId: number, inPlayerId: number) {
     try {
       await endpoints.replaceMatchLineupPlayer(matchId, teamId, outPlayerId, inPlayerId)
-      const grouped = await endpoints.listMatchLineups(matchId)
-      setLineupsByMatch((prev) => ({ ...prev, [matchId]: Object.fromEntries(Object.entries(grouped).map(([k, arr]) => [Number(k), (arr || []).map((e) => ({ team_id: e.team_id, player_id: e.player_id }))])) }))
+      await refreshStats()
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Erro ao trocar jogador na partida'
       setError(message)
@@ -286,16 +270,19 @@ export default function PeladaMatchesPage() {
   async function refreshStats() {
     if (!peladaId) return
     try {
-      const [evts, statsOrNull] = await Promise.all([
-        endpoints.listMatchEventsByPelada(peladaId),
-        endpoints.listPlayerStatsByPelada(peladaId).catch(() => null),
-      ])
-      let sm = statsMapFromApi(statsOrNull)
-      if (Object.keys(sm).length === 0 && evts.length > 0) {
-        sm = aggregateStatsFromEvents(evts)
+      const data = await endpoints.getPeladaDashboardData(peladaId) // Fetch all dashboard data again
+      let sm = statsMapFromApi(data.player_stats)
+      if (Object.keys(sm).length === 0 && data.match_events.length > 0) {
+        sm = aggregateStatsFromEvents(data.match_events)
       }
+      // Re-build relMap and nameMap from the fresh data for buildRowsFromStatMap
+      const nameMap: Record<number, string> = {}
+      for (const u of data.users) nameMap[u.id] = u.name
+      const relMap: Record<number, number> = {}
+      for (const pl of data.organization_players) { relMap[pl.id] = pl.user_id }
+
       setStatsMap(sm)
-      setStatsRows(buildRowsFromStatMap(sm, orgPlayerIdToUserId, userIdToName))
+      setStatsRows(buildRowsFromStatMap(sm, relMap, nameMap))
     } catch (error: unknown) {
       // keep UI; show error once
       setError((prev) => prev || (error instanceof Error ? error.message : 'Erro ao carregar estatísticas'))
