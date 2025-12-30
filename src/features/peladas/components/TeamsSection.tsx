@@ -2,14 +2,17 @@ import { useState, useEffect, useMemo } from 'react'
 import type { DragEvent } from 'react'
 import { Button, Paper, Typography, Stack } from '@mui/material'
 import Grid from '@mui/material/Grid'
-import type { Player, Team, TeamPlayer, NormalizedScoresResponse } from '../../../shared/api/endpoints'
+import type { Player, Team, NormalizedScoresResponse, User } from '../../../shared/api/endpoints' // Removed TeamPlayer, added User
 import { api } from '../../../shared/api/client'
+
+// Define a type for players that include user info
+type PlayerWithUser = Player & { user: User }
 
 export type TeamsSectionProps = {
   teams: Team[]
-  teamPlayers: Record<number, TeamPlayer[]>
+  teamPlayers: Record<number, PlayerWithUser[]> // Updated type
   playersPerTeam?: number | null
-  benchPlayers: Player[]
+  benchPlayers: PlayerWithUser[] // Updated type
   creatingTeam: boolean
   locked?: boolean
   onCreateTeam: (name: string) => Promise<void>
@@ -20,8 +23,7 @@ export type TeamsSectionProps = {
   onRandomizeTeams: () => Promise<void>
   menu: { playerId: number; sourceTeamId: number | null } | null
   setMenu: (v: { playerId: number; sourceTeamId: number | null } | null) => void
-  orgPlayerIdToUserId: Record<number, number>
-  userIdToName: Record<number, string>
+  // Removed orgPlayerIdToUserId and userIdToName as they are no longer needed
   orgPlayerIdToPlayer: Record<number, Player>
 }
 
@@ -42,25 +44,29 @@ export default function TeamsSection(props: TeamsSectionProps) {
     menu,
     setMenu,
   } = props
-  const { orgPlayerIdToUserId, userIdToName, orgPlayerIdToPlayer } = props
+  // Removed orgPlayerIdToUserId and userIdToName from destructuring
+  const { orgPlayerIdToPlayer } = props
   const [filling, setFilling] = useState(false)
   const [fetchedScores, setFetchedScores] = useState<Record<number, number>>({})
 
   const playerIdsStr = useMemo(() => {
     const ids = new Set<number>()
     benchPlayers.forEach((p) => ids.add(p.id))
-    Object.values(teamPlayers).flat().forEach((tp) => ids.add(tp.player_id))
+    Object.values(teamPlayers).flat().forEach((p) => ids.add(p.id)) // Changed tp.player_id to p.id
     return Array.from(ids).sort().join(',')
   }, [benchPlayers, teamPlayers])
 
   useEffect(() => {
     if (!playerIdsStr) return
     const ids = playerIdsStr.split(',').map(Number)
-    api.post<NormalizedScoresResponse>('/api/scores/normalized', { player_ids: ids })
-      .then((res) => {
-        if (res.scores) setFetchedScores(res.scores)
-      })
-      .catch((err) => console.error('Error fetching scores:', err))
+    // Only fetch scores if there are actual players
+    if (ids.length > 0) {
+      api.post<NormalizedScoresResponse>('/api/scores/normalized', { player_ids: ids })
+        .then((res) => {
+          if (res.scores) setFetchedScores(res.scores)
+        })
+        .catch((err) => console.error('Error fetching scores:', err))
+    }
   }, [playerIdsStr])
 
   const effectiveScores = fetchedScores
@@ -120,40 +126,39 @@ export default function TeamsSection(props: TeamsSectionProps) {
                 {t.name}
                 {(() => {
                   const tps = teamPlayers[t.id] || []
-                  const vals = tps.map(tp => (typeof effectiveScores[tp.player_id] === 'number' ? effectiveScores[tp.player_id] : orgPlayerIdToPlayer[tp.player_id]?.grade)).filter((g): g is number => typeof g === 'number')
+                  const vals = tps.map(p => (typeof effectiveScores[p.id] === 'number' ? effectiveScores[p.id] : p.grade)).filter((g): g is number => typeof g === 'number')
                   if (!vals.length) return null
                   const avg = (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1)
                   return <span style={{ marginLeft: 8, color: '#666', fontWeight: 400 }}>(média {avg})</span>
                 })()}
               </Typography>
             <ul style={{ padding: 0, listStyle: 'none' }}>
-              {(teamPlayers[t.id] || []).map((tp) => (
+              {(teamPlayers[t.id] || []).map((p) => ( // Changed tp to p
                 <Paper
-                  key={`${t.id}-${tp.player_id}`}
+                  key={`${t.id}-${p.id}`} // Changed tp.player_id to p.id
                   component="li"
                   draggable={!locked}
-                  onDragStart={locked ? undefined : (e) => onDragStartPlayer(e, tp.player_id, t.id)}
+                  onDragStart={locked ? undefined : (e) => onDragStartPlayer(e, p.id, t.id)} // Changed tp.player_id to p.id
                   tabIndex={0}
                   variant="outlined"
                   sx={{ p: 1, mb: 1, display: 'flex', alignItems: 'center' }}
                 >
                 {(() => {
-                  const userId = orgPlayerIdToUserId[tp.player_id]
-                  const name = userIdToName[userId] ?? `Player #${tp.player_id}`
-                  const score = effectiveScores[tp.player_id]
-                  const grade = orgPlayerIdToPlayer[tp.player_id]?.grade
+                  const name = p.user?.name ?? `Player #${p.id}` // Access user.name directly
+                  const score = effectiveScores[p.id]
+                  const grade = p.grade
                   const val = (typeof score === 'number') ? score.toFixed(1) : (grade != null ? String(grade) : null)
                   return val ? `${name} (${val})` : name
                 })()}
                   {!locked && (
-                    <Button size="small" variant="text" className="inline-form" sx={{ ml: 1 }} aria-haspopup="menu" aria-expanded={menu?.playerId === tp.player_id && menu?.sourceTeamId === t.id} onClick={() => setMenu({ playerId: tp.player_id, sourceTeamId: t.id })}>Mover</Button>
+                    <Button size="small" variant="text" className="inline-form" sx={{ ml: 1 }} aria-haspopup="menu" aria-expanded={menu?.playerId === p.id && menu?.sourceTeamId === t.id} onClick={() => setMenu({ playerId: p.id, sourceTeamId: t.id })}>Mover</Button> // Changed tp.player_id to p.id
                   )}
-                  {!locked && menu?.playerId === tp.player_id && menu?.sourceTeamId === t.id && (
-                    <Paper role="menu" aria-label={`Mover jogador #${tp.player_id}`} sx={{ mt: 1, p: 1 }}>
+                  {!locked && menu?.playerId === p.id && menu?.sourceTeamId === t.id && ( // Changed tp.player_id to p.id
+                    <Paper role="menu" aria-label={`Mover jogador #${p.id}`} sx={{ mt: 1, p: 1 }}>
                       <Stack className="stack">
-                        <Button role="menuitem" onClick={() => movePlayer(tp.player_id, t.id, null)}>Para banco</Button>
+                        <Button role="menuitem" onClick={() => movePlayer(p.id, t.id, null)}>Para banco</Button> // Changed tp.player_id to p.id
                         {teams.filter((x) => x.id !== t.id).map((tgt) => (
-                          <Button key={tgt.id} role="menuitem" onClick={() => movePlayer(tp.player_id, t.id, tgt.id)}>Para {tgt.name}</Button>
+                          <Button key={tgt.id} role="menuitem" onClick={() => movePlayer(p.id, t.id, tgt.id)}>Para {tgt.name}</Button> // Changed tp.player_id to p.id
                         ))}
                         <Button role="menuitem" onClick={() => setMenu(null)}>Cancelar</Button>
                       </Stack>
@@ -246,7 +251,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
                   sx={{ p: 1, display: 'flex', alignItems: 'center' }}
                 >
                   {(() => {
-                    const name = userIdToName[p.user_id] ?? `Player #${p.id}`
+                    const name = p.user?.name ?? `Player #${p.id}` // Access user.name directly
                     const score = effectiveScores[p.id]
                     const val = (typeof score === 'number') ? score.toFixed(1) : (p.grade != null ? String(p.grade) : null)
                     return val ? `${name} (${val})` : name

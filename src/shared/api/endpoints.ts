@@ -31,6 +31,15 @@ export type VotingInfo = { can_vote: boolean; has_voted: boolean; eligible_playe
 export type BatchVotePayload = { voter_id: number; votes: { target_id: number; stars: number }[] }
 export type BatchVoteResponse = { votes_cast: number }
 
+export type PeladaFullDetailsResponse = {
+  pelada: Pelada;
+  teams: (Team & { players: (Player & { user: User })[] })[];
+  available_players: (Player & { user: User })[];
+  users_map: Record<number, User>;
+  org_players_map: Record<number, Player>;
+  voting_info: VotingInfo | null;
+}
+
 export function createApi(client: ApiClient) {
   return {
     // Organizations
@@ -47,6 +56,7 @@ export function createApi(client: ApiClient) {
     deletePelada: (id: number) => client.delete(`/api/peladas/${id}`),
     beginPelada: (id: number, matchesPerTeam?: number) => client.post(`/api/peladas/${id}/begin`, matchesPerTeam ? { matches_per_team: matchesPerTeam } : undefined),
     closePelada: (id: number) => client.post(`/api/peladas/${id}/close`),
+    getPeladaFullDetails: (id: number) => client.get<PeladaFullDetailsResponse>(`/api/peladas/${id}/full-details`),
 
     // Teams
     listTeamsByPelada: (peladaId: number) => client.get<Team[]>(`/api/peladas/${peladaId}/teams`),
@@ -98,3 +108,4 @@ export function createApi(client: ApiClient) {
     listVotesByPelada: (peladaId: number) => client.get<Vote[]>(`/api/peladas/${peladaId}/votes`),
   }
 }
+

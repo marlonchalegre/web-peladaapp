@@ -4,21 +4,23 @@ import { useParams, Link as RouterLink } from 'react-router-dom'
 import { Container, Typography, Alert, Button, Stack, Box } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { api } from '../../../shared/api/client'
-import { createApi, type Pelada, type Team, type TeamPlayer, type Player, type VotingInfo } from '../../../shared/api/endpoints'
+import { createApi, type Pelada, type Team, type Player, type VotingInfo, type User, type PeladaFullDetailsResponse } from '../../../shared/api/endpoints'
 import { useAuth } from '../../../app/providers/AuthContext'
 import PeladaActions from '../components/PeladaActions'
 import TeamsSection from '../components/TeamsSection'
 
 const endpoints = createApi(api)
 
+type TeamWithPlayers = Team & { players: (Player & { user: User })[] }
+
 export default function PeladaDetailPage() {
   const { id } = useParams()
   const { user } = useAuth()
   const peladaId = Number(id)
   const [pelada, setPelada] = useState<Pelada | null>(null)
-  const [teams, setTeams] = useState<Team[]>([])
-  const [teamPlayers, setTeamPlayers] = useState<Record<number, TeamPlayer[]>>({})
-  const [availablePlayers, setAvailablePlayers] = useState<Player[]>([])
+  const [teams, setTeams] = useState<TeamWithPlayers[]>([])
+  const [teamPlayers, setTeamPlayers] = useState<Record<number, (Player & { user: User })[]>>({})
+  const [availablePlayers, setAvailablePlayers] = useState<(Player & { user: User })[]>([])
   const [userIdToName, setUserIdToName] = useState<Record<number, string>>({})
   const [orgPlayerIdToUserId, setOrgPlayerIdToUserId] = useState<Record<number, number>>({})
   const [orgPlayerIdToPlayer, setOrgPlayerIdToPlayer] = useState<Record<number, Player>>({})
@@ -28,10 +30,49 @@ export default function PeladaDetailPage() {
   const [live, setLive] = useState('')
   const [menu, setMenu] = useState<{ playerId: number; sourceTeamId: number | null } | null>(null)
   const [votingInfo, setVotingInfo] = useState<VotingInfo | null>(null)
-  const [_currentPlayerOrgId, setCurrentPlayerOrgId] = useState<number | null>(null)
 
-  const assignedIds = useMemo(() => new Set(Object.values(teamPlayers).flat().map((tp) => tp.player_id)), [teamPlayers])
+  const assignedIds = useMemo(() => new Set(Object.values(teamPlayers).flat().map((tp) => tp.id)), [teamPlayers])
   const benchPlayers = useMemo(() => availablePlayers.filter((p) => !assignedIds.has(p.id)), [availablePlayers, assignedIds])
+
+  async function fetchPeladaData() {
+    if (!peladaId) return
+    try {
+      const data = await endpoints.getPeladaFullDetails(peladaId)
+      setPelada(data.pelada)
+      setTeams(data.teams)
+      setAvailablePlayers(data.available_players)
+      setVotingInfo(data.voting_info)
+
+      const nameMap: Record<number, string> = {}
+      for (const u of Object.values(data.users_map)) {
+        nameMap[u.id] = u.name
+      }
+      setUserIdToName(nameMap)
+
+      const relMap: Record<number, number> = {}
+      const playerMap: Record<number, Player> = {}
+      for (const pl of Object.values(data.org_players_map)) {
+        relMap[pl.id] = pl.user_id
+        playerMap[pl.id] = pl
+      }
+      setOrgPlayerIdToUserId(relMap)
+      setOrgPlayerIdToPlayer(playerMap)
+
+      const playersByTeam: Record<number, (Player & { user: User })[]> = {}
+      for (const t of data.teams) {
+        playersByTeam[t.id] = t.players
+      }
+      setTeamPlayers(playersByTeam)
+
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao carregar pelada'
+      setError(message)
+    }
+  }
+
+  useEffect(() => {
+    fetchPeladaData()
+  }, [peladaId, user])
 
   function onDragStartPlayer(e: DragEvent<HTMLElement>, playerId: number, sourceTeamId: number | null) {
     e.dataTransfer.setData('application/json', JSON.stringify({ playerId, sourceTeamId }))
@@ -57,8 +98,7 @@ export default function PeladaDetailPage() {
     if (sourceTeamId == null) return // already bench
     try {
       await endpoints.removePlayerFromTeam(sourceTeamId, playerId)
-      const list = await endpoints.listTeamPlayers(sourceTeamId)
-      setTeamPlayers((prev) => ({ ...prev, [sourceTeamId]: list }))
+      await fetchPeladaData() // Refresh all data
       setLive(`Jogador #${playerId} movido para banco`)
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Erro ao mover para banco'
@@ -77,12 +117,7 @@ export default function PeladaDetailPage() {
         await endpoints.removePlayerFromTeam(sourceTeamId, playerId)
       }
       await endpoints.addPlayerToTeam(targetTeamId, playerId)
-      const targetList = await endpoints.listTeamPlayers(targetTeamId)
-      setTeamPlayers((prev) => ({ ...prev, [targetTeamId]: targetList }))
-      if (sourceTeamId != null) {
-        const srcList = await endpoints.listTeamPlayers(sourceTeamId)
-        setTeamPlayers((prev) => ({ ...prev, [sourceTeamId]: srcList }))
-      }
+      await fetchPeladaData() // Refresh all data
       const tName = teams.find((t) => t.id === targetTeamId)?.name || String(targetTeamId)
       setLive(`Jogador #${playerId} movido para time ${tName}`)
     } catch (error: unknown) {
@@ -95,26 +130,18 @@ export default function PeladaDetailPage() {
     try {
       if (targetTeamId == null && sourceTeamId != null) {
         await endpoints.removePlayerFromTeam(sourceTeamId, playerId)
-        const srcList = await endpoints.listTeamPlayers(sourceTeamId)
-        setTeamPlayers((prev) => ({ ...prev, [sourceTeamId]: srcList }))
         setLive(`Jogador #${playerId} movido para banco`)
       } else if (targetTeamId != null && sourceTeamId == null) {
         await endpoints.addPlayerToTeam(targetTeamId, playerId)
-        const tgt = await endpoints.listTeamPlayers(targetTeamId)
-        setTeamPlayers((prev) => ({ ...prev, [targetTeamId]: tgt }))
         const tName = teams.find((t) => t.id === targetTeamId)?.name || String(targetTeamId)
         setLive(`Jogador #${playerId} adicionado ao time ${tName}`)
       } else if (targetTeamId != null && sourceTeamId != null && targetTeamId !== sourceTeamId) {
         await endpoints.removePlayerFromTeam(sourceTeamId, playerId)
         await endpoints.addPlayerToTeam(targetTeamId, playerId)
-        const [srcList, tgtList] = await Promise.all([
-          endpoints.listTeamPlayers(sourceTeamId),
-          endpoints.listTeamPlayers(targetTeamId),
-        ])
-        setTeamPlayers((prev) => ({ ...prev, [sourceTeamId]: srcList, [targetTeamId]: tgtList }))
         const tName = teams.find((t) => t.id === targetTeamId)?.name || String(targetTeamId)
         setLive(`Jogador #${playerId} movido para time ${tName}`)
       }
+      await fetchPeladaData() // Refresh all data after any move operation
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Erro ao mover jogador'
       setError(message)
@@ -131,66 +158,12 @@ export default function PeladaDetailPage() {
         player_ids: playerIds,
         players_per_team: pelada.players_per_team
       })
-      const ts = await endpoints.listTeamsByPelada(peladaId)
-      setTeams(ts)
-      const playersByTeam: Record<number, TeamPlayer[]> = {}
-      for (const t of ts) {
-        playersByTeam[t.id] = await endpoints.listTeamPlayers(t.id)
-      }
-      setTeamPlayers(playersByTeam)
+      await fetchPeladaData() // Refresh all data after randomization
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Erro ao randomizar times'
       setError(message)
     }
   }
-
-  useEffect(() => {
-    if (!peladaId) return
-    Promise.all([
-      endpoints.getPelada(peladaId),
-      endpoints.listTeamsByPelada(peladaId),
-      endpoints.listUsers(),
-    ])
-      .then(async ([p, ts, users]) => {
-        setPelada(p)
-        setTeams(ts)
-        const orgId = p.organization_id
-        const av = await endpoints.listPlayersByOrg(orgId)
-        setAvailablePlayers(av)
-        // Build maps for name resolution
-        const nameMap: Record<number, string> = {}
-        for (const u of users) nameMap[u.id] = u.name
-        setUserIdToName(nameMap)
-        const relMap: Record<number, number> = {}
-        const playerMap: Record<number, Player> = {}
-        for (const pl of av) { relMap[pl.id] = pl.user_id; playerMap[pl.id] = pl }
-        setOrgPlayerIdToUserId(relMap)
-        setOrgPlayerIdToPlayer(playerMap)
-        const playersByTeam: Record<number, TeamPlayer[]> = {}
-        for (const t of ts) {
-          playersByTeam[t.id] = await endpoints.listTeamPlayers(t.id)
-        }
-        setTeamPlayers(playersByTeam)
-
-        // Get voting info if pelada is closed
-        if (p.status === 'closed' && user) {
-          try {
-            const currentPlayer = av.find(pl => pl.user_id === user.id)
-            if (currentPlayer) {
-              setCurrentPlayerOrgId(currentPlayer.id)
-              const vInfo = await endpoints.getVotingInfo(peladaId, currentPlayer.id)
-              setVotingInfo(vInfo)
-            }
-          } catch {
-            // Ignore voting info errors
-          }
-        }
-      })
-      .catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : 'Erro ao carregar pelada'
-        setError(message)
-      })
-  }, [peladaId, user])
 
   if (error) return <Container><Alert severity="error">{error}</Alert></Container>
   if (!pelada) return <Container><Typography>Carregando...</Typography></Container>
@@ -218,8 +191,7 @@ export default function PeladaDetailPage() {
           setChangingStatus(true)
           try {
             await endpoints.beginPelada(peladaId, matchesPerTeam)
-            const p = await endpoints.getPelada(peladaId)
-            setPelada(p)
+            await fetchPeladaData() // Refresh pelada data
           } catch (error: unknown) {
             const message = error instanceof Error ? error.message : 'Erro ao iniciar pelada'
             setError(message)
@@ -261,8 +233,8 @@ export default function PeladaDetailPage() {
         onCreateTeam={async (name) => {
           setCreatingTeam(true)
           try {
-            const team = await endpoints.createTeam({ pelada_id: peladaId, name })
-            setTeams((prev) => [...prev, team])
+            await endpoints.createTeam({ pelada_id: peladaId, name })
+            await fetchPeladaData() // Refresh all data
           } catch (error: unknown) {
             const message = error instanceof Error ? error.message : 'Erro ao criar time'
             setError(message)
@@ -281,3 +253,4 @@ export default function PeladaDetailPage() {
     </Container>
   )
 }
+
