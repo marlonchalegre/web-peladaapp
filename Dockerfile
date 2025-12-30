@@ -2,13 +2,17 @@ ARG MODE=dev
 
 # Frontend dev image - runs Vite
 FROM node:20-alpine AS dev
+ARG TARGETARCH
 # Install build dependencies for native modules
 RUN apk add --no-cache python3 make g++
 WORKDIR /app
 COPY package.json package-lock.json .npmrc ./
 # Install dependencies and explicitly install rollup native bindings
-RUN npm ci --no-audit --no-fund || true && \
-    npm install --no-save @rollup/rollup-linux-arm64-musl && \
+RUN npm install --no-audit --no-fund && \
+    (case ${TARGETARCH} in \
+        "arm64") npm install --no-save @rollup/rollup-linux-arm64-musl;; \
+        "amd64") npm install --no-save @rollup/rollup-linux-x64-musl;; \
+    esac) && \
     npm cache clean --force
 COPY . .
 ENV HOST=0.0.0.0
@@ -18,13 +22,17 @@ CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "8080"]
 
 # Frontend prod image - builds then serves via nginx
 FROM node:20-alpine AS build
+ARG TARGETARCH
 # Install build dependencies for native modules
 RUN apk add --no-cache python3 make g++
 WORKDIR /app
 COPY package.json package-lock.json .npmrc ./
 # Install dependencies and explicitly install rollup native bindings
-RUN npm ci --no-audit --no-fund || true && \
-    npm install --no-save @rollup/rollup-linux-arm64-musl && \
+RUN npm install --no-audit --no-fund && \
+    (case ${TARGETARCH} in \
+        "arm64") npm install --no-save @rollup/rollup-linux-arm64-musl;; \
+        "amd64") npm install --no-save @rollup/rollup-linux-x64-musl;; \
+    esac) && \
     npm cache clean --force
 COPY . .
 RUN npm run build
