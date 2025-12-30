@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import type { DragEvent } from 'react'
 import { Button, Paper, Typography, Stack } from '@mui/material'
 import Grid from '@mui/material/Grid'
 import type { Player, Team, TeamPlayer } from '../../../shared/api/endpoints'
+import { api } from '../../../shared/api/client'
 
 export type TeamsSectionProps = {
   teams: Team[]
@@ -16,12 +17,12 @@ export type TeamsSectionProps = {
   dropToBench: (e: DragEvent<HTMLElement>) => Promise<void>
   dropToTeam: (e: DragEvent<HTMLElement>, targetTeamId: number) => Promise<void>
   movePlayer: (playerId: number, sourceTeamId: number | null, targetTeamId: number | null) => Promise<void>
+  onRandomizeTeams: () => Promise<void>
   menu: { playerId: number; sourceTeamId: number | null } | null
   setMenu: (v: { playerId: number; sourceTeamId: number | null } | null) => void
   orgPlayerIdToUserId: Record<number, number>
   userIdToName: Record<number, string>
   orgPlayerIdToPlayer: Record<number, Player>
-  orgPlayerIdToScore?: Record<number, number>
 }
 
 export default function TeamsSection(props: TeamsSectionProps) {
@@ -37,11 +38,32 @@ export default function TeamsSection(props: TeamsSectionProps) {
     dropToBench,
     dropToTeam,
     movePlayer,
+    onRandomizeTeams,
     menu,
     setMenu,
   } = props
-  const { orgPlayerIdToUserId, userIdToName, orgPlayerIdToPlayer, orgPlayerIdToScore = {} } = props
+  const { orgPlayerIdToUserId, userIdToName, orgPlayerIdToPlayer } = props
   const [filling, setFilling] = useState(false)
+  const [fetchedScores, setFetchedScores] = useState<Record<number, number>>({})
+
+  const playerIdsStr = useMemo(() => {
+    const ids = new Set<number>()
+    benchPlayers.forEach((p) => ids.add(p.id))
+    Object.values(teamPlayers).flat().forEach((tp) => ids.add(tp.player_id))
+    return Array.from(ids).sort().join(',')
+  }, [benchPlayers, teamPlayers])
+
+  useEffect(() => {
+    if (!playerIdsStr) return
+    const ids = playerIdsStr.split(',').map(Number)
+    api.post('/api/scores/normalized', { player_ids: ids })
+      .then((res) => {
+        if (res.data?.scores) setFetchedScores(res.data.scores)
+      })
+      .catch((err) => console.error('Error fetching scores:', err))
+  }, [playerIdsStr])
+
+  const effectiveScores = fetchedScores
 
   const maxSlots = typeof playersPerTeam === 'number' ? Math.max(playersPerTeam, 0) : 0
   const openSlots = teams.reduce((sum, t) => sum + Math.max(0, maxSlots - ((teamPlayers[t.id] || []).length)), 0)
@@ -51,31 +73,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
     if (disabled) return
     setFilling(true)
     try {
-      const remainingPerTeam: Record<number, number> = {}
-      for (const t of teams) {
-        const currentCount = (teamPlayers[t.id] || []).length
-        remainingPerTeam[t.id] = Math.max(0, maxSlots - currentCount)
-      }
-      const targetSlots: number[] = []
-      for (const t of teams) {
-        for (let i = 0; i < remainingPerTeam[t.id]; i += 1) targetSlots.push(t.id)
-      }
-      function shuffle<T>(arr: T[]): T[] {
-        const a = arr.slice()
-        for (let i = a.length - 1; i > 0; i -= 1) {
-          const j = Math.floor(Math.random() * (i + 1))
-          const tmp = a[i]; a[i] = a[j]; a[j] = tmp
-        }
-        return a
-      }
-      const shuffledPlayers = shuffle(benchPlayers.map(p => p.id))
-      const shuffledTargets = shuffle(targetSlots)
-      const moves = Math.min(shuffledPlayers.length, shuffledTargets.length)
-      for (let i = 0; i < moves; i += 1) {
-        const pid = shuffledPlayers[i]
-        const tid = shuffledTargets[i]
-        await movePlayer(pid, null, tid)
-      }
+      await onRandomizeTeams()
     } finally {
       setFilling(false)
     }
@@ -122,7 +120,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
                 {t.name}
                 {(() => {
                   const tps = teamPlayers[t.id] || []
-                  const vals = tps.map(tp => (typeof orgPlayerIdToScore[tp.player_id] === 'number' ? orgPlayerIdToScore[tp.player_id] : orgPlayerIdToPlayer[tp.player_id]?.grade)).filter((g): g is number => typeof g === 'number')
+                  const vals = tps.map(tp => (typeof effectiveScores[tp.player_id] === 'number' ? effectiveScores[tp.player_id] : orgPlayerIdToPlayer[tp.player_id]?.grade)).filter((g): g is number => typeof g === 'number')
                   if (!vals.length) return null
                   const avg = (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1)
                   return <span style={{ marginLeft: 8, color: '#666', fontWeight: 400 }}>(média {avg})</span>
@@ -142,7 +140,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
                 {(() => {
                   const userId = orgPlayerIdToUserId[tp.player_id]
                   const name = userIdToName[userId] ?? `Player #${tp.player_id}`
-                  const score = orgPlayerIdToScore[tp.player_id]
+                  const score = effectiveScores[tp.player_id]
                   const grade = orgPlayerIdToPlayer[tp.player_id]?.grade
                   const val = (typeof score === 'number') ? score.toFixed(1) : (grade != null ? String(grade) : null)
                   return val ? `${name} (${val})` : name
@@ -249,7 +247,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
                 >
                   {(() => {
                     const name = userIdToName[p.user_id] ?? `Player #${p.id}`
-                    const score = orgPlayerIdToScore[p.id]
+                    const score = effectiveScores[p.id]
                     const val = (typeof score === 'number') ? score.toFixed(1) : (p.grade != null ? String(p.grade) : null)
                     return val ? `${name} (${val})` : name
                   })()}

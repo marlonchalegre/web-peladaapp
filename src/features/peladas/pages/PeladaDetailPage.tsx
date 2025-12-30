@@ -22,7 +22,6 @@ export default function PeladaDetailPage() {
   const [userIdToName, setUserIdToName] = useState<Record<number, string>>({})
   const [orgPlayerIdToUserId, setOrgPlayerIdToUserId] = useState<Record<number, number>>({})
   const [orgPlayerIdToPlayer, setOrgPlayerIdToPlayer] = useState<Record<number, Player>>({})
-  const [orgPlayerIdToScore, setOrgPlayerIdToScore] = useState<Record<number, number>>({})
   const [error, setError] = useState<string | null>(null)
   const [creatingTeam, setCreatingTeam] = useState(false)
   const [changingStatus, setChangingStatus] = useState(false)
@@ -124,6 +123,27 @@ export default function PeladaDetailPage() {
     }
   }
 
+  async function handleRandomizeTeams() {
+    if (!peladaId || !pelada?.players_per_team) return
+    try {
+      const playerIds = benchPlayers.map(p => p.id)
+      await api.post(`/api/peladas/${peladaId}/teams/randomize`, {
+        player_ids: playerIds,
+        players_per_team: pelada.players_per_team
+      })
+      const ts = await endpoints.listTeamsByPelada(peladaId)
+      setTeams(ts)
+      const playersByTeam: Record<number, TeamPlayer[]> = {}
+      for (const t of ts) {
+        playersByTeam[t.id] = await endpoints.listTeamPlayers(t.id)
+      }
+      setTeamPlayers(playersByTeam)
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao randomizar times'
+      setError(message)
+    }
+  }
+
   useEffect(() => {
     if (!peladaId) return
     Promise.all([
@@ -151,20 +171,7 @@ export default function PeladaDetailPage() {
           playersByTeam[t.id] = await endpoints.listTeamPlayers(t.id)
         }
         setTeamPlayers(playersByTeam)
-        // Fetch normalized scores for all organization players in this pelada
-        const ids = av.map(p => p.id)
-        const scorePairs = await Promise.all(ids.map(async (pid) => {
-          try {
-            const s = await endpoints.getNormalizedScore(peladaId, pid)
-            return [pid, s.score as number] as const
-          } catch {
-            return [pid, NaN] as const
-          }
-        }))
-        const scoreMap: Record<number, number> = {}
-        for (const [pid, s] of scorePairs) if (!Number.isNaN(s)) scoreMap[pid] = s
-        setOrgPlayerIdToScore(scoreMap)
-        
+
         // Get voting info if pelada is closed
         if (p.status === 'closed' && user) {
           try {
@@ -226,9 +233,9 @@ export default function PeladaDetailPage() {
           Ver partidas da pelada
         </Button>
         {votingInfo?.can_vote && (
-          <Button 
-            component={RouterLink} 
-            to={`/peladas/${peladaId}/voting`} 
+          <Button
+            component={RouterLink}
+            to={`/peladas/${peladaId}/voting`}
             variant="contained"
             color={votingInfo.has_voted ? "success" : "primary"}
           >
@@ -251,7 +258,6 @@ export default function PeladaDetailPage() {
         orgPlayerIdToUserId={orgPlayerIdToUserId}
         userIdToName={userIdToName}
         orgPlayerIdToPlayer={orgPlayerIdToPlayer}
-        orgPlayerIdToScore={orgPlayerIdToScore}
         onCreateTeam={async (name) => {
           setCreatingTeam(true)
           try {
@@ -268,6 +274,7 @@ export default function PeladaDetailPage() {
         dropToBench={dropToBench}
         dropToTeam={dropToTeam}
         movePlayer={movePlayer}
+        onRandomizeTeams={handleRandomizeTeams}
         menu={menu}
         setMenu={setMenu}
       />
