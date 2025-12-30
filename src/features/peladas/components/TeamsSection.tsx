@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import type { DragEvent } from 'react'
 import { Button, Paper, Typography, Stack } from '@mui/material'
 import Grid from '@mui/material/Grid'
-import type { Player, Team, TeamPlayer } from '../../../shared/api/endpoints'
+import type { Player, Team, TeamPlayer, NormalizedScoresResponse } from '../../../shared/api/endpoints'
 import { api } from '../../../shared/api/client'
 
 export type TeamsSectionProps = {
@@ -56,9 +56,9 @@ export default function TeamsSection(props: TeamsSectionProps) {
   useEffect(() => {
     if (!playerIdsStr) return
     const ids = playerIdsStr.split(',').map(Number)
-    api.post('/api/scores/normalized', { player_ids: ids })
+    api.post<NormalizedScoresResponse>('/api/scores/normalized', { player_ids: ids })
       .then((res) => {
-        if (res.data?.scores) setFetchedScores(res.data.scores)
+        if (res.scores) setFetchedScores(res.scores)
       })
       .catch((err) => console.error('Error fetching scores:', err))
   }, [playerIdsStr])

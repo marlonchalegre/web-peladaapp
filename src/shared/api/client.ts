@@ -68,39 +68,58 @@ export class ApiClient {
     return (await res.json()) as T
   }
 
-  async get<T>(path: string): Promise<T> {
-    const res = await fetch(`${this.baseUrl}${path}`, {
+  async get<T>(path: string, params?: Record<string, string | number>): Promise<T> {
+    const fullPath = `${this.baseUrl}${path}`;
+    const baseUrl = this.baseUrl || (typeof window !== 'undefined' ? window.location.origin : '');
+    const url = new URL(fullPath, baseUrl);
+
+    if (params) {
+      Object.keys(params).forEach(key => url.searchParams.append(key, String(params[key])));
+    }
+    const res = await fetch(url.toString(), {
       method: 'GET',
       headers: this.headers(),
-    })
-    return this.handleResponse<T>(res)
+    });
+    return this.handleResponse<T>(res);
   }
 
   async post<T>(path: string, body?: unknown): Promise<T> {
-    const res = await fetch(`${this.baseUrl}${path}`, {
+    const fullPath = `${this.baseUrl}${path}`;
+    const baseUrl = this.baseUrl || (typeof window !== 'undefined' ? window.location.origin : '');
+    const url = new URL(fullPath, baseUrl);
+
+    const res = await fetch(url.toString(), {
       method: 'POST',
       headers: this.headers(),
       body: body ? JSON.stringify(body) : undefined,
-    })
-    return this.handleResponse<T>(res)
+    });
+    return this.handleResponse<T>(res);
   }
 
   async put<T>(path: string, body?: unknown): Promise<T> {
-    const res = await fetch(`${this.baseUrl}${path}`, {
+    const fullPath = `${this.baseUrl}${path}`;
+    const baseUrl = this.baseUrl || (typeof window !== 'undefined' ? window.location.origin : '');
+    const url = new URL(fullPath, baseUrl);
+
+    const res = await fetch(url.toString(), {
       method: 'PUT',
       headers: this.headers(),
       body: body ? JSON.stringify(body) : undefined,
-    })
-    return this.handleResponse<T>(res)
+    });
+    return this.handleResponse<T>(res);
   }
 
   async delete<T>(path: string, body?: unknown): Promise<T> {
-    const res = await fetch(`${this.baseUrl}${path}`, {
+    const fullPath = `${this.baseUrl}${path}`;
+    const baseUrl = this.baseUrl || (typeof window !== 'undefined' ? window.location.origin : '');
+    const url = new URL(fullPath, baseUrl);
+
+    const res = await fetch(url.toString(), {
       method: 'DELETE',
       headers: this.headers(),
       body: body ? JSON.stringify(body) : undefined,
-    })
-    return this.handleResponse<T>(res)
+    });
+    return this.handleResponse<T>(res);
   }
 }
 

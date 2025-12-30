@@ -10,10 +10,22 @@ export type TeamPlayer = { team_id: number; player_id: number }
 export type Match = { id: number; pelada_id: number; sequence: number; status?: string | null; home_team_id: number; away_team_id: number; home_score: number; away_score: number }
 export type Substitution = { id: number; match_id: number; out_player_id: number; in_player_id: number; minute?: number | null }
 export type NormalizedScore = { score: number }
+export type NormalizedScoresResponse = { scores: Record<number, number>; }
 export type MatchEventType = 'assist' | 'goal' | 'own_goal'
 export type MatchEvent = { id: number; match_id: number; player_id: number; event_type: MatchEventType; created_at?: string }
 export type PlayerStats = { player_id: number; goals: number; assists: number; own_goals: number }
 export type MatchLineupEntry = { team_id: number; player_id: number }
+export type PeladaDashboardDataResponse = {
+  pelada: Pelada;
+  matches: Match[];
+  teams: Team[];
+  users: User[];
+  organization_players: Player[];
+  match_events: MatchEvent[];
+  player_stats: PlayerStats[] | null;
+  team_players_map: Record<number, TeamPlayer[]>;
+  match_lineups_map: Record<number, Record<number, MatchLineupEntry[]>>;
+}
 export type Vote = { id: number; pelada_id: number; voter_id: number; target_id: number; stars: number; created_at?: string }
 export type VotingInfo = { can_vote: boolean; has_voted: boolean; eligible_players: number[]; message?: string }
 export type BatchVotePayload = { voter_id: number; votes: { target_id: number; stars: number }[] }
@@ -30,6 +42,7 @@ export function createApi(client: ApiClient) {
     // Peladas
     listPeladasByOrg: (organizationId: number) => client.get<Pelada[]>(`/api/organizations/${organizationId}/peladas`),
     getPelada: (id: number) => client.get<Pelada>(`/api/peladas/${id}`),
+    getPeladaDashboardData: (id: number) => client.get<PeladaDashboardDataResponse>(`/api/peladas/${id}/dashboard-data`),
     createPelada: (payload: Partial<Pelada>) => client.post<Pelada>('/api/peladas', payload),
     deletePelada: (id: number) => client.delete(`/api/peladas/${id}`),
     beginPelada: (id: number, matchesPerTeam?: number) => client.post(`/api/peladas/${id}/begin`, matchesPerTeam ? { matches_per_team: matchesPerTeam } : undefined),

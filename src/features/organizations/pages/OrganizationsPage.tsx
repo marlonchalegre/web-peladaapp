@@ -30,12 +30,12 @@ export default function OrganizationsPage() {
   const [admins, setAdmins] = useState<OrganizationAdmin[]>([])
   const [loadingAdmins, setLoadingAdmins] = useState(false)
   const [page, setPage] = useState(1)
-  const [perPage, setPerPage] = useState(10)
+  const [perPage] = useState(10)
   const [total, setTotal] = useState(0)
 
   useEffect(() => {
     setLoading(true)
-    api.get<PagedOrgs>('/api/organizations', { params: { page, per_page: perPage } })
+    api.get<PagedOrgs>('/api/organizations', { page, per_page: perPage })
       .then((data) => {
         setOrgs(data.organizations)
         setTotal(data.total)
