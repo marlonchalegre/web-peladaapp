@@ -9,11 +9,12 @@ export type Team = { id: number; pelada_id: number; name: string }
 export type TeamPlayer = { team_id: number; player_id: number }
 export type Match = { id: number; pelada_id: number; sequence: number; status?: string | null; home_team_id: number; away_team_id: number; home_score: number; away_score: number }
 export type Substitution = { id: number; match_id: number; out_player_id: number; in_player_id: number; minute?: number | null }
-export type NormalizedScore = { score: number }
+export type SubstitutionResponse = { result: number }
+export type NormalizedScore = { player_id: number; score: number }
 export type NormalizedScoresResponse = { scores: Record<number, number>; }
 export type MatchEventType = 'assist' | 'goal' | 'own_goal'
 export type MatchEvent = { id: number; match_id: number; player_id: number; event_type: MatchEventType; created_at?: string }
-export type PlayerStats = { player_id: number; goals: number; assists: number; own_goals: number }
+export type PlayerStats = { player_id: number; user_id: number; name: string; goals: number; assists: number; own_goals: number }
 export type MatchLineupEntry = { team_id: number; player_id: number }
 export type PeladaDashboardDataResponse = {
   pelada: Pelada;
@@ -54,8 +55,8 @@ export function createApi(client: ApiClient) {
     getPeladaDashboardData: (id: number) => client.get<PeladaDashboardDataResponse>(`/api/peladas/${id}/dashboard-data`),
     createPelada: (payload: Partial<Pelada>) => client.post<Pelada>('/api/peladas', payload),
     deletePelada: (id: number) => client.delete(`/api/peladas/${id}`),
-    beginPelada: (id: number, matchesPerTeam?: number) => client.post(`/api/peladas/${id}/begin`, matchesPerTeam ? { matches_per_team: matchesPerTeam } : undefined),
-    closePelada: (id: number) => client.post(`/api/peladas/${id}/close`),
+    beginPelada: (id: number, matchesPerTeam?: number) => client.post<{ matches_created: number }>(`/api/peladas/${id}/begin`, matchesPerTeam ? { matches_per_team: matchesPerTeam } : undefined),
+    closePelada: (id: number) => client.post<Pelada>(`/api/peladas/${id}/close`),
     getPeladaFullDetails: (id: number) => client.get<PeladaFullDetailsResponse>(`/api/peladas/${id}/full-details`),
 
     // Teams
@@ -82,7 +83,7 @@ export function createApi(client: ApiClient) {
     // Substitutions
     listSubstitutions: (matchId: number) => client.get<Substitution[]>(`/api/matches/${matchId}/substitutions`),
     createSubstitution: (matchId: number, outPlayerId: number, inPlayerId: number, minute?: number) =>
-      client.post(`/api/matches/${matchId}/substitutions`, { out_player_id: outPlayerId, in_player_id: inPlayerId, minute }),
+      client.post<SubstitutionResponse>(`/api/matches/${matchId}/substitutions`, { out_player_id: outPlayerId, in_player_id: inPlayerId, minute }),
 
     // Players
     listPlayersByOrg: (organizationId: number) => client.get<Player[]>(`/api/organizations/${organizationId}/players`),
@@ -108,4 +109,3 @@ export function createApi(client: ApiClient) {
     listVotesByPelada: (peladaId: number) => client.get<Vote[]>(`/api/peladas/${peladaId}/votes`),
   }
 }
-

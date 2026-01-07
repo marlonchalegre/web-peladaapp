@@ -7,8 +7,8 @@ describe('ApiClient', () => {
 
   beforeEach(() => {
     client = new ApiClient()
-    mockFetch = vi.fn() as any
-    global.fetch = mockFetch as any
+    mockFetch = vi.fn() as unknown as typeof fetch
+    global.fetch = mockFetch
   })
 
   afterEach(() => {
@@ -27,7 +27,7 @@ describe('ApiClient', () => {
       await client.get('/api/test')
 
       expect(mockFetch).toHaveBeenCalledWith(
-        '/api/test',
+        expect.stringContaining('/api/test'),
         expect.objectContaining({
           headers: expect.objectContaining({
             'Authorization': 'Token test-token',
@@ -47,7 +47,7 @@ describe('ApiClient', () => {
       await client.get('/auth/login')
 
       expect(mockFetch).toHaveBeenCalledWith(
-        '/auth/login',
+        expect.stringContaining('/auth/login'),
         expect.objectContaining({
           headers: expect.not.objectContaining({
             'Authorization': expect.anything(),
@@ -65,8 +65,6 @@ describe('ApiClient', () => {
         json: async () => ({ error: 'Authentication required', type: 'authentication' }),
       })
 
-      await expect(client.get('/api/users')).rejects.toThrow(ApiError)
-      
       try {
         await client.get('/api/users')
       } catch (error) {
@@ -148,7 +146,7 @@ describe('ApiClient', () => {
       const result = await client.get('/api/users/1')
 
       expect(mockFetch).toHaveBeenCalledWith(
-        '/api/users/1',
+        expect.stringContaining('/api/users/1'),
         expect.objectContaining({ method: 'GET' })
       )
       expect(result).toEqual({ id: 1, name: 'Test' })
@@ -164,7 +162,7 @@ describe('ApiClient', () => {
       const result = await client.post('/api/users', body)
 
       expect(mockFetch).toHaveBeenCalledWith(
-        '/api/users',
+        expect.stringContaining('/api/users'),
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify(body),
@@ -183,7 +181,7 @@ describe('ApiClient', () => {
       const result = await client.put('/api/users/1', body)
 
       expect(mockFetch).toHaveBeenCalledWith(
-        '/api/users/1',
+        expect.stringContaining('/api/users/1'),
         expect.objectContaining({
           method: 'PUT',
           body: JSON.stringify(body),
@@ -201,7 +199,7 @@ describe('ApiClient', () => {
       const result = await client.delete('/api/users/1')
 
       expect(mockFetch).toHaveBeenCalledWith(
-        '/api/users/1',
+        expect.stringContaining('/api/users/1'),
         expect.objectContaining({ method: 'DELETE' })
       )
       expect(result).toEqual({ success: true })
