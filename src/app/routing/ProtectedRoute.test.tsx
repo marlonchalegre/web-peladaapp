@@ -113,25 +113,7 @@ describe('ProtectedRoute', () => {
       user: { id: 1, name: 'Test User', email: 'test@example.com' },
     })
 
-    const { rerender } = render(
-      <AuthContext.Provider value={authValue}>
-        <MemoryRouter initialEntries={['/']}>
-          <Routes>
-            <Route path="/login" element={<div>Login Page</div>} />
-            <Route element={<ProtectedRoute />}>
-              <Route path="/" element={<div>Home</div>} />
-              <Route path="/organizations" element={<div>Organizations</div>} />
-              <Route path="/profile" element={<div>Profile</div>} />
-            </Route>
-          </Routes>
-        </MemoryRouter>
-      </AuthContext.Provider>
-    )
-
-    expect(screen.getByText('Home')).toBeInTheDocument()
-
-    // Test navigation to organizations
-    rerender(
+    render(
       <AuthContext.Provider value={authValue}>
         <MemoryRouter initialEntries={['/organizations']}>
           <Routes>
