@@ -83,6 +83,30 @@ export class ApiClient {
     return this.handleResponse<T>(res);
   }
 
+  async getPaginated<T>(path: string, params?: Record<string, string | number>): Promise<{ data: T, total: number, page: number, perPage: number, totalPages: number }> {
+    const fullPath = `${this.baseUrl}${path}`;
+    const baseUrl = this.baseUrl || (typeof window !== 'undefined' ? window.location.origin : '');
+    const url = new URL(fullPath, baseUrl);
+
+    if (params) {
+      Object.keys(params).forEach(key => url.searchParams.append(key, String(params[key])));
+    }
+    const res = await fetch(url.toString(), {
+      method: 'GET',
+      headers: this.headers(),
+    });
+    
+    const data = await this.handleResponse<T>(res);
+    
+    return {
+      data,
+      total: parseInt(res.headers.get('X-Total') || '0', 10),
+      page: parseInt(res.headers.get('X-Page') || '1', 10),
+      perPage: parseInt(res.headers.get('X-Per-Page') || '20', 10),
+      totalPages: parseInt(res.headers.get('X-Total-Pages') || '0', 10),
+    };
+  }
+
   async post<T>(path: string, body?: unknown): Promise<T> {
     const fullPath = `${this.baseUrl}${path}`;
     const baseUrl = this.baseUrl || (typeof window !== 'undefined' ? window.location.origin : '');

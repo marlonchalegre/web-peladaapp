@@ -41,6 +41,14 @@ export type PeladaFullDetailsResponse = {
   voting_info: VotingInfo | null;
 }
 
+export type PaginatedResponse<T> = {
+  data: T[];
+  total: number;
+  page: number;
+  perPage: number;
+  totalPages: number;
+}
+
 export function createApi(client: ApiClient) {
   return {
     // Organizations
@@ -50,7 +58,7 @@ export function createApi(client: ApiClient) {
     deleteOrganization: (id: number) => client.delete(`/api/organizations/${id}`),
 
     // Peladas
-    listPeladasByOrg: (organizationId: number) => client.get<Pelada[]>(`/api/organizations/${organizationId}/peladas`),
+    listPeladasByOrg: (organizationId: number, page: number = 1, perPage: number = 20) => client.getPaginated<Pelada[]>(`/api/organizations/${organizationId}/peladas`, { page, per_page: perPage }),
     getPelada: (id: number) => client.get<Pelada>(`/api/peladas/${id}`),
     getPeladaDashboardData: (id: number) => client.get<PeladaDashboardDataResponse>(`/api/peladas/${id}/dashboard-data`),
     createPelada: (payload: Partial<Pelada>) => client.post<Pelada>('/api/peladas', payload),
