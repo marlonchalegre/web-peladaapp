@@ -1,233 +1,142 @@
 # ⚽ PeladaApp - Frontend
 
-Interface web moderna para gerenciar peladas (partidas de futebol casual) com amigos. Construído com React, TypeScript, Vite e Material-UI.
+Modern web interface for managing casual soccer matches (peladas) with friends. Built with React 19, TypeScript, Vite, and Material-UI.
 
 ---
 
-## 📖 Visão Geral
+## 📖 Overview
 
-Aplicação frontend que permite:
-- **Autenticação**: Registro e login de usuários com JWT
-- **Usuários**: Visualizar lista de usuários com paginação
-- **Organizações**: Criar e gerenciar organizações de pelada
-- **Administradores**: Sistema de gerenciamento de admins por organização
-- **Peladas**: Criar, configurar e gerenciar peladas (dias de jogo)
-- **Times**: Montagem de times com drag-and-drop
-- **Partidas**: Acompanhamento de partidas com placar ao vivo
-- **Votação**: Sistema de votação pós-jogo (1-5 estrelas)
-- **Estatísticas**: Visualização de estatísticas de jogadores e times
-- **Perfil**: Gerenciamento de perfil do usuário
+Frontend application that allows:
+- **Authentication**: JWT-based user registration and login.
+- **User Management**: View and manage user profiles.
+- **Organizations**: Create and manage soccer organizations.
+- **Peladas (Game Days)**: Configure match days, teams, and schedules.
+- **Teams**: Interactive team building with drag-and-drop support.
+- **Matches**: Live score tracking and match event registration (goals, assists).
+- **Voting System**: Post-match voting (1-5 stars) to calculate normalized player scores.
+- **Statistics**: Dashboard for player and team performance.
 
 ---
 
-## 🚀 Tecnologias
+## 🚀 Technology Stack
 
-- **React 19** - Biblioteca UI
-- **TypeScript** - Tipagem estática
-- **Vite** - Build tool e dev server
-- **Material-UI (MUI)** - Componentes UI
-- **React Router** - Roteamento
-- **Vitest** - Testes unitários
+- **Framework**: React 19
+- **Language**: TypeScript
+- **Build Tool**: Vite
+- **UI Library**: Material-UI (MUI) 7
+- **Routing**: React Router 7
+- **Testing**: Vitest + React Testing Library
+- **API Client**: Axios & Fetch API
 
 ---
 
-## 🛠️ Instalação e Desenvolvimento
+## 🛠️ Installation & Development
 
 ```bash
-# Instalar dependências
+# Install dependencies
 npm install
 
-# Executar em modo desenvolvimento
+# Run in development mode (with Hot Module Replacement)
 npm run dev
 
-# Build para produção
+# Build for production
 npm run build
 
-# Executar testes
+# Run unit tests
 npm test
 
-# Preview da build de produção
+# Preview production build locally
 npm run preview
 ```
 
 ---
 
-## 🐳 Docker
+## 🗂️ Project Structure
 
-```bash
-# Build da imagem
-docker build -t web-peladaapp:latest . --build-arg TARGETARCH=$(uname -m)
-
-# Executar container
-docker run -p 80:80 web-peladaapp:latest
-```
-
----
-
-## 🗂️ Estrutura do Projeto
+The project follows a feature-based architecture:
 
 ```text
-/
-├── src/
-│   ├── App.tsx                    # Componente raiz e rotas
-│   ├── main.tsx                   # Entry point
-│   ├── app/
-│   │   ├── providers/             # Context providers (Auth)
-│   │   └── routing/               # Rotas protegidas
-│   ├── features/
-│   │   ├── auth/                  # Login e registro
-│   │   ├── home/                  # Página inicial
-│   │   ├── organizations/         # Gestão de organizações
-│   │   ├── peladas/               # Gestão de peladas e partidas
-│   │   └── user/                  # Perfil do usuário
-│   ├── shared/
-│   │   └── api/                   # Cliente HTTP e endpoints
-│   ├── lib/                       # Tema e utilitários
-│   └── test/                      # Configuração de testes
-├── public/                       # Assets estáticos
-├── Dockerfile                    # Build de produção
-└── vite.config.ts               # Configuração Vite
+/src
+├── app/                  # Application-wide providers and routing setup
+├── features/             # Core business features
+│   ├── auth/             # Login, Registration, JWT management
+│   ├── organizations/    # Org management and player lists
+│   ├── peladas/          # Match day configuration and dashboard
+│   ├── user/             # User profile and settings
+├── shared/               # Reusable components and logic
+│   ├── api/              # API client, endpoints, and types
+│   ├── components/       # Common UI elements (buttons, inputs, etc.)
+│   ├── hooks/            # Shared React hooks
+├── lib/                  # Library configurations (MUI theme, etc.)
+├── test/                 # Test setup and mocks
 ```
 
 ---
 
-## ⚡ Funcionalidades Principais
+## ⚡ Key Features
 
-### Autenticação e Autorização
-- Sistema de login/registro com JWT
-- Proteção de rotas baseada em autenticação
-- Verificação de permissões (admin/jogador)
+### Authentication & Authorization
+- Secure JWT storage in `localStorage`.
+- Protected routes based on authentication state.
+- Permission-based UI elements (Admin vs. Player).
 
-### Gerenciamento de Usuários
-- Visualizar lista de usuários (paginada)
+### Team Management
+- **Drag-and-Drop**: Easily move players between teams.
+- **Randomization**: Algorithmically generate balanced teams based on player scores.
 
-### Gerenciamento de Organizações
-- Criar e listar organizações (paginado)
-- Adicionar e remover jogadores
-- Gerenciar múltiplos administradores por organização
+### Match Tracking
+- Real-time score updates.
+- Detailed event logging (Goals, Assists, Own Goals).
+- Match lineup management.
 
-### Peladas (Dias de Jogo)
-- Criar peladas com configurações personalizadas
-- Definir número de times e jogadores por time
-- Iniciar peladas (gera cronograma automático)
-- Encerrar peladas
-
-### Times
-- Criar times dentro de uma pelada
-- Drag-and-drop para montar times
-- Visualizar scores normalizados dos jogadores
-- Preencher times aleatoriamente
-
-### Partidas
-- Visualizar cronograma de partidas
-- Atualizar placares em tempo real
-- Registrar eventos (gols, assistências, gols contra)
-- Gerenciar escalações por partida
-- Finalizar partidas
-
-### Sistema de Votação
-- Votar em todos os jogadores (1-5 estrelas)
-- Votos obrigatórios após pelada encerrada
-- Alterar votos durante período de votação
-- Cálculo automático de scores normalizados
-
-### Estatísticas
-- Tabela de classificação de times
-- Estatísticas individuais de jogadores
-- Gols, assistências e gols contra
+### Voting & Scores
+- Integrated voting flow after matches are closed.
+- Automatic calculation of normalized scores (1-10) to help balance future games.
 
 ---
 
-## ⚙️ Configuração
+## ⚙️ Configuration
 
-### Variáveis de Ambiente
+### Environment Variables
 
-Crie um arquivo `.env` (opcional) para configurações:
+Create a `.env` file at the root:
 
 ```env
-VITE_API_URL=http://localhost:8080
+VITE_API_URL=http://localhost:8080/api
 ```
 
-Por padrão, a aplicação conecta em `http://localhost:8080/api`.
+In development with Docker, the proxy is configured to direct `/api` requests to the backend service.
 
 ---
 
-## 🔗 API Integration
-
-O frontend consome a API REST do backend (api-peladaapp). Principais endpoints:
-
-- `POST /auth/register` - Registro
-- `POST /auth/login` - Login
-- `GET /api/users` - Listar usuários (paginado)
-- `GET /api/organizations` - Listar organizações (paginado)
-- `POST /api/peladas` - Criar pelada
-- `POST /api/peladas/:id/teams/randomize` - Randomizar times
-- `GET /api/peladas/:id/voting-info` - Info de votação
-- `POST /api/votes/batch` - Votar em lote
-- `POST /api/scores/normalized` - Obter scores normalizados
-
-Todos os endpoints da API (exceto auth) requerem header:
-```
-Authorization: Token <jwt>
-```
-
----
-
-## ✅ Testes
+## ✅ Testing
 
 ```bash
-# Executar todos os testes
+# Run all tests
 npm test
 
-# Executar em modo watch
+# Watch mode
 npm test -- --watch
 
-# Coverage
+# Coverage report
 npm test -- --coverage
 ```
 
-Testes incluem:
-- Testes unitários de componentes
-- Testes de providers (AuthProvider)
-- Testes de rotas protegidas
-- Testes de cliente API
+Test suite covers:
+- Component rendering and interactions.
+- API client logic and error handling.
+- Auth flow and protected route logic.
 
 ---
 
 ## 🎨 UI/UX
 
-- Design responsivo com Material-UI
-- Tema personalizado com cores da paleta de futebol
-- Feedback visual para ações do usuário
-- Drag-and-drop intuitivo para montagem de times
-- Navegação clara e organizada
-
----
-
-## 🔒 Segurança
-
-- Tokens JWT armazenados em localStorage
-- Rotas protegidas com verificação de autenticação
-- Validação de permissões no frontend e backend
-- Logout seguro com limpeza de sessão
+- **Responsive Design**: Mobile-friendly interface for on-the-pitch use.
+- **Material Design**: Clean and professional aesthetic using MUI.
+- **Interactive Elements**: Drag-and-drop and real-time feedbacks.
 
 ---
 
 ## ⚖️ Licença
 
 MIT License
-
----
-
-## 🤝 Contribuindo
-
-Este é um projeto privado. Para contribuir:
-1. Crie uma branch para sua feature
-2. Faça commit das mudanças
-3. Abra um Pull Request
-
----
-
-## ❓ Suporte
-
-Para questões ou problemas, entre em contato com a equipe de desenvolvimento.
