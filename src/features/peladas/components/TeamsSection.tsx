@@ -24,8 +24,6 @@ export type TeamsSectionProps = {
   onRandomizeTeams: () => Promise<void>
   menu: { playerId: number; sourceTeamId: number | null } | null
   setMenu: (v: { playerId: number; sourceTeamId: number | null } | null) => void
-  // Removed orgPlayerIdToUserId and userIdToName as they are no longer needed
-  orgPlayerIdToPlayer: Record<number, Player>
 }
 
 export default function TeamsSection(props: TeamsSectionProps) {
@@ -46,8 +44,6 @@ export default function TeamsSection(props: TeamsSectionProps) {
     menu,
     setMenu,
   } = props
-  // Removed orgPlayerIdToUserId and userIdToName from destructuring
-  const { orgPlayerIdToPlayer } = props
   const [filling, setFilling] = useState(false)
   const [fetchedScores, setFetchedScores] = useState<Record<number, number>>({})
 

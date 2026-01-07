@@ -14,7 +14,7 @@ import {
 } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { api } from '../../../shared/api/client'
-import { createApi, type VotingInfo, type Player } from '../../../shared/api/endpoints'
+import { createApi, type VotingInfo } from '../../../shared/api/endpoints'
 import { useAuth } from '../../../app/providers/AuthContext'
 
 const endpoints = createApi(api)
@@ -32,10 +32,7 @@ export default function PeladaVotingPage() {
   const peladaId = Number(id)
   
   const [votingInfo, setVotingInfo] = useState<VotingInfo | null>(null)
-  const [_players, setPlayers] = useState<Player[]>([])
-  const [_userIdToName, setUserIdToName] = useState<Record<number, string>>({})
   const [playerVotes, setPlayerVotes] = useState<PlayerVote[]>([])
-  const [_currentUserId, setCurrentUserId] = useState<number | null>(null)
   const [_currentPlayerOrgId, setCurrentPlayerOrgId] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
@@ -55,13 +52,11 @@ export default function PeladaVotingPage() {
           setError('Usuário não autenticado')
           return
         }
-        setCurrentUserId(user.id)
 
         // Get all users for name mapping
         const users = await endpoints.listUsers()
         const nameMap: Record<number, string> = {}
         for (const u of users) nameMap[u.id] = u.name
-        setUserIdToName(nameMap)
 
         // Get pelada to find organization
         const pelada = await endpoints.getPelada(peladaId)
@@ -69,12 +64,11 @@ export default function PeladaVotingPage() {
 
         // Get all organization players
         const orgPlayers = await endpoints.listPlayersByOrg(orgId)
-        setPlayers(orgPlayers)
 
         // Find current user's player ID in this organization
         const currentPlayer = orgPlayers.find(p => p.user_id === user.id)
         if (!currentPlayer) {
-          setError('Você não ? um jogador desta organização')
+          setError('Você não é um jogador desta organização')
           return
         }
         setCurrentPlayerOrgId(currentPlayer.id)
@@ -84,7 +78,7 @@ export default function PeladaVotingPage() {
         setVotingInfo(info)
 
         if (!info.can_vote) {
-          setError(info.message || 'Não ? possível votar nesta pelada')
+          setError(info.message || 'Não é possível votar nesta pelada')
           return
         }
 

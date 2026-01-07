@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { DragEvent } from 'react'
 import { useParams, Link as RouterLink } from 'react-router-dom'
 import { Container, Typography, Alert, Button, Stack, Box } from '@mui/material'
@@ -34,7 +34,7 @@ export default function PeladaDetailPage() {
   const assignedIds = useMemo(() => new Set(Object.values(teamPlayers).flat().map((tp) => tp.id)), [teamPlayers])
   const benchPlayers = useMemo(() => availablePlayers.filter((p) => !assignedIds.has(p.id)), [availablePlayers, assignedIds])
 
-  async function fetchPeladaData() {
+  const fetchPeladaData = useCallback(async () => {
     if (!peladaId) return
     try {
       const data = await endpoints.getPeladaFullDetails(peladaId)
@@ -68,11 +68,11 @@ export default function PeladaDetailPage() {
       const message = error instanceof Error ? error.message : 'Erro ao carregar pelada'
       setError(message)
     }
-  }
+  }, [peladaId])
 
   useEffect(() => {
     fetchPeladaData()
-  }, [peladaId, user])
+  }, [fetchPeladaData, user])
 
   function onDragStartPlayer(e: DragEvent<HTMLElement>, playerId: number, sourceTeamId: number | null) {
     e.dataTransfer.setData('application/json', JSON.stringify({ playerId, sourceTeamId }))

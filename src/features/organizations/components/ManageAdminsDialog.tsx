@@ -33,7 +33,6 @@ type Props = {
 
 export default function ManageAdminsDialog({
   open,
-  organizationId: _organizationId,
   organizationName,
   admins,
   availableUsers,

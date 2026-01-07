@@ -37,7 +37,7 @@ export default function HomePage() {
         
         // Fetch all organizations and their players
         const response = await endpoints.listOrganizations()
-        // @ts-ignore
+        // @ts-expect-error - listOrganizations returns Organization[] but we check for legacy wrapper
         const allOrgs = response.organizations || response
 
         if (!Array.isArray(allOrgs)) {
