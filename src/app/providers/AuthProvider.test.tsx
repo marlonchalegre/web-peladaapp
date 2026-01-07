@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import { AuthProvider } from './AuthProvider'
 import { useAuth } from './AuthContext'
@@ -205,7 +205,7 @@ describe('AuthProvider', () => {
     )
 
     // Get the auth error handler that was registered
-    const authErrorHandler = (api.setAuthErrorHandler as any).mock.calls[0][0]
+    const authErrorHandler = (api.setAuthErrorHandler as Mock).mock.calls[0][0]
 
     // Simulate an auth error
     authErrorHandler()

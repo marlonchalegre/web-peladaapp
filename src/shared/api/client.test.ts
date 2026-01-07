@@ -103,7 +103,7 @@ describe('ApiClient', () => {
 
       try {
         await client.get('/api/users')
-      } catch (error) {
+      } catch {
         // Error should be thrown
       }
 
@@ -122,7 +122,7 @@ describe('ApiClient', () => {
 
       try {
         await client.get('/admin/settings')
-      } catch (error) {
+      } catch {
         // Error should be thrown
       }
 
