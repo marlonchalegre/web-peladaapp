@@ -71,6 +71,7 @@ export function createApi(client: ApiClient) {
     listTeamsByPelada: (peladaId: number) => client.get<Team[]>(`/api/peladas/${peladaId}/teams`),
     listTeamPlayers: (teamId: number) => client.get<TeamPlayer[]>(`/api/teams/${teamId}/players`),
     createTeam: (payload: { pelada_id: number; name: string }) => client.post<Team>('/api/teams', payload),
+    deleteTeam: (teamId: number) => client.delete(`/api/teams/${teamId}`),
     addPlayerToTeam: (teamId: number, playerId: number) => client.post(`/api/teams/${teamId}/players`, { player_id: playerId }),
     removePlayerFromTeam: (teamId: number, playerId: number) => client.delete<void>(`/api/teams/${teamId}/players`, { player_id: playerId }),
 

@@ -242,6 +242,15 @@ export default function PeladaDetailPage() {
             setCreatingTeam(false)
           }
         }}
+        onDeleteTeam={async (teamId) => {
+          try {
+            await endpoints.deleteTeam(teamId)
+            await fetchPeladaData()
+          } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : 'Erro ao excluir time'
+            setError(message)
+          }
+        }}
         onDragStartPlayer={onDragStartPlayer}
         dropToBench={dropToBench}
         dropToTeam={dropToTeam}

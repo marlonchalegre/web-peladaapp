@@ -16,6 +16,7 @@ export type TeamsSectionProps = {
   creatingTeam: boolean
   locked?: boolean
   onCreateTeam: (name: string) => Promise<void>
+  onDeleteTeam: (teamId: number) => Promise<void>
   onDragStartPlayer: (e: DragEvent<HTMLElement>, playerId: number, sourceTeamId: number | null) => void
   dropToBench: (e: DragEvent<HTMLElement>) => Promise<void>
   dropToTeam: (e: DragEvent<HTMLElement>, targetTeamId: number) => Promise<void>
@@ -36,6 +37,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
     creatingTeam,
     locked = false,
     onCreateTeam,
+    onDeleteTeam,
     onDragStartPlayer,
     dropToBench,
     dropToTeam,
@@ -122,15 +124,20 @@ export default function TeamsSection(props: TeamsSectionProps) {
               aria-label={`Time ${t.name}`}
               sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}
             >
-              <Typography variant="h6">
-                {t.name}
-                {(() => {
-                  const tps = teamPlayers[t.id] || []
-                  const vals = tps.map(p => (typeof effectiveScores[p.id] === 'number' ? effectiveScores[p.id] : p.grade)).filter((g): g is number => typeof g === 'number')
-                  if (!vals.length) return null
-                  const avg = (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1)
-                  return <span style={{ marginLeft: 8, color: '#666', fontWeight: 400 }}>(média {avg})</span>
-                })()}
+              <Typography variant="h6" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>
+                  {t.name}
+                  {(() => {
+                    const tps = teamPlayers[t.id] || []
+                    const vals = tps.map(p => (typeof effectiveScores[p.id] === 'number' ? effectiveScores[p.id] : p.grade)).filter((g): g is number => typeof g === 'number')
+                    if (!vals.length) return null
+                    const avg = (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1)
+                    return <span style={{ marginLeft: 8, color: '#666', fontWeight: 400 }}>(média {avg})</span>
+                  })()}
+                </span>
+                {!locked && (
+                  <Button size="small" color="error" onClick={() => onDeleteTeam(t.id)}>Excluir</Button>
+                )}
               </Typography>
             <ul style={{ padding: 0, listStyle: 'none' }}>
               {(teamPlayers[t.id] || []).map((p) => ( // Changed tp to p
