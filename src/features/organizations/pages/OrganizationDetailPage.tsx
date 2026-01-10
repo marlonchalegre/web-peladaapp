@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useParams } from 'react-router-dom'
-import { Container, Typography, Alert, TablePagination } from '@mui/material'
+import { Link as RouterLink, useParams } from 'react-router-dom'
+import { Container, Typography, Alert, TablePagination, Box, Button } from '@mui/material'
 import { api } from '../../../shared/api/client'
 import { createApi, type Pelada, type Organization } from '../../../shared/api/endpoints'
 import { useAuth } from '../../../app/providers/AuthContext'
@@ -70,7 +70,12 @@ export default function OrganizationDetailPage() {
 
   return (
     <Container>
-      <Typography variant="h4" gutterBottom>{org.name}</Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h4">{org.name}</Typography>
+        <Button component={RouterLink} to={`/organizations/${orgId}/statistics`} variant="outlined">
+          Estatísticas
+        </Button>
+      </Box>
       <Typography variant="h6" gutterBottom>Peladas</Typography>
       {isAdmin && (
         <CreatePeladaForm

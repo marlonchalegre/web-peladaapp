@@ -1,14 +1,14 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest'
 import { ApiClient, ApiError } from './client'
 
 describe('ApiClient', () => {
   let client: ApiClient
-  let mockFetch: ReturnType<typeof vi.fn>
+  let mockFetch: Mock
 
   beforeEach(() => {
     client = new ApiClient()
-    mockFetch = vi.fn() as unknown as typeof fetch
-    global.fetch = mockFetch
+    mockFetch = vi.fn()
+    global.fetch = mockFetch as unknown as typeof fetch
   })
 
   afterEach(() => {

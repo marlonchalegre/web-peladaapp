@@ -21,9 +21,6 @@ export default function PeladaDetailPage() {
   const [teams, setTeams] = useState<TeamWithPlayers[]>([])
   const [teamPlayers, setTeamPlayers] = useState<Record<number, (Player & { user: User })[]>>({})
   const [availablePlayers, setAvailablePlayers] = useState<(Player & { user: User })[]>([])
-  const [userIdToName, setUserIdToName] = useState<Record<number, string>>({})
-  const [orgPlayerIdToUserId, setOrgPlayerIdToUserId] = useState<Record<number, number>>({})
-  const [orgPlayerIdToPlayer, setOrgPlayerIdToPlayer] = useState<Record<number, Player>>({})
   const [error, setError] = useState<string | null>(null)
   const [creatingTeam, setCreatingTeam] = useState(false)
   const [changingStatus, setChangingStatus] = useState(false)
@@ -42,21 +39,6 @@ export default function PeladaDetailPage() {
       setTeams(data.teams)
       setAvailablePlayers(data.available_players)
       setVotingInfo(data.voting_info)
-
-      const nameMap: Record<number, string> = {}
-      for (const u of Object.values(data.users_map)) {
-        nameMap[u.id] = u.name
-      }
-      setUserIdToName(nameMap)
-
-      const relMap: Record<number, number> = {}
-      const playerMap: Record<number, Player> = {}
-      for (const pl of Object.values(data.org_players_map)) {
-        relMap[pl.id] = pl.user_id
-        playerMap[pl.id] = pl
-      }
-      setOrgPlayerIdToUserId(relMap)
-      setOrgPlayerIdToPlayer(playerMap)
 
       const playersByTeam: Record<number, (Player & { user: User })[]> = {}
       for (const t of data.teams) {
@@ -227,9 +209,6 @@ export default function PeladaDetailPage() {
         benchPlayers={benchPlayers}
         creatingTeam={creatingTeam}
         locked={pelada.status !== 'open'}
-        orgPlayerIdToUserId={orgPlayerIdToUserId}
-        userIdToName={userIdToName}
-        orgPlayerIdToPlayer={orgPlayerIdToPlayer}
         onCreateTeam={async (name) => {
           setCreatingTeam(true)
           try {

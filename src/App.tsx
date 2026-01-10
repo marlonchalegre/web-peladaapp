@@ -9,6 +9,7 @@ import RegisterPage from './features/auth/pages/RegisterPage'
 import HomePage from './features/home/pages/HomePage'
 import OrganizationsPage from './features/organizations/pages/OrganizationsPage'
 import OrganizationDetailPage from './features/organizations/pages/OrganizationDetailPage'
+import OrganizationStatisticsPage from './features/organizations/pages/OrganizationStatisticsPage'
 import PeladaDetailPage from './features/peladas/pages/PeladaDetailPage'
 import PeladaMatchesPage from './features/peladas/pages/PeladaMatchesPage'
 import PeladaVotingPage from './features/peladas/pages/PeladaVotingPage'
@@ -48,6 +49,11 @@ function AppLayout() {
           <Route path="/organizations/:id" element={
             <Container maxWidth="lg" sx={{ py: 3 }}>
               <OrganizationDetailPage />
+            </Container>
+          } />
+          <Route path="/organizations/:id/statistics" element={
+            <Container maxWidth="lg" sx={{ py: 3 }}>
+              <OrganizationStatisticsPage />
             </Container>
           } />
           <Route path="/peladas/:id" element={
