@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useParams, Link as RouterLink } from 'react-router-dom'
-import { Container, Typography, Alert, FormControl, InputLabel, Select, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Box, Button } from '@mui/material'
+import { Container, Typography, Alert, FormControl, InputLabel, Select, MenuItem, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, Box, Button, TextField, Grid } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { api } from '../../../shared/api/client'
 import { createApi, type Organization } from '../../../shared/api/endpoints'
@@ -10,6 +10,7 @@ const endpoints = createApi(api)
 type PlayerStats = {
   player_id: number;
   player_name: string;
+  peladas_played: number;
   goal: number;
   assist: number;
   own_goal: number;
@@ -26,6 +27,13 @@ export default function OrganizationStatisticsPage() {
   const [error, setError] = useState<string | null>(null)
   const [orderBy, setOrderBy] = useState<keyof PlayerStats>('goal')
   const [order, setOrder] = useState<Order>('desc')
+
+  // Filters
+  const [nameFilter, setNameFilter] = useState('')
+  const [minPeladas, setMinPeladas] = useState<string>('')
+  const [minGoals, setMinGoals] = useState<string>('')
+  const [minAssists, setMinAssists] = useState<string>('')
+  const [minOwnGoals, setMinOwnGoals] = useState<string>('')
 
   useEffect(() => {
     if (!orgId) return
@@ -58,8 +66,19 @@ export default function OrganizationStatisticsPage() {
     setOrderBy(property);
   };
 
+  const filteredStats = useMemo(() => {
+    return stats.filter(row => {
+      const matchesName = row.player_name.toLowerCase().includes(nameFilter.toLowerCase())
+      const matchesPeladas = minPeladas === '' || row.peladas_played >= Number(minPeladas)
+      const matchesGoals = minGoals === '' || row.goal >= Number(minGoals)
+      const matchesAssists = minAssists === '' || row.assist >= Number(minAssists)
+      const matchesOwnGoals = minOwnGoals === '' || row.own_goal >= Number(minOwnGoals)
+      return matchesName && matchesPeladas && matchesGoals && matchesAssists && matchesOwnGoals
+    })
+  }, [stats, nameFilter, minPeladas, minGoals, minAssists, minOwnGoals])
+
   const sortedStats = useMemo(() => {
-    return [...stats].sort((a, b) => {
+    return [...filteredStats].sort((a, b) => {
       const valA = a[orderBy];
       const valB = b[orderBy];
 
@@ -67,15 +86,18 @@ export default function OrganizationStatisticsPage() {
         return order === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
       }
       
-      if (valA < valB) {
+      const numA = valA as number;
+      const numB = valB as number;
+
+      if (numA < numB) {
         return order === 'asc' ? -1 : 1;
       }
-      if (valA > valB) {
+      if (numA > numB) {
         return order === 'asc' ? 1 : -1;
       }
       return 0;
     });
-  }, [stats, order, orderBy]);
+  }, [filteredStats, order, orderBy]);
 
   const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i)
 
@@ -97,7 +119,7 @@ export default function OrganizationStatisticsPage() {
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4">{org.name} - Estatísticas</Typography>
-        <FormControl sx={{ minWidth: 120 }}>
+        <FormControl sx={{ minWidth: 150 }}>
           <InputLabel id="year-select-label">Ano</InputLabel>
           <Select
             labelId="year-select-label"
@@ -113,6 +135,61 @@ export default function OrganizationStatisticsPage() {
         </FormControl>
       </Box>
 
+      <Paper sx={{ p: 2, mb: 3 }}>
+        <Typography variant="h6" gutterBottom>Filtros</Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={3}>
+            <TextField
+              fullWidth
+              label="Nome do Jogador"
+              value={nameFilter}
+              onChange={(e) => setNameFilter(e.target.value)}
+              size="small"
+            />
+          </Grid>
+          <Grid item xs={12} sm={2}>
+            <TextField
+              fullWidth
+              label="Mínimo de Peladas"
+              type="number"
+              value={minPeladas}
+              onChange={(e) => setMinPeladas(e.target.value)}
+              size="small"
+            />
+          </Grid>
+          <Grid item xs={12} sm={2}>
+            <TextField
+              fullWidth
+              label="Mínimo de Gols"
+              type="number"
+              value={minGoals}
+              onChange={(e) => setMinGoals(e.target.value)}
+              size="small"
+            />
+          </Grid>
+          <Grid item xs={12} sm={2}>
+            <TextField
+              fullWidth
+              label="Mínimo de Assistências"
+              type="number"
+              value={minAssists}
+              onChange={(e) => setMinAssists(e.target.value)}
+              size="small"
+            />
+          </Grid>
+          <Grid item xs={12} sm={3}>
+            <TextField
+              fullWidth
+              label="Mínimo de Gols Contra"
+              type="number"
+              value={minOwnGoals}
+              onChange={(e) => setMinOwnGoals(e.target.value)}
+              size="small"
+            />
+          </Grid>
+        </Grid>
+      </Paper>
+
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
@@ -124,6 +201,15 @@ export default function OrganizationStatisticsPage() {
                   onClick={() => handleRequestSort('player_name')}
                 >
                   Jogador
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align="right">
+                <TableSortLabel
+                  active={orderBy === 'peladas_played'}
+                  direction={orderBy === 'peladas_played' ? order : 'asc'}
+                  onClick={() => handleRequestSort('peladas_played')}
+                >
+                  Peladas
                 </TableSortLabel>
               </TableCell>
               <TableCell align="right">
@@ -158,8 +244,8 @@ export default function OrganizationStatisticsPage() {
           <TableBody>
             {sortedStats.length === 0 ? (
                <TableRow>
-                 <TableCell colSpan={4} align="center">
-                   Nenhuma estatística encontrada para este ano.
+                 <TableCell colSpan={5} align="center">
+                   Nenhuma estatística encontrada para os filtros aplicados.
                  </TableCell>
                </TableRow>
             ) : (
@@ -171,6 +257,7 @@ export default function OrganizationStatisticsPage() {
                   <TableCell component="th" scope="row">
                     {row.player_name}
                   </TableCell>
+                  <TableCell align="right">{row.peladas_played}</TableCell>
                   <TableCell align="right">{row.goal}</TableCell>
                   <TableCell align="right">{row.assist}</TableCell>
                   <TableCell align="right">{row.own_goal}</TableCell>

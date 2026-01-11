@@ -56,7 +56,7 @@ export function createApi(client: ApiClient) {
     getOrganization: (id: number) => client.get<Organization>(`/api/organizations/${id}`),
     createOrganization: (name: string) => client.post<Organization>('/api/organizations', { name }),
     deleteOrganization: (id: number) => client.delete(`/api/organizations/${id}`),
-    getOrganizationStatistics: (id: number, year: number) => client.get<{ player_id: number; player_name: string; goal: number; assist: number; own_goal: number }[]>(`/api/organizations/${id}/statistics`, { year }),
+    getOrganizationStatistics: (id: number, year: number) => client.get<{ player_id: number; player_name: string; peladas_played: number; goal: number; assist: number; own_goal: number }[]>(`/api/organizations/${id}/statistics`, { year }),
 
     // Peladas
     listPeladasByOrg: (organizationId: number, page: number = 1, perPage: number = 20) => client.getPaginated<Pelada[]>(`/api/organizations/${organizationId}/peladas`, { page, per_page: perPage }),
