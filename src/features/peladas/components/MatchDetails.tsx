@@ -195,7 +195,7 @@ export default function MatchDetails(props: Props) {
           const maxSlots = typeof playersPerTeam === 'number' ? Math.max(playersPerTeam || 0, 0) : 0
           const empty = Math.max(0, maxSlots - players.length)
           return Array.from({ length: empty }).map((_, idx) => (
-            <ListItem key={`${side}-empty-${idx}`} sx={{ gap: 1, color: '#888' }}>
+            <ListItem key={`${side}-empty-${idx}`} sx={{ gap: 1, color: 'text.secondary' }}>
               {side === 'home' ? (
                 <>
                   <IconButton size="small" disabled={finished} onClick={(e) => { e.stopPropagation(); if (finished) return; setSelectMenu({ teamId }) }}>

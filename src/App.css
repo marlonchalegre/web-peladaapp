@@ -4,54 +4,10 @@
   width: 100%;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-
 /* App-specific utility styles */
 .grid {
   display: grid;
   gap: 16px;
-}
-
-.panel {
-  background: color-mix(in oklab, canvasText 10%, canvas 92%);
-  border: 1px solid color-mix(in oklab, canvasText 20%, canvas 80%);
-  border-radius: 8px;
-  padding: 12px 14px;
-  text-align: left;
 }
 
 /* Responsive table wrapper */
@@ -66,15 +22,6 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 8px;
-}
-
-.droppable {
-  border: 2px dashed transparent;
-  transition: border-color 120ms ease-in-out, background-color 120ms ease-in-out;
-}
-.droppable--over {
-  border-color: rgba(25, 118, 210, 0.5); /* MUI primary.main ~ #1976d2 */
-  background-color: rgba(25, 118, 210, 0.08);
 }
 
 /* legacy .draggable no longer used; kept for backward compatibility */

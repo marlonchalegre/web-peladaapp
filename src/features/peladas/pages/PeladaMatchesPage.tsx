@@ -1,12 +1,12 @@
-import { Fragment, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams, Link as RouterLink } from 'react-router-dom'
-import { Paper, Table, TableHead, TableRow, TableCell, TableBody, TableContainer, Button, Box, Stack, Typography, Alert } from '@mui/material'
+import { Paper, Button, Box, Stack, Typography, Alert, List, ListItemButton, ListItemText, Divider } from '@mui/material'
 import Grid from '@mui/material/Grid'
 import { api } from '../../../shared/api/client'
 import { createApi, type Match, type Team, type Pelada, type TeamPlayer, type Player, type MatchEvent, type PlayerStats } from '../../../shared/api/endpoints'
 import StandingsPanel from '../components/StandingsPanel'
 import PlayerStatsPanel, { type PlayerStatRow } from '../components/PlayerStatsPanel'
-import MatchDetails, { type ActionKey } from '../components/MatchDetails'
+import ActiveMatchDashboard from '../components/ActiveMatchDashboard'
 
 const endpoints = createApi(api)
 
@@ -60,12 +60,15 @@ export default function PeladaMatchesPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [closing, setClosing] = useState(false)
-  const [exp, setExp] = useState<Set<number>>(() => new Set<number>())
+  
+  // New state for selection
+  const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null)
+
   const [updatingScore, setUpdatingScore] = useState<Record<number, boolean>>({})
   const [statsMap, setStatsMap] = useState<Record<number, PlayerStatCounts>>({})
   const [statsRows, setStatsRows] = useState<PlayerStatRow[]>([])
   const [loadedPeladaId, setLoadedPeladaId] = useState<number | null>(null)
-  const [openAction, setOpenAction] = useState<ActionKey>(null)
+  
   const [playerSort, setPlayerSort] = useState<{ by: 'default' | 'goals' | 'assists'; dir: 'asc' | 'desc' }>({ by: 'default', dir: 'desc' })
   const [selectMenu, setSelectMenu] = useState<{ teamId: number; forPlayerId?: number } | null>(null)
 
@@ -87,6 +90,11 @@ export default function PeladaMatchesPage() {
         setPelada(data.pelada)
         setMatches(data.matches)
         setTeams(data.teams)
+
+        // Select first match if none selected
+        if (data.matches.length > 0) {
+            setSelectedMatchId((prev) => prev ?? data.matches[0].id)
+        }
 
         const nameMap: Record<number, string> = {}
         for (const u of data.users) nameMap[u.id] = u.name
@@ -129,15 +137,6 @@ export default function PeladaMatchesPage() {
       .finally(() => setLoading(false))
   }, [peladaId, loadedPeladaId])
 
-  function toggleExpand(matchId: number) {
-    setExp((prev) => {
-      const next = new Set(prev)
-      if (next.has(matchId)) next.delete(matchId)
-      else next.add(matchId)
-      return next
-    })
-  }
-
   const standings = useMemo(() => {
     const table: Record<number, { teamId: number; wins: number; draws: number; losses: number; goalsFor: number; name: string }> = {}
     for (const t of teams) table[t.id] = { teamId: t.id, wins: 0, draws: 0, losses: 0, goalsFor: 0, name: t.name }
@@ -174,12 +173,34 @@ export default function PeladaMatchesPage() {
     }
     for (const pidStr of Object.keys(statsMap)) participatingIds.add(Number(pidStr))
 
+    // Calculate matches played for each player (only finished matches)
+    const matchesPlayedMap: Record<number, number> = {}
+    for (const m of matches) {
+        if ((m.status || '').toLowerCase() !== 'finished') continue
+        const lu = lineupsByMatch[m.id]
+        if (!lu) continue
+        const playersInMatch = new Set<number>()
+        for (const list of Object.values(lu)) {
+            for (const tp of list) playersInMatch.add(tp.player_id)
+        }
+        for (const pid of playersInMatch) {
+            matchesPlayedMap[pid] = (matchesPlayedMap[pid] || 0) + 1
+        }
+    }
+
     const stats: PlayerStatRow[] = []
     for (const playerId of participatingIds) {
       const userId = orgPlayerIdToUserId[playerId]
       const name = (userId !== undefined && userIdToName[userId]) ? userIdToName[userId] : `Player #${playerId}`
       const base = statsMap[playerId]
-      stats.push({ playerId, name, goals: base?.goals || 0, assists: base?.assists || 0, ownGoals: base?.ownGoals || 0 })
+      stats.push({ 
+          playerId, 
+          name, 
+          goals: base?.goals || 0, 
+          assists: base?.assists || 0, 
+          ownGoals: base?.ownGoals || 0,
+          matchesPlayed: matchesPlayedMap[playerId] || 0
+      })
     }
     // If stats computed above is empty but we have API rows, use them directly
     const arr = (stats.length === 0 && statsRows.length > 0) ? statsRows.slice() : stats
@@ -200,7 +221,7 @@ export default function PeladaMatchesPage() {
       arr.sort((a, b) => (b.goals + b.assists - b.ownGoals) - (a.goals + a.assists - a.ownGoals))
     }
     return arr
-  }, [statsMap, statsRows, teamPlayers, orgPlayerIdToUserId, userIdToName, playerSort])
+  }, [statsMap, statsRows, teamPlayers, orgPlayerIdToUserId, userIdToName, playerSort, matches, lineupsByMatch])
 
   function togglePlayerSort(by: 'goals' | 'assists') {
     setPlayerSort((prev) =>
@@ -209,18 +230,6 @@ export default function PeladaMatchesPage() {
   }
 
   const allOrgPlayers = useMemo(() => Object.values(orgPlayerIdToPlayer), [orgPlayerIdToPlayer])
-
-  async function assignPlayerToMatchTeam(matchId: number, teamId: number, playerId: number) {
-    try {
-      await endpoints.addMatchLineupPlayer(matchId, teamId, playerId)
-      await refreshStats() 
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao adicionar jogador na partida'
-      setError(message)
-    } finally {
-      setSelectMenu(null)
-    }
-  }
 
   async function replacePlayerOnMatchTeam(matchId: number, teamId: number, outPlayerId: number, inPlayerId: number) {
     try {
@@ -257,20 +266,24 @@ export default function PeladaMatchesPage() {
     }
   }
 
-  async function finishMatch(match: Match) {
-    try {
-      await endpoints.updateMatchScore(match.id, match.home_score, match.away_score, 'finished')
-      setMatches((prev) => prev.map((m) => (m.id === match.id ? { ...m, status: 'finished' } : m)))
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao finalizar partida'
-      setError(message)
-    }
-  }
-
   async function refreshStats() {
     if (!peladaId) return
     try {
       const data = await endpoints.getPeladaDashboardData(peladaId) // Fetch all dashboard data again
+      
+      // Update matches and lineups to reflect potential lineup changes
+      setMatches(data.matches) 
+      const luMap: Record<number, Record<number, TeamPlayer[]>> = {}
+      for (const [midStr, teamPlayersGroup] of Object.entries(data.match_lineups_map || {})) {
+        const mid = Number(midStr)
+        const asTeamPlayersForMatch: Record<number, TeamPlayer[]> = {}
+        for (const [teamIdStr, arr] of Object.entries(teamPlayersGroup || {})) {
+            asTeamPlayersForMatch[Number(teamIdStr)] = (arr || []).map((e) => ({ team_id: e.team_id, player_id: e.player_id }))
+        }
+        luMap[mid] = asTeamPlayersForMatch
+      }
+      setLineupsByMatch(luMap)
+
       let sm = statsMapFromApi(data.player_stats)
       if (Object.keys(sm).length === 0 && data.match_events.length > 0) {
         sm = aggregateStatsFromEvents(data.match_events)
@@ -307,11 +320,13 @@ export default function PeladaMatchesPage() {
   if (loading) return <Typography>Carregando partidas...</Typography>
   if (error) return <Alert severity="error">{error}</Alert>
 
+  const selectedMatch = matches.find(m => m.id === selectedMatchId)
+
   return (
-    <div>
-      <Typography variant="h4" gutterBottom>Partidas da Pelada #{peladaId}</Typography>
+    <Box sx={{ flexGrow: 1, p: 2 }}>
       <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-        <Button component={RouterLink} to={`/peladas/${peladaId}`}>Voltar para a pelada</Button>
+        <Typography variant="h4" sx={{ mr: 2 }}>Pelada #{peladaId}</Typography>
+        <Button component={RouterLink} to={`/peladas/${peladaId}`}>Voltar</Button>
         <Box sx={{ ml: 'auto' }}>
           {isPeladaClosed ? (
             <Typography variant="body2" color="text.secondary" sx={{ py: 1 }}>Pelada encerrada</Typography>
@@ -322,13 +337,7 @@ export default function PeladaMatchesPage() {
                 setClosing(true)
                 try {
                   await endpoints.closePelada(peladaId)
-                  const [updatedPelada, updatedMatches] = await Promise.all([
-                    endpoints.getPelada(peladaId),
-                    endpoints.listMatchesByPelada(peladaId),
-                  ])
-                  setPelada(updatedPelada)
-                  setMatches(updatedMatches)
-                  setExp(new Set())
+                  setPelada(prev => prev ? { ...prev, status: 'closed' } : null)
                 } catch (error: unknown) {
                   const message = error instanceof Error ? error.message : 'Erro ao encerrar pelada'
                   setError(message)
@@ -341,88 +350,81 @@ export default function PeladaMatchesPage() {
           )}
         </Box>
       </Stack>
-      <Grid container spacing={3} alignItems="flex-start">
-        <Grid size={{ xs: 12, md: 8 }}>
-          {matches.length === 0 ? (
-            <Typography>Nenhuma partida agendada.</Typography>
-          ) : (
-            <Paper>
-              <TableContainer>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Seq</TableCell>
-                      <TableCell>Mandante</TableCell>
-                      <TableCell>Placar</TableCell>
-                      <TableCell>Visitante</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {matches.map((m) => {
-                      const expanded = exp.has(m.id)
-                      const lu = lineupsByMatch[m.id] || {}
-                      const homePlayers = lu[m.home_team_id] || teamPlayers[m.home_team_id] || []
-                      const awayPlayers = lu[m.away_team_id] || teamPlayers[m.away_team_id] || []
-                      const lineupIds = new Set([...(homePlayers || []), ...(awayPlayers || [])].map(p => p.player_id))
-                      const benchPlayers = allOrgPlayers.filter((p) => !lineupIds.has(p.id))
-                      const finished = (m.status || '').toLowerCase() === 'finished'
-                      return (
-                        <Fragment key={m.id}>
-                          <TableRow hover sx={{ cursor: 'pointer' }} onClick={() => toggleExpand(m.id)}>
-                            <TableCell>{m.sequence}</TableCell>
-                            <TableCell>{teamNameById[m.home_team_id] || `Time ${m.home_team_id}`}</TableCell>
-                            <TableCell>{(m.home_score ?? 0)} x {(m.away_score ?? 0)}</TableCell>
-                            <TableCell>{teamNameById[m.away_team_id] || `Time ${m.away_team_id}`}</TableCell>
-                          </TableRow>
-                          {expanded && (
-                            <TableRow key={`expanded-${m.id}`}>
-                              <TableCell colSpan={4} sx={{ p: 0 }}>
-                                <Box sx={{ m: 1 }}>
-                                  {!isPeladaClosed && (
-                                    <Stack direction="row" justifyContent="flex-end" spacing={1} sx={{ mb: 1 }}>
-                                      <Button variant="contained" size="small" onClick={(e) => { e.stopPropagation(); finishMatch(m) }} disabled={finished}>
-                                        {finished ? 'Finalizada' : 'Finalizar partida'}
-                                      </Button>
-                                    </Stack>
-                                  )}
-                                  <MatchDetails
-                                    match={m}
-                                    finished={finished}
-                                    homePlayers={homePlayers}
-                                    awayPlayers={awayPlayers}
-                                    orgPlayerIdToUserId={orgPlayerIdToUserId}
-                                    userIdToName={userIdToName}
-                                    benchPlayers={benchPlayers}
-                                    playersPerTeam={pelada?.players_per_team}
-                                    openAction={openAction}
-                                    setOpenAction={setOpenAction}
-                                    selectMenu={selectMenu}
-                                    setSelectMenu={setSelectMenu}
-                                    updating={!!updatingScore[m.id]}
-                                    recordEvent={recordEvent}
-                                    deleteEventAndRefresh={deleteEventAndRefresh}
-                                    adjustScore={adjustScore}
-                                    assignPlayerToTeam={(teamId, playerId) => assignPlayerToMatchTeam(m.id, teamId, playerId)}
-                                    replacePlayerOnTeam={(teamId, outId, inId) => replacePlayerOnMatchTeam(m.id, teamId, outId, inId)}
-                                  />
-                                </Box>
-                              </TableCell>
-                            </TableRow>
-                          )}
-                        </Fragment>
-                      )
-                    })}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Paper>
-          )}
+
+      <Grid container spacing={3} sx={{ height: 'calc(100vh - 150px)', minHeight: 600 }}>
+        {/* Left Column: Match History Stream */}
+        <Grid size={{ xs: 12, md: 2 }} sx={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>Match History Stream</Typography>
+          <Paper variant="outlined" sx={{ flex: 1, overflowY: 'auto' }}>
+            <List component="nav" disablePadding>
+                {matches.length === 0 && <ListItemText sx={{ p: 2 }} primary="Nenhuma partida" />}
+                {matches.map((m) => {
+                    const isSelected = m.id === selectedMatchId
+                    return (
+                        <Box key={m.id}>
+                            <ListItemButton selected={isSelected} onClick={() => setSelectedMatchId(m.id)} sx={{ flexDirection: 'column', alignItems: 'flex-start', borderLeftWidth: isSelected ? 4 : 0, borderLeftStyle: 'solid', borderLeftColor: 'primary.main', py: 2 }}>
+                                <Typography variant="caption" color="text.secondary">Seq {m.sequence}: {teamNameById[m.home_team_id] || 'Time'}</Typography>
+                                <Stack direction="row" justifyContent="space-between" width="100%" alignItems="center" sx={{ mt: 1 }}>
+                                    <Typography variant="body2" fontWeight="bold">{teamNameById[m.home_team_id] || `Time ${m.home_team_id}`}</Typography>
+                                    <Typography variant="body2" fontWeight="bold" sx={{ mx: 1 }}>{m.home_score ?? 0} x {m.away_score ?? 0}</Typography>
+                                    <Typography variant="body2" fontWeight="bold">{teamNameById[m.away_team_id] || `Time ${m.away_team_id}`}</Typography>
+                                </Stack>
+                            </ListItemButton>
+                            <Divider />
+                        </Box>
+                    )
+                })}
+            </List>
+          </Paper>
         </Grid>
-        <Grid size={{ xs: 12, md: 4 }}>
+
+        {/* Center Column: Active Match Dashboard */}
+        <Grid size={{ xs: 12, md: 6 }} sx={{ height: '100%' }}>
+            {selectedMatch ? (
+                (() => {
+                    const lu = lineupsByMatch[selectedMatch.id] || {}
+                    const homePlayers = lu[selectedMatch.home_team_id] || teamPlayers[selectedMatch.home_team_id] || []
+                    const awayPlayers = lu[selectedMatch.away_team_id] || teamPlayers[selectedMatch.away_team_id] || []
+                    const lineupIds = new Set([...(homePlayers || []), ...(awayPlayers || [])].map(p => p.player_id))
+                    const benchPlayers = allOrgPlayers.filter((p) => !lineupIds.has(p.id))
+                    const finished = (selectedMatch.status || '').toLowerCase() === 'finished'
+
+                    return (
+                        <ActiveMatchDashboard 
+                            match={selectedMatch}
+                            homeTeamName={teamNameById[selectedMatch.home_team_id] || `Time ${selectedMatch.home_team_id}`}
+                            awayTeamName={teamNameById[selectedMatch.away_team_id] || `Time ${selectedMatch.away_team_id}`}
+                            homePlayers={homePlayers}
+                            awayPlayers={awayPlayers}
+                            orgPlayerIdToUserId={orgPlayerIdToUserId}
+                            userIdToName={userIdToName}
+                            statsMap={statsMap}
+                            benchPlayers={benchPlayers}
+                            finished={finished || isPeladaClosed}
+                            updating={!!updatingScore[selectedMatch.id]}
+                            selectMenu={selectMenu}
+                            setSelectMenu={setSelectMenu}
+                            recordEvent={recordEvent}
+                            deleteEventAndRefresh={deleteEventAndRefresh}
+                            adjustScore={adjustScore}
+                            replacePlayerOnTeam={(teamId, outId, inId) => replacePlayerOnMatchTeam(selectedMatch.id, teamId, outId, inId)}
+                        />
+                    )
+                })()
+            ) : (
+                <Paper variant="outlined" sx={{ p: 4, textAlign: 'center' }}>
+                    <Typography variant="h5" color="text.secondary">Selecione uma partida para ver os detalhes</Typography>
+                </Paper>
+            )}
+        </Grid>
+
+        {/* Right Column: Session Insights */}
+        <Grid size={{ xs: 12, md: 4 }} sx={{ height: '100%', overflowY: 'auto' }}>
+          <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>Session Insights</Typography>
           <StandingsPanel standings={standings} />
-          <PlayerStatsPanel playerStats={playerStats} playerSort={playerSort} onToggleSort={togglePlayerSort} />
+          <PlayerStatsPanel playerStats={playerStats} onToggleSort={togglePlayerSort} />
         </Grid>
       </Grid>
-    </div>
+    </Box>
   )
 }

@@ -128,7 +128,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
                     const vals = tps.map(p => (typeof effectiveScores[p.id] === 'number' ? effectiveScores[p.id] : p.grade)).filter((g): g is number => typeof g === 'number')
                     if (!vals.length) return null
                     const avg = (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1)
-                    return <span style={{ marginLeft: 8, color: '#666', fontWeight: 400 }}>(média {avg})</span>
+                    return <Typography component="span" variant="body2" sx={{ ml: 1, color: 'text.secondary', fontWeight: 400 }}>(média {avg})</Typography>
                   })()}
                 </span>
                 {!locked && (

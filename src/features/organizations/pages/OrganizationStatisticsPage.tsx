@@ -138,7 +138,7 @@ export default function OrganizationStatisticsPage() {
       <Paper sx={{ p: 2, mb: 3 }}>
         <Typography variant="h6" gutterBottom>Filtros</Typography>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={3}>
+          <Grid size={{ xs: 12, sm: 3 }}>
             <TextField
               fullWidth
               label="Nome do Jogador"
@@ -147,7 +147,7 @@ export default function OrganizationStatisticsPage() {
               size="small"
             />
           </Grid>
-          <Grid item xs={12} sm={2}>
+          <Grid size={{ xs: 12, sm: 2 }}>
             <TextField
               fullWidth
               label="Mínimo de Peladas"
@@ -157,7 +157,7 @@ export default function OrganizationStatisticsPage() {
               size="small"
             />
           </Grid>
-          <Grid item xs={12} sm={2}>
+          <Grid size={{ xs: 12, sm: 2 }}>
             <TextField
               fullWidth
               label="Mínimo de Gols"
@@ -167,7 +167,7 @@ export default function OrganizationStatisticsPage() {
               size="small"
             />
           </Grid>
-          <Grid item xs={12} sm={2}>
+          <Grid size={{ xs: 12, sm: 2 }}>
             <TextField
               fullWidth
               label="Mínimo de Assistências"
@@ -177,7 +177,7 @@ export default function OrganizationStatisticsPage() {
               size="small"
             />
           </Grid>
-          <Grid item xs={12} sm={3}>
+          <Grid size={{ xs: 12, sm: 3 }}>
             <TextField
               fullWidth
               label="Mínimo de Gols Contra"
