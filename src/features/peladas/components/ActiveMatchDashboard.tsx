@@ -1,8 +1,8 @@
-import { Paper, Typography, Box, Stack, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
-import type { Dispatch, SetStateAction } from 'react'
+import { Paper, Typography, Box, Stack, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, alpha } from '@mui/material'
+import { useState, type Dispatch, type SetStateAction } from 'react'
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz' // For substitution icon
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz' // For substitution icon
 import type { Match, TeamPlayer, Player } from '../../../shared/api/endpoints'
 
 // Reusing types from MatchDetails if possible, or redefining locally if simple
@@ -28,6 +28,66 @@ type Props = {
   deleteEventAndRefresh: (matchId: number, playerId: number, type: 'assist' | 'goal' | 'own_goal') => Promise<void>
   adjustScore: (match: Match, team: 'home' | 'away', delta: 1 | -1) => Promise<void>
   replacePlayerOnTeam: (teamId: number, outPlayerId: number, inPlayerId: number) => Promise<void>
+}
+
+function StatInput({ value, onChange, disabled }: { value: number; onChange: (diff: number) => void; disabled: boolean }) {
+  return (
+    <Box
+      sx={(theme) => ({
+        display: 'flex',
+        alignItems: 'center',
+        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: 1,
+        bgcolor: alpha(theme.palette.action.active, 0.04),
+        width: 'fit-content',
+        overflow: 'hidden'
+      })}
+    >
+      <IconButton 
+        size="small" 
+        onClick={() => onChange(-1)} 
+        disabled={disabled || value <= 0}
+        sx={{ 
+          borderRadius: 0, 
+          p: 0.5,
+          '&:hover': { bgcolor: 'action.hover' }
+        }}
+      >
+        <RemoveIcon fontSize="small" />
+      </IconButton>
+      
+      <Box 
+        sx={{ 
+          width: 32, 
+          height: 24, 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          bgcolor: 'background.paper',
+          borderLeft: 1,
+          borderRight: 1,
+          borderColor: 'divider'
+        }}
+      >
+        <Typography variant="body2" fontWeight="bold">
+          {value}
+        </Typography>
+      </Box>
+
+      <IconButton 
+        size="small" 
+        onClick={() => onChange(1)} 
+        disabled={disabled}
+        sx={{ 
+          borderRadius: 0, 
+          p: 0.5,
+          '&:hover': { bgcolor: 'action.hover' }
+        }}
+      >
+        <AddIcon fontSize="small" />
+      </IconButton>
+    </Box>
+  )
 }
 
 export default function ActiveMatchDashboard(props: Props) {
@@ -74,6 +134,34 @@ export default function ActiveMatchDashboard(props: Props) {
       setSelectMenu(null)
     } else {
       setSelectMenu({ teamId, forPlayerId: playerId })
+    }
+  }
+
+  const handleStatChange = async (
+    playerId: number, 
+    type: 'goal' | 'assist' | 'own_goal', 
+    diff: number, 
+    side: 'home' | 'away'
+  ) => {
+    if (diff === 0) return
+    const absDiff = Math.abs(diff)
+    // Loop for diff (simple serial handling, imperfect for score batching but safe for events)
+    for (let i = 0; i < absDiff; i++) {
+        if (diff > 0) {
+            await recordEvent(match.id, playerId, type)
+            if (type === 'goal') {
+                await adjustScore(match, side, 1) // Note: match prop is stale in loop, score update might be singular
+            } else if (type === 'own_goal') {
+                await adjustScore(match, side === 'home' ? 'away' : 'home', 1)
+            }
+        } else {
+            await deleteEventAndRefresh(match.id, playerId, type)
+            if (type === 'goal') {
+                await adjustScore(match, side, -1)
+            } else if (type === 'own_goal') {
+                await adjustScore(match, side === 'home' ? 'away' : 'home', -1)
+            }
+        }
     }
   }
 
@@ -140,48 +228,30 @@ export default function ActiveMatchDashboard(props: Props) {
                       </IconButton>
                     </TableCell>
                     <TableCell align="center">
-                      <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.5}>
-                        <Typography sx={{ minWidth: 20, textAlign: 'center' }}>{stats.goals}</Typography>
-                        {!finished && (
-                            <Stack direction="column">
-                                <IconButton size="small" sx={{ p: 0.2 }} disabled={updating} onClick={async () => { await recordEvent(match.id, tp.player_id, 'goal'); await adjustScore(match, tp.side, 1) }}>
-                                    <AddIcon fontSize="inherit" />
-                                </IconButton>
-                                <IconButton size="small" sx={{ p: 0.2 }} disabled={updating || stats.goals <= 0} onClick={async () => { await deleteEventAndRefresh(match.id, tp.player_id, 'goal'); await adjustScore(match, tp.side, -1) }}>
-                                    <RemoveIcon fontSize="inherit" />
-                                </IconButton>
-                            </Stack>
-                        )}
+                      <Stack direction="row" alignItems="center" justifyContent="center">
+                        <StatInput 
+                            value={stats.goals} 
+                            disabled={finished || updating} 
+                            onChange={(diff) => handleStatChange(tp.player_id, 'goal', diff, tp.side)}
+                        />
                       </Stack>
                     </TableCell>
                     <TableCell align="center">
-                      <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.5}>
-                        <Typography sx={{ minWidth: 20, textAlign: 'center' }}>{stats.assists}</Typography>
-                        {!finished && (
-                            <Stack direction="column">
-                                <IconButton size="small" sx={{ p: 0.2 }} disabled={updating} onClick={() => recordEvent(match.id, tp.player_id, 'assist')}>
-                                    <AddIcon fontSize="inherit" />
-                                </IconButton>
-                                <IconButton size="small" sx={{ p: 0.2 }} disabled={updating || stats.assists <= 0} onClick={() => deleteEventAndRefresh(match.id, tp.player_id, 'assist')}>
-                                    <RemoveIcon fontSize="inherit" />
-                                </IconButton>
-                            </Stack>
-                        )}
+                      <Stack direction="row" alignItems="center" justifyContent="center">
+                        <StatInput 
+                            value={stats.assists} 
+                            disabled={finished || updating} 
+                            onChange={(diff) => handleStatChange(tp.player_id, 'assist', diff, tp.side)}
+                        />
                       </Stack>
                     </TableCell>
                     <TableCell align="center">
-                      <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.5}>
-                        <Typography sx={{ minWidth: 20, textAlign: 'center' }}>{stats.ownGoals}</Typography>
-                        {!finished && (
-                            <Stack direction="column">
-                                <IconButton size="small" sx={{ p: 0.2 }} disabled={updating} onClick={async () => { await recordEvent(match.id, tp.player_id, 'own_goal'); await adjustScore(match, tp.side === 'home' ? 'away' : 'home', 1) }}>
-                                    <AddIcon fontSize="inherit" />
-                                </IconButton>
-                                <IconButton size="small" sx={{ p: 0.2 }} disabled={updating || stats.ownGoals <= 0} onClick={async () => { await deleteEventAndRefresh(match.id, tp.player_id, 'own_goal'); await adjustScore(match, tp.side === 'home' ? 'away' : 'home', -1) }}>
-                                    <RemoveIcon fontSize="inherit" />
-                                </IconButton>
-                            </Stack>
-                        )}
+                      <Stack direction="row" alignItems="center" justifyContent="center">
+                        <StatInput 
+                            value={stats.ownGoals} 
+                            disabled={finished || updating} 
+                            onChange={(diff) => handleStatChange(tp.player_id, 'own_goal', diff, tp.side)}
+                        />
                       </Stack>
                     </TableCell>
                   </TableRow>

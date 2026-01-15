@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Link as RouterLink, useParams } from 'react-router-dom'
-import { Container, Typography, Alert, TablePagination, Box, Button } from '@mui/material'
+import { Link as RouterLink, useParams, useNavigate } from 'react-router-dom'
+import { Container, Typography, Alert, TablePagination, Box, Button, Paper, Stack } from '@mui/material'
 import { api } from '../../../shared/api/client'
 import { createApi, type Pelada, type Organization } from '../../../shared/api/endpoints'
 import { useAuth } from '../../../app/providers/AuthContext'
@@ -12,6 +12,7 @@ const endpoints = createApi(api)
 export default function OrganizationDetailPage() {
   const { id } = useParams()
   const { user } = useAuth()
+  const navigate = useNavigate()
   const orgId = Number(id)
   const [org, setOrg] = useState<Organization | null>(null)
   const [peladas, setPeladas] = useState<Pelada[]>([])
@@ -65,53 +66,72 @@ export default function OrganizationDetailPage() {
     setPage(0)
   }
 
-  if (error) return <Container><Alert severity="error">{error}</Alert></Container>
-  if (!org) return <Container><Typography>Carregando...</Typography></Container>
+  if (error) return <Container sx={{ mt: 4 }}><Alert severity="error">{error}</Alert></Container>
+  if (!org) return <Container sx={{ mt: 4 }}><Typography>Carregando...</Typography></Container>
 
   return (
-    <Container>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h4">{org.name}</Typography>
-        <Button component={RouterLink} to={`/organizations/${orgId}/statistics`} variant="outlined">
-          Estatísticas
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      {/* Header */}
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+        <Typography variant="h4" component="h1" color="primary.main" fontWeight="bold">
+          {org.name}
+        </Typography>
+        <Button 
+          component={RouterLink} 
+          to={`/organizations/${orgId}/statistics`} 
+          variant="outlined"
+        >
+          ESTATÍSTICAS
         </Button>
       </Box>
-      <Typography variant="h6" gutterBottom>Peladas</Typography>
-      {isAdmin && (
-        <CreatePeladaForm
-          organizationId={orgId}
-          onCreate={async (payload) => {
-            try {
-              await endpoints.createPelada(payload)
-              fetchPeladas()
-            } catch (error: unknown) {
-              const message = error instanceof Error ? error.message : 'Erro ao criar pelada'
-              setError(message)
-            }
-          }}
-        />
-      )}
-      <PeladasTable
-        peladas={peladas}
-        onDelete={isAdmin ? async (id) => {
-          try {
-            await endpoints.deletePelada(id)
-            fetchPeladas()
-          } catch (error: unknown) {
-            const message = error instanceof Error ? error.message : 'Erro ao excluir pelada'
-            setError(message)
-          }
-        } : undefined}
-      />
-      <TablePagination
-        component="div"
-        count={totalPeladas}
-        page={page}
-        onPageChange={handleChangePage}
-        rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-        labelRowsPerPage="Itens por página"
-      />
+
+      <Stack spacing={4}>
+        {/* Create Pelada Section */}
+        {isAdmin && (
+          <Paper variant="outlined" sx={{ p: 3 }}>
+            <Typography variant="h5" gutterBottom>New Pelada</Typography>
+            <CreatePeladaForm
+              organizationId={orgId}
+              onCreate={async (payload) => {
+                try {
+                  const newPelada = await endpoints.createPelada(payload)
+                  // Navigate to the newly created pelada
+                  navigate(`/peladas/${newPelada.id}`)
+                } catch (error: unknown) {
+                  const message = error instanceof Error ? error.message : 'Erro ao criar pelada'
+                  setError(message)
+                }
+              }}
+            />
+          </Paper>
+        )}
+
+        {/* Pelada List Section */}
+        <Paper variant="outlined">
+          <PeladasTable
+            peladas={peladas}
+            onDelete={isAdmin ? async (id) => {
+              try {
+                await endpoints.deletePelada(id)
+                fetchPeladas()
+              } catch (error: unknown) {
+                const message = error instanceof Error ? error.message : 'Erro ao excluir pelada'
+                setError(message)
+              }
+            } : undefined}
+          />
+          <TablePagination
+            component="div"
+            count={totalPeladas}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Itens por página"
+            sx={{ borderTop: 1, borderColor: 'divider' }}
+          />
+        </Paper>
+      </Stack>
     </Container>
   )
 }

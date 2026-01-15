@@ -121,4 +121,61 @@ describe('OrganizationDetailPage', () => {
       expect(screen.getByText('Pelada #11')).toBeInTheDocument()
     })
   })
+
+  it('creates teams and redirects after creating a pelada', async () => {
+    const mockOrg = { id: 1, name: 'Test Org' }
+    const mockPeladas = {
+      data: [],
+      total: 0,
+      page: 1,
+      perPage: 10,
+      totalPages: 0
+    }
+
+    ;(api.get as Mock).mockImplementation((path: string) => {
+      if (path === '/api/organizations/1') return Promise.resolve(mockOrg)
+      if (path === '/api/organizations/1/users/1/is-admin') return Promise.resolve({ is_admin: true })
+      return Promise.reject(new Error('Not found'))
+    })
+
+    ;(api.getPaginated as Mock).mockImplementation((path: string) => {
+        if (path === '/api/organizations/1/peladas') return Promise.resolve(mockPeladas)
+        return Promise.reject(new Error('Not found'))
+    })
+
+    const createdPelada = { id: 99, organization_id: 1 }
+    ;(api.post as Mock).mockImplementation((path: string) => {
+      if (path === '/api/peladas') return Promise.resolve(createdPelada)
+      if (path === '/api/teams') return Promise.resolve({ id: 500 })
+      return Promise.reject(new Error('Unexpected post'))
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/organizations/1']}>
+        <Routes>
+          <Route path="/organizations/:id" element={<OrganizationDetailPage />} />
+          <Route path="/peladas/99" element={<div>Pelada Detail Page</div>} />
+        </Routes>
+      </MemoryRouter>
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText('New Pelada')).toBeInTheDocument()
+    })
+
+    // Fill and submit form
+    // The form is in CreatePeladaForm component
+    const createButton = screen.getByText('Criar pelada')
+    fireEvent.click(createButton)
+
+    await waitFor(() => {
+      // Should have called createPelada once
+      expect(api.post).toHaveBeenCalledWith('/api/peladas', expect.any(Object))
+      // createTeam should NOT be called by the frontend anymore
+      expect(api.post).not.toHaveBeenCalledWith('/api/teams', expect.any(Object))
+      
+      // Should have redirected
+      expect(screen.getByText('Pelada Detail Page')).toBeInTheDocument()
+    })
+  })
 })

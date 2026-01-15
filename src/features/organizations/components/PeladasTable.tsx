@@ -1,4 +1,5 @@
-import { Paper, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Link } from '@mui/material'
+import { Table, TableHead, TableRow, TableCell, TableBody, IconButton, Link as MuiLink } from '@mui/material'
+import { Link as RouterLink } from 'react-router-dom'
 import DeleteIcon from '@mui/icons-material/Delete'
 import type { Pelada } from '../../../shared/api/endpoints'
 
@@ -10,33 +11,31 @@ export type PeladasTableProps = {
 export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
   if (!peladas.length) return <p>Nenhuma pelada.</p>
   return (
-    <Paper elevation={1}>
-      <div className="table-responsive">
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Nome</TableCell>
-              {onDelete && <TableCell>Ações</TableCell>}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {peladas.map((p) => (
-              <TableRow key={`pelada-${p.id}`}>
-                <TableCell>
-                  <Link href={`/peladas/${p.id}`} underline="hover">Pelada #{p.id}</Link>
+    <div className="table-responsive">
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Nome</TableCell>
+            {onDelete && <TableCell align="right">Ações</TableCell>}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {peladas.map((p) => (
+            <TableRow key={`pelada-${p.id}`} hover>
+              <TableCell>
+                <MuiLink component={RouterLink} to={`/peladas/${p.id}`} underline="hover" color="inherit">Pelada #{p.id}</MuiLink>
+              </TableCell>
+              {onDelete && (
+                <TableCell align="right">
+                  <IconButton aria-label={`Excluir Pelada #${p.id}`} onClick={() => onDelete(p.id)} size="small" color="error">
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
                 </TableCell>
-                {onDelete && (
-                  <TableCell>
-                    <IconButton aria-label={`Excluir Pelada #${p.id}`} onClick={() => onDelete(p.id)} size="small" color="error">
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </TableCell>
-                )}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    </Paper>
+              )}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   )
 }

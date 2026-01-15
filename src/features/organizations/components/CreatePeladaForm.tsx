@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import type { FormEvent } from 'react'
-import { Stack, TextField, Button } from '@mui/material'
+import { Grid, TextField, Button } from '@mui/material'
 
 export type CreatePeladaPayload = {
   organization_id: number
@@ -39,13 +39,23 @@ export default function CreatePeladaForm({ organizationId, onCreate }: Props) {
       await onCreate({ organization_id: organizationId, when, num_teams: numTeams, players_per_team: playersPerTeam })
       formEl?.reset()
     }}>
-      <Stack spacing={2} sx={{ mb: 2, maxWidth: 480 }}>
-        <TextField name="date" type="date" label="Data" InputLabelProps={{ shrink: true }} required defaultValue={defaultDate} />
-        <TextField name="time" type="time" label="Hora" InputLabelProps={{ shrink: true }} required defaultValue={defaultTime} />
-        <TextField name="num_teams" type="number" label="Quantidade de times" inputProps={{ min: 2 }} defaultValue={2} />
-        <TextField name="players_per_team" type="number" label="Jogadores por time" inputProps={{ min: 1 }} defaultValue={5} />
-        <Button type="submit" variant="contained">Criar pelada</Button>
-      </Stack>
+      <Grid container spacing={2}>
+        <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField fullWidth name="date" type="date" label="Data" InputLabelProps={{ shrink: true }} required defaultValue={defaultDate} />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField fullWidth name="time" type="time" label="Hora" InputLabelProps={{ shrink: true }} required defaultValue={defaultTime} />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField fullWidth name="num_teams" type="number" label="Quantidade de times" inputProps={{ min: 2 }} defaultValue={2} />
+        </Grid>
+        <Grid size={{ xs: 12, sm: 6 }}>
+            <TextField fullWidth name="players_per_team" type="number" label="Jogadores por time" inputProps={{ min: 1 }} defaultValue={5} />
+        </Grid>
+        <Grid size={{ xs: 12 }}>
+            <Button fullWidth type="submit" variant="contained" size="large">Criar pelada</Button>
+        </Grid>
+      </Grid>
     </form>
   )
 }

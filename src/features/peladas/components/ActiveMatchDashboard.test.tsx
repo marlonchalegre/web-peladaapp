@@ -67,10 +67,17 @@ describe('ActiveMatchDashboard', () => {
     expect(screen.getByText('Player Data Entry')).toBeInTheDocument()
   })
 
-  it('renders substitution buttons', () => {
+  it('renders substitution buttons and stat inputs', () => {
     render(<ActiveMatchDashboard {...defaultProps} />)
+    
+    // Total buttons expected:
+    // 2 players
+    // Per player:
+    //  - 1 substitution button
+    //  - 3 stats (goals, assists, ownGoals)
+    //    - Each stat has 2 buttons (minus, plus)
+    // Total = 2 * (1 + 3 * 2) = 14 buttons
     const buttons = screen.getAllByRole('button')
-    // We expect buttons for sub, plus/minus goals/assists
-    expect(buttons.length).toBeGreaterThan(0)
+    expect(buttons).toHaveLength(14)
   })
 })
