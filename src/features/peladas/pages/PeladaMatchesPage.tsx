@@ -141,7 +141,7 @@ export default function PeladaMatchesPage() {
         setError(message)
       })
       .finally(() => setLoading(false))
-  }, [peladaId, loadedPeladaId])
+  }, [peladaId, loadedPeladaId, navigate])
 
   const standings = useMemo(() => {
     const table: Record<number, { teamId: number; wins: number; draws: number; losses: number; goalsFor: number; name: string }> = {}
