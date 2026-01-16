@@ -1,5 +1,5 @@
 import { Paper, Typography, Box, Stack, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, alpha } from '@mui/material'
-import { useState, type Dispatch, type SetStateAction } from 'react'
+import { type Dispatch, type SetStateAction } from 'react'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz' // For substitution icon
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'

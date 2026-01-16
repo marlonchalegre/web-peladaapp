@@ -32,10 +32,14 @@ export type VotingInfo = { can_vote: boolean; has_voted: boolean; eligible_playe
 export type BatchVotePayload = { voter_id: number; votes: { target_id: number; stars: number }[] }
 export type BatchVoteResponse = { votes_cast: number }
 
+export type AttendanceStatus = 'confirmed' | 'declined' | 'pending'
+export type Attendance = { id: number; pelada_id: number; player_id: number; status: AttendanceStatus; player: Player & { user: User } }
+
 export type PeladaFullDetailsResponse = {
   pelada: Pelada;
   teams: (Team & { players: (Player & { user: User })[] })[];
-  available_players: (Player & { user: User })[];
+  available_players: (Player & { user: User; attendance_status?: AttendanceStatus })[];
+  attendance: Attendance[];
   users_map: Record<number, User>;
   org_players_map: Record<number, Player>;
   voting_info: VotingInfo | null;
@@ -67,6 +71,8 @@ export function createApi(client: ApiClient) {
     beginPelada: (id: number, matchesPerTeam?: number) => client.post<{ matches_created: number }>(`/api/peladas/${id}/begin`, matchesPerTeam ? { matches_per_team: matchesPerTeam } : undefined),
     closePelada: (id: number) => client.post<Pelada>(`/api/peladas/${id}/close`),
     getPeladaFullDetails: (id: number) => client.get<PeladaFullDetailsResponse>(`/api/peladas/${id}/full-details`),
+    updateAttendance: (id: number, status: AttendanceStatus, playerId?: number) => client.post<number>(`/api/peladas/${id}/attendance`, { status, player_id: playerId }),
+    closeAttendance: (id: number) => client.post<Pelada>(`/api/peladas/${id}/close-attendance`),
 
     // Teams
     listTeamsByPelada: (peladaId: number) => client.get<Team[]>(`/api/peladas/${peladaId}/teams`),

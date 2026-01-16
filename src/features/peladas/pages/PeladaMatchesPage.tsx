@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useParams, Link as RouterLink } from 'react-router-dom'
+import { useParams, Link as RouterLink, useNavigate } from 'react-router-dom'
 import { Paper, Button, Box, Stack, Typography, Alert, List, ListItemButton, ListItemText, Divider } from '@mui/material'
 import Grid from '@mui/material/Grid'
 import { api } from '../../../shared/api/client'
@@ -48,6 +48,7 @@ function buildRowsFromStatMap(
 
 export default function PeladaMatchesPage() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const peladaId = Number(id)
   const [matches, setMatches] = useState<Match[]>([])
   const [teams, setTeams] = useState<Team[]>([])
@@ -87,6 +88,11 @@ export default function PeladaMatchesPage() {
     setLoading(true)
     endpoints.getPeladaDashboardData(peladaId)
       .then((data) => {
+        if (data.pelada.status === 'attendance') {
+          navigate(`/peladas/${peladaId}/attendance`)
+          return
+        }
+
         setPelada(data.pelada)
         setMatches(data.matches)
         setTeams(data.teams)

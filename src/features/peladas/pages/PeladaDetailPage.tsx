@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { DragEvent } from 'react'
-import { useParams, Link as RouterLink } from 'react-router-dom'
+import { useParams, Link as RouterLink, useNavigate } from 'react-router-dom'
 import { Container, Typography, Alert, Button, Stack, Box } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { api } from '../../../shared/api/client'
@@ -15,6 +15,7 @@ type TeamWithPlayers = Team & { players: (Player & { user: User })[] }
 
 export default function PeladaDetailPage() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const { user } = useAuth()
   const peladaId = Number(id)
   const [pelada, setPelada] = useState<Pelada | null>(null)
@@ -35,6 +36,12 @@ export default function PeladaDetailPage() {
     if (!peladaId) return
     try {
       const data = await endpoints.getPeladaFullDetails(peladaId)
+      
+      if (data.pelada.status === 'attendance') {
+        navigate(`/peladas/${peladaId}/attendance`)
+        return
+      }
+
       setPelada(data.pelada)
       setTeams(data.teams)
       setAvailablePlayers(data.available_players)
@@ -50,7 +57,7 @@ export default function PeladaDetailPage() {
       const message = error instanceof Error ? error.message : 'Erro ao carregar pelada'
       setError(message)
     }
-  }, [peladaId])
+  }, [peladaId, navigate])
 
   useEffect(() => {
     fetchPeladaData()

@@ -11,6 +11,7 @@ import OrganizationsPage from './features/organizations/pages/OrganizationsPage'
 import OrganizationDetailPage from './features/organizations/pages/OrganizationDetailPage'
 import OrganizationStatisticsPage from './features/organizations/pages/OrganizationStatisticsPage'
 import PeladaDetailPage from './features/peladas/pages/PeladaDetailPage'
+import AttendanceListPage from './features/peladas/pages/AttendanceListPage'
 import PeladaMatchesPage from './features/peladas/pages/PeladaMatchesPage'
 import PeladaVotingPage from './features/peladas/pages/PeladaVotingPage'
 import UserProfilePage from './features/user/pages/UserProfilePage'
@@ -59,6 +60,11 @@ function AppLayout() {
           <Route path="/peladas/:id" element={
             <Container maxWidth="lg" sx={{ py: 3 }}>
               <PeladaDetailPage />
+            </Container>
+          } />
+          <Route path="/peladas/:id/attendance" element={
+            <Container maxWidth="lg" sx={{ py: 3 }}>
+              <AttendanceListPage />
             </Container>
           } />
           <Route path="/peladas/:id/matches" element={
