@@ -9,10 +9,10 @@ Modern web interface for managing casual soccer matches (peladas) with friends. 
 Frontend application that allows:
 - **Authentication**: JWT-based user registration and login.
 - **User Management**: View and manage user profiles.
-- **Organizations**: Create and manage soccer organizations.
-- **Peladas (Game Days)**: Configure match days, teams, and schedules.
-- **Teams**: Interactive team building with drag-and-drop support.
-- **Matches**: Live score tracking and match event registration (goals, assists).
+- **Organizations**: Create and manage soccer organizations, including detailed statistics.
+- **Peladas (Game Days)**: Configure match days, manage attendance, and view dashboards.
+- **Teams**: View team compositions and standings.
+- **Matches**: Live score tracking, detailed match events, and player statistics.
 - **Voting System**: Post-match voting (1-5 stars) to calculate normalized player scores.
 - **Statistics**: Dashboard for player and team performance.
 
@@ -80,6 +80,10 @@ The project follows a feature-based architecture:
 - Protected routes based on authentication state.
 - Permission-based UI elements (Admin vs. Player).
 
+### Attendance Management
+- **RSVP**: Players can confirm or decline their attendance for a specific match day.
+- **Admin Control**: Admins can manually update player attendance and close the list to start team randomization.
+
 ### Team Management
 - **Drag-and-Drop**: Easily move players between teams.
 - **Randomization**: Algorithmically generate balanced teams based on player scores.
@@ -92,6 +96,10 @@ The project follows a feature-based architecture:
 ### Voting & Scores
 - Integrated voting flow after matches are closed.
 - Automatic calculation of normalized scores (1-10) to help balance future games.
+
+### Statistics & Dashboards
+- **Organization Stats**: Comprehensive view of player rankings, win rates, and goal contributions within an organization.
+- **Match Day Dashboard**: Real-time summary of current pelada standings and player performance.
 
 ---
 
