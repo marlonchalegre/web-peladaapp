@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Link as RouterLink } from 'react-router-dom'
-import { AppBar, Toolbar, Typography, Button, Container } from '@mui/material'
+import { AppBar, Toolbar, Typography, Button, Container, Box } from '@mui/material'
 import './App.css'
 import { AuthProvider } from './app/providers/AuthProvider'
 import { useAuth } from './app/providers/AuthContext'
@@ -19,89 +19,116 @@ import PeladaVotingPage from './features/peladas/pages/PeladaVotingPage'
 import UserProfilePage from './features/user/pages/UserProfilePage'
 import UsersPage from './features/user/pages/UsersPage'
 
+function Footer() {
+  const { t } = useTranslation()
+  const version = import.meta.env.VITE_APP_VERSION || t('app.development')
+  
+  return (
+    <Box 
+      component="footer" 
+      sx={{ 
+        py: 2, 
+        px: 2, 
+        mt: 'auto', 
+        backgroundColor: (theme) => theme.palette.grey[200],
+        textAlign: 'center'
+      }}
+    >
+      <Typography variant="body2" color="text.secondary">
+        {t('app.version', { version })}
+      </Typography>
+    </Box>
+  )
+}
+
 function AppLayout() {
   const { isAuthenticated, signOut } = useAuth()
   const { t } = useTranslation()
 
   return (
     <BrowserRouter>
-      {isAuthenticated && (
-        <AppBar position="static">
-          <Toolbar>
-            <Typography 
-              variant="h6" 
-              component={RouterLink} 
-              to="/" 
-              sx={{ 
-                flexGrow: 1, 
-                textDecoration: 'none', 
-                color: 'inherit',
-                fontWeight: 'bold'
-              }}
-            >
-              {t('app.title')}
-            </Typography>
-            <LanguageSwitcher />
-            <Button color="inherit" component={RouterLink} to="/profile">{t('navigation.profile')}</Button>
-            <Button color="inherit" onClick={() => signOut()}>{t('auth.logout')}</Button>
-          </Toolbar>
-        </AppBar>
-      )}
-      <Routes>
-        {/* Rotas públicas sem Container para permitir centralização própria */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        {isAuthenticated && (
+          <AppBar position="static">
+            <Toolbar>
+              <Typography 
+                variant="h6" 
+                component={RouterLink} 
+                to="/" 
+                sx={{ 
+                  flexGrow: 1, 
+                  textDecoration: 'none', 
+                  color: 'inherit',
+                  fontWeight: 'bold'
+                }}
+              >
+                {t('app.title')}
+              </Typography>
+              <LanguageSwitcher />
+              <Button color="inherit" component={RouterLink} to="/profile">{t('navigation.profile')}</Button>
+              <Button color="inherit" onClick={() => signOut()}>{t('auth.logout')}</Button>
+            </Toolbar>
+          </AppBar>
+        )}
+        <Box component="main" sx={{ flexGrow: 1 }}>
+          <Routes>
+            {/* Rotas públicas sem Container para permitir centralização própria */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
 
-        {/* Rotas protegidas com Container */}
-        <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/organizations" element={
-            <Container maxWidth="lg" sx={{ py: 3 }}>
-              <OrganizationsPage />
-            </Container>
-          } />
-          <Route path="/organizations/:id" element={
-            <Container maxWidth="lg" sx={{ py: 3 }}>
-              <OrganizationDetailPage />
-            </Container>
-          } />
-          <Route path="/organizations/:id/statistics" element={
-            <Container maxWidth="lg" sx={{ py: 3 }}>
-              <OrganizationStatisticsPage />
-            </Container>
-          } />
-          <Route path="/peladas/:id" element={
-            <Container maxWidth="lg" sx={{ py: 3 }}>
-              <PeladaDetailPage />
-            </Container>
-          } />
-          <Route path="/peladas/:id/attendance" element={
-            <Container maxWidth="lg" sx={{ py: 3 }}>
-              <AttendanceListPage />
-            </Container>
-          } />
-          <Route path="/peladas/:id/matches" element={
-            <Container maxWidth="lg" sx={{ py: 3 }}>
-              <PeladaMatchesPage />
-            </Container>
-          } />
-          <Route path="/peladas/:id/voting" element={
-            <Container maxWidth="lg" sx={{ py: 3 }}>
-              <PeladaVotingPage />
-            </Container>
-          } />
-          <Route path="/profile" element={
-            <Container maxWidth="lg" sx={{ py: 3 }}>
-              <UserProfilePage />
-            </Container>
-          } />
-          <Route path="/users" element={
-            <Container maxWidth="lg" sx={{ py: 3 }}>
-              <UsersPage />
-            </Container>
-          } />
-        </Route>
-      </Routes>
+            {/* Rotas protegidas com Container */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/organizations" element={
+                <Container maxWidth="lg" sx={{ py: 3 }}>
+                  <OrganizationsPage />
+                </Container>
+              } />
+              <Route path="/organizations/:id" element={
+                <Container maxWidth="lg" sx={{ py: 3 }}>
+                  <OrganizationDetailPage />
+                </Container>
+              } />
+              <Route path="/organizations/:id/statistics" element={
+                <Container maxWidth="lg" sx={{ py: 3 }}>
+                  <OrganizationStatisticsPage />
+                </Container>
+              } />
+              <Route path="/peladas/:id" element={
+                <Container maxWidth="lg" sx={{ py: 3 }}>
+                  <PeladaDetailPage />
+                </Container>
+              } />
+              <Route path="/peladas/:id/attendance" element={
+                <Container maxWidth="lg" sx={{ py: 3 }}>
+                  <AttendanceListPage />
+                </Container>
+              } />
+              <Route path="/peladas/:id/matches" element={
+                <Container maxWidth="lg" sx={{ py: 3 }}>
+                  <PeladaMatchesPage />
+                </Container>
+              } />
+              <Route path="/peladas/:id/voting" element={
+                <Container maxWidth="lg" sx={{ py: 3 }}>
+                  <PeladaVotingPage />
+                </Container>
+              } />
+              <Route path="/profile" element={
+                <Container maxWidth="lg" sx={{ py: 3 }}>
+                  <UserProfilePage />
+                </Container>
+              } />
+              <Route path="/users" element={
+                <Container maxWidth="lg" sx={{ py: 3 }}>
+                  <UsersPage />
+                </Container>
+              } />
+            </Route>
+          </Routes>
+        </Box>
+        <Footer />
+      </Box>
     </BrowserRouter>
   )
 }

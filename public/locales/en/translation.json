@@ -1,6 +1,8 @@
 {
   "app": {
-    "title": "Pelada App"
+    "title": "Pelada App",
+    "version": "Version: {{version}}",
+    "development": "development version"
   },
   "navigation": {
     "home": "Home",
@@ -121,6 +123,9 @@
         "org_name": "Organization Name",
         "role": "Role"
       }
+    },
+    "actions": {
+      "create_organization": "Create Organization"
     }
   },
   "organizations": {

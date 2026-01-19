@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react'
-import { Typography, Container, Paper, Table, TableHead, TableRow, TableCell, TableBody, Box, Alert, Link } from '@mui/material'
+import { useEffect, useState, useCallback } from 'react'
+import { Typography, Container, Paper, Table, TableHead, TableRow, TableCell, TableBody, Box, Alert, Link, Button, Dialog, DialogTitle, DialogContent } from '@mui/material'
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
 import GroupsIcon from '@mui/icons-material/Groups'
+import AddIcon from '@mui/icons-material/Add'
 import { useAuth } from '../../../app/providers/AuthContext'
 import { api } from '../../../shared/api/client'
 import { createApi } from '../../../shared/api/endpoints'
 import { useTranslation } from 'react-i18next'
 import { Loading } from '../../../shared/components/Loading'
+import CreateOrganizationForm from '../../organizations/components/CreateOrganizationForm'
 
 const endpoints = createApi(api)
 
@@ -23,65 +25,65 @@ export default function HomePage() {
   const [memberOrgs, setMemberOrgs] = useState<OrganizationWithRole[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [createDialogOpen, setCreateDialogOpen] = useState(false)
+
+  const fetchOrganizations = useCallback(async () => {
+    if (!user) return
+    try {
+      setLoading(true)
+      
+      // Fetch organizations where user is admin
+      const adminData = await endpoints.listUserAdminOrganizations(user.id)
+      if (!Array.isArray(adminData)) {
+        throw new Error(t('home.error.invalid_format_admin_orgs'))
+      }
+      const adminOrgIds = new Set(adminData.map((a) => a.organization_id))
+      
+      // Fetch all organizations and their players
+      const response = await endpoints.listOrganizations()
+      // @ts-expect-error - listOrganizations returns Organization[] but we check for legacy wrapper
+      const allOrgs = response.organizations || response
+
+      if (!Array.isArray(allOrgs)) {
+        console.error('Resposta inválida de listOrganizations:', response)
+        throw new Error(t('home.error.invalid_format_org_list'))
+      }
+      
+      // Build admin organizations list
+      const adminOrgsList: OrganizationWithRole[] = allOrgs
+        .filter((org) => adminOrgIds.has(org.id))
+        .map((org) => ({ ...org, role: 'admin' as const }))
+      
+      // For member organizations, we need to check which orgs the user is a player in
+      const playerChecks = await Promise.all(
+        allOrgs
+          .filter((org) => !adminOrgIds.has(org.id))
+          .map(async (org) => {
+            try {
+              const players = await endpoints.listPlayersByOrg(org.id)
+              const isPlayer = players.some((p) => p.user_id === user.id)
+              return isPlayer ? { ...org, role: 'player' as const } : null
+            } catch {
+              return null
+            }
+          })
+      )
+      
+      const memberOrgsList = playerChecks.filter((org) => org !== null) as OrganizationWithRole[]
+      
+      setAdminOrgs(adminOrgsList)
+      setMemberOrgs(memberOrgsList)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : t('home.error.load_failed')
+      setError(message)
+    } finally {
+      setLoading(false)
+    }
+  }, [user, t])
 
   useEffect(() => {
-    if (!user) return
-
-    const fetchOrganizations = async () => {
-      try {
-        setLoading(true)
-        
-        // Fetch organizations where user is admin
-        const adminData = await endpoints.listUserAdminOrganizations(user.id)
-        if (!Array.isArray(adminData)) {
-          throw new Error(t('home.error.invalid_format_admin_orgs'))
-        }
-        const adminOrgIds = new Set(adminData.map((a) => a.organization_id))
-        
-        // Fetch all organizations and their players
-        const response = await endpoints.listOrganizations()
-        // @ts-expect-error - listOrganizations returns Organization[] but we check for legacy wrapper
-        const allOrgs = response.organizations || response
-
-        if (!Array.isArray(allOrgs)) {
-          console.error('Resposta inválida de listOrganizations:', response)
-          throw new Error(t('home.error.invalid_format_org_list'))
-        }
-        
-        // Build admin organizations list
-        const adminOrgsList: OrganizationWithRole[] = allOrgs
-          .filter((org) => adminOrgIds.has(org.id))
-          .map((org) => ({ ...org, role: 'admin' as const }))
-        
-        // For member organizations, we need to check which orgs the user is a player in
-        const playerChecks = await Promise.all(
-          allOrgs
-            .filter((org) => !adminOrgIds.has(org.id))
-            .map(async (org) => {
-              try {
-                const players = await endpoints.listPlayersByOrg(org.id)
-                const isPlayer = players.some((p) => p.user_id === user.id)
-                return isPlayer ? { ...org, role: 'player' as const } : null
-              } catch {
-                return null
-              }
-            })
-        )
-        
-        const memberOrgsList = playerChecks.filter((org) => org !== null) as OrganizationWithRole[]
-        
-        setAdminOrgs(adminOrgsList)
-        setMemberOrgs(memberOrgsList)
-      } catch (err) {
-        const message = err instanceof Error ? err.message : t('home.error.load_failed')
-        setError(message)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchOrganizations()
-  }, [user, t])
+  }, [fetchOrganizations])
 
   if (!user) {
     return (
@@ -94,9 +96,19 @@ export default function HomePage() {
 
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
-      <Typography variant="h3" gutterBottom>
-        {t('home.welcome.user', { name: user.name })}
-      </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
+        <Typography variant="h3">
+          {t('home.welcome.user', { name: user.name })}
+        </Typography>
+        <Button 
+          variant="contained" 
+          color="primary" 
+          startIcon={<AddIcon />}
+          onClick={() => setCreateDialogOpen(true)}
+        >
+          {t('home.actions.create_organization')}
+        </Button>
+      </Box>
       
       {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
@@ -199,6 +211,19 @@ export default function HomePage() {
           </Box>
         </>
       )}
+
+      <Dialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)}>
+        <DialogTitle>{t('home.actions.create_organization')}</DialogTitle>
+        <DialogContent>
+          <Box sx={{ pt: 1 }}>
+            <CreateOrganizationForm onCreate={async (name) => {
+              await endpoints.createOrganization(name)
+              setCreateDialogOpen(false)
+              fetchOrganizations()
+            }} />
+          </Box>
+        </DialogContent>
+      </Dialog>
     </Container>
   )
 }
