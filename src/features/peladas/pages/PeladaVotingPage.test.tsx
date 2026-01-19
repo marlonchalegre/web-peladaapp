@@ -58,7 +58,8 @@ describe('PeladaVotingPage', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText('Votação da Pelada #1')).toBeInTheDocument()
+      // t('peladas.voting.title', { id: 1 }) -> 'peladas.voting.title' with simple mock
+      expect(screen.getAllByText('peladas.voting.title').length).toBeGreaterThan(0)
       expect(screen.getByText('Target Player')).toBeInTheDocument()
     })
   })

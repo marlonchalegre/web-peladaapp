@@ -6,20 +6,18 @@ import CreateOrganizationForm from '../components/CreateOrganizationForm'
 import OrganizationsTable from '../components/OrganizationsTable'
 import AddPlayersDialog from '../components/AddPlayersDialog'
 import ManageAdminsDialog from '../components/ManageAdminsDialog'
+import { useTranslation } from 'react-i18next'
+import { Loading } from '../../../shared/components/Loading'
 
 type Organization = {
   id: number
   name: string
 }
 
-type PagedOrgs = {
-  organizations: Organization[]
-  total: number
-}
-
 const endpoints = createApi(api)
 
 export default function OrganizationsPage() {
+  const { t } = useTranslation()
   const [orgs, setOrgs] = useState<Organization[]>([])
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -35,24 +33,24 @@ export default function OrganizationsPage() {
 
   useEffect(() => {
     setLoading(true)
-    api.get<PagedOrgs>('/api/organizations', { page, per_page: perPage })
+    api.getPaginated<Organization[]>('/api/organizations', { page, per_page: perPage })
       .then((data) => {
-        setOrgs(data.organizations)
+        setOrgs(data.data)
         setTotal(data.total)
       })
       .catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : 'Failed to load organizations'
+        const message = error instanceof Error ? error.message : t('organizations.list.error.load_failed')
         setError(message)
       })
       .finally(() => setLoading(false))
-  }, [page, perPage])
+  }, [page, perPage, t])
 
-  if (loading) return <Container><Typography>Carregando organizações...</Typography></Container>
+  if (loading) return <Loading message={t('organizations.list.loading')} />
   if (error) return <Container><Alert severity="error">{error}</Alert></Container>
 
   return (
     <Container>
-      <Typography variant="h4" gutterBottom>Organizações</Typography>
+      <Typography variant="h4" gutterBottom>{t('organizations.list.title')}</Typography>
       <CreateOrganizationForm onCreate={async (name) => {
         const created = await endpoints.createOrganization(name)
         setOrgs((prev) => {
@@ -74,7 +72,7 @@ export default function OrganizationsPage() {
             setSelectedUserIds(new Set())
             setAddingPlayersOrgId(o.id)
           } catch (error: unknown) {
-            const message = error instanceof Error ? error.message : 'Erro ao carregar usuários'
+            const message = error instanceof Error ? error.message : t('organizations.error.load_users_failed')
             setError(message)
           }
         }}
@@ -89,7 +87,7 @@ export default function OrganizationsPage() {
             setAdmins(orgAdmins)
             setManagingAdminsOrg(o)
           } catch (error: unknown) {
-            const message = error instanceof Error ? error.message : 'Erro ao carregar administradores'
+            const message = error instanceof Error ? error.message : t('organizations.error.load_admins_failed')
             setError(message)
           } finally {
             setLoadingAdmins(false)
@@ -100,7 +98,7 @@ export default function OrganizationsPage() {
             await endpoints.deleteOrganization(o.id)
             setOrgs((prev) => prev.filter((x) => x.id !== o.id))
           } catch (error: unknown) {
-            const message = error instanceof Error ? error.message : 'Erro ao excluir organização'
+            const message = error instanceof Error ? error.message : t('organizations.error.delete_failed')
             setError(message)
           }
         }}

@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import type { FormEvent } from 'react'
 import { Grid, TextField, Button } from '@mui/material'
+import { useTranslation } from 'react-i18next'
 
 export type CreatePeladaPayload = {
   organization_id: number
@@ -15,6 +16,7 @@ type Props = {
 }
 
 export default function CreatePeladaForm({ organizationId, onCreate }: Props) {
+  const { t } = useTranslation()
   const { defaultDate, defaultTime } = useMemo(() => {
     const now = new Date()
     const pad2 = (n: number) => String(n).padStart(2, '0')
@@ -41,19 +43,19 @@ export default function CreatePeladaForm({ organizationId, onCreate }: Props) {
     }}>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField fullWidth name="date" type="date" label="Data" InputLabelProps={{ shrink: true }} required defaultValue={defaultDate} />
+            <TextField fullWidth name="date" type="date" label={t('common.fields.date')} InputLabelProps={{ shrink: true }} required defaultValue={defaultDate} />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField fullWidth name="time" type="time" label="Hora" InputLabelProps={{ shrink: true }} required defaultValue={defaultTime} />
+            <TextField fullWidth name="time" type="time" label={t('common.fields.time')} InputLabelProps={{ shrink: true }} required defaultValue={defaultTime} />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField fullWidth name="num_teams" type="number" label="Quantidade de times" inputProps={{ min: 2 }} defaultValue={2} />
+            <TextField fullWidth name="num_teams" type="number" label={t('organizations.form.pelada.teams_count')} inputProps={{ min: 2 }} defaultValue={2} />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
-            <TextField fullWidth name="players_per_team" type="number" label="Jogadores por time" inputProps={{ min: 1 }} defaultValue={5} />
+            <TextField fullWidth name="players_per_team" type="number" label={t('organizations.form.pelada.players_per_team')} inputProps={{ min: 1 }} defaultValue={5} />
         </Grid>
         <Grid size={{ xs: 12 }}>
-            <Button fullWidth type="submit" variant="contained" size="large">Criar pelada</Button>
+            <Button fullWidth type="submit" variant="contained" size="large">{t('organizations.form.pelada.submit')}</Button>
         </Grid>
       </Grid>
     </form>

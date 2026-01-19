@@ -2,6 +2,7 @@ import { Paper, Typography, Box, IconButton, Chip, Avatar, Stack } from '@mui/ma
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import type { DragEvent } from 'react'
 import type { Player, Team, User } from '../../../shared/api/endpoints'
+import { useTranslation } from 'react-i18next'
 
 type PlayerWithUser = Player & { user: User; displayScore?: string }
 
@@ -31,6 +32,7 @@ export default function TeamCard({
   onDragStartPlayer,
   locked,
 }: TeamCardProps) {
+  const { t } = useTranslation()
 
   const emptySlots = Math.max(0, maxPlayers - players.length)
 
@@ -70,7 +72,7 @@ export default function TeamCard({
           </Typography>
           {averageScore !== null && (
             <Chip 
-              label={`MÉDIA: ${averageScore.toFixed(1)}`} 
+              label={t('peladas.team_card.average', { score: averageScore.toFixed(1) })}
               size="small" 
               sx={{ 
                 mt: 0.5, 
@@ -85,7 +87,7 @@ export default function TeamCard({
           )}
         </Box>
         {!locked && (
-          <IconButton size="small" onClick={onDelete} aria-label="Excluir time" sx={{ color: 'text.secondary' }}>
+          <IconButton size="small" onClick={onDelete} aria-label={t('peladas.team_card.delete')} sx={{ color: 'text.secondary' }}>
             <DeleteOutlineIcon fontSize="small" />
           </IconButton>
         )}
@@ -162,7 +164,7 @@ export default function TeamCard({
                boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
              }}
            >
-             Arraste um jogador
+             {t('peladas.team_card.drag_placeholder')}
            </Box>
         ))}
       </Stack>

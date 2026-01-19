@@ -12,12 +12,15 @@ import { createApi, type Pelada, type Team, type Player, type VotingInfo, type U
 import { useAuth } from '../../../app/providers/AuthContext'
 import TeamsSection from '../components/TeamsSection'
 import AvailablePlayersPanel from '../components/AvailablePlayersPanel'
+import { useTranslation } from 'react-i18next'
+import { Loading } from '../../../shared/components/Loading'
 
 const endpoints = createApi(api)
 
 type TeamWithPlayers = Team & { players: (Player & { user: User })[] }
 
 export default function PeladaDetailPage() {
+  const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -64,10 +67,10 @@ export default function PeladaDetailPage() {
       setTeamPlayers(playersByTeam)
 
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao carregar pelada'
+      const message = error instanceof Error ? error.message : t('peladas.detail.error.load_failed')
       setError(message)
     }
-  }, [peladaId, navigate])
+  }, [peladaId, navigate, t])
 
   // Fetch normalized scores whenever players change
   useEffect(() => {
@@ -156,9 +159,9 @@ export default function PeladaDetailPage() {
     try {
       await endpoints.removePlayerFromTeam(sourceTeamId, playerId)
       await fetchPeladaData() // Refresh all data
-      setLive(`Jogador #${playerId} movido para banco`)
+      setLive(t('peladas.detail.live.moved_to_bench', { playerId }))
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao mover para banco'
+      const message = error instanceof Error ? error.message : t('peladas.detail.error.move_to_bench_failed')
       setError(message)
     }
   }
@@ -176,9 +179,9 @@ export default function PeladaDetailPage() {
       await endpoints.addPlayerToTeam(targetTeamId, playerId)
       await fetchPeladaData() // Refresh all data
       const tName = teams.find((t) => t.id === targetTeamId)?.name || String(targetTeamId)
-      setLive(`Jogador #${playerId} movido para time ${tName}`)
+      setLive(t('peladas.detail.live.moved_to_team', { playerId, teamName: tName }))
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao mover jogador'
+      const message = error instanceof Error ? error.message : t('peladas.detail.error.move_player_failed')
       setError(message)
     }
   }
@@ -193,7 +196,7 @@ export default function PeladaDetailPage() {
       })
       await fetchPeladaData() // Refresh all data after randomization
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao randomizar times'
+      const message = error instanceof Error ? error.message : t('peladas.detail.error.randomize_failed')
       setError(message)
     }
   }
@@ -208,7 +211,7 @@ export default function PeladaDetailPage() {
         await fetchPeladaData() 
       }
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao iniciar pelada'
+      const message = error instanceof Error ? error.message : t('peladas.detail.error.start_failed')
       setError(message)
     } finally {
       setChangingStatus(false)
@@ -217,7 +220,7 @@ export default function PeladaDetailPage() {
   }
 
   if (error) return <Container><Alert severity="error">{error}</Alert></Container>
-  if (!pelada) return <Container><Typography>Carregando...</Typography></Container>
+  if (!pelada) return <Loading message={t('common.loading')} />
 
   return (
     <Container maxWidth="xl" sx={{ pb: 4 }}>
@@ -233,10 +236,10 @@ export default function PeladaDetailPage() {
            </IconButton>
            <Box>
              <Typography variant="overline" display="block" color="text.secondary" sx={{ lineHeight: 1 }}>
-               ORGANIZAÇÃO
+               {t('common.organization')}
              </Typography>
              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-               Pelada #{pelada.id}
+               {t('peladas.detail.title', { id: pelada.id })}
              </Typography>
            </Box>
         </Box>
@@ -254,7 +257,7 @@ export default function PeladaDetailPage() {
              startIcon={<HistoryIcon />}
              sx={{ textTransform: 'none', borderRadius: 2 }}
            >
-             Ver Partidas
+             {t('peladas.detail.button.view_matches')}
            </Button>
            
            {pelada.status === 'open' && (
@@ -270,7 +273,7 @@ export default function PeladaDetailPage() {
                  fontWeight: 'bold'
                }}
              >
-               INICIAR PELADA
+               {t('peladas.detail.button.start_pelada')}
              </Button>
            )}
            
@@ -282,7 +285,7 @@ export default function PeladaDetailPage() {
               color={votingInfo.has_voted ? "success" : "secondary"}
               sx={{ textTransform: 'none', borderRadius: 2 }}
             >
-              {votingInfo.has_voted ? 'Alterar Votos' : 'Votar nos Jogadores'}
+              {votingInfo.has_voted ? t('peladas.detail.button.change_votes') : t('peladas.detail.button.vote')}
             </Button>
           )}
         </Stack>
@@ -312,7 +315,7 @@ export default function PeladaDetailPage() {
                 await endpoints.createTeam({ pelada_id: peladaId, name })
                 await fetchPeladaData() 
               } catch (error: unknown) {
-                const message = error instanceof Error ? error.message : 'Erro ao criar time'
+                const message = error instanceof Error ? error.message : t('peladas.detail.error.create_team_failed')
                 setError(message)
               } finally {
                 setCreatingTeam(false)
@@ -323,7 +326,7 @@ export default function PeladaDetailPage() {
                 await endpoints.deleteTeam(teamId)
                 await fetchPeladaData()
               } catch (error: unknown) {
-                const message = error instanceof Error ? error.message : 'Erro ao excluir time'
+                const message = error instanceof Error ? error.message : t('peladas.detail.error.delete_team_failed')
                 setError(message)
               }
             }}
@@ -351,12 +354,12 @@ export default function PeladaDetailPage() {
 
       {/* Start Pelada Dialog */}
       <Dialog open={startDialogOpen} onClose={() => setStartDialogOpen(false)}>
-        <DialogTitle>Iniciar pelada</DialogTitle>
+        <DialogTitle>{t('peladas.dialog.start.title')}</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
             margin="dense"
-            label="Partidas por time"
+            label={t('peladas.dialog.start.matches_per_team')}
             type="number"
             fullWidth
             variant="outlined"
@@ -366,13 +369,13 @@ export default function PeladaDetailPage() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setStartDialogOpen(false)}>Cancelar</Button>
+          <Button onClick={() => setStartDialogOpen(false)}>{t('common.cancel')}</Button>
           <Button
             variant="contained"
             disabled={!matchesPerTeam || parseInt(matchesPerTeam) <= 0}
             onClick={handleBeginPelada}
           >
-            Iniciar
+            {t('common.start')}
           </Button>
         </DialogActions>
       </Dialog>

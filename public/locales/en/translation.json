@@ -1,0 +1,422 @@
+{
+  "app": {
+    "title": "Pelada App"
+  },
+  "navigation": {
+    "home": "Home",
+    "organizations": "Organizations",
+    "users": "Users",
+    "profile": "Profile"
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "error": {
+        "failed": "Login failed"
+      },
+      "button": {
+        "submit": "Login",
+        "loading": "Logging in..."
+      },
+      "link": {
+        "new_user": "New here?",
+        "register": "Create account"
+      }
+    },
+    "register": {
+      "title": "Create Account",
+      "error": {
+        "failed": "Registration failed"
+      },
+      "button": {
+        "submit": "Register",
+        "loading": "Registering..."
+      },
+      "link": {
+        "existing_user": "Already have an account?",
+        "login": "Login"
+      }
+    },
+    "logout": "Logout"
+  },
+  "components": {
+    "language_switcher": {
+      "label": "Language"
+    }
+  },
+  "common": {
+    "welcome": "Welcome to Pelada App",
+    "loading": "Loading...",
+    "cancel": "Cancel",
+    "create": "Create",
+    "add": "Add",
+    "close": "Close",
+    "actions": "Actions",
+    "select_placeholder": "Select...",
+    "year": "Year",
+    "filters": "Filters",
+    "player": "Player",
+    "goals": "Goals",
+    "assists": "Assists",
+    "own_goals": "Own Goals",
+    "back": "Back",
+    "back_to_org": "Back to Organization",
+    "start": "Start",
+    "sending": "Sending...",
+    "sub": "Sub",
+    "matches_played": "Matches",
+    "team": "Team",
+    "wins_short": "W",
+    "draws_short": "D",
+    "losses_short": "L",
+    "you": "You",
+    "organization": "ORGANIZATION",
+    "assists_short": "Assists",
+    "own_goals_short": "Own Goals",
+    "pagination": {
+      "rows_per_page": "Rows per page"
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "name": "Name",
+      "date": "Date",
+      "time": "Time",
+      "player_name": "Player Name",
+      "id": "ID",
+      "score": "Score"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "player": "Player"
+    },
+    "positions": {
+      "goalkeeper": "Goalkeeper",
+      "player": "PLAYER",
+      "unknown": "UNKNOWN"
+    }
+  },
+  "home": {
+    "error": {
+      "invalid_format_admin_orgs": "Invalid format received when fetching admin organizations",
+      "invalid_format_org_list": "Invalid format received when fetching organization list",
+      "load_failed": "Error loading organizations"
+    },
+    "welcome": {
+      "guest": "Please, log in.",
+      "user": "Welcome, {{name}}!"
+    },
+    "sections": {
+      "admin_orgs": {
+        "title": "My Organizations (Admin)",
+        "empty": "You are not an administrator of any organization."
+      },
+      "member_orgs": {
+        "title": "Organizations I belong to (Player)",
+        "empty": "You do not belong to any organization as a player."
+      }
+    },
+    "table": {
+      "headers": {
+        "org_name": "Organization Name",
+        "role": "Role"
+      }
+    }
+  },
+  "organizations": {
+    "list": {
+      "title": "Organizations",
+      "loading": "Loading organizations...",
+      "empty": "No organizations found.",
+      "error": {
+        "load_failed": "Failed to load organizations"
+      }
+    },
+    "detail": {
+      "button": {
+        "statistics": "STATISTICS"
+      },
+      "section": {
+        "new_pelada": "New Pelada"
+      },
+      "error": {
+        "load_failed": "Error loading organization",
+        "load_peladas_failed": "Error loading peladas",
+        "create_pelada_failed": "Error creating pelada",
+        "delete_pelada_failed": "Error deleting pelada"
+      }
+    },
+    "stats": {
+      "title": "{{name}} - Statistics",
+      "back_link": "Back to Organization",
+      "empty": "No statistics found for the applied filters.",
+      "filters": {
+        "min_peladas": "Min Peladas",
+        "min_goals": "Min Goals",
+        "min_assists": "Min Assists",
+        "min_own_goals": "Min Own Goals"
+      },
+      "table": {
+        "peladas": "Peladas"
+      },
+      "error": {
+        "load_org_failed": "Error loading organization",
+        "load_stats_failed": "Error loading statistics"
+      }
+    },
+    "form": {
+      "pelada": {
+        "teams_count": "Number of teams",
+        "players_per_team": "Players per team",
+        "submit": "Create pelada"
+      }
+    },
+    "dialog": {
+      "add_players": {
+        "title": "Add players",
+        "empty_users": "No users available.",
+        "select_all": "Select all",
+        "clear_selection": "Clear selection",
+        "add_selected": "Add selected",
+        "add_all": "Add all"
+      },
+      "manage_admins": {
+        "title": "Manage Administrators - {{name}}",
+        "add_section_title": "Add Administrator",
+        "current_admins_title": "Current Administrators",
+        "all_users_are_admins": "All users are already admins",
+        "select_user_label": "Select a user",
+        "cannot_remove_last_admin_tooltip": "Cannot remove the last admin",
+        "remove_admin_tooltip": "Remove admin",
+        "user_fallback": "User #{{id}}"
+      }
+    },
+    "table": {
+      "aria": {
+        "add_players": "Add players to organization {{name}}",
+        "manage_admins": "Manage administrators of organization {{name}}",
+        "delete": "Delete organization {{name}}"
+      }
+    },
+    "peladas": {
+      "empty": "No peladas.",
+      "item_name": "Pelada #{{id}}",
+      "aria": {
+        "delete": "Delete Pelada #{{id}}"
+      }
+    },
+    "error": {
+      "load_users_failed": "Error loading users",
+      "load_admins_failed": "Error loading administrators",
+      "delete_failed": "Error deleting organization",
+      "add_admin_failed": "Error adding administrator",
+      "remove_last_admin": "Cannot remove the last administrator of the organization",
+      "remove_admin_failed": "Error removing administrator"
+    }
+  },
+  "peladas": {
+    "error": {
+      "not_found": "Pelada not found"
+    },
+    "attendance": {
+      "title": "Weekly Match Attendance",
+      "subtitle": "Manage player status and finalize team generation.",
+      "error": {
+        "load_failed": "Error loading attendance list",
+        "update_failed": "Error updating attendance",
+        "close_failed": "Error closing attendance list"
+      },
+      "button": {
+        "close_list": "Close List and Create Teams",
+        "confirm": "I'm In",
+        "decline": "I'm Out"
+      },
+      "user_status": {
+        "title": "Your attendance:",
+        "subtitle": "Confirm if you will participate in this pelada."
+      },
+      "status": {
+        "confirmed": "Confirmed",
+        "declined": "Declined",
+        "pending": "Pending"
+      },
+      "empty": {
+        "confirmed": "No one confirmed yet.",
+        "declined": "No one declined yet.",
+        "pending": "Everyone has responded!"
+      },
+      "stats": {
+        "total_players": "TOTAL PLAYERS",
+        "total_confirmed": "TOTAL CONFIRMED",
+        "total_declined": "TOTAL DECLINED",
+        "total_pending": "TOTAL PENDING"
+      }
+    },
+    "detail": {
+      "title": "Pelada #{{id}}",
+      "error": {
+        "load_failed": "Error loading pelada",
+        "move_to_bench_failed": "Error moving player to bench",
+        "move_player_failed": "Error moving player",
+        "randomize_failed": "Error randomizing teams",
+        "start_failed": "Error starting pelada",
+        "create_team_failed": "Error creating team",
+        "delete_team_failed": "Error deleting team"
+      },
+      "live": {
+        "moved_to_bench": "Player #{{playerId}} moved to bench",
+        "moved_to_team": "Player #{{playerId}} moved to team {{teamName}}"
+      },
+      "button": {
+        "view_matches": "View Matches",
+        "start_pelada": "START PELADA",
+        "vote": "Vote on Players",
+        "change_votes": "Change Votes"
+      }
+    },
+    "dialog": {
+      "start": {
+        "title": "Start pelada",
+        "matches_per_team": "Matches per team"
+      }
+    },
+    "matches": {
+      "title": "Pelada #{{id}}",
+      "loading": "Loading matches...",
+      "status": {
+        "closed": "Pelada closed"
+      },
+      "button": {
+        "close_pelada": "Close pelada",
+        "closing": "Closing..."
+      },
+      "history_title": "Match History Stream",
+      "empty_history": "No matches",
+      "history_item_title": "Seq {{sequence}}: {{teamName}}",
+      "team_fallback": "Team {{id}}",
+      "confirm_end_match": "Are you sure you want to end the match?",
+      "select_match_hint": "Select a match to view details",
+      "insights_title": "Session Insights",
+      "error": {
+        "load_failed": "Error loading matches",
+        "replace_player_failed": "Error replacing player in match",
+        "negative_score": "Score cannot be negative",
+        "update_score_failed": "Error updating score",
+        "load_stats_failed": "Error loading statistics",
+        "record_event_failed": "Error recording event",
+        "close_failed": "Error closing pelada",
+        "add_player_failed": "Error adding player",
+        "end_match_failed": "Error ending match"
+      }
+    },
+    "voting": {
+      "title": "Voting for Pelada #{{id}}",
+      "success": {
+        "saved": "Votes saved successfully!"
+      },
+      "warning": {
+        "no_eligible_players": "No eligible players for voting in this pelada.",
+        "incomplete": "You need to vote for all players before saving."
+      },
+      "info": {
+        "already_voted": "You have already voted in this pelada. You can change your votes until the voting period ends.",
+        "instructions": "Vote for all players who participated in the pelada (except yourself). Voting is mandatory for all listed players. Use 1 to 5 stars."
+      },
+      "button": {
+        "back_to_pelada": "Back to Pelada",
+        "save": "Save Votes"
+      },
+      "error": {
+        "unauthenticated": "User not authenticated",
+        "not_player": "You are not a player of this organization",
+        "cannot_vote": "Cannot vote in this pelada",
+        "load_failed": "Error loading voting data",
+        "save_failed": "Error saving votes"
+      }
+    },
+    "dashboard": {
+      "empty_slot": "Empty slot",
+      "add_player": "Add player:",
+      "no_bench_players": "No players on bench",
+      "replace_with": "Replace with:",
+      "button": {
+        "end_match": "End Match"
+      },
+      "status": {
+        "finished": "MATCH FINISHED"
+      }
+    },
+    "panel": {
+      "technical_summary": {
+        "title": "Technical Summary",
+        "balance": "Overall Balance",
+        "total_players": "TOTAL PLAYERS",
+        "average": "AVERAGE PELADA"
+      },
+      "available": {
+        "title": "Available",
+        "filter_placeholder": "Filter players...",
+        "invite_button": "+ Invite more players"
+      },
+      "stats": {
+        "title": "Detailed Player Performance",
+        "sort": {
+          "goals": "Sort by goals",
+          "assists": "Sort by assists"
+        }
+      },
+      "standings": {
+        "title": "Standings"
+      }
+    },
+    "teams": {
+      "title": "Match Teams",
+      "button": {
+        "randomize": "Randomize Teams",
+        "create": "Create Team",
+        "add_placeholder": "Add Team"
+      },
+      "default_name": "Team {{number}}"
+    },
+    "team_card": {
+      "average": "AVG: {{score}}",
+      "delete": "Delete team",
+      "drag_placeholder": "Drag a player"
+    }
+  },
+  "user": {
+    "list": {
+      "title": "Users"
+    },
+    "profile": {
+      "title": "Profile Settings",
+      "subtitle": "Update your personal information. Your user score cannot be modified.",
+      "section": {
+        "change_password": "Change password (leave blank to keep current)"
+      },
+      "field": {
+        "new_password": "New Password",
+        "confirm_password": "Confirm New Password"
+      },
+      "hint": {
+        "password": "Leave blank if you don't want to change password"
+      },
+      "button": {
+        "saving": "Saving...",
+        "save": "Save Changes"
+      },
+      "success": {
+        "updated": "Profile updated successfully!"
+      },
+      "error": {
+        "load_failed": "Failed to load user profile",
+        "password_mismatch": "Passwords do not match",
+        "name_required": "Name is required",
+        "email_required": "Email is required",
+        "not_authenticated": "User not authenticated",
+        "no_changes": "No changes detected",
+        "update_failed": "Failed to update profile"
+      }
+    }
+  }
+}

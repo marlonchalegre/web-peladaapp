@@ -57,7 +57,9 @@ describe('PeladaDetailPage', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText('Pelada #1')).toBeInTheDocument()
+      // With simple mock t(k) -> k, we lose replacement. 
+      // t('peladas.detail.title', { id: 1 }) -> 'peladas.detail.title'
+      expect(screen.getAllByText('peladas.detail.title').length).toBeGreaterThan(0)
       expect(screen.getByText('Time 1')).toBeInTheDocument()
       expect(screen.getByText(/Player 1/)).toBeInTheDocument()
       expect(screen.getByText(/Player 2/)).toBeInTheDocument()

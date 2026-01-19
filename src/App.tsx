@@ -3,6 +3,8 @@ import { AppBar, Toolbar, Typography, Button, Container } from '@mui/material'
 import './App.css'
 import { AuthProvider } from './app/providers/AuthProvider'
 import { useAuth } from './app/providers/AuthContext'
+import { LanguageSwitcher } from './shared/components/LanguageSwitcher'
+import { useTranslation } from 'react-i18next'
 import ProtectedRoute from './app/routing/ProtectedRoute'
 import LoginPage from './features/auth/pages/LoginPage'
 import RegisterPage from './features/auth/pages/RegisterPage'
@@ -19,18 +21,29 @@ import UsersPage from './features/user/pages/UsersPage'
 
 function AppLayout() {
   const { isAuthenticated, signOut } = useAuth()
+  const { t } = useTranslation()
 
   return (
     <BrowserRouter>
       {isAuthenticated && (
         <AppBar position="static">
           <Toolbar>
-            <Typography variant="h6" sx={{ flexGrow: 1 }}>Pelada App</Typography>
-            <Button color="inherit" component={RouterLink} to="/">Home</Button>
-            <Button color="inherit" component={RouterLink} to="/organizations">Organizações</Button>
-            <Button color="inherit" component={RouterLink} to="/users">Users</Button>
-            <Button color="inherit" component={RouterLink} to="/profile">Perfil</Button>
-            <Button color="inherit" onClick={() => signOut()}>Sair</Button>
+            <Typography 
+              variant="h6" 
+              component={RouterLink} 
+              to="/" 
+              sx={{ 
+                flexGrow: 1, 
+                textDecoration: 'none', 
+                color: 'inherit',
+                fontWeight: 'bold'
+              }}
+            >
+              {t('app.title')}
+            </Typography>
+            <LanguageSwitcher />
+            <Button color="inherit" component={RouterLink} to="/profile">{t('navigation.profile')}</Button>
+            <Button color="inherit" onClick={() => signOut()}>{t('auth.logout')}</Button>
           </Toolbar>
         </AppBar>
       )}

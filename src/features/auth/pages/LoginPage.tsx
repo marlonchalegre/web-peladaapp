@@ -4,9 +4,11 @@ import { Box, Paper, TextField, Button, Stack, Typography, Alert, Link as MLink 
 import { login } from '../../../shared/api/client'
 import { useAuth } from '../../../app/providers/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 export default function LoginPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const { signIn } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -22,7 +24,7 @@ export default function LoginPage() {
       signIn(token, user)
       navigate('/')
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Login failed'
+      const message = error instanceof Error ? error.message : t('auth.login.error.failed')
       setError(message)
     } finally {
       setLoading(false)
@@ -43,11 +45,11 @@ export default function LoginPage() {
         <form onSubmit={onSubmit}>
           <Stack spacing={2}>
             <Typography variant="h5" component="h1" textAlign="center" gutterBottom>
-              Entrar
+              {t('auth.login.title')}
             </Typography>
             {error && <Alert severity="error">{error}</Alert>}
             <TextField 
-              label="Email" 
+              label={t('common.fields.email')}
               type="email" 
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
@@ -55,7 +57,7 @@ export default function LoginPage() {
               fullWidth 
             />
             <TextField 
-              label="Senha" 
+              label={t('common.fields.password')}
               type="password" 
               value={password} 
               onChange={(e) => setPassword(e.target.value)} 
@@ -68,10 +70,10 @@ export default function LoginPage() {
               disabled={loading}
               size="large"
             >
-              {loading ? 'Entrando...' : 'Entrar'}
+              {loading ? t('auth.login.button.loading') : t('auth.login.button.submit')}
             </Button>
             <Typography variant="body2" textAlign="center">
-              Novo aqui? <MLink href="/register" underline="hover">Criar conta</MLink>
+              {t('auth.login.link.new_user')} <MLink href="/register" underline="hover">{t('auth.login.link.register')}</MLink>
             </Typography>
           </Stack>
         </form>

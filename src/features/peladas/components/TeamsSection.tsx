@@ -5,6 +5,7 @@ import ShuffleIcon from '@mui/icons-material/Shuffle'
 import type { DragEvent } from 'react'
 import type { Player, Team, User } from '../../../shared/api/endpoints'
 import TeamCard from './TeamCard'
+import { useTranslation } from 'react-i18next'
 
 type PlayerWithUser = Player & { user: User }
 
@@ -23,6 +24,7 @@ export type TeamsSectionProps = {
 }
 
 export default function TeamsSection(props: TeamsSectionProps) {
+  const { t } = useTranslation()
   const {
     teams,
     teamPlayers,
@@ -43,7 +45,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
            {/* Icon could go here */}
            {/* <GroupIcon sx={{ mr: 1, color: 'primary.main' }} /> */}
-           <Typography variant="h5" sx={{ fontWeight: 'bold' }}>Times da Partida</Typography>
+           <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{t('peladas.teams.title')}</Typography>
         </Box>
         
         {!locked && (
@@ -55,16 +57,16 @@ export default function TeamsSection(props: TeamsSectionProps) {
               disabled={creatingTeam}
               sx={{ textTransform: 'none', borderRadius: 2 }}
             >
-              Randomizar Times
+              {t('peladas.teams.button.randomize')}
             </Button>
             <Button 
               variant="contained" 
               startIcon={<AddIcon />}
-              onClick={async () => { await onCreateTeam(`Time ${teams.length + 1}`) }} 
+              onClick={async () => { await onCreateTeam(t('peladas.teams.default_name', { number: teams.length + 1 })) }} 
               disabled={creatingTeam}
               sx={{ textTransform: 'none', borderRadius: 2, bgcolor: '#e3f2fd', color: '#1976d2', boxShadow: 'none', '&:hover': { bgcolor: '#bbdefb', boxShadow: 'none' } }}
             >
-              Criar Time
+              {t('peladas.teams.button.create')}
             </Button>
           </Stack>
         )}
@@ -129,7 +131,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
            <Grid size={{ xs: 12, md: 6, lg: 4 }}>
              <Button
                fullWidth
-               onClick={async () => { await onCreateTeam(`Time ${teams.length + 1}`) }}
+               onClick={async () => { await onCreateTeam(t('peladas.teams.default_name', { number: teams.length + 1 })) }}
                disabled={creatingTeam}
                sx={{
                  height: '100%',
@@ -160,7 +162,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
                >
                  <AddIcon />
                </Box>
-               <Typography variant="h6">Adicionar Time</Typography>
+               <Typography variant="h6">{t('peladas.teams.button.add_placeholder')}</Typography>
              </Button>
            </Grid>
         )}

@@ -7,15 +7,16 @@ import {
   Button, 
   Stack, 
   Card, 
-  CardContent,
-  Rating,
-  Box,
-  CircularProgress
+  CardContent, 
+  Rating, 
+  Box
 } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { api } from '../../../shared/api/client'
 import { createApi, type VotingInfo } from '../../../shared/api/endpoints'
 import { useAuth } from '../../../app/providers/AuthContext'
+import { useTranslation } from 'react-i18next'
+import { Loading } from '../../../shared/components/Loading'
 
 const endpoints = createApi(api)
 
@@ -26,6 +27,7 @@ type PlayerVote = {
 }
 
 export default function PeladaVotingPage() {
+  const { t } = useTranslation()
   const { id } = useParams()
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -49,7 +51,7 @@ export default function PeladaVotingPage() {
 
         // Check if user is authenticated
         if (!user) {
-          setError('Usuário não autenticado')
+          setError(t('peladas.voting.error.unauthenticated'))
           return
         }
 
@@ -68,7 +70,7 @@ export default function PeladaVotingPage() {
         // Find current user's player ID in this organization
         const currentPlayer = orgPlayers.find(p => p.user_id === user.id)
         if (!currentPlayer) {
-          setError('Você não é um jogador desta organização')
+          setError(t('peladas.voting.error.not_player'))
           return
         }
         setCurrentPlayerOrgId(currentPlayer.id)
@@ -78,14 +80,14 @@ export default function PeladaVotingPage() {
         setVotingInfo(info)
 
         if (!info.can_vote) {
-          setError(info.message || 'Não é possível votar nesta pelada')
+          setError(info.message || t('peladas.voting.error.cannot_vote'))
           return
         }
 
         // Initialize player votes for eligible players
         const votes: PlayerVote[] = info.eligible_players.map(playerId => {
           const player = orgPlayers.find(p => p.id === playerId)
-          const playerName = player ? nameMap[player.user_id] || `Jogador ${playerId}` : `Jogador ${playerId}`
+          const playerName = player ? nameMap[player.user_id] || `Player ${playerId}` : `Player ${playerId}`
           return {
             playerId,
             playerName,
@@ -95,7 +97,7 @@ export default function PeladaVotingPage() {
         setPlayerVotes(votes)
 
       } catch (error: unknown) {
-        const message = error instanceof Error ? error.message : 'Erro ao carregar dados de votação'
+        const message = error instanceof Error ? error.message : t('peladas.voting.error.load_failed')
         setError(message)
       } finally {
         setLoading(false)
@@ -103,7 +105,7 @@ export default function PeladaVotingPage() {
     }
 
     loadData()
-  }, [peladaId, user])
+  }, [peladaId, user, t])
 
   const handleVoteChange = (playerId: number, stars: number | null) => {
     setPlayerVotes(prev => 
@@ -131,7 +133,7 @@ export default function PeladaVotingPage() {
         votes
       })
 
-      setSuccess('Votos registrados com sucesso!')
+      setSuccess(t('peladas.voting.success.saved'))
       
       // Redirect to pelada detail page after 2 seconds
       setTimeout(() => {
@@ -139,7 +141,7 @@ export default function PeladaVotingPage() {
       }, 2000)
 
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao registrar votos'
+      const message = error instanceof Error ? error.message : t('peladas.voting.error.save_failed')
       setError(message)
     } finally {
       setSubmitting(false)
@@ -147,13 +149,7 @@ export default function PeladaVotingPage() {
   }
 
   if (loading) {
-    return (
-      <Container>
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
-          <CircularProgress />
-        </Box>
-      </Container>
-    )
+    return <Loading message={t('common.loading')} />
   }
 
   if (error && !votingInfo) {
@@ -161,7 +157,7 @@ export default function PeladaVotingPage() {
       <Container>
         <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>
         <Button variant="outlined" onClick={() => navigate(`/peladas/${peladaId}`)} sx={{ mt: 2 }}>
-          Voltar para a pelada
+          {t('peladas.voting.button.back_to_pelada')}
         </Button>
       </Container>
     )
@@ -176,11 +172,11 @@ export default function PeladaVotingPage() {
           startIcon={<ArrowBackIcon />}
           variant="text"
         >
-          Voltar para Pelada
+          {t('peladas.voting.button.back_to_pelada')}
         </Button>
       </Box>
       <Typography variant="h4" gutterBottom sx={{ mt: 3 }}>
-        Votação da Pelada #{peladaId}
+        {t('peladas.voting.title', { id: peladaId })}
       </Typography>
 
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
@@ -188,13 +184,12 @@ export default function PeladaVotingPage() {
 
       {votingInfo?.has_voted && (
         <Alert severity="info" sx={{ mb: 2 }}>
-          Você já votou nesta pelada. Você pode alterar seus votos até o fim do período de votação.
+          {t('peladas.voting.info.already_voted')}
         </Alert>
       )}
 
       <Alert severity="info" sx={{ mb: 3 }}>
-        Vote em todos os jogadores que participaram da pelada (exceto você mesmo). 
-        O voto é obrigatório para todos os jogadores listados. Use de 1 a 5 estrelas.
+        {t('peladas.voting.info.instructions')}
       </Alert>
 
       <Stack spacing={2} sx={{ mb: 3 }}>
@@ -213,7 +208,7 @@ export default function PeladaVotingPage() {
                   />
                   {pv.stars !== null && (
                     <Typography variant="caption" display="block" textAlign="center">
-                      {pv.stars} {pv.stars === 1 ? 'estrela' : 'estrelas'}
+                      {pv.stars} stars
                     </Typography>
                   )}
                 </Box>
@@ -225,7 +220,7 @@ export default function PeladaVotingPage() {
 
       {playerVotes.length === 0 && (
         <Alert severity="warning">
-          Não há jogadores elegíveis para votação nesta pelada.
+          {t('peladas.voting.warning.no_eligible_players')}
         </Alert>
       )}
 
@@ -235,7 +230,7 @@ export default function PeladaVotingPage() {
           onClick={() => navigate(`/peladas/${peladaId}`)}
           disabled={submitting}
         >
-          Cancelar
+          {t('common.cancel')}
         </Button>
         <Button
           variant="contained"
@@ -243,13 +238,13 @@ export default function PeladaVotingPage() {
           disabled={!allVotesComplete || submitting}
           fullWidth
         >
-          {submitting ? 'Enviando...' : 'Salvar Votos'}
+          {submitting ? t('common.sending') : t('peladas.voting.button.save')}
         </Button>
       </Stack>
 
       {!allVotesComplete && playerVotes.length > 0 && (
         <Alert severity="warning">
-          Você precisa votar em todos os jogadores antes de salvar.
+          {t('peladas.voting.warning.incomplete')}
         </Alert>
       )}
     </Container>

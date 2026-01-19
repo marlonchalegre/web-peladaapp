@@ -3,8 +3,11 @@ import { Paper, TextField, Button, Stack, Typography, Alert, Box, Divider } from
 import { updateUserProfile, getUser } from '../../../shared/api/client'
 import { useAuth } from '../../../app/providers/AuthContext'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { Loading } from '../../../shared/components/Loading'
 
 export default function UserProfilePage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { user: authUser, signIn, token } = useAuth()
   const [name, setName] = useState('')
@@ -30,14 +33,14 @@ export default function UserProfilePage() {
         setEmail(userData.email)
       } catch (error) {
         console.error('Failed to load user profile:', error)
-        setError('Falha ao carregar perfil do usuário')
+        setError(t('user.profile.error.load_failed'))
       } finally {
         setLoadingProfile(false)
       }
     }
 
     loadUserProfile()
-  }, [authUser, navigate])
+  }, [authUser, navigate, t])
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
@@ -49,23 +52,23 @@ export default function UserProfilePage() {
 
     // Validation
     if (password && password !== confirmPassword) {
-      setError('As senhas não coincidem')
+      setError(t('user.profile.error.password_mismatch'))
       return
     }
 
     if (!name.trim()) {
-      setError('Nome é obrigatório')
+      setError(t('user.profile.error.name_required'))
       return
     }
 
     if (!email.trim()) {
-      setError('Email é obrigatório')
+      setError(t('user.profile.error.email_required'))
       return
     }
 
     setLoading(true)
     try {
-      if (!authUser) throw new Error('User not authenticated')
+      if (!authUser) throw new Error(t('user.profile.error.not_authenticated'))
 
       // Prepare update data - only include fields that should be updated
       const updates: { name?: string; email?: string; password?: string } = {}
@@ -75,7 +78,7 @@ export default function UserProfilePage() {
       if (password) updates.password = password
 
       if (Object.keys(updates).length === 0) {
-        setError('Nenhuma alteração detectada')
+        setError(t('user.profile.error.no_changes'))
         setLoading(false)
         return
       }
@@ -87,11 +90,11 @@ export default function UserProfilePage() {
         signIn(token, updatedUser)
       }
 
-      setSuccess('Perfil atualizado com sucesso!')
+      setSuccess(t('user.profile.success.updated'))
       setPassword('')
       setConfirmPassword('')
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Falha ao atualizar perfil'
+      const message = error instanceof Error ? error.message : t('user.profile.error.update_failed')
       setError(message)
     } finally {
       setLoading(false)
@@ -99,19 +102,15 @@ export default function UserProfilePage() {
   }
 
   if (loadingProfile) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-        <Typography>Carregando...</Typography>
-      </Box>
-    )
+    return <Loading message={t('common.loading')} />
   }
 
   return (
     <Box maxWidth={600} mx="auto">
       <Paper sx={{ p: 4 }}>
-        <Typography variant="h4" gutterBottom>Configurações do Perfil</Typography>
+        <Typography variant="h4" gutterBottom>{t('user.profile.title')}</Typography>
         <Typography variant="body2" color="text.secondary" gutterBottom>
-          Atualize suas informações pessoais. O score do usuário não pode ser modificado.
+          {t('user.profile.subtitle')}
         </Typography>
 
         <Divider sx={{ my: 3 }} />
@@ -122,7 +121,7 @@ export default function UserProfilePage() {
             {success && <Alert severity="success">{success}</Alert>}
             
             <TextField 
-              label="Nome" 
+              label={t('common.fields.name')}
               value={name} 
               onChange={(e) => setName(e.target.value)} 
               required 
@@ -131,7 +130,7 @@ export default function UserProfilePage() {
             />
             
             <TextField 
-              label="Email" 
+              label={t('common.fields.email')}
               type="email" 
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
@@ -142,22 +141,22 @@ export default function UserProfilePage() {
 
             <Divider sx={{ my: 2 }}>
               <Typography variant="caption" color="text.secondary">
-                Alterar senha (deixe em branco para manter a atual)
+                {t('user.profile.section.change_password')}
               </Typography>
             </Divider>
             
             <TextField 
-              label="Nova Senha" 
+              label={t('user.profile.field.new_password')}
               type="password" 
               value={password} 
               onChange={(e) => setPassword(e.target.value)} 
               fullWidth 
               disabled={loading}
-              helperText="Deixe em branco se não quiser alterar a senha"
+              helperText={t('user.profile.hint.password')}
             />
             
             <TextField 
-              label="Confirmar Nova Senha" 
+              label={t('user.profile.field.confirm_password')}
               type="password" 
               value={confirmPassword} 
               onChange={(e) => setConfirmPassword(e.target.value)} 
@@ -171,14 +170,14 @@ export default function UserProfilePage() {
                 onClick={() => navigate('/')} 
                 disabled={loading}
               >
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button 
                 type="submit" 
                 variant="contained" 
                 disabled={loading}
               >
-                {loading ? 'Salvando...' : 'Salvar Alterações'}
+                {loading ? t('user.profile.button.saving') : t('user.profile.button.save')}
               </Button>
             </Box>
           </Stack>

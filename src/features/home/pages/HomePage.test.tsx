@@ -63,8 +63,8 @@ describe('HomePage', () => {
     expect(screen.queryByText('Org None')).not.toBeInTheDocument()
     
     // Check role labels
-    expect(screen.getByText('Administrador')).toBeInTheDocument()
-    expect(screen.getByText('Jogador')).toBeInTheDocument()
+    expect(screen.getByText('common.roles.admin')).toBeInTheDocument()
+    expect(screen.getByText('common.roles.player')).toBeInTheDocument()
   })
 
   it('renders empty state messages when user has no organizations', async () => {
@@ -81,8 +81,8 @@ describe('HomePage', () => {
     )
 
     await waitFor(() => {
-      expect(screen.getByText('Você não é administrador de nenhuma organização.')).toBeInTheDocument()
-      expect(screen.getByText('Você não faz parte de nenhuma organização como jogador.')).toBeInTheDocument()
+      expect(screen.getByText('home.sections.admin_orgs.empty')).toBeInTheDocument()
+      expect(screen.getByText('home.sections.member_orgs.empty')).toBeInTheDocument()
     })
   })
 })

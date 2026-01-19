@@ -12,6 +12,7 @@ import {
   IconButton,
   Card,
   CardContent,
+  CircularProgress,
 } from '@mui/material'
 import Grid from '@mui/material/Grid'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
@@ -22,12 +23,15 @@ import GroupAddIcon from '@mui/icons-material/GroupAdd'
 import { api } from '../../../shared/api/client'
 import { createApi, type Pelada, type Player, type User, type AttendanceStatus } from '../../../shared/api/endpoints'
 import { useAuth } from '../../../app/providers/AuthContext'
+import { useTranslation } from 'react-i18next'
+import { Loading } from '../../../shared/components/Loading'
 
 const endpoints = createApi(api)
 
 type PlayerWithUser = Player & { user: User; attendance_status?: AttendanceStatus }
 
 export default function AttendanceListPage() {
+  const { t } = useTranslation()
   const { id } = useParams()
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -37,11 +41,12 @@ export default function AttendanceListPage() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [updatingPlayers, setUpdatingPlayers] = useState<Set<number>>(new Set())
 
-  const fetchData = useCallback(async () => {
+  const fetchData = useCallback(async (background = false) => {
     if (!peladaId || !user) return
     try {
-      setLoading(true)
+      if (!background) setLoading(true)
       const data = await endpoints.getPeladaFullDetails(peladaId)
       setPelada(data.pelada)
       setPlayers(data.available_players)
@@ -54,24 +59,40 @@ export default function AttendanceListPage() {
         navigate(`/peladas/${peladaId}`)
       }
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao carregar lista de presença'
+      const message = error instanceof Error ? error.message : t('peladas.attendance.error.load_failed')
       setError(message)
     } finally {
-      setLoading(false)
+      if (!background) setLoading(false)
     }
-  }, [peladaId, user, navigate])
+  }, [peladaId, user, navigate, t])
 
   useEffect(() => {
     fetchData()
   }, [fetchData])
 
   const handleUpdateAttendance = async (status: AttendanceStatus, targetPlayerId?: number) => {
+    // Determine the ID to track for loading state
+    const currentPlayerAsPlayer = players.find(p => p.user_id === user?.id)
+    const idToTrack = targetPlayerId ?? currentPlayerAsPlayer?.id
+
+    if (idToTrack) {
+      setUpdatingPlayers(prev => new Set(prev).add(idToTrack))
+    }
+
     try {
       await endpoints.updateAttendance(peladaId, status, targetPlayerId)
-      fetchData()
+      await fetchData(true)
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao atualizar presença'
+      const message = error instanceof Error ? error.message : t('peladas.attendance.error.update_failed')
       setError(message)
+    } finally {
+      if (idToTrack) {
+        setUpdatingPlayers(prev => {
+          const next = new Set(prev)
+          next.delete(idToTrack)
+          return next
+        })
+      }
     }
   }
 
@@ -80,14 +101,14 @@ export default function AttendanceListPage() {
       await endpoints.closeAttendance(peladaId)
       navigate(`/peladas/${peladaId}`)
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao fechar lista'
+      const message = error instanceof Error ? error.message : t('peladas.attendance.error.close_failed')
       setError(message)
     }
   }
 
-  if (loading) return <Container sx={{ mt: 4 }}><Typography>Carregando...</Typography></Container>
+  if (loading && !pelada) return <Loading message={t('common.loading')} />
   if (error) return <Container sx={{ mt: 4 }}><Alert severity="error">{error}</Alert></Container>
-  if (!pelada) return <Container sx={{ mt: 4 }}><Alert severity="warning">Pelada não encontrada</Alert></Container>
+  if (!pelada) return <Container sx={{ mt: 4 }}><Alert severity="warning">{t('peladas.error.not_found')}</Alert></Container>
 
   const confirmed = players.filter(p => p.attendance_status === 'confirmed')
   const declined = players.filter(p => p.attendance_status === 'declined')
@@ -96,6 +117,7 @@ export default function AttendanceListPage() {
   const totalPlayers = players.length
 
   const currentPlayerAsPlayer = players.find(p => p.user_id === user?.id)
+  const isUpdatingSelf = currentPlayerAsPlayer ? updatingPlayers.has(currentPlayerAsPlayer.id) : false
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -106,17 +128,17 @@ export default function AttendanceListPage() {
           startIcon={<ArrowBackIcon />}
           variant="text"
         >
-          Voltar para Organização
+          {t('common.back_to_org')}
         </Button>
       </Box>
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4, flexWrap: 'wrap', gap: 2 }}>
         <Box>
           <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
-            Weekly Match Attendance
+            {t('peladas.attendance.title')}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Manage player status and finalize team generation.
+            {t('peladas.attendance.subtitle')}
           </Typography>
         </Box>
         {isAdmin && (
@@ -135,7 +157,7 @@ export default function AttendanceListPage() {
               fontWeight: 'bold'
             }}
           >
-            Close List and Create Teams
+            {t('peladas.attendance.button.close_list')}
           </Button>
         )}
       </Box>
@@ -145,27 +167,29 @@ export default function AttendanceListPage() {
         <Paper elevation={0} sx={{ p: 3, mb: 4, borderRadius: 3, bgcolor: '#f8fafc', border: '1px solid', borderColor: 'divider' }}>
           <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2}>
             <Box>
-              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Sua presença:</Typography>
-              <Typography variant="body2" color="text.secondary">Confirme se você participará desta pelada.</Typography>
+              <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{t('peladas.attendance.user_status.title')}</Typography>
+              <Typography variant="body2" color="text.secondary">{t('peladas.attendance.user_status.subtitle')}</Typography>
             </Box>
             <Stack direction="row" spacing={2}>
               <Button 
                 variant={currentPlayerAsPlayer.attendance_status === 'confirmed' ? 'contained' : 'outlined'}
                 color="success"
-                startIcon={<CheckCircleIcon />}
+                startIcon={isUpdatingSelf && currentPlayerAsPlayer.attendance_status !== 'confirmed' ? <CircularProgress size={20} color="inherit" /> : <CheckCircleIcon />}
                 onClick={() => handleUpdateAttendance('confirmed')}
+                disabled={isUpdatingSelf}
                 sx={{ borderRadius: 2, textTransform: 'none' }}
               >
-                Vou jogar
+                {t('peladas.attendance.button.confirm')}
               </Button>
               <Button 
                 variant={currentPlayerAsPlayer.attendance_status === 'declined' ? 'contained' : 'outlined'}
                 color="error"
-                startIcon={<CancelIcon />}
+                startIcon={isUpdatingSelf && currentPlayerAsPlayer.attendance_status !== 'declined' ? <CircularProgress size={20} color="inherit" /> : <CancelIcon />}
                 onClick={() => handleUpdateAttendance('declined')}
+                disabled={isUpdatingSelf}
                 sx={{ borderRadius: 2, textTransform: 'none' }}
               >
-                Não vou
+                {t('peladas.attendance.button.decline')}
               </Button>
             </Stack>
           </Stack>
@@ -178,7 +202,7 @@ export default function AttendanceListPage() {
           <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
             <CheckCircleIcon sx={{ mr: 1, color: 'success.main' }} />
             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-              Confirmed <Typography component="span" color="text.secondary">({confirmed.length})</Typography>
+              {t('peladas.attendance.status.confirmed')} <Typography component="span" color="text.secondary">({confirmed.length})</Typography>
             </Typography>
           </Box>
           <Stack spacing={2}>
@@ -189,11 +213,12 @@ export default function AttendanceListPage() {
                 isAdmin={isAdmin} 
                 isCurrentUser={p.user_id === user?.id}
                 onUpdate={(status) => handleUpdateAttendance(status, p.id)}
+                isUpdating={updatingPlayers.has(p.id)}
               />
             ))}
             {confirmed.length === 0 && (
               <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', textAlign: 'center', py: 2 }}>
-                Ninguém confirmado ainda.
+                {t('peladas.attendance.empty.confirmed')}
               </Typography>
             )}
           </Stack>
@@ -204,7 +229,7 @@ export default function AttendanceListPage() {
           <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
             <CancelIcon sx={{ mr: 1, color: 'error.main' }} />
             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-              Declined <Typography component="span" color="text.secondary">({declined.length})</Typography>
+              {t('peladas.attendance.status.declined')} <Typography component="span" color="text.secondary">({declined.length})</Typography>
             </Typography>
           </Box>
           <Stack spacing={2}>
@@ -215,11 +240,12 @@ export default function AttendanceListPage() {
                 isAdmin={isAdmin} 
                 isCurrentUser={p.user_id === user?.id}
                 onUpdate={(status) => handleUpdateAttendance(status, p.id)}
+                isUpdating={updatingPlayers.has(p.id)}
               />
             ))}
             {declined.length === 0 && (
               <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', textAlign: 'center', py: 2 }}>
-                Ninguém recusou ainda.
+                {t('peladas.attendance.empty.declined')}
               </Typography>
             )}
           </Stack>
@@ -230,7 +256,7 @@ export default function AttendanceListPage() {
           <Box sx={{ mb: 2, display: 'flex', alignItems: 'center' }}>
             <PendingIcon sx={{ mr: 1, color: 'text.secondary' }} />
             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-              Pending <Typography component="span" color="text.secondary">({pending.length})</Typography>
+              {t('peladas.attendance.status.pending')} <Typography component="span" color="text.secondary">({pending.length})</Typography>
             </Typography>
           </Box>
           <Stack spacing={2}>
@@ -241,11 +267,12 @@ export default function AttendanceListPage() {
                 isAdmin={isAdmin} 
                 isCurrentUser={p.user_id === user?.id}
                 onUpdate={(status) => handleUpdateAttendance(status, p.id)}
+                isUpdating={updatingPlayers.has(p.id)}
               />
             ))}
             {pending.length === 0 && (
               <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', textAlign: 'center', py: 2 }}>
-                Todos responderam!
+                {t('peladas.attendance.empty.pending')}
               </Typography>
             )}
           </Stack>
@@ -256,19 +283,19 @@ export default function AttendanceListPage() {
       <Box sx={{ mt: 8, pt: 4, borderTop: 1, borderColor: 'divider' }}>
         <Grid container spacing={4}>
           <Grid size={{ xs: 6, md: 3 }}>
-            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>TOTAL PLAYERS</Typography>
+            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>{t('peladas.attendance.stats.total_players')}</Typography>
             <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{totalPlayers}</Typography>
           </Grid>
           <Grid size={{ xs: 6, md: 3 }}>
-            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>TOTAL CONFIRMED</Typography>
+            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>{t('peladas.attendance.stats.total_confirmed')}</Typography>
             <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'success.main' }}>{confirmed.length}</Typography>
           </Grid>
           <Grid size={{ xs: 6, md: 3 }}>
-            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>TOTAL DECLINED</Typography>
+            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>{t('peladas.attendance.stats.total_declined')}</Typography>
             <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'error.main' }}>{declined.length}</Typography>
           </Grid>
           <Grid size={{ xs: 6, md: 3 }}>
-            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>TOTAL PENDING</Typography>
+            <Typography variant="overline" color="text.secondary" sx={{ fontWeight: 'bold', letterSpacing: 1 }}>{t('peladas.attendance.stats.total_pending')}</Typography>
             <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'text.secondary' }}>{pending.length}</Typography>
           </Grid>
         </Grid>
@@ -281,13 +308,16 @@ function PlayerAttendanceCard({
   player, 
   isAdmin, 
   isCurrentUser, 
-  onUpdate 
+  onUpdate,
+  isUpdating
 }: { 
   player: PlayerWithUser; 
   isAdmin: boolean;
   isCurrentUser: boolean;
   onUpdate: (status: AttendanceStatus) => void;
+  isUpdating: boolean;
 }) {
+  const { t } = useTranslation()
   const initials = player.user.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)
   
   return (
@@ -312,23 +342,31 @@ function PlayerAttendanceCard({
               {player.user.name}
             </Typography>
             <Stack direction="row" spacing={1} alignItems="center">
-              {isCurrentUser && <Typography variant="caption" color="primary.main" sx={{ fontWeight: 'bold' }}>You</Typography>}
-              {player.position_id === 1 && <Typography variant="caption" color="text.secondary">Goleiro</Typography>}
+              {isCurrentUser && <Typography variant="caption" color="primary.main" sx={{ fontWeight: 'bold' }}>{t('common.you')}</Typography>}
+              {player.position_id === 1 && <Typography variant="caption" color="text.secondary">{t('common.positions.goalkeeper')}</Typography>}
             </Stack>
           </Box>
         </Box>
         
         {(isAdmin || isCurrentUser) && (
           <Stack direction="row" spacing={1}>
-            {player.attendance_status !== 'confirmed' && (
-              <IconButton size="small" onClick={() => onUpdate('confirmed')} sx={{ color: 'grey.400', '&:hover': { color: 'success.main', bgcolor: 'success.light', alpha: 0.1 } }}>
-                <CheckCircleIcon fontSize="small" />
-              </IconButton>
-            )}
-            {player.attendance_status !== 'declined' && (
-              <IconButton size="small" onClick={() => onUpdate('declined')} sx={{ color: 'grey.400', '&:hover': { color: 'error.main', bgcolor: 'error.light', alpha: 0.1 } }}>
-                <CancelIcon fontSize="small" />
-              </IconButton>
+            {isUpdating ? (
+              <Box sx={{ p: 0.5 }}>
+                <CircularProgress size={20} />
+              </Box>
+            ) : (
+              <>
+                {player.attendance_status !== 'confirmed' && (
+                  <IconButton size="small" onClick={() => onUpdate('confirmed')} sx={{ color: 'grey.400', '&:hover': { color: 'success.main', bgcolor: 'success.light', alpha: 0.1 } }}>
+                    <CheckCircleIcon fontSize="small" />
+                  </IconButton>
+                )}
+                {player.attendance_status !== 'declined' && (
+                  <IconButton size="small" onClick={() => onUpdate('declined')} sx={{ color: 'grey.400', '&:hover': { color: 'error.main', bgcolor: 'error.light', alpha: 0.1 } }}>
+                    <CancelIcon fontSize="small" />
+                  </IconButton>
+                )}
+              </>
             )}
           </Stack>
         )}

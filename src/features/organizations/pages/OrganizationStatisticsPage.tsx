@@ -4,6 +4,8 @@ import { Container, Typography, Alert, FormControl, InputLabel, Select, MenuItem
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { api } from '../../../shared/api/client'
 import { createApi, type Organization } from '../../../shared/api/endpoints'
+import { useTranslation } from 'react-i18next'
+import { Loading } from '../../../shared/components/Loading'
 
 const endpoints = createApi(api)
 
@@ -19,6 +21,7 @@ type PlayerStats = {
 type Order = 'asc' | 'desc';
 
 export default function OrganizationStatisticsPage() {
+  const { t } = useTranslation()
   const { id } = useParams()
   const orgId = Number(id)
   const [org, setOrg] = useState<Organization | null>(null)
@@ -40,10 +43,10 @@ export default function OrganizationStatisticsPage() {
     endpoints.getOrganization(orgId)
       .then(setOrg)
       .catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : 'Erro ao carregar organização'
+        const message = error instanceof Error ? error.message : t('organizations.stats.error.load_org_failed')
         setError(message)
       })
-  }, [orgId])
+  }, [orgId, t])
 
   const fetchStats = useCallback(async () => {
     if (!orgId) return
@@ -51,10 +54,10 @@ export default function OrganizationStatisticsPage() {
       const response = await endpoints.getOrganizationStatistics(orgId, year)
       setStats(response)
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao carregar estatísticas'
+      const message = error instanceof Error ? error.message : t('organizations.stats.error.load_stats_failed')
       setError(message)
     }
-  }, [orgId, year])
+  }, [orgId, year, t])
 
   useEffect(() => {
     fetchStats()
@@ -102,7 +105,7 @@ export default function OrganizationStatisticsPage() {
   const years = Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i)
 
   if (error) return <Container><Alert severity="error">{error}</Alert></Container>
-  if (!org) return <Container><Typography>Carregando...</Typography></Container>
+  if (!org) return <Loading message={t('common.loading')} />
 
   return (
     <Container>
@@ -113,18 +116,18 @@ export default function OrganizationStatisticsPage() {
           startIcon={<ArrowBackIcon />}
           variant="text"
         >
-          Voltar para Organização
+          {t('organizations.stats.back_link')}
         </Button>
       </Box>
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4">{org.name} - Estatísticas</Typography>
+        <Typography variant="h4">{t('organizations.stats.title', { name: org.name })}</Typography>
         <FormControl sx={{ minWidth: 150 }}>
-          <InputLabel id="year-select-label">Ano</InputLabel>
+          <InputLabel id="year-select-label">{t('common.year')}</InputLabel>
           <Select
             labelId="year-select-label"
             value={year}
-            label="Ano"
+            label={t('common.year')}
             onChange={(e) => setYear(Number(e.target.value))}
             size="small"
           >
@@ -136,12 +139,12 @@ export default function OrganizationStatisticsPage() {
       </Box>
 
       <Paper sx={{ p: 2, mb: 3 }}>
-        <Typography variant="h6" gutterBottom>Filtros</Typography>
+        <Typography variant="h6" gutterBottom>{t('common.filters')}</Typography>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 3 }}>
             <TextField
               fullWidth
-              label="Nome do Jogador"
+              label={t('common.fields.player_name')}
               value={nameFilter}
               onChange={(e) => setNameFilter(e.target.value)}
               size="small"
@@ -150,7 +153,7 @@ export default function OrganizationStatisticsPage() {
           <Grid size={{ xs: 12, sm: 2 }}>
             <TextField
               fullWidth
-              label="Mínimo de Peladas"
+              label={t('organizations.stats.filters.min_peladas')}
               type="number"
               value={minPeladas}
               onChange={(e) => setMinPeladas(e.target.value)}
@@ -160,7 +163,7 @@ export default function OrganizationStatisticsPage() {
           <Grid size={{ xs: 12, sm: 2 }}>
             <TextField
               fullWidth
-              label="Mínimo de Gols"
+              label={t('organizations.stats.filters.min_goals')}
               type="number"
               value={minGoals}
               onChange={(e) => setMinGoals(e.target.value)}
@@ -170,7 +173,7 @@ export default function OrganizationStatisticsPage() {
           <Grid size={{ xs: 12, sm: 2 }}>
             <TextField
               fullWidth
-              label="Mínimo de Assistências"
+              label={t('organizations.stats.filters.min_assists')}
               type="number"
               value={minAssists}
               onChange={(e) => setMinAssists(e.target.value)}
@@ -180,7 +183,7 @@ export default function OrganizationStatisticsPage() {
           <Grid size={{ xs: 12, sm: 3 }}>
             <TextField
               fullWidth
-              label="Mínimo de Gols Contra"
+              label={t('organizations.stats.filters.min_own_goals')}
               type="number"
               value={minOwnGoals}
               onChange={(e) => setMinOwnGoals(e.target.value)}
@@ -200,7 +203,7 @@ export default function OrganizationStatisticsPage() {
                   direction={orderBy === 'player_name' ? order : 'asc'}
                   onClick={() => handleRequestSort('player_name')}
                 >
-                  Jogador
+                  {t('common.player')}
                 </TableSortLabel>
               </TableCell>
               <TableCell align="right">
@@ -209,7 +212,7 @@ export default function OrganizationStatisticsPage() {
                   direction={orderBy === 'peladas_played' ? order : 'asc'}
                   onClick={() => handleRequestSort('peladas_played')}
                 >
-                  Peladas
+                  {t('organizations.stats.table.peladas')}
                 </TableSortLabel>
               </TableCell>
               <TableCell align="right">
@@ -218,7 +221,7 @@ export default function OrganizationStatisticsPage() {
                   direction={orderBy === 'goal' ? order : 'asc'}
                   onClick={() => handleRequestSort('goal')}
                 >
-                  Gols
+                  {t('common.goals')}
                 </TableSortLabel>
               </TableCell>
               <TableCell align="right">
@@ -227,7 +230,7 @@ export default function OrganizationStatisticsPage() {
                   direction={orderBy === 'assist' ? order : 'asc'}
                   onClick={() => handleRequestSort('assist')}
                 >
-                  Assistências
+                  {t('common.assists')}
                 </TableSortLabel>
               </TableCell>
               <TableCell align="right">
@@ -236,7 +239,7 @@ export default function OrganizationStatisticsPage() {
                   direction={orderBy === 'own_goal' ? order : 'asc'}
                   onClick={() => handleRequestSort('own_goal')}
                 >
-                  Gols Contra
+                  {t('common.own_goals')}
                 </TableSortLabel>
               </TableCell>
             </TableRow>
@@ -245,7 +248,7 @@ export default function OrganizationStatisticsPage() {
             {sortedStats.length === 0 ? (
                <TableRow>
                  <TableCell colSpan={5} align="center">
-                   Nenhuma estatística encontrada para os filtros aplicados.
+                   {t('organizations.stats.empty')}
                  </TableCell>
                </TableRow>
             ) : (

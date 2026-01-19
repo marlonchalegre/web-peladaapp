@@ -5,6 +5,7 @@ import AddIcon from '@mui/icons-material/Add'
 import AutoGraphIcon from '@mui/icons-material/AutoGraph'
 import type { DragEvent } from 'react'
 import type { Player, User } from '../../../shared/api/endpoints'
+import { useTranslation } from 'react-i18next'
 
 type PlayerWithUser = Player & { user: User }
 
@@ -20,6 +21,7 @@ type AvailablePlayersPanelProps = {
 }
 
 function TechnicalSummary({ totalPlayers, averagePelada, balance }: { totalPlayers: number; averagePelada: number; balance: number }) {
+  const { t } = useTranslation()
   return (
     <Paper
       elevation={0}
@@ -34,13 +36,13 @@ function TechnicalSummary({ totalPlayers, averagePelada, balance }: { totalPlaye
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
         <AutoGraphIcon sx={{ mr: 1 }} />
         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-          Resumo Técnico
+          {t('peladas.panel.technical_summary.title')}
         </Typography>
       </Box>
 
       <Box sx={{ mb: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-          <Typography variant="body2" sx={{ opacity: 0.9 }}>Equilíbrio Geral</Typography>
+          <Typography variant="body2" sx={{ opacity: 0.9 }}>{t('peladas.panel.technical_summary.balance')}</Typography>
           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{balance}%</Typography>
         </Box>
         <LinearProgress 
@@ -60,7 +62,7 @@ function TechnicalSummary({ totalPlayers, averagePelada, balance }: { totalPlaye
       <Stack direction="row" spacing={4}>
         <Box>
           <Typography variant="caption" sx={{ display: 'block', opacity: 0.8, fontSize: '0.7rem', fontWeight: 'bold' }}>
-            TOTAL JOGADORES
+            {t('peladas.panel.technical_summary.total_players')}
           </Typography>
           <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
             {totalPlayers}
@@ -68,7 +70,7 @@ function TechnicalSummary({ totalPlayers, averagePelada, balance }: { totalPlaye
         </Box>
         <Box>
           <Typography variant="caption" sx={{ display: 'block', opacity: 0.8, fontSize: '0.7rem', fontWeight: 'bold' }}>
-            MÉDIA PELADA
+            {t('peladas.panel.technical_summary.average')}
           </Typography>
           <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
             {averagePelada.toFixed(1)}
@@ -89,6 +91,7 @@ export default function AvailablePlayersPanel({
   averagePelada,
   balance
 }: AvailablePlayersPanelProps) {
+  const { t } = useTranslation()
   const [search, setSearch] = useState('')
 
   const filteredPlayers = useMemo(() => {
@@ -126,7 +129,7 @@ export default function AvailablePlayersPanel({
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Typography variant="h6" sx={{ fontWeight: 'bold', mr: 1 }}>
-              Disponíveis
+              {t('peladas.panel.available.title')}
             </Typography>
             <Chip label={players.length} size="small" sx={{ bgcolor: '#f5f5f5', fontWeight: 'bold' }} />
           </Box>
@@ -134,7 +137,7 @@ export default function AvailablePlayersPanel({
 
         <TextField
           fullWidth
-          placeholder="Filtrar jogadores..."
+          placeholder={t('peladas.panel.available.filter_placeholder')}
           variant="outlined"
           size="small"
           value={search}
@@ -198,7 +201,7 @@ export default function AvailablePlayersPanel({
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     {/* Position placeholder */}
-                    {p.position_id ? 'JOGADOR' : 'DESCONHECIDO'} 
+                    {p.position_id ? t('common.positions.player') : t('common.positions.unknown')} 
                   </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -227,7 +230,7 @@ export default function AvailablePlayersPanel({
           variant="outlined" 
           sx={{ mt: 3, borderStyle: 'dashed', textTransform: 'none', color: 'text.secondary' }}
         >
-          + Convidar mais jogadores
+          {t('peladas.panel.available.invite_button')}
         </Button>
       </Paper>
 

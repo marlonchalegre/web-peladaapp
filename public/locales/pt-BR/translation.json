@@ -1,0 +1,422 @@
+{
+  "app": {
+    "title": "Pelada App"
+  },
+  "navigation": {
+    "home": "Início",
+    "organizations": "Organizações",
+    "users": "Usuários",
+    "profile": "Perfil"
+  },
+  "auth": {
+    "login": {
+      "title": "Entrar",
+      "error": {
+        "failed": "Falha no login"
+      },
+      "button": {
+        "submit": "Entrar",
+        "loading": "Entrando..."
+      },
+      "link": {
+        "new_user": "Novo aqui?",
+        "register": "Criar conta"
+      }
+    },
+    "register": {
+      "title": "Criar conta",
+      "error": {
+        "failed": "Falha no registro"
+      },
+      "button": {
+        "submit": "Registrar",
+        "loading": "Registrando..."
+      },
+      "link": {
+        "existing_user": "Já tem conta?",
+        "login": "Entrar"
+      }
+    },
+    "logout": "Sair"
+  },
+  "components": {
+    "language_switcher": {
+      "label": "Idioma"
+    }
+  },
+  "common": {
+    "welcome": "Bem-vindo ao Pelada App",
+    "loading": "Carregando...",
+    "cancel": "Cancelar",
+    "create": "Criar",
+    "add": "Adicionar",
+    "close": "Fechar",
+    "actions": "Ações",
+    "select_placeholder": "Selecione...",
+    "year": "Ano",
+    "filters": "Filtros",
+    "player": "Jogador",
+    "goals": "Gols",
+    "assists": "Assistências",
+    "own_goals": "Gols Contra",
+    "back": "Voltar",
+    "back_to_org": "Voltar para Organização",
+    "start": "Iniciar",
+    "sending": "Enviando...",
+    "sub": "Sub",
+    "matches_played": "Partidas",
+    "team": "Time",
+    "wins_short": "V",
+    "draws_short": "E",
+    "losses_short": "D",
+    "you": "Você",
+    "organization": "ORGANIZAÇÃO",
+    "assists_short": "Assis.",
+    "own_goals_short": "GC",
+    "pagination": {
+      "rows_per_page": "Itens por página"
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Senha",
+      "name": "Nome",
+      "date": "Data",
+      "time": "Hora",
+      "player_name": "Nome do Jogador",
+      "id": "ID",
+      "score": "Score"
+    },
+    "roles": {
+      "admin": "Administrador",
+      "player": "Jogador"
+    },
+    "positions": {
+      "goalkeeper": "Goleiro",
+      "player": "JOGADOR",
+      "unknown": "DESCONHECIDO"
+    }
+  },
+  "home": {
+    "error": {
+      "invalid_format_admin_orgs": "Formato inválido recebido ao buscar organizações administrativas",
+      "invalid_format_org_list": "Formato inválido recebido ao buscar lista de organizações",
+      "load_failed": "Erro ao carregar organizações"
+    },
+    "welcome": {
+      "guest": "Por favor, faça login.",
+      "user": "Bem-vindo, {{name}}!"
+    },
+    "sections": {
+      "admin_orgs": {
+        "title": "Minhas Organizações (Administrador)",
+        "empty": "Você não é administrador de nenhuma organização."
+      },
+      "member_orgs": {
+        "title": "Organizações que faço parte (Jogador)",
+        "empty": "Você não faz parte de nenhuma organização como jogador."
+      }
+    },
+    "table": {
+      "headers": {
+        "org_name": "Nome da Organização",
+        "role": "Função"
+      }
+    }
+  },
+  "organizations": {
+    "list": {
+      "title": "Organizações",
+      "loading": "Carregando organizações...",
+      "empty": "Nenhuma organização encontrada.",
+      "error": {
+        "load_failed": "Falha ao carregar organizações"
+      }
+    },
+    "detail": {
+      "button": {
+        "statistics": "ESTATÍSTICAS"
+      },
+      "section": {
+        "new_pelada": "Nova Pelada"
+      },
+      "error": {
+        "load_failed": "Erro ao carregar organização",
+        "load_peladas_failed": "Erro ao carregar peladas",
+        "create_pelada_failed": "Erro ao criar pelada",
+        "delete_pelada_failed": "Erro ao excluir pelada"
+      }
+    },
+    "stats": {
+      "title": "{{name}} - Estatísticas",
+      "back_link": "Voltar para Organização",
+      "empty": "Nenhuma estatística encontrada para os filtros aplicados.",
+      "filters": {
+        "min_peladas": "Mínimo de Peladas",
+        "min_goals": "Mínimo de Gols",
+        "min_assists": "Mínimo de Assistências",
+        "min_own_goals": "Mínimo de Gols Contra"
+      },
+      "table": {
+        "peladas": "Peladas"
+      },
+      "error": {
+        "load_org_failed": "Erro ao carregar organização",
+        "load_stats_failed": "Erro ao carregar estatísticas"
+      }
+    },
+    "form": {
+      "pelada": {
+        "teams_count": "Quantidade de times",
+        "players_per_team": "Jogadores por time",
+        "submit": "Criar pelada"
+      }
+    },
+    "dialog": {
+      "add_players": {
+        "title": "Adicionar jogadores",
+        "empty_users": "Nenhum usuário disponível.",
+        "select_all": "Selecionar todos",
+        "clear_selection": "Limpar seleção",
+        "add_selected": "Adicionar selecionados",
+        "add_all": "Adicionar todos"
+      },
+      "manage_admins": {
+        "title": "Gerenciar Administradores - {{name}}",
+        "add_section_title": "Adicionar Administrador",
+        "current_admins_title": "Administradores Atuais",
+        "all_users_are_admins": "Todos os usuários já são admins",
+        "select_user_label": "Selecione um usuário",
+        "cannot_remove_last_admin_tooltip": "Não é possível remover o último admin",
+        "remove_admin_tooltip": "Remover admin",
+        "user_fallback": "Usuário #{{id}}"
+      }
+    },
+    "table": {
+      "aria": {
+        "add_players": "Adicionar jogadores à organização {{name}}",
+        "manage_admins": "Gerenciar administradores da organização {{name}}",
+        "delete": "Excluir organização {{name}}"
+      }
+    },
+    "peladas": {
+      "empty": "Nenhuma pelada.",
+      "item_name": "Pelada #{{id}}",
+      "aria": {
+        "delete": "Excluir Pelada #{{id}}"
+      }
+    },
+    "error": {
+      "load_users_failed": "Erro ao carregar usuários",
+      "load_admins_failed": "Erro ao carregar administradores",
+      "delete_failed": "Erro ao excluir organização",
+      "add_admin_failed": "Erro ao adicionar administrador",
+      "remove_last_admin": "Não é possível remover o último administrador da organização",
+      "remove_admin_failed": "Erro ao remover administrador"
+    }
+  },
+  "peladas": {
+    "error": {
+      "not_found": "Pelada não encontrada"
+    },
+    "attendance": {
+      "title": "Presença Semanal",
+      "subtitle": "Gerencie o status dos jogadores e finalize a geração dos times.",
+      "error": {
+        "load_failed": "Erro ao carregar lista de presença",
+        "update_failed": "Erro ao atualizar presença",
+        "close_failed": "Erro ao fechar lista"
+      },
+      "button": {
+        "close_list": "Fechar Lista e Criar Times",
+        "confirm": "Vou jogar",
+        "decline": "Não vou"
+      },
+      "user_status": {
+        "title": "Sua presença:",
+        "subtitle": "Confirme se você participará desta pelada."
+      },
+      "status": {
+        "confirmed": "Confirmado",
+        "declined": "Recusado",
+        "pending": "Pendente"
+      },
+      "empty": {
+        "confirmed": "Ninguém confirmado ainda.",
+        "declined": "Ninguém recusou ainda.",
+        "pending": "Todos responderam!"
+      },
+      "stats": {
+        "total_players": "TOTAL JOGADORES",
+        "total_confirmed": "TOTAL CONFIRMADOS",
+        "total_declined": "TOTAL RECUSADOS",
+        "total_pending": "TOTAL PENDENTES"
+      }
+    },
+    "detail": {
+      "title": "Pelada #{{id}}",
+      "error": {
+        "load_failed": "Erro ao carregar pelada",
+        "move_to_bench_failed": "Erro ao mover jogador para o banco",
+        "move_player_failed": "Erro ao mover jogador",
+        "randomize_failed": "Erro ao randomizar times",
+        "start_failed": "Erro ao iniciar pelada",
+        "create_team_failed": "Erro ao criar time",
+        "delete_team_failed": "Erro ao excluir time"
+      },
+      "live": {
+        "moved_to_bench": "Jogador #{{playerId}} movido para banco",
+        "moved_to_team": "Jogador #{{playerId}} movido para time {{teamName}}"
+      },
+      "button": {
+        "view_matches": "Ver Partidas",
+        "start_pelada": "INICIAR PELADA",
+        "vote": "Votar nos Jogadores",
+        "change_votes": "Alterar Votos"
+      }
+    },
+    "dialog": {
+      "start": {
+        "title": "Iniciar pelada",
+        "matches_per_team": "Partidas por time"
+      }
+    },
+    "matches": {
+      "title": "Pelada #{{id}}",
+      "loading": "Carregando partidas...",
+      "status": {
+        "closed": "Pelada encerrada"
+      },
+      "button": {
+        "close_pelada": "Encerrar pelada",
+        "closing": "Encerrando..."
+      },
+      "history_title": "Histórico de Partidas",
+      "empty_history": "Nenhuma partida",
+      "history_item_title": "Seq {{sequence}}: {{teamName}}",
+      "team_fallback": "Time {{id}}",
+      "confirm_end_match": "Tem certeza que deseja encerrar a partida?",
+      "select_match_hint": "Selecione uma partida para ver os detalhes",
+      "insights_title": "Insights da Sessão",
+      "error": {
+        "load_failed": "Erro ao carregar partidas",
+        "replace_player_failed": "Erro ao trocar jogador na partida",
+        "negative_score": "Placar não pode ficar negativo",
+        "update_score_failed": "Erro ao atualizar placar",
+        "load_stats_failed": "Erro ao carregar estatísticas",
+        "record_event_failed": "Erro ao registrar evento",
+        "close_failed": "Erro ao encerrar pelada",
+        "add_player_failed": "Erro ao adicionar jogador",
+        "end_match_failed": "Erro ao encerrar partida"
+      }
+    },
+    "voting": {
+      "title": "Votação da Pelada #{{id}}",
+      "success": {
+        "saved": "Votos registrados com sucesso!"
+      },
+      "warning": {
+        "no_eligible_players": "Não há jogadores elegíveis para votação nesta pelada.",
+        "incomplete": "Você precisa votar em todos os jogadores antes de salvar."
+      },
+      "info": {
+        "already_voted": "Você já votou nesta pelada. Você pode alterar seus votos até o fim do período de votação.",
+        "instructions": "Vote em todos os jogadores que participaram da pelada (exceto você mesmo). O voto é obrigatório para todos os jogadores listados. Use de 1 a 5 estrelas."
+      },
+      "button": {
+        "back_to_pelada": "Voltar para Pelada",
+        "save": "Salvar Votos"
+      },
+      "error": {
+        "unauthenticated": "Usuário não autenticado",
+        "not_player": "Você não é um jogador desta organização",
+        "cannot_vote": "Não é possível votar nesta pelada",
+        "load_failed": "Erro ao carregar dados de votação",
+        "save_failed": "Erro ao registrar votos"
+      }
+    },
+    "dashboard": {
+      "empty_slot": "Vaga disponível",
+      "add_player": "Adicionar jogador:",
+      "no_bench_players": "Nenhum jogador no banco",
+      "replace_with": "Substituir por:",
+      "button": {
+        "end_match": "Encerrar Partida"
+      },
+      "status": {
+        "finished": "PARTIDA ENCERRADA"
+      }
+    },
+    "panel": {
+      "technical_summary": {
+        "title": "Resumo Técnico",
+        "balance": "Equilíbrio Geral",
+        "total_players": "TOTAL JOGADORES",
+        "average": "MÉDIA PELADA"
+      },
+      "available": {
+        "title": "Disponíveis",
+        "filter_placeholder": "Filtrar jogadores...",
+        "invite_button": "+ Convidar mais jogadores"
+      },
+      "stats": {
+        "title": "Desempenho Detalhado",
+        "sort": {
+          "goals": "Ordenar por gols",
+          "assists": "Ordenar por assistências"
+        }
+      },
+      "standings": {
+        "title": "Classificação"
+      }
+    },
+    "teams": {
+      "title": "Times da Partida",
+      "button": {
+        "randomize": "Randomizar Times",
+        "create": "Criar Time",
+        "add_placeholder": "Adicionar Time"
+      },
+      "default_name": "Time {{number}}"
+    },
+    "team_card": {
+      "average": "MÉDIA: {{score}}",
+      "delete": "Excluir time",
+      "drag_placeholder": "Arraste um jogador"
+    }
+  },
+  "user": {
+    "list": {
+      "title": "Usuários"
+    },
+    "profile": {
+      "title": "Configurações do Perfil",
+      "subtitle": "Atualize suas informações pessoais. O score do usuário não pode ser modificado.",
+      "section": {
+        "change_password": "Alterar senha (deixe em branco para manter a atual)"
+      },
+      "field": {
+        "new_password": "Nova Senha",
+        "confirm_password": "Confirmar Nova Senha"
+      },
+      "hint": {
+        "password": "Deixe em branco se não quiser alterar a senha"
+      },
+      "button": {
+        "saving": "Salvando...",
+        "save": "Salvar Alterações"
+      },
+      "success": {
+        "updated": "Perfil atualizado com sucesso!"
+      },
+      "error": {
+        "load_failed": "Falha ao carregar perfil do usuário",
+        "password_mismatch": "As senhas não coincidem",
+        "name_required": "Nome é obrigatório",
+        "email_required": "Email é obrigatório",
+        "not_authenticated": "Usuário não autenticado",
+        "no_changes": "Nenhuma alteração detectada",
+        "update_failed": "Falha ao atualizar perfil"
+      }
+    }
+  }
+}

@@ -47,6 +47,8 @@ describe('ActiveMatchDashboard', () => {
     deleteEventAndRefresh: vi.fn(),
     adjustScore: vi.fn(),
     replacePlayerOnTeam: vi.fn(),
+    addPlayerToTeam: vi.fn(),
+    onEndMatch: vi.fn(),
   }
 
   it('renders team names and score', () => {
@@ -60,11 +62,9 @@ describe('ActiveMatchDashboard', () => {
     render(<ActiveMatchDashboard {...defaultProps} />)
     expect(screen.getByText('Player One')).toBeInTheDocument()
     expect(screen.getByText('Player Two')).toBeInTheDocument()
-    // Check stats (goals/assists)
-    // There are multiple cells with numbers, so we might need to be specific or just check presence
-    // Actually getByText might find multiple "0"s.
-    // Let's check for specific stats if possible, or just layout elements.
-    expect(screen.getByText('Player Data Entry')).toBeInTheDocument()
+    // Check table headers
+    expect(screen.getByText('common.player')).toBeInTheDocument()
+    expect(screen.getByText('common.goals')).toBeInTheDocument()
   })
 
   it('renders substitution buttons and stat inputs', () => {
@@ -77,7 +77,8 @@ describe('ActiveMatchDashboard', () => {
     //  - 3 stats (goals, assists, ownGoals)
     //    - Each stat has 2 buttons (minus, plus)
     // Total = 2 * (1 + 3 * 2) = 14 buttons
+    // + 1 End Match button
     const buttons = screen.getAllByRole('button')
-    expect(buttons).toHaveLength(14)
+    expect(buttons).toHaveLength(15)
   })
 })

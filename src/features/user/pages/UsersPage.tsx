@@ -11,8 +11,10 @@ import {
   Typography,
 } from '@mui/material';
 import { getUsers, type User, type PaginatedUsers } from '../../../shared/api/user';
+import { useTranslation } from 'react-i18next';
 
 const UsersPage = () => {
+  const { t } = useTranslation();
   const [users, setUsers] = useState<User[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -52,16 +54,16 @@ const UsersPage = () => {
   return (
     <>
       <Typography variant="h4" component="h1" gutterBottom>
-        Users
+        {t('user.list.title')}
       </Typography>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Score</TableCell>
+              <TableCell>{t('common.fields.id')}</TableCell>
+              <TableCell>{t('common.fields.name')}</TableCell>
+              <TableCell>{t('common.fields.email')}</TableCell>
+              <TableCell>{t('common.fields.score')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -83,6 +85,7 @@ const UsersPage = () => {
           page={pagination.page - 1}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage={t('common.pagination.rows_per_page')}
         />
       </TableContainer>
     </>

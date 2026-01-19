@@ -2,6 +2,22 @@ import { afterEach, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
+// Mock react-i18next
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+    i18n: {
+      changeLanguage: () => new Promise(() => {}),
+      language: 'en',
+    },
+  }),
+  initReactI18next: {
+    type: '3rdParty',
+    init: () => {},
+  },
+  Trans: ({ children }: { children: React.ReactNode }) => children,
+}))
+
 // Mock localStorage
 const localStorageMock = (function() {
   let store: Record<string, string> = {}

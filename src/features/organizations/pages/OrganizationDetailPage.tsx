@@ -6,10 +6,13 @@ import { createApi, type Pelada, type Organization } from '../../../shared/api/e
 import { useAuth } from '../../../app/providers/AuthContext'
 import CreatePeladaForm from '../components/CreatePeladaForm'
 import PeladasTable from '../components/PeladasTable'
+import { useTranslation } from 'react-i18next'
+import { Loading } from '../../../shared/components/Loading'
 
 const endpoints = createApi(api)
 
 export default function OrganizationDetailPage() {
+  const { t } = useTranslation()
   const { id } = useParams()
   const { user } = useAuth()
   const navigate = useNavigate()
@@ -35,10 +38,10 @@ export default function OrganizationDetailPage() {
         setIsAdmin(adminCheck.is_admin)
       })
       .catch((error: unknown) => {
-        const message = error instanceof Error ? error.message : 'Erro ao carregar organização'
+        const message = error instanceof Error ? error.message : t('organizations.detail.error.load_failed')
         setError(message)
       })
-  }, [orgId, user])
+  }, [orgId, user, t])
 
   const fetchPeladas = useCallback(async () => {
     if (!orgId) return
@@ -48,10 +51,10 @@ export default function OrganizationDetailPage() {
       setPeladas(response.data)
       setTotalPeladas(response.total)
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao carregar peladas'
+      const message = error instanceof Error ? error.message : t('organizations.detail.error.load_peladas_failed')
       setError(message)
     }
-  }, [orgId, page, rowsPerPage])
+  }, [orgId, page, rowsPerPage, t])
 
   useEffect(() => {
     fetchPeladas()
@@ -67,7 +70,7 @@ export default function OrganizationDetailPage() {
   }
 
   if (error) return <Container sx={{ mt: 4 }}><Alert severity="error">{error}</Alert></Container>
-  if (!org) return <Container sx={{ mt: 4 }}><Typography>Carregando...</Typography></Container>
+  if (!org) return <Loading message={t('common.loading')} />
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -81,7 +84,7 @@ export default function OrganizationDetailPage() {
           to={`/organizations/${orgId}/statistics`} 
           variant="outlined"
         >
-          ESTATÍSTICAS
+          {t('organizations.detail.button.statistics')}
         </Button>
       </Box>
 
@@ -89,7 +92,7 @@ export default function OrganizationDetailPage() {
         {/* Create Pelada Section */}
         {isAdmin && (
           <Paper variant="outlined" sx={{ p: 3 }}>
-            <Typography variant="h5" gutterBottom>New Pelada</Typography>
+            <Typography variant="h5" gutterBottom>{t('organizations.detail.section.new_pelada')}</Typography>
             <CreatePeladaForm
               organizationId={orgId}
               onCreate={async (payload) => {
@@ -98,7 +101,7 @@ export default function OrganizationDetailPage() {
                   // Navigate to the newly created pelada
                   navigate(`/peladas/${newPelada.id}`)
                 } catch (error: unknown) {
-                  const message = error instanceof Error ? error.message : 'Erro ao criar pelada'
+                  const message = error instanceof Error ? error.message : t('organizations.detail.error.create_pelada_failed')
                   setError(message)
                 }
               }}
@@ -115,7 +118,7 @@ export default function OrganizationDetailPage() {
                 await endpoints.deletePelada(id)
                 fetchPeladas()
               } catch (error: unknown) {
-                const message = error instanceof Error ? error.message : 'Erro ao excluir pelada'
+                const message = error instanceof Error ? error.message : t('organizations.detail.error.delete_pelada_failed')
                 setError(message)
               }
             } : undefined}
@@ -127,7 +130,7 @@ export default function OrganizationDetailPage() {
             onPageChange={handleChangePage}
             rowsPerPage={rowsPerPage}
             onRowsPerPageChange={handleChangeRowsPerPage}
-            labelRowsPerPage="Itens por página"
+            labelRowsPerPage={t('common.pagination.rows_per_page')}
             sx={{ borderTop: 1, borderColor: 'divider' }}
           />
         </Paper>

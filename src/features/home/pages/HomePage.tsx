@@ -5,6 +5,8 @@ import GroupsIcon from '@mui/icons-material/Groups'
 import { useAuth } from '../../../app/providers/AuthContext'
 import { api } from '../../../shared/api/client'
 import { createApi } from '../../../shared/api/endpoints'
+import { useTranslation } from 'react-i18next'
+import { Loading } from '../../../shared/components/Loading'
 
 const endpoints = createApi(api)
 
@@ -16,6 +18,7 @@ type OrganizationWithRole = {
 
 export default function HomePage() {
   const { user } = useAuth()
+  const { t } = useTranslation()
   const [adminOrgs, setAdminOrgs] = useState<OrganizationWithRole[]>([])
   const [memberOrgs, setMemberOrgs] = useState<OrganizationWithRole[]>([])
   const [loading, setLoading] = useState(true)
@@ -31,7 +34,7 @@ export default function HomePage() {
         // Fetch organizations where user is admin
         const adminData = await endpoints.listUserAdminOrganizations(user.id)
         if (!Array.isArray(adminData)) {
-          throw new Error('Formato inválido recebido ao buscar organizações administrativas')
+          throw new Error(t('home.error.invalid_format_admin_orgs'))
         }
         const adminOrgIds = new Set(adminData.map((a) => a.organization_id))
         
@@ -42,7 +45,7 @@ export default function HomePage() {
 
         if (!Array.isArray(allOrgs)) {
           console.error('Resposta inválida de listOrganizations:', response)
-          throw new Error('Formato inválido recebido ao buscar lista de organizações')
+          throw new Error(t('home.error.invalid_format_org_list'))
         }
         
         // Build admin organizations list
@@ -70,7 +73,7 @@ export default function HomePage() {
         setAdminOrgs(adminOrgsList)
         setMemberOrgs(memberOrgsList)
       } catch (err) {
-        const message = err instanceof Error ? err.message : 'Erro ao carregar organizações'
+        const message = err instanceof Error ? err.message : t('home.error.load_failed')
         setError(message)
       } finally {
         setLoading(false)
@@ -78,13 +81,13 @@ export default function HomePage() {
     }
 
     fetchOrganizations()
-  }, [user])
+  }, [user, t])
 
   if (!user) {
     return (
       <Container maxWidth="lg" sx={{ py: 3 }}>
-        <Typography variant="h3" gutterBottom>Pelada App</Typography>
-        <Typography variant="body1">Por favor, faça login.</Typography>
+        <Typography variant="h3" gutterBottom>{t('app.title')}</Typography>
+        <Typography variant="body1">{t('home.welcome.guest')}</Typography>
       </Container>
     )
   }
@@ -92,7 +95,7 @@ export default function HomePage() {
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
       <Typography variant="h3" gutterBottom>
-        Bem-vindo, {user.name}!
+        {t('home.welcome.user', { name: user.name })}
       </Typography>
       
       {error && (
@@ -102,21 +105,21 @@ export default function HomePage() {
       )}
 
       {loading ? (
-        <Typography>Carregando...</Typography>
+        <Loading message={t('common.loading')} />
       ) : (
         <>
           <Box sx={{ mb: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <AdminPanelSettingsIcon sx={{ mr: 1 }} color="primary" />
               <Typography variant="h5">
-                Minhas Organizações (Administrador)
+                {t('home.sections.admin_orgs.title')}
               </Typography>
             </Box>
             
             {adminOrgs.length === 0 ? (
               <Paper elevation={1} sx={{ p: 2 }}>
                 <Typography variant="body2" color="text.secondary">
-                  Você não é administrador de nenhuma organização.
+                  {t('home.sections.admin_orgs.empty')}
                 </Typography>
               </Paper>
             ) : (
@@ -124,8 +127,8 @@ export default function HomePage() {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Nome da Organização</TableCell>
-                      <TableCell>Função</TableCell>
+                      <TableCell>{t('home.table.headers.org_name')}</TableCell>
+                      <TableCell>{t('home.table.headers.role')}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -139,7 +142,7 @@ export default function HomePage() {
                         <TableCell>
                           <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <AdminPanelSettingsIcon fontSize="small" sx={{ mr: 0.5 }} color="primary" />
-                            Administrador
+                            {t('common.roles.admin')}
                           </Box>
                         </TableCell>
                       </TableRow>
@@ -154,14 +157,14 @@ export default function HomePage() {
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <GroupsIcon sx={{ mr: 1 }} color="action" />
               <Typography variant="h5">
-                Organizações que faço parte (Jogador)
+                {t('home.sections.member_orgs.title')}
               </Typography>
             </Box>
             
             {memberOrgs.length === 0 ? (
               <Paper elevation={1} sx={{ p: 2 }}>
                 <Typography variant="body2" color="text.secondary">
-                  Você não faz parte de nenhuma organização como jogador.
+                  {t('home.sections.member_orgs.empty')}
                 </Typography>
               </Paper>
             ) : (
@@ -169,8 +172,8 @@ export default function HomePage() {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Nome da Organização</TableCell>
-                      <TableCell>Função</TableCell>
+                      <TableCell>{t('home.table.headers.org_name')}</TableCell>
+                      <TableCell>{t('home.table.headers.role')}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -184,7 +187,7 @@ export default function HomePage() {
                         <TableCell>
                           <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <GroupsIcon fontSize="small" sx={{ mr: 0.5 }} />
-                            Jogador
+                            {t('common.roles.player')}
                           </Box>
                         </TableCell>
                       </TableRow>
