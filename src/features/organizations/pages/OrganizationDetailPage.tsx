@@ -41,14 +41,13 @@ export default function OrganizationDetailPage() {
   useEffect(() => {
     if (!orgId || !user) return;
 
-    // Load org details and admin status
-    Promise.all([
-      endpoints.getOrganization(orgId),
-      endpoints.checkIsAdmin(orgId, user.id),
-    ])
-      .then(([o, adminCheck]) => {
+    // Load org details
+    endpoints
+      .getOrganization(orgId)
+      .then((o) => {
         setOrg(o);
-        setIsAdmin(adminCheck.is_admin);
+        const userIsAdmin = user.admin_orgs?.includes(orgId) ?? false;
+        setIsAdmin(userIsAdmin);
       })
       .catch((error: unknown) => {
         const message =

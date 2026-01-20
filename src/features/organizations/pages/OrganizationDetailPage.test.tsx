@@ -16,7 +16,7 @@ vi.mock("../../../shared/api/client", () => ({
 // Mock AuthContext
 vi.mock("../../../app/providers/AuthContext", () => ({
   useAuth: () => ({
-    user: { id: 1, name: "Test User", email: "test@example.com" },
+    user: { id: 1, name: "Test User", email: "test@example.com", admin_orgs: [1] },
     isAuthenticated: true,
   }),
 }));
@@ -43,8 +43,6 @@ describe("OrganizationDetailPage", () => {
 
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/organizations/1") return Promise.resolve(mockOrg);
-      if (path === "/api/organizations/1/users/1/is-admin")
-        return Promise.resolve({ is_admin: true });
       return Promise.reject(new Error("Not found"));
     });
     (api.getPaginated as Mock).mockImplementation((path: string) => {
@@ -96,8 +94,6 @@ describe("OrganizationDetailPage", () => {
 
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/organizations/1") return Promise.resolve(mockOrg);
-      if (path === "/api/organizations/1/users/1/is-admin")
-        return Promise.resolve({ is_admin: true });
       return Promise.reject(new Error("Not found"));
     });
     (api.getPaginated as Mock).mockImplementation(
@@ -150,8 +146,6 @@ describe("OrganizationDetailPage", () => {
 
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/organizations/1") return Promise.resolve(mockOrg);
-      if (path === "/api/organizations/1/users/1/is-admin")
-        return Promise.resolve({ is_admin: true });
       return Promise.reject(new Error("Not found"));
     });
     (api.getPaginated as Mock).mockImplementation((path: string) => {

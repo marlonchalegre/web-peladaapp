@@ -26,27 +26,15 @@ describe("HomePage", () => {
   });
 
   it("lists organizations where user is admin or player", async () => {
-    // Mock user is admin of Org A
-    const mockAdminOrgs = [{ id: 1, organization_id: 101, user_id: 1 }];
-    // Mock all organizations
-    const mockAllOrgs = [
-      { id: 101, name: "Org Admin" },
-      { id: 102, name: "Org Player" },
-      { id: 103, name: "Org None" },
+    // Mock user organizations
+    const mockUserOrgs = [
+      { id: 101, name: "Org Admin", role: "admin" },
+      { id: 102, name: "Org Player", role: "player" },
     ];
-    // Mock players for Org 102 (user is in it)
-    const mockPlayers102 = [{ id: 1, user_id: 1, organization_id: 102 }];
-    // Mock players for Org 103 (user NOT in it)
-    const mockPlayers103 = [{ id: 2, user_id: 2, organization_id: 103 }];
 
     (api.get as Mock).mockImplementation((path: string) => {
-      if (path.includes("/admin-organizations"))
-        return Promise.resolve(mockAdminOrgs);
-      if (path === "/api/organizations") return Promise.resolve(mockAllOrgs);
-      if (path === "/api/organizations/102/players")
-        return Promise.resolve(mockPlayers102);
-      if (path === "/api/organizations/103/players")
-        return Promise.resolve(mockPlayers103);
+      if (path === "/api/users/1/organizations")
+        return Promise.resolve(mockUserOrgs);
       return Promise.resolve([]);
     });
 
@@ -61,8 +49,6 @@ describe("HomePage", () => {
       expect(screen.getByText("Org Player")).toBeInTheDocument();
     });
 
-    expect(screen.queryByText("Org None")).not.toBeInTheDocument();
-
     // Check role labels
     expect(screen.getByText("common.roles.admin")).toBeInTheDocument();
     expect(screen.getByText("common.roles.player")).toBeInTheDocument();
@@ -70,8 +56,7 @@ describe("HomePage", () => {
 
   it("renders empty state messages when user has no organizations", async () => {
     (api.get as Mock).mockImplementation((path: string) => {
-      if (path.includes("/admin-organizations")) return Promise.resolve([]);
-      if (path === "/api/organizations") return Promise.resolve([]);
+      if (path === "/api/users/1/organizations") return Promise.resolve([]);
       return Promise.resolve([]);
     });
 

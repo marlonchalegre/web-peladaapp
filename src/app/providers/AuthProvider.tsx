@@ -5,8 +5,15 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
+import { jwtDecode } from "jwt-decode";
 import { api, type User } from "../../shared/api/client";
 import { AuthContext, type AuthContextValue } from "./AuthContext";
+
+type TokenPayload = {
+  id: number;
+  email: string;
+  admin_orgs?: number[];
+};
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(() => {
@@ -15,7 +22,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const [user, setUser] = useState<User | null>(() => {
     const stored = localStorage.getItem("authUser");
-    return stored ? JSON.parse(stored) : null;
+    const storedToken = localStorage.getItem("authToken");
+
+    if (stored) {
+      const u = JSON.parse(stored) as User;
+      if (storedToken) {
+        try {
+          const payload = jwtDecode<TokenPayload>(storedToken);
+          u.admin_orgs = payload.admin_orgs;
+        } catch (e) {
+          console.error("Failed to decode stored token", e);
+        }
+      }
+      return u;
+    }
+    return null;
   });
 
   const signOut = useCallback(() => {
@@ -32,8 +53,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [token]);
 
   useEffect(() => {
-    if (user) localStorage.setItem("authUser", JSON.stringify(user));
-    else localStorage.removeItem("authUser");
+    if (user) {
+      // Don't store admin_orgs in localStorage, it should come from token
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { admin_orgs, ...userToStore } = user;
+      localStorage.setItem("authUser", JSON.stringify(userToStore));
+    } else {
+      localStorage.removeItem("authUser");
+    }
   }, [user]);
 
   // Setup global auth error handler
@@ -52,6 +79,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       isAuthenticated: Boolean(token && user),
       signIn: (t, u) => {
+        try {
+          const payload = jwtDecode<TokenPayload>(t);
+          u.admin_orgs = payload.admin_orgs;
+        } catch (e) {
+          console.error("Failed to decode token", e);
+        }
         setToken(t);
         setUser(u);
       },

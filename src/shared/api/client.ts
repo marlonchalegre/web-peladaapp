@@ -193,6 +193,7 @@ export type User = {
   id: number;
   name: string;
   email: string;
+  admin_orgs?: number[];
 };
 
 export type UserProfileUpdate = {

@@ -1,7 +1,7 @@
 import { ApiClient } from "./client";
 
 export type Organization = { id: number; name: string };
-export type User = { id: number; name: string; email: string };
+export type User = { id: number; name: string; email: string; admin_orgs?: number[] };
 export type Player = {
   id: number;
   user_id: number;
@@ -312,10 +312,6 @@ export function createApi(client: ApiClient) {
       ),
     removeOrganizationAdmin: (organizationId: number, userId: number) =>
       client.delete(`/api/organizations/${organizationId}/admins/${userId}`),
-    checkIsAdmin: (organizationId: number, userId: number) =>
-      client.get<{ is_admin: boolean }>(
-        `/api/organizations/${organizationId}/users/${userId}/is-admin`,
-      ),
 
     // Scores
     getNormalizedScore: (peladaId: number, orgPlayerId: number) =>
