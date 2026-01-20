@@ -79,7 +79,10 @@ export default function OrganizationDetailPage() {
   }, [orgId, page, rowsPerPage, t]);
 
   useEffect(() => {
-    fetchPeladas();
+    const load = async () => {
+      await fetchPeladas();
+    };
+    load();
   }, [fetchPeladas]);
 
   const handleChangePage = (_event: unknown, newPage: number) => {

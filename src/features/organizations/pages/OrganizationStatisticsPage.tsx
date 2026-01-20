@@ -87,7 +87,10 @@ export default function OrganizationStatisticsPage() {
   }, [orgId, year, t]);
 
   useEffect(() => {
-    fetchStats();
+    const load = async () => {
+      await fetchStats();
+    };
+    load();
   }, [fetchStats]);
 
   const handleRequestSort = (property: keyof PlayerStats) => {
