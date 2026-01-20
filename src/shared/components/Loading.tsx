@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Typography, alpha } from '@mui/material';
+import { Box, CircularProgress, Typography, alpha } from "@mui/material";
 
 interface LoadingProps {
   message?: string;
@@ -9,16 +9,23 @@ export const Loading = ({ message, fullScreen = false }: LoadingProps) => {
   return (
     <Box
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: fullScreen ? '100vh' : '50vh',
-        width: '100%',
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: fullScreen ? "100vh" : "50vh",
+        width: "100%",
         p: 3,
       }}
     >
-      <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <Box
+        sx={{
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <CircularProgress
           variant="determinate"
           sx={{
@@ -33,8 +40,8 @@ export const Loading = ({ message, fullScreen = false }: LoadingProps) => {
           disableShrink
           sx={{
             color: (theme) => theme.palette.primary.main,
-            animationDuration: '550ms',
-            position: 'absolute',
+            animationDuration: "550ms",
+            position: "absolute",
             left: 0,
           }}
           size={60}
@@ -42,13 +49,13 @@ export const Loading = ({ message, fullScreen = false }: LoadingProps) => {
         />
       </Box>
       {message && (
-        <Typography 
-          variant="body1" 
-          sx={{ 
-            mt: 3, 
-            color: 'text.secondary',
+        <Typography
+          variant="body1"
+          sx={{
+            mt: 3,
+            color: "text.secondary",
             fontWeight: 500,
-            letterSpacing: 0.5
+            letterSpacing: 0.5,
           }}
         >
           {message}

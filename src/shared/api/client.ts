@@ -1,119 +1,152 @@
 export type ApiConfig = {
-  baseUrl?: string
-}
+  baseUrl?: string;
+};
 
 function getBaseUrl(): string {
-  if (typeof window !== 'undefined') return '' // use vite proxy in dev
-  const globalAny = globalThis as { process?: { env?: Record<string, string | undefined> } } | undefined
-  const fromNode = globalAny?.process?.env?.API_BASE_URL
-  return fromNode ?? ''
+  if (typeof window !== "undefined") return ""; // use vite proxy in dev
+  const globalAny = globalThis as
+    | { process?: { env?: Record<string, string | undefined> } }
+    | undefined;
+  const fromNode = globalAny?.process?.env?.API_BASE_URL;
+  return fromNode ?? "";
 }
 
 export class ApiError extends Error {
   constructor(
     public status: number,
     public data: unknown,
-    message?: string
+    message?: string,
   ) {
-    super(message || `API Error: ${status}`)
-    this.name = 'ApiError'
+    super(message || `API Error: ${status}`);
+    this.name = "ApiError";
   }
 
   isAuthError(): boolean {
-    return this.status === 401
+    return this.status === 401;
   }
 
   isForbiddenError(): boolean {
-    return this.status === 403
+    return this.status === 403;
   }
 }
 
 export class ApiClient {
-  private token: string | null
-  private baseUrl: string
-  private onAuthError?: () => void
+  private token: string | null;
+  private baseUrl: string;
+  private onAuthError?: () => void;
 
   constructor(config?: ApiConfig) {
-    this.baseUrl = config?.baseUrl ?? getBaseUrl()
+    this.baseUrl = config?.baseUrl ?? getBaseUrl();
     // Initialize token early to avoid first-render race conditions
-    this.token = (typeof window !== 'undefined') ? (localStorage.getItem('authToken') || null) : null
+    this.token =
+      typeof window !== "undefined"
+        ? localStorage.getItem("authToken") || null
+        : null;
   }
 
   setToken(token: string | null) {
-    this.token = token
+    this.token = token;
   }
 
   setAuthErrorHandler(handler: () => void) {
-    this.onAuthError = handler
+    this.onAuthError = handler;
   }
 
   private headers(): HeadersInit {
-    const headers: HeadersInit = { 'Content-Type': 'application/json' }
-    if (this.token) headers['Authorization'] = `Token ${this.token}`
-    return headers
+    const headers: HeadersInit = { "Content-Type": "application/json" };
+    if (this.token) headers["Authorization"] = `Token ${this.token}`;
+    return headers;
   }
 
   private async handleResponse<T>(res: Response): Promise<T> {
     if (!res.ok) {
-      const errorData = await res.json().catch(() => ({ error: res.statusText }))
-      const apiError = new ApiError(res.status, errorData, errorData.error || errorData.message)
-      
+      const errorData = await res
+        .json()
+        .catch(() => ({ error: res.statusText }));
+      const apiError = new ApiError(
+        res.status,
+        errorData,
+        errorData.error || errorData.message,
+      );
+
       // Trigger auth error handler for 401 errors
       if (apiError.isAuthError() && this.onAuthError) {
-        this.onAuthError()
+        this.onAuthError();
       }
-      
-      throw apiError
+
+      throw apiError;
     }
-    return (await res.json()) as T
+    return (await res.json()) as T;
   }
 
-  async get<T>(path: string, params?: Record<string, string | number>): Promise<T> {
+  async get<T>(
+    path: string,
+    params?: Record<string, string | number>,
+  ): Promise<T> {
     const fullPath = `${this.baseUrl}${path}`;
-    const baseUrl = this.baseUrl || (typeof window !== 'undefined' ? window.location.origin : '');
+    const baseUrl =
+      this.baseUrl ||
+      (typeof window !== "undefined" ? window.location.origin : "");
     const url = new URL(fullPath, baseUrl);
 
     if (params) {
-      Object.keys(params).forEach(key => url.searchParams.append(key, String(params[key])));
+      Object.keys(params).forEach((key) =>
+        url.searchParams.append(key, String(params[key])),
+      );
     }
     const res = await fetch(url.toString(), {
-      method: 'GET',
+      method: "GET",
       headers: this.headers(),
     });
     return this.handleResponse<T>(res);
   }
 
-  async getPaginated<T>(path: string, params?: Record<string, string | number>): Promise<{ data: T, total: number, page: number, perPage: number, totalPages: number }> {
+  async getPaginated<T>(
+    path: string,
+    params?: Record<string, string | number>,
+  ): Promise<{
+    data: T;
+    total: number;
+    page: number;
+    perPage: number;
+    totalPages: number;
+  }> {
     const fullPath = `${this.baseUrl}${path}`;
-    const baseUrl = this.baseUrl || (typeof window !== 'undefined' ? window.location.origin : '');
+    const baseUrl =
+      this.baseUrl ||
+      (typeof window !== "undefined" ? window.location.origin : "");
     const url = new URL(fullPath, baseUrl);
 
     if (params) {
-      Object.keys(params).forEach(key => url.searchParams.append(key, String(params[key])));
+      Object.keys(params).forEach((key) =>
+        url.searchParams.append(key, String(params[key])),
+      );
     }
     const res = await fetch(url.toString(), {
-      method: 'GET',
+      method: "GET",
       headers: this.headers(),
     });
-    
+
     const data = await this.handleResponse<T>(res);
-    
+
     return {
       data,
-      total: parseInt(res.headers.get('X-Total') || '0', 10),
-      page: parseInt(res.headers.get('X-Page') || '1', 10),
-      perPage: parseInt(res.headers.get('X-Per-Page') || '20', 10),
-      totalPages: parseInt(res.headers.get('X-Total-Pages') || '0', 10),
+      total: parseInt(res.headers.get("X-Total") || "0", 10),
+      page: parseInt(res.headers.get("X-Page") || "1", 10),
+      perPage: parseInt(res.headers.get("X-Per-Page") || "20", 10),
+      totalPages: parseInt(res.headers.get("X-Total-Pages") || "0", 10),
     };
   }
 
   async post<T>(path: string, body?: unknown): Promise<T> {
     const fullPath = `${this.baseUrl}${path}`;
-    const baseUrl = this.baseUrl || (typeof window !== 'undefined' ? window.location.origin : '');
+    const baseUrl =
+      this.baseUrl ||
+      (typeof window !== "undefined" ? window.location.origin : "");
     const url = new URL(fullPath, baseUrl);
 
     const res = await fetch(url.toString(), {
-      method: 'POST',
+      method: "POST",
       headers: this.headers(),
       body: body ? JSON.stringify(body) : undefined,
     });
@@ -122,11 +155,13 @@ export class ApiClient {
 
   async put<T>(path: string, body?: unknown): Promise<T> {
     const fullPath = `${this.baseUrl}${path}`;
-    const baseUrl = this.baseUrl || (typeof window !== 'undefined' ? window.location.origin : '');
+    const baseUrl =
+      this.baseUrl ||
+      (typeof window !== "undefined" ? window.location.origin : "");
     const url = new URL(fullPath, baseUrl);
 
     const res = await fetch(url.toString(), {
-      method: 'PUT',
+      method: "PUT",
       headers: this.headers(),
       body: body ? JSON.stringify(body) : undefined,
     });
@@ -135,11 +170,13 @@ export class ApiClient {
 
   async delete<T>(path: string, body?: unknown): Promise<T> {
     const fullPath = `${this.baseUrl}${path}`;
-    const baseUrl = this.baseUrl || (typeof window !== 'undefined' ? window.location.origin : '');
+    const baseUrl =
+      this.baseUrl ||
+      (typeof window !== "undefined" ? window.location.origin : "");
     const url = new URL(fullPath, baseUrl);
 
     const res = await fetch(url.toString(), {
-      method: 'DELETE',
+      method: "DELETE",
       headers: this.headers(),
       body: body ? JSON.stringify(body) : undefined,
     });
@@ -147,37 +184,47 @@ export class ApiClient {
   }
 }
 
-export type LoginResponse = { 
-  token: string
-  user: User
-}
+export type LoginResponse = {
+  token: string;
+  user: User;
+};
 
 export type User = {
-  id: number
-  name: string
-  email: string
-}
+  id: number;
+  name: string;
+  email: string;
+};
 
 export type UserProfileUpdate = {
-  name?: string
-  email?: string
-  password?: string
+  name?: string;
+  email?: string;
+  password?: string;
+};
+
+export const api = new ApiClient();
+
+export async function login(
+  email: string,
+  password: string,
+): Promise<LoginResponse> {
+  return api.post<LoginResponse>("/auth/login", { email, password });
 }
 
-export const api = new ApiClient()
-
-export async function login(email: string, password: string): Promise<LoginResponse> {
-  return api.post<LoginResponse>('/auth/login', { email, password })
-}
-
-export async function register(name: string, email: string, password: string): Promise<void> {
-  await api.post('/auth/register', { name, email, password })
+export async function register(
+  name: string,
+  email: string,
+  password: string,
+): Promise<void> {
+  await api.post("/auth/register", { name, email, password });
 }
 
 export async function getUser(userId: number): Promise<User> {
-  return api.get<User>(`/api/user/${userId}`)
+  return api.get<User>(`/api/user/${userId}`);
 }
 
-export async function updateUserProfile(userId: number, updates: UserProfileUpdate): Promise<User> {
-  return api.put<User>(`/api/user/${userId}/profile`, updates)
+export async function updateUserProfile(
+  userId: number,
+  updates: UserProfileUpdate,
+): Promise<User> {
+  return api.put<User>(`/api/user/${userId}/profile`, updates);
 }

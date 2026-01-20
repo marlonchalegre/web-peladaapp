@@ -1,14 +1,14 @@
-import axios from 'axios';
+import axios from "axios";
 
 export const api = axios.create({
-  baseURL: '/api',
+  baseURL: "/api",
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem("authToken");
   if (token) {
     config.headers.Authorization = `Token ${token}`;
   }

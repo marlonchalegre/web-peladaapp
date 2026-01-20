@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -9,9 +9,13 @@ import {
   Paper,
   TablePagination,
   Typography,
-} from '@mui/material';
-import { getUsers, type User, type PaginatedUsers } from '../../../shared/api/user';
-import { useTranslation } from 'react-i18next';
+} from "@mui/material";
+import {
+  getUsers,
+  type User,
+  type PaginatedUsers,
+} from "../../../shared/api/user";
+import { useTranslation } from "react-i18next";
 
 const UsersPage = () => {
   const { t } = useTranslation();
@@ -43,7 +47,9 @@ const UsersPage = () => {
     setPagination((prev) => ({ ...prev, page: newPage + 1 }));
   };
 
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setPagination({
       ...pagination,
       per_page: parseInt(event.target.value, 10),
@@ -54,16 +60,16 @@ const UsersPage = () => {
   return (
     <>
       <Typography variant="h4" component="h1" gutterBottom>
-        {t('user.list.title')}
+        {t("user.list.title")}
       </Typography>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>{t('common.fields.id')}</TableCell>
-              <TableCell>{t('common.fields.name')}</TableCell>
-              <TableCell>{t('common.fields.email')}</TableCell>
-              <TableCell>{t('common.fields.score')}</TableCell>
+              <TableCell>{t("common.fields.id")}</TableCell>
+              <TableCell>{t("common.fields.name")}</TableCell>
+              <TableCell>{t("common.fields.email")}</TableCell>
+              <TableCell>{t("common.fields.score")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -85,7 +91,7 @@ const UsersPage = () => {
           page={pagination.page - 1}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage={t('common.pagination.rows_per_page')}
+          labelRowsPerPage={t("common.pagination.rows_per_page")}
         />
       </TableContainer>
     </>

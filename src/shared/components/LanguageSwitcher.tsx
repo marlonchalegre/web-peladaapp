@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Button, Menu, MenuItem, Tooltip } from '@mui/material';
-import TranslateIcon from '@mui/icons-material/Translate';
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { Button, Menu, MenuItem, Tooltip } from "@mui/material";
+import TranslateIcon from "@mui/icons-material/Translate";
 
 export const LanguageSwitcher: React.FC = () => {
   const { i18n, t } = useTranslation();
@@ -26,17 +26,17 @@ export const LanguageSwitcher: React.FC = () => {
 
   return (
     <>
-      <Tooltip title={t('components.language_switcher.label')}>
+      <Tooltip title={t("components.language_switcher.label")}>
         <Button
           color="inherit"
           id="language-button"
-          aria-controls={open ? 'language-menu' : undefined}
+          aria-controls={open ? "language-menu" : undefined}
           aria-haspopup="true"
-          aria-expanded={open ? 'true' : undefined}
+          aria-expanded={open ? "true" : undefined}
           onClick={handleClick}
           startIcon={<TranslateIcon />}
         >
-          {currentLang.startsWith('pt') ? 'PT' : 'EN'}
+          {currentLang.startsWith("pt") ? "PT" : "EN"}
         </Button>
       </Tooltip>
       <Menu
@@ -45,13 +45,19 @@ export const LanguageSwitcher: React.FC = () => {
         open={open}
         onClose={handleClose}
         MenuListProps={{
-          'aria-labelledby': 'language-button',
+          "aria-labelledby": "language-button",
         }}
       >
-        <MenuItem onClick={() => changeLanguage('pt-BR')} selected={currentLang.startsWith('pt')}>
+        <MenuItem
+          onClick={() => changeLanguage("pt-BR")}
+          selected={currentLang.startsWith("pt")}
+        >
           Português (BR)
         </MenuItem>
-        <MenuItem onClick={() => changeLanguage('en')} selected={currentLang.startsWith('en')}>
+        <MenuItem
+          onClick={() => changeLanguage("en")}
+          selected={currentLang.startsWith("en")}
+        >
           English
         </MenuItem>
       </Menu>

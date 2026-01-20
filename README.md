@@ -7,6 +7,7 @@ Modern web interface for managing casual soccer matches (peladas) with friends. 
 ## 📖 Overview
 
 Frontend application that allows:
+
 - **Authentication**: JWT-based user registration and login.
 - **User Management**: View and manage user profiles.
 - **Organizations**: Create and manage soccer organizations, including detailed statistics.
@@ -45,6 +46,9 @@ npm run build
 # Run unit tests
 npm test
 
+# Format all code
+npm run format:all
+
 # Preview production build locally
 npm run preview
 ```
@@ -76,28 +80,34 @@ The project follows a feature-based architecture:
 ## ⚡ Key Features
 
 ### Authentication & Authorization
+
 - Secure JWT storage in `localStorage`.
 - Protected routes based on authentication state.
 - Permission-based UI elements (Admin vs. Player).
 
 ### Attendance Management
+
 - **RSVP**: Players can confirm or decline their attendance for a specific match day.
 - **Admin Control**: Admins can manually update player attendance and close the list to start team randomization.
 
 ### Team Management
+
 - **Drag-and-Drop**: Easily move players between teams.
 - **Randomization**: Algorithmically generate balanced teams based on player scores.
 
 ### Match Tracking
+
 - Real-time score updates.
 - Detailed event logging (Goals, Assists, Own Goals).
 - Match lineup management.
 
 ### Voting & Scores
+
 - Integrated voting flow after matches are closed.
 - Automatic calculation of normalized scores (1-10) to help balance future games.
 
 ### Statistics & Dashboards
+
 - **Organization Stats**: Comprehensive view of player rankings, win rates, and goal contributions within an organization.
 - **Match Day Dashboard**: Real-time summary of current pelada standings and player performance.
 
@@ -131,6 +141,7 @@ npm test -- --coverage
 ```
 
 Test suite covers:
+
 - Component rendering and interactions.
 - API client logic and error handling.
 - Auth flow and protected route logic.

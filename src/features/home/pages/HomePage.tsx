@@ -1,115 +1,145 @@
-import { useEffect, useState, useCallback } from 'react'
-import { Typography, Container, Paper, Table, TableHead, TableRow, TableCell, TableBody, Box, Alert, Link, Button, Dialog, DialogTitle, DialogContent } from '@mui/material'
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'
-import GroupsIcon from '@mui/icons-material/Groups'
-import AddIcon from '@mui/icons-material/Add'
-import { useAuth } from '../../../app/providers/AuthContext'
-import { api } from '../../../shared/api/client'
-import { createApi } from '../../../shared/api/endpoints'
-import { useTranslation } from 'react-i18next'
-import { Loading } from '../../../shared/components/Loading'
-import CreateOrganizationForm from '../../organizations/components/CreateOrganizationForm'
+import { useEffect, useState, useCallback } from "react";
+import {
+  Typography,
+  Container,
+  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Box,
+  Alert,
+  Link,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+} from "@mui/material";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import GroupsIcon from "@mui/icons-material/Groups";
+import AddIcon from "@mui/icons-material/Add";
+import { useAuth } from "../../../app/providers/AuthContext";
+import { api } from "../../../shared/api/client";
+import { createApi } from "../../../shared/api/endpoints";
+import { useTranslation } from "react-i18next";
+import { Loading } from "../../../shared/components/Loading";
+import CreateOrganizationForm from "../../organizations/components/CreateOrganizationForm";
 
-const endpoints = createApi(api)
+const endpoints = createApi(api);
 
 type OrganizationWithRole = {
-  id: number
-  name: string
-  role: 'admin' | 'player'
-}
+  id: number;
+  name: string;
+  role: "admin" | "player";
+};
 
 export default function HomePage() {
-  const { user } = useAuth()
-  const { t } = useTranslation()
-  const [adminOrgs, setAdminOrgs] = useState<OrganizationWithRole[]>([])
-  const [memberOrgs, setMemberOrgs] = useState<OrganizationWithRole[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const { user } = useAuth();
+  const { t } = useTranslation();
+  const [adminOrgs, setAdminOrgs] = useState<OrganizationWithRole[]>([]);
+  const [memberOrgs, setMemberOrgs] = useState<OrganizationWithRole[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const fetchOrganizations = useCallback(async () => {
-    if (!user) return
+    if (!user) return;
     try {
-      setLoading(true)
-      
+      setLoading(true);
+
       // Fetch organizations where user is admin
-      const adminData = await endpoints.listUserAdminOrganizations(user.id)
+      const adminData = await endpoints.listUserAdminOrganizations(user.id);
       if (!Array.isArray(adminData)) {
-        throw new Error(t('home.error.invalid_format_admin_orgs'))
+        throw new Error(t("home.error.invalid_format_admin_orgs"));
       }
-      const adminOrgIds = new Set(adminData.map((a) => a.organization_id))
-      
+      const adminOrgIds = new Set(adminData.map((a) => a.organization_id));
+
       // Fetch all organizations and their players
-      const response = await endpoints.listOrganizations()
+      const response = await endpoints.listOrganizations();
       // @ts-expect-error - listOrganizations returns Organization[] but we check for legacy wrapper
-      const allOrgs = response.organizations || response
+      const allOrgs = response.organizations || response;
 
       if (!Array.isArray(allOrgs)) {
-        console.error('Resposta inválida de listOrganizations:', response)
-        throw new Error(t('home.error.invalid_format_org_list'))
+        console.error("Resposta inválida de listOrganizations:", response);
+        throw new Error(t("home.error.invalid_format_org_list"));
       }
-      
+
       // Build admin organizations list
       const adminOrgsList: OrganizationWithRole[] = allOrgs
         .filter((org) => adminOrgIds.has(org.id))
-        .map((org) => ({ ...org, role: 'admin' as const }))
-      
+        .map((org) => ({ ...org, role: "admin" as const }));
+
       // For member organizations, we need to check which orgs the user is a player in
       const playerChecks = await Promise.all(
         allOrgs
           .filter((org) => !adminOrgIds.has(org.id))
           .map(async (org) => {
             try {
-              const players = await endpoints.listPlayersByOrg(org.id)
-              const isPlayer = players.some((p) => p.user_id === user.id)
-              return isPlayer ? { ...org, role: 'player' as const } : null
+              const players = await endpoints.listPlayersByOrg(org.id);
+              const isPlayer = players.some((p) => p.user_id === user.id);
+              return isPlayer ? { ...org, role: "player" as const } : null;
             } catch {
-              return null
+              return null;
             }
-          })
-      )
-      
-      const memberOrgsList = playerChecks.filter((org) => org !== null) as OrganizationWithRole[]
-      
-      setAdminOrgs(adminOrgsList)
-      setMemberOrgs(memberOrgsList)
+          }),
+      );
+
+      const memberOrgsList = playerChecks.filter(
+        (org) => org !== null,
+      ) as OrganizationWithRole[];
+
+      setAdminOrgs(adminOrgsList);
+      setMemberOrgs(memberOrgsList);
     } catch (err) {
-      const message = err instanceof Error ? err.message : t('home.error.load_failed')
-      setError(message)
+      const message =
+        err instanceof Error ? err.message : t("home.error.load_failed");
+      setError(message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [user, t])
+  }, [user, t]);
 
   useEffect(() => {
-    fetchOrganizations()
-  }, [fetchOrganizations])
+    fetchOrganizations();
+  }, [fetchOrganizations]);
 
   if (!user) {
     return (
       <Container maxWidth="lg" sx={{ py: 3 }}>
-        <Typography variant="h3" gutterBottom>{t('app.title')}</Typography>
-        <Typography variant="body1">{t('home.welcome.guest')}</Typography>
+        <Typography variant="h3" gutterBottom>
+          {t("app.title")}
+        </Typography>
+        <Typography variant="body1">{t("home.welcome.guest")}</Typography>
       </Container>
-    )
+    );
   }
 
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+          flexWrap: "wrap",
+          gap: 2,
+        }}
+      >
         <Typography variant="h3">
-          {t('home.welcome.user', { name: user.name })}
+          {t("home.welcome.user", { name: user.name })}
         </Typography>
-        <Button 
-          variant="contained" 
-          color="primary" 
+        <Button
+          variant="contained"
+          color="primary"
           startIcon={<AddIcon />}
           onClick={() => setCreateDialogOpen(true)}
         >
-          {t('home.actions.create_organization')}
+          {t("home.actions.create_organization")}
         </Button>
       </Box>
-      
+
       {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
           {error}
@@ -117,21 +147,21 @@ export default function HomePage() {
       )}
 
       {loading ? (
-        <Loading message={t('common.loading')} />
+        <Loading message={t("common.loading")} />
       ) : (
         <>
           <Box sx={{ mb: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
               <AdminPanelSettingsIcon sx={{ mr: 1 }} color="primary" />
               <Typography variant="h5">
-                {t('home.sections.admin_orgs.title')}
+                {t("home.sections.admin_orgs.title")}
               </Typography>
             </Box>
-            
+
             {adminOrgs.length === 0 ? (
               <Paper elevation={1} sx={{ p: 2 }}>
                 <Typography variant="body2" color="text.secondary">
-                  {t('home.sections.admin_orgs.empty')}
+                  {t("home.sections.admin_orgs.empty")}
                 </Typography>
               </Paper>
             ) : (
@@ -139,22 +169,29 @@ export default function HomePage() {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>{t('home.table.headers.org_name')}</TableCell>
-                      <TableCell>{t('home.table.headers.role')}</TableCell>
+                      <TableCell>{t("home.table.headers.org_name")}</TableCell>
+                      <TableCell>{t("home.table.headers.role")}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {adminOrgs.map((org) => (
                       <TableRow key={`admin-${org.id}`}>
                         <TableCell>
-                          <Link href={`/organizations/${org.id}`} underline="hover">
+                          <Link
+                            href={`/organizations/${org.id}`}
+                            underline="hover"
+                          >
                             {org.name}
                           </Link>
                         </TableCell>
                         <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <AdminPanelSettingsIcon fontSize="small" sx={{ mr: 0.5 }} color="primary" />
-                            {t('common.roles.admin')}
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <AdminPanelSettingsIcon
+                              fontSize="small"
+                              sx={{ mr: 0.5 }}
+                              color="primary"
+                            />
+                            {t("common.roles.admin")}
                           </Box>
                         </TableCell>
                       </TableRow>
@@ -166,17 +203,17 @@ export default function HomePage() {
           </Box>
 
           <Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
               <GroupsIcon sx={{ mr: 1 }} color="action" />
               <Typography variant="h5">
-                {t('home.sections.member_orgs.title')}
+                {t("home.sections.member_orgs.title")}
               </Typography>
             </Box>
-            
+
             {memberOrgs.length === 0 ? (
               <Paper elevation={1} sx={{ p: 2 }}>
                 <Typography variant="body2" color="text.secondary">
-                  {t('home.sections.member_orgs.empty')}
+                  {t("home.sections.member_orgs.empty")}
                 </Typography>
               </Paper>
             ) : (
@@ -184,22 +221,25 @@ export default function HomePage() {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>{t('home.table.headers.org_name')}</TableCell>
-                      <TableCell>{t('home.table.headers.role')}</TableCell>
+                      <TableCell>{t("home.table.headers.org_name")}</TableCell>
+                      <TableCell>{t("home.table.headers.role")}</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {memberOrgs.map((org) => (
                       <TableRow key={`member-${org.id}`}>
                         <TableCell>
-                          <Link href={`/organizations/${org.id}`} underline="hover">
+                          <Link
+                            href={`/organizations/${org.id}`}
+                            underline="hover"
+                          >
                             {org.name}
                           </Link>
                         </TableCell>
                         <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
                             <GroupsIcon fontSize="small" sx={{ mr: 0.5 }} />
-                            {t('common.roles.player')}
+                            {t("common.roles.player")}
                           </Box>
                         </TableCell>
                       </TableRow>
@@ -212,18 +252,23 @@ export default function HomePage() {
         </>
       )}
 
-      <Dialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)}>
-        <DialogTitle>{t('home.actions.create_organization')}</DialogTitle>
+      <Dialog
+        open={createDialogOpen}
+        onClose={() => setCreateDialogOpen(false)}
+      >
+        <DialogTitle>{t("home.actions.create_organization")}</DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 1 }}>
-            <CreateOrganizationForm onCreate={async (name) => {
-              await endpoints.createOrganization(name)
-              setCreateDialogOpen(false)
-              fetchOrganizations()
-            }} />
+            <CreateOrganizationForm
+              onCreate={async (name) => {
+                await endpoints.createOrganization(name);
+                setCreateDialogOpen(false);
+                fetchOrganizations();
+              }}
+            />
           </Box>
         </DialogContent>
       </Dialog>
     </Container>
-  )
+  );
 }
