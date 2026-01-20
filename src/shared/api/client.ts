@@ -228,3 +228,7 @@ export async function updateUserProfile(
 ): Promise<User> {
   return api.put<User>(`/api/user/${userId}/profile`, updates);
 }
+
+export async function deleteUser(userId: number): Promise<void> {
+  return api.delete<void>(`/api/user/${userId}`);
+}

@@ -30,7 +30,6 @@ import AttendanceListPage from "./features/peladas/pages/AttendanceListPage";
 import PeladaMatchesPage from "./features/peladas/pages/PeladaMatchesPage";
 import PeladaVotingPage from "./features/peladas/pages/PeladaVotingPage";
 import UserProfilePage from "./features/user/pages/UserProfilePage";
-import UsersPage from "./features/user/pages/UsersPage";
 
 function Footer() {
   const { t } = useTranslation();
@@ -180,14 +179,6 @@ function AppLayout() {
                 element={
                   <Container maxWidth="lg" sx={{ py: 3 }}>
                     <UserProfilePage />
-                  </Container>
-                }
-              />
-              <Route
-                path="/users"
-                element={
-                  <Container maxWidth="lg" sx={{ py: 3 }}>
-                    <UsersPage />
                   </Container>
                 }
               />

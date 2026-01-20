@@ -410,7 +410,8 @@
       "title": "Configurações do Perfil",
       "subtitle": "Atualize suas informações pessoais. O score do usuário não pode ser modificado.",
       "section": {
-        "change_password": "Alterar senha (deixe em branco para manter a atual)"
+        "change_password": "Alterar senha (deixe em branco para manter a atual)",
+        "danger_zone": "Zona de Perigo"
       },
       "field": {
         "new_password": "Nova Senha",
@@ -421,10 +422,17 @@
       },
       "button": {
         "saving": "Salvando...",
-        "save": "Salvar Alterações"
+        "save": "Salvar Alterações",
+        "delete_account": "Excluir Conta"
+      },
+      "dialog": {
+        "delete_title": "Excluir Conta",
+        "delete_confirm": "Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.",
+        "delete_button": "Excluir"
       },
       "success": {
-        "updated": "Perfil atualizado com sucesso!"
+        "updated": "Perfil atualizado com sucesso!",
+        "deleted": "Conta excluída com sucesso."
       },
       "error": {
         "load_failed": "Falha ao carregar perfil do usuário",
@@ -433,7 +441,8 @@
         "email_required": "Email é obrigatório",
         "not_authenticated": "Usuário não autenticado",
         "no_changes": "Nenhuma alteração detectada",
-        "update_failed": "Falha ao atualizar perfil"
+        "update_failed": "Falha ao atualizar perfil",
+        "delete_failed": "Falha ao excluir conta"
       }
     }
   }

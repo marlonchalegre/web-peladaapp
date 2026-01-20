@@ -8,8 +8,17 @@ import {
   Alert,
   Box,
   Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
-import { updateUserProfile, getUser } from "../../../shared/api/client";
+import {
+  updateUserProfile,
+  getUser,
+  deleteUser,
+} from "../../../shared/api/client";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -18,7 +27,7 @@ import { Loading } from "../../../shared/components/Loading";
 export default function UserProfilePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { user: authUser, signIn, token } = useAuth();
+  const { user: authUser, signIn, signOut, token } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,6 +36,7 @@ export default function UserProfilePage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [loadingProfile, setLoadingProfile] = useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!authUser) {
@@ -113,6 +123,24 @@ export default function UserProfilePage() {
     }
   }
 
+  const handleDeleteAccount = async () => {
+    if (!authUser) return;
+    setLoading(true);
+    try {
+      await deleteUser(authUser.id);
+      signOut();
+      navigate("/login");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("user.profile.error.delete_failed");
+      setError(message);
+      setLoading(false);
+      setDeleteDialogOpen(false);
+    }
+  };
+
   if (loadingProfile) {
     return <Loading message={t("common.loading")} />;
   }
@@ -194,7 +222,51 @@ export default function UserProfilePage() {
             </Box>
           </Stack>
         </form>
+
+        <Divider sx={{ my: 4 }} />
+
+        <Typography
+          variant="caption"
+          color="error"
+          sx={{ display: "block", mb: 2 }}
+        >
+          {t("user.profile.section.danger_zone")}
+        </Typography>
+
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={() => setDeleteDialogOpen(true)}
+          disabled={loading}
+          fullWidth
+        >
+          {t("user.profile.button.delete_account")}
+        </Button>
       </Paper>
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        aria-labelledby="delete-account-dialog-title"
+        aria-describedby="delete-account-dialog-description"
+      >
+        <DialogTitle id="delete-account-dialog-title">
+          {t("user.profile.dialog.delete_title")}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="delete-account-dialog-description">
+            {t("user.profile.dialog.delete_confirm")}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)} autoFocus>
+            {t("common.cancel")}
+          </Button>
+          <Button onClick={handleDeleteAccount} color="error">
+            {t("user.profile.dialog.delete_button")}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
