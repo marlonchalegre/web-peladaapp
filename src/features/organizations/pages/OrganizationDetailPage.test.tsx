@@ -16,7 +16,12 @@ vi.mock("../../../shared/api/client", () => ({
 // Mock AuthContext
 vi.mock("../../../app/providers/AuthContext", () => ({
   useAuth: () => ({
-    user: { id: 1, name: "Test User", email: "test@example.com", admin_orgs: [1] },
+    user: {
+      id: 1,
+      name: "Test User",
+      email: "test@example.com",
+      admin_orgs: [1],
+    },
     isAuthenticated: true,
   }),
 }));

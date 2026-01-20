@@ -1,7 +1,12 @@
 import { ApiClient } from "./client";
 
 export type Organization = { id: number; name: string };
-export type User = { id: number; name: string; email: string; admin_orgs?: number[] };
+export type User = {
+  id: number;
+  name: string;
+  email: string;
+  admin_orgs?: number[];
+};
 export type Player = {
   id: number;
   user_id: number;
