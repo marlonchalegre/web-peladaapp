@@ -102,8 +102,6 @@
   },
   "home": {
     "error": {
-      "invalid_format_admin_orgs": "Formato inválido recebido ao buscar organizações administrativas",
-      "invalid_format_org_list": "Formato inválido recebido ao buscar lista de organizações",
       "load_failed": "Erro ao carregar organizações"
     },
     "welcome": {

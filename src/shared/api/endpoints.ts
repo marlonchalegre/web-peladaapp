@@ -131,7 +131,6 @@ export type PaginatedResponse<T> = {
 export function createApi(client: ApiClient) {
   return {
     // Organizations
-    listOrganizations: () => client.get<Organization[]>("/api/organizations"),
     getOrganization: (id: number) =>
       client.get<Organization>(`/api/organizations/${id}`),
     createOrganization: (name: string) =>
@@ -301,10 +300,6 @@ export function createApi(client: ApiClient) {
     listAdminsByOrganization: (organizationId: number) =>
       client.get<OrganizationAdmin[]>(
         `/api/organizations/${organizationId}/admins`,
-      ),
-    listUserAdminOrganizations: (userId: number) =>
-      client.get<OrganizationAdmin[]>(
-        `/api/users/${userId}/admin-organizations`,
       ),
     listUserOrganizations: (userId: number) =>
       client.get<(Organization & { role: "admin" | "player" })[]>(

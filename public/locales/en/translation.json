@@ -102,8 +102,6 @@
   },
   "home": {
     "error": {
-      "invalid_format_admin_orgs": "Invalid format received when fetching admin organizations",
-      "invalid_format_org_list": "Invalid format received when fetching organization list",
       "load_failed": "Error loading organizations"
     },
     "welcome": {
