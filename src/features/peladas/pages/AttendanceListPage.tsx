@@ -63,11 +63,9 @@ export default function AttendanceListPage() {
         setPelada(data.pelada);
         setPlayers(data.available_players);
 
-        const adminCheck = await endpoints.checkIsAdmin(
-          data.pelada.organization_id,
-          user.id,
-        );
-        setIsAdmin(adminCheck.is_admin);
+        const userIsAdmin =
+          user.admin_orgs?.includes(data.pelada.organization_id) ?? false;
+        setIsAdmin(userIsAdmin);
 
         // If already open or closed, redirect to detail page
         if (data.pelada.status !== "attendance") {
