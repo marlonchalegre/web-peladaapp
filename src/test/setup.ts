@@ -3,9 +3,10 @@ import { cleanup } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
 // Mock react-i18next
+const tSpy = (key: string) => key
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string) => key,
+    t: tSpy,
     i18n: {
       changeLanguage: () => new Promise(() => {}),
       language: 'en',

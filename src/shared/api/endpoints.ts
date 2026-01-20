@@ -105,6 +105,7 @@ export function createApi(client: ApiClient) {
     listPlayersByOrg: (organizationId: number) => client.get<Player[]>(`/api/organizations/${organizationId}/players`),
     createPlayer: (payload: Partial<Player>) => client.post<Player>('/api/players', payload),
     getPlayer: (id: number) => client.get<Player>(`/api/players/${id}`),
+    deletePlayer: (id: number) => client.delete(`/api/players/${id}`),
 
     // Users
     listUsers: () => client.get<User[]>('/api/users'),

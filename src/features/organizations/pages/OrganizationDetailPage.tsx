@@ -79,13 +79,25 @@ export default function OrganizationDetailPage() {
         <Typography variant="h4" component="h1" color="primary.main" fontWeight="bold">
           {org.name}
         </Typography>
-        <Button 
-          component={RouterLink} 
-          to={`/organizations/${orgId}/statistics`} 
-          variant="outlined"
-        >
-          {t('organizations.detail.button.statistics')}
-        </Button>
+        <Stack direction="row" spacing={1}>
+          <Button 
+            component={RouterLink} 
+            to={`/organizations/${orgId}/statistics`} 
+            variant="outlined"
+          >
+            {t('organizations.detail.button.statistics')}
+          </Button>
+          {isAdmin && (
+            <Button 
+              component={RouterLink} 
+              to={`/organizations/${orgId}/management`} 
+              variant="outlined"
+              color="primary"
+            >
+              {t('organizations.detail.button.management')}
+            </Button>
+          )}
+        </Stack>
       </Box>
 
       <Stack spacing={4}>

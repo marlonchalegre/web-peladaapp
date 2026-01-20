@@ -139,7 +139,8 @@
     },
     "detail": {
       "button": {
-        "statistics": "STATISTICS"
+        "statistics": "STATISTICS",
+        "management": "MANAGEMENT"
       },
       "section": {
         "new_pelada": "New Pelada"
@@ -150,6 +151,18 @@
         "create_pelada_failed": "Error creating pelada",
         "delete_pelada_failed": "Error deleting pelada"
       }
+    },
+    "management": {
+      "title": "Manage Organization - {{name}}",
+      "sections": {
+        "members": "Members",
+        "admins": "Administrators",
+        "danger_zone": "Danger Zone"
+      },
+      "remove_member_confirm": "Are you sure you want to remove this member from the organization?",
+      "delete_description": "Deleting an organization is a permanent action and cannot be undone. All associated data will be lost.",
+      "delete_confirm_title": "Delete Organization",
+      "delete_confirm_instruction": "Please type the name of the organization \"{{name}}\" to confirm."
     },
     "stats": {
       "title": "{{name}} - Statistics",

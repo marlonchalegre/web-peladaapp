@@ -139,7 +139,8 @@
     },
     "detail": {
       "button": {
-        "statistics": "ESTATÍSTICAS"
+        "statistics": "ESTATÍSTICAS",
+        "management": "GERENCIAMENTO"
       },
       "section": {
         "new_pelada": "Nova Pelada"
@@ -150,6 +151,18 @@
         "create_pelada_failed": "Erro ao criar pelada",
         "delete_pelada_failed": "Erro ao excluir pelada"
       }
+    },
+    "management": {
+      "title": "Gerenciar Organização - {{name}}",
+      "sections": {
+        "members": "Membros",
+        "admins": "Administradores",
+        "danger_zone": "Zona de Perigo"
+      },
+      "remove_member_confirm": "Tem certeza que deseja remover este membro da organização?",
+      "delete_description": "Excluir uma organização é uma ação permanente e não pode ser desfeita. Todos os dados associados serão perdidos.",
+      "delete_confirm_title": "Excluir Organização",
+      "delete_confirm_instruction": "Por favor, digite o nome da organização \"{{name}}\" para confirmar."
     },
     "stats": {
       "title": "{{name}} - Estatísticas",

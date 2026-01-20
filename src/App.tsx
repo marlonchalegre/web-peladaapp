@@ -12,6 +12,7 @@ import HomePage from './features/home/pages/HomePage'
 import OrganizationsPage from './features/organizations/pages/OrganizationsPage'
 import OrganizationDetailPage from './features/organizations/pages/OrganizationDetailPage'
 import OrganizationStatisticsPage from './features/organizations/pages/OrganizationStatisticsPage'
+import OrganizationManagementPage from './features/organizations/pages/OrganizationManagementPage'
 import PeladaDetailPage from './features/peladas/pages/PeladaDetailPage'
 import AttendanceListPage from './features/peladas/pages/AttendanceListPage'
 import PeladaMatchesPage from './features/peladas/pages/PeladaMatchesPage'
@@ -51,19 +52,32 @@ function AppLayout() {
         {isAuthenticated && (
           <AppBar position="static">
             <Toolbar>
-              <Typography 
-                variant="h6" 
+              <Box 
                 component={RouterLink} 
                 to="/" 
                 sx={{ 
-                  flexGrow: 1, 
+                  display: 'flex', 
+                  alignItems: 'center', 
                   textDecoration: 'none', 
                   color: 'inherit',
-                  fontWeight: 'bold'
+                  flexGrow: 1 
                 }}
               >
-                {t('app.title')}
-              </Typography>
+                <Box
+                  component="img"
+                  src="/logo.png"
+                  alt="Pelada App Logo"
+                  sx={{ height: 40, mr: 2, borderRadius: '50%' }}
+                />
+                <Typography 
+                  variant="h6" 
+                  sx={{ 
+                    fontWeight: 'bold'
+                  }}
+                >
+                  {t('app.title')}
+                </Typography>
+              </Box>
               <LanguageSwitcher />
               <Button color="inherit" component={RouterLink} to="/profile">{t('navigation.profile')}</Button>
               <Button color="inherit" onClick={() => signOut()}>{t('auth.logout')}</Button>
@@ -92,6 +106,11 @@ function AppLayout() {
               <Route path="/organizations/:id/statistics" element={
                 <Container maxWidth="lg" sx={{ py: 3 }}>
                   <OrganizationStatisticsPage />
+                </Container>
+              } />
+              <Route path="/organizations/:id/management" element={
+                <Container maxWidth="lg" sx={{ py: 3 }}>
+                  <OrganizationManagementPage />
                 </Container>
               } />
               <Route path="/peladas/:id" element={
