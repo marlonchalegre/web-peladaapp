@@ -50,6 +50,8 @@
     "welcome": "Welcome to Pelada App",
     "loading": "Loading...",
     "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
     "create": "Create",
     "add": "Add",
     "close": "Close",

@@ -306,6 +306,10 @@ export function createApi(client: ApiClient) {
       client.get<OrganizationAdmin[]>(
         `/api/users/${userId}/admin-organizations`,
       ),
+    listUserOrganizations: (userId: number) =>
+      client.get<(Organization & { role: "admin" | "player" })[]>(
+        `/api/users/${userId}/organizations`,
+      ),
     addOrganizationAdmin: (organizationId: number, userId: number) =>
       client.post<OrganizationAdmin>(
         `/api/organizations/${organizationId}/admins`,

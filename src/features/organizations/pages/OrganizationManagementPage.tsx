@@ -440,7 +440,7 @@ export default function OrganizationManagementPage() {
               try {
                 setActionLoading(true);
                 await endpoints.deleteOrganization(orgId);
-                navigate("/organizations");
+                navigate("/");
               } catch (err) {
                 setError(err instanceof Error ? err.message : String(err));
                 setActionLoading(false);
@@ -452,7 +452,7 @@ export default function OrganizationManagementPage() {
             {actionLoading ? (
               <CircularProgress size={24} />
             ) : (
-              t("common.actions")
+              t("common.delete")
             )}
           </Button>
         </DialogActions>

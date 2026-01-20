@@ -48,46 +48,14 @@ export default function HomePage() {
     try {
       setLoading(true);
 
-      // Fetch organizations where user is admin
-      const adminData = await endpoints.listUserAdminOrganizations(user.id);
-      if (!Array.isArray(adminData)) {
-        throw new Error(t("home.error.invalid_format_admin_orgs"));
-      }
-      const adminOrgIds = new Set(adminData.map((a) => a.organization_id));
+      const userOrgs = await endpoints.listUserOrganizations(user.id);
 
-      // Fetch all organizations and their players
-      const response = await endpoints.listOrganizations();
-      // @ts-expect-error - listOrganizations returns Organization[] but we check for legacy wrapper
-      const allOrgs = response.organizations || response;
-
-      if (!Array.isArray(allOrgs)) {
-        console.error("Resposta inválida de listOrganizations:", response);
+      if (!Array.isArray(userOrgs)) {
         throw new Error(t("home.error.invalid_format_org_list"));
       }
 
-      // Build admin organizations list
-      const adminOrgsList: OrganizationWithRole[] = allOrgs
-        .filter((org) => adminOrgIds.has(org.id))
-        .map((org) => ({ ...org, role: "admin" as const }));
-
-      // For member organizations, we need to check which orgs the user is a player in
-      const playerChecks = await Promise.all(
-        allOrgs
-          .filter((org) => !adminOrgIds.has(org.id))
-          .map(async (org) => {
-            try {
-              const players = await endpoints.listPlayersByOrg(org.id);
-              const isPlayer = players.some((p) => p.user_id === user.id);
-              return isPlayer ? { ...org, role: "player" as const } : null;
-            } catch {
-              return null;
-            }
-          }),
-      );
-
-      const memberOrgsList = playerChecks.filter(
-        (org) => org !== null,
-      ) as OrganizationWithRole[];
+      const adminOrgsList = userOrgs.filter((org) => org.role === "admin");
+      const memberOrgsList = userOrgs.filter((org) => org.role === "player");
 
       setAdminOrgs(adminOrgsList);
       setMemberOrgs(memberOrgsList);

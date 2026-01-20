@@ -21,7 +21,6 @@ import ProtectedRoute from "./app/routing/ProtectedRoute";
 import LoginPage from "./features/auth/pages/LoginPage";
 import RegisterPage from "./features/auth/pages/RegisterPage";
 import HomePage from "./features/home/pages/HomePage";
-import OrganizationsPage from "./features/organizations/pages/OrganizationsPage";
 import OrganizationDetailPage from "./features/organizations/pages/OrganizationDetailPage";
 import OrganizationStatisticsPage from "./features/organizations/pages/OrganizationStatisticsPage";
 import OrganizationManagementPage from "./features/organizations/pages/OrganizationManagementPage";
@@ -110,14 +109,6 @@ function AppLayout() {
             {/* Rotas protegidas com Container */}
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<HomePage />} />
-              <Route
-                path="/organizations"
-                element={
-                  <Container maxWidth="lg" sx={{ py: 3 }}>
-                    <OrganizationsPage />
-                  </Container>
-                }
-              />
               <Route
                 path="/organizations/:id"
                 element={
