@@ -217,6 +217,69 @@ export default function AttendanceListPage() {
         )}
       </Box>
 
+      {/* Stats Header */}
+      <Box sx={{ mb: 4, pb: 4, borderBottom: 1, borderColor: "divider" }}>
+        <Grid container spacing={4}>
+          <Grid size={{ xs: 6, md: 3 }}>
+            <Typography
+              variant="overline"
+              color="text.secondary"
+              sx={{ fontWeight: "bold", letterSpacing: 1 }}
+            >
+              {t("peladas.attendance.stats.total_players")}
+            </Typography>
+            <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+              {totalPlayers}
+            </Typography>
+          </Grid>
+          <Grid size={{ xs: 6, md: 3 }}>
+            <Typography
+              variant="overline"
+              color="text.secondary"
+              sx={{ fontWeight: "bold", letterSpacing: 1 }}
+            >
+              {t("peladas.attendance.stats.total_confirmed")}
+            </Typography>
+            <Typography
+              variant="h4"
+              sx={{ fontWeight: "bold", color: "success.main" }}
+            >
+              {confirmed.length}
+            </Typography>
+          </Grid>
+          <Grid size={{ xs: 6, md: 3 }}>
+            <Typography
+              variant="overline"
+              color="text.secondary"
+              sx={{ fontWeight: "bold", letterSpacing: 1 }}
+            >
+              {t("peladas.attendance.stats.total_declined")}
+            </Typography>
+            <Typography
+              variant="h4"
+              sx={{ fontWeight: "bold", color: "error.main" }}
+            >
+              {declined.length}
+            </Typography>
+          </Grid>
+          <Grid size={{ xs: 6, md: 3 }}>
+            <Typography
+              variant="overline"
+              color="text.secondary"
+              sx={{ fontWeight: "bold", letterSpacing: 1 }}
+            >
+              {t("peladas.attendance.stats.total_pending")}
+            </Typography>
+            <Typography
+              variant="h4"
+              sx={{ fontWeight: "bold", color: "text.secondary" }}
+            >
+              {pending.length}
+            </Typography>
+          </Grid>
+        </Grid>
+      </Box>
+
       {/* Current User Quick Action */}
       {currentPlayerAsPlayer && (
         <Paper
@@ -292,69 +355,6 @@ export default function AttendanceListPage() {
           </Stack>
         </Paper>
       )}
-
-      {/* Stats Header */}
-      <Box sx={{ mb: 4, pb: 4, borderBottom: 1, borderColor: "divider" }}>
-        <Grid container spacing={4}>
-          <Grid size={{ xs: 6, md: 3 }}>
-            <Typography
-              variant="overline"
-              color="text.secondary"
-              sx={{ fontWeight: "bold", letterSpacing: 1 }}
-            >
-              {t("peladas.attendance.stats.total_players")}
-            </Typography>
-            <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-              {totalPlayers}
-            </Typography>
-          </Grid>
-          <Grid size={{ xs: 6, md: 3 }}>
-            <Typography
-              variant="overline"
-              color="text.secondary"
-              sx={{ fontWeight: "bold", letterSpacing: 1 }}
-            >
-              {t("peladas.attendance.stats.total_confirmed")}
-            </Typography>
-            <Typography
-              variant="h4"
-              sx={{ fontWeight: "bold", color: "success.main" }}
-            >
-              {confirmed.length}
-            </Typography>
-          </Grid>
-          <Grid size={{ xs: 6, md: 3 }}>
-            <Typography
-              variant="overline"
-              color="text.secondary"
-              sx={{ fontWeight: "bold", letterSpacing: 1 }}
-            >
-              {t("peladas.attendance.stats.total_declined")}
-            </Typography>
-            <Typography
-              variant="h4"
-              sx={{ fontWeight: "bold", color: "error.main" }}
-            >
-              {declined.length}
-            </Typography>
-          </Grid>
-          <Grid size={{ xs: 6, md: 3 }}>
-            <Typography
-              variant="overline"
-              color="text.secondary"
-              sx={{ fontWeight: "bold", letterSpacing: 1 }}
-            >
-              {t("peladas.attendance.stats.total_pending")}
-            </Typography>
-            <Typography
-              variant="h4"
-              sx={{ fontWeight: "bold", color: "text.secondary" }}
-            >
-              {pending.length}
-            </Typography>
-          </Grid>
-        </Grid>
-      </Box>
 
       <Grid container spacing={3}>
         {/* Confirmed Column */}
