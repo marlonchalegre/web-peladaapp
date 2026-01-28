@@ -137,7 +137,7 @@ describe("HomePage", () => {
 
     expect(peladaLinks[0]).toHaveAttribute("href", "/peladas/1/matches"); // Open
     expect(peladaLinks[1]).toHaveAttribute("href", "/peladas/2/matches"); // Running
-    expect(peladaLinks[2]).toHaveAttribute("href", "/peladas/3/matches"); // Closed
+    expect(peladaLinks[2]).toHaveAttribute("href", "/peladas/3/voting"); // Closed -> Voting
     expect(peladaLinks[3]).toHaveAttribute("href", "/peladas/4/voting"); // Voting
     expect(peladaLinks[4]).toHaveAttribute("href", "/peladas/5/attendance"); // Attendance
   });

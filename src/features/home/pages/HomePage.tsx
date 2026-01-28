@@ -257,7 +257,8 @@ export default function HomePage() {
                             to={
                               pelada.status === "attendance"
                                 ? `/peladas/${pelada.id}/attendance`
-                                : pelada.status === "voting"
+                                : pelada.status === "voting" ||
+                                    pelada.status === "closed"
                                   ? `/peladas/${pelada.id}/voting`
                                   : `/peladas/${pelada.id}/matches`
                             }
