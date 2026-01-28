@@ -151,22 +151,6 @@ export default function HomePage() {
             )}
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setCreateDialogOpen(true)}
-          sx={{
-            bgcolor: "primary.main",
-            borderRadius: 2,
-            textTransform: "none",
-            fontWeight: 600,
-            px: 3,
-            py: 1,
-            ":hover": { bgcolor: "primary.dark" },
-          }}
-        >
-          {t("home.actions.create_organization", "CRIAR ORGANIZAÇÃO")}
-        </Button>
       </Box>
 
       {error && (
@@ -359,17 +343,39 @@ export default function HomePage() {
 
           {/* Minhas Organizações (Administrador) */}
           <Box sx={{ mb: 5 }}>
-            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-              <SecurityIcon sx={{ mr: 1.5, color: "secondary.main" }} />
-              <Typography
-                variant="h6"
-                sx={{ fontWeight: 600, color: "text.primary" }}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                mb: 2,
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <SecurityIcon sx={{ mr: 1.5, color: "secondary.main" }} />
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: 600, color: "text.primary" }}
+                >
+                  {t(
+                    "home.sections.admin_orgs.title",
+                    "Minhas Organizações (Administrador)",
+                  )}
+                </Typography>
+              </Box>
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<AddIcon />}
+                onClick={() => setCreateDialogOpen(true)}
+                sx={{
+                  borderRadius: 2,
+                  textTransform: "none",
+                  fontWeight: 600,
+                }}
               >
-                {t(
-                  "home.sections.admin_orgs.title",
-                  "Minhas Organizações (Administrador)",
-                )}
-              </Typography>
+                {t("home.actions.create_organization", "Criar Organização")}
+              </Button>
             </Box>
 
             <Paper
