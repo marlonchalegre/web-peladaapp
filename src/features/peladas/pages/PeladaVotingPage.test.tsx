@@ -55,4 +55,33 @@ describe("PeladaVotingPage", () => {
       expect(screen.getByText("Target Player")).toBeInTheDocument();
     });
   });
+
+  it("renders warning when no players are eligible for voting", async () => {
+    const mockVotingInfo = {
+      can_vote: true,
+      has_voted: false,
+      eligible_players: [],
+      voter_player_id: 10,
+    };
+
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/peladas/1/voting-info")
+        return Promise.resolve(mockVotingInfo);
+      return Promise.reject(new Error(`Not found: ${path}`));
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/peladas/1/voting"]}>
+        <Routes>
+          <Route path="/peladas/:id/voting" element={<PeladaVotingPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("peladas.voting.warning.no_eligible_players"),
+      ).toBeInTheDocument();
+    });
+  });
 });
