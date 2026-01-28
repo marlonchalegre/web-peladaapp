@@ -50,17 +50,24 @@ export default function HomePage() {
   const [peladasTotalPages, setPeladasTotalPages] = useState(1);
   const PELADAS_PER_PAGE = 5;
 
-  const fetchPeladas = useCallback(async (page: number) => {
-    if (!user) return;
-    try {
-      const response = await endpoints.listPeladasByUser(user.id, page, PELADAS_PER_PAGE);
-      setPeladas(response.data);
-      setPeladasPage(response.page);
-      setPeladasTotalPages(response.totalPages);
-    } catch (err) {
-      console.error("Failed to fetch peladas", err);
-    }
-  }, [user]);
+  const fetchPeladas = useCallback(
+    async (page: number) => {
+      if (!user) return;
+      try {
+        const response = await endpoints.listPeladasByUser(
+          user.id,
+          page,
+          PELADAS_PER_PAGE,
+        );
+        setPeladas(response.data);
+        setPeladasPage(response.page);
+        setPeladasTotalPages(response.totalPages);
+      } catch (err) {
+        console.error("Failed to fetch peladas", err);
+      }
+    },
+    [user],
+  );
 
   const fetchOrganizations = useCallback(async () => {
     if (!user) return;
@@ -92,7 +99,10 @@ export default function HomePage() {
     fetchPeladas(1);
   }, [fetchOrganizations, fetchPeladas]);
 
-  const handlePeladaPageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
+  const handlePeladaPageChange = (
+    _event: React.ChangeEvent<unknown>,
+    value: number,
+  ) => {
     fetchPeladas(value);
   };
 
@@ -180,23 +190,35 @@ export default function HomePage() {
                             }
                             underline="hover"
                           >
-                             {pelada.scheduled_at
-                              ? new Date(pelada.scheduled_at).toLocaleDateString() + " " + new Date(pelada.scheduled_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                            {pelada.scheduled_at
+                              ? new Date(
+                                  pelada.scheduled_at,
+                                ).toLocaleDateString() +
+                                " " +
+                                new Date(
+                                  pelada.scheduled_at,
+                                ).toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })
                               : t("common.date.tbd", "TBD")}
                           </Link>
                         </TableCell>
                         <TableCell>
                           {pelada.organization_name || pelada.organization_id}
                         </TableCell>
-                         <TableCell>
-                          {t(`pelada.status.${pelada.status}`, pelada.status || "")}
+                        <TableCell>
+                          {t(
+                            `pelada.status.${pelada.status}`,
+                            pelada.status || "",
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
                 {peladasTotalPages > 1 && (
-                  <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                  <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
                     <Pagination
                       count={peladasTotalPages}
                       page={peladasPage}

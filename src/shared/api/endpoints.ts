@@ -170,10 +170,10 @@ export function createApi(client: ApiClient) {
       page: number = 1,
       perPage: number = 20,
     ) =>
-      client.getPaginated<Pelada[]>(
-        `/api/users/${userId}/peladas`,
-        { page, per_page: perPage },
-      ),
+      client.getPaginated<Pelada[]>(`/api/users/${userId}/peladas`, {
+        page,
+        per_page: perPage,
+      }),
     getPelada: (id: number) => client.get<Pelada>(`/api/peladas/${id}`),
     getPeladaDashboardData: (id: number) =>
       client.get<PeladaDashboardDataResponse>(

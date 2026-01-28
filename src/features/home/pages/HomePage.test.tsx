@@ -69,19 +69,50 @@ describe("HomePage", () => {
       if (path === "/api/users/1/peladas") {
         return Promise.resolve({
           data: [
-            { id: 1, status: "open", scheduled_at: "2023-01-01T10:00:00Z", organization_name: "Org 1" },
-            { id: 2, status: "running", scheduled_at: "2023-01-02T10:00:00Z", organization_name: "Org 1" },
-            { id: 3, status: "closed", scheduled_at: "2023-01-03T10:00:00Z", organization_name: "Org 1" },
-            { id: 4, status: "voting", scheduled_at: "2023-01-04T10:00:00Z", organization_name: "Org 1" },
-            { id: 5, status: "attendance", scheduled_at: "2023-01-05T10:00:00Z", organization_name: "Org 1" },
+            {
+              id: 1,
+              status: "open",
+              scheduled_at: "2023-01-01T10:00:00Z",
+              organization_name: "Org 1",
+            },
+            {
+              id: 2,
+              status: "running",
+              scheduled_at: "2023-01-02T10:00:00Z",
+              organization_name: "Org 1",
+            },
+            {
+              id: 3,
+              status: "closed",
+              scheduled_at: "2023-01-03T10:00:00Z",
+              organization_name: "Org 1",
+            },
+            {
+              id: 4,
+              status: "voting",
+              scheduled_at: "2023-01-04T10:00:00Z",
+              organization_name: "Org 1",
+            },
+            {
+              id: 5,
+              status: "attendance",
+              scheduled_at: "2023-01-05T10:00:00Z",
+              organization_name: "Org 1",
+            },
           ],
           total: 5,
           page: 1,
           perPage: 5,
-          totalPages: 1
+          totalPages: 1,
         });
       }
-      return Promise.resolve({ data: [], total: 0, page: 1, perPage: 10, totalPages: 0 });
+      return Promise.resolve({
+        data: [],
+        total: 0,
+        page: 1,
+        perPage: 10,
+        totalPages: 0,
+      });
     });
 
     render(
@@ -97,15 +128,17 @@ describe("HomePage", () => {
     const links = screen.getAllByRole("link");
     // We expect 5 pelada links. Note: There might be other links (e.g. "Create Organization" if button is a link, but it's a button).
     // The table cells contain the links.
-    
+
     // The links are rendered in the order of the table rows
     // Filter links that match /peladas/
-    const peladaLinks = links.filter(l => l.getAttribute("href")?.startsWith("/peladas/"));
+    const peladaLinks = links.filter((l) =>
+      l.getAttribute("href")?.startsWith("/peladas/"),
+    );
 
     expect(peladaLinks[0]).toHaveAttribute("href", "/peladas/1/matches"); // Open
     expect(peladaLinks[1]).toHaveAttribute("href", "/peladas/2/matches"); // Running
     expect(peladaLinks[2]).toHaveAttribute("href", "/peladas/3/matches"); // Closed
-    expect(peladaLinks[3]).toHaveAttribute("href", "/peladas/4/voting");  // Voting
+    expect(peladaLinks[3]).toHaveAttribute("href", "/peladas/4/voting"); // Voting
     expect(peladaLinks[4]).toHaveAttribute("href", "/peladas/5/attendance"); // Attendance
   });
 
