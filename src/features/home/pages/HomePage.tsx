@@ -17,6 +17,7 @@ import {
   Chip,
   Avatar,
   Link,
+  Pagination,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
@@ -52,6 +53,8 @@ export default function HomePage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const [peladas, setPeladas] = useState<Pelada[]>([]);
+  const [peladasPage, setPeladasPage] = useState(1);
+  const [peladasTotalPages, setPeladasTotalPages] = useState(1);
   const PELADAS_PER_PAGE = 5;
 
   const fetchPeladas = useCallback(
@@ -64,6 +67,8 @@ export default function HomePage() {
           PELADAS_PER_PAGE,
         );
         setPeladas(response.data);
+        setPeladasPage(response.page);
+        setPeladasTotalPages(response.totalPages);
       } catch (err) {
         console.error("Failed to fetch peladas", err);
       }
@@ -100,6 +105,13 @@ export default function HomePage() {
     fetchOrganizations();
     fetchPeladas(1);
   }, [fetchOrganizations, fetchPeladas]);
+
+  const handlePeladaPageChange = (
+    _event: React.ChangeEvent<unknown>,
+    value: number,
+  ) => {
+    fetchPeladas(value);
+  };
 
   if (!user) {
     return (
@@ -331,6 +343,17 @@ export default function HomePage() {
                   )}
                 </TableBody>
               </Table>
+              {peladasTotalPages > 1 && (
+                <Box sx={{ display: "flex", justifyContent: "center", p: 2, borderTop: 1, borderColor: "divider" }}>
+                  <Pagination
+                    count={peladasTotalPages}
+                    page={peladasPage}
+                    onChange={handlePeladaPageChange}
+                    color="primary"
+                    size="small"
+                  />
+                </Box>
+              )}
             </Paper>
           </Box>
 
