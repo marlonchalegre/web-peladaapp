@@ -31,7 +31,7 @@ import { createApi, type Pelada } from "../../../shared/api/endpoints";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import CreateOrganizationForm from "../../organizations/components/CreateOrganizationForm";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 
 const endpoints = createApi(api);
 
@@ -44,6 +44,7 @@ type OrganizationWithRole = {
 export default function HomePage() {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [adminOrgs, setAdminOrgs] = useState<OrganizationWithRole[]>([]);
   const [memberOrgs, setMemberOrgs] = useState<OrganizationWithRole[]>([]);
   const [loading, setLoading] = useState(true);
@@ -242,85 +243,91 @@ export default function HomePage() {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    peladas.map((pelada) => (
-                      <TableRow
-                        key={`pelada-${pelada.id}`}
-                        hover
-                        sx={{
-                          cursor: "pointer",
-                          "&:last-child td, &:last-child th": { border: 0 },
-                        }}
-                      >
-                        <TableCell sx={{ py: 2.5 }}>
-                          <Link
-                            component={RouterLink}
-                            to={
-                              pelada.status === "attendance"
-                                ? `/peladas/${pelada.id}/attendance`
-                                : pelada.status === "voting"
-                                  ? `/peladas/${pelada.id}/voting`
-                                  : `/peladas/${pelada.id}/matches`
-                            }
-                            underline="hover"
-                            sx={{ display: "block", textDecoration: "none" }}
-                          >
+                    peladas.map((pelada) => {
+                      const peladaLink =
+                        pelada.status === "attendance"
+                          ? `/peladas/${pelada.id}/attendance`
+                          : pelada.status === "voting"
+                            ? `/peladas/${pelada.id}/voting`
+                            : `/peladas/${pelada.id}/matches`;
+
+                      return (
+                        <TableRow
+                          key={`pelada-${pelada.id}`}
+                          hover
+                          onClick={() => navigate(peladaLink)}
+                          sx={{
+                            cursor: "pointer",
+                            "&:last-child td, &:last-child th": { border: 0 },
+                          }}
+                        >
+                          <TableCell sx={{ py: 2.5 }}>
+                            <Link
+                              component={RouterLink}
+                              to={peladaLink}
+                              underline="hover"
+                              sx={{ display: "block", textDecoration: "none" }}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  color: "primary.main",
+                                  fontWeight: 500,
+                                }}
+                              >
+                                {pelada.scheduled_at
+                                  ? new Date(
+                                      pelada.scheduled_at,
+                                    ).toLocaleDateString()
+                                  : t("common.date.tbd", "TBD")}
+                              </Typography>
+                              <Typography
+                                variant="caption"
+                                sx={{ color: "text.secondary" }}
+                              >
+                                {pelada.scheduled_at
+                                  ? new Date(
+                                      pelada.scheduled_at,
+                                    ).toLocaleTimeString([], {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })
+                                  : ""}
+                              </Typography>
+                            </Link>
+                          </TableCell>
+                          <TableCell sx={{ py: 2.5 }}>
                             <Typography
                               variant="body2"
+                              fontWeight={500}
+                              color="text.primary"
+                            >
+                              {pelada.organization_name ||
+                                pelada.organization_id}
+                            </Typography>
+                          </TableCell>
+                          <TableCell sx={{ py: 2.5 }}>
+                            <Chip
+                              label={t(
+                                `pelada.status.${pelada.status}`,
+                                pelada.status || "",
+                              )}
+                              size="small"
                               sx={{
-                                color: "primary.main",
+                                bgcolor: "success.light",
+                                color: "success.main",
                                 fontWeight: 500,
+                                borderRadius: 1,
                               }}
-                            >
-                              {pelada.scheduled_at
-                                ? new Date(
-                                    pelada.scheduled_at,
-                                  ).toLocaleDateString()
-                                : t("common.date.tbd", "TBD")}
-                            </Typography>
-                            <Typography
-                              variant="caption"
-                              sx={{ color: "text.secondary" }}
-                            >
-                              {pelada.scheduled_at
-                                ? new Date(
-                                    pelada.scheduled_at,
-                                  ).toLocaleTimeString([], {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  })
-                                : ""}
-                            </Typography>
-                          </Link>
-                        </TableCell>
-                        <TableCell sx={{ py: 2.5 }}>
-                          <Typography
-                            variant="body2"
-                            fontWeight={500}
-                            color="text.primary"
-                          >
-                            {pelada.organization_name || pelada.organization_id}
-                          </Typography>
-                        </TableCell>
-                        <TableCell sx={{ py: 2.5 }}>
-                          <Chip
-                            label={t(
-                              `pelada.status.${pelada.status}`,
-                              pelada.status || "",
-                            )}
-                            size="small"
-                            sx={{
-                              bgcolor: "success.light",
-                              color: "success.main",
-                              fontWeight: 500,
-                              borderRadius: 1,
-                            }}
-                          />
-                        </TableCell>
-                        <TableCell sx={{ py: 2.5 }}>
-                          <ChevronRightIcon sx={{ color: "grey.300" }} />
-                        </TableCell>
-                      </TableRow>
-                    ))
+                            />
+                          </TableCell>
+                          <TableCell sx={{ py: 2.5 }}>
+                            <ChevronRightIcon sx={{ color: "grey.300" }} />
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
                   )}
                 </TableBody>
               </Table>
@@ -395,7 +402,7 @@ export default function HomePage() {
                     </TableRow>
                   ) : (
                     adminOrgs.map((org) => (
-                      <TableRow key={`admin-${org.id}`}>
+                      <TableRow key={`admin-${org.id}`} hover onClick={() => navigate(`/organizations/${org.id}`)} sx={{ cursor: 'pointer' }}>
                         <TableCell sx={{ py: 2.5 }}>
                           <Box sx={{ display: "flex", alignItems: "center" }}>
                             <Avatar
@@ -417,6 +424,7 @@ export default function HomePage() {
                               variant="body2"
                               fontWeight={600}
                               color="text.primary"
+                              onClick={(e) => e.stopPropagation()}
                             >
                               {org.name}
                             </Link>
@@ -453,6 +461,7 @@ export default function HomePage() {
                                 boxShadow: "none",
                               },
                             }}
+                            onClick={(e) => e.stopPropagation()}
                           >
                             {t("common.actions.manage", "Gerenciar")}
                           </Button>
@@ -562,7 +571,7 @@ export default function HomePage() {
                   </TableHead>
                   <TableBody>
                     {memberOrgs.map((org) => (
-                      <TableRow key={`member-${org.id}`} hover>
+                      <TableRow key={`member-${org.id}`} hover onClick={() => navigate(`/organizations/${org.id}`)} sx={{ cursor: 'pointer' }}>
                         <TableCell sx={{ py: 2.5 }}>
                           <Box sx={{ display: "flex", alignItems: "center" }}>
                             <Avatar
@@ -584,6 +593,7 @@ export default function HomePage() {
                               variant="body2"
                               fontWeight={600}
                               color="text.primary"
+                              onClick={(e) => e.stopPropagation()}
                             >
                               {org.name}
                             </Link>
