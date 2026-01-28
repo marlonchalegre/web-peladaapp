@@ -26,6 +26,7 @@ export type OrganizationAdmin = {
 export type Pelada = {
   id: number;
   organization_id: number;
+  organization_name?: string;
   scheduled_at?: string | null;
   when?: string | null;
   num_teams?: number | null;
@@ -162,6 +163,15 @@ export function createApi(client: ApiClient) {
     ) =>
       client.getPaginated<Pelada[]>(
         `/api/organizations/${organizationId}/peladas`,
+        { page, per_page: perPage },
+      ),
+    listPeladasByUser: (
+      userId: number,
+      page: number = 1,
+      perPage: number = 20,
+    ) =>
+      client.getPaginated<Pelada[]>(
+        `/api/users/${userId}/peladas`,
         { page, per_page: perPage },
       ),
     getPelada: (id: number) => client.get<Pelada>(`/api/peladas/${id}`),

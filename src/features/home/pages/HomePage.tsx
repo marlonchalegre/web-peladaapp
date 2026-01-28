@@ -15,13 +15,15 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  Pagination,
 } from "@mui/material";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import GroupsIcon from "@mui/icons-material/Groups";
 import AddIcon from "@mui/icons-material/Add";
+import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { api } from "../../../shared/api/client";
-import { createApi } from "../../../shared/api/endpoints";
+import { createApi, type Pelada } from "../../../shared/api/endpoints";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import CreateOrganizationForm from "../../organizations/components/CreateOrganizationForm";
@@ -42,6 +44,23 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+
+  const [peladas, setPeladas] = useState<Pelada[]>([]);
+  const [peladasPage, setPeladasPage] = useState(1);
+  const [peladasTotalPages, setPeladasTotalPages] = useState(1);
+  const PELADAS_PER_PAGE = 5;
+
+  const fetchPeladas = useCallback(async (page: number) => {
+    if (!user) return;
+    try {
+      const response = await endpoints.listPeladasByUser(user.id, page, PELADAS_PER_PAGE);
+      setPeladas(response.data);
+      setPeladasPage(response.page);
+      setPeladasTotalPages(response.totalPages);
+    } catch (err) {
+      console.error("Failed to fetch peladas", err);
+    }
+  }, [user]);
 
   const fetchOrganizations = useCallback(async () => {
     if (!user) return;
@@ -70,7 +89,12 @@ export default function HomePage() {
 
   useEffect(() => {
     fetchOrganizations();
-  }, [fetchOrganizations]);
+    fetchPeladas(1);
+  }, [fetchOrganizations, fetchPeladas]);
+
+  const handlePeladaPageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
+    fetchPeladas(value);
+  };
 
   if (!user) {
     return (
@@ -118,6 +142,73 @@ export default function HomePage() {
         <Loading message={t("common.loading")} />
       ) : (
         <>
+          <Box sx={{ mb: 4 }}>
+            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+              <SportsSoccerIcon sx={{ mr: 1 }} color="primary" />
+              <Typography variant="h5">
+                {t("home.sections.peladas.title")}
+              </Typography>
+            </Box>
+
+            {peladas.length === 0 ? (
+              <Paper elevation={1} sx={{ p: 2 }}>
+                <Typography variant="body2" color="text.secondary">
+                  {t("home.sections.peladas.empty")}
+                </Typography>
+              </Paper>
+            ) : (
+              <Paper elevation={1}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>{t("home.table.headers.date")}</TableCell>
+                      <TableCell>{t("home.table.headers.org_name")}</TableCell>
+                      <TableCell>{t("home.table.headers.status")}</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {peladas.map((pelada) => (
+                      <TableRow key={`pelada-${pelada.id}`}>
+                        <TableCell>
+                          <Link
+                            href={
+                              pelada.status === "attendance"
+                                ? `/peladas/${pelada.id}/attendance`
+                                : pelada.status === "voting"
+                                  ? `/peladas/${pelada.id}/voting`
+                                  : `/peladas/${pelada.id}/matches`
+                            }
+                            underline="hover"
+                          >
+                             {pelada.scheduled_at
+                              ? new Date(pelada.scheduled_at).toLocaleDateString() + " " + new Date(pelada.scheduled_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                              : t("common.date.tbd", "TBD")}
+                          </Link>
+                        </TableCell>
+                        <TableCell>
+                          {pelada.organization_name || pelada.organization_id}
+                        </TableCell>
+                         <TableCell>
+                          {t(`pelada.status.${pelada.status}`, pelada.status || "")}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                {peladasTotalPages > 1 && (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+                    <Pagination
+                      count={peladasTotalPages}
+                      page={peladasPage}
+                      onChange={handlePeladaPageChange}
+                      color="primary"
+                    />
+                  </Box>
+                )}
+              </Paper>
+            )}
+          </Box>
+
           <Box sx={{ mb: 4 }}>
             <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
               <AdminPanelSettingsIcon sx={{ mr: 1 }} color="primary" />

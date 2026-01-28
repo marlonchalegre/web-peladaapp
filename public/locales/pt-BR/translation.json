@@ -109,6 +109,10 @@
       "user": "Bem-vindo, {{name}}!"
     },
     "sections": {
+      "peladas": {
+        "title": "Minhas Peladas",
+        "empty": "Nenhuma pelada encontrada."
+      },
       "admin_orgs": {
         "title": "Minhas Organizações (Administrador)",
         "empty": "Você não é administrador de nenhuma organização."
@@ -120,6 +124,8 @@
     },
     "table": {
       "headers": {
+        "date": "Data",
+        "status": "Status",
         "org_name": "Nome da Organização",
         "role": "Função"
       }
@@ -400,6 +406,14 @@
       "average": "MÉDIA: {{score}}",
       "delete": "Excluir time",
       "drag_placeholder": "Arraste um jogador"
+    }
+  },
+  "pelada": {
+    "status": {
+      "open": "Aberta",
+      "attendance": "Lista de Presença",
+      "running": "Em Andamento",
+      "closed": "Encerrada"
     }
   },
   "user": {
