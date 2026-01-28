@@ -26,27 +26,15 @@ describe("PeladaVotingPage", () => {
   });
 
   it("renders voting form with eligible players", async () => {
-    const mockUsers = [
-      { id: 1, name: "Current User" },
-      { id: 2, name: "Target Player" },
-    ];
-    const mockPelada = { id: 1, organization_id: 101 };
-    const mockOrgPlayers = [
-      { id: 10, user_id: 1, organization_id: 101 },
-      { id: 11, user_id: 2, organization_id: 101 },
-    ];
     const mockVotingInfo = {
       can_vote: true,
       has_voted: false,
-      eligible_players: [11], // Player 11 (User 2) is eligible
+      eligible_players: [{ player_id: 11, name: "Target Player" }],
+      voter_player_id: 10,
     };
 
     (api.get as Mock).mockImplementation((path: string) => {
-      if (path === "/api/users") return Promise.resolve(mockUsers);
-      if (path === "/api/peladas/1") return Promise.resolve(mockPelada);
-      if (path === "/api/organizations/101/players")
-        return Promise.resolve(mockOrgPlayers);
-      if (path === "/api/peladas/1/voters/10/voting-info")
+      if (path === "/api/peladas/1/voting-info")
         return Promise.resolve(mockVotingInfo);
       return Promise.reject(new Error(`Not found: ${path}`));
     });

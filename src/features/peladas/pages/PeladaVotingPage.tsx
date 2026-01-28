@@ -35,9 +35,6 @@ export default function PeladaVotingPage() {
 
   const [votingInfo, setVotingInfo] = useState<VotingInfo | null>(null);
   const [playerVotes, setPlayerVotes] = useState<PlayerVote[]>([]);
-  const [_currentPlayerOrgId, setCurrentPlayerOrgId] = useState<number | null>(
-    null,
-  );
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -57,28 +54,8 @@ export default function PeladaVotingPage() {
           return;
         }
 
-        // Get all users for name mapping
-        const users = await endpoints.listUsers();
-        const nameMap: Record<number, string> = {};
-        for (const u of users) nameMap[u.id] = u.name;
-
-        // Get pelada to find organization
-        const pelada = await endpoints.getPelada(peladaId);
-        const orgId = pelada.organization_id;
-
-        // Get all organization players
-        const orgPlayers = await endpoints.listPlayersByOrg(orgId);
-
-        // Find current user's player ID in this organization
-        const currentPlayer = orgPlayers.find((p) => p.user_id === user.id);
-        if (!currentPlayer) {
-          setError(t("peladas.voting.error.not_player"));
-          return;
-        }
-        setCurrentPlayerOrgId(currentPlayer.id);
-
-        // Get voting info
-        const info = await endpoints.getVotingInfo(peladaId, currentPlayer.id);
+        // Get voting info in one single request
+        const info = await endpoints.getVotingInfo(peladaId);
         setVotingInfo(info);
 
         if (!info.can_vote) {
@@ -87,17 +64,11 @@ export default function PeladaVotingPage() {
         }
 
         // Initialize player votes for eligible players
-        const votes: PlayerVote[] = info.eligible_players.map((playerId) => {
-          const player = orgPlayers.find((p) => p.id === playerId);
-          const playerName = player
-            ? nameMap[player.user_id] || `Player ${playerId}`
-            : `Player ${playerId}`;
-          return {
-            playerId,
-            playerName,
-            stars: null,
-          };
-        });
+        const votes: PlayerVote[] = info.eligible_players.map((p) => ({
+          playerId: p.player_id,
+          playerName: p.name,
+          stars: null,
+        }));
         setPlayerVotes(votes);
       } catch (error: unknown) {
         const message =
@@ -123,7 +94,7 @@ export default function PeladaVotingPage() {
     playerVotes.length > 0 && playerVotes.every((pv) => pv.stars !== null);
 
   const handleSubmit = async () => {
-    if (!allVotesComplete || !_currentPlayerOrgId) return;
+    if (!allVotesComplete || !votingInfo?.voter_player_id) return;
 
     try {
       setSubmitting(true);
@@ -136,7 +107,7 @@ export default function PeladaVotingPage() {
       }));
 
       await endpoints.batchCastVotes(peladaId, {
-        voter_id: _currentPlayerOrgId,
+        voter_id: votingInfo.voter_player_id,
         votes,
       });
 

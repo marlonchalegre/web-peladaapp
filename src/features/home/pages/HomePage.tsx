@@ -402,7 +402,12 @@ export default function HomePage() {
                     </TableRow>
                   ) : (
                     adminOrgs.map((org) => (
-                      <TableRow key={`admin-${org.id}`} hover onClick={() => navigate(`/organizations/${org.id}`)} sx={{ cursor: 'pointer' }}>
+                      <TableRow
+                        key={`admin-${org.id}`}
+                        hover
+                        onClick={() => navigate(`/organizations/${org.id}`)}
+                        sx={{ cursor: "pointer" }}
+                      >
                         <TableCell sx={{ py: 2.5 }}>
                           <Box sx={{ display: "flex", alignItems: "center" }}>
                             <Avatar
@@ -571,7 +576,12 @@ export default function HomePage() {
                   </TableHead>
                   <TableBody>
                     {memberOrgs.map((org) => (
-                      <TableRow key={`member-${org.id}`} hover onClick={() => navigate(`/organizations/${org.id}`)} sx={{ cursor: 'pointer' }}>
+                      <TableRow
+                        key={`member-${org.id}`}
+                        hover
+                        onClick={() => navigate(`/organizations/${org.id}`)}
+                        sx={{ cursor: "pointer" }}
+                      >
                         <TableCell sx={{ py: 2.5 }}>
                           <Box sx={{ display: "flex", alignItems: "center" }}>
                             <Avatar
