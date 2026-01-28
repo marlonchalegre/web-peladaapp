@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -8,13 +9,20 @@ import {
   AppBar,
   Toolbar,
   Typography,
-  Button,
   Container,
   Box,
+  IconButton,
+  Avatar,
+  Menu,
+  MenuItem,
+  Tooltip,
 } from "@mui/material";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
 import "./App.css";
 import { AuthProvider } from "./app/providers/AuthProvider";
 import { useAuth } from "./app/providers/AuthContext";
+import { useAppTheme } from "./app/providers/ThemeContext";
 import { LanguageSwitcher } from "./shared/components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
 import ProtectedRoute from "./app/routing/ProtectedRoute";
@@ -41,7 +49,9 @@ function Footer() {
         py: 2,
         px: 2,
         mt: "auto",
-        backgroundColor: (theme) => theme.palette.grey[200],
+        backgroundColor: "background.paper",
+        borderTop: 1,
+        borderColor: "divider",
         textAlign: "center",
       }}
     >
@@ -53,16 +63,45 @@ function Footer() {
 }
 
 function AppLayout() {
-  const { isAuthenticated, signOut } = useAuth();
+  const { isAuthenticated, user, signOut } = useAuth();
+  const { mode, toggleTheme } = useAppTheme();
   const { t } = useTranslation();
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
+  const handleLogout = () => {
+    handleCloseUserMenu();
+    signOut();
+  };
 
   return (
     <BrowserRouter>
       <Box
-        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          minHeight: "100vh",
+          bgcolor: "background.default",
+        }}
       >
         {isAuthenticated && (
-          <AppBar position="static">
+          <AppBar
+            position="static"
+            color="inherit"
+            elevation={0}
+            sx={{
+              borderBottom: 1,
+              borderColor: "divider",
+              bgcolor: "background.paper",
+            }}
+          >
             <Toolbar>
               <Box
                 component={RouterLink}
@@ -79,24 +118,76 @@ function AppLayout() {
                   component="img"
                   src="/logo.png"
                   alt="Pelada App Logo"
-                  sx={{ height: 40, mr: 2, borderRadius: "50%" }}
+                  sx={{ height: 32, mr: 1.5 }}
                 />
                 <Typography
                   variant="h6"
+                  component="div"
                   sx={{
-                    fontWeight: "bold",
+                    fontWeight: 700,
+                    color: "text.primary",
+                    fontSize: "1.125rem",
                   }}
                 >
-                  {t("app.title")}
+                  PeladaApp
                 </Typography>
               </Box>
-              <LanguageSwitcher />
-              <Button color="inherit" component={RouterLink} to="/profile">
-                {t("navigation.profile")}
-              </Button>
-              <Button color="inherit" onClick={() => signOut()}>
-                {t("auth.logout")}
-              </Button>
+
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <LanguageSwitcher />
+                <IconButton
+                  onClick={toggleTheme}
+                  sx={{ color: "text.secondary" }}
+                >
+                  {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
+                </IconButton>
+
+                <Tooltip title="Open settings">
+                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, ml: 1 }}>
+                    <Avatar
+                      sx={{
+                        bgcolor: "primary.dark",
+                        width: 36,
+                        height: 36,
+                        fontSize: "0.9rem",
+                      }}
+                    >
+                      {user?.name?.charAt(0).toUpperCase() || "U"}
+                    </Avatar>
+                  </IconButton>
+                </Tooltip>
+                <Menu
+                  sx={{ mt: "45px" }}
+                  id="menu-appbar"
+                  anchorEl={anchorElUser}
+                  anchorOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: "top",
+                    horizontal: "right",
+                  }}
+                  open={Boolean(anchorElUser)}
+                  onClose={handleCloseUserMenu}
+                >
+                  <MenuItem
+                    component={RouterLink}
+                    to="/profile"
+                    onClick={handleCloseUserMenu}
+                  >
+                    <Typography textAlign="center">
+                      {t("navigation.profile")}
+                    </Typography>
+                  </MenuItem>
+                  <MenuItem onClick={handleLogout}>
+                    <Typography textAlign="center">
+                      {t("auth.logout")}
+                    </Typography>
+                  </MenuItem>
+                </Menu>
+              </Box>
             </Toolbar>
           </AppBar>
         )}

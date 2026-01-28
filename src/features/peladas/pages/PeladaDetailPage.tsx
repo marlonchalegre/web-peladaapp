@@ -19,7 +19,6 @@ import Grid from "@mui/material/Grid";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import HistoryIcon from "@mui/icons-material/History";
-import DarkModeIcon from "@mui/icons-material/DarkMode"; // Placeholder for theme toggle if needed, or just ignore
 import { api } from "../../../shared/api/client";
 import {
   createApi,
@@ -337,11 +336,6 @@ export default function PeladaDetailPage() {
         </Box>
 
         <Stack direction="row" spacing={2} alignItems="center">
-          {/* Dark Mode Icon Placeholder */}
-          <IconButton>
-            <DarkModeIcon />
-          </IconButton>
-
           <Button
             component={RouterLink}
             to={`/peladas/${peladaId}/matches`}
@@ -361,7 +355,7 @@ export default function PeladaDetailPage() {
               sx={{
                 textTransform: "none",
                 borderRadius: 2,
-                bgcolor: "#1a44c2", // Deep blue
+                bgcolor: "primary.dark", // Deep blue
                 fontWeight: "bold",
               }}
             >

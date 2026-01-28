@@ -47,7 +47,7 @@ function TechnicalSummary({
       elevation={0}
       sx={{
         p: 3,
-        bgcolor: "#1a44c2", // Deep blue
+        bgcolor: "primary.dark", // Deep blue
         color: "white",
         borderRadius: 4,
         mt: 3,
@@ -146,7 +146,7 @@ export default function AvailablePlayersPanel({
         elevation={0}
         sx={{
           p: 3,
-          bgcolor: "white",
+          bgcolor: "background.paper",
           borderRadius: 3,
           border: "1px solid",
           borderColor: "divider",
@@ -193,7 +193,11 @@ export default function AvailablePlayersPanel({
             <Chip
               label={players.length}
               size="small"
-              sx={{ bgcolor: "#f5f5f5", fontWeight: "bold" }}
+              sx={{
+                bgcolor: "action.hover",
+                color: "text.secondary",
+                fontWeight: "bold",
+              }}
             />
           </Box>
         </Box>
@@ -207,7 +211,7 @@ export default function AvailablePlayersPanel({
           onChange={(e) => setSearch(e.target.value)}
           sx={{
             mb: 2,
-            bgcolor: "#f8f9fa",
+            bgcolor: "background.default",
             "& .MuiOutlinedInput-notchedOutline": { border: "none" },
           }}
           InputProps={{
@@ -232,14 +236,14 @@ export default function AvailablePlayersPanel({
                   p: 1.5,
                   display: "flex",
                   alignItems: "center",
-                  bgcolor: "white",
+                  bgcolor: "background.paper",
                   border: "1px solid",
                   borderColor: "divider",
                   borderRadius: 2,
                   cursor: locked ? "default" : "grab",
                   "&:hover": {
                     borderColor: "primary.main",
-                    bgcolor: "#f5faff",
+                    bgcolor: "action.hover",
                   },
                 }}
                 draggable={!locked}
@@ -252,8 +256,8 @@ export default function AvailablePlayersPanel({
                     width: 40,
                     height: 40,
                     fontSize: 16,
-                    bgcolor: "#ffe0b2", // Light orange/yellow
-                    color: "#e65100",
+                    bgcolor: "warning.light", // Light orange/yellow
+                    color: "warning.main",
                     mr: 2,
                     fontWeight: "bold",
                   }}
@@ -282,7 +286,7 @@ export default function AvailablePlayersPanel({
                     <IconButton
                       size="small"
                       sx={{
-                        color: "#1976d2",
+                        color: "primary.main",
                         padding: "4px",
                       }}
                     >

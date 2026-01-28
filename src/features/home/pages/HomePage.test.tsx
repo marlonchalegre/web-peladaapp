@@ -159,7 +159,7 @@ describe("HomePage", () => {
         screen.getByText("home.sections.admin_orgs.empty"),
       ).toBeInTheDocument();
       expect(
-        screen.getByText("home.sections.member_orgs.empty"),
+        screen.getByText("home.sections.member_orgs.empty_desc"),
       ).toBeInTheDocument();
     });
   });

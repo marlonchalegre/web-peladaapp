@@ -10,23 +10,28 @@ import {
   TableBody,
   Box,
   Alert,
-  Link,
   Button,
   Dialog,
   DialogTitle,
   DialogContent,
-  Pagination,
+  Chip,
+  Avatar,
+  Link,
 } from "@mui/material";
-import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
-import GroupsIcon from "@mui/icons-material/Groups";
 import AddIcon from "@mui/icons-material/Add";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
+import SecurityIcon from "@mui/icons-material/Security";
+import GroupsIcon from "@mui/icons-material/Groups";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
+import InfoIcon from "@mui/icons-material/Info";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { api } from "../../../shared/api/client";
 import { createApi, type Pelada } from "../../../shared/api/endpoints";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import CreateOrganizationForm from "../../organizations/components/CreateOrganizationForm";
+import { Link as RouterLink } from "react-router-dom";
 
 const endpoints = createApi(api);
 
@@ -46,8 +51,6 @@ export default function HomePage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const [peladas, setPeladas] = useState<Pelada[]>([]);
-  const [peladasPage, setPeladasPage] = useState(1);
-  const [peladasTotalPages, setPeladasTotalPages] = useState(1);
   const PELADAS_PER_PAGE = 5;
 
   const fetchPeladas = useCallback(
@@ -60,8 +63,6 @@ export default function HomePage() {
           PELADAS_PER_PAGE,
         );
         setPeladas(response.data);
-        setPeladasPage(response.page);
-        setPeladasTotalPages(response.totalPages);
       } catch (err) {
         console.error("Failed to fetch peladas", err);
       }
@@ -99,46 +100,59 @@ export default function HomePage() {
     fetchPeladas(1);
   }, [fetchOrganizations, fetchPeladas]);
 
-  const handlePeladaPageChange = (
-    _event: React.ChangeEvent<unknown>,
-    value: number,
-  ) => {
-    fetchPeladas(value);
-  };
-
   if (!user) {
     return (
       <Container maxWidth="lg" sx={{ py: 3 }}>
-        <Typography variant="h3" gutterBottom>
-          {t("app.title")}
-        </Typography>
-        <Typography variant="body1">{t("home.welcome.guest")}</Typography>
+        <Loading message={t("common.loading")} />
       </Container>
     );
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 3 }}>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      {/* Header / Welcome Section */}
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
-          mb: 3,
-          flexWrap: "wrap",
-          gap: 2,
+          alignItems: "flex-start",
+          mb: 5,
         }}
       >
-        <Typography variant="h3">
-          {t("home.welcome.user", { name: user.name })}
-        </Typography>
+        <Box>
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{ fontWeight: 700, color: "text.primary", mb: 1 }}
+          >
+            {t("home.welcome.prefix", "Bem-vindo, ")}
+            <Box component="span" sx={{ color: "primary.main" }}>
+              {user.name}
+            </Box>
+            !
+          </Typography>
+          <Typography variant="body1" sx={{ color: "text.secondary" }}>
+            {t(
+              "home.welcome.subtitle",
+              "Aqui está o resumo das suas atividades.",
+            )}
+          </Typography>
+        </Box>
         <Button
           variant="contained"
-          color="primary"
           startIcon={<AddIcon />}
           onClick={() => setCreateDialogOpen(true)}
+          sx={{
+            bgcolor: "primary.main",
+            borderRadius: 2,
+            textTransform: "none",
+            fontWeight: 600,
+            px: 3,
+            py: 1,
+            ":hover": { bgcolor: "primary.dark" },
+          }}
         >
-          {t("home.actions.create_organization")}
+          {t("home.actions.create_organization", "CRIAR ORGANIZAÇÃO")}
         </Button>
       </Box>
 
@@ -152,36 +166,95 @@ export default function HomePage() {
         <Loading message={t("common.loading")} />
       ) : (
         <>
-          <Box sx={{ mb: 4 }}>
+          {/* Minhas Peladas Section */}
+          <Box sx={{ mb: 5 }}>
             <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-              <SportsSoccerIcon sx={{ mr: 1 }} color="primary" />
-              <Typography variant="h5">
-                {t("home.sections.peladas.title")}
+              <SportsSoccerIcon sx={{ mr: 1.5, color: "primary.main" }} />
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 600, color: "text.primary" }}
+              >
+                {t("home.sections.peladas.title", "Minhas Peladas")}
               </Typography>
             </Box>
 
-            {peladas.length === 0 ? (
-              <Paper elevation={1} sx={{ p: 2 }}>
-                <Typography variant="body2" color="text.secondary">
-                  {t("home.sections.peladas.empty")}
-                </Typography>
-              </Paper>
-            ) : (
-              <Paper elevation={1}>
-                <Table>
-                  <TableHead>
+            <Paper
+              elevation={0}
+              sx={{
+                border: 1,
+                borderColor: "divider",
+                borderRadius: 3,
+                overflow: "hidden",
+              }}
+            >
+              <Table>
+                <TableHead sx={{ bgcolor: "background.default" }}>
+                  <TableRow>
+                    <TableCell
+                      sx={{
+                        color: "text.secondary",
+                        fontWeight: 600,
+                        fontSize: "0.75rem",
+                        letterSpacing: "0.05em",
+                        textTransform: "uppercase",
+                        py: 2,
+                      }}
+                    >
+                      {t("home.table.headers.date", "DATA")}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "text.secondary",
+                        fontWeight: 600,
+                        fontSize: "0.75rem",
+                        letterSpacing: "0.05em",
+                        textTransform: "uppercase",
+                        py: 2,
+                      }}
+                    >
+                      {t("home.table.headers.org_name", "NOME DA ORGANIZAÇÃO")}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "text.secondary",
+                        fontWeight: 600,
+                        fontSize: "0.75rem",
+                        letterSpacing: "0.05em",
+                        textTransform: "uppercase",
+                        py: 2,
+                      }}
+                    >
+                      {t("home.table.headers.status", "STATUS")}
+                    </TableCell>
+                    <TableCell padding="checkbox" />
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {peladas.length === 0 ? (
                     <TableRow>
-                      <TableCell>{t("home.table.headers.date")}</TableCell>
-                      <TableCell>{t("home.table.headers.org_name")}</TableCell>
-                      <TableCell>{t("home.table.headers.status")}</TableCell>
+                      <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
+                        <Typography color="text.secondary">
+                          {t(
+                            "home.sections.peladas.empty",
+                            "Nenhuma pelada encontrada.",
+                          )}
+                        </Typography>
+                      </TableCell>
                     </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {peladas.map((pelada) => (
-                      <TableRow key={`pelada-${pelada.id}`}>
-                        <TableCell>
+                  ) : (
+                    peladas.map((pelada) => (
+                      <TableRow
+                        key={`pelada-${pelada.id}`}
+                        hover
+                        sx={{
+                          cursor: "pointer",
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
+                      >
+                        <TableCell sx={{ py: 2.5 }}>
                           <Link
-                            href={
+                            component={RouterLink}
+                            to={
                               pelada.status === "attendance"
                                 ? `/peladas/${pelada.id}/attendance`
                                 : pelada.status === "voting"
@@ -189,138 +262,338 @@ export default function HomePage() {
                                   : `/peladas/${pelada.id}/matches`
                             }
                             underline="hover"
+                            sx={{ display: "block", textDecoration: "none" }}
                           >
-                            {pelada.scheduled_at
-                              ? new Date(
-                                  pelada.scheduled_at,
-                                ).toLocaleDateString() +
-                                " " +
-                                new Date(
-                                  pelada.scheduled_at,
-                                ).toLocaleTimeString([], {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })
-                              : t("common.date.tbd", "TBD")}
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                color: "primary.main",
+                                fontWeight: 500,
+                              }}
+                            >
+                              {pelada.scheduled_at
+                                ? new Date(
+                                    pelada.scheduled_at,
+                                  ).toLocaleDateString()
+                                : t("common.date.tbd", "TBD")}
+                            </Typography>
+                            <Typography
+                              variant="caption"
+                              sx={{ color: "text.secondary" }}
+                            >
+                              {pelada.scheduled_at
+                                ? new Date(
+                                    pelada.scheduled_at,
+                                  ).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })
+                                : ""}
+                            </Typography>
                           </Link>
                         </TableCell>
-                        <TableCell>
-                          {pelada.organization_name || pelada.organization_id}
+                        <TableCell sx={{ py: 2.5 }}>
+                          <Typography
+                            variant="body2"
+                            fontWeight={500}
+                            color="text.primary"
+                          >
+                            {pelada.organization_name || pelada.organization_id}
+                          </Typography>
                         </TableCell>
-                        <TableCell>
-                          {t(
-                            `pelada.status.${pelada.status}`,
-                            pelada.status || "",
-                          )}
+                        <TableCell sx={{ py: 2.5 }}>
+                          <Chip
+                            label={t(
+                              `pelada.status.${pelada.status}`,
+                              pelada.status || "",
+                            )}
+                            size="small"
+                            sx={{
+                              bgcolor: "success.light",
+                              color: "success.main",
+                              fontWeight: 500,
+                              borderRadius: 1,
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell sx={{ py: 2.5 }}>
+                          <ChevronRightIcon sx={{ color: "grey.300" }} />
                         </TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                {peladasTotalPages > 1 && (
-                  <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
-                    <Pagination
-                      count={peladasTotalPages}
-                      page={peladasPage}
-                      onChange={handlePeladaPageChange}
-                      color="primary"
-                    />
-                  </Box>
-                )}
-              </Paper>
-            )}
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </Paper>
           </Box>
 
-          <Box sx={{ mb: 4 }}>
+          {/* Minhas Organizações (Administrador) */}
+          <Box sx={{ mb: 5 }}>
             <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-              <AdminPanelSettingsIcon sx={{ mr: 1 }} color="primary" />
-              <Typography variant="h5">
-                {t("home.sections.admin_orgs.title")}
+              <SecurityIcon sx={{ mr: 1.5, color: "secondary.main" }} />
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 600, color: "text.primary" }}
+              >
+                {t(
+                  "home.sections.admin_orgs.title",
+                  "Minhas Organizações (Administrador)",
+                )}
               </Typography>
             </Box>
 
-            {adminOrgs.length === 0 ? (
-              <Paper elevation={1} sx={{ p: 2 }}>
-                <Typography variant="body2" color="text.secondary">
-                  {t("home.sections.admin_orgs.empty")}
-                </Typography>
-              </Paper>
-            ) : (
-              <Paper elevation={1}>
-                <Table>
-                  <TableHead>
+            <Paper
+              elevation={0}
+              sx={{
+                border: 1,
+                borderColor: "divider",
+                borderRadius: 3,
+                overflow: "hidden",
+              }}
+            >
+              <Table>
+                <TableHead sx={{ bgcolor: "background.default" }}>
+                  <TableRow>
+                    <TableCell
+                      sx={{
+                        color: "text.secondary",
+                        fontWeight: 600,
+                        fontSize: "0.75rem",
+                        letterSpacing: "0.05em",
+                        textTransform: "uppercase",
+                        py: 2,
+                      }}
+                    >
+                      {t("home.table.headers.org_name", "NOME DA ORGANIZAÇÃO")}
+                    </TableCell>
+                    <TableCell
+                      sx={{
+                        color: "text.secondary",
+                        fontWeight: 600,
+                        fontSize: "0.75rem",
+                        letterSpacing: "0.05em",
+                        textTransform: "uppercase",
+                        py: 2,
+                      }}
+                    >
+                      {t("home.table.headers.role", "FUNÇÃO")}
+                    </TableCell>
+                    <TableCell />
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {adminOrgs.length === 0 ? (
                     <TableRow>
-                      <TableCell>{t("home.table.headers.org_name")}</TableCell>
-                      <TableCell>{t("home.table.headers.role")}</TableCell>
+                      <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
+                        <Typography color="text.secondary">
+                          {t(
+                            "home.sections.admin_orgs.empty",
+                            "Nenhuma organização administrada.",
+                          )}
+                        </Typography>
+                      </TableCell>
                     </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {adminOrgs.map((org) => (
+                  ) : (
+                    adminOrgs.map((org) => (
                       <TableRow key={`admin-${org.id}`}>
-                        <TableCell>
-                          <Link
-                            href={`/organizations/${org.id}`}
-                            underline="hover"
-                          >
-                            {org.name}
-                          </Link>
-                        </TableCell>
-                        <TableCell>
+                        <TableCell sx={{ py: 2.5 }}>
                           <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <AdminPanelSettingsIcon
-                              fontSize="small"
-                              sx={{ mr: 0.5 }}
-                              color="primary"
-                            />
-                            {t("common.roles.admin")}
+                            <Avatar
+                              variant="rounded"
+                              sx={{
+                                bgcolor: "secondary.light",
+                                color: "secondary.main",
+                                mr: 2,
+                                width: 40,
+                                height: 40,
+                              }}
+                            >
+                              <GroupsIcon />
+                            </Avatar>
+                            <Link
+                              component={RouterLink}
+                              to={`/organizations/${org.id}`}
+                              underline="hover"
+                              variant="body2"
+                              fontWeight={600}
+                              color="text.primary"
+                            >
+                              {org.name}
+                            </Link>
                           </Box>
                         </TableCell>
+                        <TableCell sx={{ py: 2.5 }}>
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <VerifiedUserIcon
+                              sx={{
+                                fontSize: 16,
+                                mr: 0.5,
+                                color: "text.secondary",
+                              }}
+                            />
+                            <Typography variant="body2" color="text.secondary">
+                              {t("common.roles.admin", "Administrador")}
+                            </Typography>
+                          </Box>
+                        </TableCell>
+                        <TableCell align="right" sx={{ py: 2.5 }}>
+                          <Button
+                            component={RouterLink}
+                            to={`/organizations/${org.id}`}
+                            variant="contained"
+                            size="small"
+                            sx={{
+                              bgcolor: "action.hover",
+                              color: "text.primary",
+                              boxShadow: "none",
+                              textTransform: "none",
+                              fontWeight: 600,
+                              "&:hover": {
+                                bgcolor: "action.selected",
+                                boxShadow: "none",
+                              },
+                            }}
+                          >
+                            {t("common.actions.manage", "Gerenciar")}
+                          </Button>
+                        </TableCell>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Paper>
-            )}
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </Paper>
           </Box>
 
+          {/* Organizações que faço parte (Jogador) */}
           <Box>
             <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-              <GroupsIcon sx={{ mr: 1 }} color="action" />
-              <Typography variant="h5">
-                {t("home.sections.member_orgs.title")}
+              <GroupsIcon sx={{ mr: 1.5, color: "text.secondary" }} />
+              <Typography
+                variant="h6"
+                sx={{ fontWeight: 600, color: "text.primary" }}
+              >
+                {t(
+                  "home.sections.member_orgs.title",
+                  "Organizações que faço parte (Jogador)",
+                )}
               </Typography>
             </Box>
 
             {memberOrgs.length === 0 ? (
-              <Paper elevation={1} sx={{ p: 2 }}>
-                <Typography variant="body2" color="text.secondary">
-                  {t("home.sections.member_orgs.empty")}
+              <Box
+                sx={{
+                  border: "2px dashed",
+                  borderColor: "divider",
+                  borderRadius: 3,
+                  py: 8,
+                  px: 4,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  bgcolor: "background.paper",
+                  textAlign: "center",
+                }}
+              >
+                <Avatar
+                  sx={{
+                    bgcolor: "grey.100",
+                    color: "grey.400",
+                    width: 48,
+                    height: 48,
+                    mb: 2,
+                  }}
+                >
+                  <InfoIcon />
+                </Avatar>
+                <Typography
+                  variant="body1"
+                  color="text.secondary"
+                  sx={{ maxWidth: 400 }}
+                >
+                  {t(
+                    "home.sections.member_orgs.empty_desc",
+                    "No momento, você não faz parte de nenhuma organização como jogador.",
+                  )}
                 </Typography>
-              </Paper>
+              </Box>
             ) : (
-              <Paper elevation={1}>
+              <Paper
+                elevation={0}
+                sx={{
+                  border: 1,
+                  borderColor: "divider",
+                  borderRadius: 3,
+                  overflow: "hidden",
+                }}
+              >
                 <Table>
-                  <TableHead>
+                  <TableHead sx={{ bgcolor: "background.default" }}>
                     <TableRow>
-                      <TableCell>{t("home.table.headers.org_name")}</TableCell>
-                      <TableCell>{t("home.table.headers.role")}</TableCell>
+                      <TableCell
+                        sx={{
+                          color: "text.secondary",
+                          fontWeight: 600,
+                          fontSize: "0.75rem",
+                          letterSpacing: "0.05em",
+                          textTransform: "uppercase",
+                          py: 2,
+                        }}
+                      >
+                        {t(
+                          "home.table.headers.org_name",
+                          "NOME DA ORGANIZAÇÃO",
+                        )}
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          color: "text.secondary",
+                          fontWeight: 600,
+                          fontSize: "0.75rem",
+                          letterSpacing: "0.05em",
+                          textTransform: "uppercase",
+                          py: 2,
+                        }}
+                      >
+                        {t("home.table.headers.role", "FUNÇÃO")}
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {memberOrgs.map((org) => (
-                      <TableRow key={`member-${org.id}`}>
-                        <TableCell>
-                          <Link
-                            href={`/organizations/${org.id}`}
-                            underline="hover"
-                          >
-                            {org.name}
-                          </Link>
-                        </TableCell>
-                        <TableCell>
+                      <TableRow key={`member-${org.id}`} hover>
+                        <TableCell sx={{ py: 2.5 }}>
                           <Box sx={{ display: "flex", alignItems: "center" }}>
-                            <GroupsIcon fontSize="small" sx={{ mr: 0.5 }} />
-                            {t("common.roles.player")}
+                            <Avatar
+                              variant="rounded"
+                              sx={{
+                                bgcolor: "grey.100",
+                                color: "text.secondary",
+                                mr: 2,
+                                width: 40,
+                                height: 40,
+                              }}
+                            >
+                              <GroupsIcon />
+                            </Avatar>
+                            <Link
+                              component={RouterLink}
+                              to={`/organizations/${org.id}`}
+                              underline="hover"
+                              variant="body2"
+                              fontWeight={600}
+                              color="text.primary"
+                            >
+                              {org.name}
+                            </Link>
+                          </Box>
+                        </TableCell>
+                        <TableCell sx={{ py: 2.5 }}>
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            <Typography variant="body2" color="text.secondary">
+                              {t("common.roles.player", "Jogador")}
+                            </Typography>
                           </Box>
                         </TableCell>
                       </TableRow>

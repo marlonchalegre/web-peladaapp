@@ -89,10 +89,10 @@ export default function TeamsSection(props: TeamsSectionProps) {
               sx={{
                 textTransform: "none",
                 borderRadius: 2,
-                bgcolor: "#e3f2fd",
-                color: "#1976d2",
+                bgcolor: "primary.light",
+                color: "primary.main",
                 boxShadow: "none",
-                "&:hover": { bgcolor: "#bbdefb", boxShadow: "none" },
+                "&:hover": { bgcolor: "grey.200", boxShadow: "none" },
               }}
             >
               {t("peladas.teams.button.create")}

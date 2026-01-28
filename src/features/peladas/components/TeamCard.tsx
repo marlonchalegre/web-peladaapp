@@ -117,8 +117,8 @@ export default function TeamCard({
                 height: 22,
                 fontSize: "0.65rem",
                 fontWeight: "bold",
-                bgcolor: "#e3f2fd",
-                color: "#1976d2",
+                bgcolor: "primary.light",
+                color: "primary.main",
                 borderRadius: 1,
               }}
             />
@@ -146,7 +146,7 @@ export default function TeamCard({
                 p: 1.5,
                 display: "flex",
                 alignItems: "center",
-                bgcolor: "#f8f9fa",
+                bgcolor: "background.default",
                 borderRadius: 3,
                 cursor: locked ? "default" : "grab",
                 border: "1px solid transparent",
@@ -181,8 +181,8 @@ export default function TeamCard({
                 size="small"
                 sx={{
                   height: 24,
-                  bgcolor: "#e8f5e9",
-                  color: "#2e7d32",
+                  bgcolor: "success.light",
+                  color: "success.main",
                   fontWeight: "bold",
                   borderRadius: 1,
                 }}
@@ -199,15 +199,16 @@ export default function TeamCard({
               sx={{
                 p: 2,
                 borderRadius: 3,
-                background: "linear-gradient(135deg, #a395a3 0%, #8c7b8c 100%)",
-                color: "rgba(255,255,255,0.8)",
+                bgcolor: "grey.100",
+                color: "text.secondary",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 height: 52,
                 fontSize: "0.85rem",
                 fontWeight: 500,
-                boxShadow: "inset 0 2px 4px rgba(0,0,0,0.1)",
+                border: "1px dashed",
+                borderColor: "divider",
               }}
             >
               {t("peladas.team_card.drag_placeholder")}

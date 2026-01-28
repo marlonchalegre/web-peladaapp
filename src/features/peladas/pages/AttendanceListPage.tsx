@@ -206,8 +206,8 @@ export default function AttendanceListPage() {
               px: 4,
               py: 1.5,
               borderRadius: 2,
-              bgcolor: "#4f46e5",
-              "&:hover": { bgcolor: "#4338ca" },
+              bgcolor: "secondary.main",
+              "&:hover": { bgcolor: "secondary.dark" },
               textTransform: "none",
               fontWeight: "bold",
             }}
@@ -225,7 +225,7 @@ export default function AttendanceListPage() {
             p: 3,
             mb: 4,
             borderRadius: 3,
-            bgcolor: "#f8fafc",
+            bgcolor: "background.default",
             border: "1px solid",
             borderColor: "divider",
           }}
@@ -491,7 +491,7 @@ function PlayerAttendanceCard({
         borderRadius: 3,
         border: "1px solid",
         borderColor: "divider",
-        "&:hover": { borderColor: "primary.main", bgcolor: "#fcfdff" },
+        "&:hover": { borderColor: "primary.main", bgcolor: "grey.50" },
         transition: "all 0.2s",
       }}
     >
@@ -509,7 +509,7 @@ function PlayerAttendanceCard({
               width: 44,
               height: 44,
               mr: 2,
-              bgcolor: isCurrentUser ? "primary.main" : "#f1f5f9",
+              bgcolor: isCurrentUser ? "primary.main" : "grey.100",
               color: isCurrentUser ? "white" : "text.primary",
               fontSize: "0.875rem",
               fontWeight: "bold",
