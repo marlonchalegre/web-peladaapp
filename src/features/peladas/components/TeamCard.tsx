@@ -164,16 +164,16 @@ export default function TeamCard({
                   width: 32,
                   height: 32,
                   fontSize: 12,
-                  bgcolor: stringToColor(p.user.name),
+                  bgcolor: stringToColor(p.user?.name || ""),
                   mr: 1.5,
                   fontWeight: "bold",
                 }}
               >
-                {getInitials(p.user.name)}
+                {getInitials(p.user?.name || "")}
               </Avatar>
               <Box sx={{ flexGrow: 1 }}>
                 <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                  {p.user.name}
+                  {p.user?.name || "Unknown"}
                 </Typography>
               </Box>
               <Chip
