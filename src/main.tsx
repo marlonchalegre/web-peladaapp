@@ -2,10 +2,10 @@ import { StrictMode, Suspense } from "react";
 import { CssBaseline } from "@mui/material";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import App from "./App.tsx";
+import App from "./App";
 import "./lib/i18n";
-import { Loading } from "./shared/components/Loading.tsx";
-import { ThemeContextProvider } from "./app/providers/ThemeProvider.tsx";
+import { Loading } from "./shared/components/Loading";
+import { ThemeContextProvider } from "./app/providers/ThemeProvider";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
