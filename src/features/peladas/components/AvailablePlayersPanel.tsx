@@ -269,9 +269,8 @@ export default function AvailablePlayersPanel({
                     {p.user.name}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    {/* Position placeholder */}
-                    {p.position_id
-                      ? t("common.positions.player")
+                    {p.user.position
+                      ? t(`common.positions.${p.user.position.toLowerCase()}`)
                       : t("common.positions.unknown")}
                   </Typography>
                 </Box>

@@ -175,6 +175,15 @@ export default function TeamCard({
                 <Typography variant="body2" sx={{ fontWeight: "bold" }}>
                   {p.user?.name || "Unknown"}
                 </Typography>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ fontSize: "0.7rem", display: "block" }}
+                >
+                  {p.user?.position
+                    ? t(`common.positions.${p.user.position.toLowerCase()}`)
+                    : t("common.positions.unknown")}
+                </Typography>
               </Box>
               <Chip
                 label={p.displayScore ?? "-"}
