@@ -122,6 +122,7 @@ export type PeladaFullDetailsResponse = {
     user: User;
     attendance_status?: AttendanceStatus;
   })[];
+  scores: Record<number, number>;
   attendance: Attendance[];
   users_map: Record<number, User>;
   org_players_map: Record<number, Player>;

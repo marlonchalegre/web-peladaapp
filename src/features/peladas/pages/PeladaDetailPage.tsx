@@ -27,7 +27,6 @@ import {
   type Player,
   type VotingInfo,
   type User,
-  type NormalizedScoresResponse,
 } from "../../../shared/api/endpoints";
 import { useAuth } from "../../../app/providers/AuthContext";
 import TeamsSection from "../components/TeamsSection";
@@ -94,6 +93,7 @@ export default function PeladaDetailPage() {
       setTeams(data.teams);
       setAvailablePlayers(data.available_players);
       setVotingInfo(data.voting_info);
+      if (data.scores) setScores(data.scores);
 
       const playersByTeam: Record<number, (Player & { user: User })[]> = {};
       for (const t of data.teams) {
@@ -108,22 +108,6 @@ export default function PeladaDetailPage() {
       setError(message);
     }
   }, [peladaId, navigate, t]);
-
-  // Fetch normalized scores whenever players change
-  useEffect(() => {
-    const allPlayers = [...benchPlayers, ...Object.values(teamPlayers).flat()];
-    if (allPlayers.length === 0) return;
-
-    const ids = allPlayers.map((p) => p.id);
-    api
-      .post<NormalizedScoresResponse>("/api/scores/normalized", {
-        player_ids: ids,
-      })
-      .then((res) => {
-        if (res.scores) setScores(res.scores);
-      })
-      .catch((err) => console.error("Error fetching scores:", err));
-  }, [benchPlayers, teamPlayers]);
 
   useEffect(() => {
     fetchPeladaData();
