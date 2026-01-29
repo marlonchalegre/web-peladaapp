@@ -84,6 +84,7 @@
       "email": "Email",
       "password": "Password",
       "name": "Name",
+      "position": "Position",
       "date": "Date",
       "time": "Time",
       "player_name": "Player Name",
@@ -96,6 +97,9 @@
     },
     "positions": {
       "goalkeeper": "Goalkeeper",
+      "striker": "Striker",
+      "midfielder": "Midfielder",
+      "defender": "Defender",
       "player": "PLAYER",
       "unknown": "UNKNOWN"
     }

@@ -13,6 +13,10 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import {
   updateUserProfile,
@@ -30,6 +34,7 @@ export default function UserProfilePage() {
   const { user: authUser, signIn, signOut, token } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [position, setPosition] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -50,6 +55,7 @@ export default function UserProfilePage() {
         const userData = await getUser(authUser.id);
         setName(userData.name);
         setEmail(userData.email);
+        setPosition(userData.position || "");
       } catch (error) {
         console.error("Failed to load user profile:", error);
         setError(t("user.profile.error.load_failed"));
@@ -90,10 +96,16 @@ export default function UserProfilePage() {
       if (!authUser) throw new Error(t("user.profile.error.not_authenticated"));
 
       // Prepare update data - only include fields that should be updated
-      const updates: { name?: string; email?: string; password?: string } = {};
+      const updates: {
+        name?: string;
+        email?: string;
+        password?: string;
+        position?: string;
+      } = {};
 
       if (name !== authUser.name) updates.name = name;
       if (email !== authUser.email) updates.email = email;
+      if (position !== authUser.position) updates.position = position;
       if (password) updates.password = password;
 
       if (Object.keys(updates).length === 0) {
@@ -180,6 +192,35 @@ export default function UserProfilePage() {
               fullWidth
               disabled={loading}
             />
+
+            <FormControl fullWidth disabled={loading}>
+              <InputLabel id="position-select-label">
+                {t("common.fields.position")}
+              </InputLabel>
+              <Select
+                labelId="position-select-label"
+                id="position-select"
+                value={position}
+                label={t("common.fields.position")}
+                onChange={(e) => setPosition(e.target.value)}
+              >
+                <MenuItem value="">
+                  <em>{t("common.select_placeholder")}</em>
+                </MenuItem>
+                <MenuItem value="Striker">
+                  {t("common.positions.striker")}
+                </MenuItem>
+                <MenuItem value="Midfielder">
+                  {t("common.positions.midfielder")}
+                </MenuItem>
+                <MenuItem value="Defender">
+                  {t("common.positions.defender")}
+                </MenuItem>
+                <MenuItem value="Goalkeeper">
+                  {t("common.positions.goalkeeper")}
+                </MenuItem>
+              </Select>
+            </FormControl>
 
             <Divider sx={{ my: 2 }}>
               <Typography variant="caption" color="text.secondary">

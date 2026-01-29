@@ -194,12 +194,14 @@ export type User = {
   name: string;
   email: string;
   admin_orgs?: number[];
+  position?: string;
 };
 
 export type UserProfileUpdate = {
   name?: string;
   email?: string;
   password?: string;
+  position?: string;
 };
 
 export const api = new ApiClient();

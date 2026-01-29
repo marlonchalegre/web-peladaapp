@@ -328,7 +328,15 @@ export default function HomePage() {
                 </TableBody>
               </Table>
               {peladasTotalPages > 1 && (
-                <Box sx={{ display: "flex", justifyContent: "center", p: 2, borderTop: 1, borderColor: "divider" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    p: 2,
+                    borderTop: 1,
+                    borderColor: "divider",
+                  }}
+                >
                   <Pagination
                     count={peladasTotalPages}
                     page={peladasPage}
