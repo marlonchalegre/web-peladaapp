@@ -136,7 +136,9 @@ export default function AvailablePlayersPanel({
 
   const filteredPlayers = useMemo(() => {
     const result = search
-      ? players.filter((p) => p.user.name.toLowerCase().includes(search.toLowerCase()))
+      ? players.filter((p) =>
+          p.user.name.toLowerCase().includes(search.toLowerCase()),
+        )
       : [...players];
 
     const order: Record<string, number> = {
