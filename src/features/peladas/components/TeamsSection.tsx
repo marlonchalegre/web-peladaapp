@@ -1,4 +1,10 @@
-import { Button, Typography, Stack, Box } from "@mui/material";
+import {
+  Button,
+  Typography,
+  Stack,
+  Box,
+  CircularProgress,
+} from "@mui/material";
 import Grid from "@mui/material/Grid";
 import AddIcon from "@mui/icons-material/Add";
 import ShuffleIcon from "@mui/icons-material/Shuffle";
@@ -101,8 +107,28 @@ export default function TeamsSection(props: TeamsSectionProps) {
         )}
       </Box>
 
-      <Grid container spacing={3} alignItems="stretch">
-        {teams.map((t) => {
+      <Box sx={{ position: "relative" }}>
+        {creatingTeam && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              bgcolor: "rgba(255, 255, 255, 0.5)",
+              zIndex: 10,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 3,
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        )}
+        <Grid container spacing={3} alignItems="stretch">
+          {teams.map((t) => {
           const players = teamPlayers[t.id] || [];
 
           // Calculate average
@@ -204,6 +230,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
           </Grid>
         )}
       </Grid>
+      </Box>
     </section>
   );
 }

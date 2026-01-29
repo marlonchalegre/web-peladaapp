@@ -54,7 +54,7 @@ export default function PeladaDetailPage() {
     (Player & { user: User })[]
   >([]);
   const [error, setError] = useState<string | null>(null);
-  const [creatingTeam, setCreatingTeam] = useState(false);
+  const [processing, setProcessing] = useState(false);
   const [changingStatus, setChangingStatus] = useState(false);
   const [live, setLive] = useState("");
   const [votingInfo, setVotingInfo] = useState<VotingInfo | null>(null);
@@ -184,6 +184,10 @@ export default function PeladaDetailPage() {
     playerId: number,
     sourceTeamId: number | null,
   ) {
+    if (processing) {
+      e.preventDefault();
+      return;
+    }
     e.dataTransfer.setData(
       "application/json",
       JSON.stringify({ playerId, sourceTeamId }),
@@ -210,10 +214,12 @@ export default function PeladaDetailPage() {
 
   async function dropToBench(e: DragEvent<HTMLElement>) {
     e.preventDefault();
+    if (processing) return;
     const data = parseDrag(e);
     if (!data) return;
     const { playerId, sourceTeamId } = data;
     if (sourceTeamId == null) return; // already bench
+    setProcessing(true);
     try {
       await endpoints.removePlayerFromTeam(sourceTeamId, playerId);
       await fetchPeladaData(); // Refresh all data
@@ -224,15 +230,19 @@ export default function PeladaDetailPage() {
           ? error.message
           : t("peladas.detail.error.move_to_bench_failed");
       setError(message);
+    } finally {
+      setProcessing(false);
     }
   }
 
   async function dropToTeam(e: DragEvent<HTMLElement>, targetTeamId: number) {
     e.preventDefault();
+    if (processing) return;
     const data = parseDrag(e);
     if (!data) return;
     const { playerId, sourceTeamId } = data;
     if (sourceTeamId === targetTeamId) return;
+    setProcessing(true);
     try {
       if (sourceTeamId != null) {
         await endpoints.removePlayerFromTeam(sourceTeamId, playerId);
@@ -250,11 +260,14 @@ export default function PeladaDetailPage() {
           ? error.message
           : t("peladas.detail.error.move_player_failed");
       setError(message);
+    } finally {
+      setProcessing(false);
     }
   }
 
   async function handleRandomizeTeams() {
-    if (!peladaId || !pelada?.players_per_team) return;
+    if (!peladaId || !pelada?.players_per_team || processing) return;
+    setProcessing(true);
     try {
       const playerIds = benchPlayers.map((p) => p.id);
       await api.post(`/api/peladas/${peladaId}/teams/randomize`, {
@@ -268,11 +281,13 @@ export default function PeladaDetailPage() {
           ? error.message
           : t("peladas.detail.error.randomize_failed");
       setError(message);
+    } finally {
+      setProcessing(false);
     }
   }
 
   async function handleBeginPelada() {
-    if (!peladaId) return;
+    if (!peladaId || processing) return;
     setChangingStatus(true);
     try {
       const matches = parseInt(matchesPerTeam, 10);
@@ -351,7 +366,7 @@ export default function PeladaDetailPage() {
               variant="contained"
               startIcon={<PlayArrowIcon />}
               onClick={() => setStartDialogOpen(true)}
-              disabled={changingStatus}
+              disabled={changingStatus || processing}
               sx={{
                 textTransform: "none",
                 borderRadius: 2,
@@ -405,10 +420,10 @@ export default function PeladaDetailPage() {
             teams={teams}
             teamPlayers={teamPlayers}
             playersPerTeam={pelada.players_per_team ?? undefined}
-            creatingTeam={creatingTeam}
+            creatingTeam={processing}
             locked={pelada.status !== "open"}
             onCreateTeam={async (name) => {
-              setCreatingTeam(true);
+              setProcessing(true);
               try {
                 await endpoints.createTeam({ pelada_id: peladaId, name });
                 await fetchPeladaData();
@@ -419,10 +434,11 @@ export default function PeladaDetailPage() {
                     : t("peladas.detail.error.create_team_failed");
                 setError(message);
               } finally {
-                setCreatingTeam(false);
+                setProcessing(false);
               }
             }}
             onDeleteTeam={async (teamId) => {
+              setProcessing(true);
               try {
                 await endpoints.deleteTeam(teamId);
                 await fetchPeladaData();
@@ -432,6 +448,8 @@ export default function PeladaDetailPage() {
                     ? error.message
                     : t("peladas.detail.error.delete_team_failed");
                 setError(message);
+              } finally {
+                setProcessing(false);
               }
             }}
             onDragStartPlayer={onDragStartPlayer}
@@ -448,7 +466,8 @@ export default function PeladaDetailPage() {
             scores={scores}
             onDropToBench={dropToBench}
             onDragStartPlayer={(e, pid) => onDragStartPlayer(e, pid, null)}
-            locked={pelada.status !== "open"}
+            locked={pelada.status !== "open" || processing}
+            loading={processing}
             totalPlayersInPelada={totalPlayers}
             averagePelada={averagePelada}
             balance={balance}
