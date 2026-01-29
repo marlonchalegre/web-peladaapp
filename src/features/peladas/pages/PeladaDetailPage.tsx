@@ -269,9 +269,15 @@ export default function PeladaDetailPage() {
     if (!peladaId || !pelada?.players_per_team || processing) return;
     setProcessing(true);
     try {
-      const playerIds = benchPlayers.map((p) => p.id);
+      // Include bench players AND players already in teams to allow reshuffling
+      const teamPlayerIds = Object.values(teamPlayers)
+        .flat()
+        .map((p) => p.id);
+      const benchPlayerIds = benchPlayers.map((p) => p.id);
+      const allPlayerIds = [...benchPlayerIds, ...teamPlayerIds];
+
       await api.post(`/api/peladas/${peladaId}/teams/randomize`, {
-        player_ids: playerIds,
+        player_ids: allPlayerIds,
         players_per_team: pelada.players_per_team,
       });
       await fetchPeladaData(); // Refresh all data after randomization
@@ -467,7 +473,6 @@ export default function PeladaDetailPage() {
             onDropToBench={dropToBench}
             onDragStartPlayer={(e, pid) => onDragStartPlayer(e, pid, null)}
             locked={pelada.status !== "open" || processing}
-            loading={processing}
             totalPlayersInPelada={totalPlayers}
             averagePelada={averagePelada}
             balance={balance}

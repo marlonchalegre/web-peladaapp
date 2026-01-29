@@ -11,7 +11,6 @@ import {
   Stack,
   Button,
   LinearProgress,
-  CircularProgress,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
@@ -28,7 +27,6 @@ type AvailablePlayersPanelProps = {
   onDropToBench: (e: DragEvent<HTMLElement>) => void;
   onDragStartPlayer: (e: DragEvent<HTMLElement>, playerId: number) => void;
   locked?: boolean;
-  loading?: boolean;
   totalPlayersInPelada: number;
   averagePelada: number;
   balance: number;
@@ -129,7 +127,6 @@ export default function AvailablePlayersPanel({
   onDropToBench,
   onDragStartPlayer,
   locked,
-  loading,
   totalPlayersInPelada,
   averagePelada,
   balance,
@@ -145,25 +142,6 @@ export default function AvailablePlayersPanel({
 
   return (
     <Box sx={{ position: "relative" }}>
-      {loading && (
-        <Box
-          sx={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            bgcolor: "rgba(255, 255, 255, 0.5)",
-            zIndex: 10,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 3,
-          }}
-        >
-          <CircularProgress />
-        </Box>
-      )}
       <Paper
         elevation={0}
         sx={{
