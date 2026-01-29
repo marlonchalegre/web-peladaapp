@@ -50,6 +50,18 @@ export default function TeamCard({
 
   const emptySlots = Math.max(0, maxPlayers - players.length);
 
+  const sortedPlayers = [...players].sort((a, b) => {
+    const order: Record<string, number> = {
+      Goalkeeper: 0,
+      Defender: 1,
+      Midfielder: 2,
+      Striker: 3,
+    };
+    const posA = order[a.user?.position || ""] ?? 4;
+    const posB = order[b.user?.position || ""] ?? 4;
+    return posA - posB;
+  });
+
   return (
     <Paper
       elevation={0}
@@ -137,7 +149,7 @@ export default function TeamCard({
       </Box>
 
       <Stack spacing={1.5} sx={{ flexGrow: 1 }}>
-        {players.map((p) => {
+        {sortedPlayers.map((p) => {
           return (
             <Paper
               key={p.id}

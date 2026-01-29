@@ -135,9 +135,22 @@ export default function AvailablePlayersPanel({
   const [search, setSearch] = useState("");
 
   const filteredPlayers = useMemo(() => {
-    if (!search) return players;
-    const lower = search.toLowerCase();
-    return players.filter((p) => p.user.name.toLowerCase().includes(lower));
+    const result = search
+      ? players.filter((p) => p.user.name.toLowerCase().includes(search.toLowerCase()))
+      : [...players];
+
+    const order: Record<string, number> = {
+      Goalkeeper: 0,
+      Defender: 1,
+      Midfielder: 2,
+      Striker: 3,
+    };
+
+    return result.sort((a, b) => {
+      const posA = order[a.user?.position || ""] ?? 4;
+      const posB = order[b.user?.position || ""] ?? 4;
+      return posA - posB;
+    });
   }, [players, search]);
 
   return (
