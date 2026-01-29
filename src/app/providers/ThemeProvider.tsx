@@ -1,28 +1,8 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useMemo,
-  useEffect,
-} from "react";
-import { ThemeProvider } from "@mui/material";
+import React, { useState, useMemo, useEffect } from "react";
+import { ThemeProvider as MuiThemeProvider } from "@mui/material";
 import type { PaletteMode } from "@mui/material";
 import { getTheme } from "../../lib/theme";
-
-type ThemeContextType = {
-  mode: PaletteMode;
-  toggleTheme: () => void;
-};
-
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
-export const useAppTheme = () => {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error("useAppTheme must be used within a ThemeContextProvider");
-  }
-  return context;
-};
+import { ThemeContext } from "./ThemeContext";
 
 export const ThemeContextProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -44,7 +24,7 @@ export const ThemeContextProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <ThemeContext.Provider value={{ mode, toggleTheme }}>
-      <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      <MuiThemeProvider theme={theme}>{children}</MuiThemeProvider>
     </ThemeContext.Provider>
   );
 };
