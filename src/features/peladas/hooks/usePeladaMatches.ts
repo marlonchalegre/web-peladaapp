@@ -21,7 +21,6 @@ export function usePeladaMatches(peladaId: number) {
     userIdToName,
     orgPlayerIdToPlayer,
     matchEvents,
-    setMatchEvents,
     playerStatsFromApi,
     refreshData,
   } = data;
@@ -41,7 +40,6 @@ export function usePeladaMatches(peladaId: number) {
     peladaId,
     matchesRef,
     setMatches,
-    setMatchEvents,
     setPelada,
     refreshData,
     setError,

@@ -4,7 +4,6 @@ import { api } from "../../../shared/api/client";
 import {
   createApi,
   type Match,
-  type MatchEvent,
   type Pelada,
 } from "../../../shared/api/endpoints";
 
@@ -14,7 +13,6 @@ export function useMatchActions(
   peladaId: number,
   matchesRef: React.MutableRefObject<Match[]>,
   setMatches: (matches: Match[] | ((prev: Match[]) => Match[])) => void,
-  setMatchEvents: (events: MatchEvent[]) => void,
   setPelada: Dispatch<SetStateAction<Pelada | null>>,
   refreshData: () => Promise<void>,
   setError: (msg: string | null) => void,
