@@ -47,16 +47,6 @@ export type Match = {
   home_score: number;
   away_score: number;
 };
-export type Substitution = {
-  id: number;
-  match_id: number;
-  out_player_id: number;
-  in_player_id: number;
-  minute?: number | null;
-};
-export type SubstitutionResponse = { result: number };
-export type NormalizedScore = { player_id: number; score: number };
-export type NormalizedScoresResponse = { scores: Record<number, number> };
 export type MatchEventType = "assist" | "goal" | "own_goal";
 export type MatchEvent = {
   id: number;
@@ -84,14 +74,6 @@ export type PeladaDashboardDataResponse = {
   player_stats: PlayerStats[] | null;
   team_players_map: Record<number, TeamPlayer[]>;
   match_lineups_map: Record<number, Record<number, MatchLineupEntry[]>>;
-};
-export type Vote = {
-  id: number;
-  pelada_id: number;
-  voter_id: number;
-  target_id: number;
-  stars: number;
-  created_at?: string;
 };
 export type VotingInfo = {
   can_vote: boolean;
@@ -177,7 +159,6 @@ export function createApi(client: ApiClient) {
         page,
         per_page: perPage,
       }),
-    getPelada: (id: number) => client.get<Pelada>(`/api/peladas/${id}`),
     getPeladaDashboardData: (id: number) =>
       client.get<PeladaDashboardDataResponse>(
         `/api/peladas/${id}/dashboard-data`,
@@ -207,10 +188,6 @@ export function createApi(client: ApiClient) {
       client.post<Pelada>(`/api/peladas/${id}/close-attendance`),
 
     // Teams
-    listTeamsByPelada: (peladaId: number) =>
-      client.get<Team[]>(`/api/peladas/${peladaId}/teams`),
-    listTeamPlayers: (teamId: number) =>
-      client.get<TeamPlayer[]>(`/api/teams/${teamId}/players`),
     createTeam: (payload: { pelada_id: number; name: string }) =>
       client.post<Team>("/api/teams", payload),
     deleteTeam: (teamId: number) => client.delete(`/api/teams/${teamId}`),
@@ -222,12 +199,6 @@ export function createApi(client: ApiClient) {
       }),
 
     // Matches
-    listMatchesByPelada: (peladaId: number) =>
-      client.get<Match[]>(`/api/peladas/${peladaId}/matches`),
-    listMatchEventsByPelada: (peladaId: number) =>
-      client.get<MatchEvent[]>(`/api/peladas/${peladaId}/events`),
-    listPlayerStatsByPelada: (peladaId: number) =>
-      client.get<PlayerStats[]>(`/api/peladas/${peladaId}/player-stats`),
     updateMatchScore: (
       id: number,
       home: number,
@@ -259,21 +230,8 @@ export function createApi(client: ApiClient) {
       }),
 
     // Match lineups (per-match players)
-    listMatchLineups: (matchId: number) =>
-      client.get<Record<number, MatchLineupEntry[]>>(
-        `/api/matches/${matchId}/lineups`,
-      ),
     addMatchLineupPlayer: (matchId: number, teamId: number, playerId: number) =>
       client.post(`/api/matches/${matchId}/lineups`, {
-        team_id: teamId,
-        player_id: playerId,
-      }),
-    removeMatchLineupPlayer: (
-      matchId: number,
-      teamId: number,
-      playerId: number,
-    ) =>
-      client.delete<void>(`/api/matches/${matchId}/lineups`, {
         team_id: teamId,
         player_id: playerId,
       }),
@@ -289,26 +247,11 @@ export function createApi(client: ApiClient) {
         in_player_id: inPlayerId,
       }),
 
-    // Substitutions
-    listSubstitutions: (matchId: number) =>
-      client.get<Substitution[]>(`/api/matches/${matchId}/substitutions`),
-    createSubstitution: (
-      matchId: number,
-      outPlayerId: number,
-      inPlayerId: number,
-      minute?: number,
-    ) =>
-      client.post<SubstitutionResponse>(
-        `/api/matches/${matchId}/substitutions`,
-        { out_player_id: outPlayerId, in_player_id: inPlayerId, minute },
-      ),
-
     // Players
     listPlayersByOrg: (organizationId: number) =>
       client.get<Player[]>(`/api/organizations/${organizationId}/players`),
     createPlayer: (payload: Partial<Player>) =>
       client.post<Player>("/api/players", payload),
-    getPlayer: (id: number) => client.get<Player>(`/api/players/${id}`),
     deletePlayer: (id: number) => client.delete(`/api/players/${id}`),
 
     // Users
@@ -331,12 +274,6 @@ export function createApi(client: ApiClient) {
     removeOrganizationAdmin: (organizationId: number, userId: number) =>
       client.delete(`/api/organizations/${organizationId}/admins/${userId}`),
 
-    // Scores
-    getNormalizedScore: (peladaId: number, orgPlayerId: number) =>
-      client.get<NormalizedScore>(
-        `/api/peladas/${peladaId}/players/${orgPlayerId}/normalized-score`,
-      ),
-
     // Voting
     getVotingInfo: (peladaId: number) =>
       client.get<VotingInfo>(`/api/peladas/${peladaId}/voting-info`),
@@ -345,7 +282,5 @@ export function createApi(client: ApiClient) {
         `/api/peladas/${peladaId}/votes/batch`,
         payload,
       ),
-    listVotesByPelada: (peladaId: number) =>
-      client.get<Vote[]>(`/api/peladas/${peladaId}/votes`),
   };
 }
