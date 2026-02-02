@@ -25,6 +25,11 @@ vi.mock("react-router-dom", () => ({
   useNavigate: () => vi.fn(),
 }));
 
+// Mock jwt-decode to avoid parsing errors with dummy tokens
+vi.mock("jwt-decode", () => ({
+  jwtDecode: vi.fn(() => ({ admin_orgs: [] })),
+}));
+
 // Helper component to test the auth context
 function TestComponent() {
   const { isAuthenticated, token, user, signIn, signOut } = useAuth();
