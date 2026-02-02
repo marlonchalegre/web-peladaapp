@@ -317,6 +317,7 @@
       "history_item_title": "Seq {{sequence}}: {{teamName}}",
       "team_fallback": "Team {{id}}",
       "confirm_end_match": "Are you sure you want to end the match?",
+      "confirm_close_pelada": "Are you sure you want to close this pelada? This will finish all pending matches.",
       "select_match_hint": "Select a match to view details",
       "insights_title": "Session Insights",
       "error": {
@@ -448,6 +449,15 @@
         "update_failed": "Failed to update profile",
         "delete_failed": "Failed to delete account"
       }
+    }
+  },
+  "pelada": {
+    "status": {
+      "open": "Open",
+      "attendance": "Attendance",
+      "running": "Running",
+      "closed": "Closed",
+      "voting": "Voting Open"
     }
   }
 }

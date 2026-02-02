@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef, useCallback } from "react";
 import { useParams, Link as RouterLink, useNavigate } from "react-router-dom";
 import {
   Paper,
@@ -11,8 +11,10 @@ import {
   ListItemButton,
   ListItemText,
   Divider,
+  IconButton,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { api } from "../../../shared/api/client";
 import {
   createApi,
@@ -97,6 +99,12 @@ export default function PeladaMatchesPage() {
   const navigate = useNavigate();
   const peladaId = Number(id);
   const [matches, setMatches] = useState<Match[]>([]);
+  const matchesRef = useRef<Match[]>([]);
+
+  useEffect(() => {
+    matchesRef.current = matches;
+  }, [matches]);
+
   const [teams, setTeams] = useState<Team[]>([]);
   const [pelada, setPelada] = useState<Pelada | null>(null);
   const [teamPlayers, setTeamPlayers] = useState<Record<number, TeamPlayer[]>>(
@@ -115,6 +123,7 @@ export default function PeladaMatchesPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [closing, setClosing] = useState(false);
+  const [matchEvents, setMatchEvents] = useState<MatchEvent[]>([]);
 
   // New state for selection
   const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null);
@@ -144,7 +153,17 @@ export default function PeladaMatchesPage() {
     return m;
   }, [teams]);
 
-  const isPeladaClosed = (pelada?.status || "").toLowerCase() === "closed";
+  const currentMatchStats = useMemo(() => {
+    if (!selectedMatchId) return {};
+    const filteredEvents = matchEvents.filter(
+      (e) => e.match_id === selectedMatchId,
+    );
+    return aggregateStatsFromEvents(filteredEvents);
+  }, [matchEvents, selectedMatchId]);
+
+  const isPeladaClosed = ["closed", "voting"].includes(
+    (pelada?.status || "").toLowerCase(),
+  );
 
   useEffect(() => {
     if (!peladaId) return;
@@ -161,7 +180,9 @@ export default function PeladaMatchesPage() {
 
         setPelada(data.pelada);
         setMatches(data.matches);
+        matchesRef.current = data.matches;
         setTeams(data.teams);
+        setMatchEvents(data.match_events);
 
         // Select first match if none selected
         if (data.matches.length > 0) {
@@ -386,46 +407,52 @@ export default function PeladaMatchesPage() {
     }
   }
 
-  async function adjustScore(
-    match: Match,
-    team: "home" | "away",
-    delta: 1 | -1 = 1,
-  ) {
-    const currentHome = match.home_score ?? 0;
-    const currentAway = match.away_score ?? 0;
-    const newHome = team === "home" ? currentHome + delta : currentHome;
-    const newAway = team === "away" ? currentAway + delta : currentAway;
-    if (newHome < 0 || newAway < 0) {
-      setError(t("peladas.matches.error.negative_score"));
-      throw new Error("NEGATIVE_SCORE");
-    }
-    const status = newHome + newAway > 0 ? "running" : "scheduled";
-    setUpdatingScore((prev) => ({ ...prev, [match.id]: true }));
-    try {
-      await endpoints.updateMatchScore(match.id, newHome, newAway, status);
-      setMatches((prev) =>
-        prev.map((m) =>
-          m.id === match.id
-            ? {
-                ...m,
-                home_score: newHome,
-                away_score: newAway,
-                status: status === "scheduled" ? m.status : status,
-              }
-            : m,
-        ),
-      );
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : t("peladas.matches.error.update_score_failed");
-      setError(message);
-      throw error;
-    } finally {
-      setUpdatingScore((prev) => ({ ...prev, [match.id]: false }));
-    }
-  }
+  const adjustScore = useCallback(
+    async (matchId: number, team: "home" | "away", delta: 1 | -1 = 1) => {
+      const match = matchesRef.current.find((m) => m.id === matchId);
+      if (!match) return;
+
+      const currentHome = match.home_score ?? 0;
+      const currentAway = match.away_score ?? 0;
+      const newHome = team === "home" ? currentHome + delta : currentHome;
+      const newAway = team === "away" ? currentAway + delta : currentAway;
+
+      if (newHome < 0 || newAway < 0) {
+        setError(t("peladas.matches.error.negative_score"));
+        throw new Error("NEGATIVE_SCORE");
+      }
+
+      const status = newHome + newAway > 0 ? "running" : "scheduled";
+      setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
+      try {
+        await endpoints.updateMatchScore(matchId, newHome, newAway, status);
+        setMatches((prev) => {
+          const next = prev.map((m) =>
+            m.id === matchId
+              ? {
+                  ...m,
+                  home_score: newHome,
+                  away_score: newAway,
+                  status: status === "scheduled" ? m.status : status,
+                }
+              : m,
+          );
+          matchesRef.current = next;
+          return next;
+        });
+      } catch (error: unknown) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : t("peladas.matches.error.update_score_failed");
+        setError(message);
+        throw error;
+      } finally {
+        setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
+      }
+    },
+    [t],
+  );
 
   async function refreshStats() {
     if (!peladaId) return;
@@ -434,6 +461,8 @@ export default function PeladaMatchesPage() {
 
       // Update matches and lineups to reflect potential lineup changes
       setMatches(data.matches);
+      matchesRef.current = data.matches;
+      setMatchEvents(data.match_events);
       const luMap: Record<number, Record<number, TeamPlayer[]>> = {};
       for (const [midStr, teamPlayersGroup] of Object.entries(
         data.match_lineups_map || {},
@@ -481,8 +510,20 @@ export default function PeladaMatchesPage() {
     playerId: number,
     type: "assist" | "goal" | "own_goal",
   ) {
-    await endpoints.deleteMatchEvent(matchId, playerId, type);
-    await refreshStats();
+    setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
+    try {
+      await endpoints.deleteMatchEvent(matchId, playerId, type);
+      await refreshStats();
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("peladas.matches.error.record_event_failed"); // generic delete/record error
+      setError(message);
+      throw error;
+    } finally {
+      setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
+    }
   }
 
   async function recordEvent(
@@ -490,6 +531,7 @@ export default function PeladaMatchesPage() {
     playerId: number,
     type: "assist" | "goal" | "own_goal",
   ) {
+    setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
     try {
       await endpoints.createMatchEvent(matchId, playerId, type);
       await refreshStats();
@@ -499,6 +541,9 @@ export default function PeladaMatchesPage() {
           ? error.message
           : t("peladas.matches.error.record_event_failed");
       setError(message);
+      throw error;
+    } finally {
+      setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
     }
   }
 
@@ -509,14 +554,29 @@ export default function PeladaMatchesPage() {
 
   return (
     <Box sx={{ flexGrow: 1, p: 2 }}>
-      <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-        <Typography variant="h4" sx={{ mr: 2 }}>
-          {t("peladas.matches.title", { id: peladaId })}
-        </Typography>
-        <Button component={RouterLink} to={`/peladas/${peladaId}`}>
-          {t("common.back")}
-        </Button>
-        <Box sx={{ ml: "auto" }}>
+      <Box
+        sx={{
+          mb: 3,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <IconButton
+            component={RouterLink}
+            to={`/peladas/${peladaId}`}
+            sx={{ mr: 2 }}
+            aria-label={t("common.back")}
+          >
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+            {t("peladas.matches.title", { id: peladaId })}
+          </Typography>
+        </Box>
+
+        <Box>
           {isPeladaClosed ? (
             <Typography variant="body2" color="text.secondary" sx={{ py: 1 }}>
               {t("peladas.matches.status.closed")}
@@ -527,6 +587,15 @@ export default function PeladaMatchesPage() {
               color="error"
               onClick={async () => {
                 if (!peladaId || isPeladaClosed) return;
+                if (
+                  !window.confirm(
+                    t(
+                      "peladas.matches.confirm_close_pelada",
+                      "Tem certeza que deseja encerrar esta pelada? Isso finalizará todas as partidas pendentes.",
+                    ),
+                  )
+                )
+                  return;
                 setClosing(true);
                 try {
                   await endpoints.closePelada(peladaId);
@@ -544,6 +613,7 @@ export default function PeladaMatchesPage() {
                 }
               }}
               disabled={closing}
+              sx={{ px: 3, borderRadius: 2, fontWeight: "bold" }}
             >
               {closing
                 ? t("peladas.matches.button.closing")
@@ -551,12 +621,15 @@ export default function PeladaMatchesPage() {
             </Button>
           )}
         </Box>
-      </Stack>
+      </Box>
 
       <Grid
         container
         spacing={3}
-        sx={{ height: "calc(100vh - 150px)", minHeight: 600 }}
+        sx={{
+          height: { xs: "auto", md: "calc(100vh - 240px)" },
+          minHeight: { md: 600 },
+        }}
       >
         {/* Left Column: Match History Stream */}
         <Grid
@@ -680,7 +753,7 @@ export default function PeladaMatchesPage() {
                   awayPlayers={awayPlayers}
                   orgPlayerIdToUserId={orgPlayerIdToUserId}
                   userIdToName={userIdToName}
-                  statsMap={statsMap}
+                  statsMap={currentMatchStats}
                   benchPlayers={benchPlayers}
                   finished={finished || isPeladaClosed}
                   updating={!!updatingScore[selectedMatch.id]}
@@ -730,13 +803,15 @@ export default function PeladaMatchesPage() {
                         selectedMatch.away_score ?? 0,
                         "finished",
                       );
-                      setMatches((prev) =>
-                        prev.map((m) =>
+                      setMatches((prev) => {
+                        const next = prev.map((m) =>
                           m.id === selectedMatch.id
                             ? { ...m, status: "finished" }
                             : m,
-                        ),
-                      );
+                        );
+                        matchesRef.current = next;
+                        return next;
+                      });
                       await refreshStats();
                     } catch (error: unknown) {
                       const message =

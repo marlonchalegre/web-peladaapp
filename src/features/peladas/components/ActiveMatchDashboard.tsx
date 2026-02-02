@@ -12,8 +12,9 @@ import {
   TableRow,
   alpha,
   Button,
+  CircularProgress,
 } from "@mui/material";
-import { type Dispatch, type SetStateAction } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz"; // For substitution icon
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -62,7 +63,7 @@ type Props = {
     type: "assist" | "goal" | "own_goal",
   ) => Promise<void>;
   adjustScore: (
-    match: Match,
+    matchId: number,
     team: "home" | "away",
     delta: 1 | -1,
   ) => Promise<void>;
@@ -79,10 +80,12 @@ function StatInput({
   value,
   onChange,
   disabled,
+  loading = false,
 }: {
   value: number;
   onChange: (diff: number) => void;
   disabled: boolean;
+  loading?: boolean;
 }) {
   return (
     <Box
@@ -94,12 +97,13 @@ function StatInput({
         bgcolor: alpha(theme.palette.action.active, 0.04),
         width: "fit-content",
         overflow: "hidden",
+        position: "relative",
       })}
     >
       <IconButton
         size="small"
         onClick={() => onChange(-1)}
-        disabled={disabled || value <= 0}
+        disabled={disabled || value <= 0 || loading}
         sx={{
           borderRadius: 0,
           p: 0.5,
@@ -122,15 +126,19 @@ function StatInput({
           borderColor: "divider",
         }}
       >
-        <Typography variant="body2" fontWeight="bold">
-          {value}
-        </Typography>
+        {loading ? (
+          <CircularProgress size={16} />
+        ) : (
+          <Typography variant="body2" fontWeight="bold">
+            {value}
+          </Typography>
+        )}
       </Box>
 
       <IconButton
         size="small"
         onClick={() => onChange(1)}
-        disabled={disabled}
+        disabled={disabled || loading}
         sx={{
           borderRadius: 0,
           p: 0.5,
@@ -167,6 +175,8 @@ export default function ActiveMatchDashboard(props: Props) {
     addPlayerToTeam,
     onEndMatch,
   } = props;
+
+  const [loadingStats, setLoadingStats] = useState<Record<string, boolean>>({});
 
   // Combine players for the list? Or show two sections?
   // The design shows a single list. Let's try to combine but maybe indicate team.
@@ -251,24 +261,31 @@ export default function ActiveMatchDashboard(props: Props) {
     side: "home" | "away",
   ) => {
     if (diff === 0) return;
-    const absDiff = Math.abs(diff);
-    // Loop for diff (simple serial handling, imperfect for score batching but safe for events)
-    for (let i = 0; i < absDiff; i++) {
-      if (diff > 0) {
-        await recordEvent(match.id, playerId, type);
-        if (type === "goal") {
-          await adjustScore(match, side, 1); // Note: match prop is stale in loop, score update might be singular
-        } else if (type === "own_goal") {
-          await adjustScore(match, side === "home" ? "away" : "home", 1);
-        }
-      } else {
-        await deleteEventAndRefresh(match.id, playerId, type);
-        if (type === "goal") {
-          await adjustScore(match, side, -1);
-        } else if (type === "own_goal") {
-          await adjustScore(match, side === "home" ? "away" : "home", -1);
+    const loadingKey = `${playerId}-${type}`;
+    if (loadingStats[loadingKey]) return;
+
+    setLoadingStats((prev) => ({ ...prev, [loadingKey]: true }));
+    try {
+      const absDiff = Math.abs(diff);
+      for (let i = 0; i < absDiff; i++) {
+        if (diff > 0) {
+          await recordEvent(match.id, playerId, type);
+          if (type === "goal") {
+            await adjustScore(match.id, side, 1);
+          } else if (type === "own_goal") {
+            await adjustScore(match.id, side === "home" ? "away" : "home", 1);
+          }
+        } else {
+          await deleteEventAndRefresh(match.id, playerId, type);
+          if (type === "goal") {
+            await adjustScore(match.id, side, -1);
+          } else if (type === "own_goal") {
+            await adjustScore(match.id, side === "home" ? "away" : "home", -1);
+          }
         }
       }
+    } finally {
+      setLoadingStats((prev) => ({ ...prev, [loadingKey]: false }));
     }
   };
 
@@ -380,7 +397,7 @@ export default function ActiveMatchDashboard(props: Props) {
                               bgcolor:
                                 tp.side === "home"
                                   ? "primary.main"
-                                  : "secondary.main",
+                                  : "away.main",
                               borderRadius: 1,
                             }}
                           />
@@ -479,9 +496,7 @@ export default function ActiveMatchDashboard(props: Props) {
                             width: 4,
                             height: 24,
                             bgcolor:
-                              tp.side === "home"
-                                ? "primary.main"
-                                : "secondary.main",
+                              tp.side === "home" ? "primary.main" : "away.main",
                             borderRadius: 1,
                           }}
                         />
@@ -562,6 +577,7 @@ export default function ActiveMatchDashboard(props: Props) {
                         <StatInput
                           value={stats.goals}
                           disabled={finished || updating}
+                          loading={loadingStats[`${tp.player_id}-goal`]}
                           onChange={(diff) =>
                             handleStatChange(
                               tp.player_id,
@@ -582,6 +598,7 @@ export default function ActiveMatchDashboard(props: Props) {
                         <StatInput
                           value={stats.assists}
                           disabled={finished || updating}
+                          loading={loadingStats[`${tp.player_id}-assist`]}
                           onChange={(diff) =>
                             handleStatChange(
                               tp.player_id,
@@ -602,6 +619,7 @@ export default function ActiveMatchDashboard(props: Props) {
                         <StatInput
                           value={stats.ownGoals}
                           disabled={finished || updating}
+                          loading={loadingStats[`${tp.player_id}-own_goal`]}
                           onChange={(diff) =>
                             handleStatChange(
                               tp.player_id,

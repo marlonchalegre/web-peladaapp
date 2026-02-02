@@ -1,6 +1,15 @@
 import { createTheme, alpha } from "@mui/material";
 import type { PaletteMode } from "@mui/material";
 
+declare module "@mui/material/styles" {
+  interface Palette {
+    away: Palette["primary"];
+  }
+  interface PaletteOptions {
+    away?: PaletteOptions["primary"];
+  }
+}
+
 export const getTheme = (mode: PaletteMode) =>
   createTheme({
     palette: {
@@ -13,6 +22,9 @@ export const getTheme = (mode: PaletteMode) =>
       secondary: {
         main: "#6366f1", // indigo-500
         light: mode === "light" ? "#e0e7ff" : "#312e81", // indigo-100 or indigo-900
+      },
+      away: {
+        main: "#f97316", // orange-500
       },
       success: {
         main: mode === "light" ? "#166534" : "#4ade80", // green-800 or green-400

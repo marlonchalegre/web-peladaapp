@@ -323,6 +323,7 @@
       "history_item_title": "Seq {{sequence}}: {{teamName}}",
       "team_fallback": "Time {{id}}",
       "confirm_end_match": "Tem certeza que deseja encerrar a partida?",
+      "confirm_close_pelada": "Tem certeza que deseja encerrar esta pelada? Isso finalizará todas as partidas pendentes.",
       "select_match_hint": "Selecione uma partida para ver os detalhes",
       "insights_title": "Insights da Sessão",
       "error": {
@@ -417,7 +418,8 @@
       "open": "Aberta",
       "attendance": "Lista de Presença",
       "running": "Em Andamento",
-      "closed": "Encerrada"
+      "closed": "Encerrada",
+      "voting": "Votação Aberta"
     }
   },
   "user": {
