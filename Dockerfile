@@ -5,6 +5,7 @@ FROM node:20-alpine AS dev
 ARG TARGETARCH
 # Install build dependencies for native modules
 RUN apk add --no-cache python3 make g++
+RUN npm install -g npm@11.8.0
 WORKDIR /app
 COPY package.json package-lock.json .npmrc ./
 # Install dependencies and explicitly install rollup native bindings
@@ -27,6 +28,7 @@ ARG VITE_APP_VERSION=dev
 ENV VITE_APP_VERSION=$VITE_APP_VERSION
 # Install build dependencies for native modules
 RUN apk add --no-cache python3 make g++
+RUN npm install -g npm@11.8.0
 WORKDIR /app
 COPY package.json package-lock.json .npmrc ./
 # Install dependencies and explicitly install rollup native bindings
