@@ -68,23 +68,29 @@ export default function RegisterPage() {
             </Typography>
             {error && <Alert severity="error">{error}</Alert>}
             <TextField
+              id="name"
               label={t("common.fields.name")}
+              autoComplete="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
               fullWidth
             />
             <TextField
+              id="email"
               label={t("common.fields.email")}
               type="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               fullWidth
             />
             <TextField
+              id="password"
               label={t("common.fields.password")}
               type="password"
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required

@@ -175,7 +175,9 @@ export default function UserProfilePage() {
             {success && <Alert severity="success">{success}</Alert>}
 
             <TextField
+              id="name"
               label={t("common.fields.name")}
+              autoComplete="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -184,8 +186,10 @@ export default function UserProfilePage() {
             />
 
             <TextField
+              id="email"
               label={t("common.fields.email")}
               type="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -203,6 +207,7 @@ export default function UserProfilePage() {
                 value={position}
                 label={t("common.fields.position")}
                 onChange={(e) => setPosition(e.target.value)}
+                autoComplete="organization-title"
               >
                 <MenuItem value="">
                   <em>{t("common.select_placeholder")}</em>
@@ -229,8 +234,10 @@ export default function UserProfilePage() {
             </Divider>
 
             <TextField
+              id="new-password"
               label={t("user.profile.field.new_password")}
               type="password"
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               fullWidth
@@ -239,8 +246,10 @@ export default function UserProfilePage() {
             />
 
             <TextField
+              id="confirm-password"
               label={t("user.profile.field.confirm_password")}
               type="password"
+              autoComplete="new-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               fullWidth
