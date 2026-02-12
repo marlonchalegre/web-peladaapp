@@ -12,11 +12,12 @@ import {
 } from "@mui/material";
 import { login } from "../../../shared/api/client";
 import { useAuth } from "../../../app/providers/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { t } = useTranslation();
   const { signIn } = useAuth();
   const [email, setEmail] = useState("");
@@ -31,7 +32,8 @@ export default function LoginPage() {
     try {
       const { token, user } = await login(email, password);
       signIn(token, user);
-      navigate("/");
+      const redirect = searchParams.get("redirect") || "/";
+      navigate(redirect);
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : t("auth.login.error.failed");
@@ -95,8 +97,19 @@ export default function LoginPage() {
             </Button>
             <Typography variant="body2" textAlign="center">
               {t("auth.login.link.new_user")}{" "}
-              <MLink href="/register" underline="hover">
+              <MLink
+                href={`/register${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`}
+                underline="hover"
+              >
                 {t("auth.login.link.register")}
+              </MLink>
+            </Typography>
+            <Typography variant="body2" textAlign="center">
+              <MLink
+                href={`/first-access${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`}
+                underline="hover"
+              >
+                {t("auth.login.link.first_access")}
               </MLink>
             </Typography>
           </Stack>

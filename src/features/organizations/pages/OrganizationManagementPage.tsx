@@ -11,9 +11,11 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import AddPlayersDialog from "../components/AddPlayersDialog";
+import InvitePlayerDialog from "../components/InvitePlayerDialog";
 import { useOrganizationManagement } from "../hooks/useOrganizationManagement";
 import MembersSection from "../components/MembersSection";
 import AdminsSection from "../components/AdminsSection";
+import InvitationsList from "../components/InvitationsList";
 import DangerZoneSection from "../components/DangerZoneSection";
 import DeleteOrganizationDialog from "../components/DeleteOrganizationDialog";
 
@@ -26,12 +28,19 @@ export default function OrganizationManagementPage() {
     org,
     players,
     admins,
+    invitations,
     loading,
     error,
     setError,
     actionLoading,
     isAddPlayersOpen,
     setIsAddPlayersOpen,
+    isInviteOpen,
+    setIsInviteOpen,
+    publicInviteLink,
+    fetchInviteLink,
+    invitedUser,
+    setInvitedUser,
     selectedUserIds,
     setSelectedUserIds,
     selectedAdminUserId,
@@ -44,9 +53,11 @@ export default function OrganizationManagementPage() {
     usersNotPlayers,
     playersNotAdmins,
     handleRemovePlayer,
+    handleRevokeInvitation,
     handleAddAdmin,
     handleRemoveAdmin,
     handleAddPlayers,
+    handleInvitePlayer,
     handleDeleteOrganization,
   } = useOrganizationManagement(orgId);
 
@@ -84,6 +95,12 @@ export default function OrganizationManagementPage() {
       )}
 
       <Stack spacing={4}>
+        <InvitationsList
+          invitations={invitations}
+          onRevoke={handleRevokeInvitation}
+          actionLoading={actionLoading}
+        />
+
         <MembersSection
           players={players}
           usersMap={usersMap}
@@ -91,6 +108,7 @@ export default function OrganizationManagementPage() {
             setSelectedUserIds(new Set());
             setIsAddPlayersOpen(true);
           }}
+          onInviteClick={() => setIsInviteOpen(true)}
           onRemovePlayer={handleRemovePlayer}
           actionLoading={actionLoading}
         />
@@ -144,6 +162,17 @@ export default function OrganizationManagementPage() {
         onAddSelected={() => handleAddPlayers()}
         onAddAll={() => handleAddPlayers(usersNotPlayers.map((u) => u.id))}
         onClose={() => setIsAddPlayersOpen(false)}
+      />
+
+      <InvitePlayerDialog
+        open={isInviteOpen}
+        onClose={() => setIsInviteOpen(false)}
+        onInvite={handleInvitePlayer}
+        invitedUser={invitedUser}
+        onClearInvited={() => setInvitedUser(null)}
+        publicInviteLink={publicInviteLink}
+        onFetchPublicLink={fetchInviteLink}
+        loading={actionLoading}
       />
     </Container>
   );

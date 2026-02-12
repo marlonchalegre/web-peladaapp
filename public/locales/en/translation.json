@@ -22,7 +22,8 @@
       },
       "link": {
         "new_user": "New here?",
-        "register": "Create account"
+        "register": "Create account",
+        "first_access": "Invited? Complete registration"
       }
     },
     "register": {
@@ -37,6 +38,17 @@
       "link": {
         "existing_user": "Already have an account?",
         "login": "Login"
+      }
+    },
+    "first_access": {
+      "title": "Complete Registration",
+      "description": "Welcome! You were invited to join an organization. Please fill in your details to finish your registration.",
+      "error": {
+        "failed": "Registration completion failed"
+      },
+      "button": {
+        "submit": "Finish Registration",
+        "loading": "Finishing..."
       }
     },
     "logout": "Logout"
@@ -113,6 +125,10 @@
       "user": "Welcome, {{name}}!"
     },
     "sections": {
+      "pending_invitations": {
+        "title": "Pending Invitations",
+        "invited_to_join": "You have been invited to join this organization."
+      },
       "admin_orgs": {
         "title": "My Organizations (Admin)",
         "empty": "You are not an administrator of any organization."
@@ -156,17 +172,48 @@
         "delete_pelada_failed": "Error deleting pelada"
       }
     },
+    "invitation": {
+      "join_title": "Join Organization",
+      "join_description": "You have been invited to join {{name}}.",
+      "button": {
+        "join": "Join Now"
+      },
+      "error": {
+        "invalid_token": "This invitation link is invalid or has expired.",
+        "join_failed": "Failed to join the organization. Please try again later."
+      }
+    },
     "management": {
       "title": "Manage Organization - {{name}}",
       "sections": {
+        "invitations": "Active Invitations",
         "members": "Members",
         "admins": "Administrators",
         "danger_zone": "Danger Zone"
       },
       "remove_member_confirm": "Are you sure you want to remove this member from the organization?",
+      "revoke_invitation_confirm": "Are you sure you want to revoke this invitation?",
       "delete_description": "Deleting an organization is a permanent action and cannot be undone. All associated data will be lost.",
       "delete_confirm_title": "Delete Organization",
       "delete_confirm_instruction": "Please type the name of the organization \"{{name}}\" to confirm."
+    },
+    "invitation": {
+      "join_title": "Join Organization",
+      "join_description": "You have been invited to join {{name}}.",
+      "empty": "No active invitations.",
+      "public_link_label": "Public Invite Link",
+      "button": {
+        "join": "Join Now"
+      },
+      "status": {
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "rejected": "Rejected"
+      },
+      "error": {
+        "invalid_token": "This invitation link is invalid or has expired.",
+        "join_failed": "Failed to join the organization. Please try again later."
+      }
     },
     "stats": {
       "title": "{{name}} - Statistics",
@@ -201,6 +248,18 @@
         "clear_selection": "Clear selection",
         "add_selected": "Add selected",
         "add_all": "Add all"
+      },
+      "invite_player": {
+        "title": "Invite player",
+        "personal_invite": "Personal Invite",
+        "description": "Enter the email of the player you want to invite to this organization.",
+        "send_invite": "Send invite",
+        "public_link": "Public Invite Link",
+        "public_link_description": "Share this link with anyone to allow them to join the organization.",
+        "generate_link": "Generate Link",
+        "new_user_success": "User invited successfully! Since they don't have an account yet, share the link below with them to complete their registration:",
+        "share_link": "Invitation link:",
+        "existing_user_success": "User {{email}} was already in our database and has been automatically added to the organization."
       },
       "manage_admins": {
         "title": "Manage Administrators - {{name}}",

@@ -22,7 +22,8 @@
       },
       "link": {
         "new_user": "Novo aqui?",
-        "register": "Criar conta"
+        "register": "Criar conta",
+        "first_access": "Convidado? Complete o registro"
       }
     },
     "register": {
@@ -37,6 +38,17 @@
       "link": {
         "existing_user": "Já tem conta?",
         "login": "Entrar"
+      }
+    },
+    "first_access": {
+      "title": "Completar Registro",
+      "description": "Bem-vindo! Você foi convidado para participar de uma organização. Por favor, preencha seus dados para finalizar seu registro.",
+      "error": {
+        "failed": "Falha ao completar o registro"
+      },
+      "button": {
+        "submit": "Finalizar Registro",
+        "loading": "Finalizando..."
       }
     },
     "logout": "Sair"
@@ -113,6 +125,10 @@
       "user": "Bem-vindo, {{name}}!"
     },
     "sections": {
+      "pending_invitations": {
+        "title": "Convites Pendentes",
+        "invited_to_join": "Você foi convidado para participar desta organização."
+      },
       "peladas": {
         "title": "Minhas Peladas",
         "empty": "Nenhuma pelada encontrada."
@@ -162,14 +178,34 @@
         "delete_pelada_failed": "Erro ao excluir pelada"
       }
     },
+    "invitation": {
+      "join_title": "Entrar na Organização",
+      "join_description": "Você foi convidado para participar de {{name}}.",
+      "empty": "Nenhum convite ativo.",
+      "public_link_label": "Link de Convite Público",
+      "button": {
+        "join": "Entrar Agora"
+      },
+      "status": {
+        "pending": "Pendente",
+        "accepted": "Aceito",
+        "rejected": "Rejeitado"
+      },
+      "error": {
+        "invalid_token": "Este link de convite é inválido ou expirou.",
+        "join_failed": "Falha ao entrar na organização. Por favor, tente novamente mais tarde."
+      }
+    },
     "management": {
       "title": "Gerenciar Organização - {{name}}",
       "sections": {
+        "invitations": "Convites Ativos",
         "members": "Membros",
         "admins": "Administradores",
         "danger_zone": "Zona de Perigo"
       },
       "remove_member_confirm": "Tem certeza que deseja remover este membro da organização?",
+      "revoke_invitation_confirm": "Tem certeza que deseja revogar este convite?",
       "delete_description": "Excluir uma organização é uma ação permanente e não pode ser desfeita. Todos os dados associados serão perdidos.",
       "delete_confirm_title": "Excluir Organização",
       "delete_confirm_instruction": "Por favor, digite o nome da organização \"{{name}}\" para confirmar."
@@ -207,6 +243,18 @@
         "clear_selection": "Limpar seleção",
         "add_selected": "Adicionar selecionados",
         "add_all": "Adicionar todos"
+      },
+      "invite_player": {
+        "title": "Convidar jogador",
+        "personal_invite": "Convite Pessoal",
+        "description": "Insira o email do jogador que você deseja convidar para esta organização.",
+        "send_invite": "Enviar convite",
+        "public_link": "Link de Convite Público",
+        "public_link_description": "Compartilhe este link com qualquer pessoa para permitir que ela entre na organização.",
+        "generate_link": "Gerar Link",
+        "new_user_success": "Usuário convidado com sucesso! Como ele ainda não possui conta, compartilhe o link abaixo com ele para que complete o registro:",
+        "share_link": "Link de convite:",
+        "existing_user_success": "O usuário {{email}} já estava em nossa base de dados e foi adicionado automaticamente à organização."
       },
       "manage_admins": {
         "title": "Gerenciar Administradores - {{name}}",

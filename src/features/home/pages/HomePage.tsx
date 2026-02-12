@@ -8,6 +8,7 @@ import PeladasList from "../components/PeladasList";
 import AdminOrganizationsList from "../components/AdminOrganizationsList";
 import MemberOrganizationsList from "../components/MemberOrganizationsList";
 import CreateOrganizationDialog from "../components/CreateOrganizationDialog";
+import PendingInvitations from "../components/PendingInvitations";
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -19,10 +20,12 @@ export default function HomePage() {
     error,
     adminOrgs,
     memberOrgs,
+    pendingInvitations,
     peladas,
     peladasPage,
     peladasTotalPages,
     handlePeladaPageChange,
+    acceptInvitation,
     createOrganization,
   } = useHomeDashboard();
 
@@ -76,6 +79,11 @@ export default function HomePage() {
         <Loading message={t("common.loading")} />
       ) : (
         <>
+          <PendingInvitations 
+            invitations={pendingInvitations} 
+            onAccept={acceptInvitation} 
+          />
+
           <PeladasList
             peladas={peladas}
             page={peladasPage}

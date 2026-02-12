@@ -2,13 +2,7 @@ import { useState, useCallback, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api } from "../../../shared/api/client";
-import {
-  createApi,
-  type Organization,
-  type User,
-  type Player,
-  type OrganizationAdmin,
-} from "../../../shared/api/endpoints";
+import { createApi, type Organization, type User, type Player, type OrganizationAdmin, type OrganizationInvitation } from "../../../shared/api/endpoints";
 
 const endpoints = createApi(api);
 
@@ -19,11 +13,18 @@ export function useOrganizationManagement(orgId: number) {
   const [org, setOrg] = useState<Organization | null>(null);
   const [players, setPlayers] = useState<Player[]>([]);
   const [admins, setAdmins] = useState<OrganizationAdmin[]>([]);
+  const [invitations, setInvitations] = useState<OrganizationInvitation[]>([]);
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [isAddPlayersOpen, setIsAddPlayersOpen] = useState(false);
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [publicInviteLink, setPublicInviteLink] = useState<string | null>(null);
+  const [invitedUser, setInvitedUser] = useState<{
+    email: string;
+    isNew: boolean;
+  } | null>(null);
   const [selectedUserIds, setSelectedUserIds] = useState<Set<number>>(
     new Set(),
   );
@@ -41,15 +42,17 @@ export function useOrganizationManagement(orgId: number) {
     setLoading(true);
     setError(null);
     try {
-      const [o, p, a, u] = await Promise.all([
+      const [o, p, a, i, u] = await Promise.all([
         endpoints.getOrganization(orgId),
         endpoints.listPlayersByOrg(orgId),
         endpoints.listAdminsByOrganization(orgId),
+        endpoints.listOrganizationInvitations(orgId),
         endpoints.listUsers(),
       ]);
       setOrg(o);
       setPlayers(p);
       setAdmins(a);
+      setInvitations(i);
       setAllUsers(u);
     } catch (err) {
       const message =
@@ -79,6 +82,25 @@ export function useOrganizationManagement(orgId: number) {
         err instanceof Error
           ? err.message
           : t("organizations.error.delete_failed");
+      setError(message);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleRevokeInvitation = async (invitationId: number) => {
+    if (!window.confirm(t("organizations.management.revoke_invitation_confirm", "Are you sure you want to revoke this invitation?")))
+      return;
+
+    setActionLoading(true);
+    try {
+      await endpoints.revokeInvitation(orgId, invitationId);
+      await fetchData();
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : t("organizations.error.revoke_failed", "Failed to revoke invitation");
       setError(message);
     } finally {
       setActionLoading(false);
@@ -153,6 +175,33 @@ export function useOrganizationManagement(orgId: number) {
     }
   };
 
+  const fetchInviteLink = useCallback(async () => {
+    setActionLoading(true);
+    try {
+      const { token } = await endpoints.getInviteLink(orgId);
+      setPublicInviteLink(`${window.location.origin}/join/${token}`);
+    } catch (err) {
+      console.error("Failed to fetch invite link", err);
+    } finally {
+      setActionLoading(false);
+    }
+  }, [orgId]);
+
+  const handleInvitePlayer = async (email: string) => {
+    setActionLoading(true);
+    setError(null);
+    try {
+      const result = await endpoints.invitePlayer(orgId, email);
+      setInvitedUser({ email: result.email, isNew: result.is_new_user });
+      await fetchData();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const handleDeleteOrganization = async () => {
     if (!org || confirmOrgName !== org.name) return;
     setActionLoading(true);
@@ -197,6 +246,7 @@ export function useOrganizationManagement(orgId: number) {
     org,
     players,
     admins,
+    invitations,
     allUsers,
     loading,
     error,
@@ -204,6 +254,12 @@ export function useOrganizationManagement(orgId: number) {
     actionLoading,
     isAddPlayersOpen,
     setIsAddPlayersOpen,
+    isInviteOpen,
+    setIsInviteOpen,
+    publicInviteLink,
+    fetchInviteLink,
+    invitedUser,
+    setInvitedUser,
     selectedUserIds,
     setSelectedUserIds,
     selectedAdminUserId,
@@ -216,9 +272,11 @@ export function useOrganizationManagement(orgId: number) {
     usersNotPlayers,
     playersNotAdmins,
     handleRemovePlayer,
+    handleRevokeInvitation,
     handleAddAdmin,
     handleRemoveAdmin,
     handleAddPlayers,
+    handleInvitePlayer,
     handleDeleteOrganization,
   };
 }

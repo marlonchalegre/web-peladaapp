@@ -24,6 +24,13 @@ vi.mock("../../../app/providers/AuthContext", () => ({
 describe("HomePage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    (api.getPaginated as Mock).mockResolvedValue({
+      data: [],
+      total: 0,
+      page: 1,
+      perPage: 5,
+      totalPages: 0,
+    });
   });
 
   it("lists organizations where user is admin or player", async () => {
@@ -36,6 +43,7 @@ describe("HomePage", () => {
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/users/1/organizations")
         return Promise.resolve(mockUserOrgs);
+      if (path === "/api/invitations/pending") return Promise.resolve([]);
       return Promise.resolve([]);
     });
 
@@ -61,6 +69,7 @@ describe("HomePage", () => {
       if (path === "/api/users/1/organizations") {
         return Promise.resolve([]);
       }
+      if (path === "/api/invitations/pending") return Promise.resolve([]);
       return Promise.resolve([]);
     });
 
@@ -145,6 +154,7 @@ describe("HomePage", () => {
   it("renders empty state messages when user has no organizations", async () => {
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/users/1/organizations") return Promise.resolve([]);
+      if (path === "/api/invitations/pending") return Promise.resolve([]);
       return Promise.resolve([]);
     });
 

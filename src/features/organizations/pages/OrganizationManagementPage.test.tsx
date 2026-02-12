@@ -60,6 +60,8 @@ describe("OrganizationManagementPage", () => {
         return Promise.resolve(mockPlayers);
       if (url === "/api/organizations/1/admins")
         return Promise.resolve(mockAdmins);
+      if (url === "/api/organizations/1/invitations")
+        return Promise.resolve([]);
       if (url === "/api/users") return Promise.resolve(mockUsers);
       return Promise.reject(new Error(`Unhandled GET: ${url}`));
     });
@@ -202,6 +204,8 @@ describe("OrganizationManagementPage", () => {
       if (url === "/api/organizations/1") return Promise.resolve(mockOrg);
       if (url === "/api/organizations/1/players")
         return Promise.resolve(mockPlayers);
+      if (url === "/api/organizations/1/invitations")
+        return Promise.resolve([]);
       if (url === "/api/users") return Promise.resolve(mockUsers);
       return Promise.reject(new Error(`Unhandled GET: ${url}`));
     });

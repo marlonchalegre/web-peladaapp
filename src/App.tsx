@@ -28,8 +28,10 @@ import { useTranslation } from "react-i18next";
 import ProtectedRoute from "./app/routing/ProtectedRoute";
 import LoginPage from "./features/auth/pages/LoginPage";
 import RegisterPage from "./features/auth/pages/RegisterPage";
+import FirstAccessPage from "./features/auth/pages/FirstAccessPage";
 import HomePage from "./features/home/pages/HomePage";
 import OrganizationDetailPage from "./features/organizations/pages/OrganizationDetailPage";
+import JoinOrganizationPage from "./features/organizations/pages/JoinOrganizationPage";
 import OrganizationStatisticsPage from "./features/organizations/pages/OrganizationStatisticsPage";
 import OrganizationManagementPage from "./features/organizations/pages/OrganizationManagementPage";
 import PeladaDetailPage from "./features/peladas/pages/PeladaDetailPage";
@@ -196,10 +198,12 @@ function AppLayout() {
             {/* Rotas públicas sem Container para permitir centralização própria */}
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/first-access" element={<FirstAccessPage />} />
 
             {/* Rotas protegidas com Container */}
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<HomePage />} />
+              <Route path="/join/:token" element={<JoinOrganizationPage />} />
               <Route
                 path="/organizations/:id"
                 element={

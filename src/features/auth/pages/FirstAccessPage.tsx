@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import {
   Box,
@@ -9,30 +9,49 @@ import {
   Typography,
   Alert,
   Link as MLink,
+  MenuItem,
 } from "@mui/material";
-import { register, login } from "../../../shared/api/client";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { api } from "../../../shared/api/client";
+import { createApi } from "../../../shared/api/endpoints";
 
-export default function RegisterPage() {
+const endpoints = createApi(api);
+
+const POSITIONS = ["Striker", "Midfielder", "Defender", "Goalkeeper"];
+
+export default function FirstAccessPage() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const { t } = useTranslation();
   const { signIn } = useAuth();
+  const [searchParams] = useSearchParams();
+
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(searchParams.get("email") || "");
   const [password, setPassword] = useState("");
+  const [position, setPosition] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const emailParam = searchParams.get("email");
+    if (emailParam) {
+      setEmail(emailParam);
+    }
+  }, [searchParams]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
     setLoading(true);
     try {
-      await register(name, email, password);
-      const { token, user } = await login(email, password);
+      const { token, user } = await endpoints.firstAccess({
+        name,
+        email,
+        password,
+        position: position || undefined,
+      });
       signIn(token, user);
       const redirect = searchParams.get("redirect") || "/";
       navigate(redirect);
@@ -40,7 +59,7 @@ export default function RegisterPage() {
       const message =
         error instanceof Error
           ? error.message
-          : t("auth.register.error.failed");
+          : t("auth.first_access.error.failed");
       setError(message);
     } finally {
       setLoading(false);
@@ -66,18 +85,12 @@ export default function RegisterPage() {
               textAlign="center"
               gutterBottom
             >
-              {t("auth.register.title")}
+              {t("auth.first_access.title")}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" textAlign="center">
+              {t("auth.first_access.description")}
             </Typography>
             {error && <Alert severity="error">{error}</Alert>}
-            <TextField
-              id="name"
-              label={t("common.fields.name")}
-              autoComplete="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              fullWidth
-            />
             <TextField
               id="email"
               label={t("common.fields.email")}
@@ -87,6 +100,17 @@ export default function RegisterPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               fullWidth
+              disabled={!!searchParams.get("email")}
+            />
+            <TextField
+              id="name"
+              label={t("common.fields.name")}
+              autoComplete="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              fullWidth
+              autoFocus
             />
             <TextField
               id="password"
@@ -98,6 +122,23 @@ export default function RegisterPage() {
               required
               fullWidth
             />
+            <TextField
+              id="position"
+              select
+              label={t("common.fields.position")}
+              value={position}
+              onChange={(e) => setPosition(e.target.value)}
+              fullWidth
+            >
+              <MenuItem value="">
+                <em>{t("common.select_placeholder")}</em>
+              </MenuItem>
+              {POSITIONS.map((pos) => (
+                <MenuItem key={pos} value={pos}>
+                  {t(`common.positions.${pos.toLowerCase()}`)}
+                </MenuItem>
+              ))}
+            </TextField>
             <Button
               type="submit"
               variant="contained"
@@ -105,11 +146,10 @@ export default function RegisterPage() {
               size="large"
             >
               {loading
-                ? t("auth.register.button.loading")
-                : t("auth.register.button.submit")}
+                ? t("auth.first_access.button.loading")
+                : t("auth.first_access.button.submit")}
             </Button>
             <Typography variant="body2" textAlign="center">
-              {t("auth.register.link.existing_user")}{" "}
               <MLink
                 href={`/login${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`}
                 underline="hover"

@@ -97,6 +97,16 @@ export type Attendance = {
   player: Player & { user: User };
 };
 
+export type OrganizationInvitation = {
+  id: number;
+  organization_id: number;
+  organization_name?: string;
+  email?: string;
+  token: string;
+  status: "pending" | "accepted" | "rejected";
+  created_at: string;
+};
+
 export type PeladaFullDetailsResponse = {
   pelada: Pelada;
   teams: (Team & { players: (Player & { user: User })[] })[];
@@ -128,6 +138,15 @@ export function createApi(client: ApiClient) {
       client.post<Organization>("/api/organizations", { name }),
     deleteOrganization: (id: number) =>
       client.delete(`/api/organizations/${id}`),
+    invitePlayer: (id: number, email: string) =>
+      client.post<{
+        user_id: number;
+        email: string;
+        is_new_user: boolean;
+        organization_id: number;
+      }>(`/api/organizations/${id}/invite`, { email }),
+    getInviteLink: (id: number) =>
+      client.get<{ token: string }>(`/api/organizations/${id}/invite-link`),
     getOrganizationStatistics: (id: number, year: number) =>
       client.get<
         {
@@ -257,15 +276,32 @@ export function createApi(client: ApiClient) {
     // Users
     listUsers: () => client.get<User[]>("/api/users"),
 
+    firstAccess: (payload: {
+      name: string;
+      email: string;
+      password?: string;
+      position?: string;
+    }) => client.post<{ token: string; user: User }>("/auth/first-access", payload),
+
     // Organization Admins
     listAdminsByOrganization: (organizationId: number) =>
       client.get<OrganizationAdmin[]>(
         `/api/organizations/${organizationId}/admins`,
       ),
+    listOrganizationInvitations: (organizationId: number) =>
+      client.get<OrganizationInvitation[]>(`/api/organizations/${organizationId}/invitations`),
+    revokeInvitation: (organizationId: number, invitationId: number) =>
+      client.delete(`/api/organizations/${organizationId}/invitations/${invitationId}`),
     listUserOrganizations: (userId: number) =>
       client.get<(Organization & { role: "admin" | "player" })[]>(
         `/api/users/${userId}/organizations`,
       ),
+    listPendingInvitations: () =>
+      client.get<OrganizationInvitation[]>("/api/invitations/pending"),
+    getInvitationInfo: (token: string) =>
+      client.get<OrganizationInvitation>(`/auth/invitations/${token}`),
+    acceptInvitation: (token: string) =>
+      client.post<{ organization_id: number }>(`/api/invitations/${token}/accept`, {}),
     addOrganizationAdmin: (organizationId: number, userId: number) =>
       client.post<OrganizationAdmin>(
         `/api/organizations/${organizationId}/admins`,

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { api } from "../../../shared/api/client";
-import { createApi, type Pelada } from "../../../shared/api/endpoints";
+import { createApi, type Pelada, type OrganizationInvitation } from "../../../shared/api/endpoints";
 import { useTranslation } from "react-i18next";
 
 const endpoints = createApi(api);
@@ -18,6 +18,7 @@ export function useHomeDashboard() {
 
   const [adminOrgs, setAdminOrgs] = useState<OrganizationWithRole[]>([]);
   const [memberOrgs, setMemberOrgs] = useState<OrganizationWithRole[]>([]);
+  const [pendingInvitations, setPendingInvitations] = useState<OrganizationInvitation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,6 +45,16 @@ export function useHomeDashboard() {
     },
     [user],
   );
+
+  const fetchPendingInvitations = useCallback(async () => {
+    if (!user) return;
+    try {
+      const invites = await endpoints.listPendingInvitations();
+      setPendingInvitations(invites);
+    } catch (err) {
+      console.error("Failed to fetch pending invitations", err);
+    }
+  }, [user]);
 
   const fetchOrganizations = useCallback(async () => {
     if (!user) return;
@@ -73,7 +84,8 @@ export function useHomeDashboard() {
   useEffect(() => {
     fetchOrganizations();
     fetchPeladas(1);
-  }, [fetchOrganizations, fetchPeladas]);
+    fetchPendingInvitations();
+  }, [fetchOrganizations, fetchPeladas, fetchPendingInvitations]);
 
   const handlePeladaPageChange = (
     _event: React.ChangeEvent<unknown>,
@@ -81,6 +93,16 @@ export function useHomeDashboard() {
   ) => {
     fetchPeladas(value);
   };
+
+  const acceptInvitation = useCallback(async (token: string) => {
+    try {
+      await endpoints.acceptInvitation(token);
+      await fetchPendingInvitations();
+      await fetchOrganizations();
+    } catch (err) {
+      console.error("Failed to accept invitation", err);
+    }
+  }, [fetchPendingInvitations, fetchOrganizations]);
 
   const createOrganization = useCallback(
     async (name: string) => {
@@ -95,11 +117,13 @@ export function useHomeDashboard() {
     error,
     adminOrgs,
     memberOrgs,
+    pendingInvitations,
     peladas,
     peladasPage,
     peladasTotalPages,
     fetchOrganizations,
     handlePeladaPageChange,
+    acceptInvitation,
     createOrganization,
   };
 }
