@@ -50,7 +50,6 @@ export default function OrganizationManagementPage() {
     confirmOrgName,
     setConfirmOrgName,
     usersMap,
-    usersNotPlayers,
     playersNotAdmins,
     handleRemovePlayer,
     handleRevokeInvitation,
@@ -146,10 +145,9 @@ export default function OrganizationManagementPage() {
 
       <AddPlayersDialog
         open={isAddPlayersOpen}
-        users={usersNotPlayers}
         selectedIds={selectedUserIds}
-        onSelectAll={() =>
-          setSelectedUserIds(new Set(usersNotPlayers.map((u) => u.id)))
+        onSelectAll={(ids) =>
+          setSelectedUserIds(new Set(ids))
         }
         onClear={() => setSelectedUserIds(new Set())}
         onToggle={(id, checked) =>
@@ -161,8 +159,8 @@ export default function OrganizationManagementPage() {
           })
         }
         onAddSelected={() => handleAddPlayers()}
-        onAddAll={() => handleAddPlayers(usersNotPlayers.map((u) => u.id))}
         onClose={() => setIsAddPlayersOpen(false)}
+        excludeUserIds={new Set(players.map(p => p.user_id))}
       />
 
       <InvitePlayerDialog

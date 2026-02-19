@@ -79,6 +79,8 @@
     "back_to_org": "Back to Organization",
     "start": "Start",
     "sending": "Sending...",
+    "selected": "{{count}} selected",
+    "load_more": "Load more",
     "sub": "Sub",
     "matches_played": "Matches",
     "team": "Team",
@@ -245,10 +247,11 @@
     "dialog": {
       "add_players": {
         "title": "Add players",
-        "empty_users": "No users available.",
-        "select_all": "Select all",
+        "empty_users": "Type a name or email to search for users.",
+        "no_results": "No users found for this search.",
+        "select_all": "Select results",
         "clear_selection": "Clear selection",
-        "add_selected": "Add selected",
+        "add_selected": "Add selected ({{count}})",
         "add_all": "Add all"
       },
       "invite_player": {

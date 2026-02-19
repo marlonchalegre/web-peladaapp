@@ -275,6 +275,8 @@ export function createApi(client: ApiClient) {
 
     // Users
     listUsers: () => client.get<User[]>("/api/users"),
+    searchUsers: (query: string, page: number = 1, perPage: number = 20) =>
+      client.getPaginated<User[]>("/api/users/search", { q: query, page, per_page: perPage }),
 
     firstAccess: (payload: {
       name: string;

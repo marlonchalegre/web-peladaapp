@@ -9,79 +9,185 @@ import {
   ListItemText,
   Checkbox,
   Stack,
+  TextField,
+  CircularProgress,
+  Box,
+  Typography,
 } from "@mui/material";
-import type { User } from "../../../shared/api/endpoints";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { createApi, type User } from "../../../shared/api/endpoints";
+import { api } from "../../../shared/api/client";
 import { useTranslation } from "react-i18next";
+
+const endpoints = createApi(api);
 
 type Props = {
   open: boolean;
-  users: User[];
   selectedIds: Set<number>;
-  onSelectAll: () => void;
+  onSelectAll: (ids: number[]) => void;
   onClear: () => void;
   onToggle: (userId: number, checked: boolean) => void;
   onAddSelected: () => Promise<void>;
-  onAddAll: () => Promise<void>;
   onClose: () => void;
+  excludeUserIds?: Set<number>;
 };
 
 export default function AddPlayersDialog({
   open,
-  users,
   selectedIds,
   onSelectAll,
   onClear,
   onToggle,
   onAddSelected,
-  onAddAll,
   onClose,
+  excludeUserIds = new Set(),
 }: Props) {
   const { t } = useTranslation();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [total, setTotal] = useState(0);
+
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const fetchUsers = useCallback(
+    async (query: string, pageNum: number, append: boolean = false) => {
+      setLoading(true);
+      try {
+        const response = await endpoints.searchUsers(query, pageNum, 10);
+        const filteredData = response.data.filter(
+          (u) => !excludeUserIds.has(u.id),
+        );
+        if (append) {
+          setUsers((prev) => [...prev, ...filteredData]);
+        } else {
+          setUsers(filteredData);
+        }
+        setTotal(response.total);
+        setHasMore(pageNum < response.totalPages);
+      } catch (error) {
+        console.error("Failed to search users", error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [excludeUserIds],
+  );
+
+  useEffect(() => {
+    if (open) {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      debounceTimerRef.current = setTimeout(() => {
+        setPage(1);
+        fetchUsers(searchQuery, 1);
+      }, 300);
+    }
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [searchQuery, open, fetchUsers]);
+
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchUsers(searchQuery, nextPage, true);
+  };
+
+  const handleSelectAllFound = () => {
+    const allIds = users.map((u) => u.id);
+    onSelectAll(allIds);
+  };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>{t("organizations.dialog.add_players.title")}</DialogTitle>
       <DialogContent dividers>
-        {users.length === 0 ? (
-          <ListItemText
-            primary={t("organizations.dialog.add_players.empty_users")}
+        <Stack spacing={2}>
+          <TextField
+            fullWidth
+            size="small"
+            placeholder={t("common.fields.name") + " / Email"}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            autoFocus
           />
-        ) : (
-          <Stack spacing={1}>
-            <Stack direction="row" spacing={1}>
-              <Button variant="outlined" size="small" onClick={onSelectAll}>
-                {t("organizations.dialog.add_players.select_all")}
-              </Button>
-              <Button variant="text" size="small" onClick={onClear}>
-                {t("organizations.dialog.add_players.clear_selection")}
-              </Button>
-            </Stack>
-            <List sx={{ maxHeight: 320, overflow: "auto" }}>
-              {users.map((u) => (
-                <ListItem
-                  key={`user-${u.id}`}
-                  secondaryAction={
-                    <Checkbox
-                      edge="end"
-                      checked={selectedIds.has(u.id)}
-                      onChange={(e) => onToggle(u.id, e.target.checked)}
-                    />
-                  }
-                >
-                  <ListItemText primary={u.name} secondary={u.email} />
-                </ListItem>
-              ))}
-            </List>
+
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={handleSelectAllFound}
+              disabled={users.length === 0}
+            >
+              {t("organizations.dialog.add_players.select_all")}
+            </Button>
+            <Button
+              variant="text"
+              size="small"
+              onClick={onClear}
+              disabled={selectedIds.size === 0}
+            >
+              {t("organizations.dialog.add_players.clear_selection")}
+            </Button>
+            <Box sx={{ flexGrow: 1 }} />
+            <Typography variant="caption" color="text.secondary">
+              {t("common.selected", { count: selectedIds.size })}
+            </Typography>
           </Stack>
-        )}
+
+          <List sx={{ maxHeight: 320, minHeight: 100, overflow: "auto" }}>
+            {users.length === 0 && !loading && (
+              <Box sx={{ p: 2, textAlign: "center" }}>
+                <Typography color="text.secondary">
+                  {searchQuery
+                    ? t("organizations.dialog.add_players.no_results")
+                    : t("organizations.dialog.add_players.empty_users")}
+                </Typography>
+              </Box>
+            )}
+            {users.map((u) => (
+              <ListItem
+                key={`user-${u.id}`}
+                secondaryAction={
+                  <Checkbox
+                    edge="end"
+                    checked={selectedIds.has(u.id)}
+                    onChange={(e) => onToggle(u.id, e.target.checked)}
+                  />
+                }
+              >
+                <ListItemText primary={u.name} secondary={u.email} />
+              </ListItem>
+            ))}
+            {loading && (
+              <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
+                <CircularProgress size={24} />
+              </Box>
+            )}
+            {hasMore && !loading && (
+              <Button fullWidth onClick={handleLoadMore}>
+                {t("common.load_more")}
+              </Button>
+            )}
+          </List>
+        </Stack>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>{t("common.cancel")}</Button>
-        <Button onClick={onAddSelected} variant="contained">
-          {t("organizations.dialog.add_players.add_selected")}
-        </Button>
-        <Button onClick={onAddAll} variant="outlined">
-          {t("organizations.dialog.add_players.add_all")}
+        <Button
+          onClick={onAddSelected}
+          variant="contained"
+          disabled={selectedIds.size === 0}
+        >
+          {t("organizations.dialog.add_players.add_selected", {
+            count: selectedIds.size,
+          })}
         </Button>
       </DialogActions>
     </Dialog>

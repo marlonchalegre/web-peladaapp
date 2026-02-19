@@ -79,6 +79,8 @@
     "back_to_org": "Voltar para Organização",
     "start": "Iniciar",
     "sending": "Enviando...",
+    "selected": "{{count}} selecionado(s)",
+    "load_more": "Carregar mais",
     "sub": "Sub",
     "matches_played": "Partidas",
     "team": "Time",
@@ -240,10 +242,11 @@
     "dialog": {
       "add_players": {
         "title": "Adicionar jogadores",
-        "empty_users": "Nenhum usuário disponível.",
-        "select_all": "Selecionar todos",
+        "empty_users": "Digite um nome ou email para buscar usuários.",
+        "no_results": "Nenhum usuário encontrado para esta busca.",
+        "select_all": "Selecionar resultados",
         "clear_selection": "Limpar seleção",
-        "add_selected": "Adicionar selecionados",
+        "add_selected": "Adicionar selecionados ({{count}})",
         "add_all": "Adicionar todos"
       },
       "invite_player": {

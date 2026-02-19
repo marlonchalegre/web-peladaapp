@@ -14,7 +14,6 @@ export function useOrganizationManagement(orgId: number) {
   const [players, setPlayers] = useState<Player[]>([]);
   const [admins, setAdmins] = useState<OrganizationAdmin[]>([]);
   const [invitations, setInvitations] = useState<OrganizationInvitation[]>([]);
-  const [allUsers, setAllUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,18 +41,16 @@ export function useOrganizationManagement(orgId: number) {
     setLoading(true);
     setError(null);
     try {
-      const [o, p, a, i, u] = await Promise.all([
+      const [o, p, a, i] = await Promise.all([
         endpoints.getOrganization(orgId),
         endpoints.listPlayersByOrg(orgId),
         endpoints.listAdminsByOrganization(orgId),
         endpoints.listOrganizationInvitations(orgId),
-        endpoints.listUsers(),
       ]);
       setOrg(o);
       setPlayers(p);
       setAdmins(a);
       setInvitations(i);
-      setAllUsers(u);
     } catch (err) {
       const message =
         err instanceof Error
@@ -217,28 +214,29 @@ export function useOrganizationManagement(orgId: number) {
     }
   };
 
-  const usersMap = useMemo(
-    () => new Map(allUsers.map((u) => [u.id, u])),
-    [allUsers],
-  );
-  const playerUserIds = useMemo(
-    () => new Set(players.map((p) => p.user_id)),
-    [players],
-  );
-  const usersNotPlayers = useMemo(
-    () => allUsers.filter((u) => !playerUserIds.has(u.id)),
-    [allUsers, playerUserIds],
-  );
+  const usersMap = useMemo(() => {
+    const map = new Map<number, User>();
+    // Note: In a real app, if players/admins don't have full user data, 
+    // we'd need a way to fetch it. For now, we assume they have enough
+    // or we'll fetch details as needed.
+    admins.forEach(a => {
+      if (a.user_id && a.user_name && a.user_email) {
+        map.set(a.user_id, { id: a.user_id, name: a.user_name, email: a.user_email });
+      }
+    });
+    return map;
+  }, [admins]);
 
   const adminUserIds = useMemo(
     () => new Set(admins.map((a) => a.user_id)),
     [admins],
   );
+  
   const playersNotAdmins = useMemo(
     () =>
       players
-        .map((p) => usersMap.get(p.user_id))
-        .filter((u): u is User => u !== undefined && !adminUserIds.has(u.id)),
+        .map((p) => usersMap.get(p.user_id) || { id: p.user_id, name: `User #${p.user_id}`, email: "" })
+        .filter((u): u is User => !adminUserIds.has(u.id)),
     [players, usersMap, adminUserIds],
   );
 
@@ -247,7 +245,6 @@ export function useOrganizationManagement(orgId: number) {
     players,
     admins,
     invitations,
-    allUsers,
     loading,
     error,
     setError,
@@ -269,7 +266,6 @@ export function useOrganizationManagement(orgId: number) {
     confirmOrgName,
     setConfirmOrgName,
     usersMap,
-    usersNotPlayers,
     playersNotAdmins,
     handleRemovePlayer,
     handleRevokeInvitation,
