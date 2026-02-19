@@ -58,7 +58,9 @@ describe("PeladaDetailPage", () => {
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/peladas/1/full-details")
         return Promise.resolve(mockFullDetails);
-      return Promise.reject(new Error("Not found"));
+      if (path === "/api/organizations/101/admins")
+        return Promise.resolve([]);
+      return Promise.reject(new Error(`Not found: ${path}`));
     });
     (api.post as Mock).mockImplementation((path: string) => {
       if (path === "/api/scores/normalized")

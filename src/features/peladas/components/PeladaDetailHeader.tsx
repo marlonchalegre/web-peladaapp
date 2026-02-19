@@ -40,6 +40,7 @@ export default function PeladaDetailHeader({
           component={RouterLink}
           to={`/organizations/${pelada.organization_id}`}
           sx={{ mr: 2 }}
+          aria-label={t("common.back_to_org")}
         >
           <ArrowBackIcon />
         </IconButton>

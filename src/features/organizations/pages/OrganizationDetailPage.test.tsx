@@ -48,7 +48,8 @@ describe("OrganizationDetailPage", () => {
 
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/organizations/1") return Promise.resolve(mockOrg);
-      return Promise.reject(new Error("Not found"));
+      if (path === "/api/organizations/1/admins") return Promise.resolve([]);
+      return Promise.reject(new Error(`Not found: ${path}`));
     });
     (api.getPaginated as Mock).mockImplementation((path: string) => {
       if (path === "/api/organizations/1/peladas")
@@ -99,7 +100,8 @@ describe("OrganizationDetailPage", () => {
 
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/organizations/1") return Promise.resolve(mockOrg);
-      return Promise.reject(new Error("Not found"));
+      if (path === "/api/organizations/1/admins") return Promise.resolve([]);
+      return Promise.reject(new Error(`Not found: ${path}`));
     });
     (api.getPaginated as Mock).mockImplementation(
       (path: string, params: { page: number }) => {
@@ -151,7 +153,8 @@ describe("OrganizationDetailPage", () => {
 
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/organizations/1") return Promise.resolve(mockOrg);
-      return Promise.reject(new Error("Not found"));
+      if (path === "/api/organizations/1/admins") return Promise.resolve([]);
+      return Promise.reject(new Error(`Not found: ${path}`));
     });
     (api.getPaginated as Mock).mockImplementation((path: string) => {
       if (path === "/api/organizations/1/peladas")

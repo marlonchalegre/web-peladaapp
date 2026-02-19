@@ -66,6 +66,7 @@ export default function TeamCard({
     <Paper
       elevation={0}
       variant="outlined"
+      data-testid="team-card"
       sx={{
         p: 2,
         height: "100%",
@@ -115,6 +116,7 @@ export default function TeamCard({
           <Typography
             variant="h6"
             sx={{ fontWeight: "bold", fontSize: "1.1rem" }}
+            data-testid="team-card-name"
           >
             {team.name}
           </Typography>

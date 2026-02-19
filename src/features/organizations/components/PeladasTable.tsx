@@ -34,7 +34,7 @@ export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
         </TableHead>
         <TableBody>
           {peladas.map((p) => (
-            <TableRow key={`pelada-${p.id}`} hover>
+            <TableRow key={`pelada-${p.id}`} hover data-testid="pelada-row">
               <TableCell>
                 <MuiLink
                   component={RouterLink}
