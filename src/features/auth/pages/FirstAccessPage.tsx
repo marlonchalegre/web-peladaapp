@@ -87,7 +87,11 @@ export default function FirstAccessPage() {
             >
               {t("auth.first_access.title")}
             </Typography>
-            <Typography variant="body2" color="text.secondary" textAlign="center">
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              textAlign="center"
+            >
               {t("auth.first_access.description")}
             </Typography>
             {error && <Alert severity="error">{error}</Alert>}

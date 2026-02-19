@@ -79,9 +79,9 @@ export default function HomePage() {
         <Loading message={t("common.loading")} />
       ) : (
         <>
-          <PendingInvitations 
-            invitations={pendingInvitations} 
-            onAccept={acceptInvitation} 
+          <PendingInvitations
+            invitations={pendingInvitations}
+            onAccept={acceptInvitation}
           />
 
           <PeladasList

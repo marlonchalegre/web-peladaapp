@@ -1,11 +1,4 @@
-import {
-  Box,
-  Typography,
-  Paper,
-  Button,
-  Stack,
-  Divider,
-} from "@mui/material";
+import { Box, Typography, Paper, Button, Stack, Divider } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import { useTranslation } from "react-i18next";
 import { type OrganizationInvitation } from "../../../shared/api/endpoints";
@@ -43,7 +36,10 @@ export default function PendingInvitations({ invitations, onAccept }: Props) {
                   {inv.organization_name}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {t("home.sections.pending_invitations.invited_to_join", "Você foi convidado para participar desta organização.")}
+                  {t(
+                    "home.sections.pending_invitations.invited_to_join",
+                    "Você foi convidado para participar desta organização.",
+                  )}
                 </Typography>
               </Box>
               <Button

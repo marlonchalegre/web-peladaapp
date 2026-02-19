@@ -103,7 +103,9 @@ export default function InvitePlayerDialog({
                 {t("organizations.dialog.invite_player.public_link")}
               </Typography>
               <Typography variant="body2" color="text.secondary" gutterBottom>
-                {t("organizations.dialog.invite_player.public_link_description")}
+                {t(
+                  "organizations.dialog.invite_player.public_link_description",
+                )}
               </Typography>
               {publicInviteLink ? (
                 <Box

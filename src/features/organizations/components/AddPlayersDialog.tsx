@@ -48,7 +48,6 @@ export default function AddPlayersDialog({
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [total, setTotal] = useState(0);
 
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -65,7 +64,6 @@ export default function AddPlayersDialog({
         } else {
           setUsers(filteredData);
         }
-        setTotal(response.total);
         setHasMore(pageNum < response.totalPages);
       } catch (error) {
         console.error("Failed to search users", error);

@@ -40,7 +40,7 @@ describe("InvitationsList", () => {
   it("calls onRevoke when delete button is clicked", () => {
     render(<InvitationsList {...defaultProps} />);
 
-    const deleteButtons = screen.getAllByTitle("common.revoke");
+    const deleteButtons = screen.getAllByLabelText("common.revoke");
     fireEvent.click(deleteButtons[0]);
 
     expect(defaultProps.onRevoke).toHaveBeenCalledWith(1);
@@ -63,7 +63,7 @@ describe("InvitationsList", () => {
 
     render(<InvitationsList {...defaultProps} />);
 
-    const copyButtons = screen.getAllByTitle("common.copy_link");
+    const copyButtons = screen.getAllByLabelText("common.copy_link");
     fireEvent.click(copyButtons[0]);
 
     expect(writeText).toHaveBeenCalledWith(

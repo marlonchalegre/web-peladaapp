@@ -23,21 +23,25 @@ describe("PendingInvitations", () => {
 
   it("renders pending invitations", () => {
     render(<PendingInvitations {...defaultProps} />);
-    expect(screen.getByText("home.sections.pending_invitations.title")).toBeInTheDocument();
+    expect(
+      screen.getByText("home.sections.pending_invitations.title"),
+    ).toBeInTheDocument();
     expect(screen.getByText("Test Org")).toBeInTheDocument();
   });
 
   it("calls onAccept when button is clicked", () => {
     render(<PendingInvitations {...defaultProps} />);
-    
+
     const acceptButton = screen.getByText("common.accept");
     fireEvent.click(acceptButton);
-    
+
     expect(defaultProps.onAccept).toHaveBeenCalledWith("token-123");
   });
 
   it("renders nothing when no invitations", () => {
-    const { container } = render(<PendingInvitations invitations={[]} onAccept={vi.fn()} />);
+    const { container } = render(
+      <PendingInvitations invitations={[]} onAccept={vi.fn()} />,
+    );
     expect(container).toBeEmptyDOMElement();
   });
 });

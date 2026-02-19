@@ -14,6 +14,8 @@ export type Player = {
   organization_id: number;
   grade?: number | null;
   position_id?: number | null;
+  user_name?: string;
+  user_email?: string;
 };
 export type OrganizationAdmin = {
   id: number;
@@ -276,14 +278,19 @@ export function createApi(client: ApiClient) {
     // Users
     listUsers: () => client.get<User[]>("/api/users"),
     searchUsers: (query: string, page: number = 1, perPage: number = 20) =>
-      client.getPaginated<User[]>("/api/users/search", { q: query, page, per_page: perPage }),
+      client.getPaginated<User[]>("/api/users/search", {
+        q: query,
+        page,
+        per_page: perPage,
+      }),
 
     firstAccess: (payload: {
       name: string;
       email: string;
       password?: string;
       position?: string;
-    }) => client.post<{ token: string; user: User }>("/auth/first-access", payload),
+    }) =>
+      client.post<{ token: string; user: User }>("/auth/first-access", payload),
 
     // Organization Admins
     listAdminsByOrganization: (organizationId: number) =>
@@ -291,9 +298,13 @@ export function createApi(client: ApiClient) {
         `/api/organizations/${organizationId}/admins`,
       ),
     listOrganizationInvitations: (organizationId: number) =>
-      client.get<OrganizationInvitation[]>(`/api/organizations/${organizationId}/invitations`),
+      client.get<OrganizationInvitation[]>(
+        `/api/organizations/${organizationId}/invitations`,
+      ),
     revokeInvitation: (organizationId: number, invitationId: number) =>
-      client.delete(`/api/organizations/${organizationId}/invitations/${invitationId}`),
+      client.delete(
+        `/api/organizations/${organizationId}/invitations/${invitationId}`,
+      ),
     listUserOrganizations: (userId: number) =>
       client.get<(Organization & { role: "admin" | "player" })[]>(
         `/api/users/${userId}/organizations`,
@@ -303,7 +314,10 @@ export function createApi(client: ApiClient) {
     getInvitationInfo: (token: string) =>
       client.get<OrganizationInvitation>(`/auth/invitations/${token}`),
     acceptInvitation: (token: string) =>
-      client.post<{ organization_id: number }>(`/api/invitations/${token}/accept`, {}),
+      client.post<{ organization_id: number }>(
+        `/api/invitations/${token}/accept`,
+        {},
+      ),
     addOrganizationAdmin: (organizationId: number, userId: number) =>
       client.post<OrganizationAdmin>(
         `/api/organizations/${organizationId}/admins`,

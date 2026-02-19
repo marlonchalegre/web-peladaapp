@@ -146,9 +146,7 @@ export default function OrganizationManagementPage() {
       <AddPlayersDialog
         open={isAddPlayersOpen}
         selectedIds={selectedUserIds}
-        onSelectAll={(ids) =>
-          setSelectedUserIds(new Set(ids))
-        }
+        onSelectAll={(ids) => setSelectedUserIds(new Set(ids))}
         onClear={() => setSelectedUserIds(new Set())}
         onToggle={(id, checked) =>
           setSelectedUserIds((prev) => {
@@ -160,7 +158,7 @@ export default function OrganizationManagementPage() {
         }
         onAddSelected={() => handleAddPlayers()}
         onClose={() => setIsAddPlayersOpen(false)}
-        excludeUserIds={new Set(players.map(p => p.user_id))}
+        excludeUserIds={new Set(players.map((p) => p.user_id))}
       />
 
       <InvitePlayerDialog

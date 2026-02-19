@@ -13,7 +13,10 @@ import {
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { api } from "../../../shared/api/client";
-import { createApi, type OrganizationInvitation } from "../../../shared/api/endpoints";
+import {
+  createApi,
+  type OrganizationInvitation,
+} from "../../../shared/api/endpoints";
 
 const endpoints = createApi(api);
 
@@ -22,8 +25,10 @@ export default function JoinOrganizationPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  
-  const [invitation, setInvitation] = useState<OrganizationInvitation | null>(null);
+
+  const [invitation, setInvitation] = useState<OrganizationInvitation | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [joining, setJoining] = useState(false);
@@ -47,7 +52,7 @@ export default function JoinOrganizationPage() {
 
   const handleJoin = async () => {
     if (!token) return;
-    
+
     if (!isAuthenticated) {
       navigate(`/login?redirect=/join/${token}`);
       return;
@@ -75,7 +80,9 @@ export default function JoinOrganizationPage() {
   if (error || !invitation) {
     return (
       <Container maxWidth="sm" sx={{ py: 8 }}>
-        <Alert severity="error">{error || t("organizations.invitation.error.invalid_token")}</Alert>
+        <Alert severity="error">
+          {error || t("organizations.invitation.error.invalid_token")}
+        </Alert>
         <Button onClick={() => navigate("/")} sx={{ mt: 2 }}>
           {t("common.back_to_home")}
         </Button>
@@ -89,13 +96,20 @@ export default function JoinOrganizationPage() {
         <Typography variant="h4" gutterBottom>
           {t("organizations.invitation.join_title")}
         </Typography>
-        <Typography variant="h5" color="primary" gutterBottom sx={{ fontWeight: "bold", my: 3 }}>
+        <Typography
+          variant="h5"
+          color="primary"
+          gutterBottom
+          sx={{ fontWeight: "bold", my: 3 }}
+        >
           {invitation.organization_name}
         </Typography>
         <Typography variant="body1" color="text.secondary" paragraph>
-          {t("organizations.invitation.join_description", { name: invitation.organization_name })}
+          {t("organizations.invitation.join_description", {
+            name: invitation.organization_name,
+          })}
         </Typography>
-        
+
         <Stack spacing={2} sx={{ mt: 4 }}>
           <Button
             variant="contained"
@@ -104,7 +118,9 @@ export default function JoinOrganizationPage() {
             disabled={joining}
             fullWidth
           >
-            {joining ? t("common.loading") : t("organizations.invitation.button.join")}
+            {joining
+              ? t("common.loading")
+              : t("organizations.invitation.button.join")}
           </Button>
           <Button
             variant="outlined"

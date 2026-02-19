@@ -2,7 +2,14 @@ import { useState, useCallback, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api } from "../../../shared/api/client";
-import { createApi, type Organization, type User, type Player, type OrganizationAdmin, type OrganizationInvitation } from "../../../shared/api/endpoints";
+import {
+  createApi,
+  type Organization,
+  type User,
+  type Player,
+  type OrganizationAdmin,
+  type OrganizationInvitation,
+} from "../../../shared/api/endpoints";
 
 const endpoints = createApi(api);
 
@@ -86,7 +93,14 @@ export function useOrganizationManagement(orgId: number) {
   };
 
   const handleRevokeInvitation = async (invitationId: number) => {
-    if (!window.confirm(t("organizations.management.revoke_invitation_confirm", "Are you sure you want to revoke this invitation?")))
+    if (
+      !window.confirm(
+        t(
+          "organizations.management.revoke_invitation_confirm",
+          "Are you sure you want to revoke this invitation?",
+        ),
+      )
+    )
       return;
 
     setActionLoading(true);
@@ -97,7 +111,10 @@ export function useOrganizationManagement(orgId: number) {
       const message =
         err instanceof Error
           ? err.message
-          : t("organizations.error.revoke_failed", "Failed to revoke invitation");
+          : t(
+              "organizations.error.revoke_failed",
+              "Failed to revoke invitation",
+            );
       setError(message);
     } finally {
       setActionLoading(false);
@@ -216,26 +233,47 @@ export function useOrganizationManagement(orgId: number) {
 
   const usersMap = useMemo(() => {
     const map = new Map<number, User>();
-    // Note: In a real app, if players/admins don't have full user data, 
-    // we'd need a way to fetch it. For now, we assume they have enough
-    // or we'll fetch details as needed.
-    admins.forEach(a => {
+
+    // Add data from players
+    players.forEach((p) => {
+      if (p.user_id && p.user_name && p.user_email) {
+        map.set(p.user_id, {
+          id: p.user_id,
+          name: p.user_name,
+          email: p.user_email,
+        });
+      }
+    });
+
+    // Add data from admins (can overwrite or supplement)
+    admins.forEach((a) => {
       if (a.user_id && a.user_name && a.user_email) {
-        map.set(a.user_id, { id: a.user_id, name: a.user_name, email: a.user_email });
+        map.set(a.user_id, {
+          id: a.user_id,
+          name: a.user_name,
+          email: a.user_email,
+        });
       }
     });
     return map;
-  }, [admins]);
+  }, [players, admins]);
 
   const adminUserIds = useMemo(
     () => new Set(admins.map((a) => a.user_id)),
     [admins],
   );
-  
+
   const playersNotAdmins = useMemo(
     () =>
       players
-        .map((p) => usersMap.get(p.user_id) || { id: p.user_id, name: `User #${p.user_id}`, email: "" })
+        .map(
+          (p) =>
+            usersMap.get(p.user_id) || {
+              id: p.user_id,
+              name: `User #${p.user_id}`,
+              email: "",
+            },
+        )
         .filter((u): u is User => !adminUserIds.has(u.id)),
     [players, usersMap, adminUserIds],
   );

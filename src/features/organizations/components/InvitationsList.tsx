@@ -122,6 +122,7 @@ export default function InvitationsList({
                     edge="end"
                     onClick={() => copyToClipboard(inv.token)}
                     sx={{ mr: 1 }}
+                    aria-label={t("common.copy_link")}
                   >
                     <ContentCopyIcon fontSize="small" />
                   </IconButton>
@@ -132,6 +133,7 @@ export default function InvitationsList({
                     color="error"
                     onClick={() => onRevoke(inv.id)}
                     disabled={actionLoading}
+                    aria-label={t("common.revoke")}
                   >
                     <DeleteIcon />
                   </IconButton>
