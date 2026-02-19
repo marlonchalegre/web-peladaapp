@@ -98,6 +98,7 @@ export default function OrganizationManagementPage() {
         <InvitationsList
           invitations={invitations}
           onRevoke={handleRevokeInvitation}
+          onInviteClick={() => setIsInviteOpen(true)}
           actionLoading={actionLoading}
         />
 

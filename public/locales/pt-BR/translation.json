@@ -89,6 +89,8 @@
     "organization": "ORGANIZAÇÃO",
     "assists_short": "Assis.",
     "own_goals_short": "GC",
+    "copy_link": "Copiar Link",
+    "revoke": "Revogar",
     "pagination": {
       "rows_per_page": "Itens por página"
     },
@@ -181,7 +183,7 @@
     "invitation": {
       "join_title": "Entrar na Organização",
       "join_description": "Você foi convidado para participar de {{name}}.",
-      "empty": "Nenhum convite ativo.",
+      "empty": "Nenhum convite ativo. Clique no botão acima para convidar jogadores.",
       "public_link_label": "Link de Convite Público",
       "button": {
         "join": "Entrar Agora"

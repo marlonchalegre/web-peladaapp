@@ -89,6 +89,8 @@
     "organization": "ORGANIZATION",
     "assists_short": "Assists",
     "own_goals_short": "Own Goals",
+    "copy_link": "Copy Link",
+    "revoke": "Revoke",
     "pagination": {
       "rows_per_page": "Rows per page"
     },
@@ -200,7 +202,7 @@
     "invitation": {
       "join_title": "Join Organization",
       "join_description": "You have been invited to join {{name}}.",
-      "empty": "No active invitations.",
+      "empty": "No active invitations. Click the button above to invite players.",
       "public_link_label": "Public Invite Link",
       "button": {
         "join": "Join Now"
