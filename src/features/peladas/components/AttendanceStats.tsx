@@ -28,7 +28,11 @@ export default function AttendanceStats({
           >
             {t("peladas.attendance.stats.total_players")}
           </Typography>
-          <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+          <Typography
+            variant="h4"
+            sx={{ fontWeight: "bold" }}
+            data-testid="stats-total-players"
+          >
             {total}
           </Typography>
         </Grid>
@@ -43,6 +47,7 @@ export default function AttendanceStats({
           <Typography
             variant="h4"
             sx={{ fontWeight: "bold", color: "success.main" }}
+            data-testid="stats-confirmed-count"
           >
             {confirmedCount}
           </Typography>
@@ -58,6 +63,7 @@ export default function AttendanceStats({
           <Typography
             variant="h4"
             sx={{ fontWeight: "bold", color: "error.main" }}
+            data-testid="stats-declined-count"
           >
             {declinedCount}
           </Typography>
@@ -73,6 +79,7 @@ export default function AttendanceStats({
           <Typography
             variant="h4"
             sx={{ fontWeight: "bold", color: "text.secondary" }}
+            data-testid="stats-pending-count"
           >
             {pendingCount}
           </Typography>

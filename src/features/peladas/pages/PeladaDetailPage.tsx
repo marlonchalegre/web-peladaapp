@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { Container, Alert } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { useTranslation } from "react-i18next";
@@ -6,6 +7,9 @@ import { Loading } from "../../../shared/components/Loading";
 import TeamsSection from "../components/TeamsSection";
 import AvailablePlayersPanel from "../components/AvailablePlayersPanel";
 import { usePeladaDetail } from "../hooks/usePeladaDetail";
+import { useAuth } from "../../../app/providers/AuthContext";
+import { api } from "../../../shared/api/client";
+import { createApi } from "../../../shared/api/endpoints";
 import PeladaDetailHeader from "../components/PeladaDetailHeader";
 import StartPeladaDialog from "../components/StartPeladaDialog";
 
@@ -13,6 +17,8 @@ export default function PeladaDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams();
   const peladaId = Number(id);
+  const { user } = useAuth();
+  const [actuallyIsAdmin, setActuallyIsAdmin] = useState(false);
 
   const {
     pelada,
@@ -39,6 +45,19 @@ export default function PeladaDetailPage() {
     handleDeleteTeam,
   } = usePeladaDetail(peladaId);
 
+  useEffect(() => {
+    if (pelada?.organization_id && user) {
+      const endpoints = createApi(api);
+      endpoints
+        .listAdminsByOrganization(pelada.organization_id)
+        .then((admins) => {
+          if (admins.some((a) => a.user_id === user.id)) {
+            setActuallyIsAdmin(true);
+          }
+        });
+    }
+  }, [pelada?.organization_id, user]);
+
   if (error)
     return (
       <Container>
@@ -55,6 +74,7 @@ export default function PeladaDetailPage() {
         onStartClick={() => setStartDialogOpen(true)}
         changingStatus={changingStatus}
         processing={processing}
+        isAdminOverride={actuallyIsAdmin}
       />
 
       <div
@@ -91,6 +111,7 @@ export default function PeladaDetailPage() {
             dropToTeam={dropToTeam}
             onRandomizeTeams={handleRandomizeTeams}
             scores={scores}
+            isAdminOverride={actuallyIsAdmin}
           />
         </Grid>
 
@@ -101,7 +122,9 @@ export default function PeladaDetailPage() {
             scores={scores}
             onDropToBench={dropToBench}
             onDragStartPlayer={(e, pid) => onDragStartPlayer(e, pid, null)}
-            locked={pelada.status !== "open" || processing}
+            locked={
+              (pelada.status !== "open" && !actuallyIsAdmin) || processing
+            }
             totalPlayersInPelada={stats.totalPlayers}
             averagePelada={stats.averagePelada}
             balance={stats.balance}

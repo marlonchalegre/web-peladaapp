@@ -58,6 +58,7 @@ export default function AdminOrganizationsList({
           size="small"
           startIcon={<AddIcon />}
           onClick={onCreate}
+          data-testid="create-org-open-dialog"
           sx={{
             borderRadius: 2,
             textTransform: "none",
@@ -149,6 +150,7 @@ export default function AdminOrganizationsList({
                         fontWeight={600}
                         color="text.primary"
                         onClick={(e) => e.stopPropagation()}
+                        data-testid={`org-link-${org.name}`}
                       >
                         {org.name}
                       </Link>

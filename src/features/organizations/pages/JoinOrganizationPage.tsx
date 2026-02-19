@@ -117,6 +117,7 @@ export default function JoinOrganizationPage() {
             onClick={handleJoin}
             disabled={joining}
             fullWidth
+            data-testid="join-org-button"
           >
             {joining
               ? t("common.loading")
@@ -127,6 +128,7 @@ export default function JoinOrganizationPage() {
             onClick={() => navigate("/")}
             disabled={joining}
             fullWidth
+            data-testid="cancel-join-button"
           >
             {t("common.cancel")}
           </Button>

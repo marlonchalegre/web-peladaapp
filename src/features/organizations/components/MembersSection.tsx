@@ -54,6 +54,7 @@ export default function MembersSection({
             startIcon={<EmailIcon />}
             onClick={onInviteClick}
             disabled={actionLoading}
+            data-testid="members-invite-button"
           >
             {t("organizations.dialog.invite_player.title")}
           </Button>
@@ -62,6 +63,7 @@ export default function MembersSection({
             startIcon={<PersonAddIcon />}
             onClick={onAddClick}
             disabled={actionLoading}
+            data-testid="members-add-button"
           >
             {t("common.add")}
           </Button>

@@ -69,6 +69,7 @@ export default function UserAttendanceStatus({
             }
             onClick={() => onUpdate("confirmed")}
             disabled={isUpdating}
+            data-testid="attendance-confirm-button"
             sx={{ borderRadius: 2, textTransform: "none" }}
           >
             {t("peladas.attendance.button.confirm")}
@@ -87,6 +88,7 @@ export default function UserAttendanceStatus({
             }
             onClick={() => onUpdate("declined")}
             disabled={isUpdating}
+            data-testid="attendance-decline-button"
             sx={{ borderRadius: 2, textTransform: "none" }}
           >
             {t("peladas.attendance.button.decline")}

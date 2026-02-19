@@ -91,6 +91,7 @@ export default function PeladaMatchesPage() {
               color="error"
               onClick={handleClosePelada}
               disabled={closing}
+              data-testid="close-pelada-button"
               sx={{ px: 3, borderRadius: 2, fontWeight: "bold" }}
             >
               {closing

@@ -1,4 +1,5 @@
 import { useParams, Link as RouterLink } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { Container, Typography, Alert, Button, Box } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -9,6 +10,9 @@ import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import { useAttendance } from "../hooks/useAttendance";
+import { useAuth } from "../../../app/providers/AuthContext";
+import { api } from "../../../shared/api/client";
+import { createApi } from "../../../shared/api/endpoints";
 import AttendanceStats from "../components/AttendanceStats";
 import UserAttendanceStatus from "../components/UserAttendanceStatus";
 import AttendanceListColumn from "../components/AttendanceListColumn";
@@ -17,6 +21,8 @@ export default function AttendanceListPage() {
   const { t } = useTranslation();
   const { id } = useParams();
   const peladaId = Number(id);
+  const { user } = useAuth();
+  const [actuallyIsAdmin, setActuallyIsAdmin] = useState(false);
 
   const {
     pelada,
@@ -33,6 +39,39 @@ export default function AttendanceListPage() {
     handleUpdateAttendance,
     handleCloseAttendance,
   } = useAttendance(peladaId);
+
+  useEffect(() => {
+    if (pelada?.organization_id && user) {
+      const endpoints = createApi(api);
+      endpoints
+        .listAdminsByOrganization(pelada.organization_id)
+        .then((admins) => {
+          if (admins.some((a) => a.user_id === user.id)) {
+            setActuallyIsAdmin(true);
+          }
+        });
+    }
+  }, [pelada?.organization_id, user]);
+
+  useEffect(() => {
+    console.log("[AttendancePage] Debug State:", {
+      userId: user?.id,
+      confirmedCount: confirmed.length,
+      declinedCount: declined.length,
+      pendingCount: pending.length,
+      totalPlayers,
+      hasCurrentPlayer: !!currentPlayerAsPlayer,
+      peladaId,
+    });
+  }, [
+    user,
+    confirmed,
+    declined,
+    pending,
+    totalPlayers,
+    currentPlayerAsPlayer,
+    peladaId,
+  ]);
 
   if (loading && !pelada) return <Loading message={t("common.loading")} />;
   if (error)
@@ -84,12 +123,13 @@ export default function AttendanceListPage() {
             {t("peladas.attendance.subtitle")}
           </Typography>
         </Box>
-        {isAdmin && (
+        {(isAdmin || actuallyIsAdmin) && (
           <Button
             variant="contained"
             size="large"
             startIcon={<GroupAddIcon />}
             onClick={handleCloseAttendance}
+            data-testid="close-attendance-button"
             sx={{
               px: 4,
               py: 1.5,

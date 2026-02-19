@@ -257,7 +257,7 @@ export function usePeladaDetail(peladaId: number) {
       const matches = parseInt(matchesPerTeam, 10);
       if (matches > 0) {
         await endpoints.beginPelada(peladaId, matches);
-        await fetchPeladaData();
+        navigate(`/peladas/${peladaId}/matches`);
       }
     } catch (error: unknown) {
       const message =

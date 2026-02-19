@@ -34,6 +34,7 @@ export type TeamsSectionProps = {
   ) => Promise<void>;
   onRandomizeTeams: () => Promise<void>;
   scores: Record<number, number>;
+  isAdminOverride?: boolean;
 };
 
 export default function TeamsSection(props: TeamsSectionProps) {
@@ -50,6 +51,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
     dropToTeam,
     onRandomizeTeams,
     scores,
+    isAdminOverride = false,
   } = props;
 
   return (
@@ -70,7 +72,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
           </Typography>
         </Box>
 
-        {!locked && (
+        {(!locked || isAdminOverride) && (
           <Stack direction="row" spacing={2}>
             <Button
               variant="outlined"
@@ -79,6 +81,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
                 await onRandomizeTeams();
               }}
               disabled={creatingTeam}
+              data-testid="randomize-teams-button"
               sx={{ textTransform: "none", borderRadius: 2 }}
             >
               {t("peladas.teams.button.randomize")}
@@ -92,6 +95,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
                 );
               }}
               disabled={creatingTeam}
+              data-testid="create-team-button"
               sx={{
                 textTransform: "none",
                 borderRadius: 2,
@@ -186,7 +190,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
           })}
 
           {/* Add Team Placeholder */}
-          {!locked && (
+          {(!locked || isAdminOverride) && (
             <Grid size={{ xs: 12, md: 6, lg: 4 }}>
               <Button
                 fullWidth

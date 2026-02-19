@@ -47,6 +47,7 @@ export default function StartPeladaDialog({
           variant="contained"
           disabled={!matchesPerTeam || parseInt(matchesPerTeam) <= 0}
           onClick={onConfirm}
+          data-testid="confirm-start-pelada-button"
         >
           {t("common.start")}
         </Button>

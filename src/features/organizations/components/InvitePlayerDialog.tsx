@@ -42,8 +42,14 @@ export default function InvitePlayerDialog({
 
   const handleInvite = async () => {
     if (!email) return;
-    await onInvite(email);
-    setEmail("");
+    console.log("[InviteDialog] Inviting email:", email);
+    try {
+      await onInvite(email);
+      console.log("[InviteDialog] Invite success");
+      setEmail("");
+    } catch (err) {
+      console.error("[InviteDialog] Invite failed:", err);
+    }
   };
 
   const invitationLink = invitedUser
@@ -84,12 +90,14 @@ export default function InvitePlayerDialog({
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={loading}
                   autoFocus
+                  inputProps={{ "data-testid": "invite-email-input" }}
                 />
                 <Button
                   onClick={handleInvite}
                   variant="contained"
                   disabled={!email || loading}
                   sx={{ whiteSpace: "nowrap" }}
+                  data-testid="send-invite-button"
                 >
                   {t("organizations.dialog.invite_player.send_invite")}
                 </Button>
@@ -121,12 +129,14 @@ export default function InvitePlayerDialog({
                   <Typography
                     variant="body2"
                     sx={{ flexGrow: 1, wordBreak: "break-all", mr: 1 }}
+                    data-testid="public-invite-link-text"
                   >
                     {publicInviteLink}
                   </Typography>
                   <IconButton
                     size="small"
                     onClick={() => copyToClipboard(publicInviteLink)}
+                    data-testid="copy-public-link-button"
                   >
                     <ContentCopyIcon fontSize="small" />
                   </IconButton>
@@ -137,6 +147,7 @@ export default function InvitePlayerDialog({
                   onClick={onFetchPublicLink}
                   disabled={loading}
                   sx={{ mt: 1 }}
+                  data-testid="generate-public-link-button"
                 >
                   {t("organizations.dialog.invite_player.generate_link")}
                 </Button>
@@ -147,7 +158,11 @@ export default function InvitePlayerDialog({
           <Box sx={{ mt: 1 }}>
             {invitedUser.isNew ? (
               <>
-                <Alert severity="success" sx={{ mb: 2 }}>
+                <Alert
+                  severity="success"
+                  sx={{ mb: 2 }}
+                  data-testid="invite-success-alert"
+                >
                   {t("organizations.dialog.invite_player.new_user_success")}
                 </Alert>
                 <Typography variant="body2" gutterBottom>
@@ -166,19 +181,24 @@ export default function InvitePlayerDialog({
                   <Typography
                     variant="body2"
                     sx={{ flexGrow: 1, wordBreak: "break-all", mr: 1 }}
+                    data-testid="invitation-link-text"
                   >
                     {invitationLink}
                   </Typography>
                   <IconButton
                     size="small"
                     onClick={() => copyToClipboard(invitationLink)}
+                    data-testid="copy-invitation-link-button"
                   >
                     <ContentCopyIcon fontSize="small" />
                   </IconButton>
                 </Box>
               </>
             ) : (
-              <Alert severity="success">
+              <Alert
+                severity="success"
+                data-testid="invite-existing-success-alert"
+              >
                 {t("organizations.dialog.invite_player.existing_user_success", {
                   email: invitedUser.email,
                 })}

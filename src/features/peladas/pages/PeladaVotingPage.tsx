@@ -188,14 +188,20 @@ export default function PeladaVotingPage() {
 
       <Stack spacing={2} sx={{ mb: 3 }}>
         {playerVotes.map((pv) => (
-          <Card key={pv.playerId} variant="outlined">
+          <Card
+            key={pv.playerId}
+            variant="outlined"
+            data-testid={`voting-card-${pv.playerId}`}
+          >
             <CardContent>
               <Stack
                 direction="row"
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <Typography variant="h6">{pv.playerName}</Typography>
+                <Typography variant="h6" data-testid="player-name">
+                  {pv.playerName}
+                </Typography>
                 <Box>
                   <Rating
                     name={`player-${pv.playerId}`}
@@ -205,6 +211,7 @@ export default function PeladaVotingPage() {
                     }
                     size="large"
                     max={5}
+                    data-testid={`rating-${pv.playerId}`}
                   />
                   {pv.stars !== null && (
                     <Typography
@@ -240,6 +247,7 @@ export default function PeladaVotingPage() {
           variant="contained"
           onClick={handleSubmit}
           disabled={!allVotesComplete || submitting}
+          data-testid="submit-votes-button"
           fullWidth
         >
           {submitting ? t("common.sending") : t("peladas.voting.button.save")}

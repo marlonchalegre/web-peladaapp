@@ -46,8 +46,16 @@ export default function OrganizationDetailPage() {
       .getOrganization(orgId)
       .then((o) => {
         setOrg(o);
+        // Initial check from AuthContext
         const userIsAdmin = user.admin_orgs?.includes(orgId) ?? false;
         setIsAdmin(userIsAdmin);
+
+        // Secondary check: Fetch admins list to be sure
+        endpoints.listAdminsByOrganization(orgId).then((admins) => {
+          if (admins.some((a) => a.user_id === user.id)) {
+            setIsAdmin(true);
+          }
+        });
       })
       .catch((error: unknown) => {
         const message =
@@ -137,6 +145,7 @@ export default function OrganizationDetailPage() {
               to={`/organizations/${orgId}/management`}
               variant="outlined"
               color="primary"
+              data-testid="org-management-button"
             >
               {t("organizations.detail.button.management")}
             </Button>

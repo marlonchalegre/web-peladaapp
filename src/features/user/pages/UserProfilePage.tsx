@@ -183,6 +183,7 @@ export default function UserProfilePage() {
               required
               fullWidth
               disabled={loading}
+              inputProps={{ "data-testid": "profile-name" }}
             />
 
             <TextField
@@ -195,6 +196,7 @@ export default function UserProfilePage() {
               required
               fullWidth
               disabled={loading}
+              inputProps={{ "data-testid": "profile-email" }}
             />
 
             <FormControl fullWidth disabled={loading}>
@@ -208,20 +210,30 @@ export default function UserProfilePage() {
                 label={t("common.fields.position")}
                 onChange={(e) => setPosition(e.target.value)}
                 autoComplete="organization-title"
+                data-testid="profile-position-select"
               >
                 <MenuItem value="">
                   <em>{t("common.select_placeholder")}</em>
                 </MenuItem>
-                <MenuItem value="Striker">
+                <MenuItem value="Striker" data-testid="position-option-Striker">
                   {t("common.positions.striker")}
                 </MenuItem>
-                <MenuItem value="Midfielder">
+                <MenuItem
+                  value="Midfielder"
+                  data-testid="position-option-Midfielder"
+                >
                   {t("common.positions.midfielder")}
                 </MenuItem>
-                <MenuItem value="Defender">
+                <MenuItem
+                  value="Defender"
+                  data-testid="position-option-Defender"
+                >
                   {t("common.positions.defender")}
                 </MenuItem>
-                <MenuItem value="Goalkeeper">
+                <MenuItem
+                  value="Goalkeeper"
+                  data-testid="position-option-Goalkeeper"
+                >
                   {t("common.positions.goalkeeper")}
                 </MenuItem>
               </Select>
@@ -243,6 +255,7 @@ export default function UserProfilePage() {
               fullWidth
               disabled={loading}
               helperText={t("user.profile.hint.password")}
+              inputProps={{ "data-testid": "profile-new-password" }}
             />
 
             <TextField
@@ -254,6 +267,7 @@ export default function UserProfilePage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               fullWidth
               disabled={loading || !password}
+              inputProps={{ "data-testid": "profile-confirm-password" }}
             />
 
             <Box display="flex" gap={2} justifyContent="flex-end">
@@ -264,7 +278,12 @@ export default function UserProfilePage() {
               >
                 {t("common.cancel")}
               </Button>
-              <Button type="submit" variant="contained" disabled={loading}>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={loading}
+                data-testid="profile-save-button"
+              >
                 {loading
                   ? t("user.profile.button.saving")
                   : t("user.profile.button.save")}
@@ -289,6 +308,7 @@ export default function UserProfilePage() {
           onClick={() => setDeleteDialogOpen(true)}
           disabled={loading}
           fullWidth
+          data-testid="profile-delete-account-button"
         >
           {t("user.profile.button.delete_account")}
         </Button>
@@ -312,7 +332,11 @@ export default function UserProfilePage() {
           <Button onClick={() => setDeleteDialogOpen(false)} autoFocus>
             {t("common.cancel")}
           </Button>
-          <Button onClick={handleDeleteAccount} color="error">
+          <Button
+            onClick={handleDeleteAccount}
+            color="error"
+            data-testid="confirm-delete-account-button"
+          >
             {t("user.profile.dialog.delete_button")}
           </Button>
         </DialogActions>

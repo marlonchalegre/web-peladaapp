@@ -145,7 +145,11 @@ function AppLayout() {
                 </IconButton>
 
                 <Tooltip title="Open settings">
-                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0, ml: 1 }}>
+                  <IconButton
+                    onClick={handleOpenUserMenu}
+                    sx={{ p: 0, ml: 1 }}
+                    data-testid="user-settings-button"
+                  >
                     <Avatar
                       sx={{
                         bgcolor: "primary.dark",
@@ -178,12 +182,16 @@ function AppLayout() {
                     component={RouterLink}
                     to="/profile"
                     onClick={handleCloseUserMenu}
+                    data-testid="profile-menu-item"
                   >
                     <Typography textAlign="center">
                       {t("navigation.profile")}
                     </Typography>
                   </MenuItem>
-                  <MenuItem onClick={handleLogout}>
+                  <MenuItem
+                    onClick={handleLogout}
+                    data-testid="logout-menu-item"
+                  >
                     <Typography textAlign="center">
                       {t("auth.logout")}
                     </Typography>

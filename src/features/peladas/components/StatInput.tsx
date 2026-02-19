@@ -13,6 +13,7 @@ interface StatInputProps {
   onChange: (diff: number) => void;
   disabled: boolean;
   loading?: boolean;
+  testIdPrefix?: string;
 }
 
 export default function StatInput({
@@ -20,6 +21,7 @@ export default function StatInput({
   onChange,
   disabled,
   loading = false,
+  testIdPrefix,
 }: StatInputProps) {
   return (
     <Box
@@ -38,6 +40,7 @@ export default function StatInput({
         size="small"
         onClick={() => onChange(-1)}
         disabled={disabled || value <= 0 || loading}
+        data-testid={testIdPrefix ? `${testIdPrefix}-decrement` : undefined}
         sx={{
           borderRadius: 0,
           p: 0.5,
@@ -63,7 +66,11 @@ export default function StatInput({
         {loading ? (
           <CircularProgress size={16} />
         ) : (
-          <Typography variant="body2" fontWeight="bold">
+          <Typography
+            variant="body2"
+            fontWeight="bold"
+            data-testid={testIdPrefix ? `${testIdPrefix}-value` : undefined}
+          >
             {value}
           </Typography>
         )}
@@ -73,6 +80,7 @@ export default function StatInput({
         size="small"
         onClick={() => onChange(1)}
         disabled={disabled || loading}
+        data-testid={testIdPrefix ? `${testIdPrefix}-increment` : undefined}
         sx={{
           borderRadius: 0,
           p: 0.5,

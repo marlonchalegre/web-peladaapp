@@ -41,6 +41,7 @@ export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
                   to={`/peladas/${p.id}`}
                   underline="hover"
                   color="inherit"
+                  data-testid={`pelada-link-${p.id}`}
                 >
                   {t("organizations.peladas.item_name", { id: p.id })}
                 </MuiLink>

@@ -152,7 +152,7 @@ export default function MatchPlayerRow({
   }
 
   return (
-    <TableRow hover>
+    <TableRow hover data-testid={`player-row-${playerName}`}>
       <TableCell>
         <Stack direction="row" alignItems="center" spacing={1}>
           <Box
@@ -163,7 +163,9 @@ export default function MatchPlayerRow({
               borderRadius: 1,
             }}
           />
-          <Typography variant="body2">{playerName}</Typography>
+          <Typography variant="body2" data-testid="player-name">
+            {playerName}
+          </Typography>
         </Stack>
         {isSubMenuOpen && (
           <Paper
@@ -219,6 +221,7 @@ export default function MatchPlayerRow({
             disabled={finished || updating}
             loading={loadingGoals}
             onChange={(diff) => onStatChange("goal", diff)}
+            testIdPrefix="stat-goals"
           />
         </Stack>
       </TableCell>
@@ -229,6 +232,7 @@ export default function MatchPlayerRow({
             disabled={finished || updating}
             loading={loadingAssists}
             onChange={(diff) => onStatChange("assist", diff)}
+            testIdPrefix="stat-assists"
           />
         </Stack>
       </TableCell>
@@ -239,6 +243,7 @@ export default function MatchPlayerRow({
             disabled={finished || updating}
             loading={loadingOwnGoals}
             onChange={(diff) => onStatChange("own_goal", diff)}
+            testIdPrefix="stat-own-goals"
           />
         </Stack>
       </TableCell>

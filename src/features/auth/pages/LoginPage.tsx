@@ -74,6 +74,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               fullWidth
+              inputProps={{ "data-testid": "login-email" }}
             />
             <TextField
               id="password"
@@ -84,12 +85,14 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               fullWidth
+              inputProps={{ "data-testid": "login-password" }}
             />
             <Button
               type="submit"
               variant="contained"
               disabled={loading}
               size="large"
+              data-testid="login-submit"
             >
               {loading
                 ? t("auth.login.button.loading")

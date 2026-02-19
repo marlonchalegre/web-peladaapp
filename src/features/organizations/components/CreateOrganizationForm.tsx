@@ -27,8 +27,13 @@ export default function CreateOrganizationForm({ onCreate }: Props) {
           label={t("common.fields.name")}
           required
           size="small"
+          inputProps={{ "data-testid": "org-name-input" }}
         />
-        <Button type="submit" variant="contained">
+        <Button
+          type="submit"
+          variant="contained"
+          data-testid="org-submit-button"
+        >
           {t("common.create")}
         </Button>
       </Stack>

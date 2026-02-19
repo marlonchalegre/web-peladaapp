@@ -105,6 +105,7 @@ export default function FirstAccessPage() {
               required
               fullWidth
               disabled={!!searchParams.get("email")}
+              inputProps={{ "data-testid": "first-access-email" }}
             />
             <TextField
               id="name"
@@ -115,6 +116,7 @@ export default function FirstAccessPage() {
               required
               fullWidth
               autoFocus
+              inputProps={{ "data-testid": "first-access-name" }}
             />
             <TextField
               id="password"
@@ -125,6 +127,7 @@ export default function FirstAccessPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               fullWidth
+              inputProps={{ "data-testid": "first-access-password" }}
             />
             <TextField
               id="position"
@@ -133,12 +136,17 @@ export default function FirstAccessPage() {
               value={position}
               onChange={(e) => setPosition(e.target.value)}
               fullWidth
+              data-testid="first-access-position-select"
             >
               <MenuItem value="">
                 <em>{t("common.select_placeholder")}</em>
               </MenuItem>
               {POSITIONS.map((pos) => (
-                <MenuItem key={pos} value={pos}>
+                <MenuItem
+                  key={pos}
+                  value={pos}
+                  data-testid={`position-option-${pos}`}
+                >
                   {t(`common.positions.${pos.toLowerCase()}`)}
                 </MenuItem>
               ))}
@@ -148,6 +156,7 @@ export default function FirstAccessPage() {
               variant="contained"
               disabled={loading}
               size="large"
+              data-testid="first-access-submit"
             >
               {loading
                 ? t("auth.first_access.button.loading")

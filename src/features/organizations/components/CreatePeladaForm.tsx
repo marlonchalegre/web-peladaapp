@@ -92,7 +92,13 @@ export default function CreatePeladaForm({ organizationId, onCreate }: Props) {
           />
         </Grid>
         <Grid size={{ xs: 12 }}>
-          <Button fullWidth type="submit" variant="contained" size="large">
+          <Button
+            fullWidth
+            type="submit"
+            variant="contained"
+            size="large"
+            data-testid="create-pelada-submit"
+          >
             {t("organizations.form.pelada.submit")}
           </Button>
         </Grid>

@@ -65,15 +65,22 @@ export default function AdminsSection({
               )
             }
             disabled={actionLoading || playersNotAdmins.length === 0}
+            data-testid="admin-select"
             label={
               playersNotAdmins.length === 0
                 ? t("organizations.dialog.manage_admins.all_users_are_admins")
                 : t("organizations.dialog.manage_admins.select_user_label")
             }
           >
-            <MenuItem value="">{t("common.select_placeholder")}</MenuItem>
+            <MenuItem value="" data-testid="admin-option-empty">
+              {t("common.select_placeholder")}
+            </MenuItem>
             {playersNotAdmins.map((user) => (
-              <MenuItem key={user.id} value={user.id}>
+              <MenuItem
+                key={user.id}
+                value={user.id}
+                data-testid={`admin-option-${user.id}`}
+              >
                 {user.name} ({user.email})
               </MenuItem>
             ))}
@@ -82,6 +89,7 @@ export default function AdminsSection({
             variant="contained"
             onClick={onAddAdmin}
             disabled={actionLoading || selectedAdminUserId === ""}
+            data-testid="add-admin-button"
             startIcon={
               actionLoading ? <CircularProgress size={20} /> : <AddIcon />
             }

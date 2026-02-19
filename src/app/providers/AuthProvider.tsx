@@ -88,6 +88,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setToken(t);
         setUser(u);
       },
+      refreshUser: async () => {
+        if (!user) return;
+        try {
+          // We can use listUserOrganizations to update admin_orgs
+          // The backend might not have an endpoint that returns the full user with updated token/admin_orgs
+          // but we can at least update the admin_orgs list in the user object
+          const userOrgs = await api.get<
+            (Organization & { role: "admin" | "player" })[]
+          >(`/api/users/${user.id}/organizations`);
+          const adminOrgsList = userOrgs
+            .filter((org) => org.role === "admin")
+            .map((org) => org.id);
+
+          setUser({ ...user, admin_orgs: adminOrgsList });
+        } catch (e) {
+          console.error("Failed to refresh user data", e);
+        }
+      },
       signOut,
     }),
     [token, user, signOut],

@@ -12,6 +12,7 @@ interface PeladaDetailHeaderProps {
   onStartClick: () => void;
   changingStatus: boolean;
   processing: boolean;
+  isAdminOverride?: boolean;
 }
 
 export default function PeladaDetailHeader({
@@ -20,6 +21,7 @@ export default function PeladaDetailHeader({
   onStartClick,
   changingStatus,
   processing,
+  isAdminOverride = false,
 }: PeladaDetailHeaderProps) {
   const { t } = useTranslation();
 
@@ -67,12 +69,14 @@ export default function PeladaDetailHeader({
           {t("peladas.detail.button.view_matches")}
         </Button>
 
-        {pelada.status === "open" && (
+        {(pelada.status === "open" ||
+          (pelada.status !== "closed" && isAdminOverride)) && (
           <Button
             variant="contained"
             startIcon={<PlayArrowIcon />}
             onClick={onStartClick}
             disabled={changingStatus || processing}
+            data-testid="start-pelada-button"
             sx={{
               textTransform: "none",
               borderRadius: 2,

@@ -34,13 +34,17 @@ export default function RegisterPage() {
     e.preventDefault();
     setError(null);
     setLoading(true);
+    console.log("Registering user:", { name, email, position });
     try {
       await register(name, email, password, position || undefined);
+      console.log("Registration success, logging in...");
       const { token, user } = await login(email, password);
+      console.log("Login success, token received");
       signIn(token, user);
       const redirect = searchParams.get("redirect") || "/";
       navigate(redirect);
     } catch (error: unknown) {
+      console.error("Registration/Login failed:", error);
       const message =
         error instanceof Error
           ? error.message
@@ -82,6 +86,7 @@ export default function RegisterPage() {
               required
               fullWidth
               autoFocus
+              inputProps={{ "data-testid": "register-name" }}
             />
             <TextField
               id="email"
@@ -92,6 +97,7 @@ export default function RegisterPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               fullWidth
+              inputProps={{ "data-testid": "register-email" }}
             />
             <TextField
               id="password"
@@ -102,6 +108,7 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               fullWidth
+              inputProps={{ "data-testid": "register-password" }}
             />
             <TextField
               id="position"
@@ -110,12 +117,17 @@ export default function RegisterPage() {
               value={position}
               onChange={(e) => setPosition(e.target.value)}
               fullWidth
+              data-testid="register-position-select"
             >
               <MenuItem value="">
                 <em>{t("common.select_placeholder")}</em>
               </MenuItem>
               {POSITIONS.map((pos) => (
-                <MenuItem key={pos} value={pos}>
+                <MenuItem
+                  key={pos}
+                  value={pos}
+                  data-testid={`position-option-${pos}`}
+                >
                   {t(`common.positions.${pos.toLowerCase()}`)}
                 </MenuItem>
               ))}
@@ -125,6 +137,7 @@ export default function RegisterPage() {
               variant="contained"
               disabled={loading}
               size="large"
+              data-testid="register-submit"
             >
               {loading
                 ? t("auth.register.button.loading")

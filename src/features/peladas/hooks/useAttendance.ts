@@ -43,6 +43,11 @@ export function useAttendance(peladaId: number) {
 
         const userIsAdmin =
           user.admin_orgs?.includes(data.pelada.organization_id) ?? false;
+        console.log("[useAttendance] Admin check:", {
+          userAdminOrgs: user.admin_orgs,
+          peladaOrgId: data.pelada.organization_id,
+          userIsAdmin,
+        });
         setIsAdmin(userIsAdmin);
 
         // If already open or closed, redirect to detail page
@@ -71,7 +76,9 @@ export function useAttendance(peladaId: number) {
     targetPlayerId?: number,
   ) => {
     // Determine the ID to track for loading state
-    const currentPlayerAsPlayer = players.find((p) => p.user_id === user?.id);
+    const currentPlayerAsPlayer = players.find(
+      (p) => String(p.user_id) === String(user?.id),
+    );
     const idToTrack = targetPlayerId ?? currentPlayerAsPlayer?.id;
 
     if (idToTrack) {
@@ -117,7 +124,9 @@ export function useAttendance(peladaId: number) {
     (p) => !p.attendance_status || p.attendance_status === "pending",
   );
 
-  const currentPlayerAsPlayer = players.find((p) => p.user_id === user?.id);
+  const currentPlayerAsPlayer = players.find(
+    (p) => String(p.user_id) === String(user?.id),
+  );
   const isUpdatingSelf = currentPlayerAsPlayer
     ? updatingPlayers.has(currentPlayerAsPlayer.id)
     : false;

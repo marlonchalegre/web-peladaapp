@@ -159,6 +159,7 @@ export default function MatchControlTable({
             color="secondary"
             onClick={onEndMatch}
             disabled={updating}
+            data-testid="end-match-button"
           >
             {t("peladas.dashboard.button.end_match")}
           </Button>
@@ -167,6 +168,7 @@ export default function MatchControlTable({
             variant="overline"
             color="text.secondary"
             sx={{ fontWeight: "bold" }}
+            data-testid="match-status-text"
           >
             {t("peladas.dashboard.status.finished")}
           </Typography>

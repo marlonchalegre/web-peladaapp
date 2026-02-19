@@ -6,6 +6,7 @@ export type AuthContextValue = {
   user: User | null;
   isAuthenticated: boolean;
   signIn: (token: string, user: User) => void;
+  refreshUser: () => Promise<void>;
   signOut: () => void;
 };
 

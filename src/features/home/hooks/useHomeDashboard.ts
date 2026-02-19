@@ -17,7 +17,7 @@ export type OrganizationWithRole = {
 };
 
 export function useHomeDashboard() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const { t } = useTranslation();
 
   const [adminOrgs, setAdminOrgs] = useState<OrganizationWithRole[]>([]);
@@ -78,6 +78,12 @@ export function useHomeDashboard() {
 
       setAdminOrgs(adminOrgsList);
       setMemberOrgs(memberOrgsList);
+
+      // Update local user object if it's missing the new org in admin_orgs
+      // This is a local backup if refreshUser didn't update the context fast enough
+      if (user && adminOrgsList.length > (user.admin_orgs?.length || 0)) {
+        user.admin_orgs = adminOrgsList.map((o) => o.id);
+      }
     } catch (err) {
       const message =
         err instanceof Error ? err.message : t("home.error.load_failed");
@@ -116,9 +122,10 @@ export function useHomeDashboard() {
   const createOrganization = useCallback(
     async (name: string) => {
       await endpoints.createOrganization(name);
+      await refreshUser();
       fetchOrganizations();
     },
-    [fetchOrganizations],
+    [fetchOrganizations, refreshUser],
   );
 
   return {

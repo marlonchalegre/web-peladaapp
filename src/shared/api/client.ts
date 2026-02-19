@@ -76,6 +76,11 @@ export class ApiClient {
 
       throw apiError;
     }
+
+    if (res.status === 204) {
+      return {} as T;
+    }
+
     return (await res.json()) as T;
   }
 

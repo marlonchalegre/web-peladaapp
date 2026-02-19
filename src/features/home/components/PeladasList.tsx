@@ -122,6 +122,7 @@ export default function PeladasList({
                     key={`pelada-${pelada.id}`}
                     hover
                     onClick={() => navigate(peladaLink)}
+                    data-testid={`pelada-row-${pelada.id}`}
                     sx={{
                       cursor: "pointer",
                       "&:last-child td, &:last-child th": { border: 0 },
@@ -134,6 +135,7 @@ export default function PeladasList({
                         underline="hover"
                         sx={{ display: "block", textDecoration: "none" }}
                         onClick={(e) => e.stopPropagation()}
+                        data-testid={`pelada-link-${pelada.id}`}
                       >
                         <Typography
                           variant="body2"
