@@ -9,11 +9,14 @@ import {
   Typography,
   Alert,
   Link as MLink,
+  MenuItem,
 } from "@mui/material";
 import { register, login } from "../../../shared/api/client";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+
+const POSITIONS = ["Striker", "Midfielder", "Defender", "Goalkeeper"];
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -23,6 +26,7 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [position, setPosition] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -31,7 +35,7 @@ export default function RegisterPage() {
     setError(null);
     setLoading(true);
     try {
-      await register(name, email, password);
+      await register(name, email, password, position || undefined);
       const { token, user } = await login(email, password);
       signIn(token, user);
       const redirect = searchParams.get("redirect") || "/";
@@ -77,6 +81,7 @@ export default function RegisterPage() {
               onChange={(e) => setName(e.target.value)}
               required
               fullWidth
+              autoFocus
             />
             <TextField
               id="email"
@@ -98,6 +103,23 @@ export default function RegisterPage() {
               required
               fullWidth
             />
+            <TextField
+              id="position"
+              select
+              label={t("common.fields.position")}
+              value={position}
+              onChange={(e) => setPosition(e.target.value)}
+              fullWidth
+            >
+              <MenuItem value="">
+                <em>{t("common.select_placeholder")}</em>
+              </MenuItem>
+              {POSITIONS.map((pos) => (
+                <MenuItem key={pos} value={pos}>
+                  {t(`common.positions.${pos.toLowerCase()}`)}
+                </MenuItem>
+              ))}
+            </TextField>
             <Button
               type="submit"
               variant="contained"

@@ -217,8 +217,9 @@ export async function register(
   name: string,
   email: string,
   password: string,
+  position?: string,
 ): Promise<void> {
-  await api.post("/auth/register", { name, email, password });
+  await api.post("/auth/register", { name, email, password, position });
 }
 
 export async function getUser(userId: number): Promise<User> {
