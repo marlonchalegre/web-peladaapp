@@ -23,6 +23,7 @@ export default function PendingInvitations({ invitations, onAccept }: Props) {
           {invitations.map((inv) => (
             <Box
               key={inv.id}
+              data-testid={`invitation-card-${inv.organization_name}`}
               sx={{
                 p: 2,
                 display: "flex",
@@ -47,6 +48,7 @@ export default function PendingInvitations({ invitations, onAccept }: Props) {
                 startIcon={<CheckIcon />}
                 onClick={() => onAccept(inv.token)}
                 size="small"
+                data-testid={`accept-invitation-${inv.organization_name}`}
               >
                 {t("common.accept", "Aceitar")}
               </Button>
