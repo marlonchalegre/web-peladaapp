@@ -8,6 +8,7 @@ import {
 import { jwtDecode } from "jwt-decode";
 import { api, type User } from "../../shared/api/client";
 import { AuthContext, type AuthContextValue } from "./AuthContext";
+import type { Organization } from "../../shared/api/endpoints";
 
 type TokenPayload = {
   id: number;

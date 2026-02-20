@@ -92,9 +92,8 @@ describe("OrganizationManagementPage", () => {
   });
 
   const renderComponent = async () => {
-    let result: ReturnType<typeof render>;
-    await act(async () => {
-      result = render(
+    return await act(async () => {
+      return render(
         <AuthProvider>
           <MemoryRouter initialEntries={["/organizations/1/management"]}>
             <Routes>
@@ -107,7 +106,6 @@ describe("OrganizationManagementPage", () => {
         </AuthProvider>,
       );
     });
-    return result;
   };
 
   it("renders organization details and sections after loading", async () => {

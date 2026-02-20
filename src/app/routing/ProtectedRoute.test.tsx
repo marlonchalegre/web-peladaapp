@@ -12,6 +12,7 @@ const mockAuthContext = (
   user: null,
   isAuthenticated: false,
   signIn: vi.fn(),
+  refreshUser: vi.fn(),
   signOut: vi.fn(),
   ...overrides,
 });
