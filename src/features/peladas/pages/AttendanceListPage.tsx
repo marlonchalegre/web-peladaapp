@@ -53,26 +53,6 @@ export default function AttendanceListPage() {
     }
   }, [pelada?.organization_id, user]);
 
-  useEffect(() => {
-    console.log("[AttendancePage] Debug State:", {
-      userId: user?.id,
-      confirmedCount: confirmed.length,
-      declinedCount: declined.length,
-      pendingCount: pending.length,
-      totalPlayers,
-      hasCurrentPlayer: !!currentPlayerAsPlayer,
-      peladaId,
-    });
-  }, [
-    user,
-    confirmed,
-    declined,
-    pending,
-    totalPlayers,
-    currentPlayerAsPlayer,
-    peladaId,
-  ]);
-
   if (loading && !pelada) return <Loading message={t("common.loading")} />;
   if (error)
     return (

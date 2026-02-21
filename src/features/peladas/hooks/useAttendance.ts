@@ -43,11 +43,6 @@ export function useAttendance(peladaId: number) {
 
         const userIsAdmin =
           user.admin_orgs?.includes(data.pelada.organization_id) ?? false;
-        console.log("[useAttendance] Admin check:", {
-          userAdminOrgs: user.admin_orgs,
-          peladaOrgId: data.pelada.organization_id,
-          userIsAdmin,
-        });
         setIsAdmin(userIsAdmin);
 
         // If already open or closed, redirect to detail page

@@ -123,7 +123,13 @@ export default function MemberOrganizationsList({
                 <TableRow
                   key={`member-${org.id}`}
                   hover
-                  onClick={() => navigate(`/organizations/${org.id}`)}
+                  onClick={(e) => {
+                    // Prevenir a navegação se o clique for em um elemento interativo
+                    if ((e.target as HTMLElement).closest("button, a")) {
+                      return;
+                    }
+                    navigate(`/organizations/${org.id}`);
+                  }}
                   sx={{ cursor: "pointer" }}
                 >
                   <TableCell sx={{ py: 2.5 }}>

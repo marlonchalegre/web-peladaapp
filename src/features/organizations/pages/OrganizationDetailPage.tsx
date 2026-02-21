@@ -9,6 +9,11 @@ import {
   Button,
   Paper,
   Stack,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import { api } from "../../../shared/api/client";
 import {
@@ -37,6 +42,8 @@ export default function OrganizationDetailPage() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
+  const [isLeaving, setIsLeaving] = useState(false);
 
   useEffect(() => {
     if (!orgId || !user) return;
@@ -104,6 +111,27 @@ export default function OrganizationDetailPage() {
     setPage(0);
   };
 
+  const confirmLeave = async () => {
+    if (!orgId) return;
+    setIsLeaving(true);
+    try {
+      await endpoints.leaveOrganization(orgId);
+      navigate("/");
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : t(
+              "organizations.detail.error.leave_failed",
+              "Falha ao sair da organização",
+            );
+      setError(message);
+      setLeaveDialogOpen(false);
+    } finally {
+      setIsLeaving(false);
+    }
+  };
+
   if (error)
     return (
       <Container sx={{ mt: 4 }}>
@@ -139,6 +167,16 @@ export default function OrganizationDetailPage() {
           >
             {t("organizations.detail.button.statistics")}
           </Button>
+          {!isAdmin && (
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => setLeaveDialogOpen(true)}
+              data-testid="leave-org-button"
+            >
+              {t("organizations.detail.button.leave", "Sair da Organização")}
+            </Button>
+          )}
           {isAdmin && (
             <Button
               component={RouterLink}
@@ -214,6 +252,44 @@ export default function OrganizationDetailPage() {
           />
         </Paper>
       </Stack>
+
+      {/* Confirmation Dialog */}
+      <Dialog
+        open={leaveDialogOpen}
+        onClose={() => !isLeaving && setLeaveDialogOpen(false)}
+      >
+        <DialogTitle>
+          {t("organizations.detail.leave_dialog.title", "Sair da Organização")}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {t(
+              "organizations.detail.leave_dialog.content",
+              "Tem certeza que deseja sair desta organização? Você perderá o acesso às peladas e estatísticas desta organização.",
+            )}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            onClick={() => setLeaveDialogOpen(false)}
+            disabled={isLeaving}
+            color="inherit"
+          >
+            {t("common.actions.cancel", "Cancelar")}
+          </Button>
+          <Button
+            onClick={confirmLeave}
+            disabled={isLeaving}
+            color="error"
+            variant="contained"
+            autoFocus
+          >
+            {isLeaving
+              ? t("common.loading", "Carregando...")
+              : t("common.actions.confirm", "Confirmar")}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }

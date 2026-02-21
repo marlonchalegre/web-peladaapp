@@ -42,10 +42,8 @@ export default function InvitePlayerDialog({
 
   const handleInvite = async () => {
     if (!email) return;
-    console.log("[InviteDialog] Inviting email:", email);
     try {
       await onInvite(email);
-      console.log("[InviteDialog] Invite success");
       setEmail("");
     } catch (err) {
       console.error("[InviteDialog] Invite failed:", err);

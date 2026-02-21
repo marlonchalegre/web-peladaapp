@@ -140,6 +140,8 @@ export function createApi(client: ApiClient) {
       client.post<Organization>("/api/organizations", { name }),
     deleteOrganization: (id: number) =>
       client.delete(`/api/organizations/${id}`),
+    leaveOrganization: (id: number) =>
+      client.post(`/api/organizations/${id}/leave`, {}),
     invitePlayer: (id: number, email: string) =>
       client.post<{
         user_id: number;

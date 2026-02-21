@@ -205,4 +205,106 @@ describe("OrganizationDetailPage", () => {
       expect(screen.getByText("Pelada Detail Page")).toBeInTheDocument();
     });
   });
+
+  it("shows leave organization button for non-admin players and opens confirmation dialog", async () => {
+    const mockOrg = { id: 2, name: "Non-Admin Org" };
+    const mockPeladas = {
+      data: [],
+      total: 0,
+      page: 1,
+      perPage: 10,
+      totalPages: 0,
+    };
+
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/organizations/2") return Promise.resolve(mockOrg);
+      if (path === "/api/organizations/2/admins") return Promise.resolve([]); // Not an admin
+      return Promise.reject(new Error(`Not found: ${path}`));
+    });
+    (api.getPaginated as Mock).mockImplementation((path: string) => {
+      if (path === "/api/organizations/2/peladas")
+        return Promise.resolve(mockPeladas);
+      return Promise.reject(new Error("Not found"));
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/organizations/2"]}>
+        <Routes>
+          <Route
+            path="/organizations/:id"
+            element={<OrganizationDetailPage />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Non-Admin Org")).toBeInTheDocument();
+    });
+
+    // Button should be present for non-admins
+    const leaveButton = screen.getByTestId("leave-org-button");
+    expect(leaveButton).toBeInTheDocument();
+
+    // Click leave button to open dialog
+    fireEvent.click(leaveButton);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("organizations.detail.leave_dialog.title"),
+      ).toBeInTheDocument();
+    });
+
+    // Mock leave API call
+    (api.post as Mock).mockResolvedValueOnce({});
+
+    // Click confirm in dialog
+    const confirmButton = screen.getByText("common.actions.confirm");
+    fireEvent.click(confirmButton);
+
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledWith("/api/organizations/2/leave", {});
+    });
+  });
+
+  it("does not show leave organization button for admins", async () => {
+    const mockOrg = { id: 1, name: "Admin Org" };
+    const mockPeladas = {
+      data: [],
+      total: 0,
+      page: 1,
+      perPage: 10,
+      totalPages: 0,
+    };
+
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/organizations/1") return Promise.resolve(mockOrg);
+      if (path === "/api/organizations/1/admins")
+        return Promise.resolve([{ user_id: 1, organization_id: 1 }]); // User is admin
+      return Promise.reject(new Error(`Not found: ${path}`));
+    });
+    (api.getPaginated as Mock).mockImplementation((path: string) => {
+      if (path === "/api/organizations/1/peladas")
+        return Promise.resolve(mockPeladas);
+      return Promise.reject(new Error("Not found"));
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/organizations/1"]}>
+        <Routes>
+          <Route
+            path="/organizations/:id"
+            element={<OrganizationDetailPage />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Admin Org")).toBeInTheDocument();
+    });
+
+    // Leave button should NOT be present for admins
+    expect(screen.queryByTestId("leave-org-button")).not.toBeInTheDocument();
+  });
 });

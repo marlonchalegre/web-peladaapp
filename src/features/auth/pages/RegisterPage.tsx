@@ -34,12 +34,9 @@ export default function RegisterPage() {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    console.log("Registering user:", { name, email, position });
     try {
       await register(name, email, password, position || undefined);
-      console.log("Registration success, logging in...");
       const { token, user } = await login(email, password);
-      console.log("Login success, token received");
       signIn(token, user);
       const redirect = searchParams.get("redirect") || "/";
       navigate(redirect);

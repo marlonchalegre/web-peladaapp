@@ -125,8 +125,24 @@ export default function AdminOrganizationsList({
                 <TableRow
                   key={`admin-${org.id}`}
                   hover
-                  onClick={() => navigate(`/organizations/${org.id}`)}
-                  sx={{ cursor: "pointer" }}
+                  onClick={(e) => {
+                    // Prevenir a navegação se o clique for em um elemento interativo
+                    if ((e.target as HTMLElement).closest("button, a")) {
+                      return;
+                    }
+                    navigate(`/organizations/${org.id}`);
+                  }}
+                  sx={{
+                    cursor: "pointer",
+                    "& .MuiTableCell-root": {
+                      position: "relative",
+                    },
+                    // Ensure the button is always on top and clickable
+                    "& button, & a": {
+                      position: "relative",
+                      zIndex: 2,
+                    },
+                  }}
                 >
                   <TableCell sx={{ py: 2.5 }}>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -172,8 +188,6 @@ export default function AdminOrganizationsList({
                   </TableCell>
                   <TableCell align="right" sx={{ py: 2.5 }}>
                     <Button
-                      component={RouterLink}
-                      to={`/organizations/${org.id}`}
                       variant="contained"
                       size="small"
                       sx={{
@@ -187,7 +201,11 @@ export default function AdminOrganizationsList({
                           boxShadow: "none",
                         },
                       }}
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/organizations/${org.id}/management`);
+                      }}
+                      data-testid={`manage-org-${org.id}`}
                     >
                       {t("common.actions.manage", "Gerenciar")}
                     </Button>
