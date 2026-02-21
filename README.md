@@ -111,6 +111,10 @@ The project follows a feature-based architecture:
 - **Organization Stats**: Comprehensive view of player rankings, win rates, and goal contributions within an organization.
 - **Match Day Dashboard**: Real-time summary of current pelada standings and player performance.
 
+### Organization Management
+
+- **Leave Organization**: Players can voluntarily leave an organization they are a member of (unless they are the last administrator).
+
 ---
 
 ## ⚙️ Configuration
