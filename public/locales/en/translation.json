@@ -407,6 +407,7 @@
       },
       "info": {
         "already_voted": "You have already voted in this pelada. You can change your votes until the voting period ends.",
+        "already_voted_view_change": "You have already voted. You can see your votes below and change them until the voting period ends.",
         "instructions": "Vote for all players who participated in the pelada (except yourself). Voting is mandatory for all listed players. Use 1 to 5 stars."
       },
       "button": {

@@ -81,6 +81,7 @@ export type VotingInfo = {
   can_vote: boolean;
   has_voted: boolean;
   eligible_players: { player_id: number; name: string }[];
+  current_votes?: { target_id: number; stars: number }[];
   voter_player_id?: number | null;
   message?: string;
 };

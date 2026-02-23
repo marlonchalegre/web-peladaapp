@@ -63,12 +63,17 @@ export default function PeladaVotingPage() {
           return;
         }
 
-        // Initialize player votes for eligible players
-        const votes: PlayerVote[] = info.eligible_players.map((p) => ({
-          playerId: p.player_id,
-          playerName: p.name,
-          stars: null,
-        }));
+        // Initialize player votes for eligible players, pre-populating with existing votes if available
+        const votes: PlayerVote[] = info.eligible_players.map((p) => {
+          const existingVote = info.current_votes?.find(
+            (v) => v.target_id === p.player_id,
+          );
+          return {
+            playerId: p.player_id,
+            playerName: p.name,
+            stars: existingVote ? existingVote.stars : null,
+          };
+        });
         setPlayerVotes(votes);
       } catch (error: unknown) {
         const message =
@@ -178,7 +183,7 @@ export default function PeladaVotingPage() {
 
       {votingInfo?.has_voted && (
         <Alert severity="info" sx={{ mb: 2 }}>
-          {t("peladas.voting.info.already_voted")}
+          {t("peladas.voting.info.already_voted_view_change")}
         </Alert>
       )}
 

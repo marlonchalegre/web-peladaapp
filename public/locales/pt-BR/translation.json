@@ -402,6 +402,7 @@
       },
       "info": {
         "already_voted": "Você já votou nesta pelada. Você pode alterar seus votos até o fim do período de votação.",
+        "already_voted_view_change": "Você já votou. Você pode ver seus votos abaixo e alterá-los até o fim do período de votação.",
         "instructions": "Vote em todos os jogadores que participaram da pelada (exceto você mesmo). O voto é obrigatório para todos os jogadores listados. Use de 1 a 5 estrelas."
       },
       "button": {
