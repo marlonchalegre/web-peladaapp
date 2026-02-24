@@ -19,6 +19,7 @@ FROM node:20-alpine AS build
 ARG TARGETARCH
 ARG VITE_APP_VERSION=dev
 ENV VITE_APP_VERSION=$VITE_APP_VERSION
+ENV NODE_OPTIONS=--max-old-space-size=4096
 WORKDIR /app
 # Use BuildKit cache for npm
 RUN --mount=type=cache,target=/root/.npm \
