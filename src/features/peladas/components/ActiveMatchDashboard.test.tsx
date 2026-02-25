@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { vi, describe, it, expect } from "vitest";
 import ActiveMatchDashboard from "./ActiveMatchDashboard";
 import type { Match, TeamPlayer, Player } from "../../../shared/api/endpoints";
+import { ThemeContextProvider } from "../../../app/providers/ThemeProvider";
 
 describe("ActiveMatchDashboard", () => {
   const mockMatch: Match = {
@@ -48,14 +49,22 @@ describe("ActiveMatchDashboard", () => {
   };
 
   it("renders team names and score", () => {
-    render(<ActiveMatchDashboard {...defaultProps} />);
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard {...defaultProps} />
+      </ThemeContextProvider>,
+    );
     expect(screen.getByText("Home Team")).toBeInTheDocument();
     expect(screen.getByText("Away Team")).toBeInTheDocument();
     expect(screen.getByText("2 x 1")).toBeInTheDocument();
   });
 
   it("renders player names and stats", () => {
-    render(<ActiveMatchDashboard {...defaultProps} />);
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard {...defaultProps} />
+      </ThemeContextProvider>,
+    );
     expect(screen.getByText("Player One")).toBeInTheDocument();
     expect(screen.getByText("Player Two")).toBeInTheDocument();
     // Check table headers
@@ -64,7 +73,11 @@ describe("ActiveMatchDashboard", () => {
   });
 
   it("renders substitution buttons and stat inputs", () => {
-    render(<ActiveMatchDashboard {...defaultProps} />);
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard {...defaultProps} />
+      </ThemeContextProvider>,
+    );
 
     // Total buttons expected:
     // 2 players

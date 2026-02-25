@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import TeamCard from "./TeamCard";
 import type { Player, Team, User } from "../../../shared/api/endpoints";
+import { ThemeContextProvider } from "../../../app/providers/ThemeProvider";
 
 // Mock react-i18next
 vi.mock("react-i18next", () => ({
@@ -47,14 +48,16 @@ describe("TeamCard", () => {
 
   it("renders team name and average score", () => {
     render(
-      <TeamCard
-        team={mockTeam}
-        players={mockPlayers}
-        averageScore={7.75}
-        onDelete={() => {}}
-        onDrop={async () => {}}
-        onDragStartPlayer={() => {}}
-      />,
+      <ThemeContextProvider>
+        <TeamCard
+          team={mockTeam}
+          players={mockPlayers}
+          averageScore={7.75}
+          onDelete={() => {}}
+          onDrop={async () => {}}
+          onDragStartPlayer={() => {}}
+        />
+      </ThemeContextProvider>,
     );
 
     expect(screen.getByText("Team Alpha")).toBeInTheDocument();
@@ -63,14 +66,16 @@ describe("TeamCard", () => {
 
   it("renders players with their names and positions in order", () => {
     render(
-      <TeamCard
-        team={mockTeam}
-        players={mockPlayers}
-        averageScore={7.75}
-        onDelete={() => {}}
-        onDrop={async () => {}}
-        onDragStartPlayer={() => {}}
-      />,
+      <ThemeContextProvider>
+        <TeamCard
+          team={mockTeam}
+          players={mockPlayers}
+          averageScore={7.75}
+          onDelete={() => {}}
+          onDrop={async () => {}}
+          onDragStartPlayer={() => {}}
+        />
+      </ThemeContextProvider>,
     );
 
     expect(screen.getByText("Player 1")).toBeInTheDocument();

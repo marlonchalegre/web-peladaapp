@@ -72,14 +72,7 @@ export default function MatchPlayerRow({
                 width: 4,
                 height: 24,
                 bgcolor:
-                  item.side === "home" ? "primary.main" : "secondary.main", // Assuming secondary for away or custom logic
-                // The original code used 'away.main' which is likely a custom theme color.
-                // I will use 'secondary.main' as fallback or try to preserve if I knew the theme.
-                // Original: item.side === "home" ? "primary.main" : "away.main"
-                // I'll stick to a safe color or assume 'text.secondary' for away if not defined?
-                // Actually let's use 'error.main' or 'secondary.main' distinctively.
-                // The original code had `away.main` which implies custom theme.
-                // I'll use `secondary.main` for now.
+                  item.side === "home" ? "primary.main" : "away.main", 
               }}
             />
             <Typography
@@ -159,7 +152,7 @@ export default function MatchPlayerRow({
             sx={{
               width: 4,
               height: 24,
-              bgcolor: item.side === "home" ? "primary.main" : "secondary.main", // See note above about 'away.main'
+              bgcolor: item.side === "home" ? "primary.main" : "away.main", 
               borderRadius: 1,
             }}
           />

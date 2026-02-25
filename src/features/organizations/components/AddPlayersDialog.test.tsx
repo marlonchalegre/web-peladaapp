@@ -31,7 +31,12 @@ describe("AddPlayersDialog", () => {
     // Default search result
     mockSearchUsers.mockResolvedValue({
       data: [
-        { id: 1, name: "Alice Smith", username: "alice", email: "alice@test.com" },
+        {
+          id: 1,
+          name: "Alice Smith",
+          username: "alice",
+          email: "alice@test.com",
+        },
         { id: 2, name: "Bob Jones", username: "bob", email: "bob@test.com" },
       ],
       total: 2,
@@ -80,7 +85,9 @@ describe("AddPlayersDialog", () => {
       render(<AddPlayersDialog {...defaultProps} />);
     });
 
-    const input = screen.getByPlaceholderText("common.fields.name / common.fields.email");
+    const input = screen.getByPlaceholderText(
+      "common.fields.name / common.fields.email",
+    );
 
     await act(async () => {
       fireEvent.change(input, { target: { value: "Cristiano" } });
@@ -192,7 +199,9 @@ describe("AddPlayersDialog", () => {
       render(<AddPlayersDialog {...defaultProps} />);
     });
 
-    const input = screen.getByPlaceholderText("common.fields.name / common.fields.email");
+    const input = screen.getByPlaceholderText(
+      "common.fields.name / common.fields.email",
+    );
 
     await act(async () => {
       fireEvent.change(input, { target: { value: "unknown-user" } });

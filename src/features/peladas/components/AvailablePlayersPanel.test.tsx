@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import AvailablePlayersPanel from "./AvailablePlayersPanel";
 import type { Player, User } from "../../../shared/api/endpoints";
+import { ThemeContextProvider } from "../../../app/providers/ThemeProvider";
 
 // Mock react-i18next
 vi.mock("react-i18next", () => ({
@@ -43,15 +44,17 @@ describe("AvailablePlayersPanel", () => {
 
   it("renders list of players with positions", () => {
     render(
-      <AvailablePlayersPanel
-        players={mockPlayers}
-        scores={{ 101: 9.0, 102: 8.0 }}
-        onDropToBench={() => {}}
-        onDragStartPlayer={() => {}}
-        totalPlayersInPelada={2}
-        averagePelada={8.5}
-        balance={100}
-      />,
+      <ThemeContextProvider>
+        <AvailablePlayersPanel
+          players={mockPlayers}
+          scores={{ 101: 9.0, 102: 8.0 }}
+          onDropToBench={() => {}}
+          onDragStartPlayer={() => {}}
+          totalPlayersInPelada={2}
+          averagePelada={8.5}
+          balance={100}
+        />
+      </ThemeContextProvider>,
     );
 
     expect(screen.getByText("Alice")).toBeInTheDocument();
@@ -62,15 +65,17 @@ describe("AvailablePlayersPanel", () => {
 
   it("filters players by name search", () => {
     render(
-      <AvailablePlayersPanel
-        players={mockPlayers}
-        scores={{ 101: 9.0, 102: 8.0 }}
-        onDropToBench={() => {}}
-        onDragStartPlayer={() => {}}
-        totalPlayersInPelada={2}
-        averagePelada={8.5}
-        balance={100}
-      />,
+      <ThemeContextProvider>
+        <AvailablePlayersPanel
+          players={mockPlayers}
+          scores={{ 101: 9.0, 102: 8.0 }}
+          onDropToBench={() => {}}
+          onDragStartPlayer={() => {}}
+          totalPlayersInPelada={2}
+          averagePelada={8.5}
+          balance={100}
+        />
+      </ThemeContextProvider>,
     );
 
     const searchInput = screen.getByPlaceholderText(

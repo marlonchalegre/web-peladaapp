@@ -60,9 +60,24 @@ describe("OrganizationManagementPage", () => {
     },
   ];
   const mockUsers = [
-    { id: 1, name: "Admin User", username: "admin", email: "admin@example.com" },
-    { id: 2, name: "Player User", username: "player", email: "player@example.com" },
-    { id: 3, name: "Search User", username: "search", email: "search@example.com" },
+    {
+      id: 1,
+      name: "Admin User",
+      username: "admin",
+      email: "admin@example.com",
+    },
+    {
+      id: 2,
+      name: "Player User",
+      username: "player",
+      email: "player@example.com",
+    },
+    {
+      id: 3,
+      name: "Search User",
+      username: "search",
+      email: "search@example.com",
+    },
   ];
 
   beforeEach(() => {
