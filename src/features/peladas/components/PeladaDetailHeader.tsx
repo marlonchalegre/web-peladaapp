@@ -70,8 +70,7 @@ export default function PeladaDetailHeader({
           {t("peladas.detail.button.view_matches")}
         </Button>
 
-        {(pelada.status === "open" ||
-          (pelada.status !== "closed" && isAdminOverride)) && (
+        {pelada.status === "open" && isAdminOverride && (
           <Button
             variant="contained"
             startIcon={<PlayArrowIcon />}

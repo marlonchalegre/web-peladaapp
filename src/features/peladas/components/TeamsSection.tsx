@@ -72,7 +72,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
           </Typography>
         </Box>
 
-        {(!locked || isAdminOverride) && (
+        {!locked && isAdminOverride && (
           <Stack direction="row" spacing={2}>
             <Button
               variant="outlined"
@@ -190,7 +190,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
           })}
 
           {/* Add Team Placeholder */}
-          {(!locked || isAdminOverride) && (
+          {!locked && isAdminOverride && (
             <Grid size={{ xs: 12, md: 6, lg: 4 }}>
               <Button
                 fullWidth
