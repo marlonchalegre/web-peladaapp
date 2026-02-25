@@ -37,6 +37,7 @@ describe("OrganizationManagementPage", () => {
       user_id: 1,
       organization_id: 1,
       user_name: "Admin User",
+      user_username: "admin",
       user_email: "admin@example.com",
     },
     {
@@ -44,6 +45,7 @@ describe("OrganizationManagementPage", () => {
       user_id: 2,
       organization_id: 1,
       user_name: "Player User",
+      user_username: "player",
       user_email: "player@example.com",
     },
   ];
@@ -53,13 +55,14 @@ describe("OrganizationManagementPage", () => {
       organization_id: 1,
       user_id: 1,
       user_name: "Admin User",
+      user_username: "admin",
       user_email: "admin@example.com",
     },
   ];
   const mockUsers = [
-    { id: 1, name: "Admin User", email: "admin@example.com" },
-    { id: 2, name: "Player User", email: "player@example.com" },
-    { id: 3, name: "Search User", email: "search@example.com" },
+    { id: 1, name: "Admin User", username: "admin", email: "admin@example.com" },
+    { id: 2, name: "Player User", username: "player", email: "player@example.com" },
+    { id: 3, name: "Search User", username: "search", email: "search@example.com" },
   ];
 
   beforeEach(() => {

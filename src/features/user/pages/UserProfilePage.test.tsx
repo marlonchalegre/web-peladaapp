@@ -29,6 +29,7 @@ describe("UserProfilePage", () => {
   const defaultUser = {
     id: 1,
     name: "Test User",
+    username: "testuser",
     email: "test@example.com",
     position: "Goalkeeper",
   };
@@ -54,6 +55,7 @@ describe("UserProfilePage", () => {
 
     await waitFor(() => {
       expect(screen.getByDisplayValue("Test User")).toBeInTheDocument();
+      expect(screen.getByDisplayValue("testuser")).toBeInTheDocument();
       expect(screen.getByDisplayValue("test@example.com")).toBeInTheDocument();
       expect(
         screen.getByText("common.positions.goalkeeper"),

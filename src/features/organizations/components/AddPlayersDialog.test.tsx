@@ -31,8 +31,8 @@ describe("AddPlayersDialog", () => {
     // Default search result
     mockSearchUsers.mockResolvedValue({
       data: [
-        { id: 1, name: "Alice Smith", email: "alice@test.com" },
-        { id: 2, name: "Bob Jones", email: "bob@test.com" },
+        { id: 1, name: "Alice Smith", username: "alice", email: "alice@test.com" },
+        { id: 2, name: "Bob Jones", username: "bob", email: "bob@test.com" },
       ],
       total: 2,
       page: 1,
@@ -80,7 +80,7 @@ describe("AddPlayersDialog", () => {
       render(<AddPlayersDialog {...defaultProps} />);
     });
 
-    const input = screen.getByPlaceholderText("common.fields.name / Email");
+    const input = screen.getByPlaceholderText("common.fields.name / common.fields.email");
 
     await act(async () => {
       fireEvent.change(input, { target: { value: "Cristiano" } });
@@ -95,8 +95,8 @@ describe("AddPlayersDialog", () => {
   it("excludes users present in excludeUserIds", async () => {
     mockSearchUsers.mockResolvedValue({
       data: [
-        { id: 1, name: "Alice", email: "" },
-        { id: 10, name: "Excluded", email: "" },
+        { id: 1, name: "Alice", username: "alice", email: "" },
+        { id: 10, name: "Excluded", username: "excluded", email: "" },
       ],
       total: 2,
       page: 1,
@@ -155,7 +155,7 @@ describe("AddPlayersDialog", () => {
 
   it("shows 'Load More' button when hasMore is true", async () => {
     mockSearchUsers.mockResolvedValue({
-      data: [{ id: 1, name: "Alice", email: "" }],
+      data: [{ id: 1, name: "Alice", username: "alice", email: "" }],
       total: 2,
       page: 1,
       perPage: 1,
@@ -192,7 +192,7 @@ describe("AddPlayersDialog", () => {
       render(<AddPlayersDialog {...defaultProps} />);
     });
 
-    const input = screen.getByPlaceholderText("common.fields.name / Email");
+    const input = screen.getByPlaceholderText("common.fields.name / common.fields.email");
 
     await act(async () => {
       fireEvent.change(input, { target: { value: "unknown-user" } });

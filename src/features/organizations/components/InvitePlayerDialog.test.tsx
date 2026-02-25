@@ -2,6 +2,13 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import InvitePlayerDialog from "./InvitePlayerDialog";
 
+// Mock react-i18next
+vi.mock("react-i18next", () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+  }),
+}));
+
 describe("InvitePlayerDialog", () => {
   const defaultProps = {
     open: true,
@@ -19,21 +26,23 @@ describe("InvitePlayerDialog", () => {
     expect(
       screen.getByText("organizations.dialog.invite_player.title"),
     ).toBeInTheDocument();
-    expect(screen.getByLabelText("auth.email")).toBeInTheDocument();
+    // Labels are now common.fields.email and common.fields.name
+    expect(screen.getByLabelText("common.fields.email")).toBeInTheDocument();
+    expect(screen.getByLabelText("common.fields.name")).toBeInTheDocument();
   });
 
   it("calls onInvite when send button is clicked", async () => {
     render(<InvitePlayerDialog {...defaultProps} />);
 
-    const emailInput = screen.getByLabelText("auth.email");
-    fireEvent.change(emailInput, { target: { value: "test@example.com" } });
+    const handleInput = screen.getByLabelText("common.fields.email");
+    fireEvent.change(handleInput, { target: { value: "testuser" } });
 
     const sendButton = screen.getByText(
       "organizations.dialog.invite_player.send_invite",
     );
     fireEvent.click(sendButton);
 
-    expect(defaultProps.onInvite).toHaveBeenCalledWith("test@example.com");
+    expect(defaultProps.onInvite).toHaveBeenCalledWith("testuser", undefined);
   });
 
   it("calls onFetchPublicLink when generate link button is clicked", () => {
