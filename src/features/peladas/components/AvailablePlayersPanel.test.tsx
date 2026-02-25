@@ -19,13 +19,25 @@ describe("AvailablePlayersPanel", () => {
       id: 101,
       user_id: 1,
       organization_id: 1,
-      user: { id: 1, name: "Alice", email: "a@e.com", position: "Goalkeeper" },
+      user: {
+        id: 1,
+        name: "Alice",
+        username: "alice",
+        email: "a@e.com",
+        position: "Goalkeeper",
+      },
     },
     {
       id: 102,
       user_id: 2,
       organization_id: 1,
-      user: { id: 2, name: "Bob", email: "b@e.com", position: "Striker" },
+      user: {
+        id: 2,
+        name: "Bob",
+        username: "bob",
+        email: "b@e.com",
+        position: "Striker",
+      },
     },
   ];
 

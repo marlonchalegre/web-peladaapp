@@ -42,7 +42,12 @@ describe("ProtectedRoute", () => {
     const authValue = mockAuthContext({
       isAuthenticated: true,
       token: "valid-token",
-      user: { id: 1, name: "Test User", email: "test@example.com" },
+      user: {
+        id: 1,
+        name: "Test User",
+        username: "testuser",
+        email: "test@example.com",
+      },
     });
 
     render(
@@ -113,7 +118,12 @@ describe("ProtectedRoute", () => {
     const authValue = mockAuthContext({
       isAuthenticated: true,
       token: "valid-token",
-      user: { id: 1, name: "Test User", email: "test@example.com" },
+      user: {
+        id: 1,
+        name: "Test User",
+        username: "testuser",
+        email: "test@example.com",
+      },
     });
 
     render(

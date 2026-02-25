@@ -67,6 +67,7 @@
     "create": "Create",
     "add": "Add",
     "close": "Close",
+    "optional": "Optional",
     "actions": "Actions",
     "select_placeholder": "Select...",
     "year": "Year",
@@ -97,6 +98,7 @@
       "rows_per_page": "Rows per page"
     },
     "fields": {
+      "username": "Username",
       "email": "Email",
       "password": "Password",
       "name": "Name",
@@ -247,7 +249,7 @@
     "dialog": {
       "add_players": {
         "title": "Add players",
-        "empty_users": "Type a name or email to search for users.",
+        "empty_users": "Type a name, username or email to search for users.",
         "no_results": "No users found for this search.",
         "select_all": "Select results",
         "clear_selection": "Clear selection",
@@ -257,7 +259,7 @@
       "invite_player": {
         "title": "Invite player",
         "personal_invite": "Personal Invite",
-        "description": "Enter the email of the player you want to invite to this organization.",
+        "description": "Enter the username or email of the player you want to invite to this organization.",
         "send_invite": "Send invite",
         "public_link": "Public Invite Link",
         "public_link_description": "Share this link with anyone to allow them to join the organization.",

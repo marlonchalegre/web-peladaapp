@@ -46,6 +46,7 @@ function TestComponent() {
           signIn("test-token", {
             id: 1,
             name: "Test User",
+            username: "testuser",
             email: "test@example.com",
           })
         }
@@ -85,6 +86,7 @@ describe("AuthProvider", () => {
     const mockUser = {
       id: 1,
       name: "Stored User",
+      username: "storeduser",
       email: "stored@example.com",
     };
 
@@ -152,7 +154,12 @@ describe("AuthProvider", () => {
     localStorage.setItem("authToken", "initial-token");
     localStorage.setItem(
       "authUser",
-      JSON.stringify({ id: 1, name: "User", email: "user@example.com" }),
+      JSON.stringify({
+        id: 1,
+        name: "User",
+        username: "user1",
+        email: "user@example.com",
+      }),
     );
 
     render(
@@ -194,7 +201,12 @@ describe("AuthProvider", () => {
     localStorage.clear();
     localStorage.setItem(
       "authUser",
-      JSON.stringify({ id: 1, name: "User", email: "user@example.com" }),
+      JSON.stringify({
+        id: 1,
+        name: "User",
+        username: "user1",
+        email: "user@example.com",
+      }),
     );
 
     rerender(
@@ -210,7 +222,12 @@ describe("AuthProvider", () => {
     localStorage.setItem("authToken", "initial-token");
     localStorage.setItem(
       "authUser",
-      JSON.stringify({ id: 1, name: "User", email: "user@example.com" }),
+      JSON.stringify({
+        id: 1,
+        name: "User",
+        username: "user1",
+        email: "user@example.com",
+      }),
     );
 
     render(
@@ -234,7 +251,12 @@ describe("AuthProvider", () => {
     localStorage.setItem("authToken", "expired-token");
     localStorage.setItem(
       "authUser",
-      JSON.stringify({ id: 1, name: "User", email: "user@example.com" }),
+      JSON.stringify({
+        id: 1,
+        name: "User",
+        username: "user1",
+        email: "user@example.com",
+      }),
     );
 
     render(

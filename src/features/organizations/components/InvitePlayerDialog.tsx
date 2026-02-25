@@ -19,8 +19,8 @@ import { useTranslation } from "react-i18next";
 type Props = {
   open: boolean;
   onClose: () => void;
-  onInvite: (email: string) => Promise<void>;
-  invitedUser: { email: string; isNew: boolean } | null;
+  onInvite: (email?: string, name?: string) => Promise<void>;
+  invitedUser: { email?: string; name?: string; isNew: boolean } | null;
   onClearInvited: () => void;
   publicInviteLink: string | null;
   onFetchPublicLink: () => Promise<void>;
@@ -38,19 +38,21 @@ export default function InvitePlayerDialog({
   loading,
 }: Props) {
   const { t } = useTranslation();
-  const [email, setEmail] = useState("");
+  const [handle, setHandle] = useState("");
+  const [name, setName] = useState("");
 
   const handleInvite = async () => {
-    if (!email) return;
+    if (!handle && !name) return;
     try {
-      await onInvite(email);
-      setEmail("");
+      await onInvite(handle || undefined, name || undefined);
+      setHandle("");
+      setName("");
     } catch (err) {
       console.error("[InviteDialog] Invite failed:", err);
     }
   };
 
-  const invitationLink = invitedUser
+  const invitationLink = invitedUser?.email
     ? `${window.location.origin}/first-access?email=${encodeURIComponent(invitedUser.email)}`
     : "";
 
@@ -79,22 +81,31 @@ export default function InvitePlayerDialog({
               <Typography variant="body2" color="text.secondary" gutterBottom>
                 {t("organizations.dialog.invite_player.description")}
               </Typography>
-              <Stack direction="row" spacing={1} alignItems="flex-start">
+              <Stack spacing={1.5}>
                 <TextField
                   fullWidth
                   size="small"
-                  label={t("auth.email")}
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  label={t("common.fields.email")}
+                  value={handle}
+                  onChange={(e) => setHandle(e.target.value)}
                   disabled={loading}
                   autoFocus
                   inputProps={{ "data-testid": "invite-email-input" }}
                 />
+                <TextField
+                  fullWidth
+                  size="small"
+                  label={t("common.fields.name")}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  disabled={loading}
+                  inputProps={{ "data-testid": "invite-name-input" }}
+                />
                 <Button
                   onClick={handleInvite}
                   variant="contained"
-                  disabled={!email || loading}
-                  sx={{ whiteSpace: "nowrap" }}
+                  disabled={(!handle && !name) || loading}
+                  fullWidth
                   data-testid="send-invite-button"
                 >
                   {t("organizations.dialog.invite_player.send_invite")}
@@ -154,7 +165,7 @@ export default function InvitePlayerDialog({
           </Stack>
         ) : (
           <Box sx={{ mt: 1 }}>
-            {invitedUser.isNew ? (
+            {invitedUser.isNew && invitedUser.email ? (
               <>
                 <Alert
                   severity="success"
@@ -192,13 +203,17 @@ export default function InvitePlayerDialog({
                   </IconButton>
                 </Box>
               </>
+            ) : invitedUser.isNew && !invitedUser.email ? (
+              <Alert severity="success" data-testid="invite-name-success-alert">
+                {t("common.welcome")} - {invitedUser.name} added!
+              </Alert>
             ) : (
               <Alert
                 severity="success"
                 data-testid="invite-existing-success-alert"
               >
                 {t("organizations.dialog.invite_player.existing_user_success", {
-                  email: invitedUser.email,
+                  email: invitedUser.email || invitedUser.name,
                 })}
               </Alert>
             )}

@@ -28,7 +28,8 @@ export function useOrganizationManagement(orgId: number) {
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [publicInviteLink, setPublicInviteLink] = useState<string | null>(null);
   const [invitedUser, setInvitedUser] = useState<{
-    email: string;
+    email?: string;
+    name?: string;
     isNew: boolean;
   } | null>(null);
   const [selectedUserIds, setSelectedUserIds] = useState<Set<number>>(
@@ -201,12 +202,16 @@ export function useOrganizationManagement(orgId: number) {
     }
   }, [orgId]);
 
-  const handleInvitePlayer = async (email: string) => {
+  const handleInvitePlayer = async (email?: string, name?: string) => {
     setActionLoading(true);
     setError(null);
     try {
-      const result = await endpoints.invitePlayer(orgId, email);
-      setInvitedUser({ email: result.email, isNew: result.is_new_user });
+      const result = await endpoints.invitePlayer(orgId, email, name);
+      setInvitedUser({
+        email: result.email,
+        name: result.name,
+        isNew: result.is_new_user,
+      });
       await fetchData();
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
@@ -236,22 +241,24 @@ export function useOrganizationManagement(orgId: number) {
 
     // Add data from players
     players.forEach((p) => {
-      if (p.user_id && p.user_name && p.user_email) {
+      if (p.user_id && p.user_name && p.user_username) {
         map.set(p.user_id, {
           id: p.user_id,
           name: p.user_name,
-          email: p.user_email,
+          username: p.user_username,
+          email: p.user_email || "",
         });
       }
     });
 
     // Add data from admins (can overwrite or supplement)
     admins.forEach((a) => {
-      if (a.user_id && a.user_name && a.user_email) {
+      if (a.user_id && a.user_name && a.user_username) {
         map.set(a.user_id, {
           id: a.user_id,
           name: a.user_name,
-          email: a.user_email,
+          username: a.user_username,
+          email: a.user_email || "",
         });
       }
     });

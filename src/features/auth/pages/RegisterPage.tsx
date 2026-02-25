@@ -24,6 +24,7 @@ export default function RegisterPage() {
   const { t } = useTranslation();
   const { signIn } = useAuth();
   const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [position, setPosition] = useState("");
@@ -35,8 +36,14 @@ export default function RegisterPage() {
     setError(null);
     setLoading(true);
     try {
-      await register(name, email, password, position || undefined);
-      const { token, user } = await login(email, password);
+      await register(
+        name,
+        username,
+        email || undefined,
+        password,
+        position || undefined,
+      );
+      const { token, user } = await login(username, password);
       signIn(token, user);
       const redirect = searchParams.get("redirect") || "/";
       navigate(redirect);
@@ -86,13 +93,24 @@ export default function RegisterPage() {
               inputProps={{ "data-testid": "register-name" }}
             />
             <TextField
+              id="username"
+              label={t("common.fields.username")}
+              autoComplete="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              fullWidth
+              inputProps={{ "data-testid": "register-username" }}
+            />
+            <TextField
               id="email"
-              label={t("common.fields.email")}
-              type="email"
+              label={
+                t("common.fields.email") + " (" + t("common.optional") + ")"
+              }
+              type="text"
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
               fullWidth
               inputProps={{ "data-testid": "register-email" }}
             />

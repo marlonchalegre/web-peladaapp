@@ -33,6 +33,7 @@ export default function UserProfilePage() {
   const navigate = useNavigate();
   const { user: authUser, signIn, signOut, token } = useAuth();
   const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [position, setPosition] = useState("");
   const [password, setPassword] = useState("");
@@ -54,7 +55,8 @@ export default function UserProfilePage() {
       try {
         const userData = await getUser(authUser.id);
         setName(userData.name);
-        setEmail(userData.email);
+        setUsername(userData.username);
+        setEmail(userData.email || "");
         setPosition(userData.position || "");
       } catch (error) {
         console.error("Failed to load user profile:", error);
@@ -98,12 +100,14 @@ export default function UserProfilePage() {
       // Prepare update data - only include fields that should be updated
       const updates: {
         name?: string;
+        username?: string;
         email?: string;
         password?: string;
         position?: string;
       } = {};
 
       if (name !== authUser.name) updates.name = name;
+      if (username !== authUser.username) updates.username = username;
       if (email !== authUser.email) updates.email = email;
       if (position !== authUser.position) updates.position = position;
       if (password) updates.password = password;
@@ -187,13 +191,24 @@ export default function UserProfilePage() {
             />
 
             <TextField
+              id="username"
+              label={t("common.fields.username")}
+              autoComplete="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              fullWidth
+              disabled={loading}
+              inputProps={{ "data-testid": "profile-username" }}
+            />
+
+            <TextField
               id="email"
               label={t("common.fields.email")}
-              type="email"
+              type="text"
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
               fullWidth
               disabled={loading}
               inputProps={{ "data-testid": "profile-email" }}

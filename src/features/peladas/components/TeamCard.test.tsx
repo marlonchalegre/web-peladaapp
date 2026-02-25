@@ -24,6 +24,7 @@ describe("TeamCard", () => {
       user: {
         id: 1,
         name: "Player 1",
+        username: "player1",
         email: "p1@e.com",
         position: "Goalkeeper",
       },
@@ -33,7 +34,13 @@ describe("TeamCard", () => {
       id: 102,
       user_id: 2,
       organization_id: 1,
-      user: { id: 2, name: "Player 2", email: "p2@e.com", position: "Striker" },
+      user: {
+        id: 2,
+        name: "Player 2",
+        username: "player2",
+        email: "p2@e.com",
+        position: "Striker",
+      },
       displayScore: "7.0",
     },
   ];

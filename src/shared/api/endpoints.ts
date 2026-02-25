@@ -4,7 +4,8 @@ export type Organization = { id: number; name: string };
 export type User = {
   id: number;
   name: string;
-  email: string;
+  username: string;
+  email?: string;
   admin_orgs?: number[];
   position?: string;
 };
@@ -15,6 +16,7 @@ export type Player = {
   grade?: number | null;
   position_id?: number | null;
   user_name?: string;
+  user_username?: string;
   user_email?: string;
 };
 export type OrganizationAdmin = {
@@ -22,6 +24,7 @@ export type OrganizationAdmin = {
   organization_id: number;
   user_id: number;
   user_name?: string;
+  user_username?: string;
   user_email?: string;
   organization_name?: string;
   created_at?: string;
@@ -143,13 +146,14 @@ export function createApi(client: ApiClient) {
       client.delete(`/api/organizations/${id}`),
     leaveOrganization: (id: number) =>
       client.post(`/api/organizations/${id}/leave`, {}),
-    invitePlayer: (id: number, email: string) =>
+    invitePlayer: (id: number, email?: string, name?: string) =>
       client.post<{
         user_id: number;
-        email: string;
+        email?: string;
+        name?: string;
         is_new_user: boolean;
         organization_id: number;
-      }>(`/api/organizations/${id}/invite`, { email }),
+      }>(`/api/organizations/${id}/invite`, { email, name }),
     getInviteLink: (id: number) =>
       client.get<{ token: string }>(`/api/organizations/${id}/invite-link`),
     getOrganizationStatistics: (id: number, year: number) =>
@@ -289,6 +293,7 @@ export function createApi(client: ApiClient) {
 
     firstAccess: (payload: {
       name: string;
+      username: string;
       email: string;
       password?: string;
       position?: string;

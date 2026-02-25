@@ -110,7 +110,9 @@ export default function AddPlayersDialog({
           <TextField
             fullWidth
             size="small"
-            placeholder={t("common.fields.name") + " / Email"}
+            placeholder={
+              t("common.fields.name") + " / " + t("common.fields.email")
+            }
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             autoFocus

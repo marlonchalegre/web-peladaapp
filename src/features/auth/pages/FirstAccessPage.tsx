@@ -28,6 +28,7 @@ export default function FirstAccessPage() {
   const [searchParams] = useSearchParams();
 
   const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState(searchParams.get("email") || "");
   const [password, setPassword] = useState("");
   const [position, setPosition] = useState("");
@@ -38,6 +39,11 @@ export default function FirstAccessPage() {
     const emailParam = searchParams.get("email");
     if (emailParam) {
       setEmail(emailParam);
+      // Also default username to email if it's not an actual email address
+      // (as it was used for handles before)
+      if (!emailParam.includes("@")) {
+        setUsername(emailParam);
+      }
     }
   }, [searchParams]);
 
@@ -48,6 +54,7 @@ export default function FirstAccessPage() {
     try {
       const { token, user } = await endpoints.firstAccess({
         name,
+        username,
         email,
         password,
         position: position || undefined,
@@ -98,14 +105,24 @@ export default function FirstAccessPage() {
             <TextField
               id="email"
               label={t("common.fields.email")}
-              type="email"
+              type="text"
               autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               fullWidth
-              disabled={!!searchParams.get("email")}
+              disabled={!!searchParams.get("email") && email.includes("@")}
               inputProps={{ "data-testid": "first-access-email" }}
+            />
+            <TextField
+              id="username"
+              label={t("common.fields.username")}
+              autoComplete="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              fullWidth
+              inputProps={{ "data-testid": "first-access-username" }}
             />
             <TextField
               id="name"

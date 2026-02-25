@@ -197,13 +197,15 @@ export type LoginResponse = {
 export type User = {
   id: number;
   name: string;
-  email: string;
+  username: string;
+  email?: string;
   admin_orgs?: number[];
   position?: string;
 };
 
 export type UserProfileUpdate = {
   name?: string;
+  username?: string;
   email?: string;
   password?: string;
   position?: string;
@@ -220,11 +222,18 @@ export async function login(
 
 export async function register(
   name: string,
-  email: string,
+  username: string,
+  email: string | undefined,
   password: string,
   position?: string,
 ): Promise<void> {
-  await api.post("/auth/register", { name, email, password, position });
+  await api.post("/auth/register", {
+    name,
+    username,
+    email,
+    password,
+    position,
+  });
 }
 
 export async function getUser(userId: number): Promise<User> {

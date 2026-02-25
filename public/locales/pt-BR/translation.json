@@ -67,6 +67,7 @@
     "create": "Criar",
     "add": "Adicionar",
     "close": "Fechar",
+    "optional": "Opcional",
     "actions": "Ações",
     "select_placeholder": "Selecione...",
     "year": "Ano",
@@ -97,6 +98,7 @@
       "rows_per_page": "Itens por página"
     },
     "fields": {
+      "username": "Username",
       "email": "Email",
       "password": "Senha",
       "name": "Nome",
@@ -242,7 +244,7 @@
     "dialog": {
       "add_players": {
         "title": "Adicionar jogadores",
-        "empty_users": "Digite um nome ou email para buscar usuários.",
+        "empty_users": "Digite um nome, username ou email para buscar usuários.",
         "no_results": "Nenhum usuário encontrado para esta busca.",
         "select_all": "Selecionar resultados",
         "clear_selection": "Limpar seleção",
@@ -252,7 +254,7 @@
       "invite_player": {
         "title": "Convidar jogador",
         "personal_invite": "Convite Pessoal",
-        "description": "Insira o email do jogador que você deseja convidar para esta organização.",
+        "description": "Insira o username ou email do jogador que você deseja convidar para esta organização.",
         "send_invite": "Enviar convite",
         "public_link": "Link de Convite Público",
         "public_link_description": "Compartilhe este link com qualquer pessoa para permitir que ela entre na organização.",
@@ -512,7 +514,7 @@
         "load_failed": "Falha ao carregar perfil do usuário",
         "password_mismatch": "As senhas não coincidem",
         "name_required": "Nome é obrigatório",
-        "email_required": "Email é obrigatório",
+        "email_required": "Handle é obrigatório",
         "not_authenticated": "Usuário não autenticado",
         "no_changes": "Nenhuma alteração detectada",
         "update_failed": "Falha ao atualizar perfil",
