@@ -366,6 +366,8 @@
     "matches": {
       "title": "Pelada #{{id}}",
       "loading": "Carregando partidas...",
+      "share_summary": "Compartilhar Resumo",
+      "summary_copied": "Resumo copiado para a área de transferência!",
       "status": {
         "closed": "Pelada encerrada"
       },

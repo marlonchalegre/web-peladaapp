@@ -183,6 +183,7 @@ export default function PeladaMatchesPage() {
             standings={standings}
             playerStats={playerStats}
             onToggleSort={togglePlayerSort}
+            scheduledAt={pelada?.scheduled_at}
           />
         </Grid>
       </Grid>
