@@ -11,7 +11,7 @@ import {
   TableCell,
   TableBody,
 } from "@mui/material";
-import { type Dispatch, type SetStateAction } from "react";
+import React, { type Dispatch, type SetStateAction } from "react";
 import { useTranslation } from "react-i18next";
 import { type TeamPlayer, type Player } from "../../../shared/api/endpoints";
 import MatchPlayerRow, { type DashboardRowItem } from "./MatchPlayerRow";
@@ -37,6 +37,10 @@ interface MatchControlTableProps {
   >;
   benchPlayers: Player[];
   finished: boolean;
+  isMatchFinished: boolean;
+  isPeladaClosed: boolean;
+  isEditing: boolean;
+  onToggleEdit: () => void;
   updating: boolean;
   selectMenu: SelectMenuState;
   setSelectMenu: Dispatch<SetStateAction<SelectMenuState>>;
@@ -63,6 +67,10 @@ export default function MatchControlTable({
   statsMap,
   benchPlayers,
   finished,
+  isMatchFinished,
+  isPeladaClosed,
+  isEditing,
+  onToggleEdit,
   updating,
   selectMenu,
   setSelectMenu,
@@ -144,6 +152,7 @@ export default function MatchControlTable({
         overflow: "hidden",
         display: "flex",
         flexDirection: "column",
+        ...(isEditing && { borderColor: "warning.main", borderWidth: 2 }),
       }}
     >
       <Stack
@@ -153,7 +162,7 @@ export default function MatchControlTable({
         sx={{ p: 2, pb: 1 }}
       >
         <Box />
-        {!finished ? (
+        {!isMatchFinished ? (
           <Button
             variant="contained"
             color="secondary"
@@ -164,14 +173,40 @@ export default function MatchControlTable({
             {t("peladas.dashboard.button.end_match")}
           </Button>
         ) : (
-          <Typography
-            variant="overline"
-            color="text.secondary"
-            sx={{ fontWeight: "bold" }}
-            data-testid="match-status-text"
-          >
-            {t("peladas.dashboard.status.finished")}
-          </Typography>
+          <Stack direction="row" spacing={2} alignItems="center">
+            {isEditing ? (
+              <Button
+                variant="contained"
+                color="warning"
+                onClick={onToggleEdit}
+                data-testid="finish-editing-button"
+              >
+                {t("peladas.dashboard.button.finish_editing")}
+              </Button>
+            ) : (
+              <>
+                <Typography
+                  variant="overline"
+                  color="text.secondary"
+                  sx={{ fontWeight: "bold" }}
+                  data-testid="match-status-text"
+                >
+                  {t("peladas.dashboard.status.finished")}
+                </Typography>
+                {!isPeladaClosed && (
+                  <Button
+                    variant="outlined"
+                    color="warning"
+                    size="small"
+                    onClick={onToggleEdit}
+                    data-testid="edit-match-button"
+                  >
+                    {t("peladas.dashboard.button.edit_match")}
+                  </Button>
+                )}
+              </>
+            )}
+          </Stack>
         )}
       </Stack>
       <TableContainer sx={{ flex: 1, overflowY: "auto" }}>
@@ -186,7 +221,7 @@ export default function MatchControlTable({
             </TableRow>
           </TableHead>
           <TableBody>
-            {allPlayersInMatch.map((tp) => {
+            {allPlayersInMatch.map((tp, index) => {
               const stats = statsMap[tp.player_id] || {
                 goals: 0,
                 assists: 0,
@@ -196,31 +231,53 @@ export default function MatchControlTable({
                 selectMenu?.teamId === tp.teamId &&
                 selectMenu?.forPlayerId === tp.player_id;
 
+              // Separator logic: if this is the first away player and we have home players
+              const isFirstAway =
+                tp.side === "away" &&
+                (index === 0 || allPlayersInMatch[index - 1].side === "home");
+
               return (
-                <MatchPlayerRow
-                  key={`${tp.side}-${tp.player_id}`}
-                  item={tp}
-                  stats={stats}
-                  playerName={getPlayerName(tp.player_id)}
-                  isSubMenuOpen={isSubMenuOpen}
-                  finished={finished}
-                  updating={updating}
-                  loadingGoals={loadingStats[`${tp.player_id}-goal`]}
-                  loadingAssists={loadingStats[`${tp.player_id}-assist`]}
-                  loadingOwnGoals={loadingStats[`${tp.player_id}-own_goal`]}
-                  benchPlayers={benchPlayers}
-                  onStatChange={(type, diff) =>
-                    onStatChange(tp.player_id, type, diff, tp.side)
-                  }
-                  onSubClick={() => handleSubClick(tp.teamId, tp.player_id)}
-                  onAddClick={() => handleAddClick(tp.teamId, tp.player_id)}
-                  onCloseMenu={() => setSelectMenu(null)}
-                  onReplace={(inId) =>
-                    onReplacePlayer(tp.teamId, tp.player_id, inId)
-                  }
-                  onAdd={(inId) => onAddPlayer(tp.teamId, inId)}
-                  getPlayerName={getPlayerName}
-                />
+                <React.Fragment key={`${tp.side}-${tp.player_id}`}>
+                  {isFirstAway && index > 0 && (
+                    <TableRow sx={{ bgcolor: "action.hover" }}>
+                      <TableCell
+                        colSpan={5}
+                        sx={{ py: 0.5, textAlign: "center" }}
+                      >
+                        <Typography
+                          variant="overline"
+                          color="text.secondary"
+                          sx={{ fontWeight: "bold", letterSpacing: 2 }}
+                        >
+                          VS
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                  <MatchPlayerRow
+                    item={tp}
+                    stats={stats}
+                    playerName={getPlayerName(tp.player_id)}
+                    isSubMenuOpen={isSubMenuOpen}
+                    finished={finished}
+                    updating={updating}
+                    loadingGoals={loadingStats[`${tp.player_id}-goal`]}
+                    loadingAssists={loadingStats[`${tp.player_id}-assist`]}
+                    loadingOwnGoals={loadingStats[`${tp.player_id}-own_goal`]}
+                    benchPlayers={benchPlayers}
+                    onStatChange={(type, diff) =>
+                      onStatChange(tp.player_id, type, diff, tp.side)
+                    }
+                    onSubClick={() => handleSubClick(tp.teamId, tp.player_id)}
+                    onAddClick={() => handleAddClick(tp.teamId, tp.player_id)}
+                    onCloseMenu={() => setSelectMenu(null)}
+                    onReplace={(inId) =>
+                      onReplacePlayer(tp.teamId, tp.player_id, inId)
+                    }
+                    onAdd={(inId) => onAddPlayer(tp.teamId, inId)}
+                    getPlayerName={getPlayerName}
+                  />
+                </React.Fragment>
               );
             })}
           </TableBody>

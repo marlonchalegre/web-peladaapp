@@ -430,7 +430,9 @@
       "no_bench_players": "No players on bench",
       "replace_with": "Replace with:",
       "button": {
-        "end_match": "End Match"
+        "end_match": "End Match",
+        "edit_match": "Edit Match",
+        "finish_editing": "Finish Editing"
       },
       "status": {
         "finished": "MATCH FINISHED"

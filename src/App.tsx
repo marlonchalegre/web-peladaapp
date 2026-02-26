@@ -254,11 +254,7 @@ function AppLayout() {
               />
               <Route
                 path="/peladas/:id/matches"
-                element={
-                  <Container maxWidth="lg" sx={{ py: 3 }}>
-                    <PeladaMatchesPage />
-                  </Container>
-                }
+                element={<PeladaMatchesPage />}
               />
               <Route
                 path="/peladas/:id/voting"

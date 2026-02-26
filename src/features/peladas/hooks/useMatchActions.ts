@@ -48,7 +48,13 @@ export function useMatchActions(
         throw new Error("NEGATIVE_SCORE");
       }
 
-      const status = newHome + newAway > 0 ? "running" : "scheduled";
+      const status =
+        match.status === "finished"
+          ? "finished"
+          : newHome + newAway > 0
+            ? "running"
+            : "scheduled";
+
       setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
       try {
         await endpoints.updateMatchScore(matchId, newHome, newAway, status);

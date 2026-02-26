@@ -47,9 +47,19 @@ export function usePeladaMatches(peladaId: number) {
 
   const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null);
 
-  // Auto-select first match
+  const handleEndMatch = async (matchId: number) => {
+    await actions.endMatch(matchId);
+    // Find next scheduled match using matchesRef (which has the latest data after refresh)
+    const nextMatch = matchesRef.current.find((m) => m.status === "scheduled");
+    if (nextMatch) {
+      setSelectedMatchId(nextMatch.id);
+    }
+  };
+
+  // Auto-select first match or the first scheduled match if nothing is selected
   if (!selectedMatchId && matches.length > 0) {
-    setSelectedMatchId(matches[0].id);
+    const firstScheduled = matches.find((m) => m.status === "scheduled");
+    setSelectedMatchId(firstScheduled ? firstScheduled.id : matches[0].id);
   }
 
   const selectedMatch = useMemo(
@@ -148,7 +158,7 @@ export function usePeladaMatches(peladaId: number) {
     recordEvent: actions.recordEvent,
     deleteEventAndRefresh: actions.deleteEventAndRefresh,
     addPlayerToTeam: actions.addPlayerToTeam,
-    endMatch: actions.endMatch,
+    endMatch: handleEndMatch,
     togglePlayerSort: standingsData.togglePlayerSort,
   };
 }

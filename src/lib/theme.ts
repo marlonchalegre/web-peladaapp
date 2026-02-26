@@ -3,9 +3,11 @@ import type { PaletteMode } from "@mui/material";
 
 declare module "@mui/material/styles" {
   interface Palette {
+    home: Palette["primary"];
     away: Palette["primary"];
   }
   interface PaletteOptions {
+    home?: PaletteOptions["primary"];
     away?: PaletteOptions["primary"];
   }
 }
@@ -23,8 +25,11 @@ export const getTheme = (mode: PaletteMode) =>
         main: "#6366f1", // indigo-500
         light: mode === "light" ? "#e0e7ff" : "#312e81", // indigo-100 or indigo-900
       },
-      away: {
+      home: {
         main: "#f97316", // orange-500
+      },
+      away: {
+        main: "#2563eb", // blue-600
       },
       success: {
         main: mode === "light" ? "#166534" : "#4ade80", // green-800 or green-400

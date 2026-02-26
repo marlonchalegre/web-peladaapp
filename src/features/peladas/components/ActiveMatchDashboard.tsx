@@ -18,6 +18,7 @@ type Props = {
   >;
   benchPlayers: Player[];
   finished: boolean;
+  isPeladaClosed: boolean;
   updating: boolean;
   selectMenu: SelectMenuState;
   setSelectMenu: Dispatch<SetStateAction<SelectMenuState>>;
@@ -59,6 +60,7 @@ export default function ActiveMatchDashboard(props: Props) {
     statsMap,
     benchPlayers,
     finished,
+    isPeladaClosed,
     updating,
     selectMenu,
     setSelectMenu,
@@ -72,6 +74,9 @@ export default function ActiveMatchDashboard(props: Props) {
   } = props;
 
   const [loadingStats, setLoadingStats] = useState<Record<string, boolean>>({});
+  const [isEditing, setIsEditing] = useState(false);
+
+  const effectiveFinished = finished && !isEditing;
 
   const handleStatChange = async (
     playerId: number,
@@ -127,7 +132,11 @@ export default function ActiveMatchDashboard(props: Props) {
         userIdToName={userIdToName}
         statsMap={statsMap}
         benchPlayers={benchPlayers}
-        finished={finished}
+        finished={effectiveFinished}
+        isMatchFinished={finished}
+        isPeladaClosed={isPeladaClosed}
+        isEditing={isEditing}
+        onToggleEdit={() => setIsEditing(!isEditing)}
         updating={updating}
         selectMenu={selectMenu}
         setSelectMenu={setSelectMenu}

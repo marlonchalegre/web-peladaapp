@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect } from "vitest";
 import ActiveMatchDashboard from "./ActiveMatchDashboard";
 import type { Match, TeamPlayer, Player } from "../../../shared/api/endpoints";
@@ -37,6 +38,7 @@ describe("ActiveMatchDashboard", () => {
     statsMap: mockStatsMap,
     benchPlayers: [] as Player[],
     finished: false,
+    isPeladaClosed: false,
     updating: false,
     selectMenu: null,
     setSelectMenu: vi.fn(),
@@ -89,5 +91,45 @@ describe("ActiveMatchDashboard", () => {
     // + 1 End Match button
     const buttons = screen.getAllByRole("button");
     expect(buttons).toHaveLength(15);
+  });
+
+  it("renders VS separator between home and away players", () => {
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard {...defaultProps} />
+      </ThemeContextProvider>,
+    );
+    expect(screen.getByText("VS")).toBeInTheDocument();
+  });
+
+  it("shows finished status and allows editing if match is finished and pelada is open", async () => {
+    const user = userEvent.setup();
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard {...defaultProps} finished={true} />
+      </ThemeContextProvider>,
+    );
+
+    expect(screen.getByTestId("match-status-text")).toBeInTheDocument();
+    const editBtn = screen.getByTestId("edit-match-button");
+    expect(editBtn).toBeInTheDocument();
+
+    await user.click(editBtn);
+    expect(screen.getByTestId("finish-editing-button")).toBeInTheDocument();
+  });
+
+  it("hides edit match button if pelada is closed", () => {
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          finished={true}
+          isPeladaClosed={true}
+        />
+      </ThemeContextProvider>,
+    );
+
+    expect(screen.getByTestId("match-status-text")).toBeInTheDocument();
+    expect(screen.queryByTestId("edit-match-button")).not.toBeInTheDocument();
   });
 });

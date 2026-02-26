@@ -71,8 +71,7 @@ export default function MatchPlayerRow({
               sx={{
                 width: 4,
                 height: 24,
-                bgcolor:
-                  item.side === "home" ? "primary.main" : "away.main", 
+                bgcolor: item.side === "home" ? "home.main" : "away.main",
               }}
             />
             <Typography
@@ -152,7 +151,7 @@ export default function MatchPlayerRow({
             sx={{
               width: 4,
               height: 24,
-              bgcolor: item.side === "home" ? "primary.main" : "away.main", 
+              bgcolor: item.side === "home" ? "home.main" : "away.main",
               borderRadius: 1,
             }}
           />

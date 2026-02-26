@@ -425,7 +425,9 @@
       "no_bench_players": "Nenhum jogador no banco",
       "replace_with": "Substituir por:",
       "button": {
-        "end_match": "Encerrar Partida"
+        "end_match": "Encerrar Partida",
+        "edit_match": "Editar Partida",
+        "finish_editing": "Finalizar Edição"
       },
       "status": {
         "finished": "PARTIDA ENCERRADA"

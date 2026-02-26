@@ -27,8 +27,8 @@ export default function Scoreboard({
         borderRadius: 2,
         border: "none",
         overflow: "hidden",
-        background: (theme) => 
-          `linear-gradient(90deg, ${theme.palette.primary.main} 50%, ${theme.palette.away.main} 50%)`
+        background: (theme) =>
+          `linear-gradient(90deg, ${theme.palette.home.main} 50%, ${theme.palette.away.main} 50%)`,
       }}
     >
       <Box sx={{ p: 2 }}>

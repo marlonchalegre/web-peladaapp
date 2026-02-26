@@ -57,7 +57,7 @@ export default function PeladaMatchesPage() {
   if (error) return <Alert severity="error">{error}</Alert>;
 
   return (
-    <Box sx={{ flexGrow: 1, p: 2 }}>
+    <Box sx={{ flexGrow: 1, py: 3, px: 4 }}>
       <Box
         sx={{
           mb: 3,
@@ -151,7 +151,8 @@ export default function PeladaMatchesPage() {
               userIdToName={userIdToName}
               statsMap={currentMatchStats}
               benchPlayers={activeMatchData.benchPlayers}
-              finished={activeMatchData.finished || isPeladaClosed}
+              finished={activeMatchData.finished}
+              isPeladaClosed={isPeladaClosed}
               updating={!!updatingScore[selectedMatch.id]}
               selectMenu={selectMenu}
               setSelectMenu={setSelectMenu}

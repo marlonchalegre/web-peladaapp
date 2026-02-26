@@ -47,7 +47,7 @@ describe("Admin Actions Visibility", () => {
           <ThemeContextProvider>
             <PeladaDetailHeader {...headerProps} isAdminOverride={true} />
           </ThemeContextProvider>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
       expect(screen.getByTestId("start-pelada-button")).toBeInTheDocument();
     });
@@ -58,24 +58,28 @@ describe("Admin Actions Visibility", () => {
           <ThemeContextProvider>
             <PeladaDetailHeader {...headerProps} isAdminOverride={false} />
           </ThemeContextProvider>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
-      expect(screen.queryByTestId("start-pelada-button")).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId("start-pelada-button"),
+      ).not.toBeInTheDocument();
     });
 
     it("hides Start Pelada button when pelada is already running even for admins", () => {
       render(
         <MemoryRouter>
           <ThemeContextProvider>
-            <PeladaDetailHeader 
-              {...headerProps} 
-              pelada={{ ...mockPelada, status: "running" }} 
-              isAdminOverride={true} 
+            <PeladaDetailHeader
+              {...headerProps}
+              pelada={{ ...mockPelada, status: "running" }}
+              isAdminOverride={true}
             />
           </ThemeContextProvider>
-        </MemoryRouter>
+        </MemoryRouter>,
       );
-      expect(screen.queryByTestId("start-pelada-button")).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId("start-pelada-button"),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -83,8 +87,12 @@ describe("Admin Actions Visibility", () => {
     it("shows Randomize and Create Team buttons for admins when open", () => {
       render(
         <ThemeContextProvider>
-          <TeamsSection {...teamsSectionProps} locked={false} isAdminOverride={true} />
-        </ThemeContextProvider>
+          <TeamsSection
+            {...teamsSectionProps}
+            locked={false}
+            isAdminOverride={true}
+          />
+        </ThemeContextProvider>,
       );
       expect(screen.getByTestId("randomize-teams-button")).toBeInTheDocument();
       expect(screen.getByTestId("create-team-button")).toBeInTheDocument();
@@ -93,21 +101,37 @@ describe("Admin Actions Visibility", () => {
     it("hides Randomize and Create Team buttons for non-admins", () => {
       render(
         <ThemeContextProvider>
-          <TeamsSection {...teamsSectionProps} locked={false} isAdminOverride={false} />
-        </ThemeContextProvider>
+          <TeamsSection
+            {...teamsSectionProps}
+            locked={false}
+            isAdminOverride={false}
+          />
+        </ThemeContextProvider>,
       );
-      expect(screen.queryByTestId("randomize-teams-button")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("create-team-button")).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId("randomize-teams-button"),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId("create-team-button"),
+      ).not.toBeInTheDocument();
     });
 
     it("hides buttons when locked (running/closed) even for admins", () => {
       render(
         <ThemeContextProvider>
-          <TeamsSection {...teamsSectionProps} locked={true} isAdminOverride={true} />
-        </ThemeContextProvider>
+          <TeamsSection
+            {...teamsSectionProps}
+            locked={true}
+            isAdminOverride={true}
+          />
+        </ThemeContextProvider>,
       );
-      expect(screen.queryByTestId("randomize-teams-button")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("create-team-button")).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId("randomize-teams-button"),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId("create-team-button"),
+      ).not.toBeInTheDocument();
     });
   });
 });
