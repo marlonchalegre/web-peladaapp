@@ -15,7 +15,7 @@ EXPOSE 8080
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "8080"]
 
 # Frontend prod image - builds then serves via nginx
-FROM node:20-alpine AS build
+FROM --platform=$BUILDPLATFORM node:20-alpine AS build
 ARG TARGETARCH
 ARG VITE_APP_VERSION=dev
 ENV VITE_APP_VERSION=$VITE_APP_VERSION
