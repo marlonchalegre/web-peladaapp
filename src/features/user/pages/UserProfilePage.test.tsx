@@ -131,4 +131,33 @@ describe("UserProfilePage", () => {
       });
     });
   });
+
+  it("allows updating profile with empty email", async () => {
+    (getUser as Mock).mockResolvedValue(defaultUser);
+    (updateUserProfile as Mock).mockResolvedValue({
+      ...defaultUser,
+      email: "",
+    });
+
+    render(
+      <MemoryRouter>
+        <UserProfilePage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("test@example.com")).toBeInTheDocument();
+    });
+
+    const emailInput = screen.getByLabelText(/common.fields.email/i);
+    fireEvent.change(emailInput, { target: { value: "" } });
+
+    fireEvent.click(screen.getByText("user.profile.button.save"));
+
+    await waitFor(() => {
+      expect(updateUserProfile).toHaveBeenCalledWith(1, {
+        email: "",
+      });
+    });
+  });
 });

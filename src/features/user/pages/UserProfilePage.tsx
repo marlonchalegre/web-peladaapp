@@ -88,11 +88,6 @@ export default function UserProfilePage() {
       return;
     }
 
-    if (!email.trim()) {
-      setError(t("user.profile.error.email_required"));
-      return;
-    }
-
     setLoading(true);
     try {
       if (!authUser) throw new Error(t("user.profile.error.not_authenticated"));

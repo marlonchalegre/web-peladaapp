@@ -516,7 +516,7 @@
         "load_failed": "Falha ao carregar perfil do usuário",
         "password_mismatch": "As senhas não coincidem",
         "name_required": "Nome é obrigatório",
-        "email_required": "Handle é obrigatório",
+        "email_required": "Email é obrigatório",
         "not_authenticated": "Usuário não autenticado",
         "no_changes": "Nenhuma alteração detectada",
         "update_failed": "Falha ao atualizar perfil",
