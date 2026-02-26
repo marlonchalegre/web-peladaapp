@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { formatPeladaSummary } from "./formatSummary";
 import { type StandingRow } from "../components/StandingsPanel";
 import { type PlayerStatRow } from "../components/PlayerStatsPanel";
