@@ -8,6 +8,7 @@ import {
   Paper,
 } from "@mui/material";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import PanToolIcon from "@mui/icons-material/PanTool";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { useTranslation } from "react-i18next";
 import { type Player } from "../../../shared/api/endpoints";
@@ -19,6 +20,7 @@ export type DashboardRowItem = {
   side: "home" | "away";
   teamId: number;
   isEmpty: boolean;
+  is_goalkeeper?: boolean;
 };
 
 interface MatchPlayerRowProps {
@@ -144,7 +146,7 @@ export default function MatchPlayerRow({
   }
 
   return (
-    <TableRow hover data-testid={`player-row-${playerName}`}>
+    <TableRow hover data-testid="player-row">
       <TableCell>
         <Stack direction="row" alignItems="center" spacing={1}>
           <Box
@@ -158,6 +160,12 @@ export default function MatchPlayerRow({
           <Typography variant="body2" data-testid="player-name">
             {playerName}
           </Typography>
+          {!!item.is_goalkeeper && (
+            <PanToolIcon
+              sx={{ fontSize: 14, color: "secondary.main", ml: 0.5 }}
+              titleAccess={t("common.positions.goalkeeper")}
+            />
+          )}
         </Stack>
         {isSubMenuOpen && (
           <Paper

@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import TeamsSection from "../components/TeamsSection";
 import AvailablePlayersPanel from "../components/AvailablePlayersPanel";
+import FixedGoalkeepersSection from "../components/FixedGoalkeepersSection";
 import { usePeladaDetail } from "../hooks/usePeladaDetail";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { api } from "../../../shared/api/client";
@@ -25,6 +26,8 @@ export default function PeladaDetailPage() {
     teams,
     teamPlayers,
     benchPlayers,
+    homeGk,
+    awayGk,
     votingInfo,
     scores,
     error,
@@ -39,6 +42,10 @@ export default function PeladaDetailPage() {
     onDragStartPlayer,
     dropToBench,
     dropToTeam,
+    dropToFixedGk,
+    removeFixedGk,
+    handleSetGoalkeeper,
+    handleRemovePlayer,
     handleRandomizeTeams,
     handleBeginPelada,
     handleCreateTeam,
@@ -97,8 +104,19 @@ export default function PeladaDetailPage() {
 
       {/* Main Layout */}
       <Grid container spacing={4}>
-        {/* Left Column: Teams */}
+        {/* Left Column: Teams & GKs */}
         <Grid size={{ xs: 12, lg: 9 }}>
+          {pelada.fixed_goalkeepers && (
+            <FixedGoalkeepersSection
+              homeGk={homeGk}
+              awayGk={awayGk}
+              onDrop={dropToFixedGk}
+              onRemove={removeFixedGk}
+              locked={pelada.status !== "open"}
+              onDragStartPlayer={onDragStartPlayer}
+            />
+          )}
+
           <TeamsSection
             teams={teams}
             teamPlayers={teamPlayers}
@@ -109,9 +127,12 @@ export default function PeladaDetailPage() {
             onDeleteTeam={handleDeleteTeam}
             onDragStartPlayer={onDragStartPlayer}
             dropToTeam={dropToTeam}
+            onSetGoalkeeper={handleSetGoalkeeper}
+            onRemovePlayer={handleRemovePlayer}
             onRandomizeTeams={handleRandomizeTeams}
             scores={scores}
             isAdminOverride={actuallyIsAdmin}
+            fixedGoalkeepersEnabled={false} // Disabled individual team slots
           />
         </Grid>
 

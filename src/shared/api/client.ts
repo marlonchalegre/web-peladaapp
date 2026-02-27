@@ -60,13 +60,13 @@ export class ApiClient {
 
   private async handleResponse<T>(res: Response): Promise<T> {
     if (!res.ok) {
-      const errorData = await res
+      const errorData = (await res
         .json()
-        .catch(() => ({ error: res.statusText }));
+        .catch(() => ({ error: res.statusText }))) as Record<string, unknown>;
       const apiError = new ApiError(
         res.status,
         errorData,
-        errorData.error || errorData.message,
+        (errorData.message as string) || (errorData.error as string),
       );
 
       // Trigger auth error handler for 401 errors

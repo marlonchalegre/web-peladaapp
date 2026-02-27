@@ -93,6 +93,7 @@ export function usePeladaData(peladaId: number) {
           asTeamPlayers[Number(teamIdStr)] = (arr || []).map((e) => ({
             team_id: e.team_id,
             player_id: e.player_id,
+            is_goalkeeper: e.is_goalkeeper,
           }));
         }
         setTeamPlayers(asTeamPlayers);
@@ -109,6 +110,7 @@ export function usePeladaData(peladaId: number) {
             asTeamPlayersForMatch[Number(teamIdStr)] = (arr || []).map((e) => ({
               team_id: e.team_id,
               player_id: e.player_id,
+              is_goalkeeper: e.is_goalkeeper,
             }));
           }
           luMap[mid] = asTeamPlayersForMatch;

@@ -1,6 +1,12 @@
 import { useMemo } from "react";
 import type { FormEvent } from "react";
-import { Grid, TextField, Button } from "@mui/material";
+import {
+  Grid,
+  TextField,
+  Button,
+  FormControlLabel,
+  Switch,
+} from "@mui/material";
 import { useTranslation } from "react-i18next";
 
 export type CreatePeladaPayload = {
@@ -8,6 +14,7 @@ export type CreatePeladaPayload = {
   when: string;
   num_teams: number;
   players_per_team: number;
+  fixed_goalkeepers?: boolean;
 };
 
 type Props = {
@@ -37,6 +44,8 @@ export default function CreatePeladaForm({ organizationId, onCreate }: Props) {
         const when = date && time ? `${date}T${time}` : "";
         const numTeams = Number(data.get("num_teams") || 2);
         const playersPerTeam = Number(data.get("players_per_team") || 5);
+        const fixedGoalkeepers = data.get("fixed_goalkeepers") === "on";
+
         if (!when) return;
         if (numTeams < 2 || playersPerTeam < 1) return;
         await onCreate({
@@ -44,6 +53,7 @@ export default function CreatePeladaForm({ organizationId, onCreate }: Props) {
           when,
           num_teams: numTeams,
           players_per_team: playersPerTeam,
+          fixed_goalkeepers: fixedGoalkeepers,
         });
         formEl?.reset();
       }}
@@ -89,6 +99,12 @@ export default function CreatePeladaForm({ organizationId, onCreate }: Props) {
             label={t("organizations.form.pelada.players_per_team")}
             inputProps={{ min: 1 }}
             defaultValue={5}
+          />
+        </Grid>
+        <Grid size={{ xs: 12 }}>
+          <FormControlLabel
+            control={<Switch name="fixed_goalkeepers" color="primary" />}
+            label={t("organizations.form.pelada.fixed_goalkeepers")}
           />
         </Grid>
         <Grid size={{ xs: 12 }}>

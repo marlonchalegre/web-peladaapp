@@ -16,8 +16,6 @@ import { useTranslation } from "react-i18next";
 import { type TeamPlayer, type Player } from "../../../shared/api/endpoints";
 import MatchPlayerRow, { type DashboardRowItem } from "./MatchPlayerRow";
 
-// Defined locally or imported if shared.
-// Since ActiveMatchDashboard used it locally, I will define here or assume passed as props.
 export type SelectMenuState = {
   teamId: number;
   forPlayerId?: number;
@@ -88,7 +86,14 @@ export default function MatchControlTable({
     side: "home" | "away",
     teamId: number,
   ): DashboardRowItem[] => {
-    const list: DashboardRowItem[] = players.map((p) => ({
+    // Sort players: Goalkeepers first
+    const sortedPlayers = [...players].sort((a, b) => {
+      if (a.is_goalkeeper && !b.is_goalkeeper) return -1;
+      if (!a.is_goalkeeper && b.is_goalkeeper) return 1;
+      return 0;
+    });
+
+    const list: DashboardRowItem[] = sortedPlayers.map((p) => ({
       ...p,
       side,
       teamId,
@@ -231,7 +236,6 @@ export default function MatchControlTable({
                 selectMenu?.teamId === tp.teamId &&
                 selectMenu?.forPlayerId === tp.player_id;
 
-              // Separator logic: if this is the first away player and we have home players
               const isFirstAway =
                 tp.side === "away" &&
                 (index === 0 || allPlayersInMatch[index - 1].side === "home");

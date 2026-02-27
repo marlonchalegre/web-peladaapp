@@ -124,11 +124,14 @@
   },
   "home": {
     "error": {
-      "load_failed": "Erro ao carregar organizações"
+      "load_failed": "Erro ao carregar organizações",
+      "invalid_format_org_list": "Formato de lista de organizações inválido"
     },
     "welcome": {
       "guest": "Por favor, faça login.",
-      "user": "Bem-vindo, {{name}}!"
+      "user": "Bem-vindo, {{name}}!",
+      "prefix": "Bem-vindo, ",
+      "subtitle": "Aqui está o resumo das suas atividades."
     },
     "sections": {
       "pending_invitations": {
@@ -145,13 +148,14 @@
       },
       "member_orgs": {
         "title": "Organizações que faço parte (Jogador)",
-        "empty": "Você não faz parte de nenhuma organização como jogador."
+        "empty": "Você não faz parte de nenhuma organização como jogador.",
+        "empty_desc": "No momento, você não faz parte de nenhuma organização como jogador."
       }
     },
     "table": {
       "headers": {
-        "date": "Data",
-        "status": "Status",
+        "date": "DATA",
+        "status": "STATUS",
         "org_name": "Nome da Organização",
         "role": "Função"
       }
@@ -238,6 +242,7 @@
       "pelada": {
         "teams_count": "Quantidade de times",
         "players_per_team": "Jogadores por time",
+        "fixed_goalkeepers": "Goleiros Fixos",
         "submit": "Criar pelada"
       }
     },
@@ -344,7 +349,9 @@
         "randomize_failed": "Erro ao randomizar times",
         "start_failed": "Erro ao iniciar pelada",
         "create_team_failed": "Erro ao criar time",
-        "delete_team_failed": "Erro ao excluir time"
+        "delete_team_failed": "Erro ao excluir time",
+        "set_goalkeeper_failed": "Erro ao definir goleiro",
+        "remove_player_failed": "Erro ao remover jogador"
       },
       "live": {
         "moved_to_bench": "Jogador #{{playerId}} movido para banco",
@@ -465,6 +472,14 @@
         "create": "Criar Time",
         "add_placeholder": "Adicionar Time"
       },
+      "menu": {
+        "set_goalkeeper": "Definir como Goleiro",
+        "remove_player": "Remover do Time"
+      },
+      "fixed_goalkeepers_title": "Goleiros Fixos da Sessão",
+      "home_goalkeeper": "GOLEIRO (CASA)",
+      "away_goalkeeper": "GOLEIRO (FORA)",
+      "drag_gk_here": "Arraste um goleiro para cá",
       "default_name": "Time {{number}}"
     },
     "team_card": {

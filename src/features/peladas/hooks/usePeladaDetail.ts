@@ -20,7 +20,9 @@ import { useAuth } from "../../../app/providers/AuthContext";
 
 const endpoints = createApi(api);
 
-export type TeamWithPlayers = Team & { players: (Player & { user: User })[] };
+export type TeamWithPlayers = Team & {
+  players: (Player & { user: User; is_goalkeeper?: boolean })[];
+};
 
 export function usePeladaDetail(peladaId: number) {
   const { t } = useTranslation();
@@ -30,7 +32,7 @@ export function usePeladaDetail(peladaId: number) {
   const [pelada, setPelada] = useState<Pelada | null>(null);
   const [teams, setTeams] = useState<TeamWithPlayers[]>([]);
   const [teamPlayers, setTeamPlayers] = useState<
-    Record<number, (Player & { user: User })[]>
+    Record<number, (Player & { user: User; is_goalkeeper?: boolean })[]>
   >({});
   const [availablePlayers, setAvailablePlayers] = useState<
     (Player & { user: User })[]
@@ -62,7 +64,10 @@ export function usePeladaDetail(peladaId: number) {
       setVotingInfo(data.voting_info);
       if (data.scores) setScores(data.scores);
 
-      const playersByTeam: Record<number, (Player & { user: User })[]> = {};
+      const playersByTeam: Record<
+        number,
+        (Player & { user: User; is_goalkeeper?: boolean })[]
+      > = {};
       for (const t of data.teams) {
         playersByTeam[t.id] = t.players;
       }
@@ -90,14 +95,42 @@ export function usePeladaDetail(peladaId: number) {
     [teamPlayers],
   );
 
+  const globalGkIds = useMemo(() => {
+    return new Set(
+      [
+        pelada?.home_fixed_goalkeeper_id,
+        pelada?.away_fixed_goalkeeper_id,
+      ].filter(Boolean) as number[],
+    );
+  }, [pelada]);
+
   const benchPlayers = useMemo(
-    () => availablePlayers.filter((p) => !assignedIds.has(p.id)),
-    [availablePlayers, assignedIds],
+    () =>
+      availablePlayers.filter(
+        (p) => !assignedIds.has(p.id) && !globalGkIds.has(p.id),
+      ),
+    [availablePlayers, assignedIds, globalGkIds],
   );
+
+  const homeGk = useMemo(() => {
+    if (!pelada?.home_fixed_goalkeeper_id) return null;
+    return (
+      availablePlayers.find((p) => p.id === pelada.home_fixed_goalkeeper_id) ||
+      null
+    );
+  }, [pelada?.home_fixed_goalkeeper_id, availablePlayers]);
+
+  const awayGk = useMemo(() => {
+    if (!pelada?.away_fixed_goalkeeper_id) return null;
+    return (
+      availablePlayers.find((p) => p.id === pelada.away_fixed_goalkeeper_id) ||
+      null
+    );
+  }, [pelada?.away_fixed_goalkeeper_id, availablePlayers]);
 
   const stats = useMemo(() => {
     const allPlayers = [...benchPlayers, ...Object.values(teamPlayers).flat()];
-    const totalPlayers = allPlayers.length;
+    const totalPlayers = allPlayers.length + globalGkIds.size;
 
     const validScores = allPlayers
       .map((p) => scores[p.id] ?? p.grade)
@@ -133,7 +166,7 @@ export function usePeladaDetail(peladaId: number) {
     }
 
     return { totalPlayers, averagePelada, balance };
-  }, [benchPlayers, teamPlayers, scores]);
+  }, [benchPlayers, teamPlayers, scores, globalGkIds]);
 
   function onDragStartPlayer(
     e: DragEvent<HTMLElement>,
@@ -174,10 +207,23 @@ export function usePeladaDetail(peladaId: number) {
     const data = parseDrag(e);
     if (!data) return;
     const { playerId, sourceTeamId } = data;
-    if (sourceTeamId == null) return; // already bench
+
     setProcessing(true);
     try {
-      await endpoints.removePlayerFromTeam(sourceTeamId, playerId);
+      if (sourceTeamId != null) {
+        await endpoints.removePlayerFromTeam(sourceTeamId, playerId);
+      } else {
+        // Might be a global GK being removed
+        if (playerId === pelada?.home_fixed_goalkeeper_id) {
+          await api.put(`/api/peladas/${peladaId}`, {
+            home_fixed_goalkeeper_id: null,
+          });
+        } else if (playerId === pelada?.away_fixed_goalkeeper_id) {
+          await api.put(`/api/peladas/${peladaId}`, {
+            away_fixed_goalkeeper_id: null,
+          });
+        }
+      }
       await fetchPeladaData();
       setLive(t("peladas.detail.live.moved_to_bench", { playerId }));
     } catch (error: unknown) {
@@ -201,12 +247,24 @@ export function usePeladaDetail(peladaId: number) {
     if (!data) return;
     const { playerId, sourceTeamId } = data;
     if (sourceTeamId === targetTeamId) return;
+
     setProcessing(true);
     try {
       if (sourceTeamId != null) {
         await endpoints.removePlayerFromTeam(sourceTeamId, playerId);
+      } else {
+        // If it was a global GK, unset it
+        if (playerId === pelada?.home_fixed_goalkeeper_id) {
+          await api.put(`/api/peladas/${peladaId}`, {
+            home_fixed_goalkeeper_id: null,
+          });
+        } else if (playerId === pelada?.away_fixed_goalkeeper_id) {
+          await api.put(`/api/peladas/${peladaId}`, {
+            away_fixed_goalkeeper_id: null,
+          });
+        }
       }
-      await endpoints.addPlayerToTeam(targetTeamId, playerId);
+      await endpoints.addPlayerToTeam(targetTeamId, playerId, false);
       await fetchPeladaData();
       const tName =
         teams.find((t) => t.id === targetTeamId)?.name || String(targetTeamId);
@@ -218,6 +276,97 @@ export function usePeladaDetail(peladaId: number) {
         error instanceof Error
           ? error.message
           : t("peladas.detail.error.move_player_failed");
+      setError(message);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const dropToFixedGk = async (
+    e: DragEvent<HTMLElement>,
+    side: "home" | "away",
+  ) => {
+    e.preventDefault();
+    if (processing) return;
+    const data = parseDrag(e);
+    if (!data) return;
+    const { playerId, sourceTeamId } = data;
+
+    setProcessing(true);
+    try {
+      if (sourceTeamId != null) {
+        await endpoints.removePlayerFromTeam(sourceTeamId, playerId);
+      }
+
+      const update =
+        side === "home"
+          ? { home_fixed_goalkeeper_id: playerId }
+          : { away_fixed_goalkeeper_id: playerId };
+
+      await api.put(`/api/peladas/${peladaId}`, update);
+      await fetchPeladaData();
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("peladas.detail.error.set_goalkeeper_failed");
+      setError(message);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const removeFixedGk = async (side: "home" | "away") => {
+    if (processing) return;
+    setProcessing(true);
+    try {
+      const update =
+        side === "home"
+          ? { home_fixed_goalkeeper_id: null }
+          : { away_fixed_goalkeeper_id: null };
+
+      await api.put(`/api/peladas/${peladaId}`, update);
+      await fetchPeladaData();
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("peladas.detail.error.remove_player_failed");
+      setError(message);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleSetGoalkeeper = async (teamId: number, playerId: number) => {
+    if (processing) return;
+    setProcessing(true);
+    try {
+      await endpoints.removePlayerFromTeam(teamId, playerId);
+      await endpoints.addPlayerToTeam(teamId, playerId, true);
+      await fetchPeladaData();
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("peladas.detail.error.set_goalkeeper_failed");
+      setError(message);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleRemovePlayer = async (teamId: number, playerId: number) => {
+    if (processing) return;
+    setProcessing(true);
+    try {
+      await endpoints.removePlayerFromTeam(teamId, playerId);
+      await fetchPeladaData();
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("peladas.detail.error.remove_player_failed");
       setError(message);
     } finally {
       setProcessing(false);
@@ -309,6 +458,8 @@ export function usePeladaDetail(peladaId: number) {
     teamPlayers,
     availablePlayers,
     benchPlayers,
+    homeGk,
+    awayGk,
     votingInfo,
     scores,
     error,
@@ -323,6 +474,10 @@ export function usePeladaDetail(peladaId: number) {
     onDragStartPlayer,
     dropToBench,
     dropToTeam,
+    dropToFixedGk,
+    removeFixedGk,
+    handleSetGoalkeeper,
+    handleRemovePlayer,
     handleRandomizeTeams,
     handleBeginPelada,
     handleCreateTeam,

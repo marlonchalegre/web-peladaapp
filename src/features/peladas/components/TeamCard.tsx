@@ -6,13 +6,24 @@ import {
   Chip,
   Avatar,
   Stack,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import type { DragEvent } from "react";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import SportsScoreIcon from "@mui/icons-material/SportsScore";
+import { useState } from "react";
+import type { DragEvent, MouseEvent } from "react";
 import type { Player, Team, User } from "../../../shared/api/endpoints";
 import { useTranslation } from "react-i18next";
 
-type PlayerWithUser = Player & { user: User; displayScore?: string };
+type PlayerWithUser = Player & {
+  user: User;
+  displayScore?: string;
+  is_goalkeeper?: boolean;
+};
 
 type TeamCardProps = {
   team: Team;
@@ -22,18 +33,10 @@ type TeamCardProps = {
   onDelete: () => void;
   onDrop: (e: DragEvent<HTMLElement>) => void;
   onDragStartPlayer: (e: DragEvent<HTMLElement>, playerId: number) => void;
+  onSetGoalkeeper?: (playerId: number) => Promise<void>;
+  onRemovePlayer?: (playerId: number) => Promise<void>;
   locked?: boolean;
-  movePlayerMenu?: {
-    menu: { playerId: number; sourceTeamId: number | null } | null;
-    setMenu: (
-      v: { playerId: number; sourceTeamId: number | null } | null,
-    ) => void;
-    movePlayer: (
-      playerId: number,
-      sourceTeamId: number | null,
-      targetTeamId: number | null,
-    ) => Promise<void>;
-  };
+  fixedGoalkeepersEnabled?: boolean;
 };
 
 export default function TeamCard({
@@ -44,15 +47,32 @@ export default function TeamCard({
   onDelete,
   onDrop,
   onDragStartPlayer,
+  onSetGoalkeeper,
+  onRemovePlayer,
   locked,
+  fixedGoalkeepersEnabled,
 }: TeamCardProps) {
   const { t } = useTranslation();
+  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
+  const [selectedPlayerId, setSelectedPlayerId] = useState<null | number>(null);
+
+  const handleOpenMenu = (event: MouseEvent<HTMLElement>, playerId: number) => {
+    setMenuAnchor(event.currentTarget);
+    setSelectedPlayerId(playerId);
+  };
+
+  const handleCloseMenu = () => {
+    setMenuAnchor(null);
+    setSelectedPlayerId(null);
+  };
 
   const emptySlots = Math.max(0, maxPlayers - players.length);
 
   const sortedPlayers = [...players].sort((a, b) => {
+    if (a.is_goalkeeper && !b.is_goalkeeper) return -1;
+    if (!a.is_goalkeeper && b.is_goalkeeper) return 1;
+
     const order: Record<string, number> = {
-      Goalkeeper: 0,
       Defender: 1,
       Midfielder: 2,
       Striker: 3,
@@ -61,6 +81,8 @@ export default function TeamCard({
     const posB = order[b.user?.position || ""] ?? 4;
     return posA - posB;
   });
+
+  const selectedPlayer = players.find((p) => p.id === selectedPlayerId);
 
   return (
     <Paper
@@ -160,13 +182,17 @@ export default function TeamCard({
                 p: 1.5,
                 display: "flex",
                 alignItems: "center",
-                bgcolor: "background.default",
+                bgcolor: p.is_goalkeeper
+                  ? "primary.light"
+                  : "background.default",
                 borderRadius: 3,
                 cursor: locked ? "default" : "grab",
                 border: "1px solid transparent",
+                borderColor: p.is_goalkeeper ? "primary.main" : "transparent",
                 "&:hover": {
-                  borderColor: "divider",
+                  borderColor: p.is_goalkeeper ? "primary.main" : "divider",
                 },
+                position: "relative",
               }}
               draggable={!locked}
               onDragStart={
@@ -186,9 +212,23 @@ export default function TeamCard({
                 {getInitials(p.user?.name || "")}
               </Avatar>
               <Box sx={{ flexGrow: 1 }}>
-                <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                  {p.user?.name || "Unknown"}
-                </Typography>
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                    {p.user?.name || "Unknown"}
+                  </Typography>
+                  {p.is_goalkeeper && (
+                    <Chip
+                      label="GK"
+                      size="small"
+                      color="primary"
+                      sx={{
+                        height: 16,
+                        fontSize: "0.6rem",
+                        fontWeight: "bold",
+                      }}
+                    />
+                  )}
+                </Stack>
                 <Typography
                   variant="caption"
                   color="text.secondary"
@@ -199,17 +239,28 @@ export default function TeamCard({
                     : t("common.positions.unknown")}
                 </Typography>
               </Box>
-              <Chip
-                label={p.displayScore ?? "-"}
-                size="small"
-                sx={{
-                  height: 24,
-                  bgcolor: "success.light",
-                  color: "success.main",
-                  fontWeight: "bold",
-                  borderRadius: 1,
-                }}
-              />
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Chip
+                  label={p.displayScore ?? "-"}
+                  size="small"
+                  sx={{
+                    height: 24,
+                    bgcolor: "success.light",
+                    color: "success.main",
+                    fontWeight: "bold",
+                    borderRadius: 1,
+                  }}
+                />
+                {!locked && (
+                  <IconButton
+                    size="small"
+                    onClick={(e) => handleOpenMenu(e, p.id)}
+                    sx={{ p: 0.5 }}
+                  >
+                    <MoreVertIcon fontSize="small" />
+                  </IconButton>
+                )}
+              </Stack>
             </Paper>
           );
         })}
@@ -238,6 +289,47 @@ export default function TeamCard({
             </Box>
           ))}
       </Stack>
+
+      <Menu
+        anchorEl={menuAnchor}
+        open={Boolean(menuAnchor)}
+        onClose={handleCloseMenu}
+      >
+        {fixedGoalkeepersEnabled &&
+          selectedPlayer &&
+          !selectedPlayer.is_goalkeeper && (
+            <MenuItem
+              onClick={async () => {
+                if (selectedPlayerId && onSetGoalkeeper) {
+                  await onSetGoalkeeper(selectedPlayerId);
+                }
+                handleCloseMenu();
+              }}
+            >
+              <ListItemIcon>
+                <SportsScoreIcon fontSize="small" color="primary" />
+              </ListItemIcon>
+              <ListItemText>
+                {t("peladas.teams.menu.set_goalkeeper")}
+              </ListItemText>
+            </MenuItem>
+          )}
+        <MenuItem
+          onClick={async () => {
+            if (selectedPlayerId && onRemovePlayer) {
+              await onRemovePlayer(selectedPlayerId);
+            }
+            handleCloseMenu();
+          }}
+        >
+          <ListItemIcon>
+            <DeleteOutlineIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          <ListItemText sx={{ color: "error.main" }}>
+            {t("peladas.teams.menu.remove_player")}
+          </ListItemText>
+        </MenuItem>
+      </Menu>
     </Paper>
   );
 }

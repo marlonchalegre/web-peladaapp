@@ -124,16 +124,23 @@
   },
   "home": {
     "error": {
-      "load_failed": "Error loading organizations"
+      "load_failed": "Error loading organizations",
+      "invalid_format_org_list": "Invalid organization list format"
     },
     "welcome": {
       "guest": "Please, log in.",
-      "user": "Welcome, {{name}}!"
+      "user": "Welcome, {{name}}!",
+      "prefix": "Welcome, ",
+      "subtitle": "Here is a summary of your activities."
     },
     "sections": {
       "pending_invitations": {
         "title": "Pending Invitations",
         "invited_to_join": "You have been invited to join this organization."
+      },
+      "peladas": {
+        "title": "My Peladas",
+        "empty": "No peladas found."
       },
       "admin_orgs": {
         "title": "My Organizations (Admin)",
@@ -141,11 +148,14 @@
       },
       "member_orgs": {
         "title": "Organizations I belong to (Player)",
-        "empty": "You do not belong to any organization as a player."
+        "empty": "You do not belong to any organization as a player.",
+        "empty_desc": "Currently, you are not part of any organization as a player."
       }
     },
     "table": {
       "headers": {
+        "date": "DATE",
+        "status": "STATUS",
         "org_name": "Organization Name",
         "role": "Role"
       }
@@ -243,6 +253,7 @@
       "pelada": {
         "teams_count": "Number of teams",
         "players_per_team": "Players per team",
+        "fixed_goalkeepers": "Fixed Goalkeepers",
         "submit": "Create pelada"
       }
     },
@@ -349,7 +360,9 @@
         "randomize_failed": "Error randomizing teams",
         "start_failed": "Error starting pelada",
         "create_team_failed": "Error creating team",
-        "delete_team_failed": "Error deleting team"
+        "delete_team_failed": "Error deleting team",
+        "set_goalkeeper_failed": "Error setting goalkeeper",
+        "remove_player_failed": "Error removing player"
       },
       "live": {
         "moved_to_bench": "Player #{{playerId}} moved to bench",
@@ -470,6 +483,14 @@
         "create": "Create Team",
         "add_placeholder": "Add Team"
       },
+      "menu": {
+        "set_goalkeeper": "Set as Goalkeeper",
+        "remove_player": "Remove from Team"
+      },
+      "fixed_goalkeepers_title": "Session Fixed Goalkeepers",
+      "home_goalkeeper": "GOALKEEPER (HOME)",
+      "away_goalkeeper": "GOALKEEPER (AWAY)",
+      "drag_gk_here": "Drag a goalkeeper here",
       "default_name": "Team {{number}}"
     },
     "team_card": {

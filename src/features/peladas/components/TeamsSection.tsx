@@ -13,7 +13,7 @@ import type { Player, Team, User } from "../../../shared/api/endpoints";
 import TeamCard from "./TeamCard";
 import { useTranslation } from "react-i18next";
 
-type PlayerWithUser = Player & { user: User };
+type PlayerWithUser = Player & { user: User; is_goalkeeper?: boolean };
 
 export type TeamsSectionProps = {
   teams: Team[];
@@ -32,9 +32,12 @@ export type TeamsSectionProps = {
     e: DragEvent<HTMLElement>,
     targetTeamId: number,
   ) => Promise<void>;
+  onSetGoalkeeper: (teamId: number, playerId: number) => Promise<void>;
+  onRemovePlayer: (teamId: number, playerId: number) => Promise<void>;
   onRandomizeTeams: () => Promise<void>;
   scores: Record<number, number>;
   isAdminOverride?: boolean;
+  fixedGoalkeepersEnabled?: boolean;
 };
 
 export default function TeamsSection(props: TeamsSectionProps) {
@@ -49,9 +52,12 @@ export default function TeamsSection(props: TeamsSectionProps) {
     onDeleteTeam,
     onDragStartPlayer,
     dropToTeam,
+    onSetGoalkeeper,
+    onRemovePlayer,
     onRandomizeTeams,
     scores,
     isAdminOverride = false,
+    fixedGoalkeepersEnabled = false,
   } = props;
 
   return (
@@ -65,8 +71,6 @@ export default function TeamsSection(props: TeamsSectionProps) {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {/* Icon could go here */}
-          {/* <GroupIcon sx={{ mr: 1, color: 'primary.main' }} /> */}
           <Typography variant="h5" sx={{ fontWeight: "bold" }}>
             {t("peladas.teams.title")}
           </Typography>
@@ -147,21 +151,6 @@ export default function TeamsSection(props: TeamsSectionProps) {
               avg = vals.reduce((a, b) => a + b, 0) / vals.length;
             }
 
-            // Map players with display properties if needed, but TeamCard handles basic mapping.
-            // We assume TeamCard will use `scores` if passed or we inject it into player objects?
-            // TeamCard currently expects `players` and uses `p.grade`.
-            // I updated TeamCard to render scores. I need to make sure I pass the scores correctly or modify TeamCard to take `scores` map.
-            // In my TeamCard implementation, I used: `const score = scores[p.id] ?? p.grade` logic INSIDE AvailablePlayersPanel but in TeamCard I put a placeholder comment.
-            // I should verify TeamCard implementation I wrote.
-
-            /*
-            In TeamCard I wrote:
-            <Chip 
-                 label={(p as any).displayScore ?? '-'} 
-            ...
-          */
-
-            // So I need to inject `displayScore` into the players array passed to TeamCard.
             const playersWithScores = players.map((p) => {
               const s = scores[p.id] ?? p.grade;
               return {
@@ -182,8 +171,10 @@ export default function TeamsSection(props: TeamsSectionProps) {
                   onDragStartPlayer={(e, pid) =>
                     onDragStartPlayer(e, pid, t.id)
                   }
+                  onSetGoalkeeper={(pid) => onSetGoalkeeper(t.id, pid)}
+                  onRemovePlayer={(pid) => onRemovePlayer(t.id, pid)}
                   locked={locked}
-                  // Optional props for menu if I want to keep that functionality
+                  fixedGoalkeepersEnabled={fixedGoalkeepersEnabled}
                 />
               </Grid>
             );

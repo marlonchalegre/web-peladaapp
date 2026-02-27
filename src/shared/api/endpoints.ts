@@ -37,11 +37,16 @@ export type Pelada = {
   when?: string | null;
   num_teams?: number | null;
   players_per_team?: number | null;
+  fixed_goalkeepers?: boolean | null;
   status?: string | null;
   closed_at?: string | null;
 };
 export type Team = { id: number; pelada_id: number; name: string };
-export type TeamPlayer = { team_id: number; player_id: number };
+export type TeamPlayer = {
+  team_id: number;
+  player_id: number;
+  is_goalkeeper?: boolean;
+};
 export type Match = {
   id: number;
   pelada_id: number;
@@ -68,7 +73,11 @@ export type PlayerStats = {
   assists: number;
   own_goals: number;
 };
-export type MatchLineupEntry = { team_id: number; player_id: number };
+export type MatchLineupEntry = {
+  team_id: number;
+  player_id: number;
+  is_goalkeeper?: boolean;
+};
 export type PeladaDashboardDataResponse = {
   pelada: Pelada;
   matches: Match[];
@@ -115,7 +124,9 @@ export type OrganizationInvitation = {
 
 export type PeladaFullDetailsResponse = {
   pelada: Pelada;
-  teams: (Team & { players: (Player & { user: User })[] })[];
+  teams: (Team & {
+    players: (Player & { user: User; is_goalkeeper?: boolean })[];
+  })[];
   available_players: (Player & {
     user: User;
     attendance_status?: AttendanceStatus;
@@ -219,8 +230,15 @@ export function createApi(client: ApiClient) {
     createTeam: (payload: { pelada_id: number; name: string }) =>
       client.post<Team>("/api/teams", payload),
     deleteTeam: (teamId: number) => client.delete(`/api/teams/${teamId}`),
-    addPlayerToTeam: (teamId: number, playerId: number) =>
-      client.post(`/api/teams/${teamId}/players`, { player_id: playerId }),
+    addPlayerToTeam: (
+      teamId: number,
+      playerId: number,
+      isGoalkeeper?: boolean,
+    ) =>
+      client.post(`/api/teams/${teamId}/players`, {
+        player_id: playerId,
+        is_goalkeeper: isGoalkeeper,
+      }),
     removePlayerFromTeam: (teamId: number, playerId: number) =>
       client.delete<void>(`/api/teams/${teamId}/players`, {
         player_id: playerId,
