@@ -36,6 +36,8 @@ describe("Admin Actions Visibility", () => {
     onDeleteTeam: vi.fn(),
     onDragStartPlayer: vi.fn(),
     dropToTeam: vi.fn(),
+    onSetGoalkeeper: vi.fn(),
+    onRemovePlayer: vi.fn(),
     onRandomizeTeams: vi.fn(),
     scores: {},
   };

@@ -38,6 +38,8 @@ export type Pelada = {
   num_teams?: number | null;
   players_per_team?: number | null;
   fixed_goalkeepers?: boolean | null;
+  home_fixed_goalkeeper_id?: number | null;
+  away_fixed_goalkeeper_id?: number | null;
   status?: string | null;
   closed_at?: string | null;
 };

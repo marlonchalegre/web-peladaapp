@@ -22,7 +22,11 @@ interface FixedGoalkeepersSectionProps {
   onDrop: (e: DragEvent<HTMLElement>, side: "home" | "away") => Promise<void>;
   onRemove: (side: "home" | "away") => Promise<void>;
   locked?: boolean;
-  onDragStartPlayer: (e: DragEvent<HTMLElement>, playerId: number) => void;
+  onDragStartPlayer: (
+    e: DragEvent<HTMLElement>,
+    playerId: number,
+    sourceTeamId: number | null,
+  ) => void;
 }
 
 export default function FixedGoalkeepersSection({
@@ -100,7 +104,7 @@ export default function FixedGoalkeepersSection({
           spacing={2}
           alignItems="center"
           draggable={!locked}
-          onDragStart={(e) => onDragStartPlayer(e, player.id)}
+          onDragStart={(e) => onDragStartPlayer(e, player.id, null)}
           sx={{ cursor: locked ? "default" : "grab" }}
         >
           <Avatar
