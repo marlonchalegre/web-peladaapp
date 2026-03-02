@@ -160,7 +160,8 @@ export default function MatchPlayerRow({
           <Typography variant="body2" data-testid="player-name">
             {playerName}
           </Typography>
-          {!!item.is_goalkeeper && (
+          {(item.is_goalkeeper === true ||
+            (item.is_goalkeeper as unknown as number) === 1) && (
             <PanToolIcon
               sx={{ fontSize: 14, color: "secondary.main", ml: 0.5 }}
               titleAccess={t("common.positions.goalkeeper")}

@@ -24,6 +24,9 @@ type PlayerVote = {
   playerId: number;
   playerName: string;
   stars: number | null;
+  goals: number;
+  assists: number;
+  own_goals: number;
 };
 
 export default function PeladaVotingPage() {
@@ -48,13 +51,11 @@ export default function PeladaVotingPage() {
         setLoading(true);
         setError(null);
 
-        // Check if user is authenticated
         if (!user) {
           setError(t("peladas.voting.error.unauthenticated"));
           return;
         }
 
-        // Get voting info in one single request
         const info = await endpoints.getVotingInfo(peladaId);
         setVotingInfo(info);
 
@@ -63,7 +64,6 @@ export default function PeladaVotingPage() {
           return;
         }
 
-        // Initialize player votes for eligible players, pre-populating with existing votes if available
         const votes: PlayerVote[] = info.eligible_players.map((p) => {
           const existingVote = info.current_votes?.find(
             (v) => v.target_id === p.player_id,
@@ -72,6 +72,9 @@ export default function PeladaVotingPage() {
             playerId: p.player_id,
             playerName: p.name,
             stars: existingVote ? existingVote.stars : null,
+            goals: p.goals ?? 0,
+            assists: p.assists ?? 0,
+            own_goals: p.own_goals ?? 0,
           };
         });
         setPlayerVotes(votes);
@@ -118,7 +121,6 @@ export default function PeladaVotingPage() {
 
       setSuccess(t("peladas.voting.success.saved"));
 
-      // Redirect to pelada detail page after 2 seconds
       setTimeout(() => {
         navigate(`/peladas/${peladaId}`);
       }, 2000);
@@ -204,9 +206,25 @@ export default function PeladaVotingPage() {
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <Typography variant="h6" data-testid="player-name">
-                  {pv.playerName}
-                </Typography>
+                <Box>
+                  <Typography variant="h6" data-testid="player-name">
+                    {pv.playerName}
+                  </Typography>
+                  <Stack direction="row" spacing={2} sx={{ mt: 0.5 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      <strong>{t("common.goals")}:</strong> {pv.goals}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      <strong>{t("common.assists_short")}:</strong> {pv.assists}
+                    </Typography>
+                    {pv.own_goals > 0 && (
+                      <Typography variant="body2" color="error">
+                        <strong>{t("common.own_goals_short")}:</strong>{" "}
+                        {pv.own_goals}
+                      </Typography>
+                    )}
+                  </Stack>
+                </Box>
                 <Box>
                   <Rating
                     name={`player-${pv.playerId}`}

@@ -15,11 +15,13 @@ import { Loading } from "../../../shared/components/Loading";
 import { usePeladaMatches } from "../hooks/usePeladaMatches";
 import MatchHistoryList from "../components/MatchHistoryList";
 import SessionInsights from "../components/SessionInsights";
+import { useAuth } from "../../../app/providers/AuthContext";
 
 export default function PeladaMatchesPage() {
   const { t } = useTranslation();
   const { id } = useParams();
   const peladaId = Number(id);
+  const { user } = useAuth();
 
   const {
     loading,
@@ -52,6 +54,9 @@ export default function PeladaMatchesPage() {
     playerStats,
     togglePlayerSort,
   } = usePeladaMatches(peladaId);
+
+  const isAdmin =
+    user?.admin_orgs?.includes(pelada?.organization_id || -1) || false;
 
   if (loading) return <Loading message={t("peladas.matches.loading")} />;
   if (error) return <Alert severity="error">{error}</Alert>;
@@ -153,6 +158,7 @@ export default function PeladaMatchesPage() {
               benchPlayers={activeMatchData.benchPlayers}
               finished={activeMatchData.finished}
               isPeladaClosed={isPeladaClosed}
+              isAdmin={isAdmin}
               updating={!!updatingScore[selectedMatch.id]}
               selectMenu={selectMenu}
               setSelectMenu={setSelectMenu}

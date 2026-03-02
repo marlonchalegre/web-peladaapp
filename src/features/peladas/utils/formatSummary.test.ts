@@ -12,10 +12,25 @@ describe("formatPeladaSummary", () => {
       { teamId: 1, name: "Time 1", wins: 0, draws: 2, losses: 4 },
     ];
     const playerStats: PlayerStatRow[] = [
-      { playerId: 1, name: "Chalegre", goals: 4, assists: 0, ownGoals: 0 },
+      {
+        playerId: 1,
+        name: "Chalegre",
+        goals: 4,
+        assists: 0,
+        ownGoals: 0,
+        goalsConceded: 2,
+      },
       { playerId: 2, name: "C.Bala", goals: 3, assists: 0, ownGoals: 0 },
       { playerId: 3, name: "Rafa Lucena", goals: 0, assists: 2, ownGoals: 0 },
       { playerId: 4, name: "Igor", goals: 0, assists: 2, ownGoals: 0 },
+      {
+        playerId: 5,
+        name: "Goalkeeper",
+        goals: 0,
+        assists: 0,
+        ownGoals: 0,
+        goalsConceded: 5,
+      },
     ];
 
     const result = formatPeladaSummary(date, standings, playerStats);
@@ -30,6 +45,9 @@ describe("formatPeladaSummary", () => {
     expect(result).toContain("Assistencias:");
     expect(result).toContain("Rafa Lucena - 2");
     expect(result).toContain("Igor - 2");
+    expect(result).toContain("Gols sofridos:");
+    expect(result).toContain("Chalegre - 2");
+    expect(result).toContain("Goalkeeper - 5");
     // Should NOT contain the footnote artifacts
     expect(result).not.toContain("[1]");
   });
@@ -61,5 +79,26 @@ describe("formatPeladaSummary", () => {
     expect(result).toContain("Classificacao:");
     expect(result).not.toContain("Gols:");
     expect(result).not.toContain("Assistencias:");
+    expect(result).not.toContain("Gols sofridos:");
+  });
+
+  it("should show Gols sofridos even if zero", () => {
+    const date = null;
+    const standings: StandingRow[] = [];
+    const playerStats: PlayerStatRow[] = [
+      {
+        playerId: 1,
+        name: "GK",
+        goals: 0,
+        assists: 0,
+        ownGoals: 0,
+        goalsConceded: 0,
+      },
+    ];
+
+    const result = formatPeladaSummary(date, standings, playerStats);
+
+    expect(result).toContain("Gols sofridos:");
+    expect(result).toContain("GK - 0");
   });
 });

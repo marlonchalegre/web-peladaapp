@@ -27,14 +27,17 @@ vi.mock("../components/ActiveMatchDashboard", () => ({
   default: ({
     statsMap,
     finished,
+    isAdmin,
   }: {
     statsMap: Record<number, { goals: number; assists: number }>;
     finished: boolean;
+    isAdmin: boolean;
   }) => (
     <div data-testid="active-match-dashboard">
       <span data-testid="finished-status">
         {finished ? "finished" : "running"}
       </span>
+      <span data-testid="is-admin">{isAdmin ? "true" : "false"}</span>
       <pre data-testid="stats-map">{JSON.stringify(statsMap)}</pre>
     </div>
   ),

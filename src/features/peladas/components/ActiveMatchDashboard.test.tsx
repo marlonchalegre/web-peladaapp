@@ -39,6 +39,7 @@ describe("ActiveMatchDashboard", () => {
     benchPlayers: [] as Player[],
     finished: false,
     isPeladaClosed: false,
+    isAdmin: false,
     updating: false,
     selectMenu: null,
     setSelectMenu: vi.fn(),
@@ -118,18 +119,35 @@ describe("ActiveMatchDashboard", () => {
     expect(screen.getByTestId("finish-editing-button")).toBeInTheDocument();
   });
 
-  it("hides edit match button if pelada is closed", () => {
+  it("hides edit match button if pelada is closed and user is NOT admin", () => {
     render(
       <ThemeContextProvider>
         <ActiveMatchDashboard
           {...defaultProps}
           finished={true}
           isPeladaClosed={true}
+          isAdmin={false}
         />
       </ThemeContextProvider>,
     );
 
     expect(screen.getByTestId("match-status-text")).toBeInTheDocument();
     expect(screen.queryByTestId("edit-match-button")).not.toBeInTheDocument();
+  });
+
+  it("shows edit match button if pelada is closed but user IS admin", () => {
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          finished={true}
+          isPeladaClosed={true}
+          isAdmin={true}
+        />
+      </ThemeContextProvider>,
+    );
+
+    expect(screen.getByTestId("match-status-text")).toBeInTheDocument();
+    expect(screen.getByTestId("edit-match-button")).toBeInTheDocument();
   });
 });

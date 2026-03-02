@@ -111,13 +111,29 @@ export function usePeladaStandings(
       participatingIds.add(Number(pidStr));
 
     const matchesPlayedMap: Record<number, number> = {};
+    const goalsConcededMap: Record<number, number> = {};
+
     for (const m of matches) {
       if ((m.status || "").toLowerCase() !== "finished") continue;
       const lu = lineupsByMatch[m.id];
       if (!lu) continue;
       const playersInMatch = new Set<number>();
-      for (const list of Object.values(lu)) {
-        for (const tp of list) playersInMatch.add(tp.player_id);
+      for (const [teamIdStr, list] of Object.entries(lu)) {
+        const teamId = Number(teamIdStr);
+        const goalsConcededInMatch =
+          teamId === m.home_team_id ? m.away_score : m.home_score;
+        for (const tp of list) {
+          playersInMatch.add(tp.player_id);
+          // is_goalkeeper might be a boolean or a number (1) from SQLite
+          const isGK =
+            tp.is_goalkeeper === true ||
+            (tp.is_goalkeeper as unknown as number) === 1;
+          if (isGK) {
+            goalsConcededMap[tp.player_id] =
+              (goalsConcededMap[tp.player_id] || 0) +
+              (goalsConcededInMatch ?? 0);
+          }
+        }
       }
       for (const pid of playersInMatch) {
         matchesPlayedMap[pid] = (matchesPlayedMap[pid] || 0) + 1;
@@ -138,6 +154,7 @@ export function usePeladaStandings(
         goals: base?.goals || 0,
         assists: base?.assists || 0,
         ownGoals: base?.ownGoals || 0,
+        goalsConceded: goalsConcededMap[playerId],
         matchesPlayed: matchesPlayedMap[playerId] || 0,
       });
     }

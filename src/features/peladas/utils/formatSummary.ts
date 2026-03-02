@@ -51,5 +51,21 @@ export function formatPeladaSummary(
     });
   }
 
+  // Goalkeepers (goalsConceded !== undefined)
+  const goalkeepers = playerStats
+    .filter((p) => p.goalsConceded !== undefined)
+    .sort(
+      (a, b) =>
+        (a.goalsConceded || 0) - (b.goalsConceded || 0) ||
+        a.name.localeCompare(b.name),
+    );
+
+  if (goalkeepers.length > 0) {
+    text += `\nGols sofridos:\n`;
+    goalkeepers.forEach((p) => {
+      text += `${p.name} - ${p.goalsConceded}\n`;
+    });
+  }
+
   return text;
 }

@@ -92,6 +92,7 @@
     "organization": "ORGANIZATION",
     "assists_short": "Assists",
     "own_goals_short": "Own Goals",
+    "goals_conceded_short": "GA",
     "copy_link": "Copy Link",
     "revoke": "Revoke",
     "pagination": {

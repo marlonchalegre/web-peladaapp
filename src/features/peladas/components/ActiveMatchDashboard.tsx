@@ -19,6 +19,7 @@ type Props = {
   benchPlayers: Player[];
   finished: boolean;
   isPeladaClosed: boolean;
+  isAdmin: boolean;
   updating: boolean;
   selectMenu: SelectMenuState;
   setSelectMenu: Dispatch<SetStateAction<SelectMenuState>>;
@@ -61,6 +62,7 @@ export default function ActiveMatchDashboard(props: Props) {
     benchPlayers,
     finished,
     isPeladaClosed,
+    isAdmin,
     updating,
     selectMenu,
     setSelectMenu,
@@ -135,6 +137,7 @@ export default function ActiveMatchDashboard(props: Props) {
         finished={effectiveFinished}
         isMatchFinished={finished}
         isPeladaClosed={isPeladaClosed}
+        isAdmin={isAdmin}
         isEditing={isEditing}
         onToggleEdit={() => setIsEditing(!isEditing)}
         updating={updating}

@@ -37,6 +37,7 @@ interface MatchControlTableProps {
   finished: boolean;
   isMatchFinished: boolean;
   isPeladaClosed: boolean;
+  isAdmin: boolean;
   isEditing: boolean;
   onToggleEdit: () => void;
   updating: boolean;
@@ -67,6 +68,7 @@ export default function MatchControlTable({
   finished,
   isMatchFinished,
   isPeladaClosed,
+  isAdmin,
   isEditing,
   onToggleEdit,
   updating,
@@ -88,8 +90,14 @@ export default function MatchControlTable({
   ): DashboardRowItem[] => {
     // Sort players: Goalkeepers first
     const sortedPlayers = [...players].sort((a, b) => {
-      if (a.is_goalkeeper && !b.is_goalkeeper) return -1;
-      if (!a.is_goalkeeper && b.is_goalkeeper) return 1;
+      const isGKA =
+        a.is_goalkeeper === true ||
+        (a.is_goalkeeper as unknown as number) === 1;
+      const isGKB =
+        b.is_goalkeeper === true ||
+        (b.is_goalkeeper as unknown as number) === 1;
+      if (isGKA && !isGKB) return -1;
+      if (!isGKA && isGKB) return 1;
       return 0;
     });
 
@@ -198,7 +206,7 @@ export default function MatchControlTable({
                 >
                   {t("peladas.dashboard.status.finished")}
                 </Typography>
-                {!isPeladaClosed && (
+                {(!isPeladaClosed || isAdmin) && (
                   <Button
                     variant="outlined"
                     color="warning"

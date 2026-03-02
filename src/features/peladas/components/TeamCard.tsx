@@ -256,6 +256,7 @@ export default function TeamCard({
                     size="small"
                     onClick={(e) => handleOpenMenu(e, p.id)}
                     sx={{ p: 0.5 }}
+                    aria-label={`more-${p.user?.name}`}
                   >
                     <MoreVertIcon fontSize="small" />
                   </IconButton>

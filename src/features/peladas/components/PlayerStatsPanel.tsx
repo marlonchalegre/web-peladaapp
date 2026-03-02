@@ -21,6 +21,7 @@ export type PlayerStatRow = {
   goals: number;
   assists: number;
   ownGoals: number;
+  goalsConceded?: number;
   matchesPlayed?: number;
 };
 export type SortState = {
