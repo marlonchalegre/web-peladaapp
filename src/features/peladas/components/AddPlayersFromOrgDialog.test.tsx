@@ -1,4 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { Mock } from "vitest";
+
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import AddPlayersFromOrgDialog from "./AddPlayersFromOrgDialog";
 import { ThemeContextProvider } from "../../../app/providers/ThemeProvider";
@@ -28,10 +30,9 @@ describe("AddPlayersFromOrgDialog", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (api.get as vi.MockedFunction<typeof api.get>).mockResolvedValue(
-      mockPlayers,
-    );
+    (api.get as Mock).mockResolvedValue(mockPlayers);
   });
+
 
   it("loads and displays organization players not in pelada", async () => {
     render(
