@@ -78,7 +78,7 @@ describe("ActiveMatchDashboard", () => {
   it("renders substitution buttons and stat inputs", () => {
     render(
       <ThemeContextProvider>
-        <ActiveMatchDashboard {...defaultProps} />
+        <ActiveMatchDashboard {...defaultProps} isAdmin={true} />
       </ThemeContextProvider>,
     );
 

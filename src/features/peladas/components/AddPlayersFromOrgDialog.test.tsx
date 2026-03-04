@@ -33,7 +33,6 @@ describe("AddPlayersFromOrgDialog", () => {
     (api.get as Mock).mockResolvedValue(mockPlayers);
   });
 
-
   it("loads and displays organization players not in pelada", async () => {
     render(
       <ThemeContextProvider>

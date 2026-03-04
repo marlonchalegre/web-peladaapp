@@ -81,7 +81,6 @@ export function generateExportText(
   return "```\n" + text.trim() + "\n```";
 }
 
-
 export function generateAnnouncementText(
   teams: Team[],
   teamPlayers: Record<number, PlayerWithUser[]>,

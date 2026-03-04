@@ -176,15 +176,17 @@ export default function MatchControlTable({
       >
         <Box />
         {!isMatchFinished ? (
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={onEndMatch}
-            disabled={updating}
-            data-testid="end-match-button"
-          >
-            {t("peladas.dashboard.button.end_match")}
-          </Button>
+          isAdmin && (
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={onEndMatch}
+              disabled={updating}
+              data-testid="end-match-button"
+            >
+              {t("peladas.dashboard.button.end_match")}
+            </Button>
+          )
         ) : (
           <Stack direction="row" spacing={2} alignItems="center">
             {isEditing ? (

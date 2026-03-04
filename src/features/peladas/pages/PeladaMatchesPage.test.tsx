@@ -3,6 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import PeladaMatchesPage from "./PeladaMatchesPage";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { api } from "../../../shared/api/client";
+import { useAuth } from "../../../app/providers/AuthContext";
 
 // Mock the API client
 vi.mock("../../../shared/api/client", () => ({
@@ -16,10 +17,7 @@ vi.mock("../../../shared/api/client", () => ({
 
 // Mock AuthContext
 vi.mock("../../../app/providers/AuthContext", () => ({
-  useAuth: () => ({
-    user: { id: 1, name: "Test User", email: "test@example.com" },
-    isAuthenticated: true,
-  }),
+  useAuth: vi.fn(),
 }));
 
 // Mock ActiveMatchDashboard to verify props
@@ -96,6 +94,16 @@ describe("PeladaMatchesPage", () => {
         return Promise.resolve(mockDashboardData);
       return Promise.reject(new Error("Not found"));
     });
+
+    (useAuth as Mock).mockReturnValue({
+      user: {
+        id: 1,
+        name: "Test User",
+        email: "test@example.com",
+        admin_orgs: [101], // Mock as admin of the org
+      },
+      isAuthenticated: true,
+    });
   });
 
   it("filters statistics correctly for the selected match", async () => {
@@ -162,6 +170,48 @@ describe("PeladaMatchesPage", () => {
       expect(screen.getByTestId("finished-status").textContent).toBe(
         "finished",
       );
+    });
+  });
+
+  it("hides 'Close pelada' button when user is not an admin", async () => {
+    (useAuth as Mock).mockReturnValue({
+      user: {
+        id: 1,
+        name: "Test User",
+        email: "test@example.com",
+        admin_orgs: [], // Not an admin
+      },
+      isAuthenticated: true,
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/peladas/1/matches"]}>
+        <Routes>
+          <Route path="/peladas/:id/matches" element={<PeladaMatchesPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText("peladas.matches.button.close_pelada"),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  it("shows 'Close pelada' button when user is an admin", async () => {
+    render(
+      <MemoryRouter initialEntries={["/peladas/1/matches"]}>
+        <Routes>
+          <Route path="/peladas/:id/matches" element={<PeladaMatchesPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("peladas.matches.button.close_pelada"),
+      ).toBeInTheDocument();
     });
   });
 });
