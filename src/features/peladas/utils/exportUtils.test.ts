@@ -69,7 +69,12 @@ describe("exportUtils", () => {
     it("should format text with aligned columns and proper averages", () => {
       const result = generateExportText(mockTeams, mockTeamPlayers, mockScores);
 
+      // Check for backticks
+      expect(result.startsWith("```")).toBe(true);
+      expect(result.endsWith("```")).toBe(true);
+
       // Check for team names (uppercase)
+
       expect(result).toContain("TIME 1");
       expect(result).toContain("TIME 2");
 

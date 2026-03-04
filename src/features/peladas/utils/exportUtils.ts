@@ -78,8 +78,9 @@ export function generateExportText(
     }
   });
 
-  return text;
+  return "```\n" + text.trim() + "\n```";
 }
+
 
 export function generateAnnouncementText(
   teams: Team[],
