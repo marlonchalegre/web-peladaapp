@@ -24,7 +24,14 @@ describe("Admin Actions Visibility", () => {
     pelada: mockPelada,
     votingInfo: null,
     onStartClick: vi.fn(),
+    onExportCsv: vi.fn(),
+
+    onCopyClipboard: vi.fn(),
+    onCopyAnnouncement: vi.fn(),
+    onToggleFixedGk: vi.fn(),
+
     changingStatus: false,
+
     processing: false,
   };
 

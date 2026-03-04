@@ -73,10 +73,12 @@ export default function TeamCard({
     if (!a.is_goalkeeper && b.is_goalkeeper) return 1;
 
     const order: Record<string, number> = {
+      Goalkeeper: 0,
       Defender: 1,
       Midfielder: 2,
       Striker: 3,
     };
+
     const posA = order[a.user?.position || ""] ?? 4;
     const posB = order[b.user?.position || ""] ?? 4;
     return posA - posB;

@@ -68,8 +68,22 @@
     "add": "Adicionar",
     "close": "Fechar",
     "optional": "Opcional",
-    "actions": "Ações",
+    "actions": {
+      "title": "Ações",
+      "export": "Exportar",
+      "export_text": "Exportar Texto",
+      "export_spreadsheet": "Exportar Planilha",
+      "export_announcement": "Versão de Divulgação",
+      "copy_clipboard": "Copiar para área de transferência",
+
+      "cancel": "Cancelar",
+
+      "confirm": "Confirmar",
+      "manage": "Gerenciar",
+      "view": "Visualizar"
+    },
     "select_placeholder": "Selecione...",
+
     "year": "Ano",
     "filters": "Filtros",
     "player": "Jogador",
@@ -451,10 +465,19 @@
         "average": "MÉDIA PELADA"
       },
       "available": {
-        "title": "Disponíveis",
-        "filter_placeholder": "Filtrar jogadores...",
-        "invite_button": "+ Convidar mais jogadores"
+        "title": "Jogadores",
+        "filter_placeholder": "Filtrar por nome...",
+        "invite_button": "+ Adicionar jogadores",
+        "add_dialog": {
+          "title": "Adicionar Jogadores da Organização",
+          "description": "Selecione os jogadores que não confirmaram presença mas desejam participar agora.",
+          "search_placeholder": "Buscar por nome...",
+          "empty": "Nenhum jogador disponível para adicionar.",
+          "submit": "Adicionar Selecionados",
+          "success": "Jogadores adicionados com sucesso!"
+        }
       },
+
       "stats": {
         "title": "Desempenho Detalhado",
         "sort": {

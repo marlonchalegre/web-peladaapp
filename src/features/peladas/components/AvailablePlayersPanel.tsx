@@ -15,6 +15,7 @@ import type { Player, User } from "../../../shared/api/endpoints";
 import { useTranslation } from "react-i18next";
 import TechnicalSummary from "./TechnicalSummary";
 import AvailablePlayerItem from "./AvailablePlayerItem";
+import AddPlayersFromOrgDialog from "./AddPlayersFromOrgDialog";
 
 type PlayerWithUser = Player & { user: User };
 
@@ -23,6 +24,9 @@ type AvailablePlayersPanelProps = {
   scores: Record<number, number>;
   onDropToBench: (e: DragEvent<HTMLElement>) => void;
   onDragStartPlayer: (e: DragEvent<HTMLElement>, playerId: number) => void;
+  onAddPlayersFromOrg: (playerIds: number[]) => Promise<void>;
+  organizationId: number;
+  allPlayerIdsInPelada: number[];
   locked?: boolean;
   totalPlayersInPelada: number;
   averagePelada: number;
@@ -34,6 +38,9 @@ export default function AvailablePlayersPanel({
   scores,
   onDropToBench,
   onDragStartPlayer,
+  onAddPlayersFromOrg,
+  organizationId,
+  allPlayerIdsInPelada,
   locked,
   totalPlayersInPelada,
   averagePelada,
@@ -41,6 +48,7 @@ export default function AvailablePlayersPanel({
 }: AvailablePlayersPanelProps) {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
 
   const filteredPlayers = useMemo(() => {
     const result = search
@@ -161,6 +169,8 @@ export default function AvailablePlayersPanel({
         <Button
           fullWidth
           variant="outlined"
+          onClick={() => setAddDialogOpen(true)}
+          disabled={locked}
           sx={{
             mt: 3,
             borderStyle: "dashed",
@@ -171,6 +181,14 @@ export default function AvailablePlayersPanel({
           {t("peladas.panel.available.invite_button")}
         </Button>
       </Paper>
+
+      <AddPlayersFromOrgDialog
+        open={addDialogOpen}
+        onClose={() => setAddDialogOpen(false)}
+        onAdd={onAddPlayersFromOrg}
+        organizationId={organizationId}
+        excludePlayerIds={allPlayerIdsInPelada}
+      />
 
       <TechnicalSummary
         totalPlayers={totalPlayersInPelada}

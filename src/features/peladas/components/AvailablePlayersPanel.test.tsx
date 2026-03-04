@@ -50,6 +50,9 @@ describe("AvailablePlayersPanel", () => {
           scores={{ 101: 9.0, 102: 8.0 }}
           onDropToBench={() => {}}
           onDragStartPlayer={() => {}}
+          onAddPlayersFromOrg={async () => {}}
+          organizationId={1}
+          allPlayerIdsInPelada={[101, 102]}
           totalPlayersInPelada={2}
           averagePelada={8.5}
           balance={100}
@@ -71,6 +74,9 @@ describe("AvailablePlayersPanel", () => {
           scores={{ 101: 9.0, 102: 8.0 }}
           onDropToBench={() => {}}
           onDragStartPlayer={() => {}}
+          onAddPlayersFromOrg={async () => {}}
+          organizationId={1}
+          allPlayerIdsInPelada={[101, 102]}
           totalPlayersInPelada={2}
           averagePelada={8.5}
           balance={100}

@@ -68,8 +68,22 @@
     "add": "Add",
     "close": "Close",
     "optional": "Optional",
-    "actions": "Actions",
+    "actions": {
+      "title": "Actions",
+      "export": "Export",
+      "export_text": "Export Text",
+      "export_spreadsheet": "Export Spreadsheet",
+      "export_announcement": "Announcement Version",
+      "copy_clipboard": "Copy to Clipboard",
+
+      "cancel": "Cancel",
+
+      "confirm": "Confirm",
+      "manage": "Manage",
+      "view": "View"
+    },
     "select_placeholder": "Select...",
+
     "year": "Year",
     "filters": "Filters",
     "player": "Player",
@@ -462,10 +476,19 @@
         "average": "AVERAGE PELADA"
       },
       "available": {
-        "title": "Available",
-        "filter_placeholder": "Filter players...",
-        "invite_button": "+ Invite more players"
+        "title": "Players",
+        "filter_placeholder": "Filter by name...",
+        "invite_button": "+ Add players",
+        "add_dialog": {
+          "title": "Add Players from Organization",
+          "description": "Select players who didn't confirm attendance but wish to participate now.",
+          "search_placeholder": "Search by name...",
+          "empty": "No players available to add.",
+          "submit": "Add Selected",
+          "success": "Players added successfully!"
+        }
       },
+
       "stats": {
         "title": "Detailed Player Performance",
         "sort": {

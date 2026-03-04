@@ -231,6 +231,15 @@ export function createApi(client: ApiClient) {
         status,
         player_id: playerId,
       }),
+    batchUpdateAttendance: (
+      id: number,
+      playerIds: number[],
+      status: AttendanceStatus,
+    ) =>
+      client.post<number>(`/api/peladas/${id}/attendance/batch`, {
+        player_ids: playerIds,
+        status,
+      }),
     closeAttendance: (id: number) =>
       client.post<Pelada>(`/api/peladas/${id}/close-attendance`),
 

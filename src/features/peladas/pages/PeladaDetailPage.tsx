@@ -13,6 +13,13 @@ import { api } from "../../../shared/api/client";
 import { createApi } from "../../../shared/api/endpoints";
 import PeladaDetailHeader from "../components/PeladaDetailHeader";
 import StartPeladaDialog from "../components/StartPeladaDialog";
+import {
+  generateExportText,
+  generateExportCsv,
+  generateAnnouncementText,
+  downloadFile,
+  copyToClipboard,
+} from "../utils/exportUtils";
 
 export default function PeladaDetailPage() {
   const { t } = useTranslation();
@@ -50,6 +57,9 @@ export default function PeladaDetailPage() {
     handleBeginPelada,
     handleCreateTeam,
     handleDeleteTeam,
+    handleToggleFixedGoalkeepers,
+    handleAddPlayersFromOrg,
+    allPlayerIdsInPelada,
   } = usePeladaDetail(peladaId);
 
   useEffect(() => {
@@ -73,12 +83,41 @@ export default function PeladaDetailPage() {
     );
   if (!pelada) return <Loading message={t("common.loading")} />;
 
+  const handleExportCsv = () => {
+    const csv = generateExportCsv(teams, teamPlayers, scores);
+    downloadFile(
+      `pelada-${peladaId}-times.csv`,
+      csv,
+      "text/csv;charset=utf-8;",
+    );
+  };
+
+  const handleCopyClipboard = async () => {
+    const text = generateExportText(teams, teamPlayers, scores);
+    const success = await copyToClipboard(text);
+    if (success) {
+      alert(t("common.actions.copy_success", "Copied to clipboard!"));
+    }
+  };
+
+  const handleCopyAnnouncement = async () => {
+    const text = generateAnnouncementText(teams, teamPlayers);
+    const success = await copyToClipboard(text);
+    if (success) {
+      alert(t("common.actions.copy_success", "Copied to clipboard!"));
+    }
+  };
+
   return (
     <Container maxWidth="xl" sx={{ pb: 4 }}>
       <PeladaDetailHeader
         pelada={pelada}
         votingInfo={votingInfo}
         onStartClick={() => setStartDialogOpen(true)}
+        onExportCsv={handleExportCsv}
+        onCopyClipboard={handleCopyClipboard}
+        onCopyAnnouncement={handleCopyAnnouncement}
+        onToggleFixedGk={handleToggleFixedGoalkeepers}
         changingStatus={changingStatus}
         processing={processing}
         isAdminOverride={actuallyIsAdmin}
@@ -143,6 +182,9 @@ export default function PeladaDetailPage() {
             scores={scores}
             onDropToBench={dropToBench}
             onDragStartPlayer={(e, pid) => onDragStartPlayer(e, pid, null)}
+            onAddPlayersFromOrg={handleAddPlayersFromOrg}
+            organizationId={pelada.organization_id}
+            allPlayerIdsInPelada={allPlayerIdsInPelada}
             locked={
               (pelada.status !== "open" && !actuallyIsAdmin) || processing
             }

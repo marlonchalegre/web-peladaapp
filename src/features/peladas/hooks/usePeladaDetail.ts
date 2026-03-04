@@ -452,6 +452,62 @@ export function usePeladaDetail(peladaId: number) {
     }
   };
 
+  const handleToggleFixedGoalkeepers = async (enabled: boolean) => {
+    if (processing) return;
+    setProcessing(true);
+    try {
+      const payload: Partial<Pelada> = {
+        fixed_goalkeepers: enabled,
+      };
+
+      if (!enabled) {
+        payload.home_fixed_goalkeeper_id = null;
+        payload.away_fixed_goalkeeper_id = null;
+      }
+
+      await api.put(`/api/peladas/${peladaId}`, payload);
+      await fetchPeladaData();
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("peladas.detail.error.update_failed");
+      setError(message);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleAddPlayersFromOrg = async (playerIds: number[]) => {
+    if (processing) return;
+    setProcessing(true);
+    try {
+      await endpoints.batchUpdateAttendance(peladaId, playerIds, "confirmed");
+      await fetchPeladaData();
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("peladas.detail.error.update_failed");
+      setError(message);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const allPlayerIdsInPelada = useMemo(() => {
+    const ids = new Set<number>();
+    Object.values(teamPlayers)
+      .flat()
+      .forEach((p) => ids.add(p.id));
+    availablePlayers.forEach((p) => ids.add(p.id));
+    if (pelada?.home_fixed_goalkeeper_id)
+      ids.add(pelada.home_fixed_goalkeeper_id);
+    if (pelada?.away_fixed_goalkeeper_id)
+      ids.add(pelada.away_fixed_goalkeeper_id);
+    return Array.from(ids);
+  }, [teamPlayers, availablePlayers, pelada]);
+
   return {
     pelada,
     teams,
@@ -482,5 +538,8 @@ export function usePeladaDetail(peladaId: number) {
     handleBeginPelada,
     handleCreateTeam,
     handleDeleteTeam,
+    handleToggleFixedGoalkeepers,
+    handleAddPlayersFromOrg,
+    allPlayerIdsInPelada,
   };
 }

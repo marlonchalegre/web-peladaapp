@@ -85,7 +85,7 @@ export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
               {t("home.table.headers.status", "STATUS")}
             </TableCell>
             <TableCell align="right" sx={{ pr: 3 }}>
-              {t("common.actions", "AÇÕES")}
+              {t("common.actions.title", "AÇÕES")}
             </TableCell>
           </TableRow>
         </TableHead>
