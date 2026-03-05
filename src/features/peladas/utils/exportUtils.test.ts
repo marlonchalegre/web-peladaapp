@@ -119,10 +119,13 @@ describe("exportUtils", () => {
     it("should format text for WhatsApp without scores", () => {
       const result = generateAnnouncementText(mockTeams, mockTeamPlayers);
 
+      expect(result.startsWith("```")).toBe(true);
+      expect(result.endsWith("```")).toBe(true);
       expect(result).toContain("*ESCALAÇÃO DA PELADA*");
       expect(result).toContain("*TIME 1*");
-      expect(result).toContain("• Gandalf - M");
-      expect(result).toContain("• Gimli - Z");
+      // "Gandalf" is 7 chars, nameWidth will be at least 15+2 = 17
+      expect(result).toMatch(/• Gandalf\s+M/);
+      expect(result).toMatch(/• Gimli\s+Z/);
       expect(result).not.toContain("8,5");
       expect(result).not.toContain("7,0");
     });

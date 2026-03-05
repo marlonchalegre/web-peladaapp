@@ -124,6 +124,7 @@ export function usePeladaStandings(
           teamId === m.home_team_id ? m.away_score : m.home_score;
         for (const tp of list) {
           playersInMatch.add(tp.player_id);
+          participatingIds.add(tp.player_id); // Ensure players in lineups are included
           // is_goalkeeper might be a boolean or a number (1) from SQLite
           const isGK =
             tp.is_goalkeeper === true ||

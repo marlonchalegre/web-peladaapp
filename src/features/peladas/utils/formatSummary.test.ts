@@ -35,19 +35,21 @@ describe("formatPeladaSummary", () => {
 
     const result = formatPeladaSummary(date, standings, playerStats);
 
+    expect(result.startsWith("```")).toBe(true);
+    expect(result.endsWith("```")).toBe(true);
     expect(result).toContain("Resumo da rodada 18/02");
-    expect(result).toContain("Time 3 - 16 Pontos(5V 1E 0D)");
-    expect(result).toContain("Time 2 - 6 Pontos(1V 3E 2D)");
-    expect(result).toContain("Time 1 - 2 Pontos(0V 2E 4D)");
+    expect(result).toMatch(/Time 3\s+16 pts/);
+    expect(result).toMatch(/Time 2\s+6 pts/);
+    expect(result).toMatch(/Time 1\s+2 pts/);
     expect(result).toContain("Gols:");
-    expect(result).toContain("Chalegre - 4");
-    expect(result).toContain("C.Bala - 3");
+    expect(result).toMatch(/Chalegre\s+4/);
+    expect(result).toMatch(/C.Bala\s+3/);
     expect(result).toContain("Assistencias:");
-    expect(result).toContain("Rafa Lucena - 2");
-    expect(result).toContain("Igor - 2");
+    expect(result).toMatch(/Rafa Lucena\s+2/);
+    expect(result).toMatch(/Igor\s+2/);
     expect(result).toContain("Gols sofridos:");
-    expect(result).toContain("Chalegre - 2");
-    expect(result).toContain("Goalkeeper - 5");
+    expect(result).toMatch(/Chalegre\s+2/);
+    expect(result).toMatch(/Goalkeeper\s+5/);
     // Should NOT contain the footnote artifacts
     expect(result).not.toContain("[1]");
   });
@@ -59,6 +61,8 @@ describe("formatPeladaSummary", () => {
 
     const result = formatPeladaSummary(date, standings, playerStats);
 
+    expect(result.startsWith("```")).toBe(true);
+    expect(result.endsWith("```")).toBe(true);
     expect(result).toContain("Resumo da rodada");
     expect(result).toContain("Classificacao:");
     expect(result).not.toContain("Gols:");
@@ -76,6 +80,8 @@ describe("formatPeladaSummary", () => {
 
     const result = formatPeladaSummary(date, standings, playerStats);
 
+    expect(result.startsWith("```")).toBe(true);
+    expect(result.endsWith("```")).toBe(true);
     expect(result).toContain("Classificacao:");
     expect(result).not.toContain("Gols:");
     expect(result).not.toContain("Assistencias:");
@@ -98,7 +104,37 @@ describe("formatPeladaSummary", () => {
 
     const result = formatPeladaSummary(date, standings, playerStats);
 
+    expect(result.startsWith("```")).toBe(true);
+    expect(result.endsWith("```")).toBe(true);
     expect(result).toContain("Gols sofridos:");
-    expect(result).toContain("GK - 0");
+    expect(result).toMatch(/GK\s+0/);
+  });
+
+  it("should show goalkeepers even if they have no other stats (Bug #9)", () => {
+    const date = null;
+    const standings: StandingRow[] = [];
+    const playerStats: PlayerStatRow[] = [
+      {
+        playerId: 1,
+        name: "Only Goalkeeper",
+        goals: 0,
+        assists: 0,
+        ownGoals: 0,
+        goalsConceded: 10,
+      },
+      {
+        playerId: 2,
+        name: "Striker",
+        goals: 5,
+        assists: 2,
+        ownGoals: 0,
+        // goalsConceded is undefined for non-goalkeepers
+      },
+    ];
+
+    const result = formatPeladaSummary(date, standings, playerStats);
+
+    expect(result).toContain("Gols sofridos:");
+    expect(result).toMatch(/Only Goalkeeper\s+10/);
   });
 });

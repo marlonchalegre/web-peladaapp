@@ -15,6 +15,17 @@ export function formatPeladaSummary(
 
   let text = `Resumo da rodada ${formattedDate}\n\nClassificacao:\n`;
 
+  // Calculate max name length for alignment
+  let maxNameLength = 0;
+  standings.forEach((s) => {
+    if (s.name.length > maxNameLength) maxNameLength = s.name.length;
+  });
+  playerStats.forEach((p) => {
+    if (p.name.length > maxNameLength) maxNameLength = p.name.length;
+  });
+
+  const nameWidth = Math.min(Math.max(maxNameLength, 15), 30) + 2;
+
   // Sort standings by points (calculated: wins * 3 + draws)
   const sortedStandings = [...standings].sort((a, b) => {
     const ptsA = a.wins * 3 + a.draws;
@@ -24,7 +35,8 @@ export function formatPeladaSummary(
 
   sortedStandings.forEach((s) => {
     const pts = s.wins * 3 + s.draws;
-    text += `${s.name} - ${pts} Pontos(${s.wins}V ${s.draws}E ${s.losses}D)\n`;
+    const nameStr = s.name.padEnd(nameWidth);
+    text += `${nameStr} ${pts} pts (${s.wins}V ${s.draws}E ${s.losses}D)\n`;
   });
 
   // Top scorers (goals > 0)
@@ -35,7 +47,8 @@ export function formatPeladaSummary(
   if (topScorers.length > 0) {
     text += `\nGols:\n`;
     topScorers.forEach((p) => {
-      text += `${p.name} - ${p.goals}\n`;
+      const nameStr = p.name.padEnd(nameWidth);
+      text += `${nameStr} ${p.goals}\n`;
     });
   }
 
@@ -47,7 +60,8 @@ export function formatPeladaSummary(
   if (topAssisters.length > 0) {
     text += `\nAssistencias:\n`;
     topAssisters.forEach((p) => {
-      text += `${p.name} - ${p.assists}\n`;
+      const nameStr = p.name.padEnd(nameWidth);
+      text += `${nameStr} ${p.assists}\n`;
     });
   }
 
@@ -63,9 +77,10 @@ export function formatPeladaSummary(
   if (goalkeepers.length > 0) {
     text += `\nGols sofridos:\n`;
     goalkeepers.forEach((p) => {
-      text += `${p.name} - ${p.goalsConceded}\n`;
+      const nameStr = p.name.padEnd(nameWidth);
+      text += `${nameStr} ${p.goalsConceded}\n`;
     });
   }
 
-  return text;
+  return "```\n" + text.trim() + "\n```";
 }

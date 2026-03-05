@@ -87,6 +87,17 @@ export function generateAnnouncementText(
 ): string {
   let text = "*ESCALAÇÃO DA PELADA*\n\n";
 
+  // Calculate max name length for alignment
+  let maxNameLength = 0;
+  Object.values(teamPlayers).forEach((players) => {
+    players.forEach((p) => {
+      const name = p.user?.name || "Unknown";
+      if (name.length > maxNameLength) maxNameLength = name.length;
+    });
+  });
+
+  const nameWidth = Math.min(Math.max(maxNameLength, 15), 30) + 2;
+
   teams.forEach((team, index) => {
     const players = teamPlayers[team.id] || [];
 
@@ -116,8 +127,9 @@ export function generateAnnouncementText(
         Goalkeeper: "G",
       };
       const pos = p.is_goalkeeper ? "G" : posMap[p.user?.position || ""] || "?";
+      const nameStr = (p.user?.name || "Unknown").padEnd(nameWidth);
 
-      text += `• ${p.user?.name || "Unknown"} - ${pos}\n`;
+      text += `• ${nameStr}${pos}\n`;
     });
 
     if (index < teams.length - 1) {
@@ -125,7 +137,7 @@ export function generateAnnouncementText(
     }
   });
 
-  return text;
+  return "```\n" + text.trim() + "\n```";
 }
 
 export function generateExportCsv(
