@@ -17,6 +17,9 @@ export type StandingRow = {
   wins: number;
   draws: number;
   losses: number;
+  goalsFor: number;
+  goalsAgainst: number;
+  goalDifference: number;
 };
 
 type Props = { standings: StandingRow[] };
@@ -54,6 +57,12 @@ export default function StandingsPanel({ standings }: Props) {
               <TableCell align="center" sx={{ fontWeight: "bold" }}>
                 {t("common.losses_short")}
               </TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                GP
+              </TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                SG
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -70,6 +79,10 @@ export default function StandingsPanel({ standings }: Props) {
                 <TableCell align="center">{row.wins}</TableCell>
                 <TableCell align="center">{row.draws}</TableCell>
                 <TableCell align="center">{row.losses}</TableCell>
+                <TableCell align="center">{row.goalsFor}</TableCell>
+                <TableCell align="center">
+                  {(row.goalDifference > 0 ? "+" : "") + row.goalDifference}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

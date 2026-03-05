@@ -7,9 +7,9 @@ describe("formatPeladaSummary", () => {
   it("should format the summary correctly with full data", () => {
     const date = "2026-02-18T15:00:00Z";
     const standings: StandingRow[] = [
-      { teamId: 3, name: "Time 3", wins: 5, draws: 1, losses: 0 },
-      { teamId: 2, name: "Time 2", wins: 1, draws: 3, losses: 2 },
-      { teamId: 1, name: "Time 1", wins: 0, draws: 2, losses: 4 },
+      { teamId: 3, name: "Time 3", wins: 5, draws: 1, losses: 0, goalsFor: 10, goalsAgainst: 2, goalDifference: 8 },
+      { teamId: 2, name: "Time 2", wins: 1, draws: 3, losses: 2, goalsFor: 5, goalsAgainst: 7, goalDifference: -2 },
+      { teamId: 1, name: "Time 1", wins: 0, draws: 2, losses: 4, goalsFor: 2, goalsAgainst: 8, goalDifference: -6 },
     ];
     const playerStats: PlayerStatRow[] = [
       {
@@ -72,7 +72,7 @@ describe("formatPeladaSummary", () => {
   it("should hide sections with zero values", () => {
     const date = "2026-02-18T15:00:00Z";
     const standings: StandingRow[] = [
-      { teamId: 1, name: "Time 1", wins: 1, draws: 0, losses: 0 },
+      { teamId: 1, name: "Time 1", wins: 1, draws: 0, losses: 0, goalsFor: 2, goalsAgainst: 0, goalDifference: 2 },
     ];
     const playerStats: PlayerStatRow[] = [
       { playerId: 1, name: "Player 1", goals: 0, assists: 0, ownGoals: 0 },

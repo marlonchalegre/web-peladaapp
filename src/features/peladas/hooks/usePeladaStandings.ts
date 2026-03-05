@@ -60,7 +60,7 @@ export function usePeladaStandings(
   }>({ by: "default", dir: "desc" });
 
   const standings = useMemo(() => {
-    const table: Record<number, StandingRow & { goalsFor: number }> = {};
+    const table: Record<number, StandingRow> = {};
     for (const t of teams)
       table[t.id] = {
         teamId: t.id,
@@ -68,6 +68,8 @@ export function usePeladaStandings(
         draws: 0,
         losses: 0,
         goalsFor: 0,
+        goalsAgainst: 0,
+        goalDifference: 0,
         name: t.name,
       };
     for (const m of matches) {
@@ -77,7 +79,10 @@ export function usePeladaStandings(
       if ((m.status || "").toLowerCase() !== "finished") continue;
 
       table[m.home_team_id].goalsFor += hs;
+      table[m.home_team_id].goalsAgainst += as;
       table[m.away_team_id].goalsFor += as;
+      table[m.away_team_id].goalsAgainst += hs;
+
       if (hs === as) {
         table[m.home_team_id].draws += 1;
         table[m.away_team_id].draws += 1;
@@ -89,9 +94,23 @@ export function usePeladaStandings(
         table[m.away_team_id].wins += 1;
       }
     }
-    return Object.values(table).sort(
-      (a, b) => b.wins - a.wins || b.draws - a.draws || b.goalsFor - a.goalsFor,
-    );
+
+    return Object.values(table)
+      .map((row) => ({
+        ...row,
+        goalDifference: row.goalsFor - row.goalsAgainst,
+      }))
+      .sort((a, b) => {
+        const ptsA = a.wins * 3 + a.draws;
+        const ptsB = b.wins * 3 + b.draws;
+
+        if (ptsA !== ptsB) return ptsB - ptsA;
+        if (a.goalDifference !== b.goalDifference)
+          return b.goalDifference - a.goalDifference;
+        if (a.goalsFor !== b.goalsFor) return b.goalsFor - a.goalsFor;
+
+        return a.name.localeCompare(b.name);
+      });
   }, [teams, matches]);
 
   const statsMap = useMemo(() => {
