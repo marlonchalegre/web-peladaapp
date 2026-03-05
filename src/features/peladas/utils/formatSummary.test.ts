@@ -65,9 +65,9 @@ describe("formatPeladaSummary", () => {
     expect(result.startsWith("```")).toBe(true);
     expect(result.endsWith("```")).toBe(true);
     expect(result).toContain("Resumo da rodada 18/02");
-    expect(result).toMatch(/Time 3\s+16 pts/);
-    expect(result).toMatch(/Time 2\s+6 pts/);
-    expect(result).toMatch(/Time 1\s+2 pts/);
+    expect(result).toMatch(/Time 3\s+16 pts \(5V 1E 0D\) GP:10 SG:\+8/);
+    expect(result).toMatch(/Time 2\s+6 pts \(1V 3E 2D\) GP:5 SG:-2/);
+    expect(result).toMatch(/Time 1\s+2 pts \(0V 2E 4D\) GP:2 SG:-6/);
     expect(result).toContain("Gols:");
     expect(result).toMatch(/Chalegre\s+4/);
     expect(result).toMatch(/C.Bala\s+3/);
@@ -119,6 +119,7 @@ describe("formatPeladaSummary", () => {
     expect(result.startsWith("```")).toBe(true);
     expect(result.endsWith("```")).toBe(true);
     expect(result).toContain("Classificacao:");
+    expect(result).toMatch(/Time 1\s+3 pts \(1V 0E 0D\) GP:2 SG:\+2/);
     expect(result).not.toContain("Gols:");
     expect(result).not.toContain("Assistencias:");
     expect(result).not.toContain("Gols sofridos:");
@@ -126,7 +127,18 @@ describe("formatPeladaSummary", () => {
 
   it("should show Gols sofridos even if zero", () => {
     const date = null;
-    const standings: StandingRow[] = [];
+    const standings: StandingRow[] = [
+      {
+        teamId: 1,
+        name: "Time 1",
+        wins: 0,
+        draws: 0,
+        losses: 0,
+        goalsFor: 0,
+        goalsAgainst: 0,
+        goalDifference: 0,
+      },
+    ];
     const playerStats: PlayerStatRow[] = [
       {
         playerId: 1,
@@ -148,7 +160,18 @@ describe("formatPeladaSummary", () => {
 
   it("should show goalkeepers even if they have no other stats (Bug #9)", () => {
     const date = null;
-    const standings: StandingRow[] = [];
+    const standings: StandingRow[] = [
+      {
+        teamId: 1,
+        name: "Time 1",
+        wins: 0,
+        draws: 0,
+        losses: 0,
+        goalsFor: 0,
+        goalsAgainst: 0,
+        goalDifference: 0,
+      },
+    ];
     const playerStats: PlayerStatRow[] = [
       {
         playerId: 1,

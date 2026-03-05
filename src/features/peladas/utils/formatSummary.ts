@@ -36,7 +36,8 @@ export function formatPeladaSummary(
   sortedStandings.forEach((s) => {
     const pts = s.wins * 3 + s.draws;
     const nameStr = s.name.padEnd(nameWidth);
-    text += `${nameStr} ${pts} pts (${s.wins}V ${s.draws}E ${s.losses}D)\n`;
+    const sgStr = (s.goalDifference > 0 ? "+" : "") + s.goalDifference;
+    text += `${nameStr} ${pts} pts (${s.wins}V ${s.draws}E ${s.losses}D) GP:${s.goalsFor} SG:${sgStr}\n`;
   });
 
   // Top scorers (goals > 0)
