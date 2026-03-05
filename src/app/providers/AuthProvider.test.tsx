@@ -58,6 +58,12 @@ function TestComponent() {
   );
 }
 
+vi.mock("jwt-decode", () => ({
+  jwtDecode: vi.fn(),
+}));
+
+import { jwtDecode } from "jwt-decode";
+
 describe("AuthProvider", () => {
   beforeEach(() => {
     // Clear localStorage before each test
@@ -186,8 +192,14 @@ describe("AuthProvider", () => {
   });
 
   it("considers user authenticated only when both token and user exist", () => {
-    // Token exists but no user
-    localStorage.setItem("authToken", "token-only");
+    // If only token exists, AuthProvider creates a skeleton user from it
+    // so isAuthenticated will actually be true.
+    // To test "false", we need a scenario where skeleton creation fails.
+    vi.mocked(jwtDecode).mockImplementation(() => {
+      throw new Error("Invalid token");
+    });
+
+    localStorage.setItem("authToken", "invalid-token");
 
     const { rerender } = render(
       <AuthProvider>

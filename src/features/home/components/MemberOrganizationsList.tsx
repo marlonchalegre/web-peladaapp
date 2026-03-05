@@ -154,6 +154,7 @@ export default function MemberOrganizationsList({
                         fontWeight={600}
                         color="text.primary"
                         onClick={(e) => e.stopPropagation()}
+                        data-testid={`org-link-${org.name}`}
                       >
                         {org.name}
                       </Link>

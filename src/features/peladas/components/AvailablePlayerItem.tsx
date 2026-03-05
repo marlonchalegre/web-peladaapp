@@ -23,6 +23,7 @@ export default function AvailablePlayerItem({
   return (
     <Paper
       elevation={0}
+      data-testid="player-row"
       sx={{
         p: 1.5,
         display: "flex",

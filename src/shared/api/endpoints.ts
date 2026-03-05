@@ -42,7 +42,9 @@ export type Pelada = {
   away_fixed_goalkeeper_id?: number | null;
   status?: string | null;
   closed_at?: string | null;
+  is_admin?: boolean;
 };
+
 export type Team = { id: number; pelada_id: number; name: string };
 export type TeamPlayer = {
   team_id: number;

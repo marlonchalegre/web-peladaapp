@@ -118,6 +118,7 @@ export default function PeladaDetailHeader({
             variant="outlined"
             startIcon={<SettingsIcon />}
             onClick={handleOpenSettings}
+            data-testid="pelada-settings-button"
             sx={{ textTransform: "none", borderRadius: 2 }}
           >
             {t("common.settings", "Settings")}
@@ -187,6 +188,7 @@ export default function PeladaDetailHeader({
           </ListItemIcon>
           <ListItemText>
             <FormControlLabel
+              data-testid="fixed-gk-switch-label"
               control={
                 <Switch
                   size="small"

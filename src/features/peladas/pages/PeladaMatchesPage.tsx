@@ -1,4 +1,5 @@
 import { useParams, Link as RouterLink } from "react-router-dom";
+import { useState, useEffect } from "react";
 import {
   Paper,
   Button,
@@ -16,12 +17,15 @@ import { usePeladaMatches } from "../hooks/usePeladaMatches";
 import MatchHistoryList from "../components/MatchHistoryList";
 import SessionInsights from "../components/SessionInsights";
 import { useAuth } from "../../../app/providers/AuthContext";
+import { api } from "../../../shared/api/client";
+import { createApi } from "../../../shared/api/endpoints";
 
 export default function PeladaMatchesPage() {
   const { t } = useTranslation();
   const { id } = useParams();
   const peladaId = Number(id);
   const { user } = useAuth();
+  const [actuallyIsAdmin, setActuallyIsAdmin] = useState(false);
 
   const {
     loading,
@@ -55,8 +59,22 @@ export default function PeladaMatchesPage() {
     togglePlayerSort,
   } = usePeladaMatches(peladaId);
 
+  useEffect(() => {
+    if (pelada?.organization_id && user) {
+      const endpoints = createApi(api);
+      endpoints
+        .listAdminsByOrganization(pelada.organization_id)
+        .then((admins) => {
+          setActuallyIsAdmin(admins.some((a) => a.user_id === user.id));
+        })
+        .catch((e) => console.error("Failed to check admin status", e));
+    }
+  }, [pelada?.organization_id, user]);
+
   const isAdmin =
-    user?.admin_orgs?.includes(pelada?.organization_id || -1) || false;
+    pelada?.is_admin ||
+    actuallyIsAdmin ||
+    (user?.admin_orgs?.includes(pelada?.organization_id || -1) ?? false);
 
   if (loading) return <Loading message={t("peladas.matches.loading")} />;
   if (error) return <Alert severity="error">{error}</Alert>;

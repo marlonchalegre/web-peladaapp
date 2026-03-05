@@ -75,7 +75,7 @@
       "export_spreadsheet": "Export Spreadsheet",
       "export_announcement": "Announcement Version",
       "copy_clipboard": "Copy to Clipboard",
-
+      "copy_success": "Copied to clipboard!",
       "cancel": "Cancel",
 
       "confirm": "Confirm",

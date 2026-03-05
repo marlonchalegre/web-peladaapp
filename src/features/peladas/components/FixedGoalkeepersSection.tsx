@@ -42,6 +42,7 @@ export default function FixedGoalkeepersSection({
   const renderSlot = (side: "home" | "away", player: PlayerWithUser | null) => (
     <Paper
       variant="outlined"
+      data-testid={`gk-slot-${side}`}
       sx={{
         p: 2,
         borderRadius: 4,

@@ -180,9 +180,11 @@ export default function TeamCard({
             <Paper
               key={p.id}
               elevation={0}
+              data-testid="player-row"
               sx={{
                 p: 1.5,
                 display: "flex",
+
                 alignItems: "center",
                 bgcolor: p.is_goalkeeper
                   ? "primary.light"

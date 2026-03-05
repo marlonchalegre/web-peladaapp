@@ -111,6 +111,7 @@ export default function PlayerAttendanceCard({
                   <IconButton
                     size="small"
                     onClick={() => onUpdate("confirmed")}
+                    data-testid="attendance-card-confirm"
                     sx={{
                       color: "grey.400",
                       "&:hover": {
@@ -127,6 +128,7 @@ export default function PlayerAttendanceCard({
                   <IconButton
                     size="small"
                     onClick={() => onUpdate("declined")}
+                    data-testid="attendance-card-decline"
                     sx={{
                       color: "grey.400",
                       "&:hover": {
