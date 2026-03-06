@@ -176,7 +176,10 @@ describe("OrganizationDetailPage", () => {
             path="/organizations/:id"
             element={<OrganizationDetailPage />}
           />
-          <Route path="/peladas/99" element={<div>Pelada Detail Page</div>} />
+          <Route
+            path="/peladas/99/attendance"
+            element={<div>Pelada Detail Page</div>}
+          />
         </Routes>
       </MemoryRouter>,
     );

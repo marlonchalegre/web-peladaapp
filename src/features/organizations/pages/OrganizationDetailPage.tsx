@@ -283,6 +283,7 @@ export default function OrganizationDetailPage() {
             color="error"
             variant="contained"
             autoFocus
+            data-testid="confirm-leave-org-button"
           >
             {isLeaving
               ? t("common.loading", "Carregando...")

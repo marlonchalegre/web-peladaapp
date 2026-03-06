@@ -171,6 +171,7 @@ export default function MatchPlayerRow({
         {isSubMenuOpen && (
           <Paper
             elevation={3}
+            data-testid="sub-menu"
             sx={{
               position: "absolute",
               zIndex: 10,
@@ -186,6 +187,7 @@ export default function MatchPlayerRow({
             {benchPlayers.map((bp) => (
               <Box
                 key={bp.id}
+                data-testid="bench-player-item"
                 sx={{
                   p: 0.5,
                   cursor: "pointer",
@@ -211,7 +213,12 @@ export default function MatchPlayerRow({
         )}
       </TableCell>
       <TableCell align="center">
-        <IconButton size="small" onClick={onSubClick} disabled={finished}>
+        <IconButton
+          size="small"
+          onClick={onSubClick}
+          disabled={finished}
+          data-testid="sub-button"
+        >
           <SwapHorizIcon color={isSubMenuOpen ? "primary" : "inherit"} />
         </IconButton>
       </TableCell>
