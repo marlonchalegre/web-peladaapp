@@ -15,11 +15,8 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import HistoryIcon from "@mui/icons-material/History";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import DownloadIcon from "@mui/icons-material/Download";
-import TableChartIcon from "@mui/icons-material/TableChart";
+import RateReviewIcon from "@mui/icons-material/RateReview";
 
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import SettingsIcon from "@mui/icons-material/Settings";
-import SecurityIcon from "@mui/icons-material/Security";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { Link as RouterLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -31,7 +28,6 @@ interface PeladaDetailHeaderProps {
   pelada: Pelada;
   votingInfo: VotingInfo | null;
   onStartClick: () => void;
-  onExportCsv: () => void;
   onCopyClipboard: () => void;
 
   onCopyAnnouncement: () => void;
@@ -46,9 +42,7 @@ export default function PeladaDetailHeader({
   pelada,
   votingInfo,
   onStartClick,
-  onExportCsv,
   onCopyClipboard,
-
   onCopyAnnouncement,
   onToggleFixedGk,
 
@@ -58,9 +52,6 @@ export default function PeladaDetailHeader({
 }: PeladaDetailHeaderProps) {
   const { t } = useTranslation();
   const [exportAnchor, setExportAnchor] = useState<null | HTMLElement>(null);
-  const [settingsAnchor, setSettingsAnchor] = useState<null | HTMLElement>(
-    null,
-  );
 
   const handleOpenExport = (event: MouseEvent<HTMLElement>) => {
     setExportAnchor(event.currentTarget);
@@ -68,14 +59,6 @@ export default function PeladaDetailHeader({
 
   const handleCloseExport = () => {
     setExportAnchor(null);
-  };
-
-  const handleOpenSettings = (event: MouseEvent<HTMLElement>) => {
-    setSettingsAnchor(event.currentTarget);
-  };
-
-  const handleCloseSettings = () => {
-    setSettingsAnchor(null);
   };
 
   return (
@@ -113,18 +96,6 @@ export default function PeladaDetailHeader({
       </Box>
 
       <Stack direction="row" spacing={2} alignItems="center">
-        {pelada.status === "open" && isAdminOverride && (
-          <Button
-            variant="outlined"
-            startIcon={<SettingsIcon />}
-            onClick={handleOpenSettings}
-            data-testid="pelada-settings-button"
-            sx={{ textTransform: "none", borderRadius: 2 }}
-          >
-            {t("common.settings", "Settings")}
-          </Button>
-        )}
-
         <Button
           variant="outlined"
           startIcon={<DownloadIcon />}
@@ -145,21 +116,36 @@ export default function PeladaDetailHeader({
         </Button>
 
         {pelada.status === "open" && isAdminOverride && (
-          <Button
-            variant="contained"
-            startIcon={<PlayArrowIcon />}
-            onClick={onStartClick}
-            disabled={changingStatus || processing}
-            data-testid="start-pelada-button"
-            sx={{
-              textTransform: "none",
-              borderRadius: 2,
-              bgcolor: "primary.dark",
-              fontWeight: "bold",
-            }}
-          >
-            {t("peladas.detail.button.start_pelada")}
-          </Button>
+          <>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={!!pelada.fixed_goalkeepers}
+                  onChange={(e) => onToggleFixedGk(e.target.checked)}
+                  disabled={processing}
+                  color="primary"
+                  data-testid="fixed-gk-toggle"
+                />
+              }
+              label={t("organizations.form.pelada.fixed_goalkeepers")}
+              sx={{ ml: 1 }}
+            />
+            <Button
+              variant="contained"
+              startIcon={<PlayArrowIcon />}
+              onClick={onStartClick}
+              disabled={changingStatus || processing}
+              data-testid="start-pelada-button"
+              sx={{
+                textTransform: "none",
+                borderRadius: 2,
+                bgcolor: "primary.dark",
+                fontWeight: "bold",
+              }}
+            >
+              {t("peladas.detail.button.start_pelada")}
+            </Button>
+          </>
         )}
 
         {votingInfo?.can_vote && (
@@ -176,37 +162,6 @@ export default function PeladaDetailHeader({
           </Button>
         )}
       </Stack>
-
-      <Menu
-        anchorEl={settingsAnchor}
-        open={Boolean(settingsAnchor)}
-        onClose={handleCloseSettings}
-      >
-        <MenuItem>
-          <ListItemIcon>
-            <SecurityIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>
-            <FormControlLabel
-              data-testid="fixed-gk-switch-label"
-              control={
-                <Switch
-                  size="small"
-                  checked={!!pelada.fixed_goalkeepers}
-                  onChange={(e) => onToggleFixedGk(e.target.checked)}
-                  disabled={processing}
-                />
-              }
-              label={
-                <Typography variant="body2">
-                  {t("organizations.form.pelada.fixed_goalkeepers")}
-                </Typography>
-              }
-              sx={{ m: 0 }}
-            />
-          </ListItemText>
-        </MenuItem>
-      </Menu>
 
       <Menu
         anchorEl={exportAnchor}
@@ -234,24 +189,10 @@ export default function PeladaDetailHeader({
           }}
         >
           <ListItemIcon>
-            <ContentCopyIcon fontSize="small" />
+            <RateReviewIcon fontSize="small" />
           </ListItemIcon>
           <ListItemText>
-            {t("common.actions.copy_clipboard", "Copy to Clipboard")}
-          </ListItemText>
-        </MenuItem>
-
-        <MenuItem
-          onClick={() => {
-            onExportCsv();
-            handleCloseExport();
-          }}
-        >
-          <ListItemIcon>
-            <TableChartIcon fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>
-            {t("common.actions.export_spreadsheet", "Spreadsheet")}
+            {t("common.actions.export_evaluation", "Evaluation Version")}
           </ListItemText>
         </MenuItem>
       </Menu>

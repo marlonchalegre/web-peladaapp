@@ -4,6 +4,7 @@ import {
   Stack,
   Box,
   CircularProgress,
+  TextField,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import AddIcon from "@mui/icons-material/Add";
@@ -35,6 +36,7 @@ export type TeamsSectionProps = {
   onSetGoalkeeper: (teamId: number, playerId: number) => Promise<void>;
   onRemovePlayer: (teamId: number, playerId: number) => Promise<void>;
   onRandomizeTeams: () => Promise<void>;
+  onUpdatePlayersPerTeam?: (count: number) => Promise<void>;
   scores: Record<number, number>;
   isAdminOverride?: boolean;
   fixedGoalkeepersEnabled?: boolean;
@@ -55,6 +57,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
     onSetGoalkeeper,
     onRemovePlayer,
     onRandomizeTeams,
+    onUpdatePlayersPerTeam,
     scores,
     isAdminOverride = false,
     fixedGoalkeepersEnabled = false,
@@ -70,10 +73,36 @@ export default function TeamsSection(props: TeamsSectionProps) {
           mb: 3,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+            flexWrap: "wrap",
+          }}
+        >
           <Typography variant="h5" sx={{ fontWeight: "bold" }}>
             {t("peladas.teams.title")}
           </Typography>
+          {!locked && isAdminOverride && (
+            <Stack direction="row" spacing={2} alignItems="center">
+              <TextField
+                size="small"
+                type="number"
+                label={t("organizations.form.pelada.players_per_team")}
+                value={playersPerTeam ?? 5}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value, 10);
+                  if (!isNaN(val) && val > 0) {
+                    onUpdatePlayersPerTeam?.(val);
+                  }
+                }}
+                sx={{ width: 150 }}
+                inputProps={{ min: 1 }}
+                data-testid="players-per-team-input"
+              />
+            </Stack>
+          )}
         </Box>
 
         {!locked && isAdminOverride && (

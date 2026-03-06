@@ -15,9 +15,7 @@ import PeladaDetailHeader from "../components/PeladaDetailHeader";
 import StartPeladaDialog from "../components/StartPeladaDialog";
 import {
   generateExportText,
-  generateExportCsv,
   generateAnnouncementText,
-  downloadFile,
   copyToClipboard,
 } from "../utils/exportUtils";
 
@@ -58,6 +56,7 @@ export default function PeladaDetailPage() {
     handleCreateTeam,
     handleDeleteTeam,
     handleToggleFixedGoalkeepers,
+    handleUpdatePlayersPerTeam,
     handleAddPlayersFromOrg,
     allPlayerIdsInPelada,
   } = usePeladaDetail(peladaId);
@@ -83,15 +82,6 @@ export default function PeladaDetailPage() {
     );
   if (!pelada) return <Loading message={t("common.loading")} />;
 
-  const handleExportCsv = () => {
-    const csv = generateExportCsv(teams, teamPlayers, scores);
-    downloadFile(
-      `pelada-${peladaId}-times.csv`,
-      csv,
-      "text/csv;charset=utf-8;",
-    );
-  };
-
   const handleCopyClipboard = async () => {
     const text = generateExportText(teams, teamPlayers, scores);
     const success = await copyToClipboard(text);
@@ -114,7 +104,6 @@ export default function PeladaDetailPage() {
         pelada={pelada}
         votingInfo={votingInfo}
         onStartClick={() => setStartDialogOpen(true)}
-        onExportCsv={handleExportCsv}
         onCopyClipboard={handleCopyClipboard}
         onCopyAnnouncement={handleCopyAnnouncement}
         onToggleFixedGk={handleToggleFixedGoalkeepers}
@@ -169,9 +158,10 @@ export default function PeladaDetailPage() {
             onSetGoalkeeper={handleSetGoalkeeper}
             onRemovePlayer={handleRemovePlayer}
             onRandomizeTeams={handleRandomizeTeams}
+            onUpdatePlayersPerTeam={handleUpdatePlayersPerTeam}
             scores={scores}
             isAdminOverride={actuallyIsAdmin}
-            fixedGoalkeepersEnabled={false} // Disabled individual team slots
+            fixedGoalkeepersEnabled={!!pelada.fixed_goalkeepers}
           />
         </Grid>
 

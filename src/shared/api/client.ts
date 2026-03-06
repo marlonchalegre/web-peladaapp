@@ -144,12 +144,7 @@ export class ApiClient {
   }
 
   async post<T>(path: string, body?: unknown): Promise<T> {
-    const fullPath = `${this.baseUrl}${path}`;
-    const baseUrl =
-      this.baseUrl ||
-      (typeof window !== "undefined" ? window.location.origin : "");
-    const url = new URL(fullPath, baseUrl);
-
+    const url = new URL(`${this.baseUrl}${path}`, window.location.origin);
     const res = await fetch(url.toString(), {
       method: "POST",
       headers: this.headers(),
@@ -159,12 +154,7 @@ export class ApiClient {
   }
 
   async put<T>(path: string, body?: unknown): Promise<T> {
-    const fullPath = `${this.baseUrl}${path}`;
-    const baseUrl =
-      this.baseUrl ||
-      (typeof window !== "undefined" ? window.location.origin : "");
-    const url = new URL(fullPath, baseUrl);
-
+    const url = new URL(`${this.baseUrl}${path}`, window.location.origin);
     const res = await fetch(url.toString(), {
       method: "PUT",
       headers: this.headers(),
@@ -174,12 +164,7 @@ export class ApiClient {
   }
 
   async delete<T>(path: string, body?: unknown): Promise<T> {
-    const fullPath = `${this.baseUrl}${path}`;
-    const baseUrl =
-      this.baseUrl ||
-      (typeof window !== "undefined" ? window.location.origin : "");
-    const url = new URL(fullPath, baseUrl);
-
+    const url = new URL(`${this.baseUrl}${path}`, window.location.origin);
     const res = await fetch(url.toString(), {
       method: "DELETE",
       headers: this.headers(),

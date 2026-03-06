@@ -72,9 +72,8 @@
       "title": "Ações",
       "export": "Exportar",
       "export_text": "Exportar Texto",
-      "export_spreadsheet": "Exportar Planilha",
+      "export_evaluation": "Versão para Avaliação",
       "export_announcement": "Versão de Divulgação",
-      "copy_clipboard": "Copiar para área de transferência",
       "copy_success": "Copiado para a área de transferência!",
       "cancel": "Cancelar",
 

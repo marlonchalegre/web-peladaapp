@@ -373,8 +373,29 @@ export function usePeladaDetail(peladaId: number) {
     }
   };
 
+  const handleUpdatePlayersPerTeam = async (count: number) => {
+    if (processing || !peladaId) return;
+    setProcessing(true);
+    try {
+      await api.put(`/api/peladas/${peladaId}`, {
+        players_per_team: count,
+      });
+      await fetchPeladaData();
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("peladas.detail.error.update_failed");
+      setError(message);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   const handleRandomizeTeams = async () => {
-    if (!peladaId || !pelada?.players_per_team || processing) return;
+    if (!peladaId || processing) return;
+    const playersPerTeam = pelada?.players_per_team || 5;
+    const numTeams = pelada?.num_teams || teams.length || 2;
     setProcessing(true);
     try {
       const teamPlayerIds = Object.values(teamPlayers)
@@ -385,7 +406,8 @@ export function usePeladaDetail(peladaId: number) {
 
       await api.post(`/api/peladas/${peladaId}/teams/randomize`, {
         player_ids: allPlayerIds,
-        players_per_team: pelada.players_per_team,
+        players_per_team: playersPerTeam,
+        num_teams: numTeams,
       });
       await fetchPeladaData();
     } catch (error: unknown) {
@@ -539,6 +561,7 @@ export function usePeladaDetail(peladaId: number) {
     handleCreateTeam,
     handleDeleteTeam,
     handleToggleFixedGoalkeepers,
+    handleUpdatePlayersPerTeam,
     handleAddPlayersFromOrg,
     allPlayerIdsInPelada,
   };

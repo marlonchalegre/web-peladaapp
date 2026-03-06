@@ -20,6 +20,7 @@ interface PlayerAttendanceCardProps {
   isCurrentUser: boolean;
   onUpdate: (status: AttendanceStatus) => void;
   isUpdating: boolean;
+  "data-testid"?: string;
 }
 
 export default function PlayerAttendanceCard({
@@ -28,6 +29,7 @@ export default function PlayerAttendanceCard({
   isCurrentUser,
   onUpdate,
   isUpdating,
+  "data-testid": testId,
 }: PlayerAttendanceCardProps) {
   const { t } = useTranslation();
   const initials = player.user.name
@@ -40,6 +42,7 @@ export default function PlayerAttendanceCard({
   return (
     <Card
       elevation={0}
+      data-testid={testId}
       sx={{
         borderRadius: 3,
         border: "1px solid",

@@ -53,6 +53,7 @@ export default function MatchHistoryList({
                 <ListItemButton
                   selected={isSelected}
                   onClick={() => onSelectMatch(m.id)}
+                  data-testid={`match-history-item-${m.sequence}`}
                   sx={{
                     flexDirection: "column",
                     alignItems: "flex-start",

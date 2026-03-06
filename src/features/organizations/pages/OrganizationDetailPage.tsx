@@ -203,8 +203,8 @@ export default function OrganizationDetailPage() {
               onCreate={async (payload) => {
                 try {
                   const newPelada = await endpoints.createPelada(payload);
-                  // Navigate to the newly created pelada
-                  navigate(`/peladas/${newPelada.id}`);
+                  // Navigate directly to the attendance list for the new pelada
+                  navigate(`/peladas/${newPelada.id}/attendance`);
                 } catch (error: unknown) {
                   const message =
                     error instanceof Error

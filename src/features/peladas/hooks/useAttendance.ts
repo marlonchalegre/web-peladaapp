@@ -113,6 +113,26 @@ export function useAttendance(peladaId: number) {
     }
   };
 
+  const handleAddPlayersFromOrg = async (playerIds: number[]) => {
+    try {
+      setLoading(true);
+      await Promise.all(
+        playerIds.map((pid) =>
+          api.post(`/api/peladas/${peladaId}/players`, { player_id: pid }),
+        ),
+      );
+      await fetchData(true);
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("peladas.available.error.add_failed");
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const confirmed = players.filter((p) => p.attendance_status === "confirmed");
   const declined = players.filter((p) => p.attendance_status === "declined");
   const pending = players.filter(
@@ -141,5 +161,6 @@ export function useAttendance(peladaId: number) {
     isUpdatingSelf,
     handleUpdateAttendance,
     handleCloseAttendance,
+    handleAddPlayersFromOrg,
   };
 }
