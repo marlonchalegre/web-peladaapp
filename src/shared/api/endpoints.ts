@@ -317,6 +317,8 @@ export function createApi(client: ApiClient) {
       client.get<Player[]>(`/api/organizations/${organizationId}/players`),
     createPlayer: (payload: Partial<Player>) =>
       client.post<Player>("/api/players", payload),
+    updatePlayer: (id: number, payload: Partial<Player>) =>
+      client.put<Player>(`/api/players/${id}`, payload),
     deletePlayer: (id: number) => client.delete(`/api/players/${id}`),
 
     // Users

@@ -190,6 +190,7 @@
     "detail": {
       "button": {
         "statistics": "ESTATÍSTICAS",
+        "ratings": "NOTAS",
         "management": "GERENCIAMENTO"
       },
       "section": {
@@ -233,6 +234,21 @@
       "delete_description": "Excluir uma organização é uma ação permanente e não pode ser desfeita. Todos os dados associados serão perdidos.",
       "delete_confirm_title": "Excluir Organização",
       "delete_confirm_instruction": "Por favor, digite o nome da organização \"{{name}}\" para confirmar."
+    },
+    "ratings": {
+      "title": "Notas dos Jogadores - {{name}}",
+      "subtitle": "Atualize as notas técnicas dos jogadores da organização.",
+      "search_placeholder": "Buscar jogador...",
+      "save_success": "Nota atualizada com sucesso!",
+      "error": {
+        "load_players_failed": "Erro ao carregar jogadores",
+        "update_rating_failed": "Erro ao atualizar nota"
+      },
+      "table": {
+        "player": "Jogador",
+        "current_rating": "Nota Atual",
+        "actions": "Ações"
+      }
     },
     "stats": {
       "title": "{{name}} - Estatísticas",

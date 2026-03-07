@@ -222,6 +222,7 @@ export default function InvitePlayerDialog({
       </DialogContent>
       <DialogActions>
         <Button
+          data-testid="invite-dialog-close-button"
           onClick={() => {
             onClose();
             onClearInvited();

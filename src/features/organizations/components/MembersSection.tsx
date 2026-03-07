@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import {
   Paper,
   Box,
@@ -9,10 +10,14 @@ import {
   ListItemText,
   ListItemSecondaryAction,
   IconButton,
+  TextField,
+  InputAdornment,
+  TablePagination,
 } from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import EmailIcon from "@mui/icons-material/Email";
 import DeleteIcon from "@mui/icons-material/Delete";
+import SearchIcon from "@mui/icons-material/Search";
 import { useTranslation } from "react-i18next";
 import { type User, type Player } from "../../../shared/api/endpoints";
 
@@ -34,6 +39,37 @@ export default function MembersSection({
   actionLoading,
 }: MembersSectionProps) {
   const { t } = useTranslation();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const filteredPlayers = useMemo(() => {
+    return players.filter((player) => {
+      const user = usersMap.get(player.user_id);
+      const name = (user?.name || "").toLowerCase();
+      const email = (user?.email || "").toLowerCase();
+      const search = searchTerm.toLowerCase();
+      return name.includes(search) || email.includes(search);
+    });
+  }, [players, usersMap, searchTerm]);
+
+  const paginatedPlayers = useMemo(() => {
+    return filteredPlayers.slice(
+      page * rowsPerPage,
+      page * rowsPerPage + rowsPerPage,
+    );
+  }, [filteredPlayers, page, rowsPerPage]);
+
+  const handleChangePage = (_event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   return (
     <Paper variant="outlined" sx={{ p: 3 }}>
@@ -45,7 +81,7 @@ export default function MembersSection({
           mb: 2,
         }}
       >
-        <Typography variant="h5">
+        <Typography variant="h5" fontWeight="bold">
           {t("organizations.management.sections.members")}
         </Typography>
         <Box sx={{ display: "flex", gap: 1 }}>
@@ -55,6 +91,7 @@ export default function MembersSection({
             onClick={onInviteClick}
             disabled={actionLoading}
             data-testid="members-invite-button"
+            size="small"
           >
             {t("organizations.dialog.invite_player.title")}
           </Button>
@@ -64,24 +101,54 @@ export default function MembersSection({
             onClick={onAddClick}
             disabled={actionLoading}
             data-testid="members-add-button"
+            size="small"
           >
             {t("common.add")}
           </Button>
         </Box>
       </Box>
       <Divider sx={{ mb: 2 }} />
+
+      <Box sx={{ mb: 2 }}>
+        <TextField
+          fullWidth
+          variant="outlined"
+          size="small"
+          placeholder={t("common.fields.player_name")}
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setPage(0);
+          }}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon color="action" />
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Box>
+
       <List>
-        {players.length === 0 ? (
-          <Typography color="text.secondary">
+        {paginatedPlayers.length === 0 ? (
+          <Typography
+            color="text.secondary"
+            sx={{ py: 2, textAlign: "center" }}
+          >
             {t("organizations.list.empty")}
           </Typography>
         ) : (
-          players.map((player) => {
+          paginatedPlayers.map((player) => {
             const user = usersMap.get(player.user_id);
             return (
-              <ListItem key={player.id}>
+              <ListItem key={player.id} divider sx={{ px: 0 }}>
                 <ListItemText
-                  primary={user?.name || `User #${player.user_id}`}
+                  primary={
+                    <Typography fontWeight="medium">
+                      {user?.name || `User #${player.user_id}`}
+                    </Typography>
+                  }
                   secondary={user?.email}
                 />
                 <ListItemSecondaryAction>
@@ -90,6 +157,7 @@ export default function MembersSection({
                     color="error"
                     onClick={() => onRemovePlayer(player.id)}
                     disabled={actionLoading}
+                    size="small"
                   >
                     <DeleteIcon />
                   </IconButton>
@@ -99,6 +167,19 @@ export default function MembersSection({
           })
         )}
       </List>
+
+      {filteredPlayers.length > 0 && (
+        <TablePagination
+          component="div"
+          count={filteredPlayers.length}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          rowsPerPageOptions={[5, 10, 25]}
+          labelRowsPerPage={t("common.pagination.rows_per_page")}
+        />
+      )}
     </Paper>
   );
 }

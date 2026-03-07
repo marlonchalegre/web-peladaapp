@@ -129,7 +129,8 @@ describe("OrganizationManagementPage", () => {
   it("renders organization details and sections after loading", async () => {
     await renderComponent();
     await waitFor(() => {
-      expect(screen.getAllByText("Admin User").length).toBeGreaterThan(0);
+      // Members tab is default
+      expect(screen.getByText("Admin User")).toBeInTheDocument();
       expect(screen.getByText("Player User")).toBeInTheDocument();
     });
   });
@@ -137,6 +138,14 @@ describe("OrganizationManagementPage", () => {
   it("handles adding a new admin", async () => {
     vi.mocked(api.post).mockResolvedValue({});
     await renderComponent();
+
+    // Switch to Admins tab
+    const adminsTab = screen.getByRole("tab", {
+      name: "organizations.management.sections.admins",
+    });
+    await act(async () => {
+      fireEvent.click(adminsTab);
+    });
 
     const selectLabel = await screen.findByLabelText(
       "organizations.dialog.manage_admins.select_user_label",
@@ -150,9 +159,9 @@ describe("OrganizationManagementPage", () => {
       fireEvent.click(option);
     });
 
-    const adminsHeading = screen.getByText(
-      "organizations.management.sections.admins",
-    );
+    const adminsHeading = screen.getByRole("heading", {
+      name: "organizations.management.sections.admins",
+    });
     const adminsSection = adminsHeading.closest(
       "div.MuiPaper-root",
     ) as HTMLElement;
@@ -170,7 +179,15 @@ describe("OrganizationManagementPage", () => {
   it("handles adding players flow", async () => {
     vi.mocked(api.post).mockResolvedValue({});
     await renderComponent();
-    const addMembersBtn = screen.getAllByText("common.add")[0];
+
+    // Members tab is default, find add button in members section
+    const membersHeading = screen.getByRole("heading", {
+      name: "organizations.management.sections.members",
+    });
+    const membersSection = membersHeading.closest(
+      "div.MuiPaper-root",
+    ) as HTMLElement;
+    const addMembersBtn = within(membersSection).getByText("common.add");
 
     await act(async () => {
       fireEvent.click(addMembersBtn);

@@ -70,6 +70,16 @@ export function useOrganizationManagement(orgId: number) {
     }
   }, [orgId, t]);
 
+  const refreshPlayers = useCallback(async () => {
+    if (!orgId) return;
+    try {
+      const p = await endpoints.listPlayersByOrg(orgId);
+      setPlayers(p);
+    } catch (err) {
+      console.error("Failed to refresh players", err);
+    }
+  }, [orgId]);
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -319,5 +329,6 @@ export function useOrganizationManagement(orgId: number) {
     handleAddPlayers,
     handleInvitePlayer,
     handleDeleteOrganization,
+    refreshPlayers,
   };
 }

@@ -190,6 +190,7 @@
     "detail": {
       "button": {
         "statistics": "STATISTICS",
+        "ratings": "RATINGS",
         "management": "MANAGEMENT"
       },
       "section": {
@@ -226,6 +227,21 @@
       "delete_description": "Deleting an organization is a permanent action and cannot be undone. All associated data will be lost.",
       "delete_confirm_title": "Delete Organization",
       "delete_confirm_instruction": "Please type the name of the organization \"{{name}}\" to confirm."
+    },
+    "ratings": {
+      "title": "Player Ratings - {{name}}",
+      "subtitle": "Update the technical ratings of the organization's players.",
+      "search_placeholder": "Search player...",
+      "save_success": "Rating updated successfully!",
+      "error": {
+        "load_players_failed": "Error loading players",
+        "update_rating_failed": "Error updating rating"
+      },
+      "table": {
+        "player": "Player",
+        "current_rating": "Current Rating",
+        "actions": "Actions"
+      }
     },
     "invitation": {
       "join_title": "Join Organization",

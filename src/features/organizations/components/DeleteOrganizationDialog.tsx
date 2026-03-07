@@ -50,6 +50,7 @@ export default function DeleteOrganizationDialog({
           placeholder={orgName}
           autoComplete="off"
           onPaste={(e) => e.preventDefault()}
+          inputProps={{ "data-testid": "confirm-org-name-input" }}
         />
       </DialogContent>
       <DialogActions>
@@ -61,6 +62,7 @@ export default function DeleteOrganizationDialog({
           color="error"
           disabled={confirmName !== orgName || actionLoading}
           onClick={onDelete}
+          data-testid="confirm-delete-org-button"
         >
           {actionLoading ? <CircularProgress size={24} /> : t("common.delete")}
         </Button>

@@ -62,6 +62,7 @@ export default function InvitationsList({
           startIcon={<PersonAddIcon />}
           onClick={onInviteClick}
           disabled={actionLoading}
+          data-testid="invitations-invite-button"
         >
           {t("organizations.dialog.invite_player.title")}
         </Button>

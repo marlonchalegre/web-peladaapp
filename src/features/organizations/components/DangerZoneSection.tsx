@@ -28,6 +28,7 @@ export default function DangerZoneSection({
         color="error"
         onClick={onDeleteClick}
         disabled={actionLoading}
+        data-testid="delete-org-button"
       >
         {t("organizations.table.aria.delete", { name: orgName })}
       </Button>

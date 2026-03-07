@@ -1,13 +1,24 @@
-import { useParams, Link as RouterLink } from "react-router-dom";
+import {
+  useParams,
+  Link as RouterLink,
+  useSearchParams,
+} from "react-router-dom";
 import {
   Container,
   Typography,
   Alert,
   Box,
   Button,
-  Stack,
+  Tabs,
+  Tab,
+  Paper,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import PeopleIcon from "@mui/icons-material/People";
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import MailIcon from "@mui/icons-material/Mail";
+import StarIcon from "@mui/icons-material/Star";
+import SettingsIcon from "@mui/icons-material/Settings";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import AddPlayersDialog from "../components/AddPlayersDialog";
@@ -18,11 +29,41 @@ import AdminsSection from "../components/AdminsSection";
 import InvitationsList from "../components/InvitationsList";
 import DangerZoneSection from "../components/DangerZoneSection";
 import DeleteOrganizationDialog from "../components/DeleteOrganizationDialog";
+import PlayerRatingsContent from "../components/PlayerRatingsContent";
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: string;
+  value: string;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`org-mgmt-tabpanel-${index}`}
+      aria-labelledby={`org-mgmt-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
+    </div>
+  );
+}
 
 export default function OrganizationManagementPage() {
   const { t } = useTranslation();
   const { id } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const orgId = Number(id);
+
+  const activeTab = searchParams.get("tab") || "members";
+
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
+    setSearchParams({ tab: newValue });
+  };
 
   const {
     org,
@@ -58,6 +99,7 @@ export default function OrganizationManagementPage() {
     handleAddPlayers,
     handleInvitePlayer,
     handleDeleteOrganization,
+    refreshPlayers,
   } = useOrganizationManagement(orgId);
 
   if (loading) return <Loading message={t("common.loading")} />;
@@ -83,7 +125,7 @@ export default function OrganizationManagementPage() {
         </Button>
       </Box>
 
-      <Typography variant="h4" gutterBottom fontWeight="bold">
+      <Typography variant="h4" gutterBottom fontWeight="bold" color="primary">
         {t("organizations.management.title", { name: org.name })}
       </Typography>
 
@@ -93,42 +135,109 @@ export default function OrganizationManagementPage() {
         </Alert>
       )}
 
-      <Stack spacing={4}>
-        <InvitationsList
-          invitations={invitations}
-          onRevoke={handleRevokeInvitation}
-          onInviteClick={() => setIsInviteOpen(true)}
-          actionLoading={actionLoading}
-        />
+      <Paper
+        variant="outlined"
+        sx={{ borderBottom: 1, borderColor: "divider" }}
+      >
+        <Tabs
+          value={activeTab}
+          onChange={handleTabChange}
+          aria-label="organization management tabs"
+          variant="scrollable"
+          scrollButtons="auto"
+          sx={{ px: 2 }}
+        >
+          <Tab
+            icon={<PeopleIcon />}
+            iconPosition="start"
+            label={t("organizations.management.sections.members")}
+            value="members"
+            data-testid="mgmt-tab-members"
+          />
+          <Tab
+            icon={<StarIcon />}
+            iconPosition="start"
+            label={t("organizations.detail.button.ratings")}
+            value="ratings"
+            data-testid="mgmt-tab-ratings"
+          />
+          <Tab
+            icon={<AdminPanelSettingsIcon />}
+            iconPosition="start"
+            label={t("organizations.management.sections.admins")}
+            value="admins"
+            data-testid="mgmt-tab-admins"
+          />
+          <Tab
+            icon={<MailIcon />}
+            iconPosition="start"
+            label={t("organizations.management.sections.invitations")}
+            value="invitations"
+            data-testid="mgmt-tab-invitations"
+          />
+          <Tab
+            icon={<SettingsIcon />}
+            iconPosition="start"
+            label={t("common.actions.manage")}
+            value="settings"
+            data-testid="mgmt-tab-settings"
+          />
+        </Tabs>
+      </Paper>
 
-        <MembersSection
-          players={players}
-          usersMap={usersMap}
-          onAddClick={() => {
-            setSelectedUserIds(new Set());
-            setIsAddPlayersOpen(true);
-          }}
-          onInviteClick={() => setIsInviteOpen(true)}
-          onRemovePlayer={handleRemovePlayer}
-          actionLoading={actionLoading}
-        />
+      <Box sx={{ mt: 2 }}>
+        <TabPanel value={activeTab} index="members">
+          <MembersSection
+            players={players}
+            usersMap={usersMap}
+            onAddClick={() => {
+              setSelectedUserIds(new Set());
+              setIsAddPlayersOpen(true);
+            }}
+            onInviteClick={() => setIsInviteOpen(true)}
+            onRemovePlayer={handleRemovePlayer}
+            actionLoading={actionLoading}
+          />
+        </TabPanel>
 
-        <AdminsSection
-          admins={admins}
-          playersNotAdmins={playersNotAdmins}
-          selectedAdminUserId={selectedAdminUserId}
-          onAdminUserChange={setSelectedAdminUserId}
-          onAddAdmin={handleAddAdmin}
-          onRemoveAdmin={handleRemoveAdmin}
-          actionLoading={actionLoading}
-        />
+        <TabPanel value={activeTab} index="ratings">
+          <PlayerRatingsContent
+            orgId={orgId}
+            initialPlayers={players}
+            orgName={org.name}
+            onUpdateSuccess={refreshPlayers}
+          />
+        </TabPanel>
 
-        <DangerZoneSection
-          orgName={org.name}
-          onDeleteClick={() => setIsDeleteDialogOpen(true)}
-          actionLoading={actionLoading}
-        />
-      </Stack>
+        <TabPanel value={activeTab} index="admins">
+          <AdminsSection
+            admins={admins}
+            playersNotAdmins={playersNotAdmins}
+            selectedAdminUserId={selectedAdminUserId}
+            onAdminUserChange={setSelectedAdminUserId}
+            onAddAdmin={handleAddAdmin}
+            onRemoveAdmin={handleRemoveAdmin}
+            actionLoading={actionLoading}
+          />
+        </TabPanel>
+
+        <TabPanel value={activeTab} index="invitations">
+          <InvitationsList
+            invitations={invitations}
+            onRevoke={handleRevokeInvitation}
+            onInviteClick={() => setIsInviteOpen(true)}
+            actionLoading={actionLoading}
+          />
+        </TabPanel>
+
+        <TabPanel value={activeTab} index="settings">
+          <DangerZoneSection
+            orgName={org.name}
+            onDeleteClick={() => setIsDeleteDialogOpen(true)}
+            actionLoading={actionLoading}
+          />
+        </TabPanel>
+      </Box>
 
       <DeleteOrganizationDialog
         open={isDeleteDialogOpen}
