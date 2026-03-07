@@ -44,42 +44,48 @@ export default function PlayerAttendanceCard({
       elevation={0}
       data-testid={testId}
       sx={{
-        borderRadius: 3,
+        borderRadius: 2,
         border: "1px solid",
         borderColor: "divider",
-        "&:hover": { borderColor: "primary.main", bgcolor: "grey.50" },
-        transition: "all 0.2s",
+        "&:hover": { borderColor: "primary.main", bgcolor: "action.hover" },
+        transition: "all 0.1s ease-in-out",
       }}
     >
       <CardContent
         sx={{
-          p: "16px !important",
+          p: "12px !important",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center" }}>
+        <Box sx={{ display: "flex", alignItems: "center", minWidth: 0 }}>
           <Avatar
             sx={{
-              width: 44,
-              height: 44,
-              mr: 2,
-              bgcolor: isCurrentUser ? "primary.main" : "grey.100",
+              width: 36,
+              height: 36,
+              mr: 1.5,
+              bgcolor: isCurrentUser ? "primary.main" : "grey.200",
               color: isCurrentUser ? "white" : "text.primary",
-              fontSize: "0.875rem",
-              fontWeight: "bold",
-              border: "1px solid",
+              fontSize: "0.75rem",
+              fontWeight: 800,
+              border: isCurrentUser ? "none" : "1px solid",
               borderColor: "divider",
             }}
           >
             {initials}
           </Avatar>
-          <Box>
+          <Box sx={{ minWidth: 0 }}>
             <Typography
-              variant="subtitle1"
+              variant="body1"
               component="div"
-              sx={{ fontWeight: "bold", lineHeight: 1.2 }}
+              noWrap
+              sx={{
+                fontWeight: 600,
+                lineHeight: 1.2,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
             >
               {player.user.name}
             </Typography>
@@ -94,8 +100,12 @@ export default function PlayerAttendanceCard({
                 </Typography>
               )}
               {player.position_id === 1 && (
-                <Typography variant="caption" color="text.secondary">
-                  {t("common.positions.goalkeeper")}
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: "flex", alignItems: "center" }}
+                >
+                  • {t("common.positions.goalkeeper")}
                 </Typography>
               )}
             </Stack>

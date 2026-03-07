@@ -60,6 +60,7 @@
   },
   "common": {
     "welcome": "Bem-vindo ao Pelada App",
+    "hello": "Olá",
     "loading": "Carregando...",
     "cancel": "Cancelar",
     "confirm": "Confirmar",
@@ -351,7 +352,10 @@
       },
       "user_status": {
         "title": "Sua presença:",
-        "subtitle": "Confirme se você participará desta pelada."
+        "subtitle": "Confirme se você participará desta pelada.",
+        "prompt": "Você vai jogar hoje?",
+        "confirmed_msg": "Confirmado! Nos vemos no campo.",
+        "declined_msg": "Pena que não pode vir. Esperamos você na próxima!"
       },
       "status": {
         "confirmed": "Confirmado",

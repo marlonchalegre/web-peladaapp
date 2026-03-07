@@ -1,12 +1,11 @@
 import { Box, Typography, Stack } from "@mui/material";
-import Grid from "@mui/material/Grid";
 import { type ReactNode } from "react";
 import { type PlayerWithUser } from "../hooks/useAttendance";
 import { type AttendanceStatus } from "../../../shared/api/endpoints";
 import PlayerAttendanceCard from "./PlayerAttendanceCard";
 
 interface AttendanceListColumnProps {
-  icon: ReactNode;
+  icon?: ReactNode;
   title: string;
   count: number;
   players: PlayerWithUser[];
@@ -15,6 +14,7 @@ interface AttendanceListColumnProps {
   currentUserId?: number;
   onUpdate: (status: AttendanceStatus, playerId: number) => void;
   updatingPlayers: Set<number>;
+  hideHeader?: boolean;
 }
 
 export default function AttendanceListColumn({
@@ -27,18 +27,21 @@ export default function AttendanceListColumn({
   currentUserId,
   onUpdate,
   updatingPlayers,
+  hideHeader = false,
 }: AttendanceListColumnProps) {
   return (
-    <Grid size={{ xs: 12, md: 4 }}>
-      <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
-        {icon}
-        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-          {title}{" "}
-          <Typography component="span" color="text.secondary">
-            ({count})
+    <Box sx={{ width: "100%" }}>
+      {!hideHeader && (
+        <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
+          {icon}
+          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+            {title}{" "}
+            <Typography component="span" color="text.secondary">
+              ({count})
+            </Typography>
           </Typography>
-        </Typography>
-      </Box>
+        </Box>
+      )}
       <Stack spacing={2}>
         {players.map((p) => (
           <PlayerAttendanceCard
@@ -61,6 +64,6 @@ export default function AttendanceListColumn({
           </Typography>
         )}
       </Stack>
-    </Grid>
+    </Box>
   );
 }

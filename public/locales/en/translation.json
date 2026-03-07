@@ -60,6 +60,7 @@
   },
   "common": {
     "welcome": "Welcome to Pelada App",
+    "hello": "Hello",
     "loading": "Loading...",
     "cancel": "Cancel",
     "confirm": "Confirm",
@@ -362,7 +363,10 @@
       },
       "user_status": {
         "title": "Your attendance:",
-        "subtitle": "Confirm if you will participate in this pelada."
+        "subtitle": "Confirm if you will participate in this pelada.",
+        "prompt": "Are you joining the game today?",
+        "confirmed_msg": "You're in! See you on the pitch.",
+        "declined_msg": "Sad to hear you can't make it. Hope to see you next time!"
       },
       "status": {
         "confirmed": "Confirmed",

@@ -1,29 +1,48 @@
 import { useParams, Link as RouterLink } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type SyntheticEvent } from "react";
 import {
   Container,
   Typography,
   Alert,
   Button,
   Box,
-  Stack,
+  Tabs,
+  Tab,
 } from "@mui/material";
-import Grid from "@mui/material/Grid";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
-import PendingIcon from "@mui/icons-material/Pending";
-import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import PeopleIcon from "@mui/icons-material/People";
+import PersonOffIcon from "@mui/icons-material/PersonOff";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import { useAttendance } from "../hooks/useAttendance";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { api } from "../../../shared/api/client";
 import { createApi } from "../../../shared/api/endpoints";
-import AttendanceStats from "../components/AttendanceStats";
 import UserAttendanceStatus from "../components/UserAttendanceStatus";
 import AttendanceListColumn from "../components/AttendanceListColumn";
-import AddPlayersFromOrgDialog from "../components/AddPlayersFromOrgDialog";
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function CustomTabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`attendance-tabpanel-${index}`}
+      aria-labelledby={`attendance-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
+    </div>
+  );
+}
 
 export default function AttendanceListPage() {
   const { t } = useTranslation();
@@ -31,15 +50,13 @@ export default function AttendanceListPage() {
   const peladaId = Number(id);
   const { user } = useAuth();
   const [actuallyIsAdmin, setActuallyIsAdmin] = useState(false);
-  const [addPlayersDialogOpen, setAddPlayersDialogOpen] = useState(false);
+  const [tabValue, setTabValue] = useState(0);
 
   const {
     pelada,
-    players,
     confirmed,
     declined,
     pending,
-    totalPlayers,
     isAdmin,
     loading,
     error,
@@ -48,7 +65,6 @@ export default function AttendanceListPage() {
     isUpdatingSelf,
     handleUpdateAttendance,
     handleCloseAttendance,
-    handleAddPlayersFromOrg,
   } = useAttendance(peladaId);
 
   const isAnyAdmin = pelada?.is_admin || isAdmin || actuallyIsAdmin;
@@ -66,6 +82,10 @@ export default function AttendanceListPage() {
     }
   }, [pelada?.organization_id, user]);
 
+  const handleTabChange = (_event: SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
+
   if (loading && !pelada) return <Loading message={t("common.loading")} />;
   if (error)
     return (
@@ -81,88 +101,63 @@ export default function AttendanceListPage() {
     );
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="md" sx={{ py: { xs: 2, md: 4 } }}>
       <div data-testid="attendance-list-container">
-        <Box sx={{ mb: 2 }}>
+        <Box
+          sx={{
+            mb: 3,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <Button
             component={RouterLink}
             to={`/organizations/${pelada.organization_id}`}
             startIcon={<ArrowBackIcon />}
             variant="text"
+            sx={{ color: "text.secondary", textTransform: "none" }}
           >
-            {t("common.back_to_org")}
+            {t("common.back")}
           </Button>
-        </Box>
-
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-            mb: 4,
-            flexWrap: "wrap",
-            gap: 2,
-          }}
-        >
-          <Box>
-            <Typography
-              variant="h3"
-              component="h1"
-              gutterBottom
-              sx={{ fontWeight: "bold" }}
-            >
-              {t("peladas.attendance.title")}
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              {t("peladas.attendance.subtitle")}
-            </Typography>
-          </Box>
           {isAnyAdmin && (
-            <Stack direction="row" spacing={2}>
-              <Button
-                variant="outlined"
-                size="large"
-                startIcon={<GroupAddIcon />}
-                onClick={() => setAddPlayersDialogOpen(true)}
-                data-testid="add-players-org-button"
-                sx={{
-                  px: 3,
-                  py: 1.5,
-                  borderRadius: 2,
-                  textTransform: "none",
-                  fontWeight: "bold",
-                }}
-              >
-                {t("peladas.panel.available.invite_button")}
-              </Button>
-              <Button
-                variant="contained"
-                size="large"
-                startIcon={<CheckCircleIcon />}
-                onClick={handleCloseAttendance}
-                data-testid="close-attendance-button"
-                sx={{
-                  px: 4,
-                  py: 1.5,
-                  borderRadius: 2,
-                  bgcolor: "secondary.main",
-                  "&:hover": { bgcolor: "secondary.dark" },
-                  textTransform: "none",
-                  fontWeight: "bold",
-                }}
-              >
-                {t("peladas.attendance.button.close_list")}
-              </Button>
-            </Stack>
+            <Button
+              variant="contained"
+              onClick={handleCloseAttendance}
+              data-testid="close-attendance-button"
+              startIcon={<SportsSoccerIcon />}
+              sx={{
+                borderRadius: 3,
+                bgcolor: "success.main",
+                "&:hover": {
+                  bgcolor: "success.dark",
+                  transform: "translateY(-1px)",
+                  boxShadow: "0 4px 12px rgba(22, 101, 52, 0.2)",
+                },
+                px: 3,
+                py: 1,
+                textTransform: "none",
+                fontWeight: 800,
+                transition: "all 0.2s ease",
+              }}
+            >
+              {t("peladas.attendance.button.close_list")}
+            </Button>
           )}
         </Box>
 
-        <AttendanceStats
-          total={totalPlayers}
-          confirmedCount={confirmed.length}
-          declinedCount={declined.length}
-          pendingCount={pending.length}
-        />
+        <Box sx={{ mb: 4 }}>
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{ fontWeight: 800, mb: 1, letterSpacing: -0.5 }}
+          >
+            {t("peladas.attendance.title")}
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            {t("peladas.attendance.subtitle")}
+          </Typography>
+        </Box>
 
         {currentPlayerAsPlayer && (
           <UserAttendanceStatus
@@ -172,51 +167,80 @@ export default function AttendanceListPage() {
           />
         )}
 
-        <Grid container spacing={3}>
-          <AttendanceListColumn
-            icon={<CheckCircleIcon sx={{ mr: 1, color: "success.main" }} />}
-            title={t("peladas.attendance.status.confirmed")}
-            count={confirmed.length}
-            players={confirmed}
-            emptyMessage={t("peladas.attendance.empty.confirmed")}
-            isAdmin={isAdmin}
-            currentUserId={currentPlayerAsPlayer?.user_id}
-            onUpdate={handleUpdateAttendance}
-            updatingPlayers={updatingPlayers}
-          />
+        <Box sx={{ width: "100%", mt: 2 }}>
+          <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+            <Tabs
+              value={tabValue}
+              onChange={handleTabChange}
+              variant="fullWidth"
+              aria-label="attendance tabs"
+              sx={{
+                "& .MuiTab-root": {
+                  textTransform: "none",
+                  fontWeight: "bold",
+                  fontSize: "1rem",
+                  py: 2,
+                },
+              }}
+            >
+              <Tab
+                icon={<PeopleIcon />}
+                iconPosition="start"
+                label={`${t("peladas.attendance.status.confirmed")} (${confirmed.length})`}
+              />
+              <Tab
+                icon={<HelpOutlineIcon />}
+                iconPosition="start"
+                label={`${t("peladas.attendance.status.pending")} (${pending.length})`}
+              />
+              <Tab
+                icon={<PersonOffIcon />}
+                iconPosition="start"
+                label={`${t("peladas.attendance.status.declined")} (${declined.length})`}
+              />
+            </Tabs>
+          </Box>
 
-          <AttendanceListColumn
-            icon={<CancelIcon sx={{ mr: 1, color: "error.main" }} />}
-            title={t("peladas.attendance.status.declined")}
-            count={declined.length}
-            players={declined}
-            emptyMessage={t("peladas.attendance.empty.declined")}
-            isAdmin={isAdmin}
-            currentUserId={currentPlayerAsPlayer?.user_id}
-            onUpdate={handleUpdateAttendance}
-            updatingPlayers={updatingPlayers}
-          />
-
-          <AttendanceListColumn
-            icon={<PendingIcon sx={{ mr: 1, color: "text.secondary" }} />}
-            title={t("peladas.attendance.status.pending")}
-            count={pending.length}
-            players={pending}
-            emptyMessage={t("peladas.attendance.empty.pending")}
-            isAdmin={isAdmin}
-            currentUserId={currentPlayerAsPlayer?.user_id}
-            onUpdate={handleUpdateAttendance}
-            updatingPlayers={updatingPlayers}
-          />
-        </Grid>
-
-        <AddPlayersFromOrgDialog
-          open={addPlayersDialogOpen}
-          onClose={() => setAddPlayersDialogOpen(false)}
-          onAdd={handleAddPlayersFromOrg}
-          organizationId={pelada.organization_id}
-          excludePlayerIds={players.map((p) => p.id)}
-        />
+          <CustomTabPanel value={tabValue} index={0}>
+            <AttendanceListColumn
+              title={t("peladas.attendance.status.confirmed")}
+              count={confirmed.length}
+              players={confirmed}
+              emptyMessage={t("peladas.attendance.empty.confirmed")}
+              isAdmin={isAdmin}
+              currentUserId={currentPlayerAsPlayer?.user_id}
+              onUpdate={handleUpdateAttendance}
+              updatingPlayers={updatingPlayers}
+              hideHeader
+            />
+          </CustomTabPanel>
+          <CustomTabPanel value={tabValue} index={1}>
+            <AttendanceListColumn
+              title={t("peladas.attendance.status.pending")}
+              count={pending.length}
+              players={pending}
+              emptyMessage={t("peladas.attendance.empty.pending")}
+              isAdmin={isAdmin}
+              currentUserId={currentPlayerAsPlayer?.user_id}
+              onUpdate={handleUpdateAttendance}
+              updatingPlayers={updatingPlayers}
+              hideHeader
+            />
+          </CustomTabPanel>
+          <CustomTabPanel value={tabValue} index={2}>
+            <AttendanceListColumn
+              title={t("peladas.attendance.status.declined")}
+              count={declined.length}
+              players={declined}
+              emptyMessage={t("peladas.attendance.empty.declined")}
+              isAdmin={isAdmin}
+              currentUserId={currentPlayerAsPlayer?.user_id}
+              onUpdate={handleUpdateAttendance}
+              updatingPlayers={updatingPlayers}
+              hideHeader
+            />
+          </CustomTabPanel>
+        </Box>
       </div>
     </Container>
   );
