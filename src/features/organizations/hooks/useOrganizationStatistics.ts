@@ -1,18 +1,14 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { api } from "../../../shared/api/client";
-import { createApi, type Organization } from "../../../shared/api/endpoints";
+import {
+  createApi,
+  type Organization,
+  type Player,
+  type OrganizationPlayerStats,
+} from "../../../shared/api/endpoints";
 
 const endpoints = createApi(api);
-
-export type PlayerStats = {
-  player_id: number;
-  player_name: string;
-  peladas_played: number;
-  goal: number;
-  assist: number;
-  own_goal: number;
-};
 
 type Order = "asc" | "desc";
 
@@ -20,9 +16,10 @@ export function useOrganizationStatistics(orgId: number) {
   const { t } = useTranslation();
   const [org, setOrg] = useState<Organization | null>(null);
   const [year, setYear] = useState<number>(new Date().getFullYear());
-  const [stats, setStats] = useState<PlayerStats[]>([]);
+  const [stats, setStats] = useState<OrganizationPlayerStats[]>([]);
+  const [players, setPlayers] = useState<Player[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [orderBy, setOrderBy] = useState<keyof PlayerStats>("goal");
+  const [orderBy, setOrderBy] = useState<keyof OrganizationPlayerStats>("goal");
   const [order, setOrder] = useState<Order>("desc");
 
   // Filters
@@ -43,6 +40,13 @@ export function useOrganizationStatistics(orgId: number) {
             ? error.message
             : t("organizations.stats.error.load_org_failed");
         setError(message);
+      });
+
+    endpoints
+      .listPlayersByOrg(orgId)
+      .then(setPlayers)
+      .catch((error: unknown) => {
+        console.error("Failed to load players", error);
       });
   }, [orgId, t]);
 
@@ -65,7 +69,24 @@ export function useOrganizationStatistics(orgId: number) {
     fetchStats();
   }, [fetchStats]);
 
-  const handleRequestSort = (property: keyof PlayerStats) => {
+  const handleImport = useCallback(
+    async (
+      data: {
+        player_id: number;
+        year: number;
+        goals?: number;
+        assists?: number;
+        own_goals?: number;
+      }[],
+    ) => {
+      if (!orgId) return;
+      await endpoints.upsertManualStats(orgId, data);
+      await fetchStats();
+    },
+    [orgId, fetchStats],
+  );
+
+  const handleRequestSort = (property: keyof OrganizationPlayerStats) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
@@ -126,6 +147,8 @@ export function useOrganizationStatistics(orgId: number) {
     order,
     sortedStats,
     handleRequestSort,
+    players,
+    handleImport,
     // Filter states and setters
     nameFilter,
     setNameFilter,

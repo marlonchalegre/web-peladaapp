@@ -77,6 +77,14 @@ export type PlayerStats = {
   assists: number;
   own_goals: number;
 };
+export type OrganizationPlayerStats = {
+  player_id: number;
+  player_name: string;
+  peladas_played: number;
+  goal: number;
+  assist: number;
+  own_goal: number;
+};
 export type MatchLineupEntry = {
   team_id: number;
   player_id: number;
@@ -178,16 +186,38 @@ export function createApi(client: ApiClient) {
     getInviteLink: (id: number) =>
       client.get<{ token: string }>(`/api/organizations/${id}/invite-link`),
     getOrganizationStatistics: (id: number, year: number) =>
+      client.get<OrganizationPlayerStats[]>(
+        `/api/organizations/${id}/statistics`,
+        { year },
+      ),
+
+    // Manual Stats
+    getManualStats: (id: number, year: number) =>
       client.get<
         {
+          id: number;
+          organization_id: number;
           player_id: number;
-          player_name: string;
-          peladas_played: number;
-          goal: number;
-          assist: number;
-          own_goal: number;
+          year: number;
+          goals: number;
+          assists: number;
+          own_goals: number;
         }[]
-      >(`/api/organizations/${id}/statistics`, { year }),
+      >(`/api/organizations/${id}/manual-stats`, { year }),
+    upsertManualStats: (
+      id: number,
+      stats: {
+        player_id: number;
+        year: number;
+        goals?: number;
+        assists?: number;
+        own_goals?: number;
+      }[],
+    ) =>
+      client.post<{ updated: number }>(
+        `/api/organizations/${id}/manual-stats`,
+        stats,
+      ),
 
     // Peladas
     listPeladasByOrg: (

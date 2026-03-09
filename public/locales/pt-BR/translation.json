@@ -62,6 +62,10 @@
     "welcome": "Bem-vindo ao Pelada App",
     "hello": "Olá",
     "loading": "Carregando...",
+    "import": "Importar",
+    "export": "Exportar",
+    "copy": "Copiar",
+    "copied": "Copiado!",
     "cancel": "Cancelar",
     "confirm": "Confirmar",
     "delete": "Excluir",
@@ -255,6 +259,39 @@
       "title": "{{name}} - Estatísticas",
       "back_link": "Voltar para Organização",
       "empty": "Nenhuma estatística encontrada para os filtros aplicados.",
+      "import": {
+        "title": "Importar Estatísticas",
+        "description": "Importe gols e assistências de um arquivo CSV ou insira manualmente.",
+        "help": {
+          "manual": "A inserção manual permite adicionar estatísticas jogador por jogador sem necessidade de arquivo.",
+          "csv_format": "O CSV deve seguir o formato: usuario,ano,gols,assistencias",
+          "negative_numbers": "Apenas valores positivos são aceitos para gols e assistências."
+        },
+        "button": {
+          "upload_csv": "Upload CSV",
+          "add_manual": "Adicionar Manualmente",
+          "confirm": "Confirmar Importação"
+        },
+        "player_not_found": "Jogador não encontrado pelo nome/username",
+        "error": {
+          "empty": "O arquivo está vazio",
+          "invalid_format": "Formato de CSV inválido",
+          "no_valid_data": "Nenhum dado válido para importar",
+          "failed": "Falha ao importar estatísticas"
+        }
+      },
+      "export": {
+        "dialog_title": "Exportar Estatísticas",
+        "description": "Selecione os campos que deseja incluir no texto exportado.",
+        "title": "Estatísticas - {{year}}",
+        "field": {
+          "player_name": "Jogador",
+          "peladas_played": "Peladas",
+          "goals": "Gols",
+          "assists": "Assis.",
+          "own_goals": "GC"
+        }
+      },
       "filters": {
         "min_peladas": "Mínimo de Peladas",
         "min_goals": "Mínimo de Gols",

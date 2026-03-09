@@ -62,6 +62,10 @@
     "welcome": "Welcome to Pelada App",
     "hello": "Hello",
     "loading": "Loading...",
+    "import": "Import",
+    "export": "Export",
+    "copy": "Copy",
+    "copied": "Copied!",
     "cancel": "Cancel",
     "confirm": "Confirm",
     "delete": "Delete",
@@ -266,6 +270,39 @@
       "title": "{{name}} - Statistics",
       "back_link": "Back to Organization",
       "empty": "No statistics found for the applied filters.",
+      "import": {
+        "title": "Import Statistics",
+        "description": "Import goals and assists from a CSV file or enter them manually.",
+        "help": {
+          "manual": "Manual insertion allows adding statistics player by player without a file.",
+          "csv_format": "The CSV must follow the format: username,year,goals,assists",
+          "negative_numbers": "Only positive values are accepted for goals and assists."
+        },
+        "button": {
+          "upload_csv": "Upload CSV",
+          "add_manual": "Add Manually",
+          "confirm": "Confirm Import"
+        },
+        "player_not_found": "Player not found by name/username",
+        "error": {
+          "empty": "The file is empty",
+          "invalid_format": "Invalid CSV format",
+          "no_valid_data": "No valid data to import",
+          "failed": "Failed to import statistics"
+        }
+      },
+      "export": {
+        "dialog_title": "Export Statistics",
+        "description": "Select the fields you want to include in the exported text.",
+        "title": "Statistics - {{year}}",
+        "field": {
+          "player_name": "Player",
+          "peladas_played": "Peladas",
+          "goals": "Goals",
+          "assists": "Assists",
+          "own_goals": "OG"
+        }
+      },
       "filters": {
         "min_peladas": "Min Peladas",
         "min_goals": "Min Goals",
