@@ -131,25 +131,19 @@ export default function PeladaMatchesPage() {
               </Button>
             )}
 
-            {isPeladaClosed ? (
-              <Typography variant="body2" color="text.secondary" sx={{ py: 1 }}>
-                {t("peladas.matches.status.closed")}
-              </Typography>
-            ) : (
-              isAdmin && (
-                <Button
-                  variant="contained"
-                  color="error"
-                  onClick={handleClosePelada}
-                  disabled={closing}
-                  data-testid="close-pelada-button"
-                  sx={{ px: 3, borderRadius: 2, fontWeight: "bold" }}
-                >
-                  {closing
-                    ? t("peladas.matches.button.closing")
-                    : t("peladas.matches.button.close_pelada")}
-                </Button>
-              )
+            {!isPeladaClosed && isAdmin && (
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleClosePelada}
+                disabled={closing}
+                data-testid="close-pelada-button"
+                sx={{ px: 3, borderRadius: 2, fontWeight: "bold" }}
+              >
+                {closing
+                  ? t("peladas.matches.button.closing")
+                  : t("peladas.matches.button.close_pelada")}
+              </Button>
             )}
           </Stack>
         </Box>

@@ -170,9 +170,6 @@ describe("PeladaMatchesPage", () => {
       expect(
         screen.queryByText("peladas.matches.button.close_pelada"),
       ).not.toBeInTheDocument();
-      expect(
-        screen.getByText("peladas.matches.status.closed"),
-      ).toBeInTheDocument();
       expect(screen.getByTestId("finished-status").textContent).toBe(
         "finished",
       );
