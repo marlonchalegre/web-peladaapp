@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link as RouterLink } from "react-router-dom";
+import { useParams, Link as RouterLink } from "react-router-dom";
 import {
   Container,
   Typography,
@@ -25,7 +25,6 @@ import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import GroupIcon from "@mui/icons-material/Group";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import axios from "axios";
 import { api } from "../../../shared/api/client";
 import { createApi, type VotingResults } from "../../../shared/api/endpoints";
@@ -38,7 +37,6 @@ const endpoints = createApi(api);
 export default function PeladaVotingResultsPage() {
   const { t } = useTranslation();
   const { id } = useParams();
-  const navigate = useNavigate();
   const peladaId = Number(id);
 
   const [results, setResults] = useState<VotingResults | null>(null);
@@ -81,8 +79,8 @@ export default function PeladaVotingResultsPage() {
         </Alert>
         <Button
           variant="outlined"
-          startIcon={<ArrowBackIcon />}
-          onClick={() => navigate(`/peladas/${peladaId}`)}
+          component={RouterLink}
+          to={`/peladas/${peladaId}`}
           sx={{ mt: 2 }}
         >
           {t("peladas.voting.button.back_to_pelada")}
@@ -130,14 +128,6 @@ export default function PeladaVotingResultsPage() {
             to={`/peladas/${peladaId}/matches`}
           >
             {t("peladas.detail.button.view_matches")}
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<ArrowBackIcon />}
-            component={RouterLink}
-            to={`/peladas/${peladaId}`}
-          >
-            {t("common.back")}
           </Button>
         </Box>
       </Box>

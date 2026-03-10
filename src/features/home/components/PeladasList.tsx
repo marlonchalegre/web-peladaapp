@@ -115,6 +115,8 @@ export default function PeladasList({
                   peladaLink = `/peladas/${pelada.id}/attendance`;
                 } else if (pelada.status === "voting") {
                   peladaLink = `/peladas/${pelada.id}/voting`;
+                } else if (pelada.status === "closed") {
+                  peladaLink = `/peladas/${pelada.id}/results`;
                 } else if (pelada.status === "open") {
                   peladaLink = `/peladas/${pelada.id}`;
                 }
