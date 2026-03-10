@@ -10,6 +10,7 @@ import {
   type AttendanceStatus,
 } from "../../../shared/api/endpoints";
 import { useAuth } from "../../../app/providers/AuthContext";
+import { sortPlayersByPosition } from "../utils/playerUtils";
 
 const endpoints = createApi(api);
 
@@ -140,10 +141,16 @@ export function useAttendance(peladaId: number) {
     }
   };
 
-  const confirmed = players.filter((p) => p.attendance_status === "confirmed");
-  const declined = players.filter((p) => p.attendance_status === "declined");
-  const pending = players.filter(
-    (p) => !p.attendance_status || p.attendance_status === "pending",
+  const confirmed = sortPlayersByPosition(
+    players.filter((p) => p.attendance_status === "confirmed"),
+  );
+  const declined = sortPlayersByPosition(
+    players.filter((p) => p.attendance_status === "declined"),
+  );
+  const pending = sortPlayersByPosition(
+    players.filter(
+      (p) => !p.attendance_status || p.attendance_status === "pending",
+    ),
   );
 
   const currentPlayerAsPlayer = players.find(

@@ -18,6 +18,7 @@ import { useState } from "react";
 import type { DragEvent, MouseEvent } from "react";
 import type { Player, Team, User } from "../../../shared/api/endpoints";
 import { useTranslation } from "react-i18next";
+import { sortPlayersByPosition } from "../utils/playerUtils";
 
 type PlayerWithUser = Player & {
   user: User;
@@ -68,21 +69,7 @@ export default function TeamCard({
 
   const emptySlots = Math.max(0, maxPlayers - players.length);
 
-  const sortedPlayers = [...players].sort((a, b) => {
-    if (a.is_goalkeeper && !b.is_goalkeeper) return -1;
-    if (!a.is_goalkeeper && b.is_goalkeeper) return 1;
-
-    const order: Record<string, number> = {
-      Goalkeeper: 0,
-      Defender: 1,
-      Midfielder: 2,
-      Striker: 3,
-    };
-
-    const posA = order[a.user?.position || ""] ?? 4;
-    const posB = order[b.user?.position || ""] ?? 4;
-    return posA - posB;
-  });
+  const sortedPlayers = sortPlayersByPosition(players);
 
   const selectedPlayer = players.find((p) => p.id === selectedPlayerId);
 

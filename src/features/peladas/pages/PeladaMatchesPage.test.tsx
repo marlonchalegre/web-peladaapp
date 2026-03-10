@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import PeladaMatchesPage from "./PeladaMatchesPage";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { api } from "../../../shared/api/client";
@@ -92,7 +92,9 @@ describe("PeladaMatchesPage", () => {
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/peladas/1/dashboard-data")
         return Promise.resolve(mockDashboardData);
-      return Promise.reject(new Error("Not found"));
+      if (path === "/api/organizations/101/admins")
+        return Promise.resolve([{ user_id: 1, organization_id: 101 }]);
+      return Promise.reject(new Error(`Not found: ${path}`));
     });
 
     (useAuth as Mock).mockReturnValue({
@@ -111,6 +113,7 @@ describe("PeladaMatchesPage", () => {
       <MemoryRouter initialEntries={["/peladas/1/matches"]}>
         <Routes>
           <Route path="/peladas/:id/matches" element={<PeladaMatchesPage />} />
+          <Route path="*" element={<div />} />
         </Routes>
       </MemoryRouter>,
     );
@@ -130,7 +133,7 @@ describe("PeladaMatchesPage", () => {
     const match11Item = screen.getAllByText(
       "peladas.matches.history_item_title",
     )[1];
-    match11Item.click();
+    fireEvent.click(match11Item);
 
     await waitFor(() => {
       const statsMap11 = JSON.parse(
@@ -141,21 +144,24 @@ describe("PeladaMatchesPage", () => {
     });
   });
 
-  it("hides 'Close pelada' button when status is 'voting'", async () => {
-    const votingData = {
+  it("hides 'Close pelada' button when status is 'closed'", async () => {
+    const closedData = {
       ...mockDashboardData,
-      pelada: { ...mockDashboardData.pelada, status: "voting" },
+      pelada: { ...mockDashboardData.pelada, status: "closed" },
     };
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/peladas/1/dashboard-data")
-        return Promise.resolve(votingData);
-      return Promise.reject(new Error("Not found"));
+        return Promise.resolve(closedData);
+      if (path === "/api/organizations/101/admins")
+        return Promise.resolve([{ user_id: 1, organization_id: 101 }]);
+      return Promise.reject(new Error(`Not found: ${path}`));
     });
 
     render(
       <MemoryRouter initialEntries={["/peladas/1/matches"]}>
         <Routes>
           <Route path="/peladas/:id/matches" element={<PeladaMatchesPage />} />
+          <Route path="*" element={<div />} />
         </Routes>
       </MemoryRouter>,
     );
@@ -188,6 +194,7 @@ describe("PeladaMatchesPage", () => {
       <MemoryRouter initialEntries={["/peladas/1/matches"]}>
         <Routes>
           <Route path="/peladas/:id/matches" element={<PeladaMatchesPage />} />
+          <Route path="*" element={<div />} />
         </Routes>
       </MemoryRouter>,
     );
@@ -204,6 +211,7 @@ describe("PeladaMatchesPage", () => {
       <MemoryRouter initialEntries={["/peladas/1/matches"]}>
         <Routes>
           <Route path="/peladas/:id/matches" element={<PeladaMatchesPage />} />
+          <Route path="*" element={<div />} />
         </Routes>
       </MemoryRouter>,
     );

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import AvailablePlayersPanel from "./AvailablePlayersPanel";
 import type { Player, User } from "../../../shared/api/endpoints";
 import { ThemeContextProvider } from "../../../app/providers/ThemeProvider";
@@ -13,6 +13,16 @@ vi.mock("react-i18next", () => ({
     },
   }),
 }));
+
+// Mock navigator.clipboard
+Object.assign(navigator, {
+  clipboard: {
+    writeText: vi.fn().mockImplementation(() => Promise.resolve()),
+  },
+});
+
+// Mock window.alert
+window.alert = vi.fn();
 
 describe("AvailablePlayersPanel", () => {
   const mockPlayers: (Player & { user: User })[] = [
@@ -91,5 +101,55 @@ describe("AvailablePlayersPanel", () => {
 
     expect(screen.getByText("Alice")).toBeInTheDocument();
     expect(screen.queryByText("Bob")).not.toBeInTheDocument();
+  });
+
+  it("sorts players by position", () => {
+    render(
+      <ThemeContextProvider>
+        <AvailablePlayersPanel
+          players={[mockPlayers[1], mockPlayers[0]]} // Striker first in array
+          scores={{ 101: 9.0, 102: 8.0 }}
+          onDropToBench={() => {}}
+          onDragStartPlayer={() => {}}
+          onAddPlayersFromOrg={async () => {}}
+          organizationId={1}
+          allPlayerIdsInPelada={[101, 102]}
+          totalPlayersInPelada={2}
+          averagePelada={8.5}
+          balance={100}
+        />
+      </ThemeContextProvider>,
+    );
+
+    const playerRows = screen.getAllByTestId("player-row");
+    expect(playerRows[0]).toHaveTextContent("Alice"); // GK
+    expect(playerRows[1]).toHaveTextContent("Bob"); // Striker
+  });
+
+  it("calls copyToClipboard when Copy button is clicked", async () => {
+    render(
+      <ThemeContextProvider>
+        <AvailablePlayersPanel
+          players={mockPlayers}
+          scores={{ 101: 9.0, 102: 8.0 }}
+          onDropToBench={() => {}}
+          onDragStartPlayer={() => {}}
+          onAddPlayersFromOrg={async () => {}}
+          organizationId={1}
+          allPlayerIdsInPelada={[101, 102]}
+          totalPlayersInPelada={2}
+          averagePelada={8.5}
+          balance={100}
+        />
+      </ThemeContextProvider>,
+    );
+
+    const copyButton = screen.getByText("common.copy");
+    fireEvent.click(copyButton);
+
+    await waitFor(() => {
+      expect(navigator.clipboard.writeText).toHaveBeenCalled();
+      expect(window.alert).toHaveBeenCalledWith("common.actions.copy_success");
+    });
   });
 });

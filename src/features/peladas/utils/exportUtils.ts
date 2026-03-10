@@ -1,6 +1,60 @@
 import type { Player, Team, User } from "../../../shared/api/endpoints";
+import { sortPlayersByPosition } from "./playerUtils";
 
 type PlayerWithUser = Player & { user: User; is_goalkeeper?: boolean };
+
+export function generateAvailablePlayersText(
+  players: PlayerWithUser[],
+  scores: Record<number, number>,
+): string {
+  if (players.length === 0) return "";
+
+  const sortedPlayers = sortPlayersByPosition(players);
+
+  const grouped: Record<string, PlayerWithUser[]> = {
+    Goalkeeper: [],
+    Defender: [],
+    Midfielder: [],
+    Striker: [],
+    Unknown: [],
+  };
+
+  sortedPlayers.forEach((p) => {
+    const pos = p.user?.position || "Unknown";
+    const normalizedPos =
+      pos.charAt(0).toUpperCase() + pos.slice(1).toLowerCase();
+    if (grouped[normalizedPos]) {
+      grouped[normalizedPos].push(p);
+    } else {
+      grouped.Unknown.push(p);
+    }
+  });
+
+  let text = "";
+  const positions = [
+    "Goalkeeper",
+    "Defender",
+    "Midfielder",
+    "Striker",
+    "Unknown",
+  ];
+
+  positions.forEach((pos) => {
+    const posPlayers = grouped[pos];
+    if (posPlayers.length > 0) {
+      text += `${pos}\n`;
+      posPlayers.forEach((p) => {
+        const score = scores[p.id] ?? p.grade;
+        const scoreStr =
+          typeof score === "number" ? score.toFixed(1).replace(".", ",") : "-";
+        text += `${p.user.name.padEnd(25)} ${scoreStr}\n`;
+      });
+      text += "\n";
+    }
+  });
+
+  return "```\n" + text.trim() + "\n```";
+}
 
 export function generateExportText(
   teams: Team[],
@@ -24,21 +78,7 @@ export function generateExportText(
   teams.forEach((team, index) => {
     const players = teamPlayers[team.id] || [];
 
-    // Sort players: Goalkeeper (0), Defender (1), Midfielder (2), Striker (3)
-    const sortedPlayers = [...players].sort((a, b) => {
-      if (a.is_goalkeeper && !b.is_goalkeeper) return -1;
-      if (!a.is_goalkeeper && b.is_goalkeeper) return 1;
-
-      const order: Record<string, number> = {
-        Goalkeeper: 0,
-        Defender: 1,
-        Midfielder: 2,
-        Striker: 3,
-      };
-      const posA = order[a.user?.position || ""] ?? 4;
-      const posB = order[b.user?.position || ""] ?? 4;
-      return posA - posB;
-    });
+    const sortedPlayers = sortPlayersByPosition(players);
 
     const vals = players
       .map((p) => (typeof scores[p.id] === "number" ? scores[p.id] : p.grade))
@@ -59,12 +99,14 @@ export function generateExportText(
         typeof score === "number" ? score.toFixed(2).replace(".", ",") : "-";
 
       const posMap: Record<string, string> = {
-        Defender: "Z",
-        Midfielder: "M",
-        Striker: "A",
-        Goalkeeper: "G",
+        defender: "Z",
+        midfielder: "M",
+        striker: "A",
+        goalkeeper: "G",
       };
-      const pos = p.is_goalkeeper ? "G" : posMap[p.user?.position || ""] || "?";
+      const pos = p.is_goalkeeper
+        ? "G"
+        : posMap[(p.user?.position || "").toLowerCase()] || "?";
 
       const indexStr = `${i + 1}`.padEnd(3);
       const nameStr = (p.user?.name || "Unknown").padEnd(nameWidth);
@@ -101,32 +143,20 @@ export function generateAnnouncementText(
   teams.forEach((team, index) => {
     const players = teamPlayers[team.id] || [];
 
-    // Sort players: Goalkeeper (0), Defender (1), Midfielder (2), Striker (3)
-    const sortedPlayers = [...players].sort((a, b) => {
-      if (a.is_goalkeeper && !b.is_goalkeeper) return -1;
-      if (!a.is_goalkeeper && b.is_goalkeeper) return 1;
-
-      const order: Record<string, number> = {
-        Goalkeeper: 0,
-        Defender: 1,
-        Midfielder: 2,
-        Striker: 3,
-      };
-      const posA = order[a.user?.position || ""] ?? 4;
-      const posB = order[b.user?.position || ""] ?? 4;
-      return posA - posB;
-    });
+    const sortedPlayers = sortPlayersByPosition(players);
 
     text += `*${team.name.toUpperCase()}*\n`;
 
     sortedPlayers.forEach((p) => {
       const posMap: Record<string, string> = {
-        Defender: "Z",
-        Midfielder: "M",
-        Striker: "A",
-        Goalkeeper: "G",
+        defender: "Z",
+        midfielder: "M",
+        striker: "A",
+        goalkeeper: "G",
       };
-      const pos = p.is_goalkeeper ? "G" : posMap[p.user?.position || ""] || "?";
+      const pos = p.is_goalkeeper
+        ? "G"
+        : posMap[(p.user?.position || "").toLowerCase()] || "?";
       const nameStr = (p.user?.name || "Unknown").padEnd(nameWidth);
 
       text += `• ${nameStr}${pos}\n`;
@@ -152,20 +182,7 @@ export function generateExportCsv(
   teams.forEach((team) => {
     const players = teamPlayers[team.id] || [];
 
-    const sortedPlayers = [...players].sort((a, b) => {
-      if (a.is_goalkeeper && !b.is_goalkeeper) return -1;
-      if (!a.is_goalkeeper && b.is_goalkeeper) return 1;
-
-      const order: Record<string, number> = {
-        Goalkeeper: 0,
-        Defender: 1,
-        Midfielder: 2,
-        Striker: 3,
-      };
-      const posA = order[a.user?.position || ""] ?? 4;
-      const posB = order[b.user?.position || ""] ?? 4;
-      return posA - posB;
-    });
+    const sortedPlayers = sortPlayersByPosition(players);
 
     sortedPlayers.forEach((p) => {
       const score = scores[p.id] ?? p.grade;
@@ -173,12 +190,14 @@ export function generateExportCsv(
         typeof score === "number" ? score.toFixed(2).replace(".", ",") : "-";
 
       const posMap: Record<string, string> = {
-        Defender: "Z",
-        Midfielder: "M",
-        Striker: "A",
-        Goalkeeper: "G",
+        defender: "Z",
+        midfielder: "M",
+        striker: "A",
+        goalkeeper: "G",
       };
-      const pos = p.is_goalkeeper ? "G" : posMap[p.user?.position || ""] || "?";
+      const pos = p.is_goalkeeper
+        ? "G"
+        : posMap[(p.user?.position || "").toLowerCase()] || "?";
 
       csv += `${team.name};${p.user?.name || "Unknown"};${pos};${scoreStr}\n`;
     });

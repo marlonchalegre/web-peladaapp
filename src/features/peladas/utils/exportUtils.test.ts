@@ -3,6 +3,7 @@ import {
   generateExportText,
   generateAnnouncementText,
   generateExportCsv,
+  generateAvailablePlayersText,
 } from "./exportUtils";
 import type { Player, Team, User } from "../../../shared/api/endpoints";
 
@@ -139,6 +140,45 @@ describe("exportUtils", () => {
       expect(result).toContain("Time;Nome;Posição;Nota");
       expect(result).toContain("Time 1;Gandalf;M;8,50");
       expect(result).toContain("Time 2;Sauron;G;6,50");
+    });
+  });
+
+  describe("generateAvailablePlayersText", () => {
+    it("should format available players grouped by position", () => {
+      const players: (Player & { user: User })[] = [
+        {
+          id: 1,
+          user_id: 1,
+          organization_id: 1,
+          user: {
+            id: 1,
+            name: "Goleiro A",
+            username: "g1",
+            position: "Goalkeeper",
+          },
+        },
+        {
+          id: 2,
+          user_id: 2,
+          organization_id: 1,
+          user: {
+            id: 2,
+            name: "Atacante B",
+            username: "a1",
+            position: "Striker",
+          },
+        },
+      ];
+      const scores = { 1: 8.5, 2: 7.25 };
+
+      const text = generateAvailablePlayersText(players, scores);
+
+      expect(text).toContain("Goalkeeper");
+      expect(text).toContain("Goleiro A");
+      expect(text).toContain("8,5");
+      expect(text).toContain("Striker");
+      expect(text).toContain("Atacante B");
+      expect(text).toContain("7,3"); // Rounded to 1 decimal (7.25 -> 7.3)
     });
   });
 });

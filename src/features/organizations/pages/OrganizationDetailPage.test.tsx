@@ -69,7 +69,7 @@ describe("OrganizationDetailPage", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Test Org")).toBeInTheDocument();
+      expect(screen.getAllByText("Test Org").length).toBeGreaterThan(0);
       // Pelada #1 -> organizations.peladas.item_name with simple mock
       const items = screen.getAllByText("organizations.peladas.item_name");
       expect(items.length).toBeGreaterThan(0);
@@ -242,7 +242,7 @@ describe("OrganizationDetailPage", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Non-Admin Org")).toBeInTheDocument();
+      expect(screen.getAllByText("Non-Admin Org").length).toBeGreaterThan(0);
     });
 
     // Button should be present for non-admins
@@ -304,7 +304,7 @@ describe("OrganizationDetailPage", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Admin Org")).toBeInTheDocument();
+      expect(screen.getAllByText("Admin Org").length).toBeGreaterThan(0);
     });
 
     // Leave button should NOT be present for admins

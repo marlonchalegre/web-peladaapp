@@ -11,9 +11,15 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import type { DragEvent } from "react";
 import type { Player, User } from "../../../shared/api/endpoints";
 import { useTranslation } from "react-i18next";
+import { sortPlayersByPosition } from "../utils/playerUtils";
+import {
+  generateAvailablePlayersText,
+  copyToClipboard,
+} from "../utils/exportUtils";
 import TechnicalSummary from "./TechnicalSummary";
 import AvailablePlayerItem from "./AvailablePlayerItem";
 import AddPlayersFromOrgDialog from "./AddPlayersFromOrgDialog";
@@ -51,6 +57,16 @@ export default function AvailablePlayersPanel({
   const [search, setSearch] = useState("");
   const [addDialogOpen, setAddDialogOpen] = useState(false);
 
+  const handleCopyPlayers = async () => {
+    const text = generateAvailablePlayersText(players, scores);
+    if (!text) return;
+
+    const success = await copyToClipboard(text);
+    if (success) {
+      alert(t("common.actions.copy_success", "Copied to clipboard!"));
+    }
+  };
+
   const filteredPlayers = useMemo(() => {
     const result = search
       ? players.filter((p) =>
@@ -58,18 +74,7 @@ export default function AvailablePlayersPanel({
         )
       : [...players];
 
-    const order: Record<string, number> = {
-      Goalkeeper: 0,
-      Defender: 1,
-      Midfielder: 2,
-      Striker: 3,
-    };
-
-    return result.sort((a, b) => {
-      const posA = order[a.user?.position || ""] ?? 4;
-      const posB = order[b.user?.position || ""] ?? 4;
-      return posA - posB;
-    });
+    return sortPlayersByPosition(result);
   }, [players, search]);
 
   return (
@@ -137,6 +142,26 @@ export default function AvailablePlayersPanel({
               }}
             />
           </Stack>
+
+          <Button
+            size="small"
+            variant="text"
+            startIcon={<ContentCopyIcon sx={{ fontSize: "1rem !important" }} />}
+            onClick={handleCopyPlayers}
+            data-testid="copy-players-button"
+            sx={{
+              textTransform: "none",
+              fontWeight: 700,
+              fontSize: "0.75rem",
+              color: "text.secondary",
+              "&:hover": {
+                bgcolor: "action.hover",
+                color: "primary.main",
+              },
+            }}
+          >
+            {t("common.copy")}
+          </Button>
         </Box>
 
         <TextField

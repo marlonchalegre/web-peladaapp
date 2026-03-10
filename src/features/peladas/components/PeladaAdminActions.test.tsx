@@ -50,11 +50,33 @@ describe("Admin Actions Visibility", () => {
   };
 
   describe("PeladaDetailHeader", () => {
-    it("shows Start Pelada button for admins", () => {
+    it("shows Build Schedule button as primary for admins when no plan exists", () => {
       render(
         <MemoryRouter>
           <ThemeContextProvider>
-            <PeladaDetailHeader {...headerProps} isAdminOverride={true} />
+            <PeladaDetailHeader
+              {...headerProps}
+              pelada={{ ...mockPelada, has_schedule_plan: false }}
+              isAdminOverride={true}
+            />
+          </ThemeContextProvider>
+        </MemoryRouter>,
+      );
+      expect(screen.getByTestId("build-schedule-button")).toBeInTheDocument();
+      expect(
+        screen.queryByTestId("start-pelada-button"),
+      ).not.toBeInTheDocument();
+    });
+
+    it("shows Start Pelada button for admins when plan exists", () => {
+      render(
+        <MemoryRouter>
+          <ThemeContextProvider>
+            <PeladaDetailHeader
+              {...headerProps}
+              pelada={{ ...mockPelada, has_schedule_plan: true }}
+              isAdminOverride={true}
+            />
           </ThemeContextProvider>
         </MemoryRouter>,
       );

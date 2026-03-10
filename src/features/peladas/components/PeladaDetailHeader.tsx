@@ -16,7 +16,7 @@ import {
 import HistoryIcon from "@mui/icons-material/History";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import DownloadIcon from "@mui/icons-material/Download";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import RateReviewIcon from "@mui/icons-material/RateReview";
 
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
@@ -142,62 +142,81 @@ export default function PeladaDetailHeader({
                 onClick={handleOpenExport}
                 sx={{ border: "1px solid", borderColor: "divider" }}
               >
-                <DownloadIcon />
+                <ContentCopyIcon />
               </IconButton>
             </Tooltip>
 
-            <Button
-              component={RouterLink}
-              to={`/peladas/${pelada.id}/matches`}
-              variant="outlined"
-              startIcon={<HistoryIcon />}
-              sx={{
-                textTransform: "none",
-                borderRadius: 2,
-                fontWeight: "bold",
-              }}
-            >
-              {t("peladas.detail.button.view_matches")}
-            </Button>
-          </Stack>
-
-          {pelada.status === "open" && isAdminOverride && (
-            <Stack direction="row" spacing={1}>
+            {pelada.status === "open" && isAdminOverride ? (
+              <>
+                {!pelada.has_schedule_plan ? (
+                  <Button
+                    component={RouterLink}
+                    to={`/peladas/${pelada.id}/build-schedule`}
+                    variant="contained"
+                    startIcon={<CalendarTodayIcon />}
+                    data-testid="build-schedule-button"
+                    sx={{
+                      textTransform: "none",
+                      borderRadius: 2,
+                      fontWeight: 800,
+                      px: 3,
+                    }}
+                  >
+                    {t("peladas.detail.button.build_schedule")}
+                  </Button>
+                ) : (
+                  <Stack direction="row" spacing={1}>
+                    <Button
+                      component={RouterLink}
+                      to={`/peladas/${pelada.id}/build-schedule`}
+                      variant="outlined"
+                      startIcon={<CalendarTodayIcon />}
+                      data-testid="build-schedule-button-edit"
+                      sx={{
+                        textTransform: "none",
+                        borderRadius: 2,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {t("peladas.detail.button.build_schedule")}
+                    </Button>
+                    <Button
+                      variant="contained"
+                      startIcon={<PlayArrowIcon />}
+                      onClick={onStartClick}
+                      disabled={changingStatus || processing}
+                      data-testid="start-pelada-button"
+                      sx={{
+                        textTransform: "none",
+                        borderRadius: 2,
+                        bgcolor: "primary.main",
+                        fontWeight: 800,
+                        px: 3,
+                        "&:hover": { bgcolor: "primary.dark" },
+                      }}
+                    >
+                      {t("peladas.detail.button.start_pelada")}
+                    </Button>
+                  </Stack>
+                )}
+              </>
+            ) : (
               <Button
                 component={RouterLink}
-                to={`/peladas/${pelada.id}/build-schedule`}
+                to={`/peladas/${pelada.id}/matches`}
                 variant="outlined"
-                startIcon={<CalendarTodayIcon />}
-                data-testid="build-schedule-button"
+                startIcon={<HistoryIcon />}
+                data-testid="view-matches-button"
                 sx={{
                   textTransform: "none",
                   borderRadius: 2,
                   fontWeight: "bold",
                 }}
               >
-                {t("peladas.detail.button.build_schedule")}
+                {t("peladas.detail.button.view_matches")}
               </Button>
-              <Button
-                variant="contained"
-                startIcon={<PlayArrowIcon />}
-                onClick={onStartClick}
-                disabled={
-                  changingStatus || processing || !pelada.has_schedule_plan
-                }
-                data-testid="start-pelada-button"
-                sx={{
-                  textTransform: "none",
-                  borderRadius: 2,
-                  bgcolor: "primary.main",
-                  fontWeight: 800,
-                  px: 3,
-                  "&:hover": { bgcolor: "primary.dark" },
-                }}
-              >
-                {t("peladas.detail.button.start_pelada")}
-              </Button>
-            </Stack>
-          )}
+            )}
+          </Stack>
 
           {votingInfo?.can_vote && (
             <Button
