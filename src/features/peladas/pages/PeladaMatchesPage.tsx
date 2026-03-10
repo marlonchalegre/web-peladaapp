@@ -1,6 +1,6 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link as RouterLink } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Paper, Button, Box, Typography, Alert } from "@mui/material";
+import { Paper, Button, Box, Typography, Alert, Stack } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import ActiveMatchDashboard from "../components/ActiveMatchDashboard";
 import { useTranslation } from "react-i18next";
@@ -12,6 +12,8 @@ import { useAuth } from "../../../app/providers/AuthContext";
 import { api } from "../../../shared/api/client";
 import { createApi } from "../../../shared/api/endpoints";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
+import AssessmentIcon from "@mui/icons-material/Assessment";
+import RateReviewIcon from "@mui/icons-material/RateReview";
 
 export default function PeladaMatchesPage() {
   const { t } = useTranslation();
@@ -102,26 +104,54 @@ export default function PeladaMatchesPage() {
         </Box>
 
         <Box>
-          {isPeladaClosed ? (
-            <Typography variant="body2" color="text.secondary" sx={{ py: 1 }}>
-              {t("peladas.matches.status.closed")}
-            </Typography>
-          ) : (
-            isAdmin && (
+          <Stack direction="row" spacing={1} alignItems="center">
+            {pelada?.status === "voting" && (
               <Button
                 variant="contained"
-                color="error"
-                onClick={handleClosePelada}
-                disabled={closing}
-                data-testid="close-pelada-button"
-                sx={{ px: 3, borderRadius: 2, fontWeight: "bold" }}
+                color="secondary"
+                startIcon={<RateReviewIcon />}
+                component={RouterLink}
+                to={`/peladas/${peladaId}/voting`}
+                sx={{ borderRadius: 2, fontWeight: "bold" }}
               >
-                {closing
-                  ? t("peladas.matches.button.closing")
-                  : t("peladas.matches.button.close_pelada")}
+                {t("peladas.detail.button.vote")}
               </Button>
-            )
-          )}
+            )}
+
+            {pelada?.status === "closed" && (
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<AssessmentIcon />}
+                component={RouterLink}
+                to={`/peladas/${peladaId}/results`}
+                sx={{ borderRadius: 2, fontWeight: "bold" }}
+              >
+                {t("peladas.detail.button.view_results")}
+              </Button>
+            )}
+
+            {isPeladaClosed ? (
+              <Typography variant="body2" color="text.secondary" sx={{ py: 1 }}>
+                {t("peladas.matches.status.closed")}
+              </Typography>
+            ) : (
+              isAdmin && (
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={handleClosePelada}
+                  disabled={closing}
+                  data-testid="close-pelada-button"
+                  sx={{ px: 3, borderRadius: 2, fontWeight: "bold" }}
+                >
+                  {closing
+                    ? t("peladas.matches.button.closing")
+                    : t("peladas.matches.button.close_pelada")}
+                </Button>
+              )
+            )}
+          </Stack>
         </Box>
       </Box>
 

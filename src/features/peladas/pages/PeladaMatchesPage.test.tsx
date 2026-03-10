@@ -222,4 +222,58 @@ describe("PeladaMatchesPage", () => {
       ).toBeInTheDocument();
     });
   });
+
+  it("shows 'Vote' button when status is 'voting'", async () => {
+    const votingData = {
+      ...mockDashboardData,
+      pelada: { ...mockDashboardData.pelada, status: "voting" },
+    };
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/peladas/1/dashboard-data")
+        return Promise.resolve(votingData);
+      if (path === "/api/organizations/101/admins")
+        return Promise.resolve([{ user_id: 1, organization_id: 101 }]);
+      return Promise.reject(new Error(`Not found: ${path}`));
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/peladas/1/matches"]}>
+        <Routes>
+          <Route path="/peladas/:id/matches" element={<PeladaMatchesPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("peladas.detail.button.vote")).toBeInTheDocument();
+    });
+  });
+
+  it("shows 'View Results' button when status is 'closed'", async () => {
+    const closedData = {
+      ...mockDashboardData,
+      pelada: { ...mockDashboardData.pelada, status: "closed" },
+    };
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/peladas/1/dashboard-data")
+        return Promise.resolve(closedData);
+      if (path === "/api/organizations/101/admins")
+        return Promise.resolve([{ user_id: 1, organization_id: 101 }]);
+      return Promise.reject(new Error(`Not found: ${path}`));
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/peladas/1/matches"]}>
+        <Routes>
+          <Route path="/peladas/:id/matches" element={<PeladaMatchesPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("peladas.detail.button.view_results"),
+      ).toBeInTheDocument();
+    });
+  });
 });
