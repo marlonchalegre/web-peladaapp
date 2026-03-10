@@ -45,9 +45,16 @@ export function useAttendance(peladaId: number) {
           user.admin_orgs?.includes(data.pelada.organization_id) ?? false;
         setIsAdmin(userIsAdmin);
 
-        // If already open or closed, redirect to detail page
+        // Redirect based on status if not in attendance
         if (data.pelada.status !== "attendance") {
-          navigate(`/peladas/${peladaId}`);
+          const status = data.pelada.status || "";
+          if (["running", "closed"].includes(status)) {
+            navigate(`/peladas/${peladaId}/matches`);
+          } else if (status === "voting") {
+            navigate(`/peladas/${peladaId}/voting`);
+          } else {
+            navigate(`/peladas/${peladaId}`);
+          }
         }
       } catch (error: unknown) {
         const message =

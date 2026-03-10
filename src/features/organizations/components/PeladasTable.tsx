@@ -39,11 +39,16 @@ export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
   }
 
   const getPeladaLink = (pelada: Pelada) => {
-    return pelada.status === "attendance"
-      ? `/peladas/${pelada.id}/attendance`
-      : pelada.status === "voting"
-        ? `/peladas/${pelada.id}/voting`
-        : `/peladas/${pelada.id}/matches`;
+    switch (pelada.status) {
+      case "attendance":
+        return `/peladas/${pelada.id}/attendance`;
+      case "voting":
+        return `/peladas/${pelada.id}/voting`;
+      case "open":
+        return `/peladas/${pelada.id}`;
+      default:
+        return `/peladas/${pelada.id}/matches`;
+    }
   };
 
   return (

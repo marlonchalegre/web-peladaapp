@@ -1,16 +1,7 @@
-import {
-  useState,
-  useCallback,
-  type Dispatch,
-  type SetStateAction,
-} from "react";
+import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { api } from "../../../shared/api/client";
-import {
-  createApi,
-  type Match,
-  type Pelada,
-} from "../../../shared/api/endpoints";
+import { createApi, type Match } from "../../../shared/api/endpoints";
 
 const endpoints = createApi(api);
 
@@ -18,7 +9,6 @@ export function useMatchActions(
   peladaId: number,
   matchesRef: React.MutableRefObject<Match[]>,
   setMatches: (matches: Match[] | ((prev: Match[]) => Match[])) => void,
-  setPelada: Dispatch<SetStateAction<Pelada | null>>,
   refreshData: () => Promise<void>,
   setError: (msg: string | null) => void,
 ) {
@@ -176,9 +166,7 @@ export function useMatchActions(
     setClosing(true);
     try {
       await endpoints.closePelada(peladaId);
-      setPelada((prev: Pelada | null) =>
-        prev ? { ...prev, status: "closed" } : null,
-      );
+      await refreshData();
     } catch (error: unknown) {
       setError(
         error instanceof Error

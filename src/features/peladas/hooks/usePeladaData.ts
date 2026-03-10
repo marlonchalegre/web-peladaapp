@@ -66,6 +66,16 @@ export function usePeladaData(peladaId: number) {
           return;
         }
 
+        if (data.pelada.status === "open") {
+          navigate(`/peladas/${peladaId}`);
+          return;
+        }
+
+        if (data.pelada.status === "voting") {
+          navigate(`/peladas/${peladaId}/voting`);
+          return;
+        }
+
         setPelada(data.pelada);
         setMatches(data.matches);
         matchesRef.current = data.matches;

@@ -175,7 +175,7 @@ export default function MatchControlTable({
         sx={{ p: 2, pb: 1 }}
       >
         <Box />
-        {!isMatchFinished ? (
+        {!isMatchFinished && !isPeladaClosed ? (
           isAdmin && (
             <Button
               variant="contained"

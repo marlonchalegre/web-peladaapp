@@ -110,12 +110,14 @@ export default function PeladasList({
               </TableRow>
             ) : (
               peladas.map((pelada) => {
-                const peladaLink =
-                  pelada.status === "attendance"
-                    ? `/peladas/${pelada.id}/attendance`
-                    : pelada.status === "voting"
-                      ? `/peladas/${pelada.id}/voting`
-                      : `/peladas/${pelada.id}/matches`;
+                let peladaLink = `/peladas/${pelada.id}/matches`;
+                if (pelada.status === "attendance") {
+                  peladaLink = `/peladas/${pelada.id}/attendance`;
+                } else if (pelada.status === "voting") {
+                  peladaLink = `/peladas/${pelada.id}/voting`;
+                } else if (pelada.status === "open") {
+                  peladaLink = `/peladas/${pelada.id}`;
+                }
 
                 return (
                   <TableRow

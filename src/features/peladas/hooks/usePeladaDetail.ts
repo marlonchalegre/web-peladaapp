@@ -58,6 +58,17 @@ export function usePeladaDetail(peladaId: number) {
         return;
       }
 
+      const status = data.pelada.status || "";
+      if (["running", "closed"].includes(status)) {
+        navigate(`/peladas/${peladaId}/matches`);
+        return;
+      }
+
+      if (status === "voting") {
+        navigate(`/peladas/${peladaId}/voting`);
+        return;
+      }
+
       setPelada(data.pelada);
       setTeams(data.teams);
       setAvailablePlayers(data.available_players);

@@ -14,7 +14,6 @@ export function usePeladaMatches(peladaId: number) {
     matchesRef,
     teams,
     pelada,
-    setPelada,
     teamPlayers,
     lineupsByMatch,
     orgPlayerIdToUserId,
@@ -40,7 +39,6 @@ export function usePeladaMatches(peladaId: number) {
     peladaId,
     matchesRef,
     setMatches,
-    setPelada,
     refreshData,
     setError,
   );
