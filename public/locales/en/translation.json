@@ -523,7 +523,8 @@
         "no_awards": "No awards recorded",
         "error": {
           "load_failed": "Failed to load results",
-          "not_found": "Results not found"
+          "not_found": "Results not found",
+          "still_voting": "Voting is still in progress. Results will be available once the voting period ends."
         }
       },
       "stars": "stars",

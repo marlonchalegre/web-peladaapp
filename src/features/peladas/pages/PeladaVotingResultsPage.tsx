@@ -52,11 +52,13 @@ export default function PeladaVotingResultsPage() {
         setLoading(true);
         const data = await endpoints.getVotingResults(peladaId);
         setResults(data);
-      } catch (error: unknown) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : t("peladas.voting.results.error.load_failed");
+      } catch (error: any) {
+        let message = t("peladas.voting.results.error.load_failed");
+        if (error.response?.status === 400) {
+          message = t("peladas.voting.results.error.still_voting");
+        } else if (error instanceof Error) {
+          message = error.message;
+        }
         setError(message);
       } finally {
         setLoading(false);

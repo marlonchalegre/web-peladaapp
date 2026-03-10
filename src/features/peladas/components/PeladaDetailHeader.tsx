@@ -238,7 +238,7 @@ export default function PeladaDetailHeader({
             </Button>
           )}
 
-          {pelada.status === "closed" && (
+          {pelada.status === "closed" && !votingInfo?.can_vote && (
             <Button
               component={RouterLink}
               to={`/peladas/${pelada.id}/results`}
