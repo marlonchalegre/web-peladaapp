@@ -35,6 +35,7 @@ import JoinOrganizationPage from "./features/organizations/pages/JoinOrganizatio
 import OrganizationStatisticsPage from "./features/organizations/pages/OrganizationStatisticsPage";
 import OrganizationManagementPage from "./features/organizations/pages/OrganizationManagementPage";
 import PeladaDetailPage from "./features/peladas/pages/PeladaDetailPage";
+import ScheduleBuilderPage from "./features/peladas/pages/ScheduleBuilderPage";
 import AttendanceListPage from "./features/peladas/pages/AttendanceListPage";
 import PeladaMatchesPage from "./features/peladas/pages/PeladaMatchesPage";
 import PeladaVotingPage from "./features/peladas/pages/PeladaVotingPage";
@@ -243,6 +244,10 @@ function AppLayout() {
                     <PeladaDetailPage />
                   </Container>
                 }
+              />
+              <Route
+                path="/peladas/:id/build-schedule"
+                element={<ScheduleBuilderPage />}
               />
               <Route
                 path="/peladas/:id/attendance"

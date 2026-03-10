@@ -43,6 +43,7 @@ export type Pelada = {
   status?: string | null;
   closed_at?: string | null;
   is_admin?: boolean;
+  has_schedule_plan?: boolean;
 };
 
 export type Team = { id: number; pelada_id: number; name: string };
@@ -274,6 +275,30 @@ export function createApi(client: ApiClient) {
       }),
     closeAttendance: (id: number) =>
       client.post<Pelada>(`/api/peladas/${id}/close-attendance`),
+
+    // Schedule
+    getSchedulePreview: (id: number, matchesPerTeam: number) =>
+      client.get<{
+        matches: { home: number; away: number }[];
+        template_matches?: { home: number; away: number }[];
+        random_matches?: { home: number; away: number }[];
+        is_from_format: boolean;
+      }>(`/api/peladas/${id}/schedule/preview`, {
+        matches_per_team: matchesPerTeam,
+      }),
+    saveSchedulePlan: (
+      id: number,
+      matchesPerTeam: number,
+      matches: { home: number; away: number }[],
+    ) =>
+      client.post<{ status: string }>(`/api/peladas/${id}/schedule`, {
+        matches_per_team: matchesPerTeam,
+        matches,
+      }),
+    getSchedulePlan: (id: number) =>
+      client.get<{ home: number; away: number; sequence: number }[]>(
+        `/api/peladas/${id}/schedule`,
+      ),
 
     // Teams
     createTeam: (payload: { pelada_id: number; name: string }) =>

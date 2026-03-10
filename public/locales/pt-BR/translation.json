@@ -84,7 +84,9 @@
 
       "confirm": "Confirmar",
       "manage": "Gerenciar",
-      "view": "Visualizar"
+      "view": "Visualizar",
+      "save": "Salvar",
+      "saving": "Salvando..."
     },
     "select_placeholder": "Selecione...",
 
@@ -431,14 +433,49 @@
       "button": {
         "view_matches": "Ver Partidas",
         "start_pelada": "INICIAR PELADA",
+        "build_schedule": "Montar Tabela",
         "vote": "Votar nos Jogadores",
         "change_votes": "Alterar Votos"
+      },
+      "schedule": {
+        "subtitle": "Personalize a sequência e os detalhes das partidas",
+        "config": "Configuração",
+        "match": "Partida",
+        "home": "Mandante",
+        "away": "Visitante",
+        "button": {
+          "generate": "Regerar Prévia",
+          "swap": "Inverter Mandante",
+          "add_match": "Nova Partida",
+          "refresh": "Atualizar Opções",
+          "use_template": "Carregar Último Salvo",
+          "use_random": "Gerar Novo Aleatório",
+          "suggestions": "Sugestões de Tabela"
+        },
+        "badge": {
+          "template": "Baseado no Histórico"
+        },
+        "error": {
+          "load_failed": "Erro ao carregar dados da tabela",
+          "preview_failed": "Erro ao gerar prévia da tabela",
+          "save_failed": "Erro ao salvar tabela",
+          "same_team": "Os times Mandante e Visitante devem ser diferentes"
+        },
+        "warning": {
+          "not_enough_teams": "Você precisa de pelo menos dois times para montar a tabela."
+        },
+        "config_card": "Configuração da Rodada",
+        "matches_per_team_label": "Partidas por Time",
+        "no_template": "Nenhum modelo salvo para esta configuração.",
+        "planned_matches": "Partidas Planejadas",
+        "random_tip": "Gerar nova sugestão equilibrada"
       }
     },
     "dialog": {
       "start": {
         "title": "Iniciar pelada",
-        "matches_per_team": "Partidas por time"
+        "matches_per_team": "Partidas por time",
+        "confirm": "Tem certeza que deseja iniciar a pelada com a tabela montada?"
       }
     },
     "matches": {
