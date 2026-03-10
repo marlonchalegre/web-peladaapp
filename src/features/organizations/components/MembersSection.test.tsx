@@ -10,9 +10,27 @@ vi.mock("react-i18next", () => ({
 }));
 
 const mockUsers: User[] = [
-  { id: 1, name: "Alice", username: "alice", email: "alice@example.com" },
-  { id: 2, name: "Bob", username: "bob", email: "bob@example.com" },
-  { id: 3, name: "Charlie", username: "charlie", email: "charlie@example.com" },
+  {
+    id: 1,
+    name: "Alice",
+    username: "alice",
+    email: "alice@example.com",
+    position: "STRIKER",
+  },
+  {
+    id: 2,
+    name: "Bob",
+    username: "bob",
+    email: "bob@example.com",
+    position: "GOALKEEPER",
+  },
+  {
+    id: 3,
+    name: "Charlie",
+    username: "charlie",
+    email: "charlie@example.com",
+    position: "DEFENDER",
+  },
 ];
 
 const mockPlayers: Player[] = [
@@ -33,11 +51,19 @@ describe("MembersSection", () => {
     actionLoading: false,
   };
 
-  it("renders the members list", () => {
+  it("renders the members list with positions", () => {
     render(<MembersSection {...defaultProps} />);
     expect(screen.getByText("Alice")).toBeDefined();
+    expect(screen.getByText("common.positions.striker")).toBeDefined();
     expect(screen.getByText("Bob")).toBeDefined();
+    expect(screen.getByText("common.positions.goalkeeper")).toBeDefined();
     expect(screen.getByText("Charlie")).toBeDefined();
+    expect(screen.getByText("common.positions.defender")).toBeDefined();
+
+    // Verify email is NOT rendered
+    expect(screen.queryByText("alice@example.com")).toBeNull();
+    expect(screen.queryByText("bob@example.com")).toBeNull();
+    expect(screen.queryByText("charlie@example.com")).toBeNull();
   });
 
   it("filters members by name", () => {
@@ -53,7 +79,7 @@ describe("MembersSection", () => {
     expect(screen.queryByText("Charlie")).toBeNull();
   });
 
-  it("filters members by email", () => {
+  it("does not filter members by email anymore", () => {
     render(<MembersSection {...defaultProps} />);
     const searchInput = screen.getByPlaceholderText(
       "common.fields.player_name",
@@ -61,8 +87,7 @@ describe("MembersSection", () => {
 
     fireEvent.change(searchInput, { target: { value: "bob@example" } });
 
-    expect(screen.getByText("Bob")).toBeDefined();
-    expect(screen.queryByText("Alice")).toBeNull();
+    expect(screen.queryByText("Bob")).toBeNull();
   });
 
   it("paginates members", () => {

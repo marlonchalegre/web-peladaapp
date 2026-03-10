@@ -47,9 +47,8 @@ export default function MembersSection({
     return players.filter((player) => {
       const user = usersMap.get(player.user_id);
       const name = (user?.name || "").toLowerCase();
-      const email = (user?.email || "").toLowerCase();
       const search = searchTerm.toLowerCase();
-      return name.includes(search) || email.includes(search);
+      return name.includes(search);
     });
   }, [players, usersMap, searchTerm]);
 
@@ -141,6 +140,10 @@ export default function MembersSection({
         ) : (
           paginatedPlayers.map((player) => {
             const user = usersMap.get(player.user_id);
+            const positionKey = user?.position
+              ? `common.positions.${user.position.toLowerCase()}`
+              : "common.positions.unknown";
+
             return (
               <ListItem key={player.id} divider sx={{ px: 0 }}>
                 <ListItemText
@@ -149,7 +152,7 @@ export default function MembersSection({
                       {user?.name || `User #${player.user_id}`}
                     </Typography>
                   }
-                  secondary={user?.email}
+                  secondary={t(positionKey)}
                 />
                 <ListItemSecondaryAction>
                   <IconButton
