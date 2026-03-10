@@ -26,7 +26,7 @@ import { api } from "../../../shared/api/client";
 import {
   createApi,
   type VotingInfo,
-  type VotingResults,
+  type VotingStatus,
 } from "../../../shared/api/endpoints";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { useTranslation } from "react-i18next";
@@ -53,9 +53,7 @@ export default function PeladaVotingPage() {
   const peladaId = Number(id);
 
   const [votingInfo, setVotingInfo] = useState<VotingInfo | null>(null);
-  const [votingResults, setVotingResults] = useState<VotingResults | null>(
-    null,
-  );
+  const [votingStatus, setVotingStatus] = useState<VotingStatus | null>(null);
   const [playerVotes, setPlayerVotes] = useState<PlayerVote[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -75,13 +73,13 @@ export default function PeladaVotingPage() {
           return;
         }
 
-        const [info, results] = await Promise.all([
+        const [info, status] = await Promise.all([
           endpoints.getVotingInfo(peladaId),
-          endpoints.getVotingResults(peladaId),
+          endpoints.getVotingStatus(peladaId),
         ]);
 
         setVotingInfo(info);
-        setVotingResults(results);
+        setVotingStatus(status);
 
         if (!info.can_vote) {
           setError(info.message || t("peladas.voting.error.cannot_vote"));
@@ -161,12 +159,12 @@ export default function PeladaVotingPage() {
   };
 
   const votersByStatus = useMemo(() => {
-    if (!votingResults) return { voted: [], pending: [] };
+    if (!votingStatus) return { voted: [], pending: [] };
     return {
-      voted: votingResults.voters.filter((v) => v.has_voted),
-      pending: votingResults.voters.filter((v) => !v.has_voted),
+      voted: votingStatus.voters.filter((v) => v.has_voted),
+      pending: votingStatus.voters.filter((v) => !v.has_voted),
     };
-  }, [votingResults]);
+  }, [votingStatus]);
 
   if (loading) {
     return <Loading message={t("common.loading")} />;
