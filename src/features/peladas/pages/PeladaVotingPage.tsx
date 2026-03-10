@@ -18,6 +18,7 @@ import {
   ListItemIcon,
   Paper,
   Grid,
+  Snackbar,
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PendingIcon from "@mui/icons-material/Pending";
@@ -144,12 +145,14 @@ export default function PeladaVotingPage() {
       });
 
       setSuccess(t("peladas.voting.success.saved"));
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error: unknown) {
       const message =
         error instanceof Error
           ? error.message
           : t("peladas.voting.error.save_failed");
       setError(message);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } finally {
       setSubmitting(false);
     }
@@ -443,6 +446,38 @@ export default function PeladaVotingPage() {
           </Paper>
         </Grid>
       </Grid>
+
+      <Snackbar
+        open={!!success}
+        autoHideDuration={6000}
+        onClose={() => setSuccess(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSuccess(null)}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {success}
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={!!error && !!votingInfo}
+        autoHideDuration={6000}
+        onClose={() => setError(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setError(null)}
+          severity="error"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {error}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }
