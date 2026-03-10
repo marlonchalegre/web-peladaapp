@@ -74,17 +74,25 @@ export default function PeladaVotingResultsPage() {
   if (error || !results) {
     return (
       <Container>
-        <Alert severity="error" sx={{ mt: 2 }}>
+        <Alert severity="error" sx={{ mt: 2, mb: 2 }}>
           {error || t("peladas.voting.results.error.not_found")}
         </Alert>
-        <Button
-          variant="outlined"
-          component={RouterLink}
-          to={`/peladas/${peladaId}`}
-          sx={{ mt: 2 }}
-        >
-          {t("peladas.voting.button.back_to_pelada")}
-        </Button>
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <Button
+            variant="outlined"
+            component={RouterLink}
+            to={`/peladas/${peladaId}`}
+          >
+            {t("peladas.voting.button.back_to_pelada")}
+          </Button>
+          <Button
+            variant="outlined"
+            component={RouterLink}
+            to={`/peladas/${peladaId}/matches`}
+          >
+            {t("peladas.detail.button.view_matches")}
+          </Button>
+        </Box>
       </Container>
     );
   }

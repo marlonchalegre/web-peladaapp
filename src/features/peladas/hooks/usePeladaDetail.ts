@@ -444,10 +444,8 @@ export function usePeladaDetail(peladaId: number) {
     setChangingStatus(true);
     try {
       const matches = parseInt(matchesPerTeam, 10);
-      if (matches > 0) {
-        await endpoints.beginPelada(peladaId, matches);
-        navigate(`/peladas/${peladaId}/matches`);
-      }
+      await endpoints.beginPelada(peladaId, isNaN(matches) ? 0 : matches);
+      navigate(`/peladas/${peladaId}/matches`);
     } catch (error: unknown) {
       const message =
         error instanceof Error

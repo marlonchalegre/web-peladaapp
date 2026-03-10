@@ -53,10 +53,7 @@ describe("PeladaVotingPage", () => {
       voter_player_id: 10,
     };
 
-    const mockVotingResults = {
-      mvp: [],
-      striker: [],
-      garcom: [],
+    const mockVotingStatus = {
       voters: [],
       total_eligible: 0,
       total_voted: 0,
@@ -65,8 +62,8 @@ describe("PeladaVotingPage", () => {
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/peladas/1/voting-info")
         return Promise.resolve(mockVotingInfo);
-      if (path === "/api/peladas/1/voting-results")
-        return Promise.resolve(mockVotingResults);
+      if (path === "/api/peladas/1/voting-status")
+        return Promise.resolve(mockVotingStatus);
       return Promise.reject(new Error(`Not found: ${path}`));
     });
 
@@ -102,10 +99,7 @@ describe("PeladaVotingPage", () => {
       voter_player_id: 10,
     };
 
-    const mockVotingResults = {
-      mvp: [],
-      striker: [],
-      garcom: [],
+    const mockVotingStatus = {
       voters: [],
       total_eligible: 0,
       total_voted: 0,
@@ -114,8 +108,8 @@ describe("PeladaVotingPage", () => {
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/peladas/1/voting-info")
         return Promise.resolve(mockVotingInfo);
-      if (path === "/api/peladas/1/voting-results")
-        return Promise.resolve(mockVotingResults);
+      if (path === "/api/peladas/1/voting-status")
+        return Promise.resolve(mockVotingStatus);
       return Promise.reject(new Error(`Not found: ${path}`));
     });
 
@@ -144,10 +138,7 @@ describe("PeladaVotingPage", () => {
       voter_player_id: 10,
     };
 
-    const mockVotingResults = {
-      mvp: [],
-      striker: [],
-      garcom: [],
+    const mockVotingStatus = {
       voters: [],
       total_eligible: 0,
       total_voted: 0,
@@ -156,8 +147,8 @@ describe("PeladaVotingPage", () => {
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/peladas/1/voting-info")
         return Promise.resolve(mockVotingInfo);
-      if (path === "/api/peladas/1/voting-results")
-        return Promise.resolve(mockVotingResults);
+      if (path === "/api/peladas/1/voting-status")
+        return Promise.resolve(mockVotingStatus);
       return Promise.reject(new Error(`Not found: ${path}`));
     });
 
