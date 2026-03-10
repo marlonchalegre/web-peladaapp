@@ -76,6 +76,11 @@ export function usePeladaData(peladaId: number) {
           return;
         }
 
+        if (data.pelada.status === "closed") {
+          navigate(`/peladas/${peladaId}/results`);
+          return;
+        }
+
         setPelada(data.pelada);
         setMatches(data.matches);
         matchesRef.current = data.matches;

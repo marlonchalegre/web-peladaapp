@@ -59,13 +59,18 @@ export function usePeladaDetail(peladaId: number) {
       }
 
       const status = data.pelada.status || "";
-      if (["running", "closed"].includes(status)) {
+      if (status === "running") {
         navigate(`/peladas/${peladaId}/matches`);
         return;
       }
 
       if (status === "voting") {
         navigate(`/peladas/${peladaId}/voting`);
+        return;
+      }
+
+      if (status === "closed") {
+        navigate(`/peladas/${peladaId}/results`);
         return;
       }
 

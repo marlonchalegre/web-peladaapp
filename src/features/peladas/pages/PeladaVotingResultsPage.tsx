@@ -26,6 +26,7 @@ import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import GroupIcon from "@mui/icons-material/Group";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import axios from "axios";
 import { api } from "../../../shared/api/client";
 import { createApi, type VotingResults } from "../../../shared/api/endpoints";
 import { useTranslation } from "react-i18next";
@@ -52,9 +53,9 @@ export default function PeladaVotingResultsPage() {
         setLoading(true);
         const data = await endpoints.getVotingResults(peladaId);
         setResults(data);
-      } catch (error: any) {
+      } catch (error: unknown) {
         let message = t("peladas.voting.results.error.load_failed");
-        if (error.response?.status === 400) {
+        if (axios.isAxiosError(error) && error.response?.status === 400) {
           message = t("peladas.voting.results.error.still_voting");
         } else if (error instanceof Error) {
           message = error.message;
