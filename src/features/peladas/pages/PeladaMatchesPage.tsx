@@ -14,6 +14,8 @@ import { createApi } from "../../../shared/api/endpoints";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import RateReviewIcon from "@mui/icons-material/RateReview";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { formatPeladaSummary } from "../utils/formatSummary";
 
 export default function PeladaMatchesPage() {
   const { t } = useTranslation();
@@ -53,6 +55,21 @@ export default function PeladaMatchesPage() {
     playerStats,
     togglePlayerSort,
   } = usePeladaMatches(peladaId);
+
+  const handleCopyResults = async () => {
+    const text = formatPeladaSummary(
+      pelada?.scheduled_at || null,
+      standings,
+      playerStats,
+    );
+
+    try {
+      await navigator.clipboard.writeText(text);
+      alert(t("peladas.matches.summary_copied"));
+    } catch (err) {
+      console.error("Error copying to clipboard:", err);
+    }
+  };
 
   useEffect(() => {
     if (pelada?.organization_id && user) {
@@ -105,6 +122,18 @@ export default function PeladaMatchesPage() {
 
         <Box>
           <Stack direction="row" spacing={1} alignItems="center">
+            {isPeladaClosed && (
+              <Button
+                variant="outlined"
+                color="primary"
+                startIcon={<ContentCopyIcon />}
+                onClick={handleCopyResults}
+                sx={{ borderRadius: 2, fontWeight: "bold" }}
+              >
+                {t("peladas.matches.share_summary")}
+              </Button>
+            )}
+
             {pelada?.status === "voting" && (
               <Button
                 variant="contained"
@@ -231,7 +260,6 @@ export default function PeladaMatchesPage() {
             standings={standings}
             playerStats={playerStats}
             onToggleSort={togglePlayerSort}
-            scheduledAt={pelada?.scheduled_at}
           />
         </Grid>
       </Grid>
