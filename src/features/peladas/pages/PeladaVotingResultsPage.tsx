@@ -102,10 +102,6 @@ export default function PeladaVotingResultsPage() {
               label: t("peladas.detail.title", { id: peladaId }),
               path: `/peladas/${peladaId}`,
             },
-            {
-              label: t("peladas.detail.button.vote"),
-              path: `/peladas/${peladaId}/vote`,
-            },
             { label: t("peladas.voting.results.title") },
           ]}
         />
