@@ -22,6 +22,7 @@ import {
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PendingIcon from "@mui/icons-material/Pending";
 import AssessmentIcon from "@mui/icons-material/Assessment";
+import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import { api } from "../../../shared/api/client";
 import {
   createApi,
@@ -143,10 +144,6 @@ export default function PeladaVotingPage() {
       });
 
       setSuccess(t("peladas.voting.success.saved"));
-
-      setTimeout(() => {
-        navigate(`/peladas/${peladaId}/results`);
-      }, 2000);
     } catch (error: unknown) {
       const message =
         error instanceof Error
@@ -217,14 +214,24 @@ export default function PeladaVotingPage() {
         <Typography variant="h4" fontWeight="bold">
           {t("peladas.voting.title", { id: peladaId })}
         </Typography>
-        <Button
-          variant="outlined"
-          startIcon={<AssessmentIcon />}
-          onClick={() => navigate(`/peladas/${peladaId}/results`)}
-          size="small"
-        >
-          {t("peladas.voting.button.view_results")}
-        </Button>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button
+            variant="outlined"
+            startIcon={<SportsSoccerIcon />}
+            onClick={() => navigate(`/peladas/${peladaId}/matches`)}
+            size="small"
+          >
+            {t("peladas.detail.button.view_matches")}
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<AssessmentIcon />}
+            onClick={() => navigate(`/peladas/${peladaId}/results`)}
+            size="small"
+          >
+            {t("peladas.voting.button.view_results")}
+          </Button>
+        </Box>
       </Box>
 
       {error && (

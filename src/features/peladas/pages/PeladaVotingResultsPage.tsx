@@ -122,13 +122,22 @@ export default function PeladaVotingResultsPage() {
         <Typography variant="h3" fontWeight="bold">
           {t("peladas.voting.results.hero_title")}
         </Typography>
-        <Button
-          variant="outlined"
-          startIcon={<ArrowBackIcon />}
-          onClick={() => navigate(`/peladas/${peladaId}`)}
-        >
-          {t("common.back")}
-        </Button>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button
+            variant="outlined"
+            startIcon={<SportsSoccerIcon />}
+            onClick={() => navigate(`/peladas/${peladaId}/matches`)}
+          >
+            {t("peladas.detail.button.view_matches")}
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate(`/peladas/${peladaId}`)}
+          >
+            {t("common.back")}
+          </Button>
+        </Box>
       </Box>
 
       <Grid container spacing={4}>
