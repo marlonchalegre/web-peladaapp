@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api } from "../../../shared/api/client";
 import {
@@ -22,6 +22,7 @@ export type PlayerWithUser = Player & {
 export function useAttendance(peladaId: number) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
 
   const [pelada, setPelada] = useState<Pelada | null>(null);
@@ -49,11 +50,15 @@ export function useAttendance(peladaId: number) {
         // Redirect based on status if not in attendance
         if (data.pelada.status !== "attendance") {
           const status = data.pelada.status || "";
-          if (["running", "closed"].includes(status)) {
+          const isMatchesPage = location.pathname.endsWith("/matches");
+
+          if (status === "running") {
             navigate(`/peladas/${peladaId}/matches`);
-          } else if (status === "voting") {
+          } else if (status === "voting" && !isMatchesPage) {
             navigate(`/peladas/${peladaId}/voting`);
-          } else {
+          } else if (status === "closed" && !isMatchesPage) {
+            navigate(`/peladas/${peladaId}/results`);
+          } else if (!isMatchesPage) {
             navigate(`/peladas/${peladaId}`);
           }
         }
@@ -67,7 +72,7 @@ export function useAttendance(peladaId: number) {
         if (!background) setLoading(false);
       }
     },
-    [peladaId, user, navigate, t],
+    [peladaId, user, navigate, t, location.pathname],
   );
 
   useEffect(() => {

@@ -5,7 +5,7 @@ import {
   useMemo,
   type DragEvent,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api } from "../../../shared/api/client";
 import {
@@ -27,6 +27,7 @@ export type TeamWithPlayers = Team & {
 export function usePeladaDetail(peladaId: number) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
 
   const [pelada, setPelada] = useState<Pelada | null>(null);
@@ -52,6 +53,7 @@ export function usePeladaDetail(peladaId: number) {
     if (!peladaId) return;
     try {
       const data = await endpoints.getPeladaFullDetails(peladaId);
+      const isMatchesPage = location.pathname.endsWith("/matches");
 
       if (data.pelada.status === "attendance") {
         navigate(`/peladas/${peladaId}/attendance`);
@@ -59,17 +61,17 @@ export function usePeladaDetail(peladaId: number) {
       }
 
       const status = data.pelada.status || "";
-      if (status === "running") {
+      if (status === "running" && !isMatchesPage) {
         navigate(`/peladas/${peladaId}/matches`);
         return;
       }
 
-      if (status === "voting") {
+      if (status === "voting" && !isMatchesPage) {
         navigate(`/peladas/${peladaId}/voting`);
         return;
       }
 
-      if (status === "closed") {
+      if (status === "closed" && !isMatchesPage) {
         navigate(`/peladas/${peladaId}/results`);
         return;
       }
@@ -95,7 +97,7 @@ export function usePeladaDetail(peladaId: number) {
           : t("peladas.detail.error.load_failed");
       setError(message);
     }
-  }, [peladaId, navigate, t]);
+  }, [peladaId, navigate, t, location.pathname]);
 
   useEffect(() => {
     fetchPeladaData();

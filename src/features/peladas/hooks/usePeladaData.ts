@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api } from "../../../shared/api/client";
 import {
@@ -18,6 +18,7 @@ const endpoints = createApi(api);
 export function usePeladaData(peladaId: number) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [matches, setMatches] = useState<Match[]>([]);
   const matchesRef = useRef<Match[]>([]);
@@ -61,6 +62,8 @@ export function usePeladaData(peladaId: number) {
 
       try {
         const data = await endpoints.getPeladaDashboardData(peladaId);
+        const isMatchesPage = location.pathname.endsWith("/matches");
+
         if (data.pelada.status === "attendance") {
           navigate(`/peladas/${peladaId}/attendance`);
           return;
@@ -71,12 +74,12 @@ export function usePeladaData(peladaId: number) {
           return;
         }
 
-        if (data.pelada.status === "voting") {
+        if (data.pelada.status === "voting" && !isMatchesPage) {
           navigate(`/peladas/${peladaId}/voting`);
           return;
         }
 
-        if (data.pelada.status === "closed") {
+        if (data.pelada.status === "closed" && !isMatchesPage) {
           navigate(`/peladas/${peladaId}/results`);
           return;
         }
@@ -141,7 +144,7 @@ export function usePeladaData(peladaId: number) {
         if (!isRefresh) setLoading(false);
       }
     },
-    [peladaId, loadedPeladaId, navigate, t],
+    [peladaId, loadedPeladaId, navigate, t, location.pathname],
   );
 
   useEffect(() => {
