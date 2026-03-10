@@ -25,17 +25,20 @@ export default function AvailablePlayerItem({
       elevation={0}
       data-testid="player-row"
       sx={{
-        p: 1.5,
+        p: 1.25,
         display: "flex",
         alignItems: "center",
         bgcolor: "background.paper",
         border: "1px solid",
         borderColor: "divider",
-        borderRadius: 2,
+        borderRadius: 2.5,
         cursor: locked ? "default" : "grab",
+        transition: "all 0.2s",
         "&:hover": {
           borderColor: "primary.main",
-          bgcolor: "action.hover",
+          bgcolor: "primary.lighter",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+          transform: "translateX(4px)",
         },
       }}
       draggable={!locked}
@@ -43,43 +46,63 @@ export default function AvailablePlayerItem({
     >
       <Avatar
         sx={{
-          width: 40,
-          height: 40,
-          fontSize: 16,
-          bgcolor: "warning.light",
-          color: "warning.main",
-          mr: 2,
-          fontWeight: "bold",
+          width: 36,
+          height: 36,
+          fontSize: 14,
+          bgcolor: "primary.main",
+          color: "white",
+          mr: 1.5,
+          fontWeight: 800,
+          boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
         }}
       >
         {getInitials(player.user.name)}
       </Avatar>
       <Box sx={{ flexGrow: 1 }}>
-        <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+        <Typography
+          variant="body2"
+          sx={{ fontWeight: 700, color: "text.primary", lineHeight: 1.2 }}
+        >
           {player.user.name}
         </Typography>
-        <Typography variant="caption" color="text.secondary">
+        <Typography
+          variant="caption"
+          color="text.secondary"
+          sx={{ fontWeight: 500 }}
+        >
           {player.user.position
             ? t(`common.positions.${player.user.position.toLowerCase()}`)
             : t("common.positions.unknown")}
         </Typography>
       </Box>
-      <Box sx={{ display: "flex", alignItems: "center" }}>
-        <Typography
-          variant="body2"
-          sx={{ fontWeight: "bold", mr: 1, color: "text.primary" }}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <Box
+          sx={{
+            px: 1,
+            py: 0.25,
+            bgcolor: "success.lighter",
+            color: "success.main",
+            fontWeight: 800,
+            borderRadius: 1.5,
+            fontSize: "0.75rem",
+            border: "1px solid",
+            borderColor: "success.light",
+          }}
         >
           {scoreVal}
-        </Typography>
+        </Box>
         {!locked && (
           <IconButton
             size="small"
             sx={{
               color: "primary.main",
-              padding: "4px",
+              bgcolor: "primary.lighter",
+              width: 24,
+              height: 24,
+              "&:hover": { bgcolor: "primary.light" },
             }}
           >
-            <AddIcon sx={{ fontSize: 18 }} />
+            <AddIcon sx={{ fontSize: 16 }} />
           </IconButton>
         )}
       </Box>

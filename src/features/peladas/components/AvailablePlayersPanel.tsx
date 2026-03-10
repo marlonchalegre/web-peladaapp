@@ -10,6 +10,7 @@ import {
   Button,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import AddIcon from "@mui/icons-material/Add";
 import type { DragEvent } from "react";
 import type { Player, User } from "../../../shared/api/endpoints";
 import { useTranslation } from "react-i18next";
@@ -78,9 +79,10 @@ export default function AvailablePlayersPanel({
         sx={{
           p: 3,
           bgcolor: "background.paper",
-          borderRadius: 3,
+          borderRadius: 4,
           border: "1px solid",
           borderColor: "divider",
+          boxShadow: "0 2px 12px rgba(0,0,0,0.03)",
         }}
         className={locked ? undefined : "droppable"}
         onDragOver={locked ? undefined : (e) => e.preventDefault()}
@@ -114,23 +116,27 @@ export default function AvailablePlayersPanel({
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            mb: 2,
+            mb: 2.5,
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Typography variant="h6" sx={{ fontWeight: "bold", mr: 1 }}>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 800, letterSpacing: -0.5 }}
+            >
               {t("peladas.panel.available.title")}
             </Typography>
             <Chip
               label={players.length}
               size="small"
               sx={{
-                bgcolor: "action.hover",
-                color: "text.secondary",
-                fontWeight: "bold",
+                bgcolor: "primary.main",
+                color: "white",
+                fontWeight: 900,
+                fontSize: "0.7rem",
               }}
             />
-          </Box>
+          </Stack>
         </Box>
 
         <TextField
@@ -141,20 +147,25 @@ export default function AvailablePlayersPanel({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           sx={{
-            mb: 2,
-            bgcolor: "background.default",
-            "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+            mb: 3,
+            "& .MuiOutlinedInput-root": {
+              borderRadius: 2,
+              bgcolor: "rgba(0,0,0,0.02)",
+              transition: "all 0.2s",
+              "&:hover": { bgcolor: "rgba(0,0,0,0.04)" },
+              "&.Mui-focused": { bgcolor: "background.paper" },
+            },
           }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchIcon color="disabled" fontSize="small" />
+                <SearchIcon color="action" fontSize="small" />
               </InputAdornment>
             ),
           }}
         />
 
-        <Stack spacing={1}>
+        <Stack spacing={1} sx={{ minHeight: 100 }}>
           {filteredPlayers.map((p) => (
             <AvailablePlayerItem
               key={p.id}
@@ -164,18 +175,38 @@ export default function AvailablePlayersPanel({
               onDragStart={(e) => onDragStartPlayer(e, p.id)}
             />
           ))}
+          {filteredPlayers.length === 0 && (
+            <Typography
+              variant="body2"
+              color="text.disabled"
+              align="center"
+              sx={{ py: 4 }}
+            >
+              Nenhum jogador encontrado
+            </Typography>
+          )}
         </Stack>
 
         <Button
           fullWidth
           variant="outlined"
+          startIcon={<AddIcon />}
           onClick={() => setAddDialogOpen(true)}
           disabled={locked}
           sx={{
             mt: 3,
             borderStyle: "dashed",
+            borderRadius: 2,
             textTransform: "none",
-            color: "text.secondary",
+            fontWeight: "bold",
+            py: 1,
+            color: "primary.main",
+            borderColor: "primary.light",
+            "&:hover": {
+              borderStyle: "dashed",
+              bgcolor: "primary.lighter",
+              borderColor: "primary.main",
+            },
           }}
         >
           {t("peladas.panel.available.invite_button")}

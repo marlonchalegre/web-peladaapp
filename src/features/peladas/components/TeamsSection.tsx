@@ -5,10 +5,13 @@ import {
   Box,
   CircularProgress,
   TextField,
+  InputAdornment,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import AddIcon from "@mui/icons-material/Add";
 import ShuffleIcon from "@mui/icons-material/Shuffle";
+import GroupsIcon from "@mui/icons-material/Groups";
+import PersonIcon from "@mui/icons-material/Person";
 import type { DragEvent } from "react";
 import type { Player, Team, User } from "../../../shared/api/endpoints";
 import TeamCard from "./TeamCard";
@@ -68,78 +71,107 @@ export default function TeamsSection(props: TeamsSectionProps) {
       <Box
         sx={{
           display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
           justifyContent: "space-between",
-          alignItems: "center",
-          mb: 3,
+          alignItems: { xs: "stretch", sm: "center" },
+          mb: 4,
+          gap: 2,
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 2,
-            flexWrap: "wrap",
-          }}
-        >
-          <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+        <Stack direction="row" spacing={1.5} alignItems="center">
+          <Box
+            sx={{
+              width: 32,
+              height: 32,
+              borderRadius: 1.5,
+              bgcolor: "primary.main",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "white",
+            }}
+          >
+            <GroupsIcon fontSize="small" />
+          </Box>
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: 800, letterSpacing: -0.5 }}
+          >
             {t("peladas.teams.title")}
           </Typography>
-          {!locked && isAdminOverride && (
-            <Stack direction="row" spacing={2} alignItems="center">
-              <TextField
-                size="small"
-                type="number"
-                label={t("organizations.form.pelada.players_per_team")}
-                value={playersPerTeam ?? 5}
-                onChange={(e) => {
-                  const val = parseInt(e.target.value, 10);
-                  if (!isNaN(val) && val > 0) {
-                    onUpdatePlayersPerTeam?.(val);
-                  }
-                }}
-                sx={{ width: 150 }}
-                inputProps={{ min: 1 }}
-                data-testid="players-per-team-input"
-              />
-            </Stack>
-          )}
-        </Box>
+        </Stack>
 
         {!locked && isAdminOverride && (
-          <Stack direction="row" spacing={2}>
-            <Button
-              variant="outlined"
-              startIcon={<ShuffleIcon />}
-              onClick={async () => {
-                await onRandomizeTeams();
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+            <TextField
+              size="small"
+              type="number"
+              label={t("organizations.form.pelada.players_per_team")}
+              value={playersPerTeam ?? 5}
+              onChange={(e) => {
+                const val = parseInt(e.target.value, 10);
+                if (!isNaN(val) && val > 0) {
+                  onUpdatePlayersPerTeam?.(val);
+                }
               }}
-              disabled={creatingTeam}
-              data-testid="randomize-teams-button"
-              sx={{ textTransform: "none", borderRadius: 2 }}
-            >
-              {t("peladas.teams.button.randomize")}
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={async () => {
-                await onCreateTeam(
-                  t("peladas.teams.default_name", { number: teams.length + 1 }),
-                );
-              }}
-              disabled={creatingTeam}
-              data-testid="create-team-button"
               sx={{
-                textTransform: "none",
-                borderRadius: 2,
-                bgcolor: "primary.light",
-                color: "primary.main",
-                boxShadow: "none",
-                "&:hover": { bgcolor: "grey.200", boxShadow: "none" },
+                width: { xs: "100%", sm: 160 },
+                "& .MuiOutlinedInput-root": { borderRadius: 2 },
               }}
-            >
-              {t("peladas.teams.button.create")}
-            </Button>
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PersonIcon fontSize="small" color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              inputProps={{ min: 1 }}
+              data-testid="players-per-team-input"
+            />
+
+            <Stack direction="row" spacing={1}>
+              <Button
+                variant="outlined"
+                startIcon={<ShuffleIcon />}
+                onClick={async () => {
+                  await onRandomizeTeams();
+                }}
+                disabled={creatingTeam}
+                data-testid="randomize-teams-button"
+                sx={{
+                  textTransform: "none",
+                  borderRadius: 2,
+                  fontWeight: "bold",
+                  flex: 1,
+                }}
+              >
+                {t("peladas.teams.button.randomize")}
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={async () => {
+                  await onCreateTeam(
+                    t("peladas.teams.default_name", {
+                      number: teams.length + 1,
+                    }),
+                  );
+                }}
+                disabled={creatingTeam}
+                data-testid="create-team-button"
+                sx={{
+                  textTransform: "none",
+                  borderRadius: 2,
+                  bgcolor: "primary.main",
+                  fontWeight: 800,
+                  boxShadow: "0 4px 12px rgba(25, 118, 210, 0.2)",
+                  px: 2,
+                  flex: 1,
+                }}
+              >
+                {t("peladas.teams.button.create")}
+              </Button>
+            </Stack>
           </Stack>
         )}
       </Box>
@@ -224,35 +256,51 @@ export default function TeamsSection(props: TeamsSectionProps) {
                 disabled={creatingTeam}
                 sx={{
                   height: "100%",
-                  minHeight: 200,
+                  minHeight: 220,
                   border: "2px dashed",
                   borderColor: "divider",
-                  borderRadius: 3,
+                  borderRadius: 4,
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
                   color: "text.secondary",
                   textTransform: "none",
+                  transition: "all 0.2s",
+                  "&:hover": {
+                    borderColor: "primary.main",
+                    color: "primary.main",
+                    bgcolor: "primary.lighter",
+                    "& .add-icon-box": {
+                      bgcolor: "primary.main",
+                      color: "white",
+                      borderColor: "primary.main",
+                    },
+                  },
                 }}
               >
                 <Box
+                  className="add-icon-box"
                   sx={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: "50%",
+                    width: 48,
+                    height: 48,
+                    borderRadius: 2,
                     border: "2px solid",
-                    borderColor: "inherit",
+                    borderColor: "divider",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    mb: 1,
+                    mb: 2,
+                    transition: "all 0.2s",
                   }}
                 >
-                  <AddIcon />
+                  <AddIcon fontSize="large" />
                 </Box>
-                <Typography variant="h6">
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
                   {t("peladas.teams.button.add_placeholder")}
+                </Typography>
+                <Typography variant="caption" sx={{ mt: 0.5, opacity: 0.7 }}>
+                  Adicione um novo time para equilibrar a pelada
                 </Typography>
               </Button>
             </Grid>

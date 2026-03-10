@@ -92,14 +92,21 @@ export default function TeamCard({
       variant="outlined"
       data-testid="team-card"
       sx={{
-        p: 2,
         height: "100%",
         display: "flex",
         flexDirection: "column",
         borderRadius: 4,
         borderColor: "divider",
         bgcolor: "background.paper",
-        boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+        boxShadow: "0 2px 12px rgba(0,0,0,0.03)",
+        overflow: "hidden",
+        transition: "all 0.2s ease-in-out",
+        "&.droppable--over": {
+          borderColor: "primary.main",
+          bgcolor: "primary.lighter",
+          transform: "translateY(-4px)",
+          boxShadow: "0 8px 24px rgba(25, 118, 210, 0.12)",
+        },
       }}
       className={locked ? undefined : "droppable"}
       onDragOver={locked ? undefined : (e) => e.preventDefault()}
@@ -128,18 +135,28 @@ export default function TeamCard({
             }
       }
     >
+      {/* Header */}
       <Box
         sx={{
+          p: 2,
+          pb: 1.5,
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
-          mb: 3,
+          alignItems: "flex-start",
+          bgcolor: "rgba(0,0,0,0.02)",
+          borderBottom: "1px solid",
+          borderColor: "divider",
         }}
       >
         <Box>
           <Typography
             variant="h6"
-            sx={{ fontWeight: "bold", fontSize: "1.1rem" }}
+            sx={{
+              fontWeight: 800,
+              fontSize: "1.15rem",
+              color: "text.primary",
+              letterSpacing: -0.5,
+            }}
             data-testid="team-card-name"
           >
             {team.name}
@@ -152,12 +169,13 @@ export default function TeamCard({
               size="small"
               sx={{
                 mt: 0.5,
-                height: 22,
+                height: 20,
                 fontSize: "0.65rem",
-                fontWeight: "bold",
-                bgcolor: "primary.light",
-                color: "primary.main",
+                fontWeight: 900,
+                bgcolor: "primary.main",
+                color: "white",
                 borderRadius: 1,
+                letterSpacing: 0.5,
               }}
             />
           )}
@@ -167,14 +185,18 @@ export default function TeamCard({
             size="small"
             onClick={onDelete}
             aria-label={t("peladas.team_card.delete")}
-            sx={{ color: "text.secondary" }}
+            sx={{
+              color: "text.disabled",
+              "&:hover": { color: "error.main", bgcolor: "error.lighter" },
+            }}
           >
             <DeleteOutlineIcon fontSize="small" />
           </IconButton>
         )}
       </Box>
 
-      <Stack spacing={1.5} sx={{ flexGrow: 1 }}>
+      {/* Player List */}
+      <Stack spacing={1} sx={{ p: 2, flexGrow: 1 }}>
         {sortedPlayers.map((p) => {
           return (
             <Paper
@@ -182,19 +204,21 @@ export default function TeamCard({
               elevation={0}
               data-testid="player-row"
               sx={{
-                p: 1.5,
+                p: 1.25,
                 display: "flex",
-
                 alignItems: "center",
                 bgcolor: p.is_goalkeeper
-                  ? "primary.light"
+                  ? "primary.lighter"
                   : "background.default",
-                borderRadius: 3,
+                borderRadius: 2.5,
                 cursor: locked ? "default" : "grab",
-                border: "1px solid transparent",
-                borderColor: p.is_goalkeeper ? "primary.main" : "transparent",
+                border: "1px solid",
+                borderColor: p.is_goalkeeper ? "primary.light" : "divider",
+                transition: "all 0.2s",
                 "&:hover": {
-                  borderColor: p.is_goalkeeper ? "primary.main" : "divider",
+                  borderColor: "primary.main",
+                  bgcolor: p.is_goalkeeper ? "primary.lighter" : "action.hover",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
                 },
                 position: "relative",
               }}
@@ -205,19 +229,23 @@ export default function TeamCard({
             >
               <Avatar
                 sx={{
-                  width: 32,
-                  height: 32,
-                  fontSize: 12,
+                  width: 36,
+                  height: 36,
+                  fontSize: 14,
                   bgcolor: stringToColor(p.user?.name || ""),
                   mr: 1.5,
-                  fontWeight: "bold",
+                  fontWeight: 800,
+                  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
                 }}
               >
                 {getInitials(p.user?.name || "")}
               </Avatar>
               <Box sx={{ flexGrow: 1 }}>
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: 700, color: "text.primary" }}
+                  >
                     {p.user?.name || "Unknown"}
                   </Typography>
                   {p.is_goalkeeper && (
@@ -228,7 +256,7 @@ export default function TeamCard({
                       sx={{
                         height: 16,
                         fontSize: "0.6rem",
-                        fontWeight: "bold",
+                        fontWeight: 900,
                       }}
                     />
                   )}
@@ -236,30 +264,34 @@ export default function TeamCard({
                 <Typography
                   variant="caption"
                   color="text.secondary"
-                  sx={{ fontSize: "0.7rem", display: "block" }}
+                  sx={{ fontSize: "0.7rem", display: "block", fontWeight: 500 }}
                 >
                   {p.user?.position
                     ? t(`common.positions.${p.user.position.toLowerCase()}`)
                     : t("common.positions.unknown")}
                 </Typography>
               </Box>
-              <Stack direction="row" spacing={1} alignItems="center">
-                <Chip
-                  label={p.displayScore ?? "-"}
-                  size="small"
+              <Stack direction="row" spacing={0.5} alignItems="center">
+                <Box
                   sx={{
-                    height: 24,
-                    bgcolor: "success.light",
+                    px: 1,
+                    py: 0.25,
+                    bgcolor: "success.lighter",
                     color: "success.main",
-                    fontWeight: "bold",
-                    borderRadius: 1,
+                    fontWeight: 800,
+                    borderRadius: 1.5,
+                    fontSize: "0.75rem",
+                    border: "1px solid",
+                    borderColor: "success.light",
                   }}
-                />
+                >
+                  {p.displayScore ?? "-"}
+                </Box>
                 {!locked && (
                   <IconButton
                     size="small"
                     onClick={(e) => handleOpenMenu(e, p.id)}
-                    sx={{ p: 0.5 }}
+                    sx={{ p: 0.5, color: "text.disabled" }}
                     aria-label={`more-${p.user?.name}`}
                   >
                     <MoreVertIcon fontSize="small" />
@@ -277,17 +309,22 @@ export default function TeamCard({
               key={`placeholder-${i}`}
               sx={{
                 p: 2,
-                borderRadius: 3,
-                bgcolor: "grey.100",
-                color: "text.secondary",
+                borderRadius: 2.5,
+                bgcolor: "background.default",
+                color: "text.disabled",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                height: 52,
-                fontSize: "0.85rem",
-                fontWeight: 500,
-                border: "1px dashed",
+                height: 56,
+                fontSize: "0.8rem",
+                fontWeight: 600,
+                border: "1.5px dashed",
                 borderColor: "divider",
+                transition: "all 0.2s",
+                "&:hover": {
+                  borderColor: "text.disabled",
+                  bgcolor: "action.hover",
+                },
               }}
             >
               {t("peladas.team_card.drag_placeholder")}
