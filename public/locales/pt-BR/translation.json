@@ -435,7 +435,8 @@
         "start_pelada": "INICIAR PELADA",
         "build_schedule": "Montar Tabela",
         "vote": "Votar nos Jogadores",
-        "change_votes": "Alterar Votos"
+        "change_votes": "Alterar Votos",
+        "view_results": "Ver Resultados"
       },
       "schedule": {
         "subtitle": "Personalize a sequência e os detalhes das partidas",
@@ -526,8 +527,32 @@
       },
       "button": {
         "back_to_pelada": "Voltar para Pelada",
-        "save": "Salvar Votos"
+        "save": "Salvar Votos",
+        "view_results": "Ver Resultados"
       },
+      "status": {
+        "title": "Status da Votação",
+        "voted": "Já votaram",
+        "pending": "Aguardando",
+        "none": "Ninguém votou ainda"
+      },
+      "results": {
+        "title": "Resultados da Votação",
+        "hero_title": "Melhores da Pelada",
+        "participation": "Engajamento",
+        "players_voted": "jogadores votaram",
+        "mvp_title": "MVP (Melhores Jogadores)",
+        "top_scorer": "Artilheiro",
+        "top_assists": "Garçom (Assistências)",
+        "full_ranking": "Ranking Completo",
+        "voter_transparency": "Quem Votou",
+        "no_awards": "Nenhum prêmio registrado",
+        "error": {
+          "load_failed": "Falha ao carregar resultados",
+          "not_found": "Resultados não encontrados"
+        }
+      },
+      "stars": "estrelas",
       "error": {
         "unauthenticated": "Usuário não autenticado",
         "not_player": "Você não é um jogador desta organização",

@@ -20,6 +20,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import RateReviewIcon from "@mui/icons-material/RateReview";
 
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import AssessmentIcon from "@mui/icons-material/Assessment";
 import { Link as RouterLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
@@ -234,6 +235,24 @@ export default function PeladaDetailHeader({
               {votingInfo.has_voted
                 ? t("peladas.detail.button.change_votes")
                 : t("peladas.detail.button.vote")}
+            </Button>
+          )}
+
+          {pelada.status === "closed" && (
+            <Button
+              component={RouterLink}
+              to={`/peladas/${pelada.id}/results`}
+              variant="outlined"
+              color="primary"
+              startIcon={<AssessmentIcon />}
+              sx={{
+                textTransform: "none",
+                borderRadius: 2,
+                fontWeight: "bold",
+                px: 3,
+              }}
+            >
+              {t("peladas.detail.button.view_results")}
             </Button>
           )}
         </Stack>

@@ -39,6 +39,7 @@ import ScheduleBuilderPage from "./features/peladas/pages/ScheduleBuilderPage";
 import AttendanceListPage from "./features/peladas/pages/AttendanceListPage";
 import PeladaMatchesPage from "./features/peladas/pages/PeladaMatchesPage";
 import PeladaVotingPage from "./features/peladas/pages/PeladaVotingPage";
+import PeladaVotingResultsPage from "./features/peladas/pages/PeladaVotingResultsPage";
 import UserProfilePage from "./features/user/pages/UserProfilePage";
 
 function Footer() {
@@ -266,6 +267,14 @@ function AppLayout() {
                 element={
                   <Container maxWidth="lg" sx={{ py: 3 }}>
                     <PeladaVotingPage />
+                  </Container>
+                }
+              />
+              <Route
+                path="/peladas/:id/results"
+                element={
+                  <Container maxWidth="lg" sx={{ py: 3 }}>
+                    <PeladaVotingResultsPage />
                   </Container>
                 }
               />

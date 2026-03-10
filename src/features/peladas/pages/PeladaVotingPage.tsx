@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   Container,
@@ -10,9 +10,24 @@ import {
   CardContent,
   Rating,
   Box,
+  Chip,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemIcon,
+  Paper,
+  Grid,
 } from "@mui/material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import PendingIcon from "@mui/icons-material/Pending";
+import AssessmentIcon from "@mui/icons-material/Assessment";
 import { api } from "../../../shared/api/client";
-import { createApi, type VotingInfo } from "../../../shared/api/endpoints";
+import {
+  createApi,
+  type VotingInfo,
+  type VotingResults,
+} from "../../../shared/api/endpoints";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
@@ -23,6 +38,7 @@ const endpoints = createApi(api);
 type PlayerVote = {
   playerId: number;
   playerName: string;
+  position?: string;
   stars: number | null;
   goals: number;
   assists: number;
@@ -37,6 +53,9 @@ export default function PeladaVotingPage() {
   const peladaId = Number(id);
 
   const [votingInfo, setVotingInfo] = useState<VotingInfo | null>(null);
+  const [votingResults, setVotingResults] = useState<VotingResults | null>(
+    null,
+  );
   const [playerVotes, setPlayerVotes] = useState<PlayerVote[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -56,8 +75,13 @@ export default function PeladaVotingPage() {
           return;
         }
 
-        const info = await endpoints.getVotingInfo(peladaId);
+        const [info, results] = await Promise.all([
+          endpoints.getVotingInfo(peladaId),
+          endpoints.getVotingResults(peladaId),
+        ]);
+
         setVotingInfo(info);
+        setVotingResults(results);
 
         if (!info.can_vote) {
           setError(info.message || t("peladas.voting.error.cannot_vote"));
@@ -71,6 +95,7 @@ export default function PeladaVotingPage() {
           return {
             playerId: p.player_id,
             playerName: p.name,
+            position: p.position,
             stars: existingVote ? existingVote.stars : null,
             goals: p.goals ?? 0,
             assists: p.assists ?? 0,
@@ -122,7 +147,7 @@ export default function PeladaVotingPage() {
       setSuccess(t("peladas.voting.success.saved"));
 
       setTimeout(() => {
-        navigate(`/peladas/${peladaId}`);
+        navigate(`/peladas/${peladaId}/results`);
       }, 2000);
     } catch (error: unknown) {
       const message =
@@ -134,6 +159,14 @@ export default function PeladaVotingPage() {
       setSubmitting(false);
     }
   };
+
+  const votersByStatus = useMemo(() => {
+    if (!votingResults) return { voted: [], pending: [] };
+    return {
+      voted: votingResults.voters.filter((v) => v.has_voted),
+      pending: votingResults.voters.filter((v) => !v.has_voted),
+    };
+  }, [votingResults]);
 
   if (loading) {
     return <Loading message={t("common.loading")} />;
@@ -157,13 +190,13 @@ export default function PeladaVotingPage() {
   }
 
   return (
-    <Container maxWidth="md" data-testid="voting-page-container">
+    <Container maxWidth="lg" data-testid="voting-page-container">
       <Box sx={{ mt: 2, mb: 2 }}>
         <BreadcrumbNav
           items={[
             {
               label: t("common.organization"),
-              path: `/organizations/${votingInfo?.eligible_players?.[0]?.player_id ? ".." : ".."}`, // Simplification for now
+              path: "/organizations",
             },
             {
               label: t("peladas.detail.title", { id: peladaId }),
@@ -173,9 +206,28 @@ export default function PeladaVotingPage() {
           ]}
         />
       </Box>
-      <Typography variant="h4" gutterBottom sx={{ mt: 3 }}>
-        {t("peladas.voting.title", { id: peladaId })}
-      </Typography>
+
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mt: 3,
+          mb: 2,
+        }}
+      >
+        <Typography variant="h4" fontWeight="bold">
+          {t("peladas.voting.title", { id: peladaId })}
+        </Typography>
+        <Button
+          variant="outlined"
+          startIcon={<AssessmentIcon />}
+          onClick={() => navigate(`/peladas/${peladaId}/results`)}
+          size="small"
+        >
+          {t("peladas.voting.button.view_results")}
+        </Button>
+      </Box>
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
@@ -194,99 +246,198 @@ export default function PeladaVotingPage() {
         </Alert>
       )}
 
-      <Alert severity="info" sx={{ mb: 3 }}>
-        {t("peladas.voting.info.instructions")}
-      </Alert>
+      <Grid container spacing={3}>
+        <Grid size={{ xs: 12, md: 8 }}>
+          <Alert severity="info" sx={{ mb: 3 }}>
+            {t("peladas.voting.info.instructions")}
+          </Alert>
 
-      <Stack spacing={2} sx={{ mb: 3 }}>
-        {playerVotes.map((pv) => (
-          <Card
-            key={pv.playerId}
-            variant="outlined"
-            data-testid={`voting-card-${pv.playerId}`}
-          >
-            <CardContent>
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems="center"
+          <Stack spacing={2} sx={{ mb: 3 }}>
+            {playerVotes.map((pv) => {
+              const positionKey = pv.position
+                ? `common.positions.${pv.position.toLowerCase()}`
+                : "common.positions.unknown";
+
+              return (
+                <Card
+                  key={pv.playerId}
+                  variant="outlined"
+                  data-testid={`voting-card-${pv.playerId}`}
+                  sx={{ borderRadius: 2 }}
+                >
+                  <CardContent>
+                    <Grid container alignItems="center" spacing={2}>
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                            mb: 1,
+                          }}
+                        >
+                          <Typography variant="h6" fontWeight="bold">
+                            {pv.playerName}
+                          </Typography>
+                          <Chip
+                            label={t(positionKey)}
+                            size="small"
+                            variant="outlined"
+                            color="primary"
+                            sx={{ fontSize: "0.7rem", fontWeight: "bold" }}
+                          />
+                        </Box>
+                        <Stack direction="row" spacing={2}>
+                          <Typography variant="body2" color="text.secondary">
+                            <strong>{t("common.goals")}:</strong> {pv.goals}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            <strong>{t("common.assists_short")}:</strong>{" "}
+                            {pv.assists}
+                          </Typography>
+                          {pv.own_goals > 0 && (
+                            <Typography variant="body2" color="error">
+                              <strong>{t("common.own_goals_short")}:</strong>{" "}
+                              {pv.own_goals}
+                            </Typography>
+                          )}
+                        </Stack>
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 6 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: { xs: "flex-start", sm: "flex-end" },
+                          }}
+                        >
+                          <Rating
+                            name={`player-${pv.playerId}`}
+                            value={pv.stars}
+                            onChange={(_, newValue) =>
+                              handleVoteChange(pv.playerId, newValue)
+                            }
+                            size="large"
+                            max={5}
+                            data-testid={`rating-${pv.playerId}`}
+                          />
+                          {pv.stars !== null && (
+                            <Typography
+                              variant="caption"
+                              color="primary"
+                              fontWeight="bold"
+                              sx={{ mt: 0.5 }}
+                            >
+                              {pv.stars} {t("peladas.voting.stars")}
+                            </Typography>
+                          )}
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </Stack>
+
+          {playerVotes.length === 0 && (
+            <Alert severity="warning">
+              {t("peladas.voting.warning.no_eligible_players")}
+            </Alert>
+          )}
+
+          <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
+            <Button
+              variant="outlined"
+              onClick={() => navigate(`/peladas/${peladaId}`)}
+              disabled={submitting}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleSubmit}
+              disabled={!allVotesComplete || submitting}
+              data-testid="submit-votes-button"
+              fullWidth
+              sx={{ fontWeight: "bold" }}
+            >
+              {submitting
+                ? t("common.sending")
+                : t("peladas.voting.button.save")}
+            </Button>
+          </Stack>
+
+          {!allVotesComplete && playerVotes.length > 0 && (
+            <Alert severity="warning" sx={{ mb: 3 }}>
+              {t("peladas.voting.warning.incomplete")}
+            </Alert>
+          )}
+        </Grid>
+
+        <Grid size={{ xs: 12, md: 4 }}>
+          <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+              {t("peladas.voting.status.title")}
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
+
+            <Box sx={{ mb: 3 }}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                fontWeight="bold"
+                display="block"
+                gutterBottom
               >
-                <Box>
-                  <Typography variant="h6" data-testid="player-name">
-                    {pv.playerName}
+                {t("peladas.voting.status.voted")} (
+                {votersByStatus.voted.length})
+              </Typography>
+              <List dense>
+                {votersByStatus.voted.map((v) => (
+                  <ListItem key={v.player_id} sx={{ px: 1 }}>
+                    <ListItemIcon sx={{ minWidth: 32 }}>
+                      <CheckCircleIcon color="success" fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary={v.name} />
+                  </ListItem>
+                ))}
+                {votersByStatus.voted.length === 0 && (
+                  <Typography variant="caption" sx={{ px: 1, py: 1 }}>
+                    {t("peladas.voting.status.none")}
                   </Typography>
-                  <Stack direction="row" spacing={2} sx={{ mt: 0.5 }}>
-                    <Typography variant="body2" color="text.secondary">
-                      <strong>{t("common.goals")}:</strong> {pv.goals}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      <strong>{t("common.assists_short")}:</strong> {pv.assists}
-                    </Typography>
-                    {pv.own_goals > 0 && (
-                      <Typography variant="body2" color="error">
-                        <strong>{t("common.own_goals_short")}:</strong>{" "}
-                        {pv.own_goals}
-                      </Typography>
-                    )}
-                  </Stack>
-                </Box>
-                <Box>
-                  <Rating
-                    name={`player-${pv.playerId}`}
-                    value={pv.stars}
-                    onChange={(_, newValue) =>
-                      handleVoteChange(pv.playerId, newValue)
-                    }
-                    size="large"
-                    max={5}
-                    data-testid={`rating-${pv.playerId}`}
-                  />
-                  {pv.stars !== null && (
-                    <Typography
-                      variant="caption"
-                      display="block"
-                      textAlign="center"
-                    >
-                      {pv.stars} stars
-                    </Typography>
-                  )}
-                </Box>
-              </Stack>
-            </CardContent>
-          </Card>
-        ))}
-      </Stack>
+                )}
+              </List>
+            </Box>
 
-      {playerVotes.length === 0 && (
-        <Alert severity="warning">
-          {t("peladas.voting.warning.no_eligible_players")}
-        </Alert>
-      )}
-
-      <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
-        <Button
-          variant="outlined"
-          onClick={() => navigate(`/peladas/${peladaId}`)}
-          disabled={submitting}
-        >
-          {t("common.cancel")}
-        </Button>
-        <Button
-          variant="contained"
-          onClick={handleSubmit}
-          disabled={!allVotesComplete || submitting}
-          data-testid="submit-votes-button"
-          fullWidth
-        >
-          {submitting ? t("common.sending") : t("peladas.voting.button.save")}
-        </Button>
-      </Stack>
-
-      {!allVotesComplete && playerVotes.length > 0 && (
-        <Alert severity="warning">
-          {t("peladas.voting.warning.incomplete")}
-        </Alert>
-      )}
+            <Box>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                fontWeight="bold"
+                display="block"
+                gutterBottom
+              >
+                {t("peladas.voting.status.pending")} (
+                {votersByStatus.pending.length})
+              </Typography>
+              <List dense>
+                {votersByStatus.pending.map((v) => (
+                  <ListItem key={v.player_id} sx={{ px: 1 }}>
+                    <ListItemIcon sx={{ minWidth: 32 }}>
+                      <PendingIcon color="action" fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={v.name}
+                      primaryTypographyProps={{ color: "text.secondary" }}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            </Box>
+          </Paper>
+        </Grid>
+      </Grid>
     </Container>
   );
 }

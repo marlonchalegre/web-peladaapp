@@ -108,6 +108,7 @@ export type VotingInfo = {
   eligible_players: {
     player_id: number;
     name: string;
+    position?: string;
     goals?: number;
     assists?: number;
     own_goals?: number;
@@ -116,6 +117,30 @@ export type VotingInfo = {
   voter_player_id?: number | null;
   message?: string;
 };
+
+export type PlayerResult = {
+  player_id: number;
+  name: string;
+  position?: string;
+  average_stars: number;
+  goals: number;
+  assists: number;
+  own_goals: number;
+};
+
+export type VotingResults = {
+  mvp: PlayerResult[];
+  striker: PlayerResult[];
+  garcom: PlayerResult[];
+  voters: {
+    player_id: number;
+    name: string;
+    has_voted: boolean;
+  }[];
+  total_eligible: number;
+  total_voted: number;
+};
+
 export type BatchVotePayload = {
   voter_id: number;
   votes: { target_id: number; stars: number }[];
@@ -431,6 +456,8 @@ export function createApi(client: ApiClient) {
     // Voting
     getVotingInfo: (peladaId: number) =>
       client.get<VotingInfo>(`/api/peladas/${peladaId}/voting-info`),
+    getVotingResults: (peladaId: number) =>
+      client.get<VotingResults>(`/api/peladas/${peladaId}/voting-results`),
     batchCastVotes: (peladaId: number, payload: BatchVotePayload) =>
       client.post<BatchVoteResponse>(
         `/api/peladas/${peladaId}/votes/batch`,

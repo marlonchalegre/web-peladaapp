@@ -443,7 +443,8 @@
         "view_matches": "View Matches",
         "start_pelada": "START PELADA",
         "vote": "Vote on Players",
-        "change_votes": "Change Votes"
+        "change_votes": "Change Votes",
+        "view_results": "View Results"
       }
     },
     "dialog": {
@@ -500,8 +501,32 @@
       },
       "button": {
         "back_to_pelada": "Back to Pelada",
-        "save": "Save Votes"
+        "save": "Save Votes",
+        "view_results": "View Results"
       },
+      "status": {
+        "title": "Voting Status",
+        "voted": "Already Voted",
+        "pending": "Pending",
+        "none": "No one has voted yet"
+      },
+      "results": {
+        "title": "Voting Results",
+        "hero_title": "Match Best Players",
+        "participation": "Engagement",
+        "players_voted": "players voted",
+        "mvp_title": "MVP (Best Players)",
+        "top_scorer": "Top Scorer",
+        "top_assists": "Top Assists (Waiter)",
+        "full_ranking": "Full Ranking",
+        "voter_transparency": "Who Voted",
+        "no_awards": "No awards recorded",
+        "error": {
+          "load_failed": "Failed to load results",
+          "not_found": "Results not found"
+        }
+      },
+      "stars": "stars",
       "error": {
         "unauthenticated": "User not authenticated",
         "not_player": "You are not a player of this organization",

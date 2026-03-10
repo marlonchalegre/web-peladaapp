@@ -53,9 +53,20 @@ describe("PeladaVotingPage", () => {
       voter_player_id: 10,
     };
 
+    const mockVotingResults = {
+      mvp: [],
+      striker: [],
+      garcom: [],
+      voters: [],
+      total_eligible: 0,
+      total_voted: 0,
+    };
+
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/peladas/1/voting-info")
         return Promise.resolve(mockVotingInfo);
+      if (path === "/api/peladas/1/voting-results")
+        return Promise.resolve(mockVotingResults);
       return Promise.reject(new Error(`Not found: ${path}`));
     });
 
@@ -91,9 +102,20 @@ describe("PeladaVotingPage", () => {
       voter_player_id: 10,
     };
 
+    const mockVotingResults = {
+      mvp: [],
+      striker: [],
+      garcom: [],
+      voters: [],
+      total_eligible: 0,
+      total_voted: 0,
+    };
+
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/peladas/1/voting-info")
         return Promise.resolve(mockVotingInfo);
+      if (path === "/api/peladas/1/voting-results")
+        return Promise.resolve(mockVotingResults);
       return Promise.reject(new Error(`Not found: ${path}`));
     });
 
@@ -122,9 +144,20 @@ describe("PeladaVotingPage", () => {
       voter_player_id: 10,
     };
 
+    const mockVotingResults = {
+      mvp: [],
+      striker: [],
+      garcom: [],
+      voters: [],
+      total_eligible: 0,
+      total_voted: 0,
+    };
+
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/peladas/1/voting-info")
         return Promise.resolve(mockVotingInfo);
+      if (path === "/api/peladas/1/voting-results")
+        return Promise.resolve(mockVotingResults);
       return Promise.reject(new Error(`Not found: ${path}`));
     });
 
