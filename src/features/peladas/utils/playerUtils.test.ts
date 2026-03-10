@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { sortPlayersByPosition } from "./playerUtils";
-import { User } from "../../../shared/api/endpoints";
+import type { User } from "../../../shared/api/endpoints";
 
 describe("sortPlayersByPosition", () => {
   const createPlayer = (
