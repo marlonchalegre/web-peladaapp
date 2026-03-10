@@ -242,7 +242,9 @@ describe("PeladaMatchesPage", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("peladas.detail.button.vote")).toBeInTheDocument();
+      expect(
+        screen.getByText("peladas.detail.button.vote"),
+      ).toBeInTheDocument();
     });
   });
 

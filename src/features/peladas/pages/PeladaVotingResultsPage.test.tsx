@@ -91,7 +91,9 @@ describe("PeladaVotingResultsPage", () => {
 
     await waitFor(() => {
       // Check title and engagement
-      expect(screen.getByText("peladas.voting.results.hero_title")).toBeInTheDocument();
+      expect(
+        screen.getByText("peladas.voting.results.hero_title"),
+      ).toBeInTheDocument();
       expect(screen.getByText("67%")).toBeInTheDocument(); // 2/3 voted
 
       // Check MVP Podium (might have multiple occurrences in awards/table/voters)
@@ -101,13 +103,19 @@ describe("PeladaVotingResultsPage", () => {
       expect(screen.getByText("4.8 ★")).toBeInTheDocument();
 
       // Check Special Awards
-      expect(screen.getByText("peladas.voting.results.top_scorer")).toBeInTheDocument();
+      expect(
+        screen.getByText("peladas.voting.results.top_scorer"),
+      ).toBeInTheDocument();
       expect(screen.getByText("3 Gols")).toBeInTheDocument();
-      expect(screen.getByText("peladas.voting.results.top_assists")).toBeInTheDocument();
+      expect(
+        screen.getByText("peladas.voting.results.top_assists"),
+      ).toBeInTheDocument();
       expect(screen.getByText("2 Assis.")).toBeInTheDocument();
 
       // Check Voter Transparency
-      expect(screen.getByText("peladas.voting.results.voter_transparency")).toBeInTheDocument();
+      expect(
+        screen.getByText("peladas.voting.results.voter_transparency"),
+      ).toBeInTheDocument();
     });
   });
 
@@ -133,7 +141,9 @@ describe("PeladaVotingResultsPage", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("peladas.voting.results.error.still_voting")).toBeInTheDocument();
+      expect(
+        screen.getByText("peladas.voting.results.error.still_voting"),
+      ).toBeInTheDocument();
     });
   });
 });

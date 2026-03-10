@@ -193,7 +193,10 @@ export default function PeladaVotingResultsPage() {
 
         {/* MVP Podium */}
         <Grid size={{ xs: 12, md: 8 }}>
-          <Paper variant="outlined" sx={{ p: 3, borderRadius: 4, height: "100%" }}>
+          <Paper
+            variant="outlined"
+            sx={{ p: 3, borderRadius: 4, height: "100%" }}
+          >
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 3 }}>
               <EmojiEventsIcon color="primary" fontSize="large" />
               <Typography variant="h5" fontWeight="bold">
@@ -257,7 +260,11 @@ export default function PeladaVotingResultsPage() {
                     <Typography variant="h6" fontWeight="bold" noWrap>
                       {results.mvp[0].name}
                     </Typography>
-                    <Typography variant="subtitle1" color="primary" fontWeight="bold">
+                    <Typography
+                      variant="subtitle1"
+                      color="primary"
+                      fontWeight="bold"
+                    >
                       {results.mvp[0].average_stars.toFixed(1)} ★
                     </Typography>
                     <Box
@@ -313,7 +320,9 @@ export default function PeladaVotingResultsPage() {
         <Grid size={{ xs: 12, md: 6 }}>
           <Card variant="outlined" sx={{ borderRadius: 4 }}>
             <CardContent>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}
+              >
                 <SportsSoccerIcon color="error" />
                 <Typography variant="h6" fontWeight="bold">
                   {t("peladas.voting.results.top_scorer")}
@@ -356,7 +365,9 @@ export default function PeladaVotingResultsPage() {
         <Grid size={{ xs: 12, md: 6 }}>
           <Card variant="outlined" sx={{ borderRadius: 4 }}>
             <CardContent>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}
+              >
                 <RestaurantIcon color="info" />
                 <Typography variant="h6" fontWeight="bold">
                   {t("peladas.voting.results.top_assists")}
@@ -401,7 +412,11 @@ export default function PeladaVotingResultsPage() {
           <Typography variant="h5" fontWeight="bold" sx={{ mb: 2, mt: 2 }}>
             {t("peladas.voting.results.full_ranking")}
           </Typography>
-          <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 4 }}>
+          <TableContainer
+            component={Paper}
+            variant="outlined"
+            sx={{ borderRadius: 4 }}
+          >
             <Table>
               <TableHead>
                 <TableRow sx={{ bgcolor: "grey.50" }}>
@@ -429,8 +444,12 @@ export default function PeladaVotingResultsPage() {
 
                   return (
                     <TableRow key={p.player_id} hover>
-                      <TableCell sx={{ fontWeight: "bold" }}>{i + 1}º</TableCell>
-                      <TableCell sx={{ fontWeight: "bold" }}>{p.name}</TableCell>
+                      <TableCell sx={{ fontWeight: "bold" }}>
+                        {i + 1}º
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: "bold" }}>
+                        {p.name}
+                      </TableCell>
                       <TableCell>
                         <Chip
                           label={t(positionKey)}
@@ -440,11 +459,20 @@ export default function PeladaVotingResultsPage() {
                         />
                       </TableCell>
                       <TableCell align="center">
-                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 0.5 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: 0.5,
+                          }}
+                        >
                           <Typography fontWeight="bold" color="primary">
                             {p.average_stars.toFixed(1)}
                           </Typography>
-                          <Typography variant="caption" color="text.secondary">★</Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            ★
+                          </Typography>
                         </Box>
                       </TableCell>
                       <TableCell align="center">{p.goals}</TableCell>
