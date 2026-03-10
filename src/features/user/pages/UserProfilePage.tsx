@@ -27,6 +27,7 @@ import { useAuth } from "../../../app/providers/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
+import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 
 export default function UserProfilePage() {
   const { t } = useTranslation();
@@ -158,6 +159,7 @@ export default function UserProfilePage() {
 
   return (
     <Box maxWidth={600} mx="auto">
+      <BreadcrumbNav items={[{ label: t("navigation.profile") }]} />
       <Paper sx={{ p: 4 }}>
         <Typography variant="h4" gutterBottom>
           {t("user.profile.title")}

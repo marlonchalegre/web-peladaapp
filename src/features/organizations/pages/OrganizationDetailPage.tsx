@@ -26,6 +26,7 @@ import CreatePeladaForm from "../components/CreatePeladaForm";
 import PeladasTable from "../components/PeladasTable";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
+import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 
 const endpoints = createApi(api);
 
@@ -142,6 +143,7 @@ export default function OrganizationDetailPage() {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
+      <BreadcrumbNav items={[{ label: org.name }]} />
       {/* Header */}
       <Box
         sx={{

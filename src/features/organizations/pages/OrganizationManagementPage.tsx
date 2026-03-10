@@ -1,19 +1,13 @@
-import {
-  useParams,
-  Link as RouterLink,
-  useSearchParams,
-} from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import {
   Container,
   Typography,
   Alert,
   Box,
-  Button,
   Tabs,
   Tab,
   Paper,
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PeopleIcon from "@mui/icons-material/People";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import MailIcon from "@mui/icons-material/Mail";
@@ -30,6 +24,7 @@ import InvitationsList from "../components/InvitationsList";
 import DangerZoneSection from "../components/DangerZoneSection";
 import DeleteOrganizationDialog from "../components/DeleteOrganizationDialog";
 import PlayerRatingsContent from "../components/PlayerRatingsContent";
+import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -114,16 +109,12 @@ export default function OrganizationManagementPage() {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ mb: 2 }}>
-        <Button
-          component={RouterLink}
-          to={`/organizations/${orgId}`}
-          startIcon={<ArrowBackIcon />}
-          variant="text"
-        >
-          {t("common.back_to_org")}
-        </Button>
-      </Box>
+      <BreadcrumbNav
+        items={[
+          { label: org.name, path: `/organizations/${orgId}` },
+          { label: t("organizations.detail.button.management") },
+        ]}
+      />
 
       <Typography variant="h4" gutterBottom fontWeight="bold" color="primary">
         {t("organizations.management.title", { name: org.name })}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link as RouterLink } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   Container,
   Typography,
@@ -14,7 +14,6 @@ import {
   useTheme,
   Stack,
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import { useTranslation } from "react-i18next";
@@ -27,6 +26,7 @@ import ImportStatsDialog from "../components/ImportStatsDialog";
 import ExportStatsDialog from "../components/ExportStatsDialog";
 import { api } from "../../../shared/api/client";
 import { createApi } from "../../../shared/api/endpoints";
+import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 
 const endpoints = createApi(api);
 
@@ -93,16 +93,12 @@ export default function OrganizationStatisticsPage() {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ mb: 2 }}>
-        <Button
-          component={RouterLink}
-          to={`/organizations/${orgId}`}
-          startIcon={<ArrowBackIcon />}
-          variant="text"
-        >
-          {t("organizations.stats.back_link")}
-        </Button>
-      </Box>
+      <BreadcrumbNav
+        items={[
+          { label: org.name, path: `/organizations/${orgId}` },
+          { label: t("organizations.detail.button.statistics") },
+        ]}
+      />
 
       <Box
         sx={{

@@ -1,15 +1,7 @@
-import { useParams, Link as RouterLink } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import {
-  Paper,
-  Button,
-  Box,
-  Typography,
-  Alert,
-  IconButton,
-} from "@mui/material";
+import { Paper, Button, Box, Typography, Alert } from "@mui/material";
 import Grid from "@mui/material/Grid";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ActiveMatchDashboard from "../components/ActiveMatchDashboard";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
@@ -19,6 +11,7 @@ import SessionInsights from "../components/SessionInsights";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { api } from "../../../shared/api/client";
 import { createApi } from "../../../shared/api/endpoints";
+import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 
 export default function PeladaMatchesPage() {
   const { t } = useTranslation();
@@ -81,6 +74,19 @@ export default function PeladaMatchesPage() {
 
   return (
     <Box sx={{ flexGrow: 1, py: 3, px: 4 }}>
+      <BreadcrumbNav
+        items={[
+          {
+            label: pelada?.organization_name || t("common.organization"),
+            path: `/organizations/${pelada?.organization_id}`,
+          },
+          {
+            label: t("peladas.detail.title", { id: peladaId }),
+            path: `/peladas/${peladaId}`,
+          },
+          { label: t("peladas.detail.button.view_matches") },
+        ]}
+      />
       <Box
         sx={{
           mb: 3,
@@ -90,14 +96,6 @@ export default function PeladaMatchesPage() {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton
-            component={RouterLink}
-            to={`/peladas/${peladaId}`}
-            sx={{ mr: 2 }}
-            aria-label={t("common.back")}
-          >
-            <ArrowBackIcon />
-          </IconButton>
           <Typography variant="h4" sx={{ fontWeight: "bold" }}>
             {t("peladas.matches.title", { id: peladaId })}
           </Typography>

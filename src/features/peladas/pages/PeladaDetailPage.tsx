@@ -13,6 +13,7 @@ import { api } from "../../../shared/api/client";
 import { createApi } from "../../../shared/api/endpoints";
 import PeladaDetailHeader from "../components/PeladaDetailHeader";
 import StartPeladaDialog from "../components/StartPeladaDialog";
+import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 import {
   generateExportText,
   generateAnnouncementText,
@@ -100,10 +101,34 @@ export default function PeladaDetailPage() {
 
   return (
     <Container maxWidth="xl" sx={{ pb: 4 }}>
+      <BreadcrumbNav
+        items={[
+          {
+            label: pelada.organization_name || t("common.organization"),
+            path: `/organizations/${pelada.organization_id}`,
+          },
+          { label: t("peladas.detail.title", { id: pelada.id }) },
+        ]}
+      />
       <PeladaDetailHeader
         pelada={pelada}
         votingInfo={votingInfo}
-        onStartClick={() => setStartDialogOpen(true)}
+        onStartClick={() => {
+          if (pelada.has_schedule_plan) {
+            if (
+              confirm(
+                t(
+                  "peladas.detail.dialog.start.confirm",
+                  "Are you sure you want to start the pelada with the built schedule?",
+                ),
+              )
+            ) {
+              handleBeginPelada();
+            }
+          } else {
+            setStartDialogOpen(true);
+          }
+        }}
         onCopyClipboard={handleCopyClipboard}
         onCopyAnnouncement={handleCopyAnnouncement}
         onToggleFixedGk={handleToggleFixedGoalkeepers}

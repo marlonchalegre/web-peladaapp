@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link as RouterLink } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Container,
   Typography,
@@ -11,12 +11,12 @@ import {
   Rating,
   Box,
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { api } from "../../../shared/api/client";
 import { createApi, type VotingInfo } from "../../../shared/api/endpoints";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
+import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 
 const endpoints = createApi(api);
 
@@ -157,16 +157,21 @@ export default function PeladaVotingPage() {
   }
 
   return (
-    <Container maxWidth="md">
+    <Container maxWidth="md" data-testid="voting-page-container">
       <Box sx={{ mt: 2, mb: 2 }}>
-        <Button
-          component={RouterLink}
-          to={`/peladas/${peladaId}`}
-          startIcon={<ArrowBackIcon />}
-          variant="text"
-        >
-          {t("peladas.voting.button.back_to_pelada")}
-        </Button>
+        <BreadcrumbNav
+          items={[
+            {
+              label: t("common.organization"),
+              path: `/organizations/${votingInfo?.eligible_players?.[0]?.player_id ? ".." : ".."}`, // Simplification for now
+            },
+            {
+              label: t("peladas.detail.title", { id: peladaId }),
+              path: `/peladas/${peladaId}`,
+            },
+            { label: t("peladas.detail.button.vote") },
+          ]}
+        />
       </Box>
       <Typography variant="h4" gutterBottom sx={{ mt: 3 }}>
         {t("peladas.voting.title", { id: peladaId })}

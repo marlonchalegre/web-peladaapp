@@ -1,4 +1,4 @@
-import { useParams, Link as RouterLink } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useState, useEffect, type SyntheticEvent } from "react";
 import {
   Container,
@@ -9,7 +9,6 @@ import {
   Tabs,
   Tab,
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PeopleIcon from "@mui/icons-material/People";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
@@ -22,6 +21,7 @@ import { api } from "../../../shared/api/client";
 import { createApi } from "../../../shared/api/endpoints";
 import UserAttendanceStatus from "../components/UserAttendanceStatus";
 import AttendanceListColumn from "../components/AttendanceListColumn";
+import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -102,6 +102,19 @@ export default function AttendanceListPage() {
 
   return (
     <Container maxWidth="md" sx={{ py: { xs: 2, md: 4 } }}>
+      <BreadcrumbNav
+        items={[
+          {
+            label: pelada.organization_name || t("common.organization"),
+            path: `/organizations/${pelada.organization_id}`,
+          },
+          {
+            label: t("peladas.detail.title", { id: pelada.id }),
+            path: `/peladas/${pelada.id}`,
+          },
+          { label: t("peladas.attendance.title") },
+        ]}
+      />
       <div data-testid="attendance-list-container">
         <Box
           sx={{
@@ -111,15 +124,7 @@ export default function AttendanceListPage() {
             alignItems: "center",
           }}
         >
-          <Button
-            component={RouterLink}
-            to={`/organizations/${pelada.organization_id}`}
-            startIcon={<ArrowBackIcon />}
-            variant="text"
-            sx={{ color: "text.secondary", textTransform: "none" }}
-          >
-            {t("common.back")}
-          </Button>
+          <Box />
           {isAnyAdmin && (
             <Button
               variant="contained"
