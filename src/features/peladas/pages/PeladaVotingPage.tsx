@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link as RouterLink } from "react-router-dom";
 import {
   Container,
   Typography,
@@ -221,19 +221,23 @@ export default function PeladaVotingPage() {
           <Button
             variant="outlined"
             startIcon={<SportsSoccerIcon />}
-            onClick={() => navigate(`/peladas/${peladaId}/matches`)}
+            component={RouterLink}
+            to={`/peladas/${peladaId}/matches`}
             size="small"
           >
             {t("peladas.detail.button.view_matches")}
           </Button>
-          <Button
-            variant="outlined"
-            startIcon={<AssessmentIcon />}
-            onClick={() => navigate(`/peladas/${peladaId}/results`)}
-            size="small"
-          >
-            {t("peladas.voting.button.view_results")}
-          </Button>
+          {!votingInfo?.can_vote && (
+            <Button
+              variant="outlined"
+              startIcon={<AssessmentIcon />}
+              component={RouterLink}
+              to={`/peladas/${peladaId}/results`}
+              size="small"
+            >
+              {t("peladas.voting.button.view_results")}
+            </Button>
+          )}
         </Box>
       </Box>
 
