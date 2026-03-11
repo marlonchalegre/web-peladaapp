@@ -390,6 +390,12 @@
         "confirm": "Vou jogar",
         "decline": "Não vou"
       },
+      "dialog": {
+        "close_title": "Fechar Lista e Criar Times?",
+        "close_content": "Tem certeza que deseja fechar a lista de presença e criar os times?",
+        "confirm": "Fechar e Criar",
+        "cancel": "Cancelar"
+      },
       "user_status": {
         "title": "Sua presença:",
         "subtitle": "Confirme se você participará desta pelada.",

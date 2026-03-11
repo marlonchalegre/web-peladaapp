@@ -8,6 +8,11 @@ import {
   Box,
   Tabs,
   Tab,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import PeopleIcon from "@mui/icons-material/People";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
@@ -51,6 +56,7 @@ export default function AttendanceListPage() {
   const { user } = useAuth();
   const [actuallyIsAdmin, setActuallyIsAdmin] = useState(false);
   const [tabValue, setTabValue] = useState(0);
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
 
   const {
     pelada,
@@ -68,6 +74,11 @@ export default function AttendanceListPage() {
   } = useAttendance(peladaId);
 
   const isAnyAdmin = pelada?.is_admin || isAdmin || actuallyIsAdmin;
+
+  const onConfirmClose = () => {
+    handleCloseAttendance();
+    setIsConfirmDialogOpen(false);
+  };
 
   useEffect(() => {
     if (pelada?.organization_id && user) {
@@ -128,7 +139,7 @@ export default function AttendanceListPage() {
           {isAnyAdmin && (
             <Button
               variant="contained"
-              onClick={handleCloseAttendance}
+              onClick={() => setIsConfirmDialogOpen(true)}
               data-testid="close-attendance-button"
               startIcon={<SportsSoccerIcon />}
               sx={{
@@ -247,6 +258,42 @@ export default function AttendanceListPage() {
           </CustomTabPanel>
         </Box>
       </div>
+
+      <Dialog
+        open={isConfirmDialogOpen}
+        onClose={() => setIsConfirmDialogOpen(false)}
+        aria-labelledby="confirm-close-dialog-title"
+        aria-describedby="confirm-close-dialog-description"
+      >
+        <DialogTitle id="confirm-close-dialog-title">
+          {t("peladas.attendance.dialog.close_title")}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="confirm-close-dialog-description">
+            {t("peladas.attendance.dialog.close_content")}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, gap: 1 }}>
+          <Button
+            onClick={() => setIsConfirmDialogOpen(false)}
+            variant="outlined"
+            color="inherit"
+            sx={{ borderRadius: 2, textTransform: "none" }}
+          >
+            {t("peladas.attendance.dialog.cancel")}
+          </Button>
+          <Button
+            onClick={onConfirmClose}
+            variant="contained"
+            color="success"
+            autoFocus
+            data-testid="confirm-close-attendance-button"
+            sx={{ borderRadius: 2, textTransform: "none" }}
+          >
+            {t("peladas.attendance.dialog.confirm")}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }

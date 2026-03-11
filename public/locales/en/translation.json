@@ -399,6 +399,12 @@
         "confirm": "I'm In",
         "decline": "I'm Out"
       },
+      "dialog": {
+        "close_title": "Close List and Create Teams?",
+        "close_content": "Are you sure you want to close the attendance list and create the teams?",
+        "confirm": "Close and Create",
+        "cancel": "Cancel"
+      },
       "user_status": {
         "title": "Your attendance:",
         "subtitle": "Confirm if you will participate in this pelada.",
