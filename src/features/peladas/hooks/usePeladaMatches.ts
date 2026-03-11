@@ -44,14 +44,21 @@ export function usePeladaMatches(peladaId: number) {
   );
 
   const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null);
+  const [justFinishedMatchId, setJustFinishedMatchId] = useState<number | null>(
+    null,
+  );
 
   const handleEndMatch = async (matchId: number) => {
     await actions.endMatch(matchId);
-    // Find next scheduled match using matchesRef (which has the latest data after refresh)
+    setJustFinishedMatchId(matchId);
+  };
+
+  const proceedToNextMatch = () => {
     const nextMatch = matchesRef.current.find((m) => m.status === "scheduled");
     if (nextMatch) {
       setSelectedMatchId(nextMatch.id);
     }
+    setJustFinishedMatchId(null);
   };
 
   // Auto-select first match or the first scheduled match if nothing is selected
@@ -63,6 +70,16 @@ export function usePeladaMatches(peladaId: number) {
   const selectedMatch = useMemo(
     () => matches.find((m) => m.id === selectedMatchId),
     [matches, selectedMatchId],
+  );
+
+  const justFinishedMatch = useMemo(
+    () => matches.find((m) => m.id === justFinishedMatchId),
+    [matches, justFinishedMatchId],
+  );
+
+  const nextScheduledMatch = useMemo(
+    () => matches.find((m) => m.status === "scheduled"),
+    [matches],
   );
 
   const currentMatchStats = useMemo(() => {
@@ -126,6 +143,22 @@ export function usePeladaMatches(peladaId: number) {
     teamPlayers,
     lineupsByMatch,
     orgPlayerIdToUserId,
+    orgPlayerIdToTeamId: useMemo(() => {
+      const m: Record<number, number> = {};
+      for (const [teamId, players] of Object.entries(teamPlayers)) {
+        for (const p of players) {
+          m[p.player_id] = Number(teamId);
+        }
+      }
+      for (const [, lineups] of Object.entries(lineupsByMatch)) {
+        for (const [teamId, players] of Object.entries(lineups)) {
+          for (const p of players) {
+            m[p.player_id] = Number(teamId);
+          }
+        }
+      }
+      return m;
+    }, [lineupsByMatch, teamPlayers]),
     userIdToName,
     orgPlayerIdToPlayer,
     matchEvents,
@@ -146,6 +179,8 @@ export function usePeladaMatches(peladaId: number) {
       [orgPlayerIdToPlayer],
     ),
     selectedMatch,
+    justFinishedMatch,
+    nextScheduledMatch,
     activeMatchData,
     isPeladaClosed,
     closing: actions.closing,
@@ -157,6 +192,8 @@ export function usePeladaMatches(peladaId: number) {
     deleteEventAndRefresh: actions.deleteEventAndRefresh,
     addPlayerToTeam: actions.addPlayerToTeam,
     endMatch: handleEndMatch,
+    setJustFinishedMatchId,
+    proceedToNextMatch,
     togglePlayerSort: standingsData.togglePlayerSort,
   };
 }

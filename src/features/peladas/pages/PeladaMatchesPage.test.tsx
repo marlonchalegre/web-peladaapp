@@ -4,6 +4,7 @@ import PeladaMatchesPage from "./PeladaMatchesPage";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { api } from "../../../shared/api/client";
 import { useAuth } from "../../../app/providers/AuthContext";
+import { type Match } from "../../../shared/api/endpoints";
 
 // Mock the API client
 vi.mock("../../../shared/api/client", () => ({
@@ -26,19 +27,33 @@ vi.mock("../components/ActiveMatchDashboard", () => ({
     statsMap,
     finished,
     isAdmin,
+    onEndMatch,
   }: {
     statsMap: Record<number, { goals: number; assists: number }>;
     finished: boolean;
     isAdmin: boolean;
+    onEndMatch: () => void;
   }) => (
     <div data-testid="active-match-dashboard">
       <span data-testid="finished-status">
         {finished ? "finished" : "running"}
       </span>
       <span data-testid="is-admin">{isAdmin ? "true" : "false"}</span>
+      <button data-testid="end-match-btn" onClick={onEndMatch}>
+        End
+      </button>
       <pre data-testid="stats-map">{JSON.stringify(statsMap)}</pre>
     </div>
   ),
+}));
+
+vi.mock("../components/MatchReportSummary", () => ({
+  default: ({ open, match }: { open: boolean; match: Match | null }) =>
+    open ? (
+      <div data-testid="match-summary">
+        Summary for Match {match?.sequence}
+      </div>
+    ) : null,
 }));
 
 describe("PeladaMatchesPage", () => {
@@ -273,6 +288,39 @@ describe("PeladaMatchesPage", () => {
       expect(
         screen.getByText("peladas.detail.button.view_results"),
       ).toBeInTheDocument();
+    });
+  });
+
+  it("shows match summary when end match is clicked", async () => {
+    (api.put as Mock).mockResolvedValue({
+      ...mockDashboardData.matches[1],
+      status: "finished",
+    });
+
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+
+    render(
+      <MemoryRouter initialEntries={["/peladas/1/matches"]}>
+        <Routes>
+          <Route path="/peladas/:id/matches" element={<PeladaMatchesPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    // Wait for the data to load
+    await waitFor(() => screen.getByRole("cell", { name: "Time 3" }));
+    
+    // Select the running match (seq 2)
+    const secondMatchLink = screen.getByTestId("match-history-item-2");
+    fireEvent.click(secondMatchLink);
+
+    // End the match
+    const endBtn = screen.getByTestId("end-match-btn");
+    fireEvent.click(endBtn);
+
+    await waitFor(() => {
+      expect(screen.getByTestId("match-summary")).toBeInTheDocument();
+      expect(screen.getByText("Summary for Match 2")).toBeInTheDocument();
     });
   });
 });

@@ -96,6 +96,9 @@
     "assists": "Assists",
     "own_goals": "Own Goals",
     "back": "Back",
+    "draw": "Draw",
+    "final_score": "Final Score",
+    "unknown_player": "Unknown Player",
     "back_to_org": "Back to Organization",
     "start": "Start",
     "sending": "Sending...",
@@ -555,6 +558,14 @@
       },
       "status": {
         "finished": "MATCH FINISHED"
+      },
+      "summary": {
+        "title": "Match #{{seq}} Summary",
+        "match_finished": "Match Finished!",
+        "highlights": "Highlights",
+        "next_up": "Next Up",
+        "next_match_desc": "Match #{{seq}} is ready to start.",
+        "go_to_next": "Next Match"
       }
     },
     "panel": {

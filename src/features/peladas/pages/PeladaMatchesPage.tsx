@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Paper, Button, Box, Typography, Alert, Stack } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import ActiveMatchDashboard from "../components/ActiveMatchDashboard";
+import MatchReportSummary from "../components/MatchReportSummary";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import { usePeladaMatches } from "../hooks/usePeladaMatches";
@@ -37,9 +38,13 @@ export default function PeladaMatchesPage() {
     handleClosePelada,
     // Active Match props
     selectedMatch,
+    justFinishedMatch,
+    nextScheduledMatch,
     activeMatchData,
     orgPlayerIdToUserId,
+    orgPlayerIdToTeamId,
     userIdToName,
+    matchEvents,
     currentMatchStats,
     updatingScore,
     selectMenu,
@@ -50,6 +55,8 @@ export default function PeladaMatchesPage() {
     replacePlayerOnMatchTeam,
     addPlayerToTeam,
     endMatch,
+    setJustFinishedMatchId,
+    proceedToNextMatch,
     // Insights props
     standings,
     playerStats,
@@ -263,6 +270,33 @@ export default function PeladaMatchesPage() {
           />
         </Grid>
       </Grid>
+
+      {justFinishedMatch && (
+        <MatchReportSummary
+          open={!!justFinishedMatch}
+          onClose={() => setJustFinishedMatchId(null)}
+          match={justFinishedMatch}
+          homeTeamName={
+            teamNameById[justFinishedMatch.home_team_id] ||
+            t("peladas.matches.team_fallback", {
+              id: justFinishedMatch.home_team_id,
+            })
+          }
+          awayTeamName={
+            teamNameById[justFinishedMatch.away_team_id] ||
+            t("peladas.matches.team_fallback", {
+              id: justFinishedMatch.away_team_id,
+            })
+          }
+          events={matchEvents.filter((e) => e.match_id === justFinishedMatch.id)}
+          userIdToName={userIdToName}
+          orgPlayerIdToUserId={orgPlayerIdToUserId}
+          orgPlayerIdToTeamId={orgPlayerIdToTeamId}
+          teamNameById={teamNameById}
+          nextMatch={nextScheduledMatch}
+          onProceedToNext={proceedToNextMatch}
+        />
+      )}
     </Box>
   );
 }

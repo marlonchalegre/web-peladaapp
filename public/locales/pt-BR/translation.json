@@ -98,6 +98,9 @@
     "assists": "Assistências",
     "own_goals": "Gols Contra",
     "back": "Voltar",
+    "draw": "Empate",
+    "final_score": "Placar Final",
+    "unknown_player": "Jogador Desconhecido",
     "back_to_org": "Voltar para Organização",
     "start": "Iniciar",
     "sending": "Enviando...",
@@ -581,6 +584,14 @@
       },
       "status": {
         "finished": "PARTIDA ENCERRADA"
+      },
+      "summary": {
+        "title": "Resumo da Partida #{{seq}}",
+        "match_finished": "Partida Finalizada!",
+        "highlights": "Destaques",
+        "next_up": "A Seguir",
+        "next_match_desc": "Partida #{{seq}} está pronta para começar.",
+        "go_to_next": "Próxima Partida"
       }
     },
     "panel": {
