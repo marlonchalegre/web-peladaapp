@@ -73,6 +73,8 @@ describe("PeladaVotingResultsPage", () => {
     ],
     total_eligible: 3,
     total_voted: 2,
+    organization_id: 123,
+    organization_name: "Test Org",
   };
 
   it("renders results dashboard correctly", async () => {
@@ -95,6 +97,14 @@ describe("PeladaVotingResultsPage", () => {
         screen.getByText("peladas.voting.results.hero_title"),
       ).toBeInTheDocument();
       expect(screen.getByText("67%")).toBeInTheDocument(); // 2/3 voted
+
+      // Check participation text with "of" translation
+      expect(screen.getByText(/2 common\.of 3/)).toBeInTheDocument();
+
+      // Check breadcrumb
+      const orgBreadcrumb = screen.getByRole("link", { name: "Test Org" });
+      expect(orgBreadcrumb).toBeInTheDocument();
+      expect(orgBreadcrumb.getAttribute("href")).toBe("/organizations/123");
 
       // Check MVP Podium (might have multiple occurrences in awards/table/voters)
       expect(screen.getAllByText("MVP Player").length).toBeGreaterThan(0);

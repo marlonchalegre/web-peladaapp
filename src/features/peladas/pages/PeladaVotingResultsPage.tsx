@@ -106,7 +106,12 @@ export default function PeladaVotingResultsPage() {
       <Box sx={{ mt: 2, mb: 2 }}>
         <BreadcrumbNav
           items={[
-            { label: t("common.organization"), path: "/organizations" },
+            {
+              label: results.organization_name || t("common.organization"),
+              path: results.organization_id
+                ? `/organizations/${results.organization_id}`
+                : "/",
+            },
             {
               label: t("peladas.detail.title", { id: peladaId }),
               path: `/peladas/${peladaId}`,

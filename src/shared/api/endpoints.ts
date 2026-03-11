@@ -139,6 +139,8 @@ export type VotingResults = {
   }[];
   total_eligible: number;
   total_voted: number;
+  organization_id?: number;
+  organization_name?: string;
 };
 
 export type VotingStatus = {

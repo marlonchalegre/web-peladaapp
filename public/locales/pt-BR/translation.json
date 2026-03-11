@@ -59,6 +59,7 @@
     }
   },
   "common": {
+    "of": "de",
     "welcome": "Bem-vindo ao Pelada App",
     "hello": "Olá",
     "loading": "Carregando...",
