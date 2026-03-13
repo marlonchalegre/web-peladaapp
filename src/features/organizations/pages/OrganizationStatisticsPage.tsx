@@ -4,10 +4,6 @@ import {
   Container,
   Typography,
   Alert,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Box,
   Button,
   useMediaQuery,
@@ -22,6 +18,7 @@ import { useOrganizationStatistics } from "../hooks/useOrganizationStatistics";
 import { useAuth } from "../../../app/providers/AuthContext";
 import StatsFilters from "../components/StatsFilters";
 import StatsTable from "../components/StatsTable";
+import TopStatsCards from "../components/TopStatsCards";
 import ImportStatsDialog from "../components/ImportStatsDialog";
 import ExportStatsDialog from "../components/ExportStatsDialog";
 import { api } from "../../../shared/api/client";
@@ -45,6 +42,7 @@ export default function OrganizationStatisticsPage() {
     error,
     orderBy,
     order,
+    stats,
     sortedStats,
     handleRequestSort,
     players,
@@ -57,8 +55,6 @@ export default function OrganizationStatisticsPage() {
     setMinGoals,
     minAssists,
     setMinAssists,
-    minOwnGoals,
-    setMinOwnGoals,
   } = useOrganizationStatistics(orgId);
 
   const [importOpen, setImportOpen] = useState(false);
@@ -107,18 +103,14 @@ export default function OrganizationStatisticsPage() {
           justifyContent: "space-between",
           alignItems: isMobile ? "flex-start" : "center",
           gap: 2,
-          mb: 3,
+          mb: 4,
         }}
       >
         <Typography variant={isMobile ? "h5" : "h4"} fontWeight="bold">
           {t("organizations.stats.title", { name: org.name })}
         </Typography>
 
-        <Stack
-          direction="row"
-          spacing={1}
-          sx={{ width: isMobile ? "100%" : "auto", justifyContent: "flex-end" }}
-        >
+        <Stack direction="row" spacing={1}>
           {isAdmin && (
             <Button
               variant="outlined"
@@ -126,6 +118,7 @@ export default function OrganizationStatisticsPage() {
               onClick={() => setImportOpen(true)}
               size="small"
               data-testid="import-stats-button"
+              sx={{ borderRadius: 2, textTransform: "none" }}
             >
               {t("common.import")}
             </Button>
@@ -135,28 +128,14 @@ export default function OrganizationStatisticsPage() {
             startIcon={<FileDownloadIcon />}
             onClick={() => setExportOpen(true)}
             size="small"
+            sx={{ borderRadius: 2, textTransform: "none" }}
           >
             {t("common.export")}
           </Button>
-
-          <FormControl sx={{ minWidth: 120 }}>
-            <InputLabel id="year-select-label">{t("common.year")}</InputLabel>
-            <Select
-              labelId="year-select-label"
-              value={year}
-              label={t("common.year")}
-              onChange={(e) => setYear(Number(e.target.value))}
-              size="small"
-            >
-              {years.map((y) => (
-                <MenuItem key={y} value={y}>
-                  {y}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
         </Stack>
       </Box>
+
+      <TopStatsCards stats={stats} />
 
       <StatsFilters
         nameFilter={nameFilter}
@@ -167,8 +146,9 @@ export default function OrganizationStatisticsPage() {
         onMinGoalsChange={setMinGoals}
         minAssists={minAssists}
         onMinAssistsChange={setMinAssists}
-        minOwnGoals={minOwnGoals}
-        onMinOwnGoalsChange={setMinOwnGoals}
+        year={year}
+        onYearChange={setYear}
+        years={years}
       />
 
       <StatsTable

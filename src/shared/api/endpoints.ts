@@ -99,10 +99,12 @@ export interface PlayerStats {
 export interface OrganizationPlayerStats {
   player_id: number;
   player_name: string;
+  player_position?: string;
   peladas_played: number;
   goal: number;
   assist: number;
   own_goal: number;
+  avg_rating: number;
 }
 export interface MatchLineupEntry {
   team_id: number;

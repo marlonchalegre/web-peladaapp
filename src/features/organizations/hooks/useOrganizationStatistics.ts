@@ -145,6 +145,7 @@ export function useOrganizationStatistics(orgId: number) {
     error,
     orderBy,
     order,
+    stats,
     sortedStats,
     handleRequestSort,
     players,

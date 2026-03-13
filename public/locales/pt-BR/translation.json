@@ -266,6 +266,12 @@
     },
     "stats": {
       "title": "{{name}} - Estatísticas",
+      "cards": {
+        "top_scorer": "Artilheiro",
+        "top_assister": "Garçom",
+        "mvp": "MVP",
+        "rating": "Rating"
+      },
       "back_link": "Voltar para Organização",
       "empty": "Nenhuma estatística encontrada para os filtros aplicados.",
       "import": {
@@ -302,10 +308,10 @@
         }
       },
       "filters": {
-        "min_peladas": "Mínimo de Peladas",
-        "min_goals": "Mínimo de Gols",
-        "min_assists": "Mínimo de Assistências",
-        "min_own_goals": "Mínimo de Gols Contra"
+        "min_peladas": "Peladas",
+        "min_goals": "Gols",
+        "min_assists": "Assistências",
+        "min_own_goals": "Gols Contra"
       },
       "table": {
         "peladas": "Peladas"

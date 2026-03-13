@@ -272,6 +272,12 @@
     },
     "stats": {
       "title": "{{name}} - Statistics",
+      "cards": {
+        "top_scorer": "Top Scorer",
+        "top_assister": "Top Assister",
+        "mvp": "MVP",
+        "rating": "Rating"
+      },
       "back_link": "Back to Organization",
       "empty": "No statistics found for the applied filters.",
       "import": {
@@ -308,10 +314,10 @@
         }
       },
       "filters": {
-        "min_peladas": "Min Peladas",
-        "min_goals": "Min Goals",
-        "min_assists": "Min Assists",
-        "min_own_goals": "Min Own Goals"
+        "min_peladas": "Peladas",
+        "min_goals": "Goals",
+        "min_assists": "Assists",
+        "min_own_goals": "Own Goals"
       },
       "table": {
         "peladas": "Peladas"

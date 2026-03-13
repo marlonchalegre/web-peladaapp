@@ -166,6 +166,7 @@ export default function OrganizationDetailPage() {
             component={RouterLink}
             to={`/organizations/${orgId}/statistics`}
             variant="outlined"
+            data-testid="org-statistics-button"
           >
             {t("organizations.detail.button.statistics")}
           </Button>
