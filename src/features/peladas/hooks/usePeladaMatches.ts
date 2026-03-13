@@ -74,10 +74,16 @@ export function usePeladaMatches(peladaId: number) {
     setJustFinishedMatchId(null);
   };
 
-  // Auto-select first match or the first scheduled match if nothing is selected
+  // Auto-select match if nothing is selected:
+  // Priority: Running > Scheduled > First Available
   if (!selectedMatchId && matches.length > 0) {
-    const firstScheduled = matches.find((m) => m.status === "scheduled");
-    setSelectedMatchId(firstScheduled ? firstScheduled.id : matches[0].id);
+    const running = matches.find((m) => m.status === "running");
+    if (running) {
+      setSelectedMatchId(running.id);
+    } else {
+      const firstScheduled = matches.find((m) => m.status === "scheduled");
+      setSelectedMatchId(firstScheduled ? firstScheduled.id : matches[0].id);
+    }
   }
 
   const selectedMatch = useMemo(
