@@ -119,7 +119,7 @@ function StatsHighlights({ stats }: { stats: PlayerStatRow[] }) {
     <Box sx={{ p: 2.5, bgcolor: 'action.hover' }}>
       <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
         <TrendingUpIcon color="primary" />
-        <Typography variant="h6" fontWeight="bold">{t("peladas.dashboard.highlights")}</Typography>
+        <Typography variant="h6" fontWeight="bold">{t("peladas.dashboard.summary.highlights")}</Typography>
       </Stack>
       
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3}>
