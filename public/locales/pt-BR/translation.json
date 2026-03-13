@@ -627,7 +627,7 @@
         }
       },
       "stats": {
-        "title": "Desempenho Detalhado",
+        "title": "Desempenho",
         "sort": {
           "goals": "Ordenar por gols",
           "assists": "Ordenar por assistências"

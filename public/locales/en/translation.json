@@ -592,7 +592,7 @@
       },
 
       "stats": {
-        "title": "Detailed Player Performance",
+        "title": "Performance",
         "sort": {
           "goals": "Sort by goals",
           "assists": "Sort by assists"
