@@ -5,29 +5,32 @@ export function usePeladaTimer(
   startedAt: string | null | undefined,
   accumulatedMs: number | null | undefined,
   status: TimerStatus | null | undefined,
+  isParentClosed: boolean = false,
   onStart?: () => Promise<void>,
   onPause?: () => Promise<void>,
   onReset?: () => Promise<void>,
 ) {
   const [now, setNow] = useState(0);
 
+  const effectiveRunning = status === "running" && !isParentClosed;
+
   useEffect(() => {
-    if (status === "running") {
+    if (effectiveRunning) {
       const interval = setInterval(() => {
         setNow(Date.now());
       }, 100);
       return () => clearInterval(interval);
     }
-  }, [status]);
+  }, [effectiveRunning]);
 
   const elapsedMs = useMemo(() => {
     let elapsed = accumulatedMs || 0;
-    if (status === "running" && startedAt && now > 0) {
+    if (effectiveRunning && startedAt && now > 0) {
       const startTime = new Date(startedAt).getTime();
       elapsed += now - startTime;
     }
     return elapsed;
-  }, [startedAt, accumulatedMs, status, now]);
+  }, [startedAt, accumulatedMs, effectiveRunning, now]);
 
   const formatTime = (ms: number) => {
     const seconds = Math.floor((ms / 1000) % 60);

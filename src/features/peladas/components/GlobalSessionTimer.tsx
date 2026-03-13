@@ -31,10 +31,15 @@ export default function GlobalSessionTimer({
 }: GlobalSessionTimerProps) {
   const { t } = useTranslation();
 
+  const isPeladaClosed = ["closed", "voting"].includes(
+    (pelada?.status || "").toLowerCase(),
+  );
+
   const sessionTimer = usePeladaTimer(
     pelada.timer_started_at,
     pelada.timer_accumulated_ms,
     pelada.timer_status,
+    isPeladaClosed,
     onStartPelada,
     onPausePelada,
   );

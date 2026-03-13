@@ -143,12 +143,14 @@ export default function PeladaMatchesPage() {
     pelada?.timer_started_at,
     pelada?.timer_accumulated_ms,
     pelada?.timer_status,
+    isPeladaClosed,
   );
 
   const matchTimer = usePeladaTimer(
     selectedMatch?.timer_started_at,
     selectedMatch?.timer_accumulated_ms,
     selectedMatch?.timer_status,
+    (selectedMatch?.status || "").toLowerCase() === "finished",
   );
 
   const handleCopyResults = async () => {

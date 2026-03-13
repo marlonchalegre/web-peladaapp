@@ -44,15 +44,16 @@ export default function MatchScoreHero({
   const { t } = useTranslation();
   const theme = useTheme();
 
+  const finished = (match.status || "").toLowerCase() === "finished";
+
   const matchTimer = usePeladaTimer(
     match.timer_started_at,
     match.timer_accumulated_ms,
     match.timer_status,
+    finished,
     () => onStartMatch(match.id),
     () => onPauseMatch(match.id),
   );
-
-  const finished = match.status === "finished";
 
   const scoreBoxStyle = (color: string) => ({
     width: { xs: 50, md: 60 },
