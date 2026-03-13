@@ -86,7 +86,7 @@ export default function GlobalSessionTimer({
         </Typography>
       </Box>
 
-      {isAdmin && (
+      {isAdmin && !isPeladaClosed && (
         <Stack
           direction="row"
           spacing={0.5}
