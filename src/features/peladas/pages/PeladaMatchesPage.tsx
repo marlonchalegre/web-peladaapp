@@ -250,15 +250,16 @@ export default function PeladaMatchesPage() {
 
         <Box
           sx={{
-            mb: 2,
-            display: "grid",
-            gridTemplateColumns: { xs: "1fr", sm: "1fr auto 1fr" },
+            mb: 3,
+            display: "flex",
+            flexDirection: { xs: "column", md: "row" },
             alignItems: "center",
+            justifyContent: "space-between",
             gap: 2,
           }}
         >
-          {/* Left spacer for desktop */}
-          <Box sx={{ display: { xs: "none", sm: "block" } }} />
+          {/* Left spacer for desktop to keep timer centered */}
+          <Box sx={{ flex: 1, display: { xs: "none", md: "block" } }} />
 
           {/* Integrated Session Timer (Centered) */}
           <Box sx={{ display: "flex", justifyContent: "center" }}>
@@ -276,7 +277,13 @@ export default function PeladaMatchesPage() {
           <Stack
             direction="row"
             spacing={1}
-            sx={{ justifyContent: { xs: "center", sm: "flex-end" } }}
+            flexWrap="wrap"
+            sx={{ 
+              flex: 1, 
+              justifyContent: { xs: "center", md: "flex-end" },
+              width: { xs: "100%", md: "auto" },
+              gap: 1
+            }}
           >
             <Button
               variant="outlined"
