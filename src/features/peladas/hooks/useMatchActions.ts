@@ -192,6 +192,11 @@ export function useMatchActions(
     if (!match) return;
     setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
     try {
+      // Ensure timer is paused before finishing
+      if (match.timer_status === "running") {
+        await endpoints.pauseMatchTimer(matchId);
+      }
+
       await endpoints.updateMatchScore(
         matchId,
         match.home_score ?? 0,
