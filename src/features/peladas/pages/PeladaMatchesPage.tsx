@@ -322,7 +322,7 @@ export default function PeladaMatchesPage() {
                       <ContentCopyIcon fontSize="small" />
                     </ListItemIcon>
                     <ListItemText>
-                      {t("peladas.detail.button.copy_announcement")}
+                      {t("peladas.button.copy_announcement")}
                     </ListItemText>
                   </MenuItem>
                   <MenuItem
@@ -335,7 +335,7 @@ export default function PeladaMatchesPage() {
                       <GroupIcon fontSize="small" />
                     </ListItemIcon>
                     <ListItemText>
-                      {t("peladas.detail.button.copy_teams")}
+                      {t("peladas.button.copy_teams")}
                     </ListItemText>
                   </MenuItem>
                 </>
