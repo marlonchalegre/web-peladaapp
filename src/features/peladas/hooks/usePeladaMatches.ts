@@ -53,10 +53,23 @@ export function usePeladaMatches(peladaId: number) {
     setJustFinishedMatchId(matchId);
   };
 
-  const proceedToNextMatch = () => {
+  const proceedToNextMatch = async () => {
     const nextMatch = matchesRef.current.find((m) => m.status === "scheduled");
     if (nextMatch) {
       setSelectedMatchId(nextMatch.id);
+      
+      // Auto-start timers
+      try {
+        // Start match timer
+        await actions.startMatchTimer(nextMatch.id);
+        
+        // Start pelada timer if it's not running
+        if (pelada?.timer_status !== "running") {
+          await actions.startPeladaTimer();
+        }
+      } catch (err) {
+        console.error("Failed to auto-start timers:", err);
+      }
     }
     setJustFinishedMatchId(null);
   };
