@@ -51,6 +51,22 @@ export function usePeladaMatches(peladaId: number) {
   const handleEndMatch = async (matchId: number) => {
     await actions.executeEndMatch(matchId);
     setJustFinishedMatchId(matchId);
+
+    // If no more matches are scheduled or running, stop all timers
+    const hasMoreMatches = matchesRef.current.some(
+      (m) => m.id !== matchId && (m.status === "scheduled" || m.status === "running")
+    );
+
+    if (!hasMoreMatches) {
+      try {
+        await actions.pauseMatchTimer(matchId);
+        if (pelada?.timer_status === "running") {
+          await actions.pausePeladaTimer();
+        }
+      } catch (err) {
+        console.error("Failed to stop timers after last match:", err);
+      }
+    }
   };
 
   const proceedToNextMatch = async () => {
