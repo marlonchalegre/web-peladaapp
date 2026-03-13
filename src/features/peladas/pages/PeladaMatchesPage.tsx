@@ -149,9 +149,19 @@ export default function PeladaMatchesPage() {
     }
   };
 
+  const getFullTeamPlayers = () => {
+    const full: Record<number, any[]> = {};
+    for (const [teamId, players] of Object.entries(teamPlayers)) {
+      full[Number(teamId)] = players.map((p) => ({
+        ...orgPlayerIdToPlayer[p.player_id],
+        is_goalkeeper: p.is_goalkeeper,
+      })).filter(Boolean);
+    }
+    return full;
+  };
+
   const handleCopyTeams = async () => {
-    // We don't have current scores here easily, but we can pass null or empty record
-    const text = generateExportText(teams, teamPlayers, {});
+    const text = generateExportText(teams, getFullTeamPlayers(), {});
     try {
       await navigator.clipboard.writeText(text);
       alert(t("common.actions.copy_success"));
@@ -161,7 +171,7 @@ export default function PeladaMatchesPage() {
   };
 
   const handleCopyAnnouncement = async () => {
-    const text = generateAnnouncementText(teams, teamPlayers);
+    const text = generateAnnouncementText(teams, getFullTeamPlayers());
     try {
       await navigator.clipboard.writeText(text);
       alert(t("common.actions.copy_success"));
