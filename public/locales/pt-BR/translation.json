@@ -456,7 +456,9 @@
         "build_schedule": "Montar Tabela",
         "vote": "Votar nos Jogadores",
         "change_votes": "Alterar Votos",
-        "view_results": "Ver Resultados"
+        "view_results": "Ver Resultados",
+        "copy_teams": "Copiar Times",
+        "copy_announcement": "Copiar Convite"
       },
       "schedule": {
         "subtitle": "Personalize a sequência e os detalhes das partidas",

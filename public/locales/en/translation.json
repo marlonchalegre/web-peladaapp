@@ -454,7 +454,9 @@
         "start_pelada": "START PELADA",
         "vote": "Vote on Players",
         "change_votes": "Change Votes",
-        "view_results": "View Results"
+        "view_results": "View Results",
+        "copy_teams": "Copy Teams",
+        "copy_announcement": "Copy Invite"
       }
     },
     "dialog": {

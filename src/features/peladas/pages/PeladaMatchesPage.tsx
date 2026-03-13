@@ -10,6 +10,10 @@ import {
   Container,
   Tabs,
   Tab,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import ActiveMatchDashboard from "../components/ActiveMatchDashboard";
 import MatchReportSummary from "../components/MatchReportSummary";
@@ -30,6 +34,8 @@ import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import HistoryIcon from "@mui/icons-material/History";
 import StopIcon from "@mui/icons-material/Stop";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import GroupIcon from "@mui/icons-material/Group";
 import { formatPeladaSummary } from "../utils/formatSummary";
 import {
   generateExportText,
@@ -55,6 +61,17 @@ export default function PeladaMatchesPage() {
     null,
   );
   const [closePeladaConfirmOpen, setClosePeladaConfirmOpen] = useState(false);
+  const [shareMenuAnchor, setShareMenuAnchor] = useState<null | HTMLElement>(
+    null,
+  );
+
+  const handleShareClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setShareMenuAnchor(event.currentTarget);
+  };
+
+  const handleShareClose = () => {
+    setShareMenuAnchor(null);
+  };
 
   const {
     loading,
@@ -244,36 +261,63 @@ export default function PeladaMatchesPage() {
             spacing={1}
             sx={{ justifyContent: { xs: "center", sm: "flex-end" } }}
           >
-            {pelada?.status !== "closed" && (
-              <>
-                <Button
-                  variant="outlined"
-                  startIcon={<ContentCopyIcon />}
-                  onClick={handleCopyAnnouncement}
-                  size="small"
-                  title={t("peladas.detail.button.copy_announcement")}
-                >
-                  {t("common.invite")}
-                </Button>
-                <Button
-                  variant="outlined"
-                  startIcon={<ContentCopyIcon />}
-                  onClick={handleCopyTeams}
-                  size="small"
-                  title={t("peladas.detail.button.copy_clipboard")}
-                >
-                  {t("common.teams")}
-                </Button>
-              </>
-            )}
             <Button
               variant="outlined"
-              startIcon={<ContentCopyIcon />}
-              onClick={handleCopyResults}
+              onClick={handleShareClick}
+              endIcon={<KeyboardArrowDownIcon />}
               size="small"
+              data-testid="share-dropdown-button"
             >
-              {t("peladas.matches.share_summary")}
+              {t("common.export")}
             </Button>
+            <Menu
+              anchorEl={shareMenuAnchor}
+              open={Boolean(shareMenuAnchor)}
+              onClose={handleShareClose}
+            >
+              <MenuItem
+                onClick={() => {
+                  handleCopyResults();
+                  handleShareClose();
+                }}
+              >
+                <ListItemIcon>
+                  <AssessmentIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>{t("peladas.matches.share_summary")}</ListItemText>
+              </MenuItem>
+              {pelada?.status !== "closed" && (
+                <>
+                  <MenuItem
+                    onClick={() => {
+                      handleCopyAnnouncement();
+                      handleShareClose();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <ContentCopyIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>
+                      {t("peladas.detail.button.copy_announcement")}
+                    </ListItemText>
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      handleCopyTeams();
+                      handleShareClose();
+                    }}
+                  >
+                    <ListItemIcon>
+                      <GroupIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>
+                      {t("peladas.detail.button.copy_teams")}
+                    </ListItemText>
+                  </MenuItem>
+                </>
+              )}
+            </Menu>
+
             {pelada?.status === "voting" && (
               <Button
                 variant="contained"
