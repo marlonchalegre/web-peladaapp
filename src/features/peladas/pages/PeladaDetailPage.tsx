@@ -14,6 +14,7 @@ import { createApi } from "../../../shared/api/endpoints";
 import PeladaDetailHeader from "../components/PeladaDetailHeader";
 import StartPeladaDialog from "../components/StartPeladaDialog";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
+import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
 import {
   generateExportText,
   generateAnnouncementText,
@@ -26,6 +27,8 @@ export default function PeladaDetailPage() {
   const peladaId = Number(id);
   const { user } = useAuth();
   const [actuallyIsAdmin, setActuallyIsAdmin] = useState(false);
+  const [confirmStartWithScheduleOpen, setConfirmStartWithScheduleOpen] =
+    useState(false);
 
   const {
     pelada,
@@ -115,16 +118,7 @@ export default function PeladaDetailPage() {
         votingInfo={votingInfo}
         onStartClick={() => {
           if (pelada.has_schedule_plan) {
-            if (
-              confirm(
-                t(
-                  "peladas.detail.dialog.start.confirm",
-                  "Are you sure you want to start the pelada with the built schedule?",
-                ),
-              )
-            ) {
-              handleBeginPelada();
-            }
+            setConfirmStartWithScheduleOpen(true);
           } else {
             setStartDialogOpen(true);
           }
@@ -216,6 +210,14 @@ export default function PeladaDetailPage() {
         onMatchesChange={setMatchesPerTeam}
         onClose={() => setStartDialogOpen(false)}
         onConfirm={handleBeginPelada}
+      />
+
+      <PrettyConfirmDialog
+        open={confirmStartWithScheduleOpen}
+        title={t("common.confirm")}
+        description={t("peladas.detail.dialog.start.confirm")}
+        onConfirm={handleBeginPelada}
+        onClose={() => setConfirmStartWithScheduleOpen(false)}
       />
     </Container>
   );

@@ -1,34 +1,79 @@
-import { Stack } from "@mui/material";
-import { type Dispatch, type SetStateAction, useState } from "react";
-import type { Match, TeamPlayer, Player } from "../../../shared/api/endpoints";
-import Scoreboard from "./Scoreboard";
-import MatchControlTable, { type SelectMenuState } from "./MatchControlTable";
+import {
+  Stack,
+  Box,
+  Typography,
+  Button,
+  Grid,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  ListItemIcon,
+  IconButton,
+  Chip,
+  useTheme,
+} from "@mui/material";
+import {
+  type Dispatch,
+  type SetStateAction,
+  useState,
+  useMemo,
+  useCallback,
+} from "react";
+import type {
+  Match,
+  TeamPlayer,
+  Player,
+  Pelada,
+} from "../../../shared/api/endpoints";
+import MatchScoreHero from "./MatchScoreHero";
+import MatchPlayerCard from "./MatchPlayerCard";
+import MenuIcon from "@mui/icons-material/Menu";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import EditIcon from "@mui/icons-material/Edit";
+import { useTranslation } from "react-i18next";
+import PlayerSelectMenu from "./PlayerSelectMenu";
+
+export type SelectMenuState = {
+  teamId: number;
+  forPlayerId?: number;
+  type: "replace" | "add";
+} | null;
 
 type Props = {
   match: Match;
+  pelada: Pelada;
   homeTeamName: string;
   awayTeamName: string;
   homePlayers: TeamPlayer[];
   awayPlayers: TeamPlayer[];
   orgPlayerIdToUserId: Record<number, number>;
   userIdToName: Record<number, string>;
+  orgPlayerIdToPlayer: Record<number, Player>;
   statsMap: Record<
     number,
     { goals: number; assists: number; ownGoals: number }
   >;
   benchPlayers: Player[];
   finished: boolean;
-  isPeladaClosed: boolean;
   isAdmin: boolean;
   updating: boolean;
   selectMenu: SelectMenuState;
   setSelectMenu: Dispatch<SetStateAction<SelectMenuState>>;
   playersPerTeam?: number | null;
-  // Actions
+  // Timer Actions
+  onStartMatch: (id: number) => Promise<void>;
+  onPauseMatch: (id: number) => Promise<void>;
+  onResetMatch: (id: number) => Promise<void>;
+  onOpenResetConfirm: (type: "session" | "match") => void;
+  // Data Actions
   recordEvent: (
     matchId: number,
     playerId: number,
     type: "assist" | "goal" | "own_goal",
+    sessionTimeMs?: number,
+    matchTimeMs?: number,
   ) => Promise<void>;
   deleteEventAndRefresh: (
     matchId: number,
@@ -46,39 +91,61 @@ type Props = {
     inPlayerId: number,
   ) => Promise<void>;
   addPlayerToTeam: (teamId: number, playerId: number) => Promise<void>;
-  onEndMatch: () => Promise<void>;
+  onEndMatch: () => void;
+  // History Drawer
+  matches: Match[];
+  onSelectMatch: (id: number) => void;
+  teamNameById: Record<number, string>;
 };
 
 export default function ActiveMatchDashboard(props: Props) {
   const {
     match,
+    pelada,
     homeTeamName,
     awayTeamName,
     homePlayers,
     awayPlayers,
     orgPlayerIdToUserId,
     userIdToName,
+    orgPlayerIdToPlayer,
     statsMap,
     benchPlayers,
     finished,
-    isPeladaClosed,
     isAdmin,
     updating,
     selectMenu,
     setSelectMenu,
     playersPerTeam,
+    onStartMatch,
+    onPauseMatch,
+    onOpenResetConfirm,
     recordEvent,
     deleteEventAndRefresh,
     adjustScore,
     replacePlayerOnTeam,
     addPlayerToTeam,
     onEndMatch,
+    matches,
+    onSelectMatch,
+    teamNameById,
   } = props;
 
+  const { t } = useTranslation();
+  const theme = useTheme();
   const [loadingStats, setLoadingStats] = useState<Record<string, boolean>>({});
   const [isEditing, setIsEditing] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   const effectiveFinished = finished && !isEditing;
+
+  const getPlayerName = useCallback(
+    (pid: number) => {
+      const uid = orgPlayerIdToUserId[pid];
+      return uid && userIdToName[uid] ? userIdToName[uid] : `Player #${pid}`;
+    },
+    [orgPlayerIdToUserId, userIdToName],
+  );
 
   const handleStatChange = async (
     playerId: number,
@@ -95,7 +162,7 @@ export default function ActiveMatchDashboard(props: Props) {
       const absDiff = Math.abs(diff);
       for (let i = 0; i < absDiff; i++) {
         if (diff > 0) {
-          await recordEvent(match.id, playerId, type);
+          await recordEvent(match.id, playerId, type, undefined, undefined);
           if (type === "goal") {
             await adjustScore(match.id, side, 1);
           } else if (type === "own_goal") {
@@ -115,41 +182,307 @@ export default function ActiveMatchDashboard(props: Props) {
     }
   };
 
-  return (
-    <Stack spacing={2} sx={{ height: "100%" }}>
-      <Scoreboard
-        homeTeamName={homeTeamName}
-        awayTeamName={awayTeamName}
-        homeScore={match.home_score ?? 0}
-        awayScore={match.away_score ?? 0}
-        sequence={match.sequence}
-      />
+  const generateTeamList = useCallback(
+    (players: TeamPlayer[], side: "home" | "away", teamId: number) => {
+      // Sort by position then name
+      const sortedPlayers = [...players].sort((a, b) => {
+        const playerA = orgPlayerIdToPlayer[a.player_id];
+        const playerB = orgPlayerIdToPlayer[b.player_id];
 
-      <MatchControlTable
-        homePlayers={homePlayers}
-        awayPlayers={awayPlayers}
-        homeTeamId={match.home_team_id}
-        awayTeamId={match.away_team_id}
-        orgPlayerIdToUserId={orgPlayerIdToUserId}
-        userIdToName={userIdToName}
-        statsMap={statsMap}
-        benchPlayers={benchPlayers}
-        finished={effectiveFinished}
-        isMatchFinished={finished}
-        isPeladaClosed={isPeladaClosed}
-        isAdmin={isAdmin}
-        isEditing={isEditing}
-        onToggleEdit={() => setIsEditing(!isEditing)}
-        updating={updating}
-        selectMenu={selectMenu}
-        setSelectMenu={setSelectMenu}
-        playersPerTeam={playersPerTeam}
-        loadingStats={loadingStats}
-        onStatChange={handleStatChange}
-        onReplacePlayer={replacePlayerOnTeam}
-        onAddPlayer={addPlayerToTeam}
-        onEndMatch={onEndMatch}
-      />
-    </Stack>
+        const posA = playerA?.position_id || 99;
+        const posB = playerB?.position_id || 99;
+
+        if (posA !== posB) return posA - posB;
+
+        const nameA = getPlayerName(a.player_id).toLowerCase();
+        const nameB = getPlayerName(b.player_id).toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+
+      const list = sortedPlayers.map((p) => ({
+        ...p,
+        side,
+        teamId,
+        isEmpty: false,
+      }));
+      if (playersPerTeam && players.length < playersPerTeam) {
+        const missing = playersPerTeam - players.length;
+        for (let i = 0; i < missing; i++) {
+          list.push({
+            player_id: -1 * (i + 1 + (side === "home" ? 0 : 100)),
+            team_id: teamId,
+            is_goalkeeper: false,
+            side,
+            teamId,
+            isEmpty: true,
+          });
+        }
+      }
+      return list;
+    },
+    [orgPlayerIdToPlayer, getPlayerName, playersPerTeam],
+  );
+
+  const homeList = useMemo(
+    () => generateTeamList(homePlayers, "home", match.home_team_id),
+    [homePlayers, match.home_team_id, generateTeamList],
+  );
+  const awayList = useMemo(
+    () => generateTeamList(awayPlayers, "away", match.away_team_id),
+    [awayPlayers, match.away_team_id, generateTeamList],
+  );
+
+  return (
+    <Box sx={{ pb: 8 }}>
+      <Stack spacing={2}>
+        {/* Top Actions Row */}
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <IconButton
+              onClick={() => setHistoryOpen(true)}
+              size="small"
+              color="primary"
+              data-testid="toggle-history-drawer"
+            >
+              <MenuIcon />
+            </IconButton>
+            <Chip
+              label={`PARTIDA #${match.sequence}`}
+              size="small"
+              color="primary"
+              variant="filled"
+              sx={{ fontWeight: "bold", borderRadius: 1.5 }}
+            />
+          </Stack>
+
+          {isAdmin && finished && (
+            <Button
+              startIcon={isEditing ? <CheckCircleIcon /> : <EditIcon />}
+              color={isEditing ? "success" : "warning"}
+              variant={isEditing ? "contained" : "outlined"}
+              onClick={() => setIsEditing(!isEditing)}
+              size="small"
+              sx={{ textTransform: "none", borderRadius: 2 }}
+              data-testid={
+                isEditing ? "finish-editing-button" : "edit-match-button"
+              }
+            >
+              {isEditing
+                ? t("peladas.dashboard.button.finish_editing")
+                : t("peladas.dashboard.button.edit_match")}
+            </Button>
+          )}
+        </Stack>
+
+        {/* Hero Scoreboard */}
+        <MatchScoreHero
+          match={match}
+          pelada={pelada}
+          homeTeamName={homeTeamName}
+          awayTeamName={awayTeamName}
+          isAdmin={isAdmin}
+          onStartMatch={onStartMatch}
+          onPauseMatch={onPauseMatch}
+          onOpenResetConfirm={onOpenResetConfirm}
+          onEndMatch={onEndMatch}
+          updating={updating}
+        />
+
+        {/* Players Section */}
+        <Grid container spacing={2}>
+          {/* Home Team */}
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Box
+              sx={{
+                mb: 1.5,
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                pl: 1,
+              }}
+            >
+              <Box
+                sx={{
+                  width: 4,
+                  height: 16,
+                  bgcolor: theme.palette.home.main,
+                  borderRadius: 1,
+                }}
+              />
+              <Typography
+                variant="subtitle2"
+                fontWeight="bold"
+                color="text.secondary"
+              >
+                {homeTeamName.toUpperCase()}
+              </Typography>
+            </Box>
+            <Stack spacing={1}>
+              {homeList.map((p) => (
+                <MatchPlayerCard
+                  key={p.player_id}
+                  player={p}
+                  playerName={getPlayerName(p.player_id)}
+                  playerData={orgPlayerIdToPlayer[p.player_id]}
+                  stats={
+                    statsMap[p.player_id] || {
+                      goals: 0,
+                      assists: 0,
+                      ownGoals: 0,
+                    }
+                  }
+                  finished={effectiveFinished}
+                  isAdmin={isAdmin}
+                  loadingGoals={!!loadingStats[`${p.player_id}-goal`]}
+                  loadingAssists={!!loadingStats[`${p.player_id}-assist`]}
+                  loadingOwnGoals={!!loadingStats[`${p.player_id}-own_goal`]}
+                  onStatChange={(type, diff, side) =>
+                    handleStatChange(p.player_id, type, diff, side)
+                  }
+                  onSubClick={() =>
+                    setSelectMenu({
+                      teamId: p.teamId,
+                      forPlayerId: p.player_id,
+                      type: p.isEmpty ? "add" : "replace",
+                    })
+                  }
+                />
+              ))}
+            </Stack>
+          </Grid>
+
+          {/* Away Team */}
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Box
+              sx={{
+                mb: 1.5,
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                pl: 1,
+              }}
+            >
+              <Box
+                sx={{
+                  width: 4,
+                  height: 16,
+                  bgcolor: theme.palette.away.main,
+                  borderRadius: 1,
+                }}
+              />
+              <Typography
+                variant="subtitle2"
+                fontWeight="bold"
+                color="text.secondary"
+              >
+                {awayTeamName.toUpperCase()}
+              </Typography>
+            </Box>
+            <Stack spacing={1}>
+              {awayList.map((p) => (
+                <MatchPlayerCard
+                  key={p.player_id}
+                  player={p}
+                  playerName={getPlayerName(p.player_id)}
+                  playerData={orgPlayerIdToPlayer[p.player_id]}
+                  stats={
+                    statsMap[p.player_id] || {
+                      goals: 0,
+                      assists: 0,
+                      ownGoals: 0,
+                    }
+                  }
+                  finished={effectiveFinished}
+                  isAdmin={isAdmin}
+                  loadingGoals={!!loadingStats[`${p.player_id}-goal`]}
+                  loadingAssists={!!loadingStats[`${p.player_id}-assist`]}
+                  loadingOwnGoals={!!loadingStats[`${p.player_id}-own_goal`]}
+                  onStatChange={(type, diff, side) =>
+                    handleStatChange(p.player_id, type, diff, side)
+                  }
+                  onSubClick={() =>
+                    setSelectMenu({
+                      teamId: p.teamId,
+                      forPlayerId: p.player_id,
+                      type: p.isEmpty ? "add" : "replace",
+                    })
+                  }
+                />
+              ))}
+            </Stack>
+          </Grid>
+        </Grid>
+      </Stack>
+
+      {/* Substitute Selector */}
+      {selectMenu && (
+        <PlayerSelectMenu
+          teamId={selectMenu.teamId}
+          benchPlayers={benchPlayers}
+          onClose={() => setSelectMenu(null)}
+          onSelect={(pid) => {
+            if (selectMenu.type === "add") {
+              addPlayerToTeam(selectMenu.teamId, pid);
+            } else {
+              replacePlayerOnTeam(
+                selectMenu.teamId,
+                selectMenu.forPlayerId!,
+                pid,
+              );
+            }
+          }}
+          getPlayerName={getPlayerName}
+        />
+      )}
+
+      {/* History Drawer */}
+      <Drawer
+        anchor="left"
+        open={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        data-testid="history-drawer"
+      >
+        <Box sx={{ width: 280, p: 2 }}>
+          <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
+            {t("peladas.matches.history_title")}
+          </Typography>
+          <List>
+            {matches.map((m) => (
+              <ListItem key={m.id} disablePadding sx={{ mb: 1 }}>
+                <ListItemButton
+                  selected={match.id === m.id}
+                  onClick={() => {
+                    onSelectMatch(m.id);
+                    setHistoryOpen(false);
+                  }}
+                  sx={{ borderRadius: 2 }}
+                  data-testid={`match-history-item-${m.sequence}`}
+                >
+                  <ListItemText
+                    primary={t("peladas.dashboard.summary.title", {
+                      seq: m.sequence,
+                    })}
+                    secondary={`${teamNameById[m.home_team_id] || "Home"} ${m.home_score} x ${m.away_score} ${teamNameById[m.away_team_id] || "Away"}`}
+                    secondaryTypographyProps={{
+                      variant: "caption",
+                      fontWeight: "bold",
+                    }}
+                  />
+                  {m.status === "finished" && (
+                    <ListItemIcon sx={{ minWidth: 0, ml: 1 }}>
+                      <CheckCircleIcon fontSize="small" color="success" />
+                    </ListItemIcon>
+                  )}
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      </Drawer>
+    </Box>
   );
 }

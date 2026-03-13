@@ -17,97 +17,66 @@ export const getTheme = (mode: PaletteMode) =>
     palette: {
       mode,
       primary: {
-        main: "#2563eb", // blue-600
-        dark: "#1d4ed8", // blue-700
-        light: mode === "light" ? "#dbeafe" : "#1e293b", // blue-100 or blue-900
+        main: "#10b981", // Emerald 500
+        light: "#34d399",
+        dark: "#059669",
+        contrastText: "#ffffff",
       },
       secondary: {
-        main: "#6366f1", // indigo-500
-        light: mode === "light" ? "#e0e7ff" : "#312e81", // indigo-100 or indigo-900
+        main: "#6366f1", // Indigo 500
+        light: "#818cf8",
+        dark: "#4f46e5",
+        contrastText: "#ffffff",
       },
       home: {
-        main: "#f97316", // orange-500
+        main: "#f97316", // Orange 500 (Existing)
+        light: "#fb923c",
+        dark: "#ea580c",
+        contrastText: "#ffffff",
       },
       away: {
-        main: "#2563eb", // blue-600
-      },
-      success: {
-        main: mode === "light" ? "#166534" : "#4ade80", // green-800 or green-400
-        light: mode === "light" ? "#dcfce7" : "#064e3b", // green-100 or green-900
-      },
-      warning: {
-        main: "#e65100", // orange-900
-        light: "#ffe0b2", // orange-100
-      },
-      text: {
-        primary: mode === "light" ? "#0f172a" : "#f1f5f9", // slate-900 or slate-100
-        secondary: mode === "light" ? "#64748b" : "#94a3b8", // slate-500 or slate-400
+        main: "#2563eb", // Blue 600 (Existing)
+        light: "#60a5fa",
+        dark: "#1d4ed8",
+        contrastText: "#ffffff",
       },
       background: {
-        default: mode === "light" ? "#f8f9fa" : "#020617", // slate-50 or slate-950
-        paper: mode === "light" ? "#ffffff" : "#0f172a", // white or slate-900
+        default: mode === "light" ? "#f8fafc" : "#0f172a", // Slate 50 or Slate 900
+        paper: mode === "light" ? "#ffffff" : "#1e293b", // White or Slate 800
       },
-      grey: {
-        50: "#f8f9fa",
-        100: "#f1f5f9",
-        200: "#e2e8f0",
-        300: "#cbd5e1",
-        400: "#94a3b8",
-        500: "#64748b",
-        600: "#475569",
-        700: "#334155",
-        800: "#1e293b",
-        900: "#0f172a",
+      text: {
+        primary: mode === "light" ? "#1e293b" : "#f1f5f9",
+        secondary: mode === "light" ? "#64748b" : "#94a3b8",
       },
-      divider: mode === "light" ? "#e2e8f0" : "#1e293b",
+      divider: mode === "light" ? alpha("#64748b", 0.1) : alpha("#94a3b8", 0.1),
     },
     typography: {
-      fontFamily: [
-        "Inter",
-        "system-ui",
-        "Avenir",
-        "Helvetica",
-        "Arial",
-        "sans-serif",
-      ].join(", "),
-      h1: { fontSize: "2.25rem", fontWeight: 700 },
-      h2: { fontSize: "1.75rem", fontWeight: 700 },
-      h3: { fontSize: "1.5rem", fontWeight: 700 },
-      h4: { fontSize: "1.25rem", fontWeight: 700 },
+      fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+      h1: { fontWeight: 800, letterSpacing: "-0.02em" },
+      h2: { fontWeight: 800, letterSpacing: "-0.02em" },
+      h3: { fontWeight: 700, letterSpacing: "-0.01em" },
+      h4: { fontWeight: 700, letterSpacing: "-0.01em" },
+      h5: { fontWeight: 600 },
       h6: { fontWeight: 600 },
+      button: { fontWeight: 600, textTransform: "none" },
     },
-    shape: { borderRadius: 8 },
+    shape: {
+      borderRadius: 12,
+    },
     components: {
-      MuiCssBaseline: {
-        styleOverrides: (theme) => ({
-          body: {
-            backgroundColor: theme.palette.background.default,
-            color: theme.palette.text.primary,
-            transition: "background-color 0.3s ease, color 0.3s ease",
-          },
-          ".droppable": {
-            border: "2px dashed transparent",
-            transition:
-              "border-color 120ms ease-in-out, background-color 120ms ease-in-out",
-          },
-          ".droppable--over": {
-            borderColor: alpha(theme.palette.primary.main, 0.5),
-            backgroundColor: alpha(theme.palette.primary.main, 0.08),
-          },
-          ".panel": {
-            backgroundColor: alpha(theme.palette.text.primary, 0.04),
-            border: `1px solid ${alpha(theme.palette.text.primary, 0.12)}`,
-            borderRadius: 8,
-            padding: "12px 14px",
-            textAlign: "left",
-          },
-        }),
-      },
-      MuiContainer: {
+      MuiButton: {
         styleOverrides: {
           root: {
-            width: "90%",
-            maxWidth: "90% !important",
+            borderRadius: 8,
+            boxShadow: "none",
+            "&:hover": {
+              boxShadow: "none",
+            },
+          },
+          containedPrimary: {
+            "&:hover": {
+              backgroundColor: "#059669",
+            },
           },
         },
       },
@@ -115,7 +84,12 @@ export const getTheme = (mode: PaletteMode) =>
         styleOverrides: {
           root: {
             backgroundImage: "none",
-            transition: "background-color 0.3s ease, box-shadow 0.3s ease",
+          },
+          elevation1: {
+            boxShadow:
+              mode === "light"
+                ? "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)"
+                : "0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3)",
           },
         },
       },

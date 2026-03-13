@@ -82,6 +82,7 @@ export function useMatchActions(
     setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
     try {
       await endpoints.deleteMatchEvent(matchId, playerId, type);
+
       await refreshData();
     } catch (error: unknown) {
       setError(
@@ -99,10 +100,19 @@ export function useMatchActions(
     matchId: number,
     playerId: number,
     type: "assist" | "goal" | "own_goal",
+    sessionTimeMs?: number,
+    matchTimeMs?: number,
   ) => {
     setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
     try {
-      await endpoints.createMatchEvent(matchId, playerId, type);
+      await endpoints.createMatchEvent(
+        matchId,
+        playerId,
+        type,
+        sessionTimeMs,
+        matchTimeMs,
+      );
+
       await refreshData();
     } catch (error: unknown) {
       setError(
@@ -160,9 +170,8 @@ export function useMatchActions(
     }
   };
 
-  const handleClosePelada = async (isPeladaClosed: boolean) => {
-    if (!peladaId || isPeladaClosed) return;
-    if (!window.confirm(t("peladas.matches.confirm_close_pelada"))) return;
+  const executeClosePelada = async () => {
+    if (!peladaId) return;
     setClosing(true);
     try {
       await endpoints.closePelada(peladaId);
@@ -178,10 +187,9 @@ export function useMatchActions(
     }
   };
 
-  const endMatch = async (matchId: number) => {
+  const executeEndMatch = async (matchId: number) => {
     const match = matchesRef.current.find((m) => m.id === matchId);
     if (!match) return;
-    if (!window.confirm(t("peladas.matches.confirm_end_match"))) return;
     setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
     try {
       await endpoints.updateMatchScore(
@@ -205,6 +213,46 @@ export function useMatchActions(
     }
   };
 
+  // Timer Actions
+  const startPeladaTimer = useCallback(async () => {
+    await endpoints.startPeladaTimer(peladaId);
+    await refreshData();
+  }, [peladaId, refreshData]);
+
+  const pausePeladaTimer = useCallback(async () => {
+    await endpoints.pausePeladaTimer(peladaId);
+    await refreshData();
+  }, [peladaId, refreshData]);
+
+  const resetPeladaTimer = useCallback(async () => {
+    await endpoints.resetPeladaTimer(peladaId);
+    await refreshData();
+  }, [peladaId, refreshData]);
+
+  const startMatchTimer = useCallback(
+    async (matchId: number) => {
+      await endpoints.startMatchTimer(matchId);
+      await refreshData();
+    },
+    [refreshData],
+  );
+
+  const pauseMatchTimer = useCallback(
+    async (matchId: number) => {
+      await endpoints.pauseMatchTimer(matchId);
+      await refreshData();
+    },
+    [refreshData],
+  );
+
+  const resetMatchTimer = useCallback(
+    async (matchId: number) => {
+      await endpoints.resetMatchTimer(matchId);
+      await refreshData();
+    },
+    [refreshData],
+  );
+
   return {
     updatingScore,
     closing,
@@ -215,7 +263,14 @@ export function useMatchActions(
     recordEvent,
     addPlayerToTeam,
     replacePlayerOnMatchTeam,
-    handleClosePelada,
-    endMatch,
+    executeClosePelada,
+    executeEndMatch,
+    // Timer actions
+    startPeladaTimer,
+    pausePeladaTimer,
+    resetPeladaTimer,
+    startMatchTimer,
+    pauseMatchTimer,
+    resetMatchTimer,
   };
 }

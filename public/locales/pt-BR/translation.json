@@ -82,7 +82,6 @@
       "export_announcement": "Versão de Divulgação",
       "copy_success": "Copiado para a área de transferência!",
       "cancel": "Cancelar",
-
       "confirm": "Confirmar",
       "manage": "Gerenciar",
       "view": "Visualizar",
@@ -90,19 +89,23 @@
       "saving": "Salvando..."
     },
     "select_placeholder": "Selecione...",
-
     "year": "Ano",
     "filters": "Filtros",
     "player": "Jogador",
     "goals": "Gols",
+    "goal": "Gol",
     "assists": "Assistências",
+    "assist": "Assistência",
     "own_goals": "Gols Contra",
+    "own_goal": "Gol Contra",
     "back": "Voltar",
     "draw": "Empate",
     "final_score": "Placar Final",
     "unknown_player": "Jogador Desconhecido",
     "back_to_org": "Voltar para Organização",
     "start": "Iniciar",
+    "pause": "Pausar",
+    "reset": "Resetar",
     "sending": "Enviando...",
     "selected": "{{count}} selecionado(s)",
     "load_more": "Carregar mais",
@@ -380,6 +383,13 @@
     "error": {
       "not_found": "Pelada não encontrada"
     },
+    "timeline": {
+      "title": "Linha do Tempo",
+      "session_timer": "TEMPO TOTAL DA SESSÃO",
+      "match_timer": "TEMPO DA PARTIDA #{{seq}}",
+      "no_events": "Nenhum gol ou assistência registrado ainda.",
+      "match_short": "Part."
+    },
     "attendance": {
       "title": "Presença Semanal",
       "subtitle": "Gerencie o status dos jogadores e finalize a geração dos times.",
@@ -614,7 +624,6 @@
           "success": "Jogadores adicionados com sucesso!"
         }
       },
-
       "stats": {
         "title": "Desempenho Detalhado",
         "sort": {

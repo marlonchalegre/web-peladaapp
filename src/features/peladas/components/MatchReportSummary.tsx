@@ -114,7 +114,11 @@ export default function MatchReportSummary({
         sx={{ minHeight: 24 }}
       >
         {h.goals > 0 && (
-          <Stack direction="row" alignItems="center" sx={{ color: "success.main" }}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            sx={{ color: "success.main" }}
+          >
             <SportsSoccerIcon sx={{ fontSize: 18 }} />
             {h.goals > 1 && (
               <Typography
@@ -127,7 +131,11 @@ export default function MatchReportSummary({
           </Stack>
         )}
         {h.assists > 0 && (
-          <Stack direction="row" alignItems="center" sx={{ color: "info.main" }}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            sx={{ color: "info.main" }}
+          >
             <AssistWalkerIcon sx={{ fontSize: 18 }} />
             {h.assists > 1 && (
               <Typography
@@ -140,7 +148,11 @@ export default function MatchReportSummary({
           </Stack>
         )}
         {h.ownGoals > 0 && (
-          <Stack direction="row" alignItems="center" sx={{ color: "error.main" }}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            sx={{ color: "error.main" }}
+          >
             <GavelIcon sx={{ fontSize: 18 }} />
             {h.ownGoals > 1 && (
               <Typography
@@ -228,7 +240,10 @@ export default function MatchReportSummary({
             }}
           >
             <Box sx={{ textAlign: "center", flex: 1 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+              <Typography
+                variant="subtitle1"
+                sx={{ fontWeight: "bold", mb: 1 }}
+              >
                 {homeTeamName}
               </Typography>
               {homeWinner && <EmojiEventsIcon color="warning" />}
@@ -247,7 +262,10 @@ export default function MatchReportSummary({
             </Box>
 
             <Box sx={{ textAlign: "center", flex: 1 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: "bold", mb: 1 }}>
+              <Typography
+                variant="subtitle1"
+                sx={{ fontWeight: "bold", mb: 1 }}
+              >
                 {awayTeamName}
               </Typography>
               {awayWinner && <EmojiEventsIcon color="warning" />}

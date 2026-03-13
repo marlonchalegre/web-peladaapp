@@ -1,15 +1,18 @@
 import { ApiClient } from "./client";
 
-export type Organization = { id: number; name: string };
-export type User = {
+export interface Organization {
+  id: number;
+  name: string;
+}
+export interface User {
   id: number;
   name: string;
   username: string;
   email?: string;
   admin_orgs?: number[];
   position?: string;
-};
-export type Player = {
+}
+export interface Player {
   id: number;
   user_id: number;
   organization_id: number;
@@ -18,8 +21,8 @@ export type Player = {
   user_name?: string;
   user_username?: string;
   user_email?: string;
-};
-export type OrganizationAdmin = {
+}
+export interface OrganizationAdmin {
   id: number;
   organization_id: number;
   user_id: number;
@@ -28,8 +31,11 @@ export type OrganizationAdmin = {
   user_email?: string;
   organization_name?: string;
   created_at?: string;
-};
-export type Pelada = {
+}
+
+export type TimerStatus = "stopped" | "running" | "paused";
+
+export interface Pelada {
   id: number;
   organization_id: number;
   organization_name?: string;
@@ -44,15 +50,22 @@ export type Pelada = {
   closed_at?: string | null;
   is_admin?: boolean;
   has_schedule_plan?: boolean;
-};
+  timer_started_at?: string | null;
+  timer_accumulated_ms?: number | null;
+  timer_status?: TimerStatus | null;
+}
 
-export type Team = { id: number; pelada_id: number; name: string };
-export type TeamPlayer = {
+export interface Team {
+  id: number;
+  pelada_id: number;
+  name: string;
+}
+export interface TeamPlayer {
   team_id: number;
   player_id: number;
   is_goalkeeper?: boolean;
-};
-export type Match = {
+}
+export interface Match {
   id: number;
   pelada_id: number;
   sequence: number;
@@ -61,37 +74,42 @@ export type Match = {
   away_team_id: number;
   home_score: number;
   away_score: number;
-};
+  timer_started_at?: string | null;
+  timer_accumulated_ms?: number | null;
+  timer_status?: TimerStatus | null;
+}
 export type MatchEventType = "assist" | "goal" | "own_goal";
-export type MatchEvent = {
+export interface MatchEvent {
   id: number;
   match_id: number;
   player_id: number;
   event_type: MatchEventType;
   created_at?: string;
-};
-export type PlayerStats = {
+  session_time_ms?: number | null;
+  match_time_ms?: number | null;
+}
+export interface PlayerStats {
   player_id: number;
   user_id: number;
   name: string;
   goals: number;
   assists: number;
   own_goals: number;
-};
-export type OrganizationPlayerStats = {
+}
+export interface OrganizationPlayerStats {
   player_id: number;
   player_name: string;
   peladas_played: number;
   goal: number;
   assist: number;
   own_goal: number;
-};
-export type MatchLineupEntry = {
+}
+export interface MatchLineupEntry {
   team_id: number;
   player_id: number;
   is_goalkeeper?: boolean;
-};
-export type PeladaDashboardDataResponse = {
+}
+export interface PeladaDashboardDataResponse {
   pelada: Pelada;
   matches: Match[];
   teams: Team[];
@@ -101,8 +119,8 @@ export type PeladaDashboardDataResponse = {
   player_stats: PlayerStats[] | null;
   team_players_map: Record<number, TeamPlayer[]>;
   match_lineups_map: Record<number, Record<number, MatchLineupEntry[]>>;
-};
-export type VotingInfo = {
+}
+export interface VotingInfo {
   can_vote: boolean;
   has_voted: boolean;
   eligible_players: {
@@ -116,9 +134,9 @@ export type VotingInfo = {
   current_votes?: { target_id: number; stars: number }[];
   voter_player_id?: number | null;
   message?: string;
-};
+}
 
-export type PlayerResult = {
+export interface PlayerResult {
   player_id: number;
   name: string;
   position?: string;
@@ -126,9 +144,9 @@ export type PlayerResult = {
   goals: number;
   assists: number;
   own_goals: number;
-};
+}
 
-export type VotingResults = {
+export interface VotingResults {
   mvp: PlayerResult[];
   striker: PlayerResult[];
   garcom: PlayerResult[];
@@ -141,9 +159,9 @@ export type VotingResults = {
   total_voted: number;
   organization_id?: number;
   organization_name?: string;
-};
+}
 
-export type VotingStatus = {
+export interface VotingStatus {
   voters: {
     player_id: number;
     name: string;
@@ -151,24 +169,26 @@ export type VotingStatus = {
   }[];
   total_eligible: number;
   total_voted: number;
-};
+}
 
-export type BatchVotePayload = {
+export interface BatchVotePayload {
   voter_id: number;
   votes: { target_id: number; stars: number }[];
-};
-export type BatchVoteResponse = { votes_cast: number };
+}
+export interface BatchVoteResponse {
+  votes_cast: number;
+}
 
 export type AttendanceStatus = "confirmed" | "declined" | "pending";
-export type Attendance = {
+export interface Attendance {
   id: number;
   pelada_id: number;
   player_id: number;
   status: AttendanceStatus;
   player: Player & { user: User };
-};
+}
 
-export type OrganizationInvitation = {
+export interface OrganizationInvitation {
   id: number;
   organization_id: number;
   organization_name?: string;
@@ -176,9 +196,9 @@ export type OrganizationInvitation = {
   token: string;
   status: "pending" | "accepted" | "rejected";
   created_at: string;
-};
+}
 
-export type PeladaFullDetailsResponse = {
+export interface PeladaFullDetailsResponse {
   pelada: Pelada;
   teams: (Team & {
     players: (Player & { user: User; is_goalkeeper?: boolean })[];
@@ -192,15 +212,15 @@ export type PeladaFullDetailsResponse = {
   users_map: Record<number, User>;
   org_players_map: Record<number, Player>;
   voting_info: VotingInfo | null;
-};
+}
 
-export type PaginatedResponse<T> = {
+export interface PaginatedResponse<T> {
   data: T[];
   total: number;
   page: number;
   perPage: number;
   totalPages: number;
-};
+}
 
 export function createApi(client: ApiClient) {
   return {
@@ -313,6 +333,13 @@ export function createApi(client: ApiClient) {
     closeAttendance: (id: number) =>
       client.post<Pelada>(`/api/peladas/${id}/close-attendance`),
 
+    startPeladaTimer: (id: number) =>
+      client.post<Pelada>(`/api/peladas/${id}/timer/start`, {}),
+    pausePeladaTimer: (id: number) =>
+      client.post<Pelada>(`/api/peladas/${id}/timer/pause`, {}),
+    resetPeladaTimer: (id: number) =>
+      client.post<Pelada>(`/api/peladas/${id}/timer/reset`, {}),
+
     // Schedule
     getSchedulePreview: (id: number, matchesPerTeam: number) =>
       client.get<{
@@ -367,14 +394,25 @@ export function createApi(client: ApiClient) {
         away_score: away,
         status,
       }),
+    startMatchTimer: (id: number) =>
+      client.post<Match>(`/api/matches/${id}/timer/start`, {}),
+    pauseMatchTimer: (id: number) =>
+      client.post<Match>(`/api/matches/${id}/timer/pause`, {}),
+    resetMatchTimer: (id: number) =>
+      client.post<Match>(`/api/matches/${id}/timer/reset`, {}),
+
     createMatchEvent: (
       id: number,
       playerId: number,
       eventType: MatchEventType,
+      sessionTimeMs?: number,
+      matchTimeMs?: number,
     ) =>
       client.post(`/api/matches/${id}/events`, {
         player_id: playerId,
         event_type: eventType,
+        session_time_ms: sessionTimeMs,
+        match_time_ms: matchTimeMs,
       }),
     deleteMatchEvent: (
       id: number,

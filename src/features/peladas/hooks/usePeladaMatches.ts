@@ -49,7 +49,7 @@ export function usePeladaMatches(peladaId: number) {
   );
 
   const handleEndMatch = async (matchId: number) => {
-    await actions.endMatch(matchId);
+    await actions.executeEndMatch(matchId);
     setJustFinishedMatchId(matchId);
   };
 
@@ -184,7 +184,7 @@ export function usePeladaMatches(peladaId: number) {
     activeMatchData,
     isPeladaClosed,
     closing: actions.closing,
-    handleClosePelada: () => actions.handleClosePelada(isPeladaClosed),
+    executeClosePelada: actions.executeClosePelada,
     refreshStats: refreshData,
     replacePlayerOnMatchTeam: actions.replacePlayerOnMatchTeam,
     adjustScore: actions.adjustScore,
@@ -195,5 +195,12 @@ export function usePeladaMatches(peladaId: number) {
     setJustFinishedMatchId,
     proceedToNextMatch,
     togglePlayerSort: standingsData.togglePlayerSort,
+    // Timer actions
+    startPeladaTimer: actions.startPeladaTimer,
+    pausePeladaTimer: actions.pausePeladaTimer,
+    resetPeladaTimer: actions.resetPeladaTimer,
+    startMatchTimer: actions.startMatchTimer,
+    pauseMatchTimer: actions.pauseMatchTimer,
+    resetMatchTimer: actions.resetMatchTimer,
   };
 }

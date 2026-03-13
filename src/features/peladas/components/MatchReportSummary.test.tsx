@@ -8,8 +8,10 @@ import type { Match, MatchEvent } from "../../../shared/api/endpoints";
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string, params?: Record<string, unknown>) => {
-      if (key === "peladas.dashboard.summary.title") return `Match #${params?.seq} Summary`;
-      if (key === "peladas.dashboard.summary.next_match_desc") return `Match #${params?.seq} is ready`;
+      if (key === "peladas.dashboard.summary.title")
+        return `Match #${params?.seq} Summary`;
+      if (key === "peladas.dashboard.summary.next_match_desc")
+        return `Match #${params?.seq} is ready`;
       return key;
     },
   }),
@@ -40,7 +42,11 @@ const mockEvents: MatchEvent[] = [
   { id: 4, match_id: 1, player_id: 201, event_type: "own_goal" },
 ];
 
-const mockUserIdToName = { 1: "Player One", 2: "Player Two", 3: "Opponent One" };
+const mockUserIdToName = {
+  1: "Player One",
+  2: "Player Two",
+  3: "Opponent One",
+};
 const mockOrgPlayerIdToUserId = { 101: 1, 102: 2, 201: 3 };
 const mockOrgPlayerIdToTeamId = { 101: 10, 102: 10, 201: 20 };
 const mockTeamNameById = { 10: "Time 4", 20: "Time 2" };
@@ -63,7 +69,7 @@ describe("MatchReportSummary", () => {
         orgPlayerIdToUserId={mockOrgPlayerIdToUserId}
         orgPlayerIdToTeamId={mockOrgPlayerIdToTeamId}
         teamNameById={mockTeamNameById}
-      />
+      />,
     );
 
     expect(screen.getByText("Match #4 Summary")).toBeInTheDocument();
@@ -85,7 +91,7 @@ describe("MatchReportSummary", () => {
         orgPlayerIdToUserId={mockOrgPlayerIdToUserId}
         orgPlayerIdToTeamId={mockOrgPlayerIdToTeamId}
         teamNameById={mockTeamNameById}
-      />
+      />,
     );
 
     expect(screen.getByText("Player One")).toBeInTheDocument();
@@ -95,7 +101,15 @@ describe("MatchReportSummary", () => {
   });
 
   it("shows next match preview when provided", () => {
-    const nextMatch: Match = { ...mockMatch, id: 2, sequence: 5, home_team_id: 20, away_team_id: 30, home_score: 0, away_score: 0 };
+    const nextMatch: Match = {
+      ...mockMatch,
+      id: 2,
+      sequence: 5,
+      home_team_id: 20,
+      away_team_id: 30,
+      home_score: 0,
+      away_score: 0,
+    };
     const extendedTeamNames = { ...mockTeamNameById, 30: "Time 3" };
 
     renderWithTheme(
@@ -112,10 +126,12 @@ describe("MatchReportSummary", () => {
         teamNameById={extendedTeamNames}
         nextMatch={nextMatch}
         onProceedToNext={vi.fn()}
-      />
+      />,
     );
 
-    expect(screen.getByText("peladas.dashboard.summary.next_up")).toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.dashboard.summary.next_up"),
+    ).toBeInTheDocument();
     expect(screen.getByTestId("next-home-team")).toHaveTextContent("Time 2");
     expect(screen.getByTestId("next-away-team")).toHaveTextContent("Time 3");
     expect(screen.getByText("Match #5 is ready")).toBeInTheDocument();
@@ -139,7 +155,7 @@ describe("MatchReportSummary", () => {
         teamNameById={mockTeamNameById}
         nextMatch={nextMatch}
         onProceedToNext={onProceed}
-      />
+      />,
     );
 
     const nextBtn = screen.getByText("peladas.dashboard.summary.go_to_next");

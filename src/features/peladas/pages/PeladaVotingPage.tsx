@@ -370,7 +370,7 @@ export default function PeladaVotingPage() {
               variant="contained"
               onClick={handleSubmit}
               disabled={!allVotesComplete || submitting}
-              data-testid="submit-votes-button"
+              data-testid="save-votes-button"
               fullWidth
               sx={{ fontWeight: "bold" }}
             >

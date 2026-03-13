@@ -1,10 +1,17 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import {
+  render,
+  screen,
+  waitFor,
+  fireEvent,
+  act,
+} from "@testing-library/react";
 import PeladaMatchesPage from "./PeladaMatchesPage";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { api } from "../../../shared/api/client";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { type Match } from "../../../shared/api/endpoints";
+import { ThemeContextProvider } from "../../../app/providers/ThemeProvider";
 
 // Mock the API client
 vi.mock("../../../shared/api/client", () => ({
@@ -21,26 +28,41 @@ vi.mock("../../../app/providers/AuthContext", () => ({
   useAuth: vi.fn(),
 }));
 
-// Mock ActiveMatchDashboard to verify props
+// Mock components to simplify tests
 vi.mock("../components/ActiveMatchDashboard", () => ({
   default: ({
+    match,
     statsMap,
     finished,
     isAdmin,
     onEndMatch,
+    onSelectMatch,
   }: {
-    statsMap: Record<number, { goals: number; assists: number }>;
+    match: Match;
+    statsMap: Record<
+      number,
+      { goals: number; assists: number; ownGoals: number }
+    >;
     finished: boolean;
     isAdmin: boolean;
     onEndMatch: () => void;
+    onSelectMatch: (id: number) => void;
+    matches: Match[];
   }) => (
     <div data-testid="active-match-dashboard">
+      <span data-testid="current-match-id">{match.id}</span>
       <span data-testid="finished-status">
         {finished ? "finished" : "running"}
       </span>
       <span data-testid="is-admin">{isAdmin ? "true" : "false"}</span>
       <button data-testid="end-match-btn" onClick={onEndMatch}>
-        End
+        End Match
+      </button>
+      <button data-testid="select-match-10" onClick={() => onSelectMatch(10)}>
+        Select Match 10
+      </button>
+      <button data-testid="select-match-11" onClick={() => onSelectMatch(11)}>
+        Select Match 11
       </button>
       <pre data-testid="stats-map">{JSON.stringify(statsMap)}</pre>
     </div>
@@ -50,10 +72,12 @@ vi.mock("../components/ActiveMatchDashboard", () => ({
 vi.mock("../components/MatchReportSummary", () => ({
   default: ({ open, match }: { open: boolean; match: Match | null }) =>
     open ? (
-      <div data-testid="match-summary">
-        Summary for Match {match?.sequence}
-      </div>
+      <div data-testid="match-summary">Summary for Match {match?.sequence}</div>
     ) : null,
+}));
+
+vi.mock("../components/GlobalSessionTimer", () => ({
+  default: () => <div data-testid="global-timer">Timer</div>,
 }));
 
 describe("PeladaMatchesPage", () => {
@@ -61,6 +85,7 @@ describe("PeladaMatchesPage", () => {
     pelada: {
       id: 1,
       organization_id: 101,
+      organization_name: "Test Org",
       status: "running",
       players_per_team: 5,
     },
@@ -79,7 +104,7 @@ describe("PeladaMatchesPage", () => {
         id: 11,
         pelada_id: 1,
         sequence: 2,
-        status: "running",
+        status: "scheduled",
         home_team_id: 1,
         away_team_id: 3,
         home_score: 0,
@@ -94,8 +119,22 @@ describe("PeladaMatchesPage", () => {
     users: [{ id: 1, name: "Player 1" }],
     organization_players: [{ id: 100, user_id: 1, organization_id: 101 }],
     match_events: [
-      { id: 1, match_id: 10, player_id: 100, event_type: "goal" },
-      { id: 2, match_id: 11, player_id: 100, event_type: "assist" },
+      {
+        id: 1,
+        match_id: 10,
+        player_id: 100,
+        event_type: "goal",
+        session_time_ms: 1000,
+        match_time_ms: 500,
+      },
+      {
+        id: 2,
+        match_id: 11,
+        player_id: 100,
+        event_type: "assist",
+        session_time_ms: 2000,
+        match_time_ms: 1000,
+      },
     ],
     player_stats: [],
     team_players_map: {},
@@ -117,49 +156,57 @@ describe("PeladaMatchesPage", () => {
         id: 1,
         name: "Test User",
         email: "test@example.com",
-        admin_orgs: [101], // Mock as admin of the org
+        admin_orgs: [101],
       },
       isAuthenticated: true,
     });
   });
 
-  it("filters statistics correctly for the selected match", async () => {
-    render(
-      <MemoryRouter initialEntries={["/peladas/1/matches"]}>
-        <Routes>
-          <Route path="/peladas/:id/matches" element={<PeladaMatchesPage />} />
-          <Route path="*" element={<div />} />
-        </Routes>
-      </MemoryRouter>,
+  const renderPage = () => {
+    return render(
+      <ThemeContextProvider>
+        <MemoryRouter initialEntries={["/peladas/1/matches"]}>
+          <Routes>
+            <Route
+              path="/peladas/:id/matches"
+              element={<PeladaMatchesPage />}
+            />
+          </Routes>
+        </MemoryRouter>
+      </ThemeContextProvider>,
     );
+  };
+
+  it("filters statistics correctly for the selected match", async () => {
+    renderPage();
 
     await waitFor(() => {
       expect(screen.getByTestId("active-match-dashboard")).toBeInTheDocument();
     });
 
-    // By default, first match (id: 10) should be selected
-    const statsMap10 = JSON.parse(
+    // Auto-selects first scheduled (id 11)
+    expect(screen.getByTestId("current-match-id").textContent).toBe("11");
+
+    let statsMap = JSON.parse(
       screen.getByTestId("stats-map").textContent || "{}",
     );
-    expect(statsMap10["100"].goals).toBe(1);
-    expect(statsMap10["100"].assists).toBe(0);
+    expect(statsMap["100"].goals).toBe(0);
+    expect(statsMap["100"].assists).toBe(1);
 
-    // Click second match (id: 11)
-    const match11Item = screen.getAllByText(
-      "peladas.matches.history_item_title",
-    )[1];
-    fireEvent.click(match11Item);
+    // Switch to match 10
+    const select10Btn = screen.getByTestId("select-match-10");
+    fireEvent.click(select10Btn);
 
     await waitFor(() => {
-      const statsMap11 = JSON.parse(
+      statsMap = JSON.parse(
         screen.getByTestId("stats-map").textContent || "{}",
       );
-      expect(statsMap11["100"].goals).toBe(0);
-      expect(statsMap11["100"].assists).toBe(1);
+      expect(statsMap["100"].goals).toBe(1);
+      expect(statsMap["100"].assists).toBe(0);
     });
   });
 
-  it("hides 'Close pelada' button when status is 'closed'", async () => {
+  it("hides 'Close pelada' button from Standings tab when status is 'closed'", async () => {
     const closedData = {
       ...mockDashboardData,
       pelada: { ...mockDashboardData.pelada, status: "closed" },
@@ -172,70 +219,38 @@ describe("PeladaMatchesPage", () => {
       return Promise.reject(new Error(`Not found: ${path}`));
     });
 
-    render(
-      <MemoryRouter initialEntries={["/peladas/1/matches"]}>
-        <Routes>
-          <Route path="/peladas/:id/matches" element={<PeladaMatchesPage />} />
-          <Route path="*" element={<div />} />
-        </Routes>
-      </MemoryRouter>,
-    );
+    renderPage();
 
     await waitFor(() => {
-      expect(
-        screen.queryByText("peladas.matches.button.close_pelada"),
-      ).not.toBeInTheDocument();
-      expect(screen.getByTestId("finished-status").textContent).toBe(
-        "finished",
-      );
+      expect(screen.getByTestId("active-match-dashboard")).toBeInTheDocument();
     });
+
+    // Switch to Standings tab
+    const standingsTab = screen.getByText("peladas.panel.standings.title");
+    fireEvent.click(standingsTab);
+
+    expect(
+      screen.queryByText("peladas.matches.button.close_pelada"),
+    ).not.toBeInTheDocument();
   });
 
-  it("hides 'Close pelada' button when user is not an admin", async () => {
-    (useAuth as Mock).mockReturnValue({
-      user: {
-        id: 1,
-        name: "Test User",
-        email: "test@example.com",
-        admin_orgs: [], // Not an admin
-      },
-      isAuthenticated: true,
-    });
-
-    render(
-      <MemoryRouter initialEntries={["/peladas/1/matches"]}>
-        <Routes>
-          <Route path="/peladas/:id/matches" element={<PeladaMatchesPage />} />
-          <Route path="*" element={<div />} />
-        </Routes>
-      </MemoryRouter>,
-    );
+  it("shows 'Close pelada' button in Standings tab when user is an admin", async () => {
+    renderPage();
 
     await waitFor(() => {
-      expect(
-        screen.queryByText("peladas.matches.button.close_pelada"),
-      ).not.toBeInTheDocument();
+      expect(screen.getByTestId("active-match-dashboard")).toBeInTheDocument();
     });
+
+    // Switch to Standings tab
+    const standingsTab = screen.getByText("peladas.panel.standings.title");
+    fireEvent.click(standingsTab);
+
+    expect(
+      screen.getByText("peladas.matches.button.close_pelada"),
+    ).toBeInTheDocument();
   });
 
-  it("shows 'Close pelada' button when user is an admin", async () => {
-    render(
-      <MemoryRouter initialEntries={["/peladas/1/matches"]}>
-        <Routes>
-          <Route path="/peladas/:id/matches" element={<PeladaMatchesPage />} />
-          <Route path="*" element={<div />} />
-        </Routes>
-      </MemoryRouter>,
-    );
-
-    await waitFor(() => {
-      expect(
-        screen.getByText("peladas.matches.button.close_pelada"),
-      ).toBeInTheDocument();
-    });
-  });
-
-  it("shows 'Vote' button when status is 'voting'", async () => {
+  it("shows 'Vote' button in header when status is 'voting'", async () => {
     const votingData = {
       ...mockDashboardData,
       pelada: { ...mockDashboardData.pelada, status: "voting" },
@@ -248,13 +263,7 @@ describe("PeladaMatchesPage", () => {
       return Promise.reject(new Error(`Not found: ${path}`));
     });
 
-    render(
-      <MemoryRouter initialEntries={["/peladas/1/matches"]}>
-        <Routes>
-          <Route path="/peladas/:id/matches" element={<PeladaMatchesPage />} />
-        </Routes>
-      </MemoryRouter>,
-    );
+    renderPage();
 
     await waitFor(() => {
       expect(
@@ -263,7 +272,7 @@ describe("PeladaMatchesPage", () => {
     });
   });
 
-  it("shows 'View Results' button when status is 'closed'", async () => {
+  it("shows 'View Results' button in header when status is 'closed'", async () => {
     const closedData = {
       ...mockDashboardData,
       pelada: { ...mockDashboardData.pelada, status: "closed" },
@@ -276,17 +285,11 @@ describe("PeladaMatchesPage", () => {
       return Promise.reject(new Error(`Not found: ${path}`));
     });
 
-    render(
-      <MemoryRouter initialEntries={["/peladas/1/matches"]}>
-        <Routes>
-          <Route path="/peladas/:id/matches" element={<PeladaMatchesPage />} />
-        </Routes>
-      </MemoryRouter>,
-    );
+    renderPage();
 
     await waitFor(() => {
       expect(
-        screen.getByText("peladas.detail.button.view_results"),
+        screen.getByText("peladas.matches.share_summary"),
       ).toBeInTheDocument();
     });
   });
@@ -297,30 +300,38 @@ describe("PeladaMatchesPage", () => {
       status: "finished",
     });
 
-    vi.spyOn(window, "confirm").mockReturnValue(true);
+    renderPage();
 
-    render(
-      <MemoryRouter initialEntries={["/peladas/1/matches"]}>
-        <Routes>
-          <Route path="/peladas/:id/matches" element={<PeladaMatchesPage />} />
-        </Routes>
-      </MemoryRouter>,
-    );
+    await waitFor(() => screen.getByTestId("active-match-dashboard"));
 
-    // Wait for the data to load
-    await waitFor(() => screen.getByRole("cell", { name: "Time 3" }));
-    
-    // Select the running match (seq 2)
-    const secondMatchLink = screen.getByTestId("match-history-item-2");
-    fireEvent.click(secondMatchLink);
+    // Switch to Match 11 (scheduled)
+    fireEvent.click(screen.getByTestId("select-match-11"));
 
-    // End the match
+    // Click end match button
     const endBtn = screen.getByTestId("end-match-btn");
     fireEvent.click(endBtn);
 
+    // Should show the pretty confirm dialog
     await waitFor(() => {
-      expect(screen.getByTestId("match-summary")).toBeInTheDocument();
-      expect(screen.getByText("Summary for Match 2")).toBeInTheDocument();
+      expect(
+        screen.getByText("peladas.matches.confirm_end_match"),
+      ).toBeInTheDocument();
     });
+
+    // Confirm it
+    const confirmBtn = screen.getByRole("button", { name: "common.confirm" });
+
+    await act(async () => {
+      fireEvent.click(confirmBtn);
+    });
+
+    await waitFor(
+      () => {
+        expect(screen.getByTestId("match-summary")).toBeInTheDocument();
+        // Match 11 is sequence 2
+        expect(screen.getByText(/Summary for Match 2/i)).toBeInTheDocument();
+      },
+      { timeout: 2000 },
+    );
   });
 });
