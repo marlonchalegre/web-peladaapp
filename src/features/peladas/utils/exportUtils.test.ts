@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { generateExportText, generateAnnouncementText, type PlayerWithUser } from "./exportUtils";
+import {
+  generateExportText,
+  generateAnnouncementText,
+  type PlayerWithUser,
+} from "./exportUtils";
 import { type Team, type User } from "../../../shared/api/endpoints";
 
 describe("exportUtils", () => {
@@ -22,9 +26,25 @@ describe("exportUtils", () => {
   };
 
   const mockPlayers: Record<number, PlayerWithUser[]> = {
-    1: [{ id: 1, user_id: 101, user: mockUser1, grade: 8.5, organization_id: 1, is_goalkeeper: false }],
+    1: [
+      {
+        id: 1,
+        user_id: 101,
+        user: mockUser1,
+        grade: 8.5,
+        organization_id: 1,
+        is_goalkeeper: false,
+      },
+    ],
     2: [
-      { id: 2, user_id: 102, user: mockUser2, grade: 7.0, is_goalkeeper: true, organization_id: 1 },
+      {
+        id: 2,
+        user_id: 102,
+        user: mockUser2,
+        grade: 7.0,
+        is_goalkeeper: true,
+        organization_id: 1,
+      },
     ],
   };
 
@@ -60,4 +80,5 @@ describe("exportUtils", () => {
       expect(result).not.toContain("8.5");
       expect(result).not.toContain("7.0");
     });
-  });});
+  });
+});

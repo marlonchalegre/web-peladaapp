@@ -190,12 +190,9 @@ export default function PeladaMatchesPage() {
               username: orgPlayer.user_username || "",
               email: orgPlayer.user_email || "",
               position: orgPlayer.position_id
-                ? [
-                    "goalkeeper",
-                    "defender",
-                    "midfielder",
-                    "striker",
-                  ][orgPlayer.position_id - 1]
+                ? ["goalkeeper", "defender", "midfielder", "striker"][
+                    orgPlayer.position_id - 1
+                  ]
                 : undefined,
             },
           } as PlayerWithUser;

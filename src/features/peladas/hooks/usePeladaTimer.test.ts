@@ -14,12 +14,12 @@ describe("usePeladaTimer", () => {
   it("should calculate elapsed time when running", () => {
     const baseTime = 1000000;
     vi.setSystemTime(baseTime);
-    
+
     // startedAt was 5s ago
     const startedAt = new Date(baseTime - 5000).toISOString();
-    
-    const { result } = renderHook(
-      () => usePeladaTimer(startedAt, 0, "running", false)
+
+    const { result } = renderHook(() =>
+      usePeladaTimer(startedAt, 0, "running", false),
     );
 
     // After first render and effect, it should pick up the time
@@ -31,14 +31,14 @@ describe("usePeladaTimer", () => {
     // It might not be exactly 5000 if effect haven't run yet, but let's check
     // If it's still 0, we need to wait for another tick
     if (result.current.elapsedMs === 0) {
-       act(() => {
-         vi.advanceTimersByTime(100);
-         vi.setSystemTime(baseTime + 200);
-       });
+      act(() => {
+        vi.advanceTimersByTime(100);
+        vi.setSystemTime(baseTime + 200);
+      });
     }
 
     expect(result.current.elapsedMs).toBeGreaterThanOrEqual(5000);
-    
+
     const current = result.current.elapsedMs;
     act(() => {
       vi.advanceTimersByTime(1000);
