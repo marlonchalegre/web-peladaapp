@@ -173,6 +173,7 @@ export function usePeladaMatches(peladaId: number) {
       for (const t of teams) m[t.id] = t.name;
       return m;
     }, [teams]),
+    teams,
     currentMatchStats,
     allOrgPlayers: useMemo(
       () => Object.values(orgPlayerIdToPlayer),

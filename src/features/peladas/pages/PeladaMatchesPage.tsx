@@ -31,6 +31,10 @@ import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import HistoryIcon from "@mui/icons-material/History";
 import StopIcon from "@mui/icons-material/Stop";
 import { formatPeladaSummary } from "../utils/formatSummary";
+import {
+  generateExportText,
+  generateAnnouncementText,
+} from "../utils/exportUtils";
 import GlobalSessionTimer from "../components/GlobalSessionTimer";
 import { usePeladaTimer } from "../hooks/usePeladaTimer";
 import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
@@ -82,6 +86,8 @@ export default function PeladaMatchesPage() {
     playerStats,
     togglePlayerSort,
     teamNameById,
+    teams,
+    teamPlayers,
     // Timers
     justFinishedMatch,
     nextScheduledMatch,
@@ -138,6 +144,27 @@ export default function PeladaMatchesPage() {
     try {
       await navigator.clipboard.writeText(text);
       alert(t("peladas.matches.summary_copied"));
+    } catch (err) {
+      console.error("Error copying to clipboard:", err);
+    }
+  };
+
+  const handleCopyTeams = async () => {
+    // We don't have current scores here easily, but we can pass null or empty record
+    const text = generateExportText(teams, teamPlayers, {});
+    try {
+      await navigator.clipboard.writeText(text);
+      alert(t("common.actions.copy_success"));
+    } catch (err) {
+      console.error("Error copying to clipboard:", err);
+    }
+  };
+
+  const handleCopyAnnouncement = async () => {
+    const text = generateAnnouncementText(teams, teamPlayers);
+    try {
+      await navigator.clipboard.writeText(text);
+      alert(t("common.actions.copy_success"));
     } catch (err) {
       console.error("Error copying to clipboard:", err);
     }
@@ -207,16 +234,36 @@ export default function PeladaMatchesPage() {
             spacing={1}
             sx={{ justifyContent: { xs: "center", sm: "flex-end" } }}
           >
-            {pelada?.status === "closed" && (
-              <Button
-                variant="outlined"
-                startIcon={<ContentCopyIcon />}
-                onClick={handleCopyResults}
-                size="small"
-              >
-                {t("peladas.matches.share_summary")}
-              </Button>
+            {pelada?.status !== "closed" && (
+              <>
+                <Button
+                  variant="outlined"
+                  startIcon={<ContentCopyIcon />}
+                  onClick={handleCopyAnnouncement}
+                  size="small"
+                  title={t("peladas.detail.button.copy_announcement")}
+                >
+                  {t("common.invite")}
+                </Button>
+                <Button
+                  variant="outlined"
+                  startIcon={<ContentCopyIcon />}
+                  onClick={handleCopyTeams}
+                  size="small"
+                  title={t("peladas.detail.button.copy_clipboard")}
+                >
+                  {t("common.teams")}
+                </Button>
+              </>
             )}
+            <Button
+              variant="outlined"
+              startIcon={<ContentCopyIcon />}
+              onClick={handleCopyResults}
+              size="small"
+            >
+              {t("peladas.matches.share_summary")}
+            </Button>
             {pelada?.status === "voting" && (
               <Button
                 variant="contained"
