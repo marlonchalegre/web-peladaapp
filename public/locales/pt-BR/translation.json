@@ -457,8 +457,8 @@
         "vote": "Votar nos Jogadores",
         "change_votes": "Alterar Votos",
         "view_results": "Ver Resultados",
-        "copy_teams": "Copiar Times",
-        "copy_announcement": "Copiar Convite"
+        "copy_teams": "Escalação (Com Notas)",
+        "copy_announcement": "Escalação (Sem Notas)"
       },
       "schedule": {
         "subtitle": "Personalize a sequência e os detalhes das partidas",

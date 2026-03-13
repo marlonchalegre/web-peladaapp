@@ -455,8 +455,8 @@
         "vote": "Vote on Players",
         "change_votes": "Change Votes",
         "view_results": "View Results",
-        "copy_teams": "Copy Teams",
-        "copy_announcement": "Copy Invite"
+        "copy_teams": "Lineup (With Grades)",
+        "copy_announcement": "Lineup (No Grades)"
       }
     },
     "dialog": {
