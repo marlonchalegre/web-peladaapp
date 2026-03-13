@@ -491,6 +491,7 @@ export default function PeladaMatchesPage() {
               <PlayerStatsPanel
                 playerStats={playerStats}
                 onToggleSort={togglePlayerSort}
+                showHighlights={isPeladaClosed}
               />
             </Paper>
           )}

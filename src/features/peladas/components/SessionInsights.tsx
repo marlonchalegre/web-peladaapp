@@ -13,6 +13,7 @@ interface SessionInsightsProps {
   standings: StandingRow[];
   playerStats: PlayerStatRow[];
   onToggleSort: (by: "goals" | "assists") => void;
+  isClosed?: boolean;
   // Timeline props
   events: MatchEvent[];
   matches: Match[];
@@ -48,6 +49,7 @@ export default function SessionInsights({
   standings,
   playerStats,
   onToggleSort,
+  isClosed,
   events,
   matches,
   userIdToName,
@@ -125,6 +127,7 @@ export default function SessionInsights({
         <PlayerStatsPanel
           playerStats={playerStats}
           onToggleSort={onToggleSort}
+          showHighlights={isClosed}
         />
       </CustomTabPanel>
 
