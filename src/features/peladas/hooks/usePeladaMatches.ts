@@ -54,7 +54,9 @@ export function usePeladaMatches(peladaId: number) {
 
     // If no more matches are scheduled or running, stop all timers
     const hasMoreMatches = matchesRef.current.some(
-      (m) => m.id !== matchId && (m.status === "scheduled" || m.status === "running")
+      (m) =>
+        m.id !== matchId &&
+        (m.status === "scheduled" || m.status === "running"),
     );
 
     if (!hasMoreMatches) {
@@ -73,12 +75,12 @@ export function usePeladaMatches(peladaId: number) {
     const nextMatch = matchesRef.current.find((m) => m.status === "scheduled");
     if (nextMatch) {
       setSelectedMatchId(nextMatch.id);
-      
+
       // Auto-start timers
       try {
         // Start match timer
         await actions.startMatchTimer(nextMatch.id);
-        
+
         // Start pelada timer if it's not running
         if (pelada?.timer_status !== "running") {
           await actions.startPeladaTimer();

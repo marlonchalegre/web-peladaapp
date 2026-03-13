@@ -1,7 +1,7 @@
 import type { Player, Team, User } from "../../../shared/api/endpoints";
 import { sortPlayersByPosition } from "./playerUtils";
 
-type PlayerWithUser = Player & { user: User; is_goalkeeper?: boolean };
+export type PlayerWithUser = Player & { user: User; is_goalkeeper?: boolean };
 
 export function generateAvailablePlayersText(
   players: PlayerWithUser[],

@@ -40,6 +40,7 @@ import { formatPeladaSummary } from "../utils/formatSummary";
 import {
   generateExportText,
   generateAnnouncementText,
+  type PlayerWithUser,
 } from "../utils/exportUtils";
 import GlobalSessionTimer from "../components/GlobalSessionTimer";
 import { usePeladaTimer } from "../hooks/usePeladaTimer";
@@ -169,27 +170,37 @@ export default function PeladaMatchesPage() {
   };
 
   const getFullTeamPlayers = () => {
-    const full: Record<number, any[]> = {};
+    const full: Record<number, PlayerWithUser[]> = {};
     for (const [teamId, players] of Object.entries(teamPlayers)) {
-      full[Number(teamId)] = players.map((p) => {
-        const orgPlayer = orgPlayerIdToPlayer[p.player_id];
-        if (!orgPlayer) return null;
-        
-        // Map flat properties from Player to the nested User object expected by exportUtils
-        return {
-          ...orgPlayer,
-          is_goalkeeper: p.is_goalkeeper,
-          user: {
-            id: orgPlayer.user_id,
-            name: orgPlayer.user_name || userIdToName[orgPlayer.user_id] || "Unknown",
-            username: orgPlayer.user_username || "",
-            email: orgPlayer.user_email || "",
-            position: orgPlayer.position_id 
-              ? ["goalkeeper", "defender", "midfielder", "striker"][orgPlayer.position_id - 1]
-              : undefined
-          }
-        };
-      }).filter(Boolean);
+      full[Number(teamId)] = players
+        .map((p) => {
+          const orgPlayer = orgPlayerIdToPlayer[p.player_id];
+          if (!orgPlayer) return null;
+
+          // Map flat properties from Player to the nested User object expected by exportUtils
+          return {
+            ...orgPlayer,
+            is_goalkeeper: p.is_goalkeeper,
+            user: {
+              id: orgPlayer.user_id,
+              name:
+                orgPlayer.user_name ||
+                userIdToName[orgPlayer.user_id] ||
+                "Unknown",
+              username: orgPlayer.user_username || "",
+              email: orgPlayer.user_email || "",
+              position: orgPlayer.position_id
+                ? [
+                    "goalkeeper",
+                    "defender",
+                    "midfielder",
+                    "striker",
+                  ][orgPlayer.position_id - 1]
+                : undefined,
+            },
+          } as PlayerWithUser;
+        })
+        .filter((p): p is PlayerWithUser => p !== null);
     }
     return full;
   };
@@ -278,11 +289,11 @@ export default function PeladaMatchesPage() {
             direction="row"
             spacing={1}
             flexWrap="wrap"
-            sx={{ 
-              flex: 1, 
+            sx={{
+              flex: 1,
               justifyContent: { xs: "center", md: "flex-end" },
               width: { xs: "100%", md: "auto" },
-              gap: 1
+              gap: 1,
             }}
           >
             <Button
@@ -308,7 +319,9 @@ export default function PeladaMatchesPage() {
                 <ListItemIcon>
                   <AssessmentIcon fontSize="small" />
                 </ListItemIcon>
-                <ListItemText>{t("peladas.matches.share_summary")}</ListItemText>
+                <ListItemText>
+                  {t("peladas.matches.share_summary")}
+                </ListItemText>
               </MenuItem>
               {pelada?.status !== "closed" && (
                 <>

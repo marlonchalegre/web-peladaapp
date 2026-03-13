@@ -287,6 +287,9 @@ describe("PeladaMatchesPage", () => {
 
     renderPage();
 
+    await waitFor(() => screen.getByTestId("share-dropdown-button"));
+    fireEvent.click(screen.getByTestId("share-dropdown-button"));
+
     await waitFor(() => {
       expect(
         screen.getByText("peladas.matches.share_summary"),
