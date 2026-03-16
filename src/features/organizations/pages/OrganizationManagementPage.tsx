@@ -55,9 +55,34 @@ export default function OrganizationManagementPage() {
   const orgId = Number(id);
 
   const activeTab = searchParams.get("tab") || "members";
+  const page = parseInt(searchParams.get("page") || "0", 10);
+  const rowsPerPage = parseInt(searchParams.get("limit") || "10", 10);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
-    setSearchParams({ tab: newValue });
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("tab", newValue);
+      // Reset pagination when tab changes
+      next.delete("page");
+      return next;
+    });
+  };
+
+  const handlePageChange = (newPage: number) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("page", newPage.toString());
+      return next;
+    });
+  };
+
+  const handleRowsPerPageChange = (newRowsPerPage: number) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set("limit", newRowsPerPage.toString());
+      next.set("page", "0");
+      return next;
+    });
   };
 
   const {
@@ -88,6 +113,7 @@ export default function OrganizationManagementPage() {
     usersMap,
     playersNotAdmins,
     handleRemovePlayer,
+    handleUpdatePlayer,
     handleRevokeInvitation,
     handleAddAdmin,
     handleRemoveAdmin,
@@ -97,7 +123,7 @@ export default function OrganizationManagementPage() {
     refreshPlayers,
   } = useOrganizationManagement(orgId);
 
-  if (loading) return <Loading message={t("common.loading")} />;
+  if (loading && !org) return <Loading message={t("common.loading")} />;
   if (!org)
     return (
       <Container sx={{ mt: 4 }}>
@@ -187,7 +213,12 @@ export default function OrganizationManagementPage() {
             }}
             onInviteClick={() => setIsInviteOpen(true)}
             onRemovePlayer={handleRemovePlayer}
+            onUpdatePlayer={handleUpdatePlayer}
             actionLoading={actionLoading}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
           />
         </TabPanel>
 

@@ -44,31 +44,34 @@ export function useOrganizationManagement(orgId: number) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [confirmOrgName, setConfirmOrgName] = useState("");
 
-  const fetchData = useCallback(async () => {
-    if (!orgId) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const [o, p, a, i] = await Promise.all([
-        endpoints.getOrganization(orgId),
-        endpoints.listPlayersByOrg(orgId),
-        endpoints.listAdminsByOrganization(orgId),
-        endpoints.listOrganizationInvitations(orgId),
-      ]);
-      setOrg(o);
-      setPlayers(p);
-      setAdmins(a);
-      setInvitations(i);
-    } catch (err) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : t("organizations.error.load_failed");
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
-  }, [orgId, t]);
+  const fetchData = useCallback(
+    async (silent = false) => {
+      if (!orgId) return;
+      if (!silent) setLoading(true);
+      setError(null);
+      try {
+        const [o, p, a, i] = await Promise.all([
+          endpoints.getOrganization(orgId),
+          endpoints.listPlayersByOrg(orgId),
+          endpoints.listAdminsByOrganization(orgId),
+          endpoints.listOrganizationInvitations(orgId),
+        ]);
+        setOrg(o);
+        setPlayers(p);
+        setAdmins(a);
+        setInvitations(i);
+      } catch (err) {
+        const message =
+          err instanceof Error
+            ? err.message
+            : t("organizations.error.load_failed");
+        setError(message);
+      } finally {
+        if (!silent) setLoading(false);
+      }
+    },
+    [orgId, t],
+  );
 
   const refreshPlayers = useCallback(async () => {
     if (!orgId) return;
@@ -91,12 +94,34 @@ export function useOrganizationManagement(orgId: number) {
     setActionLoading(true);
     try {
       await endpoints.deletePlayer(playerId);
-      await fetchData();
+      await fetchData(true);
     } catch (err) {
       const message =
         err instanceof Error
           ? err.message
           : t("organizations.error.delete_failed");
+      setError(message);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleUpdatePlayer = async (
+    playerId: number,
+    payload: Partial<Player>,
+  ) => {
+    setActionLoading(true);
+    try {
+      await endpoints.updatePlayer(playerId, payload);
+      await fetchData(true);
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : t(
+              "organizations.error.update_player_failed",
+              "Failed to update player",
+            );
       setError(message);
     } finally {
       setActionLoading(false);
@@ -117,7 +142,7 @@ export function useOrganizationManagement(orgId: number) {
     setActionLoading(true);
     try {
       await endpoints.revokeInvitation(orgId, invitationId);
-      await fetchData();
+      await fetchData(true);
     } catch (err) {
       const message =
         err instanceof Error
@@ -142,7 +167,7 @@ export function useOrganizationManagement(orgId: number) {
         selectedAdminUserId as number,
       );
       setSelectedAdminUserId("");
-      await fetchData();
+      await fetchData(true);
     } catch (err) {
       const message =
         err instanceof Error
@@ -163,7 +188,7 @@ export function useOrganizationManagement(orgId: number) {
     setActionLoading(true);
     try {
       await endpoints.removeOrganizationAdmin(orgId, userId);
-      await fetchData();
+      await fetchData(true);
     } catch (err) {
       const message =
         err instanceof Error
@@ -186,7 +211,7 @@ export function useOrganizationManagement(orgId: number) {
       );
       setIsAddPlayersOpen(false);
       setSelectedUserIds(new Set());
-      await fetchData();
+      await fetchData(true);
     } catch (err) {
       const message =
         err instanceof Error
@@ -222,7 +247,7 @@ export function useOrganizationManagement(orgId: number) {
         name: result.name,
         isNew: result.is_new_user,
       });
-      await fetchData();
+      await fetchData(true);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       setError(message);
@@ -323,6 +348,7 @@ export function useOrganizationManagement(orgId: number) {
     usersMap,
     playersNotAdmins,
     handleRemovePlayer,
+    handleUpdatePlayer,
     handleRevokeInvitation,
     handleAddAdmin,
     handleRemoveAdmin,

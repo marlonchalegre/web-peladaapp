@@ -149,6 +149,9 @@ export function useAttendance(peladaId: number) {
   const confirmed = sortPlayersByPosition(
     players.filter((p) => p.attendance_status === "confirmed"),
   );
+  const waitlist = sortPlayersByPosition(
+    players.filter((p) => p.attendance_status === "waitlist"),
+  );
   const declined = sortPlayersByPosition(
     players.filter((p) => p.attendance_status === "declined"),
   );
@@ -169,6 +172,7 @@ export function useAttendance(peladaId: number) {
     pelada,
     players,
     confirmed,
+    waitlist,
     declined,
     pending,
     totalPlayers: players.length,

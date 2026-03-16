@@ -13,6 +13,9 @@ import {
   TextField,
   InputAdornment,
   TablePagination,
+  Select,
+  MenuItem,
+  FormControl,
 } from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import EmailIcon from "@mui/icons-material/Email";
@@ -27,7 +30,12 @@ interface MembersSectionProps {
   onAddClick: () => void;
   onInviteClick: () => void;
   onRemovePlayer: (playerId: number) => void;
+  onUpdatePlayer: (playerId: number, payload: Partial<Player>) => void;
   actionLoading: boolean;
+  page: number;
+  rowsPerPage: number;
+  onPageChange: (newPage: number) => void;
+  onRowsPerPageChange: (newRowsPerPage: number) => void;
 }
 
 export default function MembersSection({
@@ -36,12 +44,15 @@ export default function MembersSection({
   onAddClick,
   onInviteClick,
   onRemovePlayer,
+  onUpdatePlayer,
   actionLoading,
+  page,
+  rowsPerPage,
+  onPageChange,
+  onRowsPerPageChange,
 }: MembersSectionProps) {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const filteredPlayers = useMemo(() => {
     return players.filter((player) => {
@@ -60,14 +71,13 @@ export default function MembersSection({
   }, [filteredPlayers, page, rowsPerPage]);
 
   const handleChangePage = (_event: unknown, newPage: number) => {
-    setPage(newPage);
+    onPageChange(newPage);
   };
 
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+    onRowsPerPageChange(parseInt(event.target.value, 10));
   };
 
   return (
@@ -117,7 +127,7 @@ export default function MembersSection({
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
-            setPage(0);
+            onPageChange(0);
           }}
           InputProps={{
             startAdornment: (
@@ -154,7 +164,41 @@ export default function MembersSection({
                   }
                   secondary={t(positionKey)}
                 />
-                <ListItemSecondaryAction>
+                <ListItemSecondaryAction
+                  sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                >
+                  <FormControl
+                    size="small"
+                    variant="standard"
+                    sx={{ minWidth: 120 }}
+                  >
+                    <Select
+                      value={player.member_type || "diarista"}
+                      onChange={(e) =>
+                        onUpdatePlayer(player.id, {
+                          member_type: e.target.value as
+                            | "mensalista"
+                            | "diarista",
+                        })
+                      }
+                      disabled={actionLoading}
+                      disableUnderline
+                      sx={{ fontSize: "0.875rem" }}
+                    >
+                      <MenuItem value="diarista">
+                        {t(
+                          "organizations.management.member_type.diarista",
+                          "Diarista",
+                        )}
+                      </MenuItem>
+                      <MenuItem value="mensalista">
+                        {t(
+                          "organizations.management.member_type.mensalista",
+                          "Mensalista",
+                        )}
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
                   <IconButton
                     edge="end"
                     color="error"

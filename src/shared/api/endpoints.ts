@@ -18,6 +18,7 @@ export interface Player {
   organization_id: number;
   grade?: number | null;
   position_id?: number | null;
+  member_type?: "mensalista" | "diarista";
   user_name?: string;
   user_username?: string;
   user_email?: string;
@@ -181,7 +182,11 @@ export interface BatchVoteResponse {
   votes_cast: number;
 }
 
-export type AttendanceStatus = "confirmed" | "declined" | "pending";
+export type AttendanceStatus =
+  | "confirmed"
+  | "declined"
+  | "pending"
+  | "waitlist";
 export interface Attendance {
   id: number;
   pelada_id: number;

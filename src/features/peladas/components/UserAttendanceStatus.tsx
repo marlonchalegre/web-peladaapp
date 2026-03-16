@@ -30,6 +30,11 @@ export default function UserAttendanceStatus({
     switch (player.attendance_status) {
       case "confirmed":
         return t("peladas.attendance.user_status.confirmed_msg");
+      case "waitlist":
+        return t(
+          "peladas.attendance.user_status.waitlist_msg",
+          "Você está na lista de espera.",
+        );
       case "declined":
         return t("peladas.attendance.user_status.declined_msg");
       default:
@@ -45,7 +50,11 @@ export default function UserAttendanceStatus({
         mb: 4,
         borderRadius: 4,
         bgcolor:
-          player.attendance_status === "declined" ? "grey.800" : "primary.main",
+          player.attendance_status === "declined"
+            ? "grey.800"
+            : player.attendance_status === "waitlist"
+              ? "warning.main"
+              : "primary.main",
         color: "white",
         backgroundImage:
           "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%)",

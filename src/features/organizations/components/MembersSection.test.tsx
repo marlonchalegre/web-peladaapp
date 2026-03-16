@@ -48,7 +48,12 @@ describe("MembersSection", () => {
     onAddClick: vi.fn(),
     onInviteClick: vi.fn(),
     onRemovePlayer: vi.fn(),
+    onUpdatePlayer: vi.fn(),
     actionLoading: false,
+    page: 0,
+    rowsPerPage: 10,
+    onPageChange: vi.fn(),
+    onRowsPerPageChange: vi.fn(),
   };
 
   it("renders the members list with positions", () => {
@@ -90,7 +95,7 @@ describe("MembersSection", () => {
     expect(screen.queryByText("Bob")).toBeNull();
   });
 
-  it("paginates members", () => {
+  it("calls onPageChange when pagination is used", () => {
     // Create many players for pagination
     const manyPlayers = Array.from({ length: 15 }, (_, i) => ({
       id: i + 200,
@@ -112,19 +117,11 @@ describe("MembersSection", () => {
       />,
     );
 
-    // Default rows per page is 10
-    expect(screen.getAllByRole("listitem")).toHaveLength(10);
-
-    // Check if "User 200" is there (first page)
-    expect(screen.getByText("User 200")).toBeDefined();
-
     // Go to next page
     const nextButton = screen.getByTitle("Go to next page");
     fireEvent.click(nextButton);
 
-    // Now should have 5 items
-    expect(screen.getAllByRole("listitem")).toHaveLength(5);
-    expect(screen.getByText("User 210")).toBeDefined();
+    expect(defaultProps.onPageChange).toHaveBeenCalledWith(1);
   });
 
   it("calls onRemovePlayer when delete button is clicked", () => {

@@ -18,6 +18,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import { useAttendance } from "../hooks/useAttendance";
@@ -61,6 +62,7 @@ export default function AttendanceListPage() {
   const {
     pelada,
     confirmed,
+    waitlist,
     declined,
     pending,
     isAdmin,
@@ -205,6 +207,11 @@ export default function AttendanceListPage() {
                 label={`${t("peladas.attendance.status.confirmed")} (${confirmed.length})`}
               />
               <Tab
+                icon={<AccessTimeIcon />}
+                iconPosition="start"
+                label={`${t("peladas.attendance.status.waitlist", "Lista de Espera")} (${waitlist.length})`}
+              />
+              <Tab
                 icon={<HelpOutlineIcon />}
                 iconPosition="start"
                 label={`${t("peladas.attendance.status.pending")} (${pending.length})`}
@@ -223,7 +230,7 @@ export default function AttendanceListPage() {
               count={confirmed.length}
               players={confirmed}
               emptyMessage={t("peladas.attendance.empty.confirmed")}
-              isAdmin={isAdmin}
+              isAdmin={isAnyAdmin}
               currentUserId={currentPlayerAsPlayer?.user_id}
               onUpdate={handleUpdateAttendance}
               updatingPlayers={updatingPlayers}
@@ -232,11 +239,14 @@ export default function AttendanceListPage() {
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={1}>
             <AttendanceListColumn
-              title={t("peladas.attendance.status.pending")}
-              count={pending.length}
-              players={pending}
-              emptyMessage={t("peladas.attendance.empty.pending")}
-              isAdmin={isAdmin}
+              title={t("peladas.attendance.status.waitlist", "Lista de Espera")}
+              count={waitlist.length}
+              players={waitlist}
+              emptyMessage={t(
+                "peladas.attendance.empty.waitlist",
+                "Nenhum jogador na lista de espera",
+              )}
+              isAdmin={isAnyAdmin}
               currentUserId={currentPlayerAsPlayer?.user_id}
               onUpdate={handleUpdateAttendance}
               updatingPlayers={updatingPlayers}
@@ -245,11 +255,24 @@ export default function AttendanceListPage() {
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={2}>
             <AttendanceListColumn
+              title={t("peladas.attendance.status.pending")}
+              count={pending.length}
+              players={pending}
+              emptyMessage={t("peladas.attendance.empty.pending")}
+              isAdmin={isAnyAdmin}
+              currentUserId={currentPlayerAsPlayer?.user_id}
+              onUpdate={handleUpdateAttendance}
+              updatingPlayers={updatingPlayers}
+              hideHeader
+            />
+          </CustomTabPanel>
+          <CustomTabPanel value={tabValue} index={3}>
+            <AttendanceListColumn
               title={t("peladas.attendance.status.declined")}
               count={declined.length}
               players={declined}
               emptyMessage={t("peladas.attendance.empty.declined")}
-              isAdmin={isAdmin}
+              isAdmin={isAnyAdmin}
               currentUserId={currentPlayerAsPlayer?.user_id}
               onUpdate={handleUpdateAttendance}
               updatingPlayers={updatingPlayers}
