@@ -24,17 +24,37 @@ describe("InvitationsList", () => {
 
   const defaultProps = {
     invitations: mockInvitations,
+    publicInviteLink: "http://localhost:3000/join/public-token",
     onRevoke: vi.fn(),
+    onResetLink: vi.fn(),
     onInviteClick: vi.fn(),
     actionLoading: false,
   };
 
-  it("renders list of invitations", () => {
+  it("renders list of invitations (excluding public links from the list)", () => {
     render(<InvitationsList {...defaultProps} />);
     expect(screen.getByText("invitee@test.com")).toBeInTheDocument();
+    // The public link (token-2) should NOT be in the list anymore as it is filtered out
     expect(
-      screen.getByText("organizations.invitation.public_link_label"),
+      screen.queryByText("organizations.invitation.public_link_label"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("renders public invite link when provided", () => {
+    render(<InvitationsList {...defaultProps} />);
+    expect(
+      screen.getByText("organizations.dialog.invite_player.public_link"),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText("http://localhost:3000/join/public-token"),
+    ).toBeInTheDocument();
+  });
+
+  it("calls onResetLink when reset button is clicked", () => {
+    render(<InvitationsList {...defaultProps} />);
+    const resetButton = screen.getByText("common.reset");
+    fireEvent.click(resetButton);
+    expect(defaultProps.onResetLink).toHaveBeenCalled();
   });
 
   it("calls onRevoke when delete button is clicked", () => {

@@ -1,4 +1,5 @@
 import { useParams, useSearchParams } from "react-router-dom";
+import { useState } from "react";
 import {
   Container,
   Typography,
@@ -27,6 +28,7 @@ import WahaConfigSection from "../components/WahaConfigSection";
 import DeleteOrganizationDialog from "../components/DeleteOrganizationDialog";
 import PlayerRatingsContent from "../components/PlayerRatingsContent";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
+import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -59,6 +61,8 @@ export default function OrganizationManagementPage() {
   const activeTab = searchParams.get("tab") || "members";
   const page = parseInt(searchParams.get("page") || "0", 10);
   const rowsPerPage = parseInt(searchParams.get("limit") || "10", 10);
+
+  const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
     setSearchParams((prev) => {
@@ -117,6 +121,7 @@ export default function OrganizationManagementPage() {
     handleRemovePlayer,
     handleUpdatePlayer,
     handleRevokeInvitation,
+    handleResetInviteLink,
     handleAddAdmin,
     handleRemoveAdmin,
     handleAddPlayers,
@@ -233,20 +238,6 @@ export default function OrganizationManagementPage() {
             data-testid="mgmt-tab-invitations"
           />
           <Tab
-            icon={<SettingsIcon />}
-            iconPosition="start"
-            label={
-              <Box
-                component="span"
-                sx={{ display: { xs: "none", sm: "inline" } }}
-              >
-                {t("common.actions.manage")}
-              </Box>
-            }
-            value="settings"
-            data-testid="mgmt-tab-settings"
-          />
-          <Tab
             icon={<WhatsAppIcon />}
             iconPosition="start"
             label={
@@ -259,6 +250,20 @@ export default function OrganizationManagementPage() {
             }
             value="waha"
             data-testid="mgmt-tab-waha"
+          />
+          <Tab
+            icon={<SettingsIcon />}
+            iconPosition="start"
+            label={
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
+                {t("common.actions.manage")}
+              </Box>
+            }
+            value="settings"
+            data-testid="mgmt-tab-settings"
           />
         </Tabs>
       </Paper>
@@ -307,16 +312,10 @@ export default function OrganizationManagementPage() {
         <TabPanel value={activeTab} index="invitations">
           <InvitationsList
             invitations={invitations}
+            publicInviteLink={publicInviteLink}
             onRevoke={handleRevokeInvitation}
+            onResetLink={() => setIsResetConfirmOpen(true)}
             onInviteClick={() => setIsInviteOpen(true)}
-            actionLoading={actionLoading}
-          />
-        </TabPanel>
-
-        <TabPanel value={activeTab} index="settings">
-          <DangerZoneSection
-            orgName={org.name}
-            onDeleteClick={() => setIsDeleteDialogOpen(true)}
             actionLoading={actionLoading}
           />
         </TabPanel>
@@ -325,6 +324,14 @@ export default function OrganizationManagementPage() {
           <WahaConfigSection
             organization={org}
             onUpdateSuccess={() => fetchData(true)}
+          />
+        </TabPanel>
+
+        <TabPanel value={activeTab} index="settings">
+          <DangerZoneSection
+            orgName={org.name}
+            onDeleteClick={() => setIsDeleteDialogOpen(true)}
+            actionLoading={actionLoading}
           />
         </TabPanel>
       </Box>
@@ -368,7 +375,24 @@ export default function OrganizationManagementPage() {
         onClearInvited={() => setInvitedUser(null)}
         publicInviteLink={publicInviteLink}
         onFetchPublicLink={fetchInviteLink}
+        onResetPublicLink={() => setIsResetConfirmOpen(true)}
         loading={actionLoading}
+      />
+
+      <PrettyConfirmDialog
+        open={isResetConfirmOpen}
+        onClose={() => setIsResetConfirmOpen(false)}
+        onConfirm={handleResetInviteLink}
+        title={t(
+          "organizations.management.reset_invite_link_title",
+          "Redefinir Link de Convite",
+        )}
+        description={t(
+          "organizations.management.reset_invite_link_confirm",
+          "Tem certeza que deseja redefinir o link de convite? O link atual deixará de funcionar imediatamente.",
+        )}
+        confirmLabel={t("common.reset", "Redefinir")}
+        severity="warning"
       />
     </Container>
   );

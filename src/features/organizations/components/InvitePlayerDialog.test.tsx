@@ -18,6 +18,7 @@ describe("InvitePlayerDialog", () => {
     onClearInvited: vi.fn(),
     publicInviteLink: null,
     onFetchPublicLink: vi.fn().mockResolvedValue(undefined),
+    onResetPublicLink: vi.fn().mockResolvedValue(undefined),
     loading: false,
   };
 
@@ -26,15 +27,17 @@ describe("InvitePlayerDialog", () => {
     expect(
       screen.getByText("organizations.dialog.invite_player.title"),
     ).toBeInTheDocument();
-    // Labels are now common.fields.email and common.fields.name
-    expect(screen.getByLabelText("common.fields.email")).toBeInTheDocument();
-    expect(screen.getByLabelText("common.fields.name")).toBeInTheDocument();
+    // Label is now common.fields.username
+    expect(screen.getByLabelText("common.fields.username")).toBeInTheDocument();
+    expect(
+      screen.queryByLabelText("common.fields.name"),
+    ).not.toBeInTheDocument();
   });
 
   it("calls onInvite when send button is clicked", async () => {
     render(<InvitePlayerDialog {...defaultProps} />);
 
-    const handleInput = screen.getByLabelText("common.fields.email");
+    const handleInput = screen.getByLabelText("common.fields.username");
     fireEvent.change(handleInput, { target: { value: "testuser" } });
 
     const sendButton = screen.getByText(
@@ -42,7 +45,7 @@ describe("InvitePlayerDialog", () => {
     );
     fireEvent.click(sendButton);
 
-    expect(defaultProps.onInvite).toHaveBeenCalledWith("testuser", undefined);
+    expect(defaultProps.onInvite).toHaveBeenCalledWith("testuser");
   });
 
   it("calls onFetchPublicLink when generate link button is clicked", () => {
@@ -54,6 +57,20 @@ describe("InvitePlayerDialog", () => {
     fireEvent.click(generateButton);
 
     expect(defaultProps.onFetchPublicLink).toHaveBeenCalled();
+  });
+
+  it("calls onResetPublicLink when reset button is clicked", () => {
+    render(
+      <InvitePlayerDialog
+        {...defaultProps}
+        publicInviteLink="http://example.com/join/123"
+      />,
+    );
+
+    const resetButton = screen.getByTestId("reset-public-link-button");
+    fireEvent.click(resetButton);
+
+    expect(defaultProps.onResetPublicLink).toHaveBeenCalled();
   });
 
   it("displays public link when provided", () => {

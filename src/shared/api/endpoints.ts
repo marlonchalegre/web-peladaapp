@@ -31,6 +31,7 @@ export interface Player {
   user_name?: string;
   user_username?: string;
   user_email?: string;
+  user_position?: string;
 }
 export interface OrganizationAdmin {
   id: number;
@@ -39,6 +40,7 @@ export interface OrganizationAdmin {
   user_name?: string;
   user_username?: string;
   user_email?: string;
+  user_position?: string;
   organization_name?: string;
   created_at?: string;
 }
@@ -267,6 +269,11 @@ export function createApi(client: ApiClient) {
       ),
     getInviteLink: (id: number) =>
       client.get<{ token: string }>(`/api/organizations/${id}/invite-link`),
+    resetInviteLink: (id: number) =>
+      client.post<{ token: string }>(
+        `/api/organizations/${id}/invite-link/reset`,
+        {},
+      ),
     getOrganizationStatistics: (id: number, year: number) =>
       client.get<OrganizationPlayerStats[]>(
         `/api/organizations/${id}/statistics`,

@@ -251,6 +251,8 @@
     },
     "management": {
       "title": "Gerenciar Organização - {{name}}",
+      "reset_invite_link_title": "Redefinir Link de Convite",
+      "reset_invite_link_confirm": "Tem certeza que deseja redefinir o link de convite? O link atual deixará de funcionar imediatamente.",
       "sections": {
         "invitations": "Convites Ativos",
         "members": "Membros",
@@ -381,7 +383,7 @@
       "invite_player": {
         "title": "Convidar jogador",
         "personal_invite": "Convite Pessoal",
-        "description": "Insira o username ou email do jogador que você deseja convidar para esta organização.",
+        "description": "Insira o username do jogador que você deseja convidar para esta organização.",
         "send_invite": "Enviar convite",
         "public_link": "Link de Convite Público",
         "public_link_description": "Compartilhe este link com qualquer pessoa para permitir que ela entre na organização.",

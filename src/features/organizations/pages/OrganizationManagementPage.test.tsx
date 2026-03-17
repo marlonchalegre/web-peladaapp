@@ -92,6 +92,8 @@ describe("OrganizationManagementPage", () => {
         return Promise.resolve(mockAdmins);
       if (url === "/api/organizations/1/invitations")
         return Promise.resolve([]);
+      if (url === "/api/organizations/1/invite-link")
+        return Promise.resolve({ token: "test-token" });
       return Promise.reject(new Error(`Unhandled GET: ${url}`));
     });
 

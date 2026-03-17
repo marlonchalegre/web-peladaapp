@@ -13,6 +13,7 @@ import {
   Divider,
 } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -24,6 +25,7 @@ type Props = {
   onClearInvited: () => void;
   publicInviteLink: string | null;
   onFetchPublicLink: () => Promise<void>;
+  onResetPublicLink: () => void | Promise<void>;
   loading: boolean;
 };
 
@@ -35,18 +37,17 @@ export default function InvitePlayerDialog({
   onClearInvited,
   publicInviteLink,
   onFetchPublicLink,
+  onResetPublicLink,
   loading,
 }: Props) {
   const { t } = useTranslation();
   const [handle, setHandle] = useState("");
-  const [name, setName] = useState("");
 
   const handleInvite = async () => {
-    if (!handle && !name) return;
+    if (!handle) return;
     try {
-      await onInvite(handle || undefined, name || undefined);
+      await onInvite(handle);
       setHandle("");
-      setName("");
     } catch (err) {
       console.error("[InviteDialog] Invite failed:", err);
     }
@@ -85,26 +86,18 @@ export default function InvitePlayerDialog({
                 <TextField
                   fullWidth
                   size="small"
-                  label={t("common.fields.email")}
+                  label={t("common.fields.username")}
+                  placeholder={t("common.fields.email")}
                   value={handle}
                   onChange={(e) => setHandle(e.target.value)}
                   disabled={loading}
                   autoFocus
                   inputProps={{ "data-testid": "invite-email-input" }}
                 />
-                <TextField
-                  fullWidth
-                  size="small"
-                  label={t("common.fields.name")}
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  disabled={loading}
-                  inputProps={{ "data-testid": "invite-name-input" }}
-                />
                 <Button
                   onClick={handleInvite}
                   variant="contained"
-                  disabled={(!handle && !name) || loading}
+                  disabled={!handle || loading}
                   fullWidth
                   data-testid="send-invite-button"
                 >
@@ -148,6 +141,14 @@ export default function InvitePlayerDialog({
                     data-testid="copy-public-link-button"
                   >
                     <ContentCopyIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    onClick={onResetPublicLink}
+                    disabled={loading}
+                    data-testid="reset-public-link-button"
+                  >
+                    <RefreshIcon fontSize="small" />
                   </IconButton>
                 </Box>
               ) : (

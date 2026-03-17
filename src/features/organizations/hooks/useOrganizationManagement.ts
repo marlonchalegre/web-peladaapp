@@ -44,6 +44,40 @@ export function useOrganizationManagement(orgId: number) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [confirmOrgName, setConfirmOrgName] = useState("");
 
+  const fetchInviteLink = useCallback(
+    async (silent = false) => {
+      if (!silent) setActionLoading(true);
+      try {
+        const { token } = await endpoints.getInviteLink(orgId);
+        setPublicInviteLink(`${window.location.origin}/join/${token}`);
+      } catch (err) {
+        console.error("Failed to fetch invite link", err);
+      } finally {
+        if (!silent) setActionLoading(false);
+      }
+    },
+    [orgId],
+  );
+
+  const handleResetInviteLink = useCallback(async () => {
+    setActionLoading(true);
+    try {
+      const { token } = await endpoints.resetInviteLink(orgId);
+      setPublicInviteLink(`${window.location.origin}/join/${token}`);
+      // Also refresh invitations list to show the new link and that the old one is gone
+      const i = await endpoints.listOrganizationInvitations(orgId);
+      setInvitations(i);
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : t("organizations.error.reset_failed");
+      setError(message);
+    } finally {
+      setActionLoading(false);
+    }
+  }, [orgId, t]);
+
   const fetchData = useCallback(
     async (silent = false) => {
       if (!orgId) return;
@@ -60,6 +94,8 @@ export function useOrganizationManagement(orgId: number) {
         setPlayers(p);
         setAdmins(a);
         setInvitations(i);
+        // Also fetch the public invite link to show it in the invitations tab
+        fetchInviteLink(true);
       } catch (err) {
         const message =
           err instanceof Error
@@ -70,8 +106,12 @@ export function useOrganizationManagement(orgId: number) {
         if (!silent) setLoading(false);
       }
     },
-    [orgId, t],
+    [orgId, t, fetchInviteLink],
   );
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const refreshPlayers = useCallback(async () => {
     if (!orgId) return;
@@ -82,10 +122,6 @@ export function useOrganizationManagement(orgId: number) {
       console.error("Failed to refresh players", err);
     }
   }, [orgId]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
 
   const handleRemovePlayer = async (playerId: number) => {
     if (!window.confirm(t("organizations.management.remove_member_confirm")))
@@ -225,18 +261,6 @@ export function useOrganizationManagement(orgId: number) {
     }
   };
 
-  const fetchInviteLink = useCallback(async () => {
-    setActionLoading(true);
-    try {
-      const { token } = await endpoints.getInviteLink(orgId);
-      setPublicInviteLink(`${window.location.origin}/join/${token}`);
-    } catch (err) {
-      console.error("Failed to fetch invite link", err);
-    } finally {
-      setActionLoading(false);
-    }
-  }, [orgId]);
-
   const handleInvitePlayer = async (email?: string, name?: string) => {
     setActionLoading(true);
     setError(null);
@@ -282,6 +306,7 @@ export function useOrganizationManagement(orgId: number) {
           name: p.user_name,
           username: p.user_username,
           email: p.user_email || "",
+          position: p.user_position,
         });
       }
     });
@@ -294,6 +319,7 @@ export function useOrganizationManagement(orgId: number) {
           name: a.user_name,
           username: a.user_username,
           email: a.user_email || "",
+          position: a.user_position,
         });
       }
     });
@@ -350,6 +376,7 @@ export function useOrganizationManagement(orgId: number) {
     handleRemovePlayer,
     handleUpdatePlayer,
     handleRevokeInvitation,
+    handleResetInviteLink,
     handleAddAdmin,
     handleRemoveAdmin,
     handleAddPlayers,
