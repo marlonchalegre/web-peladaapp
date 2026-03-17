@@ -356,5 +356,6 @@ export function useOrganizationManagement(orgId: number) {
     handleInvitePlayer,
     handleDeleteOrganization,
     refreshPlayers,
+    fetchData,
   };
 }

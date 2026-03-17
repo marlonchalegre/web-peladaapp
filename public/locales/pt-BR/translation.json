@@ -246,7 +246,28 @@
         "invitations": "Convites Ativos",
         "members": "Membros",
         "admins": "Administradores",
-        "danger_zone": "Zona de Perigo"
+        "danger_zone": "Zona de Perigo",
+        "waha": "WhatsApp (WAHA)"
+      },
+      "waha": {
+        "title": "Configuração WhatsApp (WAHA)",
+        "subtitle": "Configure as mensagens automáticas enviadas via WAHA.",
+        "api_url": "API URL",
+        "instance": "Nome da Instância (Session)",
+        "group_id": "ID do Grupo/Chat",
+        "enabled": "Habilitar WAHA",
+        "start_msg_enabled": "Notificar quando a pelada iniciar",
+        "end_msg_enabled": "Notificar quando a pelada encerrar",
+        "attendance_reminder_enabled": "Lembrete de presença (2x ao dia)",
+        "vote_reminder_enabled": "Lembrete de votação (2x ao dia)",
+        "vote_ended_msg_enabled": "Notificar quando a votação encerrar",
+        "save_success": "Configuração salva com sucesso!",
+        "test_connection": "Testar Conexão",
+        "test_success": "Mensagem de teste enviada!",
+        "error": {
+          "save_failed": "Erro ao salvar configuração do WAHA",
+          "test_failed": "Falha ao enviar mensagem de teste"
+        }
       },
       "remove_member_confirm": "Tem certeza que deseja remover este membro da organização?",
       "revoke_invitation_confirm": "Tem certeza que deseja revogar este convite?",

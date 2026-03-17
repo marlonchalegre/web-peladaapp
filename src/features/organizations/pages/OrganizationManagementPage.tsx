@@ -13,6 +13,7 @@ import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import MailIcon from "@mui/icons-material/Mail";
 import StarIcon from "@mui/icons-material/Star";
 import SettingsIcon from "@mui/icons-material/Settings";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import AddPlayersDialog from "../components/AddPlayersDialog";
@@ -22,6 +23,7 @@ import MembersSection from "../components/MembersSection";
 import AdminsSection from "../components/AdminsSection";
 import InvitationsList from "../components/InvitationsList";
 import DangerZoneSection from "../components/DangerZoneSection";
+import WahaConfigSection from "../components/WahaConfigSection";
 import DeleteOrganizationDialog from "../components/DeleteOrganizationDialog";
 import PlayerRatingsContent from "../components/PlayerRatingsContent";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
@@ -121,6 +123,7 @@ export default function OrganizationManagementPage() {
     handleInvitePlayer,
     handleDeleteOrganization,
     refreshPlayers,
+    fetchData,
   } = useOrganizationManagement(orgId);
   if (loading && !org) return <Loading message={t("common.loading")} />;
   if (!org)
@@ -243,6 +246,20 @@ export default function OrganizationManagementPage() {
             value="settings"
             data-testid="mgmt-tab-settings"
           />
+          <Tab
+            icon={<WhatsAppIcon />}
+            iconPosition="start"
+            label={
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
+                {t("organizations.management.sections.waha")}
+              </Box>
+            }
+            value="waha"
+            data-testid="mgmt-tab-waha"
+          />
         </Tabs>
       </Paper>
 
@@ -301,6 +318,13 @@ export default function OrganizationManagementPage() {
             orgName={org.name}
             onDeleteClick={() => setIsDeleteDialogOpen(true)}
             actionLoading={actionLoading}
+          />
+        </TabPanel>
+
+        <TabPanel value={activeTab} index="waha">
+          <WahaConfigSection
+            organization={org}
+            onUpdateSuccess={() => fetchData(true)}
           />
         </TabPanel>
       </Box>

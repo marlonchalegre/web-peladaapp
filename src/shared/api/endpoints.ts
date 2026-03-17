@@ -3,6 +3,15 @@ import { ApiClient } from "./client";
 export interface Organization {
   id: number;
   name: string;
+  waha_api_url?: string | null;
+  waha_instance?: string | null;
+  waha_group_id?: string | null;
+  waha_enabled?: boolean | null;
+  waha_start_msg_enabled?: boolean | null;
+  waha_end_msg_enabled?: boolean | null;
+  waha_attendance_reminder_enabled?: boolean | null;
+  waha_vote_reminder_enabled?: boolean | null;
+  waha_vote_ended_msg_enabled?: boolean | null;
 }
 export interface User {
   id: number;
@@ -54,6 +63,7 @@ export interface Pelada {
   timer_started_at?: string | null;
   timer_accumulated_ms?: number | null;
   timer_status?: TimerStatus | null;
+  vote_ended_message_sent?: boolean;
 }
 
 export interface Team {
@@ -234,6 +244,8 @@ export function createApi(client: ApiClient) {
     // Organizations
     getOrganization: (id: number) =>
       client.get<Organization>(`/api/organizations/${id}`),
+    updateOrganization: (id: number, payload: Partial<Organization>) =>
+      client.put<Organization>(`/api/organizations/${id}`, payload),
     createOrganization: (name: string) =>
       client.post<Organization>("/api/organizations", { name }),
     deleteOrganization: (id: number) =>
@@ -248,6 +260,11 @@ export function createApi(client: ApiClient) {
         is_new_user: boolean;
         organization_id: number;
       }>(`/api/organizations/${id}/invite`, { email, name }),
+    testWaha: (id: number) =>
+      client.post<{ status: string; message: string }>(
+        `/api/organizations/${id}/waha/test`,
+        {},
+      ),
     getInviteLink: (id: number) =>
       client.get<{ token: string }>(`/api/organizations/${id}/invite-link`),
     getOrganizationStatistics: (id: number, year: number) =>

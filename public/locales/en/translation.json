@@ -234,7 +234,28 @@
         "invitations": "Active Invitations",
         "members": "Members",
         "admins": "Administrators",
-        "danger_zone": "Danger Zone"
+        "danger_zone": "Danger Zone",
+        "waha": "WhatsApp (WAHA)"
+      },
+      "waha": {
+        "title": "WhatsApp Configuration (WAHA)",
+        "subtitle": "Configure automated messages sent via WAHA.",
+        "api_url": "API URL",
+        "instance": "Instance Name (Session)",
+        "group_id": "Group/Chat ID",
+        "enabled": "Enable WAHA",
+        "start_msg_enabled": "Notify when pelada starts",
+        "end_msg_enabled": "Notify when pelada ends",
+        "attendance_reminder_enabled": "Attendance reminder (2x daily)",
+        "vote_reminder_enabled": "Voting reminder (2x daily)",
+        "vote_ended_msg_enabled": "Notify when voting ends",
+        "save_success": "Configuration saved successfully!",
+        "test_connection": "Test Connection",
+        "test_success": "Test message sent!",
+        "error": {
+          "save_failed": "Error saving WAHA configuration",
+          "test_failed": "Failed to send test message"
+        }
       },
       "remove_member_confirm": "Are you sure you want to remove this member from the organization?",
       "revoke_invitation_confirm": "Are you sure you want to revoke this invitation?",
