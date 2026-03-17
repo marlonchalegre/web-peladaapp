@@ -144,6 +144,8 @@ Create a `.env` file at the root:
 ```env
 VITE_API_URL=http://localhost:8000/api
 VITE_GOOGLE_ANALYTICS_ID=G-XXXXXXXXXX
+# WAHA Configuration (Optional, usually configured via UI per organization)
+# If using WAHA behind the project's proxy: http://localhost:8080/waha
 ```
 
 In development with Docker, the proxy is configured in `vite.config.ts` to direct `/api` requests to the backend service.
