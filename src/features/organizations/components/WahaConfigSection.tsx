@@ -248,7 +248,12 @@ export default function WahaConfigSection({
 
           <Grid size={{ xs: 12 }}>
             <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
-              <Button type="submit" variant="contained" disabled={loading}>
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={loading}
+                data-testid="waha-save-button"
+              >
                 {loading
                   ? t("common.actions.saving")
                   : t("common.actions.save")}
@@ -257,7 +262,8 @@ export default function WahaConfigSection({
                 variant="outlined"
                 color="secondary"
                 onClick={handleTestConnection}
-                disabled={testLoading || !organization.waha_enabled}
+                disabled={testLoading || !formData.waha_enabled}
+                data-testid="waha-test-connection-button"
               >
                 {testLoading
                   ? t("common.sending")

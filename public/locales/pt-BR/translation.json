@@ -75,36 +75,8 @@
     "add": "Adicionar",
     "close": "Fechar",
     "optional": "Opcional",
-    "actions": {
-      "title": "Ações",
-      "export": "Exportar",
-      "export_text": "Exportar Texto",
-      "export_evaluation": "Versão para Avaliação",
-      "export_announcement": "Versão de Divulgação",
-      "copy_success": "Copiado para a área de transferência!",
-      "cancel": "Cancelar",
-      "confirm": "Confirmar",
-      "manage": "Gerenciar",
-      "view": "Visualizar",
-      "save": "Salvar",
-      "saving": "Salvando..."
-    },
-    "select_placeholder": "Selecione...",
-    "year": "Ano",
-    "filters": "Filtros",
-    "player": "Jogador",
-    "goals": "Gols",
-    "goal": "Gol",
-    "assists": "Assistências",
-    "assist": "Assistência",
-    "own_goals": "Gols Contra",
-    "own_goal": "Gol Contra",
-    "back": "Voltar",
-    "draw": "Empate",
-    "final_score": "Placar Final",
-    "unknown_player": "Jogador Desconhecido",
-    "back_to_org": "Voltar para Organização",
-    "start": "Iniciar",
+    "accept": "Aceitar",
+    "back_to_home": "Voltar para Início",
     "pause": "Pausar",
     "reset": "Resetar",
     "sending": "Enviando...",
@@ -123,6 +95,39 @@
     "goals_conceded_short": "GS",
     "copy_link": "Copiar Link",
     "revoke": "Revogar",
+    "actions": {
+      "title": "Ações",
+      "export": "Exportar",
+      "export_text": "Exportar Texto",
+      "export_evaluation": "Versão para Avaliação",
+      "export_announcement": "Versão de Divulgação",
+      "copy_success": "Copiado para a área de transferência!",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar",
+      "manage": "Gerenciar",
+      "view": "Visualizar",
+      "save": "Salvar",
+      "saving": "Salvando..."
+    },
+    "date": {
+      "tbd": "TBD"
+    },
+    "select_placeholder": "Selecione...",
+    "year": "Ano",
+    "filters": "Filtros",
+    "player": "Jogador",
+    "goals": "Gols",
+    "goal": "Gol",
+    "assists": "Assistências",
+    "assist": "Assistência",
+    "own_goals": "Gols Contra",
+    "own_goal": "Gol Contra",
+    "back": "Voltar",
+    "draw": "Empate",
+    "final_score": "Placar Final",
+    "unknown_player": "Jogador Desconhecido",
+    "back_to_org": "Voltar para Organização",
+    "start": "Iniciar",
     "pagination": {
       "rows_per_page": "Itens por página"
     },
@@ -210,10 +215,14 @@
       "button": {
         "statistics": "ESTATÍSTICAS",
         "ratings": "NOTAS",
-        "management": "GERENCIAMENTO"
+        "management": "GERENCIAMENTO",
+        "leave": "Sair da Organização"
       },
       "section": {
         "new_pelada": "Nova Pelada"
+      },
+      "leave_dialog": {
+        "title": "Sair da Organização"
       },
       "error": {
         "load_failed": "Erro ao carregar organização",
@@ -407,12 +416,14 @@
       }
     },
     "error": {
+      "load_failed": "Erro ao carregar organizações",
       "load_users_failed": "Erro ao carregar usuários",
       "load_admins_failed": "Erro ao carregar administradores",
       "delete_failed": "Erro ao excluir organização",
       "add_admin_failed": "Erro ao adicionar administrador",
       "remove_last_admin": "Não é possível remover o último administrador da organização",
-      "remove_admin_failed": "Erro ao remover administrador"
+      "remove_admin_failed": "Erro ao remover administrador",
+      "add_players_failed": "Erro ao adicionar jogadores"
     }
   },
   "peladas": {
@@ -425,6 +436,11 @@
       "match_timer": "TEMPO DA PARTIDA #{{seq}}",
       "no_events": "Nenhum gol ou assistência registrado ainda.",
       "match_short": "Part."
+    },
+    "available": {
+      "error": {
+        "add_failed": "Erro ao adicionar jogadores"
+      }
     },
     "attendance": {
       "title": "Lista de Presença",
@@ -455,7 +471,8 @@
       "status": {
         "confirmed": "Confirmado",
         "declined": "Recusado",
-        "pending": "Pendente"
+        "pending": "Pendente",
+        "waitlist": "Lista de Espera"
       },
       "empty": {
         "confirmed": "Ninguém confirmado ainda.",
@@ -480,7 +497,8 @@
         "create_team_failed": "Erro ao criar time",
         "delete_team_failed": "Erro ao excluir time",
         "set_goalkeeper_failed": "Erro ao definir goleiro",
-        "remove_player_failed": "Erro ao remover jogador"
+        "remove_player_failed": "Erro ao remover jogador",
+        "update_failed": "Erro ao atualizar pelada"
       },
       "live": {
         "moved_to_bench": "Jogador #{{playerId}} movido para banco",

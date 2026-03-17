@@ -223,7 +223,7 @@ export default function PeladaDetailPage() {
       <PrettyConfirmDialog
         open={confirmStartWithScheduleOpen}
         title={t("common.confirm")}
-        description={t("peladas.detail.dialog.start.confirm")}
+        description={t("peladas.dialog.start.confirm")}
         onConfirm={handleBeginPelada}
         onClose={() => setConfirmStartWithScheduleOpen(false)}
       />

@@ -75,33 +75,10 @@
     "add": "Add",
     "close": "Close",
     "optional": "Optional",
-    "actions": {
-      "title": "Actions",
-      "export": "Export",
-      "export_text": "Export Text",
-      "export_evaluation": "Evaluation Version",
-      "export_announcement": "Announcement Version",
-      "copy_success": "Copied to clipboard!",
-      "cancel": "Cancel",
-
-      "confirm": "Confirm",
-      "manage": "Manage",
-      "view": "View"
-    },
-    "select_placeholder": "Select...",
-
-    "year": "Year",
-    "filters": "Filters",
-    "player": "Player",
-    "goals": "Goals",
-    "assists": "Assists",
-    "own_goals": "Own Goals",
-    "back": "Back",
-    "draw": "Draw",
-    "final_score": "Final Score",
-    "unknown_player": "Unknown Player",
-    "back_to_org": "Back to Organization",
-    "start": "Start",
+    "accept": "Accept",
+    "back_to_home": "Back to Home",
+    "pause": "Pause",
+    "reset": "Reset",
     "sending": "Sending...",
     "selected": "{{count}} selected",
     "load_more": "Load more",
@@ -114,10 +91,43 @@
     "you": "You",
     "organization": "ORGANIZATION",
     "assists_short": "Assists",
-    "own_goals_short": "Own Goals",
+    "own_goals_short": "OG",
     "goals_conceded_short": "GA",
     "copy_link": "Copy Link",
     "revoke": "Revoke",
+    "actions": {
+      "title": "Actions",
+      "export": "Export",
+      "export_text": "Export Text",
+      "export_evaluation": "Evaluation Version",
+      "export_announcement": "Announcement Version",
+      "copy_success": "Copied to clipboard!",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "manage": "Manage",
+      "view": "View",
+      "save": "Save",
+      "saving": "Saving..."
+    },
+    "date": {
+      "tbd": "TBD"
+    },
+    "select_placeholder": "Select...",
+    "year": "Year",
+    "filters": "Filters",
+    "player": "Player",
+    "goals": "Goals",
+    "goal": "Goal",
+    "assists": "Assists",
+    "assist": "Assist",
+    "own_goals": "Own Goals",
+    "own_goal": "Own Goal",
+    "back": "Back",
+    "draw": "Draw",
+    "final_score": "Final Score",
+    "unknown_player": "Unknown Player",
+    "back_to_org": "Back to Organization",
+    "start": "Start",
     "pagination": {
       "rows_per_page": "Rows per page"
     },
@@ -205,10 +215,14 @@
       "button": {
         "statistics": "STATISTICS",
         "ratings": "RATINGS",
-        "management": "MANAGEMENT"
+        "management": "MANAGEMENT",
+        "leave": "Leave Organization"
       },
       "section": {
         "new_pelada": "New Pelada"
+      },
+      "leave_dialog": {
+        "title": "Leave Organization"
       },
       "error": {
         "load_failed": "Error loading organization",
@@ -220,8 +234,15 @@
     "invitation": {
       "join_title": "Join Organization",
       "join_description": "You have been invited to join {{name}}.",
+      "empty": "No active invitations. Click the button above to invite players.",
+      "public_link_label": "Public Invite Link",
       "button": {
         "join": "Join Now"
+      },
+      "status": {
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "rejected": "Rejected"
       },
       "error": {
         "invalid_token": "This invitation link is invalid or has expired.",
@@ -280,24 +301,6 @@
         "player": "Player",
         "current_rating": "Current Rating",
         "actions": "Actions"
-      }
-    },
-    "invitation": {
-      "join_title": "Join Organization",
-      "join_description": "You have been invited to join {{name}}.",
-      "empty": "No active invitations. Click the button above to invite players.",
-      "public_link_label": "Public Invite Link",
-      "button": {
-        "join": "Join Now"
-      },
-      "status": {
-        "pending": "Pending",
-        "accepted": "Accepted",
-        "rejected": "Rejected"
-      },
-      "error": {
-        "invalid_token": "This invitation link is invalid or has expired.",
-        "join_failed": "Failed to join the organization. Please try again later."
       }
     },
     "stats": {
@@ -413,17 +416,31 @@
       }
     },
     "error": {
+      "load_failed": "Error loading organizations",
       "load_users_failed": "Error loading users",
       "load_admins_failed": "Error loading administrators",
       "delete_failed": "Error deleting organization",
       "add_admin_failed": "Error adding administrator",
       "remove_last_admin": "Cannot remove the last administrator of the organization",
-      "remove_admin_failed": "Error removing administrator"
+      "remove_admin_failed": "Error removing administrator",
+      "add_players_failed": "Error adding players"
     }
   },
   "peladas": {
     "error": {
       "not_found": "Pelada not found"
+    },
+    "timeline": {
+      "title": "Timeline",
+      "session_timer": "TOTAL SESSION TIME",
+      "match_timer": "MATCH #{{seq}} TIME",
+      "no_events": "No goals or assists recorded yet.",
+      "match_short": "Match"
+    },
+    "available": {
+      "error": {
+        "add_failed": "Error adding players"
+      }
     },
     "attendance": {
       "title": "Weekly Match Attendance",
@@ -454,7 +471,8 @@
       "status": {
         "confirmed": "Confirmed",
         "declined": "Declined",
-        "pending": "Pending"
+        "pending": "Pending",
+        "waitlist": "Waitlist"
       },
       "empty": {
         "confirmed": "No one confirmed yet.",
@@ -479,7 +497,8 @@
         "create_team_failed": "Error creating team",
         "delete_team_failed": "Error deleting team",
         "set_goalkeeper_failed": "Error setting goalkeeper",
-        "remove_player_failed": "Error removing player"
+        "remove_player_failed": "Error removing player",
+        "update_failed": "Error updating pelada"
       },
       "live": {
         "moved_to_bench": "Player #{{playerId}} moved to bench",
@@ -488,17 +507,52 @@
       "button": {
         "view_matches": "View Matches",
         "start_pelada": "START PELADA",
+        "build_schedule": "Build Schedule",
         "vote": "Vote on Players",
         "change_votes": "Change Votes",
         "view_results": "View Results",
         "copy_teams": "Lineup (With Grades)",
         "copy_announcement": "Lineup (No Grades)"
+      },
+      "schedule": {
+        "subtitle": "Customize match sequence and details",
+        "config": "Configuration",
+        "match": "Match",
+        "home": "Home",
+        "away": "Away",
+        "button": {
+          "generate": "Regenerate Preview",
+          "swap": "Swap Home/Away",
+          "add_match": "New Match",
+          "refresh": "Refresh Options",
+          "use_template": "Load Last Saved",
+          "use_random": "Generate New Random",
+          "suggestions": "Schedule Suggestions"
+        },
+        "badge": {
+          "template": "Based on History"
+        },
+        "error": {
+          "load_failed": "Error loading schedule data",
+          "preview_failed": "Error generating schedule preview",
+          "save_failed": "Error saving schedule",
+          "same_team": "Home and Away teams must be different"
+        },
+        "warning": {
+          "not_enough_teams": "You need at least two teams to build a schedule."
+        },
+        "config_card": "Round Configuration",
+        "matches_per_team_label": "Matches per Team",
+        "no_template": "No saved template for this configuration.",
+        "planned_matches": "Planned Matches",
+        "random_tip": "Generate new balanced suggestion"
       }
     },
     "dialog": {
       "start": {
         "title": "Start pelada",
-        "matches_per_team": "Matches per team"
+        "matches_per_team": "Matches per team",
+        "confirm": "Are you sure you want to start the pelada with the generated schedule?"
       }
     },
     "matches": {
@@ -626,7 +680,6 @@
           "success": "Players added successfully!"
         }
       },
-
       "stats": {
         "title": "Performance",
         "sort": {
@@ -659,6 +712,15 @@
       "average": "AVG: {{score}}",
       "delete": "Delete team",
       "drag_placeholder": "Drag a player"
+    }
+  },
+  "pelada": {
+    "status": {
+      "open": "Open",
+      "attendance": "Attendance",
+      "running": "Running",
+      "closed": "Closed",
+      "voting": "Voting Open"
     }
   },
   "user": {
@@ -703,15 +765,6 @@
         "update_failed": "Failed to update profile",
         "delete_failed": "Failed to delete account"
       }
-    }
-  },
-  "pelada": {
-    "status": {
-      "open": "Open",
-      "attendance": "Attendance",
-      "running": "Running",
-      "closed": "Closed",
-      "voting": "Voting Open"
     }
   }
 }
