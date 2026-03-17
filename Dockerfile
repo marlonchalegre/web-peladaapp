@@ -31,7 +31,8 @@ COPY package.json package-lock.json .npmrc ./
 RUN --mount=type=cache,target=/root/.npm \
     npm ci --no-audit --no-fund
 COPY . .
-RUN npm run build
+# Ensure build args are passed to the build command if needed by vite
+RUN VITE_APP_VERSION=$VITE_APP_VERSION VITE_GOOGLE_ANALYTICS_ID=$VITE_GOOGLE_ANALYTICS_ID npm run build
 
 FROM nginx:alpine AS prod
 WORKDIR /usr/share/nginx/html
