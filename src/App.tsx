@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   BrowserRouter,
   Routes,
   Route,
   Link as RouterLink,
+  useLocation,
 } from "react-router-dom";
 import {
   AppBar,
@@ -40,6 +41,38 @@ import PeladaMatchesPage from "./features/peladas/pages/PeladaMatchesPage";
 import PeladaVotingPage from "./features/peladas/pages/PeladaVotingPage";
 import PeladaVotingResultsPage from "./features/peladas/pages/PeladaVotingResultsPage";
 import UserProfilePage from "./features/user/pages/UserProfilePage";
+import { initGA, logPageView, logEvent } from "./lib/analytics";
+
+function AnalyticsTracker() {
+  const location = useLocation();
+
+  useEffect(() => {
+    initGA();
+
+    const handleGlobalClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      const button = target.closest("button");
+
+      if (button) {
+        const buttonText =
+          button.innerText?.trim() ||
+          button.getAttribute("aria-label") ||
+          button.getAttribute("data-testid") ||
+          "unnamed-button";
+        logEvent("Interaction", "Button Click", buttonText);
+      }
+    };
+
+    document.addEventListener("click", handleGlobalClick);
+    return () => document.removeEventListener("click", handleGlobalClick);
+  }, []);
+
+  useEffect(() => {
+    logPageView(location.pathname + location.search);
+  }, [location]);
+
+  return null;
+}
 
 function Footer() {
   const { t } = useTranslation();
@@ -86,6 +119,7 @@ function AppLayout() {
 
   return (
     <BrowserRouter>
+      <AnalyticsTracker />
       <Box
         sx={{
           display: "flex",

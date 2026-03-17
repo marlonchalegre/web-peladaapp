@@ -18,7 +18,9 @@ CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "8080"]
 FROM --platform=$BUILDPLATFORM node:20-alpine AS build
 ARG TARGETARCH
 ARG VITE_APP_VERSION=dev
+ARG VITE_GOOGLE_ANALYTICS_ID
 ENV VITE_APP_VERSION=$VITE_APP_VERSION
+ENV VITE_GOOGLE_ANALYTICS_ID=$VITE_GOOGLE_ANALYTICS_ID
 ENV NODE_OPTIONS=--max-old-space-size=4096
 WORKDIR /app
 # Use BuildKit cache for npm
