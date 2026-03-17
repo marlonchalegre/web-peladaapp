@@ -149,7 +149,9 @@ export default function PeladasList({
                           }}
                         >
                           {pelada.scheduled_at
-                            ? new Date(pelada.scheduled_at).toLocaleDateString()
+                            ? new Date(pelada.scheduled_at).toLocaleDateString(
+                                t("common.locale_code", "pt-BR"),
+                              )
                             : t("common.date.tbd", "TBD")}
                         </Typography>
                         <Typography
@@ -158,7 +160,7 @@ export default function PeladasList({
                         >
                           {pelada.scheduled_at
                             ? new Date(pelada.scheduled_at).toLocaleTimeString(
-                                [],
+                                t("common.locale_code", "pt-BR"),
                                 {
                                   hour: "2-digit",
                                   minute: "2-digit",
@@ -189,6 +191,14 @@ export default function PeladasList({
                           color: "success.main",
                           fontWeight: 500,
                           borderRadius: 1,
+                          height: "auto",
+                          "& .MuiChip-label": {
+                            display: "block",
+                            whiteSpace: "normal",
+                            textAlign: "center",
+                            py: 0.5,
+                            px: 1,
+                          },
                         }}
                       />
                     </TableCell>

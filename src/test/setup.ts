@@ -3,7 +3,10 @@ import { cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom";
 
 // Mock react-i18next
-const tSpy = (key: string) => key;
+const tSpy = (key: string) => {
+  if (key === "common.locale_code") return "en-US";
+  return key;
+};
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: tSpy,

@@ -172,14 +172,14 @@ export default function PeladaVotingPage() {
 
   if (error && !votingInfo) {
     return (
-      <Container>
+      <Container maxWidth="lg" sx={{ px: { xs: 1, sm: 2 } }} disableGutters>
         <Alert severity="error" sx={{ mt: 2 }}>
           {error}
         </Alert>
         <Button
           variant="outlined"
           onClick={() => navigate(`/peladas/${peladaId}`)}
-          sx={{ mt: 2 }}
+          sx={{ mt: 2, ml: { xs: 1, sm: 0 } }}
         >
           {t("peladas.voting.button.back_to_pelada")}
         </Button>
@@ -188,8 +188,13 @@ export default function PeladaVotingPage() {
   }
 
   return (
-    <Container maxWidth="lg" data-testid="voting-page-container">
-      <Box sx={{ mt: 2, mb: 2 }}>
+    <Container
+      maxWidth="lg"
+      data-testid="voting-page-container"
+      sx={{ py: { xs: 2, sm: 4 }, px: { xs: 0, sm: 2 } }}
+      disableGutters
+    >
+      <Box sx={{ mt: 2, mb: 2, px: { xs: 1.5, sm: 0 } }}>
         <BreadcrumbNav
           items={[
             {
@@ -220,22 +225,48 @@ export default function PeladaVotingPage() {
         <Box sx={{ display: "flex", gap: 1 }}>
           <Button
             variant="outlined"
-            startIcon={<SportsSoccerIcon />}
             component={RouterLink}
             to={`/peladas/${peladaId}/matches`}
             size="small"
+            sx={{
+              minWidth: { xs: "40px", sm: "auto" },
+              px: { xs: 0, sm: 2 },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textTransform: "none",
+            }}
           >
-            {t("peladas.detail.button.view_matches")}
+            <SportsSoccerIcon sx={{ mr: { xs: 0, sm: 1 } }} />
+            <Box
+              component="span"
+              sx={{ display: { xs: "none", sm: "inline" } }}
+            >
+              {t("peladas.detail.button.view_matches")}
+            </Box>
           </Button>
           {!votingInfo?.can_vote && (
             <Button
               variant="outlined"
-              startIcon={<AssessmentIcon />}
               component={RouterLink}
               to={`/peladas/${peladaId}/results`}
               size="small"
+              sx={{
+                minWidth: { xs: "40px", sm: "auto" },
+                px: { xs: 0, sm: 2 },
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textTransform: "none",
+              }}
             >
-              {t("peladas.voting.button.view_results")}
+              <AssessmentIcon sx={{ mr: { xs: 0, sm: 1 } }} />
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
+                {t("peladas.voting.button.view_results")}
+              </Box>
             </Button>
           )}
         </Box>

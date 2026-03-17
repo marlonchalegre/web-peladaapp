@@ -56,16 +56,23 @@ export default function AdminOrganizationsList({
         <Button
           variant="outlined"
           size="small"
-          startIcon={<AddIcon />}
           onClick={onCreate}
           data-testid="create-org-open-dialog"
           sx={{
             borderRadius: 2,
             textTransform: "none",
             fontWeight: 600,
+            minWidth: { xs: "40px", sm: "auto" },
+            px: { xs: 0, sm: 2 },
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          {t("home.actions.create_organization", "Criar Organização")}
+          <AddIcon sx={{ mr: { xs: 0, sm: 1 } }} />
+          <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
+            {t("home.actions.create_organization", "Criar Organização")}
+          </Box>
         </Button>
       </Box>
 
@@ -196,6 +203,11 @@ export default function AdminOrganizationsList({
                         boxShadow: "none",
                         textTransform: "none",
                         fontWeight: 600,
+                        minWidth: { xs: "40px", sm: "auto" },
+                        px: { xs: 0, sm: 2 },
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
                         "&:hover": {
                           bgcolor: "action.selected",
                           boxShadow: "none",
@@ -207,7 +219,15 @@ export default function AdminOrganizationsList({
                       }}
                       data-testid={`manage-org-${org.id}`}
                     >
-                      {t("common.actions.manage", "Gerenciar")}
+                      <GroupsIcon
+                        sx={{ fontSize: "1.125rem", mr: { xs: 0, sm: 1 } }}
+                      />
+                      <Box
+                        component="span"
+                        sx={{ display: { xs: "none", sm: "inline" } }}
+                      >
+                        {t("common.actions.manage", "Gerenciar")}
+                      </Box>
                     </Button>
                   </TableCell>
                 </TableRow>

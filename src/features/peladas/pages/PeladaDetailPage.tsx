@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Container, Alert } from "@mui/material";
+import { Container, Alert, Box } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
@@ -80,7 +80,7 @@ export default function PeladaDetailPage() {
 
   if (error)
     return (
-      <Container>
+      <Container sx={{ mt: 4, px: { xs: 1, sm: 2 } }} disableGutters>
         <Alert severity="error">{error}</Alert>
       </Container>
     );
@@ -103,16 +103,22 @@ export default function PeladaDetailPage() {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ pb: 4 }}>
-      <BreadcrumbNav
-        items={[
-          {
-            label: pelada.organization_name || t("common.organization"),
-            path: `/organizations/${pelada.organization_id}`,
-          },
-          { label: t("peladas.detail.title", { id: pelada.id }) },
-        ]}
-      />
+    <Container
+      maxWidth="xl"
+      sx={{ pb: 4, px: { xs: 1, sm: 2 } }}
+      disableGutters
+    >
+      <Box sx={{ px: { xs: 1, sm: 0 } }}>
+        <BreadcrumbNav
+          items={[
+            {
+              label: pelada.organization_name || t("common.organization"),
+              path: `/organizations/${pelada.organization_id}`,
+            },
+            { label: t("peladas.detail.title", { id: pelada.id }) },
+          ]}
+        />
+      </Box>
       <PeladaDetailHeader
         pelada={pelada}
         votingInfo={votingInfo}
@@ -160,6 +166,7 @@ export default function PeladaDetailPage() {
               onDrop={dropToFixedGk}
               onRemove={removeFixedGk}
               locked={pelada.status !== "open"}
+              isAdminOverride={actuallyIsAdmin}
               onDragStartPlayer={onDragStartPlayer}
             />
           )}
@@ -197,6 +204,7 @@ export default function PeladaDetailPage() {
             locked={
               (pelada.status !== "open" && !actuallyIsAdmin) || processing
             }
+            isAdmin={actuallyIsAdmin}
             totalPlayersInPelada={stats.totalPlayers}
             averagePelada={stats.averagePelada}
             balance={stats.balance}

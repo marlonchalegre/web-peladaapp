@@ -43,7 +43,7 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`org-mgmt-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ pt: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ pt: { xs: 2, sm: 3 } }}>{children}</Box>}
     </div>
   );
 }
@@ -122,11 +122,10 @@ export default function OrganizationManagementPage() {
     handleDeleteOrganization,
     refreshPlayers,
   } = useOrganizationManagement(orgId);
-
   if (loading && !org) return <Loading message={t("common.loading")} />;
   if (!org)
     return (
-      <Container sx={{ mt: 4 }}>
+      <Container sx={{ mt: 4, px: { xs: 1, sm: 2 } }} disableGutters>
         <Alert severity="error">
           {error || t("organizations.error.load_failed")}
         </Alert>
@@ -134,27 +133,37 @@ export default function OrganizationManagementPage() {
     );
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <BreadcrumbNav
-        items={[
-          { label: org.name, path: `/organizations/${orgId}` },
-          { label: t("organizations.detail.button.management") },
-        ]}
-      />
+    <Container
+      maxWidth="lg"
+      sx={{ py: { xs: 2, sm: 4 }, px: { xs: 0, sm: 2 } }}
+      disableGutters
+    >
+      <Box sx={{ px: { xs: 1.5, sm: 0 } }}>
+        <BreadcrumbNav
+          items={[
+            { label: org.name, path: `/organizations/${orgId}` },
+            { label: t("organizations.detail.button.management") },
+          ]}
+        />
 
-      <Typography variant="h4" gutterBottom fontWeight="bold" color="primary">
-        {t("organizations.management.title", { name: org.name })}
-      </Typography>
+        <Typography variant="h4" gutterBottom fontWeight="bold" color="primary">
+          {t("organizations.management.title", { name: org.name })}
+        </Typography>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
-          {error}
-        </Alert>
-      )}
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
+            {error}
+          </Alert>
+        )}
+      </Box>
 
       <Paper
-        variant="outlined"
-        sx={{ borderBottom: 1, borderColor: "divider" }}
+        elevation={0}
+        sx={{
+          borderBottom: 1,
+          borderColor: "divider",
+          bgcolor: "background.paper",
+        }}
       >
         <Tabs
           value={activeTab}
@@ -162,40 +171,75 @@ export default function OrganizationManagementPage() {
           aria-label="organization management tabs"
           variant="scrollable"
           scrollButtons="auto"
-          sx={{ px: 2 }}
+          allowScrollButtonsMobile
         >
           <Tab
             icon={<PeopleIcon />}
             iconPosition="start"
-            label={t("organizations.management.sections.members")}
+            label={
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
+                {t("organizations.management.sections.members")}
+              </Box>
+            }
             value="members"
             data-testid="mgmt-tab-members"
           />
           <Tab
             icon={<StarIcon />}
             iconPosition="start"
-            label={t("organizations.detail.button.ratings")}
+            label={
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
+                {t("organizations.detail.button.ratings")}
+              </Box>
+            }
             value="ratings"
             data-testid="mgmt-tab-ratings"
           />
           <Tab
             icon={<AdminPanelSettingsIcon />}
             iconPosition="start"
-            label={t("organizations.management.sections.admins")}
+            label={
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
+                {t("organizations.management.sections.admins")}
+              </Box>
+            }
             value="admins"
             data-testid="mgmt-tab-admins"
           />
           <Tab
             icon={<MailIcon />}
             iconPosition="start"
-            label={t("organizations.management.sections.invitations")}
+            label={
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
+                {t("organizations.management.sections.invitations")}
+              </Box>
+            }
             value="invitations"
             data-testid="mgmt-tab-invitations"
           />
           <Tab
             icon={<SettingsIcon />}
             iconPosition="start"
-            label={t("common.actions.manage")}
+            label={
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
+                {t("common.actions.manage")}
+              </Box>
+            }
             value="settings"
             data-testid="mgmt-tab-settings"
           />

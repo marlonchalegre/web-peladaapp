@@ -9,7 +9,6 @@ import {
   AppBar,
   Toolbar,
   Typography,
-  Container,
   Box,
   IconButton,
   Avatar,
@@ -210,53 +209,30 @@ function AppLayout() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/first-access" element={<FirstAccessPage />} />
 
-            {/* Rotas protegidas com Container */}
+            {/* Rotas protegidas sem Container global para permitir controle por página */}
             <Route element={<ProtectedRoute />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/join/:token" element={<JoinOrganizationPage />} />
               <Route
                 path="/organizations/:id"
-                element={
-                  <Container maxWidth="lg" sx={{ py: 3 }}>
-                    <OrganizationDetailPage />
-                  </Container>
-                }
+                element={<OrganizationDetailPage />}
               />
               <Route
                 path="/organizations/:id/statistics"
-                element={
-                  <Container maxWidth="lg" sx={{ py: 3 }}>
-                    <OrganizationStatisticsPage />
-                  </Container>
-                }
+                element={<OrganizationStatisticsPage />}
               />
               <Route
                 path="/organizations/:id/management"
-                element={
-                  <Container maxWidth="lg" sx={{ py: 3 }}>
-                    <OrganizationManagementPage />
-                  </Container>
-                }
+                element={<OrganizationManagementPage />}
               />
-              <Route
-                path="/peladas/:id"
-                element={
-                  <Container maxWidth="lg" sx={{ py: 3 }}>
-                    <PeladaDetailPage />
-                  </Container>
-                }
-              />
+              <Route path="/peladas/:id" element={<PeladaDetailPage />} />
               <Route
                 path="/peladas/:id/build-schedule"
                 element={<ScheduleBuilderPage />}
               />
               <Route
                 path="/peladas/:id/attendance"
-                element={
-                  <Container maxWidth="lg" sx={{ py: 3 }}>
-                    <AttendanceListPage />
-                  </Container>
-                }
+                element={<AttendanceListPage />}
               />
               <Route
                 path="/peladas/:id/matches"
@@ -264,28 +240,13 @@ function AppLayout() {
               />
               <Route
                 path="/peladas/:id/voting"
-                element={
-                  <Container maxWidth="lg" sx={{ py: 3 }}>
-                    <PeladaVotingPage />
-                  </Container>
-                }
+                element={<PeladaVotingPage />}
               />
               <Route
                 path="/peladas/:id/results"
-                element={
-                  <Container maxWidth="lg" sx={{ py: 3 }}>
-                    <PeladaVotingResultsPage />
-                  </Container>
-                }
+                element={<PeladaVotingResultsPage />}
               />
-              <Route
-                path="/profile"
-                element={
-                  <Container maxWidth="lg" sx={{ py: 3 }}>
-                    <UserProfilePage />
-                  </Container>
-                }
-              />
+              <Route path="/profile" element={<UserProfilePage />} />
             </Route>
           </Routes>
         </Box>

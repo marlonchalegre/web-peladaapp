@@ -24,6 +24,7 @@ interface FixedGoalkeepersSectionProps {
   onDrop: (e: DragEvent<HTMLElement>, side: "home" | "away") => Promise<void>;
   onRemove: (side: "home" | "away") => Promise<void>;
   locked?: boolean;
+  isAdminOverride?: boolean;
   onDragStartPlayer: (
     e: DragEvent<HTMLElement>,
     playerId: number,
@@ -37,6 +38,7 @@ export default function FixedGoalkeepersSection({
   onDrop,
   onRemove,
   locked = false,
+  isAdminOverride = false,
   onDragStartPlayer,
 }: FixedGoalkeepersSectionProps) {
   const { t } = useTranslation();
@@ -149,7 +151,7 @@ export default function FixedGoalkeepersSection({
               sx={{ height: 20, fontSize: "0.65rem", fontWeight: 900, mt: 0.5 }}
             />
           </Box>
-          {!locked && (
+          {!locked && isAdminOverride && (
             <Tooltip title={t("common.delete")}>
               <IconButton
                 size="small"

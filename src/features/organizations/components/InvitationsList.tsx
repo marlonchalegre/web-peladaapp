@@ -59,12 +59,21 @@ export default function InvitationsList({
         <Button
           variant="outlined"
           size="small"
-          startIcon={<PersonAddIcon />}
           onClick={onInviteClick}
           disabled={actionLoading}
           data-testid="invitations-invite-button"
+          sx={{
+            minWidth: { xs: "40px", sm: "auto" },
+            px: { xs: 0, sm: 2 },
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
         >
-          {t("organizations.dialog.invite_player.title")}
+          <PersonAddIcon sx={{ mr: { xs: 0, sm: 1 } }} />
+          <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
+            {t("organizations.dialog.invite_player.title")}
+          </Box>
         </Button>
       </Box>
       <Divider sx={{ mb: 2 }} />
@@ -102,7 +111,9 @@ export default function InvitationsList({
                       variant="body2"
                       color="text.secondary"
                     >
-                      {new Date(inv.created_at).toLocaleDateString()}
+                      {new Date(inv.created_at).toLocaleDateString(
+                        t("common.locale_code", "pt-BR"),
+                      )}
                     </Typography>
                     {" • "}
                     <Chip

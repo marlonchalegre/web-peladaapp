@@ -1,5 +1,4 @@
-import { Paper, Box, Typography, Avatar, IconButton } from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
+import { Paper, Box, Typography, Avatar } from "@mui/material";
 import { type DragEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { type Player, type User } from "../../../shared/api/endpoints";
@@ -91,20 +90,6 @@ export default function AvailablePlayerItem({
         >
           {scoreVal}
         </Box>
-        {!locked && (
-          <IconButton
-            size="small"
-            sx={{
-              color: "primary.main",
-              bgcolor: "primary.lighter",
-              width: 24,
-              height: 24,
-              "&:hover": { bgcolor: "primary.light" },
-            }}
-          >
-            <AddIcon sx={{ fontSize: 16 }} />
-          </IconButton>
-        )}
       </Box>
     </Paper>
   );

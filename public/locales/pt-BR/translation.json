@@ -59,6 +59,7 @@
     }
   },
   "common": {
+    "locale_code": "pt-BR",
     "of": "de",
     "welcome": "Bem-vindo ao Pelada App",
     "hello": "Olá",
@@ -148,6 +149,10 @@
       "defender": "Defensor",
       "player": "JOGADOR",
       "unknown": "DESCONHECIDO"
+    },
+    "member_types": {
+      "mensalista": "Mensalista",
+      "diarista": "Diarista"
     }
   },
   "home": {
@@ -247,7 +252,11 @@
       "revoke_invitation_confirm": "Tem certeza que deseja revogar este convite?",
       "delete_description": "Excluir uma organização é uma ação permanente e não pode ser desfeita. Todos os dados associados serão perdidos.",
       "delete_confirm_title": "Excluir Organização",
-      "delete_confirm_instruction": "Por favor, digite o nome da organização \"{{name}}\" para confirmar."
+      "delete_confirm_instruction": "Por favor, digite o nome da organização \"{{name}}\" para confirmar.",
+      "member_type": {
+        "mensalista": "Mensalista",
+        "diarista": "Diarista"
+      }
     },
     "ratings": {
       "title": "Notas dos Jogadores - {{name}}",
@@ -397,8 +406,8 @@
       "match_short": "Part."
     },
     "attendance": {
-      "title": "Presença Semanal",
-      "subtitle": "Gerencie o status dos jogadores e finalize a geração dos times.",
+      "title": "Lista de Presença",
+      "subtitle": "Confirme sua presença ou ausência para esta pelada.",
       "error": {
         "load_failed": "Erro ao carregar lista de presença",
         "update_failed": "Erro ao atualizar presença",
@@ -622,7 +631,7 @@
       "available": {
         "title": "Jogadores",
         "filter_placeholder": "Filtrar por nome...",
-        "invite_button": "+ Adicionar jogadores",
+        "invite_button": "Adicionar jogadores",
         "add_dialog": {
           "title": "Adicionar Jogadores da Organização",
           "description": "Selecione os jogadores que não confirmaram presença mas desejam participar agora.",

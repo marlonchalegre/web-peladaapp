@@ -8,6 +8,7 @@ import {
   Box,
   Tabs,
   Tab,
+  Badge,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -45,7 +46,11 @@ function CustomTabPanel(props: TabPanelProps) {
       aria-labelledby={`attendance-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
+      {value === index && (
+        <Box sx={{ py: { xs: 2, sm: 3 }, px: { xs: 0, sm: 1 } }}>
+          {children}
+        </Box>
+      )}
     </div>
   );
 }
@@ -114,24 +119,31 @@ export default function AttendanceListPage() {
     );
 
   return (
-    <Container maxWidth="md" sx={{ py: { xs: 2, md: 4 } }}>
-      <BreadcrumbNav
-        items={[
-          {
-            label: pelada.organization_name || t("common.organization"),
-            path: `/organizations/${pelada.organization_id}`,
-          },
-          {
-            label: t("peladas.detail.title", { id: pelada.id }),
-            path: `/peladas/${pelada.id}`,
-          },
-          { label: t("peladas.attendance.title") },
-        ]}
-      />
+    <Container
+      maxWidth="md"
+      sx={{ py: { xs: 2, md: 4 }, px: { xs: 0.5, sm: 2, md: 3 } }}
+      disableGutters
+    >
+      <Box sx={{ px: { xs: 1.5, sm: 0 } }}>
+        <BreadcrumbNav
+          items={[
+            {
+              label: pelada.organization_name || t("common.organization"),
+              path: `/organizations/${pelada.organization_id}`,
+            },
+            {
+              label: t("peladas.detail.title", { id: pelada.id }),
+              path: `/peladas/${pelada.id}`,
+            },
+            { label: t("peladas.attendance.title") },
+          ]}
+        />
+      </Box>
       <div data-testid="attendance-list-container">
         <Box
           sx={{
             mb: 3,
+            px: { xs: 1.5, sm: 0 },
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
@@ -143,7 +155,6 @@ export default function AttendanceListPage() {
               variant="contained"
               onClick={() => setIsConfirmDialogOpen(true)}
               data-testid="close-attendance-button"
-              startIcon={<SportsSoccerIcon />}
               sx={{
                 borderRadius: 3,
                 bgcolor: "success.main",
@@ -152,19 +163,29 @@ export default function AttendanceListPage() {
                   transform: "translateY(-1px)",
                   boxShadow: "0 4px 12px rgba(22, 101, 52, 0.2)",
                 },
-                px: 3,
+                px: { xs: 0, sm: 3 },
                 py: 1,
+                minWidth: { xs: "40px", sm: "auto" },
                 textTransform: "none",
                 fontWeight: 800,
                 transition: "all 0.2s ease",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              {t("peladas.attendance.button.close_list")}
+              <SportsSoccerIcon sx={{ mr: { xs: 0, sm: 1 } }} />
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
+                {t("peladas.attendance.button.close_list")}
+              </Box>
             </Button>
           )}
         </Box>
 
-        <Box sx={{ mb: 4 }}>
+        <Box sx={{ mb: 4, px: { xs: 1.5, sm: 0 } }}>
           <Typography
             variant="h4"
             component="h1"
@@ -177,49 +198,126 @@ export default function AttendanceListPage() {
           </Typography>
         </Box>
 
-        {currentPlayerAsPlayer && (
-          <UserAttendanceStatus
-            player={currentPlayerAsPlayer}
-            isUpdating={isUpdatingSelf}
-            onUpdate={(status) => handleUpdateAttendance(status)}
-          />
-        )}
+        <Box sx={{ px: { xs: 1.5, sm: 0 } }}>
+          {currentPlayerAsPlayer && (
+            <UserAttendanceStatus
+              player={currentPlayerAsPlayer}
+              isUpdating={isUpdatingSelf}
+              onUpdate={(status) => handleUpdateAttendance(status)}
+            />
+          )}
+        </Box>
 
         <Box sx={{ width: "100%", mt: 2 }}>
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
             <Tabs
               value={tabValue}
               onChange={handleTabChange}
-              variant="fullWidth"
+              variant="scrollable"
+              scrollButtons="auto"
+              allowScrollButtonsMobile
               aria-label="attendance tabs"
               sx={{
                 "& .MuiTab-root": {
                   textTransform: "none",
                   fontWeight: "bold",
-                  fontSize: "1rem",
-                  py: 2,
+                  fontSize: { xs: "0.875rem", sm: "1rem" },
+                  py: 1.5,
+                  minWidth: { xs: 120, sm: 160 },
+                  flex: { sm: 1 },
+                },
+                "& .MuiTabs-flexContainer": {
+                  justifyContent: { sm: "space-between" },
                 },
               }}
             >
               <Tab
-                icon={<PeopleIcon />}
+                icon={
+                  <Badge
+                    badgeContent={confirmed.length}
+                    color="success"
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        display: { xs: "flex", md: "none" },
+                      },
+                    }}
+                  >
+                    <PeopleIcon />
+                  </Badge>
+                }
                 iconPosition="start"
-                label={`${t("peladas.attendance.status.confirmed")} (${confirmed.length})`}
+                label={
+                  <Box
+                    component="span"
+                    sx={{ display: { xs: "none", md: "inline" } }}
+                  >{`${t("peladas.attendance.status.confirmed")} (${confirmed.length})`}</Box>
+                }
               />
               <Tab
-                icon={<AccessTimeIcon />}
+                icon={
+                  <Badge
+                    badgeContent={waitlist.length}
+                    color="warning"
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        display: { xs: "flex", md: "none" },
+                      },
+                    }}
+                  >
+                    <AccessTimeIcon />
+                  </Badge>
+                }
                 iconPosition="start"
-                label={`${t("peladas.attendance.status.waitlist", "Lista de Espera")} (${waitlist.length})`}
+                label={
+                  <Box
+                    component="span"
+                    sx={{ display: { xs: "none", md: "inline" } }}
+                  >{`${t("peladas.attendance.status.waitlist", "Lista de Espera")} (${waitlist.length})`}</Box>
+                }
               />
               <Tab
-                icon={<HelpOutlineIcon />}
+                icon={
+                  <Badge
+                    badgeContent={pending.length}
+                    color="error"
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        display: { xs: "flex", md: "none" },
+                      },
+                    }}
+                  >
+                    <HelpOutlineIcon />
+                  </Badge>
+                }
                 iconPosition="start"
-                label={`${t("peladas.attendance.status.pending")} (${pending.length})`}
+                label={
+                  <Box
+                    component="span"
+                    sx={{ display: { xs: "none", md: "inline" } }}
+                  >{`${t("peladas.attendance.status.pending")} (${pending.length})`}</Box>
+                }
               />
               <Tab
-                icon={<PersonOffIcon />}
+                icon={
+                  <Badge
+                    badgeContent={declined.length}
+                    color="default"
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        display: { xs: "flex", md: "none" },
+                      },
+                    }}
+                  >
+                    <PersonOffIcon />
+                  </Badge>
+                }
                 iconPosition="start"
-                label={`${t("peladas.attendance.status.declined")} (${declined.length})`}
+                label={
+                  <Box
+                    component="span"
+                    sx={{ display: { xs: "none", md: "inline" } }}
+                  >{`${t("peladas.attendance.status.declined")} (${declined.length})`}</Box>
+                }
               />
             </Tabs>
           </Box>

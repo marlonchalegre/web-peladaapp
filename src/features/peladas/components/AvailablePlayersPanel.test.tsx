@@ -66,6 +66,7 @@ describe("AvailablePlayersPanel", () => {
           totalPlayersInPelada={2}
           averagePelada={8.5}
           balance={100}
+          isAdmin={true}
         />
       </ThemeContextProvider>,
     );
@@ -90,6 +91,7 @@ describe("AvailablePlayersPanel", () => {
           totalPlayersInPelada={2}
           averagePelada={8.5}
           balance={100}
+          isAdmin={true}
         />
       </ThemeContextProvider>,
     );
@@ -140,6 +142,7 @@ describe("AvailablePlayersPanel", () => {
           totalPlayersInPelada={2}
           averagePelada={8.5}
           balance={100}
+          isAdmin={true}
         />
       </ThemeContextProvider>,
     );

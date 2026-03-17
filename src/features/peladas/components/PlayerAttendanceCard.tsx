@@ -89,7 +89,12 @@ export default function PlayerAttendanceCard({
             >
               {player.user.name}
             </Typography>
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              sx={{ flexWrap: "wrap" }}
+            >
               {isCurrentUser && (
                 <Typography
                   variant="caption"
@@ -99,20 +104,32 @@ export default function PlayerAttendanceCard({
                   {t("common.you")}
                 </Typography>
               )}
-              {player.position_id === 1 && (
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: "flex", alignItems: "center" }}
+              >
+                {isCurrentUser && " • "}
+                {t(
+                  player.user.position
+                    ? `common.positions.${player.user.position.toLowerCase()}`
+                    : "common.positions.unknown",
+                )}
+              </Typography>
+              {player.member_type && (
                 <Typography
                   variant="caption"
                   color="text.secondary"
                   sx={{ display: "flex", alignItems: "center" }}
                 >
-                  • {t("common.positions.goalkeeper")}
+                  • {t(`common.member_types.${player.member_type}`)}
                 </Typography>
               )}
             </Stack>
           </Box>
         </Box>
 
-        {(isAdmin || isCurrentUser) && (
+        {isAdmin && (
           <Stack direction="row" spacing={1}>
             {isUpdating ? (
               <Box sx={{ p: 0.5 }}>

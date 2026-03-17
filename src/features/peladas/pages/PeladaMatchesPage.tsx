@@ -241,20 +241,26 @@ export default function PeladaMatchesPage() {
 
   return (
     <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
-      <Container maxWidth="lg" sx={{ py: 3 }}>
-        <BreadcrumbNav
-          items={[
-            {
-              label: pelada?.organization_name || t("common.organization"),
-              path: `/organizations/${pelada?.organization_id}`,
-            },
-            {
-              label: t("peladas.detail.title", { id: peladaId }),
-              path: `/peladas/${peladaId}`,
-            },
-            { label: t("peladas.detail.button.view_matches") },
-          ]}
-        />
+      <Container
+        maxWidth="lg"
+        sx={{ py: { xs: 2, sm: 3 }, px: { xs: 1, sm: 2 } }}
+        disableGutters
+      >
+        <Box sx={{ px: { xs: 1.5, sm: 0 } }}>
+          <BreadcrumbNav
+            items={[
+              {
+                label: pelada?.organization_name || t("common.organization"),
+                path: `/organizations/${pelada?.organization_id}`,
+              },
+              {
+                label: t("peladas.detail.title", { id: peladaId }),
+                path: `/peladas/${peladaId}`,
+              },
+              { label: t("peladas.detail.button.view_matches") },
+            ]}
+          />
+        </Box>
 
         <Box
           sx={{
@@ -296,11 +302,24 @@ export default function PeladaMatchesPage() {
             <Button
               variant="outlined"
               onClick={handleShareClick}
-              endIcon={<KeyboardArrowDownIcon />}
               size="small"
               data-testid="share-dropdown-button"
+              sx={{
+                minWidth: { xs: "40px", sm: "auto" },
+                px: { xs: 0, sm: 2 },
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textTransform: "none",
+              }}
             >
-              {t("common.export")}
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
+                {t("common.export")}
+              </Box>
+              <KeyboardArrowDownIcon sx={{ ml: { xs: 0, sm: 1 } }} />
             </Button>
             <Menu
               anchorEl={shareMenuAnchor}

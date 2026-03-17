@@ -96,7 +96,7 @@ describe("PeladaDetailHeader", () => {
     expect(screen.queryByTestId("start-pelada-button")).not.toBeInTheDocument();
   });
 
-  it("renders Ver Partidas for non-admin users even if open", () => {
+  it("hides Ver Partidas for non-admin users when open", () => {
     render(
       <MemoryRouter>
         <ThemeContextProvider>
@@ -116,11 +116,31 @@ describe("PeladaDetailHeader", () => {
     );
 
     expect(
+      screen.queryByText("peladas.detail.button.view_matches"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("renders Ver Partidas for non-admin users when running", () => {
+    render(
+      <MemoryRouter>
+        <ThemeContextProvider>
+          <PeladaDetailHeader
+            pelada={{ ...mockPelada, status: "running" }}
+            votingInfo={null}
+            onStartClick={() => {}}
+            onCopyClipboard={() => {}}
+            onCopyAnnouncement={() => {}}
+            onToggleFixedGk={() => {}}
+            changingStatus={false}
+            processing={false}
+            isAdminOverride={false}
+          />
+        </ThemeContextProvider>
+      </MemoryRouter>,
+    );
+
+    expect(
       screen.getByText("peladas.detail.button.view_matches"),
     ).toBeInTheDocument();
-    expect(screen.queryByTestId("start-pelada-button")).not.toBeInTheDocument();
-    expect(
-      screen.queryByTestId("build-schedule-button"),
-    ).not.toBeInTheDocument();
   });
 });

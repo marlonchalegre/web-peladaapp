@@ -15,6 +15,9 @@ import {
   DialogContentText,
   DialogActions,
 } from "@mui/material";
+import AssessmentIcon from "@mui/icons-material/Assessment";
+import SettingsIcon from "@mui/icons-material/Settings";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import { api } from "../../../shared/api/client";
 import {
   createApi,
@@ -135,22 +138,31 @@ export default function OrganizationDetailPage() {
 
   if (error)
     return (
-      <Container sx={{ mt: 4 }}>
+      <Container sx={{ mt: 4, px: { xs: 1, sm: 2 } }} disableGutters>
         <Alert severity="error">{error}</Alert>
       </Container>
     );
   if (!org) return <Loading message={t("common.loading")} />;
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <BreadcrumbNav items={[{ label: org.name }]} />
+    <Container
+      maxWidth="lg"
+      sx={{ py: { xs: 2, sm: 4 }, px: { xs: 1, sm: 2 } }}
+      disableGutters
+    >
+      <Box sx={{ px: { xs: 1, sm: 0 } }}>
+        <BreadcrumbNav items={[{ label: org.name }]} />
+      </Box>
       {/* Header */}
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
+          alignItems: "flex-start",
           mb: 4,
+          flexDirection: { xs: "column", sm: "row" },
+          gap: 2,
+          px: { xs: 1, sm: 0 },
         }}
       >
         <Typography
@@ -167,8 +179,22 @@ export default function OrganizationDetailPage() {
             to={`/organizations/${orgId}/statistics`}
             variant="outlined"
             data-testid="org-statistics-button"
+            sx={{
+              minWidth: { xs: "40px", sm: "auto" },
+              px: { xs: 0, sm: 2 },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textTransform: "none",
+            }}
           >
-            {t("organizations.detail.button.statistics")}
+            <AssessmentIcon sx={{ mr: { xs: 0, sm: 1 } }} />
+            <Box
+              component="span"
+              sx={{ display: { xs: "none", sm: "inline" } }}
+            >
+              {t("organizations.detail.button.statistics")}
+            </Box>
           </Button>
           {!isAdmin && (
             <Button
@@ -176,8 +202,22 @@ export default function OrganizationDetailPage() {
               color="error"
               onClick={() => setLeaveDialogOpen(true)}
               data-testid="leave-org-button"
+              sx={{
+                minWidth: { xs: "40px", sm: "auto" },
+                px: { xs: 0, sm: 2 },
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textTransform: "none",
+              }}
             >
-              {t("organizations.detail.button.leave", "Sair da Organização")}
+              <ExitToAppIcon sx={{ mr: { xs: 0, sm: 1 } }} />
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
+                {t("organizations.detail.button.leave", "Sair da Organização")}
+              </Box>
             </Button>
           )}
           {isAdmin && (
@@ -187,8 +227,22 @@ export default function OrganizationDetailPage() {
               variant="outlined"
               color="primary"
               data-testid="org-management-button"
+              sx={{
+                minWidth: { xs: "40px", sm: "auto" },
+                px: { xs: 0, sm: 2 },
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textTransform: "none",
+              }}
             >
-              {t("organizations.detail.button.management")}
+              <SettingsIcon sx={{ mr: { xs: 0, sm: 1 } }} />
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
+                {t("organizations.detail.button.management")}
+              </Box>
             </Button>
           )}
         </Stack>

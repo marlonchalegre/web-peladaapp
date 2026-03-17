@@ -90,11 +90,25 @@ export default function AdminsSection({
             onClick={onAddAdmin}
             disabled={actionLoading || selectedAdminUserId === ""}
             data-testid="add-admin-button"
-            startIcon={
-              actionLoading ? <CircularProgress size={20} /> : <AddIcon />
-            }
+            sx={{
+              minWidth: { xs: "40px", sm: "auto" },
+              px: { xs: 0, sm: 2 },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            {t("common.add")}
+            {actionLoading ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              <AddIcon sx={{ mr: { xs: 0, sm: 1 } }} />
+            )}
+            <Box
+              component="span"
+              sx={{ display: { xs: "none", sm: "inline" } }}
+            >
+              {t("common.add")}
+            </Box>
           </Button>
         </Box>
       </Box>

@@ -158,15 +158,23 @@ export default function UserProfilePage() {
   }
 
   return (
-    <Box maxWidth={600} mx="auto">
-      <BreadcrumbNav items={[{ label: t("navigation.profile") }]} />
-      <Paper sx={{ p: 4 }}>
-        <Typography variant="h4" gutterBottom>
-          {t("user.profile.title")}
-        </Typography>
-        <Typography variant="body2" color="text.secondary" gutterBottom>
-          {t("user.profile.subtitle")}
-        </Typography>
+    <Box
+      maxWidth={600}
+      mx="auto"
+      sx={{ py: { xs: 2, sm: 4 }, px: { xs: 0, sm: 2 } }}
+    >
+      <Box sx={{ px: { xs: 1.5, sm: 0 } }}>
+        <BreadcrumbNav items={[{ label: t("navigation.profile") }]} />
+      </Box>
+      <Paper sx={{ p: { xs: 2, sm: 4 } }}>
+        <Box sx={{ px: { xs: 0.5, sm: 0 } }}>
+          <Typography variant="h4" gutterBottom>
+            {t("user.profile.title")}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" gutterBottom>
+            {t("user.profile.subtitle")}
+          </Typography>
+        </Box>
 
         <Divider sx={{ my: 3 }} />
 

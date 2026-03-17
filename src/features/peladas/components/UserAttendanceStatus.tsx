@@ -46,7 +46,7 @@ export default function UserAttendanceStatus({
     <Paper
       elevation={0}
       sx={{
-        p: { xs: 2.5, sm: 4 },
+        p: { xs: 2, sm: 4 },
         mb: 4,
         borderRadius: 4,
         bgcolor:
@@ -111,11 +111,15 @@ export default function UserAttendanceStatus({
               bgcolor:
                 player.attendance_status === "confirmed"
                   ? "white"
-                  : "rgba(255,255,255,0.1)",
+                  : "rgba(255, 255, 255, 0.2)",
               color:
                 player.attendance_status === "confirmed"
                   ? "primary.main"
                   : "white",
+              border:
+                player.attendance_status === "confirmed"
+                  ? "none"
+                  : "1px solid rgba(255, 255, 255, 0.4)",
               boxShadow:
                 player.attendance_status === "confirmed"
                   ? "0 4px 12px rgba(0,0,0,0.2)"
@@ -123,8 +127,8 @@ export default function UserAttendanceStatus({
               "&:hover": {
                 bgcolor:
                   player.attendance_status === "confirmed"
-                    ? "white"
-                    : "rgba(255,255,255,0.25)",
+                    ? "rgba(255, 255, 255, 0.9)"
+                    : "rgba(255, 255, 255, 0.3)",
               },
               transition: "all 0.2s ease",
             }}
@@ -154,11 +158,15 @@ export default function UserAttendanceStatus({
               bgcolor:
                 player.attendance_status === "declined"
                   ? "white"
-                  : "rgba(255,255,255,0.1)",
+                  : "rgba(255, 255, 255, 0.2)",
               color:
                 player.attendance_status === "declined"
                   ? "error.main"
                   : "white",
+              border:
+                player.attendance_status === "declined"
+                  ? "none"
+                  : "1px solid rgba(255, 255, 255, 0.4)",
               boxShadow:
                 player.attendance_status === "declined"
                   ? "0 4px 12px rgba(0,0,0,0.2)"
@@ -166,8 +174,8 @@ export default function UserAttendanceStatus({
               "&:hover": {
                 bgcolor:
                   player.attendance_status === "declined"
-                    ? "white"
-                    : "rgba(255,255,255,0.25)",
+                    ? "rgba(255, 255, 255, 0.9)"
+                    : "rgba(255, 255, 255, 0.3)",
               },
               transition: "all 0.2s ease",
             }}

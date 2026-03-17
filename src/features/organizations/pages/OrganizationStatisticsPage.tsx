@@ -81,20 +81,26 @@ export default function OrganizationStatisticsPage() {
 
   if (error)
     return (
-      <Container sx={{ mt: 4 }}>
+      <Container sx={{ mt: 4, px: { xs: 1, sm: 2 } }} disableGutters>
         <Alert severity="error">{error}</Alert>
       </Container>
     );
   if (!org) return <Loading message={t("common.loading")} />;
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <BreadcrumbNav
-        items={[
-          { label: org.name, path: `/organizations/${orgId}` },
-          { label: t("organizations.detail.button.statistics") },
-        ]}
-      />
+    <Container
+      maxWidth="lg"
+      sx={{ py: { xs: 2, sm: 4 }, px: { xs: 1, sm: 2 } }}
+      disableGutters
+    >
+      <Box sx={{ px: { xs: 1, sm: 0 } }}>
+        <BreadcrumbNav
+          items={[
+            { label: org.name, path: `/organizations/${orgId}` },
+            { label: t("organizations.detail.button.statistics") },
+          ]}
+        />
+      </Box>
 
       <Box
         sx={{
@@ -104,6 +110,7 @@ export default function OrganizationStatisticsPage() {
           alignItems: isMobile ? "flex-start" : "center",
           gap: 2,
           mb: 4,
+          px: { xs: 1, sm: 0 },
         }}
       >
         <Typography variant={isMobile ? "h5" : "h4"} fontWeight="bold">
@@ -114,23 +121,49 @@ export default function OrganizationStatisticsPage() {
           {isAdmin && (
             <Button
               variant="outlined"
-              startIcon={<FileUploadIcon />}
               onClick={() => setImportOpen(true)}
               size="small"
               data-testid="import-stats-button"
-              sx={{ borderRadius: 2, textTransform: "none" }}
+              sx={{
+                borderRadius: 2,
+                textTransform: "none",
+                minWidth: { xs: "40px", sm: "auto" },
+                px: { xs: 0, sm: 2 },
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              {t("common.import")}
+              <FileUploadIcon sx={{ mr: { xs: 0, sm: 1 } }} />
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
+                {t("common.import")}
+              </Box>
             </Button>
           )}
           <Button
             variant="outlined"
-            startIcon={<FileDownloadIcon />}
             onClick={() => setExportOpen(true)}
             size="small"
-            sx={{ borderRadius: 2, textTransform: "none" }}
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              minWidth: { xs: "40px", sm: "auto" },
+              px: { xs: 0, sm: 2 },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            {t("common.export")}
+            <FileDownloadIcon sx={{ mr: { xs: 0, sm: 1 } }} />
+            <Box
+              component="span"
+              sx={{ display: { xs: "none", sm: "inline" } }}
+            >
+              {t("common.export")}
+            </Box>
           </Button>
         </Stack>
       </Box>

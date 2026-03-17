@@ -59,6 +59,7 @@
     }
   },
   "common": {
+    "locale_code": "en-US",
     "of": "of",
     "welcome": "Welcome to Pelada App",
     "hello": "Hello",
@@ -143,6 +144,10 @@
       "defender": "Defender",
       "player": "PLAYER",
       "unknown": "UNKNOWN"
+    },
+    "member_types": {
+      "mensalista": "Mensalista",
+      "diarista": "Diarista"
     }
   },
   "home": {
@@ -235,7 +240,11 @@
       "revoke_invitation_confirm": "Are you sure you want to revoke this invitation?",
       "delete_description": "Deleting an organization is a permanent action and cannot be undone. All associated data will be lost.",
       "delete_confirm_title": "Delete Organization",
-      "delete_confirm_instruction": "Please type the name of the organization \"{{name}}\" to confirm."
+      "delete_confirm_instruction": "Please type the name of the organization \"{{name}}\" to confirm.",
+      "member_type": {
+        "mensalista": "Mensalista",
+        "diarista": "Diarista"
+      }
     },
     "ratings": {
       "title": "Player Ratings - {{name}}",
@@ -586,7 +595,7 @@
       "available": {
         "title": "Players",
         "filter_placeholder": "Filter by name...",
-        "invite_button": "+ Add players",
+        "invite_button": "Add players",
         "add_dialog": {
           "title": "Add Players from Organization",
           "description": "Select players who didn't confirm attendance but wish to participate now.",

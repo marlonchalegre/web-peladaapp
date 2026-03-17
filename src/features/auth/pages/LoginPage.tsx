@@ -53,7 +53,10 @@ export default function LoginPage() {
         backgroundColor: "background.default",
       }}
     >
-      <Paper sx={{ p: 4, maxWidth: 420, width: "100%", mx: 2 }} elevation={3}>
+      <Paper
+        sx={{ p: { xs: 3, sm: 4 }, maxWidth: 420, width: "100%", mx: 2 }}
+        elevation={3}
+      >
         <form onSubmit={onSubmit}>
           <Stack spacing={2}>
             <Typography

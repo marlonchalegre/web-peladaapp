@@ -38,6 +38,7 @@ type TeamCardProps = {
   onRemovePlayer?: (playerId: number) => Promise<void>;
   locked?: boolean;
   fixedGoalkeepersEnabled?: boolean;
+  isAdminOverride?: boolean;
 };
 
 export default function TeamCard({
@@ -52,6 +53,7 @@ export default function TeamCard({
   onRemovePlayer,
   locked,
   fixedGoalkeepersEnabled,
+  isAdminOverride = false,
 }: TeamCardProps) {
   const { t } = useTranslation();
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
@@ -167,7 +169,7 @@ export default function TeamCard({
             />
           )}
         </Box>
-        {!locked && (
+        {!locked && isAdminOverride && (
           <IconButton
             size="small"
             onClick={onDelete}
@@ -274,7 +276,7 @@ export default function TeamCard({
                 >
                   {p.displayScore ?? "-"}
                 </Box>
-                {!locked && (
+                {!locked && isAdminOverride && (
                   <IconButton
                     size="small"
                     onClick={(e) => handleOpenMenu(e, p.id)}

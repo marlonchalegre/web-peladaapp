@@ -35,6 +35,7 @@ type AvailablePlayersPanelProps = {
   organizationId: number;
   allPlayerIdsInPelada: number[];
   locked?: boolean;
+  isAdmin?: boolean;
   totalPlayersInPelada: number;
   averagePelada: number;
   balance: number;
@@ -49,6 +50,7 @@ export default function AvailablePlayersPanel({
   organizationId,
   allPlayerIdsInPelada,
   locked,
+  isAdmin = false,
   totalPlayersInPelada,
   averagePelada,
   balance,
@@ -143,25 +145,29 @@ export default function AvailablePlayersPanel({
             />
           </Stack>
 
-          <Button
-            size="small"
-            variant="text"
-            startIcon={<ContentCopyIcon sx={{ fontSize: "1rem !important" }} />}
-            onClick={handleCopyPlayers}
-            data-testid="copy-players-button"
-            sx={{
-              textTransform: "none",
-              fontWeight: 700,
-              fontSize: "0.75rem",
-              color: "text.secondary",
-              "&:hover": {
-                bgcolor: "action.hover",
-                color: "primary.main",
-              },
-            }}
-          >
-            {t("common.copy")}
-          </Button>
+          {isAdmin && (
+            <Button
+              size="small"
+              variant="text"
+              startIcon={
+                <ContentCopyIcon sx={{ fontSize: "1rem !important" }} />
+              }
+              onClick={handleCopyPlayers}
+              data-testid="copy-players-button"
+              sx={{
+                textTransform: "none",
+                fontWeight: 700,
+                fontSize: "0.75rem",
+                color: "text.secondary",
+                "&:hover": {
+                  bgcolor: "action.hover",
+                  color: "primary.main",
+                },
+              }}
+            >
+              {t("common.copy")}
+            </Button>
+          )}
         </Box>
 
         <TextField
@@ -212,30 +218,31 @@ export default function AvailablePlayersPanel({
           )}
         </Stack>
 
-        <Button
-          fullWidth
-          variant="outlined"
-          startIcon={<AddIcon />}
-          onClick={() => setAddDialogOpen(true)}
-          disabled={locked}
-          sx={{
-            mt: 3,
-            borderStyle: "dashed",
-            borderRadius: 2,
-            textTransform: "none",
-            fontWeight: "bold",
-            py: 1,
-            color: "primary.main",
-            borderColor: "primary.light",
-            "&:hover": {
+        {isAdmin && (
+          <Button
+            fullWidth
+            variant="outlined"
+            startIcon={<AddIcon />}
+            onClick={() => setAddDialogOpen(true)}
+            sx={{
+              mt: 3,
               borderStyle: "dashed",
-              bgcolor: "primary.lighter",
-              borderColor: "primary.main",
-            },
-          }}
-        >
-          {t("peladas.panel.available.invite_button")}
-        </Button>
+              borderRadius: 2,
+              textTransform: "none",
+              fontWeight: "bold",
+              py: 1,
+              color: "primary.main",
+              borderColor: "primary.light",
+              "&:hover": {
+                borderStyle: "dashed",
+                bgcolor: "primary.lighter",
+                borderColor: "primary.main",
+              },
+            }}
+          >
+            {t("peladas.panel.available.invite_button")}
+          </Button>
+        )}
       </Paper>
 
       <AddPlayersFromOrgDialog

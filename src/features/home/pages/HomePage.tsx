@@ -31,14 +31,22 @@ export default function HomePage() {
 
   if (!user) {
     return (
-      <Container maxWidth="lg" sx={{ py: 3 }}>
+      <Container
+        maxWidth="lg"
+        sx={{ py: 3, px: { xs: 1, sm: 2 } }}
+        disableGutters
+      >
         <Loading message={t("common.loading")} />
       </Container>
     );
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container
+      maxWidth="lg"
+      sx={{ py: { xs: 2, sm: 4 }, px: { xs: 1, sm: 2 } }}
+      disableGutters
+    >
       {/* Header / Welcome Section */}
       <Box
         sx={{
@@ -46,6 +54,7 @@ export default function HomePage() {
           justifyContent: "space-between",
           alignItems: "flex-start",
           mb: 5,
+          px: { xs: 1, sm: 0 },
         }}
       >
         <Box>

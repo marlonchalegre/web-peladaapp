@@ -96,23 +96,47 @@ export default function MembersSection({
         <Box sx={{ display: "flex", gap: 1 }}>
           <Button
             variant="outlined"
-            startIcon={<EmailIcon />}
             onClick={onInviteClick}
             disabled={actionLoading}
             data-testid="members-invite-button"
             size="small"
+            sx={{
+              minWidth: { xs: "40px", sm: "auto" },
+              px: { xs: 0, sm: 2 },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            {t("organizations.dialog.invite_player.title")}
+            <EmailIcon sx={{ mr: { xs: 0, sm: 1 } }} />
+            <Box
+              component="span"
+              sx={{ display: { xs: "none", sm: "inline" } }}
+            >
+              {t("organizations.dialog.invite_player.title")}
+            </Box>
           </Button>
           <Button
             variant="contained"
-            startIcon={<PersonAddIcon />}
             onClick={onAddClick}
             disabled={actionLoading}
             data-testid="members-add-button"
             size="small"
+            sx={{
+              minWidth: { xs: "40px", sm: "auto" },
+              px: { xs: 0, sm: 2 },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            {t("common.add")}
+            <PersonAddIcon sx={{ mr: { xs: 0, sm: 1 } }} />
+            <Box
+              component="span"
+              sx={{ display: { xs: "none", sm: "inline" } }}
+            >
+              {t("common.add")}
+            </Box>
           </Button>
         </Box>
       </Box>

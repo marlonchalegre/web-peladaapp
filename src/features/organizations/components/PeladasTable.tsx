@@ -111,15 +111,20 @@ export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
                 <TableCell sx={{ py: 2 }}>
                   <Typography variant="body2" fontWeight={500}>
                     {p.scheduled_at
-                      ? new Date(p.scheduled_at).toLocaleDateString()
+                      ? new Date(p.scheduled_at).toLocaleDateString(
+                          t("common.locale_code", "pt-BR"),
+                        )
                       : t("common.date.tbd", "TBD")}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
                     {p.scheduled_at
-                      ? new Date(p.scheduled_at).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
+                      ? new Date(p.scheduled_at).toLocaleTimeString(
+                          t("common.locale_code", "pt-BR"),
+                          {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          },
+                        )
                       : ""}
                   </Typography>
                 </TableCell>

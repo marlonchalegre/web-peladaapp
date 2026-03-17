@@ -72,19 +72,7 @@ export default function PeladaDetailHeader({
         alignItems={{ xs: "stretch", md: "center" }}
         spacing={2}
       >
-        <Box>
-          <Typography
-            variant="overline"
-            display="block"
-            color="text.secondary"
-            sx={{ lineHeight: 1, fontWeight: "bold" }}
-          >
-            {t("common.organization")}
-          </Typography>
-          <Typography variant="h3" sx={{ fontWeight: 800, letterSpacing: -1 }}>
-            {t("peladas.detail.title", { id: pelada.id })}
-          </Typography>
-        </Box>
+        <Box />
 
         <Stack
           direction={{ xs: "column", sm: "row" }}
@@ -138,14 +126,16 @@ export default function PeladaDetailHeader({
           )}
 
           <Stack direction="row" spacing={1}>
-            <Tooltip title={t("common.actions.export")}>
-              <IconButton
-                onClick={handleOpenExport}
-                sx={{ border: "1px solid", borderColor: "divider" }}
-              >
-                <ContentCopyIcon />
-              </IconButton>
-            </Tooltip>
+            {isAdminOverride && (
+              <Tooltip title={t("common.actions.export")}>
+                <IconButton
+                  onClick={handleOpenExport}
+                  sx={{ border: "1px solid", borderColor: "divider" }}
+                >
+                  <ContentCopyIcon />
+                </IconButton>
+              </Tooltip>
+            )}
 
             {pelada.status === "open" && isAdminOverride ? (
               <>
@@ -154,16 +144,25 @@ export default function PeladaDetailHeader({
                     component={RouterLink}
                     to={`/peladas/${pelada.id}/build-schedule`}
                     variant="contained"
-                    startIcon={<CalendarTodayIcon />}
                     data-testid="build-schedule-button"
                     sx={{
                       textTransform: "none",
                       borderRadius: 2,
                       fontWeight: 800,
-                      px: 3,
+                      px: { xs: 1.5, sm: 3 },
+                      minWidth: { xs: "40px", sm: "auto" },
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
-                    {t("peladas.detail.button.build_schedule")}
+                    <CalendarTodayIcon sx={{ mr: { xs: 0, md: 1 } }} />
+                    <Box
+                      component="span"
+                      sx={{ display: { xs: "none", md: "inline" } }}
+                    >
+                      {t("peladas.detail.button.build_schedule")}
+                    </Box>
                   </Button>
                 ) : (
                   <Stack direction="row" spacing={1}>
@@ -171,19 +170,28 @@ export default function PeladaDetailHeader({
                       component={RouterLink}
                       to={`/peladas/${pelada.id}/build-schedule`}
                       variant="outlined"
-                      startIcon={<CalendarTodayIcon />}
                       data-testid="build-schedule-button-edit"
                       sx={{
                         textTransform: "none",
                         borderRadius: 2,
                         fontWeight: "bold",
+                        px: { xs: 1.5, sm: 2 },
+                        minWidth: { xs: "40px", sm: "auto" },
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
                       }}
                     >
-                      {t("peladas.detail.button.build_schedule")}
+                      <CalendarTodayIcon sx={{ mr: { xs: 0, md: 1 } }} />
+                      <Box
+                        component="span"
+                        sx={{ display: { xs: "none", md: "inline" } }}
+                      >
+                        {t("peladas.detail.button.build_schedule")}
+                      </Box>
                     </Button>
                     <Button
                       variant="contained"
-                      startIcon={<PlayArrowIcon />}
                       onClick={onStartClick}
                       disabled={changingStatus || processing}
                       data-testid="start-pelada-button"
@@ -192,30 +200,53 @@ export default function PeladaDetailHeader({
                         borderRadius: 2,
                         bgcolor: "primary.main",
                         fontWeight: 800,
-                        px: 3,
+                        px: { xs: 1.5, sm: 3 },
+                        minWidth: { xs: "40px", sm: "auto" },
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
                         "&:hover": { bgcolor: "primary.dark" },
                       }}
                     >
-                      {t("peladas.detail.button.start_pelada")}
+                      <PlayArrowIcon sx={{ mr: { xs: 0, md: 1 } }} />
+                      <Box
+                        component="span"
+                        sx={{ display: { xs: "none", md: "inline" } }}
+                      >
+                        {t("peladas.detail.button.start_pelada")}
+                      </Box>
                     </Button>
                   </Stack>
                 )}
               </>
             ) : (
-              <Button
-                component={RouterLink}
-                to={`/peladas/${pelada.id}/matches`}
-                variant="outlined"
-                startIcon={<HistoryIcon />}
-                data-testid="view-matches-button"
-                sx={{
-                  textTransform: "none",
-                  borderRadius: 2,
-                  fontWeight: "bold",
-                }}
-              >
-                {t("peladas.detail.button.view_matches")}
-              </Button>
+              // Show "View Matches" only if pelada is not open/attendance
+              !["open", "attendance"].includes(pelada.status || "") && (
+                <Button
+                  component={RouterLink}
+                  to={`/peladas/${pelada.id}/matches`}
+                  variant="outlined"
+                  data-testid="view-matches-button"
+                  sx={{
+                    textTransform: "none",
+                    borderRadius: 2,
+                    fontWeight: "bold",
+                    px: { xs: 1.5, sm: 2 },
+                    minWidth: { xs: "40px", sm: "auto" },
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <HistoryIcon sx={{ mr: { xs: 0, md: 1 } }} />
+                  <Box
+                    component="span"
+                    sx={{ display: { xs: "none", md: "inline" } }}
+                  >
+                    {t("peladas.detail.button.view_matches")}
+                  </Box>
+                </Button>
+              )
             )}
           </Stack>
 
@@ -229,12 +260,22 @@ export default function PeladaDetailHeader({
                 textTransform: "none",
                 borderRadius: 2,
                 fontWeight: "bold",
-                px: 3,
+                px: { xs: 1.5, sm: 3 },
+                minWidth: { xs: "40px", sm: "auto" },
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              {votingInfo.has_voted
-                ? t("peladas.detail.button.change_votes")
-                : t("peladas.detail.button.vote")}
+              <RateReviewIcon sx={{ mr: { xs: 0, md: 1 } }} />
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", md: "inline" } }}
+              >
+                {votingInfo.has_voted
+                  ? t("peladas.detail.button.change_votes")
+                  : t("peladas.detail.button.vote")}
+              </Box>
             </Button>
           )}
 
@@ -244,15 +285,24 @@ export default function PeladaDetailHeader({
               to={`/peladas/${pelada.id}/results`}
               variant="outlined"
               color="primary"
-              startIcon={<AssessmentIcon />}
               sx={{
                 textTransform: "none",
                 borderRadius: 2,
                 fontWeight: "bold",
-                px: 3,
+                px: { xs: 1.5, sm: 3 },
+                minWidth: { xs: "40px", sm: "auto" },
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              {t("peladas.detail.button.view_results")}
+              <AssessmentIcon sx={{ mr: { xs: 0, md: 1 } }} />
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", md: "inline" } }}
+              >
+                {t("peladas.detail.button.view_results")}
+              </Box>
             </Button>
           )}
         </Stack>

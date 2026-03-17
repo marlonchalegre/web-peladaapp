@@ -132,7 +132,6 @@ export default function TeamsSection(props: TeamsSectionProps) {
             <Stack direction="row" spacing={1}>
               <Button
                 variant="outlined"
-                startIcon={<ShuffleIcon />}
                 onClick={async () => {
                   await onRandomizeTeams();
                 }}
@@ -143,13 +142,23 @@ export default function TeamsSection(props: TeamsSectionProps) {
                   borderRadius: 2,
                   fontWeight: "bold",
                   flex: 1,
+                  minWidth: { xs: "40px", sm: "auto" },
+                  px: { xs: 1.5, md: 2 },
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                {t("peladas.teams.button.randomize")}
+                <ShuffleIcon sx={{ mr: { xs: 0, md: 1 } }} />
+                <Box
+                  component="span"
+                  sx={{ display: { xs: "none", md: "inline" } }}
+                >
+                  {t("peladas.teams.button.randomize")}
+                </Box>
               </Button>
               <Button
                 variant="contained"
-                startIcon={<AddIcon />}
                 onClick={async () => {
                   await onCreateTeam(
                     t("peladas.teams.default_name", {
@@ -165,11 +174,21 @@ export default function TeamsSection(props: TeamsSectionProps) {
                   bgcolor: "primary.main",
                   fontWeight: 800,
                   boxShadow: "0 4px 12px rgba(25, 118, 210, 0.2)",
-                  px: 2,
+                  px: { xs: 1.5, md: 2 },
+                  minWidth: { xs: "40px", sm: "auto" },
                   flex: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                {t("peladas.teams.button.create")}
+                <AddIcon sx={{ mr: { xs: 0, md: 1 } }} />
+                <Box
+                  component="span"
+                  sx={{ display: { xs: "none", md: "inline" } }}
+                >
+                  {t("peladas.teams.button.create")}
+                </Box>
               </Button>
             </Stack>
           </Stack>
@@ -236,6 +255,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
                   onRemovePlayer={(pid) => onRemovePlayer(t.id, pid)}
                   locked={locked}
                   fixedGoalkeepersEnabled={fixedGoalkeepersEnabled}
+                  isAdminOverride={isAdminOverride}
                 />
               </Grid>
             );
