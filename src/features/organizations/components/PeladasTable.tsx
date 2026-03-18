@@ -123,6 +123,7 @@ export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
                           {
                             hour: "2-digit",
                             minute: "2-digit",
+                            hour12: false,
                           },
                         )
                       : ""}

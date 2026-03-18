@@ -25,6 +25,9 @@ import { useAuth } from "./app/providers/AuthContext";
 import { useAppTheme } from "./app/providers/ThemeContext";
 import { LanguageSwitcher } from "./shared/components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import "dayjs/locale/pt-br";
 import ProtectedRoute from "./app/routing/ProtectedRoute";
 import LoginPage from "./features/auth/pages/LoginPage";
 import RegisterPage from "./features/auth/pages/RegisterPage";
@@ -291,9 +294,15 @@ function AppLayout() {
 }
 
 export default function App() {
+  const { i18n } = useTranslation();
   return (
     <AuthProvider>
-      <AppLayout />
+      <LocalizationProvider
+        dateAdapter={AdapterDayjs}
+        adapterLocale={i18n.language === "pt-BR" ? "pt-br" : "en"}
+      >
+        <AppLayout />
+      </LocalizationProvider>
     </AuthProvider>
   );
 }

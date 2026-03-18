@@ -1,7 +1,10 @@
-import { useMemo } from "react";
+import { useState } from "react";
 import type { FormEvent } from "react";
-import { Grid, TextField, Button } from "@mui/material";
+import { Grid, Button } from "@mui/material";
+import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import { useTranslation } from "react-i18next";
+import dayjs from "dayjs";
+import type { Dayjs } from "dayjs";
 
 export type CreatePeladaPayload = {
   organization_id: number;
@@ -15,54 +18,53 @@ type Props = {
 
 export default function CreatePeladaForm({ organizationId, onCreate }: Props) {
   const { t } = useTranslation();
-  const { defaultDate, defaultTime } = useMemo(() => {
-    const now = new Date();
-    const pad2 = (n: number) => String(n).padStart(2, "0");
-    return {
-      defaultDate: `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`,
-      defaultTime: `${pad2(now.getHours())}:${pad2(now.getMinutes())}`,
-    };
-  }, []);
+  const [date, setDate] = useState<Dayjs | null>(dayjs());
+  const [time, setTime] = useState<Dayjs | null>(dayjs());
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!date || !time) return;
+
+    const when = date
+      .hour(time.hour())
+      .minute(time.minute())
+      .second(0)
+      .format("YYYY-MM-DDTHH:mm:ss");
+
+    await onCreate({
+      organization_id: organizationId,
+      when,
+    });
+  };
 
   return (
-    <form
-      onSubmit={async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const formEl = e.currentTarget;
-        const data = new FormData(formEl);
-        const date = String(data.get("date") || "");
-        const time = String(data.get("time") || "");
-        const when = date && time ? `${date}T${time}` : "";
-
-        if (!when) return;
-        await onCreate({
-          organization_id: organizationId,
-          when,
-        });
-        formEl?.reset();
-      }}
-    >
+    <form onSubmit={handleSubmit}>
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, sm: 6 }}>
-          <TextField
-            fullWidth
-            name="date"
-            type="date"
+          <DatePicker
             label={t("common.fields.date")}
-            InputLabelProps={{ shrink: true }}
-            required
-            defaultValue={defaultDate}
+            value={date}
+            onChange={(newValue) => setDate(newValue)}
+            slotProps={{
+              textField: {
+                fullWidth: true,
+                required: true,
+              },
+            }}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
-          <TextField
-            fullWidth
-            name="time"
-            type="time"
+          <TimePicker
             label={t("common.fields.time")}
-            InputLabelProps={{ shrink: true }}
-            required
-            defaultValue={defaultTime}
+            value={time}
+            onChange={(newValue) => setTime(newValue)}
+            ampm={false}
+            slotProps={{
+              textField: {
+                fullWidth: true,
+                required: true,
+              },
+            }}
           />
         </Grid>
         <Grid size={{ xs: 12 }}>
