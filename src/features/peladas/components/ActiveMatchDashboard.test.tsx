@@ -116,4 +116,41 @@ describe("ActiveMatchDashboard", () => {
       screen.getByText("peladas.dashboard.button.finish_editing"),
     ).toBeInTheDocument();
   });
+
+  it("renders empty slots when teams are below playersPerTeam limit", () => {
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard {...defaultProps} playersPerTeam={5} />
+      </ThemeContextProvider>,
+    );
+
+    // Each team has 1 player, limit is 5. Each team should have 4 empty slots.
+    // Total empty slots = 8
+    const emptySlots = screen.getAllByTestId("player-row-empty");
+    expect(emptySlots.length).toBe(8);
+  });
+
+  it("renders empty slots to balance teams even if playersPerTeam is not set", () => {
+    const unbalancedHomePlayers = [
+      { team_id: 10, player_id: 101 },
+      { team_id: 10, player_id: 102 },
+    ];
+    const unbalancedAwayPlayers = [{ team_id: 20, player_id: 201 }];
+
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          homePlayers={unbalancedHomePlayers}
+          awayPlayers={unbalancedAwayPlayers}
+          playersPerTeam={undefined}
+        />
+      </ThemeContextProvider>,
+    );
+
+    // Away team has 1 player, Home has 2. Target count should be 2.
+    // Away team should have 1 empty slot.
+    const emptySlots = screen.getAllByTestId("player-row-empty");
+    expect(emptySlots.length).toBe(1);
+  });
 });

@@ -134,6 +134,7 @@ export interface PeladaDashboardDataResponse {
   player_stats: PlayerStats[] | null;
   team_players_map: Record<number, TeamPlayer[]>;
   match_lineups_map: Record<number, Record<number, MatchLineupEntry[]>>;
+  attendance?: { player_id: number; status: string }[];
 }
 export interface VotingInfo {
   can_vote: boolean;

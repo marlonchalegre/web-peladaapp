@@ -11,6 +11,7 @@ import {
   type Player,
   type MatchEvent,
   type PlayerStats,
+  type Attendance,
 } from "../../../shared/api/endpoints";
 
 const endpoints = createApi(api);
@@ -48,6 +49,7 @@ export function usePeladaData(peladaId: number) {
   const [playerStatsFromApi, setPlayerStatsFromApi] = useState<
     PlayerStats[] | null
   >(null);
+  const [attendance, setAttendance] = useState<Attendance[]>([]);
   const [loadedPeladaId, setLoadedPeladaId] = useState<number | null>(null);
 
   const fetchData = useCallback(
@@ -90,6 +92,7 @@ export function usePeladaData(peladaId: number) {
         setTeams(data.teams);
         setMatchEvents(data.match_events);
         setPlayerStatsFromApi(data.player_stats);
+        setAttendance(data.attendance || []);
 
         const nameMap: Record<number, string> = {};
         for (const u of data.users) nameMap[u.id] = u.name;
@@ -170,6 +173,7 @@ export function usePeladaData(peladaId: number) {
     matchEvents,
     setMatchEvents,
     playerStatsFromApi,
+    attendance,
     refreshData: () => fetchData(true),
   };
 }

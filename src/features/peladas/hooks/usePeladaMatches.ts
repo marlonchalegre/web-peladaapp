@@ -21,6 +21,7 @@ export function usePeladaMatches(peladaId: number) {
     orgPlayerIdToPlayer,
     matchEvents,
     playerStatsFromApi,
+    attendance,
     refreshData,
   } = data;
 
@@ -158,13 +159,41 @@ export function usePeladaMatches(peladaId: number) {
     const lineupIds = new Set(
       [...homePlayers, ...awayPlayers].map((p) => p.player_id),
     );
-    const benchPlayers = Object.values(orgPlayerIdToPlayer).filter(
-      (p) => !lineupIds.has(p.id),
+
+    const confirmedPlayerIds = new Set(
+      attendance
+        .filter((a) => {
+          const s = String(a.status || a.Status || "")
+            .trim()
+            .toLowerCase();
+          return s === "confirmed";
+        })
+        .map((a) => {
+          const pid = a.player_id ?? a["player-id"] ?? a.playerId ?? a.id;
+          return pid ? Number(pid) : null;
+        })
+        .filter((id): id is number => id !== null),
     );
+
+    // If attendance is completely missing/empty, we might want a fallback to avoid a broken UI,
+    // but the user says there are confirmed players, so let's stick to the confirmed list first.
+    const benchPlayers = Object.values(orgPlayerIdToPlayer).filter((p) => {
+      const pid = Number(p.id);
+      const isConfirmed =
+        confirmedPlayerIds.size === 0 || confirmedPlayerIds.has(pid);
+      const isInLineup = lineupIds.has(pid);
+      return isConfirmed && !isInLineup;
+    });
     const finished = (selectedMatch.status || "").toLowerCase() === "finished";
 
     return { homePlayers, awayPlayers, benchPlayers, finished };
-  }, [selectedMatch, lineupsByMatch, teamPlayers, orgPlayerIdToPlayer]);
+  }, [
+    selectedMatch,
+    lineupsByMatch,
+    teamPlayers,
+    orgPlayerIdToPlayer,
+    attendance,
+  ]);
 
   const isPeladaClosed = ["closed", "voting"].includes(
     (pelada?.status || "").toLowerCase(),

@@ -182,6 +182,14 @@ export default function ActiveMatchDashboard(props: Props) {
     }
   };
 
+  const targetCount = useMemo(() => {
+    return Math.max(
+      Number(playersPerTeam || 0),
+      homePlayers.length,
+      awayPlayers.length,
+    );
+  }, [playersPerTeam, homePlayers.length, awayPlayers.length]);
+
   const generateTeamList = useCallback(
     (players: TeamPlayer[], side: "home" | "away", teamId: number) => {
       // Sort by position then name
@@ -205,8 +213,8 @@ export default function ActiveMatchDashboard(props: Props) {
         teamId,
         isEmpty: false,
       }));
-      if (playersPerTeam && players.length < playersPerTeam) {
-        const missing = playersPerTeam - players.length;
+      if (targetCount > 0 && players.length < targetCount) {
+        const missing = targetCount - players.length;
         for (let i = 0; i < missing; i++) {
           list.push({
             player_id: -1 * (i + 1 + (side === "home" ? 0 : 100)),
@@ -220,7 +228,7 @@ export default function ActiveMatchDashboard(props: Props) {
       }
       return list;
     },
-    [orgPlayerIdToPlayer, getPlayerName, playersPerTeam],
+    [orgPlayerIdToPlayer, getPlayerName, targetCount],
   );
 
   const homeList = useMemo(
