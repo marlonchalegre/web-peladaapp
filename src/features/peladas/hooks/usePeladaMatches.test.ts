@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, type Mock } from "vitest";
 import { renderHook } from "@testing-library/react";
 import { usePeladaMatches } from "./usePeladaMatches";
 import { usePeladaData } from "./usePeladaData";
@@ -13,7 +13,9 @@ describe("usePeladaMatches", () => {
     const mockData = {
       loading: false,
       error: null,
-      matches: [{ id: 1, home_team_id: 10, away_team_id: 20, status: "running" }],
+      matches: [
+        { id: 1, home_team_id: 10, away_team_id: 20, status: "running" },
+      ],
       matchesRef: { current: [] },
       teams: [],
       pelada: { id: 1, status: "running" },
@@ -35,7 +37,7 @@ describe("usePeladaMatches", () => {
       refreshData: vi.fn(),
     };
 
-    (usePeladaData as any).mockReturnValue(mockData);
+    (usePeladaData as Mock).mockReturnValue(mockData);
 
     const { result } = renderHook(() => usePeladaMatches(1));
 
@@ -51,7 +53,9 @@ describe("usePeladaMatches", () => {
     const mockData = {
       loading: false,
       error: null,
-      matches: [{ id: 1, home_team_id: 10, away_team_id: 20, status: "running" }],
+      matches: [
+        { id: 1, home_team_id: 10, away_team_id: 20, status: "running" },
+      ],
       matchesRef: { current: [] },
       teams: [],
       pelada: { id: 1, status: "running" },
@@ -72,7 +76,7 @@ describe("usePeladaMatches", () => {
       refreshData: vi.fn(),
     };
 
-    (usePeladaData as any).mockReturnValue(mockData);
+    (usePeladaData as Mock).mockReturnValue(mockData);
 
     const { result } = renderHook(() => usePeladaMatches(1));
 
@@ -84,7 +88,9 @@ describe("usePeladaMatches", () => {
     const mockData = {
       loading: false,
       error: null,
-      matches: [{ id: 1, home_team_id: 10, away_team_id: 20, status: "running" }],
+      matches: [
+        { id: 1, home_team_id: 10, away_team_id: 20, status: "running" },
+      ],
       matchesRef: { current: [] },
       teams: [],
       pelada: { id: 1, status: "running" },
@@ -102,7 +108,7 @@ describe("usePeladaMatches", () => {
       refreshData: vi.fn(),
     };
 
-    (usePeladaData as any).mockReturnValue(mockData);
+    (usePeladaData as Mock).mockReturnValue(mockData);
 
     const { result } = renderHook(() => usePeladaMatches(1));
 

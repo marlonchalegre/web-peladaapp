@@ -201,11 +201,14 @@ export type AttendanceStatus =
   | "pending"
   | "waitlist";
 export interface Attendance {
-  id: number;
-  pelada_id: number;
+  id?: number;
+  pelada_id?: number;
   player_id: number;
-  status: AttendanceStatus;
-  player: Player & { user: User };
+  "player-id"?: number;
+  playerId?: number;
+  status: string;
+  Status?: string;
+  player?: Player & { user: User };
 }
 
 export interface OrganizationInvitation {
