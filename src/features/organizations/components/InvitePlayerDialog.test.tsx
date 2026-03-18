@@ -1,6 +1,8 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import InvitePlayerDialog from "./InvitePlayerDialog";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 // Mock react-i18next
 vi.mock("react-i18next", () => ({
@@ -23,7 +25,11 @@ describe("InvitePlayerDialog", () => {
   };
 
   it("renders correctly when open", () => {
-    render(<InvitePlayerDialog {...defaultProps} />);
+    render(
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <InvitePlayerDialog {...defaultProps} />
+      </LocalizationProvider>,
+    );
     expect(
       screen.getByText("organizations.dialog.invite_player.title"),
     ).toBeInTheDocument();
@@ -35,7 +41,11 @@ describe("InvitePlayerDialog", () => {
   });
 
   it("calls onInvite when send button is clicked", async () => {
-    render(<InvitePlayerDialog {...defaultProps} />);
+    render(
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <InvitePlayerDialog {...defaultProps} />
+      </LocalizationProvider>,
+    );
 
     const handleInput = screen.getByLabelText("common.fields.username");
     fireEvent.change(handleInput, { target: { value: "testuser" } });
@@ -49,7 +59,11 @@ describe("InvitePlayerDialog", () => {
   });
 
   it("calls onFetchPublicLink when generate link button is clicked", () => {
-    render(<InvitePlayerDialog {...defaultProps} />);
+    render(
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <InvitePlayerDialog {...defaultProps} />
+      </LocalizationProvider>,
+    );
 
     const generateButton = screen.getByText(
       "organizations.dialog.invite_player.generate_link",
@@ -61,10 +75,12 @@ describe("InvitePlayerDialog", () => {
 
   it("calls onResetPublicLink when reset button is clicked", () => {
     render(
-      <InvitePlayerDialog
-        {...defaultProps}
-        publicInviteLink="http://example.com/join/123"
-      />,
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <InvitePlayerDialog
+          {...defaultProps}
+          publicInviteLink="http://example.com/join/123"
+        />
+      </LocalizationProvider>,
     );
 
     const resetButton = screen.getByTestId("reset-public-link-button");
@@ -75,10 +91,12 @@ describe("InvitePlayerDialog", () => {
 
   it("displays public link when provided", () => {
     render(
-      <InvitePlayerDialog
-        {...defaultProps}
-        publicInviteLink="http://example.com/join/123"
-      />,
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <InvitePlayerDialog
+          {...defaultProps}
+          publicInviteLink="http://example.com/join/123"
+        />
+      </LocalizationProvider>,
     );
 
     expect(screen.getByText("http://example.com/join/123")).toBeInTheDocument();
@@ -89,10 +107,12 @@ describe("InvitePlayerDialog", () => {
 
   it("displays success message when user is invited", () => {
     render(
-      <InvitePlayerDialog
-        {...defaultProps}
-        invitedUser={{ email: "new@user.com", isNew: true }}
-      />,
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <InvitePlayerDialog
+          {...defaultProps}
+          invitedUser={{ email: "new@user.com", isNew: true }}
+        />
+      </LocalizationProvider>,
     );
 
     expect(

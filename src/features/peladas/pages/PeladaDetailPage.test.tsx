@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import PeladaDetailPage from "./PeladaDetailPage";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { api } from "../../../shared/api/client";
 
 // Mock the API client
@@ -68,11 +70,13 @@ describe("PeladaDetailPage", () => {
     });
 
     render(
-      <MemoryRouter initialEntries={["/peladas/1"]}>
-        <Routes>
-          <Route path="/peladas/:id" element={<PeladaDetailPage />} />
-        </Routes>
-      </MemoryRouter>,
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <MemoryRouter initialEntries={["/peladas/1"]}>
+          <Routes>
+            <Route path="/peladas/:id" element={<PeladaDetailPage />} />
+          </Routes>
+        </MemoryRouter>
+      </LocalizationProvider>,
     );
 
     await waitFor(() => {

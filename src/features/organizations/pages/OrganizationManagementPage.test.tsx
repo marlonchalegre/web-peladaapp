@@ -11,6 +11,8 @@ import OrganizationManagementPage from "./OrganizationManagementPage";
 import { api } from "../../../shared/api/client";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "../../../app/providers/AuthProvider";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 // Mock api client
 vi.mock("../../../shared/api/client", () => ({
@@ -115,14 +117,16 @@ describe("OrganizationManagementPage", () => {
     return await act(async () => {
       return render(
         <AuthProvider>
-          <MemoryRouter initialEntries={["/organizations/1/management"]}>
-            <Routes>
-              <Route
-                path="/organizations/:id/management"
-                element={<OrganizationManagementPage />}
-              />
-            </Routes>
-          </MemoryRouter>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <MemoryRouter initialEntries={["/organizations/1/management"]}>
+              <Routes>
+                <Route
+                  path="/organizations/:id/management"
+                  element={<OrganizationManagementPage />}
+                />
+              </Routes>
+            </MemoryRouter>
+          </LocalizationProvider>
         </AuthProvider>,
       );
     });

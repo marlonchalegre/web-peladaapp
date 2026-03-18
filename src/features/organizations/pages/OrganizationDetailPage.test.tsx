@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import OrganizationDetailPage from "./OrganizationDetailPage";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 // Mock the API client
 vi.mock("../../../shared/api/client", () => ({
@@ -58,14 +60,16 @@ describe("OrganizationDetailPage", () => {
     });
 
     render(
-      <MemoryRouter initialEntries={["/organizations/1"]}>
-        <Routes>
-          <Route
-            path="/organizations/:id"
-            element={<OrganizationDetailPage />}
-          />
-        </Routes>
-      </MemoryRouter>,
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <MemoryRouter initialEntries={["/organizations/1"]}>
+          <Routes>
+            <Route
+              path="/organizations/:id"
+              element={<OrganizationDetailPage />}
+            />
+          </Routes>
+        </MemoryRouter>
+      </LocalizationProvider>,
     );
 
     await waitFor(() => {
@@ -114,14 +118,16 @@ describe("OrganizationDetailPage", () => {
     );
 
     render(
-      <MemoryRouter initialEntries={["/organizations/1"]}>
-        <Routes>
-          <Route
-            path="/organizations/:id"
-            element={<OrganizationDetailPage />}
-          />
-        </Routes>
-      </MemoryRouter>,
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <MemoryRouter initialEntries={["/organizations/1"]}>
+          <Routes>
+            <Route
+              path="/organizations/:id"
+              element={<OrganizationDetailPage />}
+            />
+          </Routes>
+        </MemoryRouter>
+      </LocalizationProvider>,
     );
 
     await waitFor(() => {
@@ -170,18 +176,20 @@ describe("OrganizationDetailPage", () => {
     });
 
     render(
-      <MemoryRouter initialEntries={["/organizations/1"]}>
-        <Routes>
-          <Route
-            path="/organizations/:id"
-            element={<OrganizationDetailPage />}
-          />
-          <Route
-            path="/peladas/99/attendance"
-            element={<div>Pelada Detail Page</div>}
-          />
-        </Routes>
-      </MemoryRouter>,
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <MemoryRouter initialEntries={["/organizations/1"]}>
+          <Routes>
+            <Route
+              path="/organizations/:id"
+              element={<OrganizationDetailPage />}
+            />
+            <Route
+              path="/peladas/99/attendance"
+              element={<div>Pelada Detail Page</div>}
+            />
+          </Routes>
+        </MemoryRouter>
+      </LocalizationProvider>,
     );
 
     await waitFor(() => {
@@ -231,14 +239,16 @@ describe("OrganizationDetailPage", () => {
     });
 
     render(
-      <MemoryRouter initialEntries={["/organizations/2"]}>
-        <Routes>
-          <Route
-            path="/organizations/:id"
-            element={<OrganizationDetailPage />}
-          />
-        </Routes>
-      </MemoryRouter>,
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <MemoryRouter initialEntries={["/organizations/2"]}>
+          <Routes>
+            <Route
+              path="/organizations/:id"
+              element={<OrganizationDetailPage />}
+            />
+          </Routes>
+        </MemoryRouter>
+      </LocalizationProvider>,
     );
 
     await waitFor(() => {
@@ -293,14 +303,16 @@ describe("OrganizationDetailPage", () => {
     });
 
     render(
-      <MemoryRouter initialEntries={["/organizations/1"]}>
-        <Routes>
-          <Route
-            path="/organizations/:id"
-            element={<OrganizationDetailPage />}
-          />
-        </Routes>
-      </MemoryRouter>,
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <MemoryRouter initialEntries={["/organizations/1"]}>
+          <Routes>
+            <Route
+              path="/organizations/:id"
+              element={<OrganizationDetailPage />}
+            />
+          </Routes>
+        </MemoryRouter>
+      </LocalizationProvider>,
     );
 
     await waitFor(() => {
