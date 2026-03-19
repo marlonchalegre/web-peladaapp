@@ -108,12 +108,13 @@ describe("ActiveMatchDashboard", () => {
       </ThemeContextProvider>,
     );
 
-    const editBtn = screen.getByText("peladas.dashboard.button.edit_match");
+    // Using translation key regex to match localized text
+    const editBtn = screen.getByText(/dashboard\.button\.edit_match/i);
     expect(editBtn).toBeInTheDocument();
 
     await user.click(editBtn);
     expect(
-      screen.getByText("peladas.dashboard.button.finish_editing"),
+      screen.getByText(/dashboard\.button\.finish_editing/i),
     ).toBeInTheDocument();
   });
 
@@ -152,5 +153,51 @@ describe("ActiveMatchDashboard", () => {
     // Away team should have 1 empty slot.
     const emptySlots = screen.getAllByTestId("player-row-empty");
     expect(emptySlots.length).toBe(1);
+  });
+
+  it("identifies and labels the next scheduled match correctly in history drawer", async () => {
+    const user = userEvent.setup();
+    const matches: Match[] = [
+      {
+        id: 1,
+        pelada_id: 1,
+        sequence: 1,
+        home_team_id: 10,
+        away_team_id: 20,
+        home_score: 0,
+        away_score: 0,
+        status: "finished",
+      },
+      {
+        id: 2,
+        pelada_id: 1,
+        sequence: 2,
+        home_team_id: 30,
+        away_team_id: 40,
+        home_score: 0,
+        away_score: 0,
+        status: "scheduled",
+      },
+    ];
+
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          match={matches[0]}
+          matches={matches}
+        />
+      </ThemeContextProvider>,
+    );
+
+    // Open history drawer
+    const historyBtn = screen.getByTestId("toggle-history-drawer");
+    await user.click(historyBtn);
+
+    // Sequence 2 should be labeled as "ATUAL" (Standardized in PT for Next if none running)
+    // Actually we changed it to "ATUAL" for English "Current"
+    expect(
+      screen.getByText(/peladas\.matches\.status\.next/i),
+    ).toBeInTheDocument();
   });
 });

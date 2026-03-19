@@ -10,11 +10,10 @@ import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import StarsIcon from "@mui/icons-material/Stars";
 import { useTranslation } from "react-i18next";
-import type { MatchEvent, Match } from "../../../shared/api/endpoints";
+import type { MatchEvent } from "../../../shared/api/endpoints";
 
 interface PeladaTimelineProps {
   events: MatchEvent[];
-  matches: Match[];
   userIdToName: Record<number, string>;
   orgPlayerIdToUserId: Record<number, number>;
   teamNameById: Record<number, string>;
@@ -22,7 +21,6 @@ interface PeladaTimelineProps {
 
 export default function PeladaTimeline({
   events,
-  matches,
   userIdToName,
   orgPlayerIdToUserId,
 }: PeladaTimelineProps) {
@@ -77,7 +75,6 @@ export default function PeladaTimeline({
   return (
     <Timeline position="right" sx={{ p: 0 }}>
       {sortedEvents.map((event, index) => {
-        const match = matches.find((m) => m.id === event.match_id);
         const isGoal =
           event.event_type === "goal" || event.event_type === "own_goal";
 
@@ -125,9 +122,6 @@ export default function PeladaTimeline({
                   ? t("common.own_goal")
                   : t(`common.${event.event_type}`)}
                 : {getPlayerName(event.player_id)}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {t("peladas.dashboard.summary.title", { seq: match?.sequence })}
               </Typography>
             </TimelineContent>
           </TimelineItem>

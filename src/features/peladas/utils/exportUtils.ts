@@ -103,6 +103,7 @@ export function generateExportText(
         midfielder: "M",
         striker: "A",
         goalkeeper: "G",
+        unknown: "?",
       };
       const pos = p.is_goalkeeper
         ? "G"
@@ -153,6 +154,7 @@ export function generateAnnouncementText(
         midfielder: "M",
         striker: "A",
         goalkeeper: "G",
+        unknown: "?",
       };
       const pos = p.is_goalkeeper
         ? "G"
@@ -194,6 +196,7 @@ export function generateExportCsv(
         midfielder: "M",
         striker: "A",
         goalkeeper: "G",
+        unknown: "?",
       };
       const pos = p.is_goalkeeper
         ? "G"

@@ -68,6 +68,33 @@ describe("exportUtils", () => {
       const result = generateExportText(mockTeams, mockPlayers, scores);
       expect(result).toContain("0,00");
     });
+
+    it("should fallback to '?' for unknown positions", () => {
+      const unknownUser: User = {
+        id: 103,
+        name: "Stranger",
+        username: "stranger",
+        position: "unknown",
+      };
+      const unknownPlayers: Record<number, PlayerWithUser[]> = {
+        1: [
+          {
+            id: 3,
+            user_id: 103,
+            user: unknownUser,
+            grade: 5.0,
+            organization_id: 1,
+            is_goalkeeper: false,
+          },
+        ],
+      };
+      const result = generateExportText(
+        [{ id: 1, pelada_id: 1, name: "Time X" }],
+        unknownPlayers,
+        {},
+      );
+      expect(result).toContain("?");
+    });
   });
 
   describe("generateAnnouncementText", () => {

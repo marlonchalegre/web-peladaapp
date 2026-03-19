@@ -8,10 +8,9 @@ import {
   List,
   ListItem,
   ListItemButton,
-  ListItemText,
-  ListItemIcon,
   IconButton,
   Chip,
+  Avatar,
   useTheme,
 } from "@mui/material";
 import {
@@ -146,6 +145,11 @@ export default function ActiveMatchDashboard(props: Props) {
     },
     [orgPlayerIdToUserId, userIdToName],
   );
+
+  const nextMatchId = useMemo(() => {
+    if (matches.some((m) => m.status === "running")) return null;
+    return matches.find((m) => m.status === "scheduled")?.id || null;
+  }, [matches]);
 
   const handleStatChange = async (
     playerId: number,
@@ -303,7 +307,7 @@ export default function ActiveMatchDashboard(props: Props) {
         {/* Players Section */}
         <Grid container spacing={2}>
           {/* Home Team */}
-          <Grid size={{ xs: 12, sm: 6 }}>
+          <Grid size={{ xs: 12, sm: 6 }} data-testid="home-team-match-section">
             <Box
               sx={{
                 mb: 1.5,
@@ -364,7 +368,7 @@ export default function ActiveMatchDashboard(props: Props) {
           </Grid>
 
           {/* Away Team */}
-          <Grid size={{ xs: 12, sm: 6 }}>
+          <Grid size={{ xs: 12, sm: 6 }} data-testid="away-team-match-section">
             <Box
               sx={{
                 mb: 1.5,
@@ -454,40 +458,186 @@ export default function ActiveMatchDashboard(props: Props) {
         onClose={() => setHistoryOpen(false)}
         data-testid="history-drawer"
       >
-        <Box sx={{ width: 280, p: 2 }}>
-          <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
+        <Box sx={{ width: 320, p: 2 }}>
+          <Typography variant="h6" fontWeight="bold" sx={{ mb: 3, px: 1 }}>
             {t("peladas.matches.history_title")}
           </Typography>
-          <List>
-            {matches.map((m) => (
-              <ListItem key={m.id} disablePadding sx={{ mb: 1 }}>
-                <ListItemButton
-                  selected={match.id === m.id}
-                  onClick={() => {
-                    onSelectMatch(m.id);
-                    setHistoryOpen(false);
-                  }}
-                  sx={{ borderRadius: 2 }}
-                  data-testid={`match-history-item-${m.sequence}`}
-                >
-                  <ListItemText
-                    primary={t("peladas.dashboard.summary.title", {
-                      seq: m.sequence,
-                    })}
-                    secondary={`${teamNameById[m.home_team_id] || "Home"} ${m.home_score} x ${m.away_score} ${teamNameById[m.away_team_id] || "Away"}`}
-                    secondaryTypographyProps={{
-                      variant: "caption",
-                      fontWeight: "bold",
+          <List sx={{ px: 0 }}>
+            {matches.map((m) => {
+              const isSelected = match.id === m.id;
+              const isNext = m.id === nextMatchId;
+              const status = isNext ? "next" : m.status;
+
+              const statusColor =
+                status === "finished"
+                  ? "success"
+                  : status === "running"
+                    ? "primary"
+                    : status === "next"
+                      ? "info"
+                      : "default";
+
+              return (
+                <ListItem key={m.id} disablePadding sx={{ mb: 1.5 }}>
+                  <ListItemButton
+                    selected={isSelected}
+                    onClick={() => {
+                      onSelectMatch(m.id);
+                      setHistoryOpen(false);
                     }}
-                  />
-                  {m.status === "finished" && (
-                    <ListItemIcon sx={{ minWidth: 0, ml: 1 }}>
-                      <CheckCircleIcon fontSize="small" color="success" />
-                    </ListItemIcon>
-                  )}
-                </ListItemButton>
-              </ListItem>
-            ))}
+                    sx={{
+                      borderRadius: 3,
+                      border: "1px solid",
+                      borderColor: isSelected
+                        ? "primary.main"
+                        : isNext
+                          ? "info.light"
+                          : "divider",
+                      bgcolor: isSelected
+                        ? "primary.lighter"
+                        : isNext
+                          ? "info.lighter"
+                          : "transparent",
+                      flexDirection: "column",
+                      alignItems: "stretch",
+                      gap: 1,
+                      p: 1.5,
+                      "&:hover": {
+                        bgcolor: isSelected
+                          ? "primary.lighter"
+                          : isNext
+                            ? "info.lighter"
+                            : "action.hover",
+                      },
+                    }}
+                    data-testid={`match-history-item-${m.sequence}`}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        mb: 0.5,
+                      }}
+                    >
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Avatar
+                          sx={{
+                            width: 24,
+                            height: 24,
+                            fontSize: "0.75rem",
+                            bgcolor: isSelected
+                              ? "primary.main"
+                              : isNext
+                                ? "info.main"
+                                : "text.secondary",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {m.sequence}
+                        </Avatar>
+                        <Typography
+                          variant="caption"
+                          fontWeight="bold"
+                          color={
+                            isSelected
+                              ? "primary.main"
+                              : isNext
+                                ? "info.main"
+                                : "text.secondary"
+                          }
+                        >
+                          {t("peladas.matches.match_label", {
+                            seq: m.sequence,
+                          }).toUpperCase()}
+                        </Typography>
+                      </Stack>
+                      <Chip
+                        label={t(`peladas.matches.status.${status}`)}
+                        size="small"
+                        color={statusColor}
+                        variant={
+                          status === "running" || status === "next"
+                            ? "filled"
+                            : "outlined"
+                        }
+                        sx={{
+                          height: 20,
+                          fontSize: "0.65rem",
+                          fontWeight: "bold",
+                          textTransform: "uppercase",
+                        }}
+                      />
+                    </Box>
+
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          flex: 1,
+                          textAlign: "right",
+                          fontWeight: m.home_score > m.away_score ? 800 : 500,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {teamNameById[m.home_team_id] || "Home"}
+                      </Typography>
+
+                      <Box
+                        sx={{
+                          px: 1.5,
+                          py: 0.25,
+                          borderRadius: 1,
+                          bgcolor: "action.selected",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          minWidth: 60,
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Typography variant="body2" fontWeight="900">
+                          {m.home_score}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          color="text.disabled"
+                          fontWeight="bold"
+                        >
+                          x
+                        </Typography>
+                        <Typography variant="body2" fontWeight="900">
+                          {m.away_score}
+                        </Typography>
+                      </Box>
+
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          flex: 1,
+                          textAlign: "left",
+                          fontWeight: m.away_score > m.home_score ? 800 : 500,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {teamNameById[m.away_team_id] || "Away"}
+                      </Typography>
+                    </Box>
+                  </ListItemButton>
+                </ListItem>
+              );
+            })}
           </List>
         </Box>
       </Drawer>

@@ -10,9 +10,8 @@ export function usePeladaTimer(
   onPause?: () => Promise<void>,
   onReset?: () => Promise<void>,
 ) {
-  const [now, setNow] = useState(0);
-
   const effectiveRunning = status === "running" && !isParentClosed;
+  const [now, setNow] = useState(() => (effectiveRunning ? Date.now() : 0));
 
   useEffect(() => {
     if (effectiveRunning) {
@@ -27,9 +26,12 @@ export function usePeladaTimer(
     let elapsed = accumulatedMs || 0;
     if (effectiveRunning && startedAt && now > 0) {
       const startTime = new Date(startedAt).getTime();
-      elapsed += now - startTime;
+      const diff = now - startTime;
+      if (diff > 0) {
+        elapsed += diff;
+      }
     }
-    return elapsed;
+    return Math.max(0, elapsed);
   }, [startedAt, accumulatedMs, effectiveRunning, now]);
 
   const formatTime = (ms: number) => {

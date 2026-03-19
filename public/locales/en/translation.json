@@ -90,8 +90,9 @@
     "losses_short": "L",
     "you": "You",
     "organization": "ORGANIZATION",
-    "assists_short": "Assists",
-    "own_goals_short": "OG",
+    "assists_short": "AST",
+    "own_goals_short": "OWN",
+    "goals_short": "GOAL",
     "goals_conceded_short": "GA",
     "copy_link": "Copy Link",
     "revoke": "Revoke",
@@ -124,6 +125,7 @@
     "own_goal": "Own Goal",
     "back": "Back",
     "draw": "Draw",
+    "champion": "Champion",
     "final_score": "Final Score",
     "unknown_player": "Unknown Player",
     "back_to_org": "Back to Organization",
@@ -561,7 +563,11 @@
       "share_summary": "Share Summary",
       "summary_copied": "Summary copied to clipboard!",
       "status": {
-        "closed": "Pelada closed"
+        "closed": "Pelada closed",
+        "running": "In progress",
+        "scheduled": "Scheduled",
+        "next": "Current",
+        "finished": "Finished"
       },
       "button": {
         "close_pelada": "Close pelada",
@@ -569,7 +575,7 @@
       },
       "history_title": "Match History Stream",
       "empty_history": "No matches",
-      "history_item_title": "Seq {{sequence}}: {{teamName}}",
+      "match_label": "Match #{{seq}}",
       "team_fallback": "Team {{id}}",
       "confirm_end_match": "Are you sure you want to end the match?",
       "confirm_close_pelada": "Are you sure you want to close this pelada? This will finish all pending matches.",

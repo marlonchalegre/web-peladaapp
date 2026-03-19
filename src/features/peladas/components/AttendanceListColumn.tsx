@@ -51,7 +51,7 @@ export default function AttendanceListColumn({
             isCurrentUser={p.user_id === currentUserId}
             onUpdate={(status) => onUpdate(status, p.id)}
             isUpdating={updatingPlayers.has(p.id)}
-            data-testid={`attendance-card-${p.user.username}`}
+            data-testid={`attendance-card-${p.user.username || p.user_id}`}
           />
         ))}
         {players.length === 0 && (

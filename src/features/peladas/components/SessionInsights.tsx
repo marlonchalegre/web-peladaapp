@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import StandingsPanel, { type StandingRow } from "./StandingsPanel";
 import PlayerStatsPanel, { type PlayerStatRow } from "./PlayerStatsPanel";
 import PeladaTimeline from "./PeladaTimeline";
-import type { MatchEvent, Match } from "../../../shared/api/endpoints";
+import type { MatchEvent } from "../../../shared/api/endpoints";
 import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import HistoryIcon from "@mui/icons-material/History";
@@ -16,7 +16,6 @@ interface SessionInsightsProps {
   isClosed?: boolean;
   // Timeline props
   events: MatchEvent[];
-  matches: Match[];
   userIdToName: Record<number, string>;
   orgPlayerIdToUserId: Record<number, number>;
   teamNameById: Record<number, string>;
@@ -51,7 +50,6 @@ export default function SessionInsights({
   onToggleSort,
   isClosed,
   events,
-  matches,
   userIdToName,
   orgPlayerIdToUserId,
   teamNameById,
@@ -120,7 +118,7 @@ export default function SessionInsights({
       </Box>
 
       <CustomTabPanel value={tabValue} index={0}>
-        <StandingsPanel standings={standings} />
+        <StandingsPanel standings={standings} showHighlights={isClosed} />
       </CustomTabPanel>
 
       <CustomTabPanel value={tabValue} index={1}>
@@ -134,7 +132,6 @@ export default function SessionInsights({
       <CustomTabPanel value={tabValue} index={2}>
         <PeladaTimeline
           events={events}
-          matches={matches}
           userIdToName={userIdToName}
           orgPlayerIdToUserId={orgPlayerIdToUserId}
           teamNameById={teamNameById}

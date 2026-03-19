@@ -75,4 +75,19 @@ describe("usePeladaTimer", () => {
     expect(result.current.elapsedMs).toBe(120000);
     expect(result.current.formattedTime).toBe("00:02:00");
   });
+
+  it("should NOT return negative time if startedAt is in the future", () => {
+    const baseTime = 1000000;
+    vi.setSystemTime(baseTime);
+
+    // startedAt is 5s in the FUTURE (extreme edge case/clock drift)
+    const startedAt = new Date(baseTime + 5000).toISOString();
+
+    const { result } = renderHook(() =>
+      usePeladaTimer(startedAt, 0, "running", false),
+    );
+
+    expect(result.current.elapsedMs).toBe(0);
+    expect(result.current.formattedTime).toBe("00:00:00");
+  });
 });

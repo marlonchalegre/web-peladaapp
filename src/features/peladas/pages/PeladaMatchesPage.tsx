@@ -138,6 +138,16 @@ export default function PeladaMatchesPage() {
     actuallyIsAdmin ||
     (user?.admin_orgs?.includes(pelada?.organization_id || -1) ?? false);
 
+  const handleConfirmClosePelada = async () => {
+    try {
+      await executeClosePelada();
+      setClosePeladaConfirmOpen(false);
+      setActiveTab(2); // Performance tab
+    } catch {
+      // Error already handled in useMatchActions
+    }
+  };
+
   const selectedMatch = matches.find((m) => m.id === selectedMatchId) || null;
 
   const peladaTimer = usePeladaTimer(
@@ -192,8 +202,8 @@ export default function PeladaMatchesPage() {
               position: orgPlayer.position_id
                 ? ["goalkeeper", "defender", "midfielder", "striker"][
                     orgPlayer.position_id - 1
-                  ]
-                : undefined,
+                  ] || "unknown"
+                : "unknown",
             },
           } as PlayerWithUser;
         })
@@ -339,36 +349,36 @@ export default function PeladaMatchesPage() {
                   {t("peladas.matches.share_summary")}
                 </ListItemText>
               </MenuItem>
-              {pelada?.status !== "closed" && (
-                <>
-                  <MenuItem
-                    onClick={() => {
-                      handleCopyAnnouncement();
-                      handleShareClose();
-                    }}
-                  >
-                    <ListItemIcon>
-                      <ContentCopyIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>
-                      {t("peladas.detail.button.copy_announcement")}
-                    </ListItemText>
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => {
-                      handleCopyTeams();
-                      handleShareClose();
-                    }}
-                  >
-                    <ListItemIcon>
-                      <GroupIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText>
-                      {t("peladas.detail.button.copy_teams")}
-                    </ListItemText>
-                  </MenuItem>
-                </>
-              )}
+              {pelada?.status !== "closed" && [
+                <MenuItem
+                  key="copy-announcement"
+                  onClick={() => {
+                    handleCopyAnnouncement();
+                    handleShareClose();
+                  }}
+                >
+                  <ListItemIcon>
+                    <ContentCopyIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>
+                    {t("peladas.detail.button.copy_announcement")}
+                  </ListItemText>
+                </MenuItem>,
+                <MenuItem
+                  key="copy-teams"
+                  onClick={() => {
+                    handleCopyTeams();
+                    handleShareClose();
+                  }}
+                >
+                  <ListItemIcon>
+                    <GroupIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>
+                    {t("peladas.detail.button.copy_teams")}
+                  </ListItemText>
+                </MenuItem>,
+              ]}
             </Menu>
 
             {pelada?.status === "voting" && (
@@ -475,10 +485,12 @@ export default function PeladaMatchesPage() {
                 </Typography>
               </Paper>
             ))}
-
           {activeTab === 1 && (
             <Paper sx={{ borderRadius: 4, overflow: "hidden", p: 2 }}>
-              <StandingsPanel standings={standings} />
+              <StandingsPanel
+                standings={standings}
+                showHighlights={isPeladaClosed}
+              />
               {isAdmin && !isPeladaClosed && (
                 <Box
                   sx={{
@@ -514,7 +526,6 @@ export default function PeladaMatchesPage() {
               )}
             </Paper>
           )}
-
           {activeTab === 2 && (
             <Paper sx={{ borderRadius: 4, overflow: "hidden" }}>
               <PlayerStatsPanel
@@ -524,18 +535,16 @@ export default function PeladaMatchesPage() {
               />
             </Paper>
           )}
-
           {activeTab === 3 && (
             <Paper sx={{ p: 2, borderRadius: 4 }}>
               <PeladaTimeline
                 events={matchEvents}
-                matches={matches}
                 userIdToName={userIdToName}
                 orgPlayerIdToUserId={orgPlayerIdToUserId}
                 teamNameById={teamNameById}
               />
             </Paper>
-          )}
+          )}{" "}
         </Box>
 
         {justFinishedMatch && (
@@ -585,7 +594,7 @@ export default function PeladaMatchesPage() {
         open={closePeladaConfirmOpen}
         title={t("common.confirm")}
         description={t("peladas.matches.confirm_close_pelada")}
-        onConfirm={executeClosePelada}
+        onConfirm={handleConfirmClosePelada}
         onClose={() => setClosePeladaConfirmOpen(false)}
         severity="error"
       />
