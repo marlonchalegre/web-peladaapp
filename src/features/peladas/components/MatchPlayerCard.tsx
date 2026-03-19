@@ -8,6 +8,7 @@ import {
   CircularProgress,
   Tooltip,
   useTheme,
+  alpha,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
@@ -124,7 +125,11 @@ export default function MatchPlayerCard({
         direction="row"
         justifyContent="space-between"
         alignItems="center"
-        sx={{ width: "100%", gap: 0.5, flexWrap: "wrap" }}
+        sx={{
+          width: "100%",
+          gap: { xs: 0.5, sm: 1 },
+          flexWrap: "nowrap", // Force single line to avoid stats wrapping below long names
+        }}
       >
         {/* Player Info */}
         <Stack
@@ -136,7 +141,7 @@ export default function MatchPlayerCard({
             flexGrow: 1,
             flexShrink: 1,
             justifyContent: "flex-start",
-            mr: 0.5,
+            mr: { xs: 0.25, sm: 1 },
           }}
         >
           {/* Sub Button First */}
@@ -203,7 +208,7 @@ export default function MatchPlayerCard({
         {/* Actions Container */}
         <Stack
           direction="row"
-          spacing={{ xs: 0.75, sm: 1 }}
+          spacing={{ xs: 0.5, sm: 1 }}
           alignItems="center"
           sx={{
             justifyContent: "flex-end",
@@ -212,7 +217,7 @@ export default function MatchPlayerCard({
           }}
         >
           {/* Goal Controls/Stats */}
-          <Box sx={{ textAlign: "center" }}>
+          <Box sx={{ textAlign: "center", flexShrink: 0 }}>
             <Typography
               variant="caption"
               sx={{
@@ -221,6 +226,7 @@ export default function MatchPlayerCard({
                 fontWeight: "bold",
                 color: "success.main",
                 mb: 0.15,
+                opacity: 0.8,
               }}
             >
               {t("common.goals_short")}
@@ -228,12 +234,19 @@ export default function MatchPlayerCard({
             <Stack
               direction="row"
               alignItems="center"
+              justifyContent="center"
               sx={{
                 border: "2px solid",
                 borderColor: "success.main",
-                borderRadius: 1.5,
+                borderRadius: showControls ? 1.5 : "50%",
+                width: showControls ? "auto" : { xs: 24, sm: 30 },
+                height: showControls ? "auto" : { xs: 24, sm: 30 },
                 overflow: "hidden",
-                bgcolor: "background.paper",
+                bgcolor:
+                  stats.goals > 0 && !showControls
+                    ? alpha(theme.palette.success.main, 0.05)
+                    : "background.paper",
+                transition: "all 0.2s",
               }}
             >
               {showControls && (
@@ -249,10 +262,11 @@ export default function MatchPlayerCard({
               )}
               <Box
                 sx={{
-                  minWidth: { xs: 18, sm: 22 },
+                  minWidth: showControls ? { xs: 18, sm: 22 } : "auto",
                   textAlign: "center",
                   fontWeight: "bold",
                   fontSize: { xs: "0.7rem", sm: "0.8rem" },
+                  color: stats.goals > 0 ? "success.main" : "text.secondary",
                 }}
                 data-testid="stat-goals-value"
               >
@@ -277,7 +291,7 @@ export default function MatchPlayerCard({
           </Box>
 
           {/* Assist Controls/Stats */}
-          <Box sx={{ textAlign: "center" }}>
+          <Box sx={{ textAlign: "center", flexShrink: 0 }}>
             <Typography
               variant="caption"
               sx={{
@@ -286,6 +300,7 @@ export default function MatchPlayerCard({
                 fontWeight: "bold",
                 color: "info.main",
                 mb: 0.15,
+                opacity: 0.8,
               }}
             >
               {t("common.assists_short")}
@@ -293,12 +308,19 @@ export default function MatchPlayerCard({
             <Stack
               direction="row"
               alignItems="center"
+              justifyContent="center"
               sx={{
                 border: "2px solid",
                 borderColor: "info.light",
-                borderRadius: 1.5,
+                borderRadius: showControls ? 1.5 : "50%",
+                width: showControls ? "auto" : { xs: 24, sm: 30 },
+                height: showControls ? "auto" : { xs: 24, sm: 30 },
                 overflow: "hidden",
-                bgcolor: "background.paper",
+                bgcolor:
+                  stats.assists > 0 && !showControls
+                    ? alpha(theme.palette.primary.main, 0.05)
+                    : "background.paper",
+                transition: "all 0.2s",
               }}
             >
               {showControls && (
@@ -314,10 +336,11 @@ export default function MatchPlayerCard({
               )}
               <Box
                 sx={{
-                  minWidth: { xs: 18, sm: 22 },
+                  minWidth: showControls ? { xs: 18, sm: 22 } : "auto",
                   textAlign: "center",
                   fontWeight: "bold",
                   fontSize: { xs: "0.7rem", sm: "0.8rem" },
+                  color: stats.assists > 0 ? "info.main" : "text.secondary",
                 }}
                 data-testid="stat-assists-value"
               >
@@ -346,7 +369,7 @@ export default function MatchPlayerCard({
           </Box>
 
           {/* Own Goal Controls/Stats */}
-          <Box sx={{ textAlign: "center" }}>
+          <Box sx={{ textAlign: "center", flexShrink: 0 }}>
             <Typography
               variant="caption"
               sx={{
@@ -355,6 +378,7 @@ export default function MatchPlayerCard({
                 fontWeight: "bold",
                 color: stats.ownGoals > 0 ? "error.main" : "text.secondary",
                 mb: 0.15,
+                opacity: 0.8,
               }}
             >
               {t("common.own_goals_short")}
@@ -362,13 +386,19 @@ export default function MatchPlayerCard({
             <Stack
               direction="row"
               alignItems="center"
+              justifyContent="center"
               sx={{
                 border: "2px solid",
                 borderColor: stats.ownGoals > 0 ? "error.light" : "divider",
-                borderRadius: 1.5,
+                borderRadius: showControls ? 1.5 : "50%",
+                width: showControls ? "auto" : { xs: 24, sm: 30 },
+                height: showControls ? "auto" : { xs: 24, sm: 30 },
                 overflow: "hidden",
                 bgcolor:
-                  stats.ownGoals > 0 ? "error.lighter" : "background.paper",
+                  stats.ownGoals > 0 && !showControls
+                    ? alpha(theme.palette.error.main, 0.05)
+                    : "background.paper",
+                transition: "all 0.2s",
               }}
             >
               {showControls && (
@@ -384,7 +414,7 @@ export default function MatchPlayerCard({
               )}
               <Box
                 sx={{
-                  minWidth: { xs: 18, sm: 22 },
+                  minWidth: showControls ? { xs: 18, sm: 22 } : "auto",
                   textAlign: "center",
                   fontWeight: "bold",
                   fontSize: { xs: "0.7rem", sm: "0.8rem" },
