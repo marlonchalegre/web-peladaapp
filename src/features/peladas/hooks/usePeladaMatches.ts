@@ -8,9 +8,7 @@ export function usePeladaMatches(peladaId: number) {
   const {
     loading,
     error,
-    setError,
     matches,
-    setMatches,
     matchesRef,
     teams,
     pelada,
@@ -36,13 +34,7 @@ export function usePeladaMatches(peladaId: number) {
     userIdToName,
   );
 
-  const actions = useMatchActions(
-    peladaId,
-    matchesRef,
-    setMatches,
-    refreshData,
-    setError,
-  );
+  const actions = useMatchActions(peladaId, data);
 
   const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null);
   const [justFinishedMatchId, setJustFinishedMatchId] = useState<number | null>(

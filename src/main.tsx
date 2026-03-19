@@ -6,6 +6,10 @@ import App from "./App";
 import "./lib/i18n";
 import { Loading } from "./shared/components/Loading";
 import { ThemeContextProvider } from "./app/providers/ThemeProvider";
+import { registerSW } from "virtual:pwa-register";
+
+// Register service worker
+registerSW({ immediate: true });
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

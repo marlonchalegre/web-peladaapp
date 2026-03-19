@@ -62,8 +62,9 @@ export function usePeladaData(peladaId: number) {
         setLoading(true);
       }
 
-      try {
-        const data = await endpoints.getPeladaDashboardData(peladaId);
+      const applyData = (
+        data: Awaited<ReturnType<typeof endpoints.getPeladaDashboardData>>,
+      ) => {
         const isMatchesPage = location.pathname.endsWith("/matches");
 
         if (data.pelada.status === "attendance") {
@@ -137,12 +138,36 @@ export function usePeladaData(peladaId: number) {
           luMap[mid] = asTeamPlayersForMatch;
         }
         setLineupsByMatch(luMap);
+      };
+
+      try {
+        const data = await endpoints.getPeladaDashboardData(peladaId);
+        localStorage.setItem(
+          `pelada_dashboard_cache_${peladaId}`,
+          JSON.stringify(data),
+        );
+        applyData(data);
       } catch (err: unknown) {
-        const message =
-          err instanceof Error
-            ? err.message
-            : t("peladas.matches.error.load_failed");
-        setError(message);
+        let loadedFromCache = false;
+        try {
+          const cached = localStorage.getItem(
+            `pelada_dashboard_cache_${peladaId}`,
+          );
+          if (cached) {
+            applyData(JSON.parse(cached));
+            loadedFromCache = true;
+          }
+        } catch {
+          // Fall through to error
+        }
+
+        if (!loadedFromCache) {
+          const message =
+            err instanceof Error
+              ? err.message
+              : t("peladas.matches.error.load_failed");
+          setError(message);
+        }
       } finally {
         if (!isRefresh) setLoading(false);
       }

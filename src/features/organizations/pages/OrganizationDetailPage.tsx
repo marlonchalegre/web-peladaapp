@@ -52,18 +52,29 @@ export default function OrganizationDetailPage() {
   useEffect(() => {
     if (!orgId || !user) return;
 
+    // Initial check from AuthContext
+    const userIsAdmin = user.admin_orgs?.includes(orgId) ?? false;
+    setIsAdmin(userIsAdmin);
+
     // Load org details
     endpoints
       .getOrganization(orgId)
       .then((o) => {
         setOrg(o);
-        // Initial check from AuthContext
-        const userIsAdmin = user.admin_orgs?.includes(orgId) ?? false;
-        setIsAdmin(userIsAdmin);
+        console.log("ORG LOADED:", o.id, "OWNER:", o.owner_id, "USER:", user.id);
+        
+        // Check if owner
+        if (o.owner_id && user && String(o.owner_id) === String(user.id)) {
+          console.log("IS OWNER -> ADMIN");
+          setIsAdmin(true);
+          return;
+        }
 
-        // Secondary check: Fetch admins list to be sure
+        // Also check if user is in the admins list from backend
         endpoints.listAdminsByOrganization(orgId).then((admins) => {
-          if (admins.some((a) => a.user_id === user.id)) {
+          console.log("ADMINS LIST:", admins.map(a => a.user_id));
+          if (admins.some((a) => String(a.user_id) === String(user.id))) {
+            console.log("IN ADMINS LIST -> ADMIN");
             setIsAdmin(true);
           }
         });
@@ -75,7 +86,7 @@ export default function OrganizationDetailPage() {
             : t("organizations.detail.error.load_failed");
         setError(message);
       });
-  }, [orgId, user, t]);
+  }, [orgId, user, t, peladas.length]); // Added peladas.length as a hint to refresh when data changes
 
   const fetchPeladas = useCallback(async () => {
     if (!orgId) return;

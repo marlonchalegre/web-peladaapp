@@ -105,7 +105,7 @@ export default function MatchScoreHero({
             {homeTeamName.toUpperCase()}
           </Typography>
 
-          <Stack direction="row" alignItems="center" spacing={2}>
+          <Stack direction="row" alignItems="center" spacing={2} data-testid="match-score-display">
             <Box sx={scoreBoxStyle(theme.palette.home.main)}>
               <Typography variant="h4" sx={{ fontWeight: "bold" }}>
                 {match.home_score ?? 0}
@@ -214,6 +214,7 @@ export default function MatchScoreHero({
                     width: 32,
                     height: 32,
                   }}
+                  data-testid="start-match-timer-button"
                 >
                   <PlayArrowIcon fontSize="small" />
                 </IconButton>

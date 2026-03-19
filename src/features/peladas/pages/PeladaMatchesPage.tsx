@@ -45,6 +45,7 @@ import {
 import GlobalSessionTimer from "../components/GlobalSessionTimer";
 import { usePeladaTimer } from "../hooks/usePeladaTimer";
 import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
+import OfflineSyncManager from "../components/OfflineSyncManager";
 
 export default function PeladaMatchesPage() {
   const { t } = useTranslation();
@@ -119,10 +120,16 @@ export default function PeladaMatchesPage() {
     startMatchTimer,
     pauseMatchTimer,
     resetMatchTimer,
+    refreshStats,
   } = usePeladaMatches(peladaId);
 
   useEffect(() => {
     if (pelada?.organization_id && user) {
+      if (pelada.creator_id === user.id) {
+        setActuallyIsAdmin(true);
+        return;
+      }
+
       const endpoints = createApi(api);
       endpoints
         .listAdminsByOrganization(pelada.organization_id)
@@ -131,7 +138,7 @@ export default function PeladaMatchesPage() {
         })
         .catch((e) => console.error("Failed to check admin status", e));
     }
-  }, [pelada?.organization_id, user]);
+  }, [pelada?.organization_id, pelada?.creator_id, user]);
 
   const isAdmin =
     pelada?.is_admin ||
@@ -271,6 +278,11 @@ export default function PeladaMatchesPage() {
             ]}
           />
         </Box>
+
+        <OfflineSyncManager
+          peladaId={peladaId}
+          onSyncComplete={() => refreshStats()}
+        />
 
         <Box
           sx={{

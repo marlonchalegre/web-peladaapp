@@ -67,6 +67,12 @@ export default function PeladaDetailPage() {
 
   useEffect(() => {
     if (pelada?.organization_id && user) {
+      // Check if user is pelada creator or an org admin
+      if (pelada.creator_id === user.id) {
+        setActuallyIsAdmin(true);
+        return;
+      }
+
       const endpoints = createApi(api);
       endpoints
         .listAdminsByOrganization(pelada.organization_id)
@@ -76,7 +82,7 @@ export default function PeladaDetailPage() {
           }
         });
     }
-  }, [pelada?.organization_id, user]);
+  }, [pelada?.organization_id, pelada?.creator_id, user]);
 
   if (error)
     return (
