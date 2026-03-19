@@ -652,7 +652,8 @@
       "button": {
         "end_match": "End Match",
         "edit_match": "Edit Match",
-        "finish_editing": "Finish Editing"
+        "finish_editing": "Finish Editing",
+        "history": "History"
       },
       "status": {
         "finished": "MATCH FINISHED"

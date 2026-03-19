@@ -8,7 +8,6 @@ import {
   List,
   ListItem,
   ListItemButton,
-  IconButton,
   Chip,
   Avatar,
   useTheme,
@@ -28,7 +27,7 @@ import type {
 } from "../../../shared/api/endpoints";
 import MatchScoreHero from "./MatchScoreHero";
 import MatchPlayerCard from "./MatchPlayerCard";
-import MenuIcon from "@mui/icons-material/Menu";
+import HistoryIcon from "@mui/icons-material/History";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditIcon from "@mui/icons-material/Edit";
 import { useTranslation } from "react-i18next";
@@ -254,21 +253,22 @@ export default function ActiveMatchDashboard(props: Props) {
           alignItems="center"
         >
           <Stack direction="row" alignItems="center" spacing={1}>
-            <IconButton
+            <Button
               onClick={() => setHistoryOpen(true)}
               size="small"
-              color="primary"
+              variant="outlined"
+              startIcon={<HistoryIcon />}
               data-testid="toggle-history-drawer"
+              sx={{
+                textTransform: "none",
+                borderRadius: 1.5,
+                fontWeight: "bold",
+                minWidth: "auto",
+                px: 1,
+              }}
             >
-              <MenuIcon />
-            </IconButton>
-            <Chip
-              label={`PARTIDA #${match.sequence}`}
-              size="small"
-              color="primary"
-              variant="filled"
-              sx={{ fontWeight: "bold", borderRadius: 1.5 }}
-            />
+              {t("peladas.dashboard.button.history")}
+            </Button>
           </Stack>
 
           {isAdmin && finished && (

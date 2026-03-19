@@ -654,7 +654,8 @@
       "button": {
         "end_match": "Encerrar Partida",
         "edit_match": "Editar Partida",
-        "finish_editing": "Finalizar Edição"
+        "finish_editing": "Finalizar Edição",
+        "history": "Histórico"
       },
       "status": {
         "finished": "PARTIDA ENCERRADA"

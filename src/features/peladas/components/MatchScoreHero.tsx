@@ -92,13 +92,14 @@ export default function MatchScoreHero({
         >
           {/* Home Team Name */}
           <Typography
-            variant="subtitle1"
+            variant="h6"
             sx={{
               fontWeight: "bold",
-              color: "text.secondary",
+              color: "text.primary",
               flex: 1,
               textAlign: "right",
               display: { xs: "none", sm: "block" },
+              letterSpacing: 0.5,
             }}
           >
             {homeTeamName.toUpperCase()}
@@ -128,13 +129,14 @@ export default function MatchScoreHero({
 
           {/* Away Team Name */}
           <Typography
-            variant="subtitle1"
+            variant="h6"
             sx={{
               fontWeight: "bold",
-              color: "text.secondary",
+              color: "text.primary",
               flex: 1,
               textAlign: "left",
               display: { xs: "none", sm: "block" },
+              letterSpacing: 0.5,
             }}
           >
             {awayTeamName.toUpperCase()}
@@ -143,10 +145,10 @@ export default function MatchScoreHero({
 
         {/* Mobile Team Names */}
         <Typography
-          variant="caption"
+          variant="subtitle2"
           sx={{
             fontWeight: "bold",
-            color: "text.secondary",
+            color: "text.primary",
             display: { xs: "block", sm: "none" },
             textAlign: "center",
           }}
