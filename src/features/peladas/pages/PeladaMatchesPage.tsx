@@ -52,7 +52,7 @@ export default function PeladaMatchesPage() {
   const { id } = useParams();
   const peladaId = Number(id);
   const { user } = useAuth();
-  const [actuallyIsAdmin, setActuallyIsAdmin] = useState(false);
+  const [isOrgAdmin, setIsOrgAdmin] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [resetConfirmOpen, setResetConfirmOpen] = useState<{
     type: "session" | "match";
@@ -123,27 +123,28 @@ export default function PeladaMatchesPage() {
     refreshStats,
   } = usePeladaMatches(peladaId);
 
-  useEffect(() => {
-    if (pelada?.organization_id && user) {
-      if (pelada.creator_id === user.id) {
-        setActuallyIsAdmin(true);
-        return;
-      }
+  // Derived admin status
+  const isAdmin =
+    pelada?.is_admin ||
+    isOrgAdmin ||
+    (user &&
+      pelada?.organization_id &&
+      (pelada.creator_id === user.id ||
+        user.admin_orgs?.includes(pelada.organization_id)));
 
+  useEffect(() => {
+    if (pelada?.organization_id && user && !isAdmin) {
       const endpoints = createApi(api);
       endpoints
         .listAdminsByOrganization(pelada.organization_id)
         .then((admins) => {
-          setActuallyIsAdmin(admins.some((a) => a.user_id === user.id));
+          if (admins.some((a) => a.user_id === user.id)) {
+            setIsOrgAdmin(true);
+          }
         })
         .catch((e) => console.error("Failed to check admin status", e));
     }
-  }, [pelada?.organization_id, pelada?.creator_id, user]);
-
-  const isAdmin =
-    pelada?.is_admin ||
-    actuallyIsAdmin ||
-    (user?.admin_orgs?.includes(pelada?.organization_id || -1) ?? false);
+  }, [pelada?.organization_id, user, isAdmin]);
 
   const handleConfirmClosePelada = async () => {
     try {

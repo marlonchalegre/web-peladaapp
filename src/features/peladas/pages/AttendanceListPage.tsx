@@ -60,7 +60,7 @@ export default function AttendanceListPage() {
   const { id } = useParams();
   const peladaId = Number(id);
   const { user } = useAuth();
-  const [actuallyIsAdmin, setActuallyIsAdmin] = useState(false);
+  const [isOrgAdmin, setIsOrgAdmin] = useState(false);
   const [tabValue, setTabValue] = useState(0);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
 
@@ -80,7 +80,15 @@ export default function AttendanceListPage() {
     handleCloseAttendance,
   } = useAttendance(peladaId);
 
-  const isAnyAdmin = pelada?.is_admin || isAdmin || actuallyIsAdmin;
+  // Derived admin status
+  const isAnyAdmin =
+    pelada?.is_admin ||
+    isAdmin ||
+    isOrgAdmin ||
+    (user &&
+      pelada?.organization_id &&
+      (pelada.creator_id === user.id ||
+        user.admin_orgs?.includes(pelada.organization_id)));
 
   const onConfirmClose = () => {
     handleCloseAttendance();
@@ -88,17 +96,18 @@ export default function AttendanceListPage() {
   };
 
   useEffect(() => {
-    if (pelada?.organization_id && user) {
+    if (pelada?.organization_id && user && !isAnyAdmin) {
       const endpoints = createApi(api);
       endpoints
         .listAdminsByOrganization(pelada.organization_id)
         .then((admins) => {
           if (admins.some((a) => a.user_id === user.id)) {
-            setActuallyIsAdmin(true);
+            setIsOrgAdmin(true);
           }
-        });
+        })
+        .catch((err) => console.error("Failed to check admin status", err));
     }
-  }, [pelada?.organization_id, user]);
+  }, [pelada?.organization_id, user, isAnyAdmin]);
 
   const handleTabChange = (_event: SyntheticEvent, newValue: number) => {
     setTabValue(newValue);

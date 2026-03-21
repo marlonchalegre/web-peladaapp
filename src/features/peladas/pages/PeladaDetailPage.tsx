@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Container, Alert, Box } from "@mui/material";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import TeamsSection from "../components/TeamsSection";
@@ -26,7 +26,7 @@ export default function PeladaDetailPage() {
   const { id } = useParams();
   const peladaId = Number(id);
   const { user } = useAuth();
-  const [actuallyIsAdmin, setActuallyIsAdmin] = useState(false);
+  const [isOrgAdmin, setIsOrgAdmin] = useState(false);
   const [confirmStartWithScheduleOpen, setConfirmStartWithScheduleOpen] =
     useState(false);
 
@@ -65,24 +65,28 @@ export default function PeladaDetailPage() {
     allPlayerIdsInPelada,
   } = usePeladaDetail(peladaId);
 
-  useEffect(() => {
-    if (pelada?.organization_id && user) {
-      // Check if user is pelada creator or an org admin
-      if (pelada.creator_id === user.id) {
-        setActuallyIsAdmin(true);
-        return;
-      }
+  // Derived admin status
+  const isAdmin =
+    pelada?.is_admin ||
+    isOrgAdmin ||
+    (user &&
+      pelada?.organization_id &&
+      (pelada.creator_id === user.id ||
+        user.admin_orgs?.includes(pelada.organization_id)));
 
+  useEffect(() => {
+    if (pelada?.organization_id && user && !isAdmin) {
       const endpoints = createApi(api);
       endpoints
         .listAdminsByOrganization(pelada.organization_id)
         .then((admins) => {
           if (admins.some((a) => a.user_id === user.id)) {
-            setActuallyIsAdmin(true);
+            setIsOrgAdmin(true);
           }
-        });
+        })
+        .catch((err) => console.error("Failed to check admin status", err));
     }
-  }, [pelada?.organization_id, pelada?.creator_id, user]);
+  }, [pelada?.organization_id, user, isAdmin]);
 
   if (error)
     return (
@@ -140,7 +144,7 @@ export default function PeladaDetailPage() {
         onToggleFixedGk={handleToggleFixedGoalkeepers}
         changingStatus={changingStatus}
         processing={processing}
-        isAdminOverride={actuallyIsAdmin}
+        isAdminOverride={isAdmin}
       />
 
       <div
@@ -172,7 +176,7 @@ export default function PeladaDetailPage() {
               onDrop={dropToFixedGk}
               onRemove={removeFixedGk}
               locked={pelada.status !== "open"}
-              isAdminOverride={actuallyIsAdmin}
+              isAdminOverride={isAdmin}
               onDragStartPlayer={onDragStartPlayer}
             />
           )}
@@ -192,7 +196,7 @@ export default function PeladaDetailPage() {
             onRandomizeTeams={handleRandomizeTeams}
             onUpdatePlayersPerTeam={handleUpdatePlayersPerTeam}
             scores={scores}
-            isAdminOverride={actuallyIsAdmin}
+            isAdminOverride={isAdmin}
             fixedGoalkeepersEnabled={!!pelada.fixed_goalkeepers}
           />
         </Grid>
@@ -208,9 +212,9 @@ export default function PeladaDetailPage() {
             organizationId={pelada.organization_id}
             allPlayerIdsInPelada={allPlayerIdsInPelada}
             locked={
-              (pelada.status !== "open" && !actuallyIsAdmin) || processing
+              (pelada.status !== "open" && !isAdmin) || processing
             }
-            isAdmin={actuallyIsAdmin}
+            isAdmin={isAdmin}
             totalPlayersInPelada={stats.totalPlayers}
             averagePelada={stats.averagePelada}
             balance={stats.balance}
