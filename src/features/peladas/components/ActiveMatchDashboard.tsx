@@ -307,7 +307,8 @@ export default function ActiveMatchDashboard(props: Props) {
         {/* Players Section */}
         <Grid container spacing={2}>
           {/* Home Team */}
-          <Grid size={{ xs: 12, md: 6 }} data-testid="home-team-match-section">
+          <Grid size={{ xs: 12, sm: 6 }}
+ data-testid="home-team-match-section">
             <Box
               sx={{
                 mb: 1.5,
@@ -368,7 +369,8 @@ export default function ActiveMatchDashboard(props: Props) {
           </Grid>
 
           {/* Away Team */}
-          <Grid size={{ xs: 12, md: 6 }} data-testid="away-team-match-section">
+          <Grid size={{ xs: 12, sm: 6 }}
+ data-testid="away-team-match-section">
             <Box
               sx={{
                 mb: 1.5,
