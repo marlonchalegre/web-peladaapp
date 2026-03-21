@@ -7,6 +7,7 @@ import {
   Stack,
   useMediaQuery,
   useTheme,
+  alpha,
 } from "@mui/material";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import HandshakeIcon from "@mui/icons-material/Handshake";
@@ -35,13 +36,22 @@ const StatCard = ({
   value,
   unit,
 }: StatCardProps) => {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === "dark";
+
   return (
     <Card
       sx={{
         flex: 1,
         minWidth: { xs: "100%", sm: "280px" },
         borderRadius: 4,
-        boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.05)",
+        boxShadow: isDarkMode
+          ? "0px 4px 20px rgba(0, 0, 0, 0.4)"
+          : "0px 4px 20px rgba(0, 0, 0, 0.05)",
+        bgcolor: "background.paper",
+        backgroundImage: "none",
+        border: isDarkMode ? "1px solid" : "none",
+        borderColor: alpha(theme.palette.common.white, 0.1),
       }}
     >
       <CardContent sx={{ p: 3, "&:last-child": { pb: 3 } }}>
@@ -54,14 +64,20 @@ const StatCard = ({
           }}
         >
           <Box>
-            <Typography variant="h6" fontWeight="bold" sx={{ mb: 0.5 }}>
+            <Typography
+              variant="h6"
+              fontWeight="bold"
+              sx={{ mb: 0.5, color: "text.primary" }}
+            >
               {title}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               {subtitle}
             </Typography>
           </Box>
-          <Box sx={{ color: "text.secondary" }}>{icon}</Box>
+          <Box sx={{ color: isDarkMode ? "primary.light" : "text.secondary" }}>
+            {icon}
+          </Box>
         </Box>
 
         <Stack direction="row" spacing={2} alignItems="center">
@@ -69,19 +85,28 @@ const StatCard = ({
             sx={{
               width: 56,
               height: 56,
-              bgcolor: "grey.200",
-              color: "grey.600",
+              bgcolor: isDarkMode ? alpha(theme.palette.primary.main, 0.2) : "grey.200",
+              color: isDarkMode ? "primary.light" : "grey.600",
               fontSize: "1.5rem",
+              fontWeight: "bold",
             }}
           >
             {playerName.charAt(0)}
           </Avatar>
           <Box>
-            <Typography variant="subtitle1" fontWeight="bold">
+            <Typography
+              variant="subtitle1"
+              fontWeight="bold"
+              sx={{ color: "text.primary" }}
+            >
               {playerName}
             </Typography>
             <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.5 }}>
-              <Typography variant="h5" fontWeight="bold">
+              <Typography
+                variant="h5"
+                fontWeight="bold"
+                sx={{ color: "text.primary" }}
+              >
                 {value}
               </Typography>
               <Typography variant="body2" color="text.secondary">
