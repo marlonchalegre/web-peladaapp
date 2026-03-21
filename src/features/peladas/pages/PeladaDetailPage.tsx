@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { Container, Alert, Box } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { useState, useEffect, useMemo } from "react";
+import { Container, Alert, Box, Grid } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import TeamsSection from "../components/TeamsSection";
@@ -66,13 +65,16 @@ export default function PeladaDetailPage() {
   } = usePeladaDetail(peladaId);
 
   // Derived admin status
-  const isAdmin =
-    pelada?.is_admin ||
-    isOrgAdmin ||
-    (user &&
-      pelada?.organization_id &&
-      (pelada.creator_id === user.id ||
-        user.admin_orgs?.includes(pelada.organization_id)));
+  const isAdmin = useMemo(() => {
+    return !!(
+      pelada?.is_admin ||
+      isOrgAdmin ||
+      (user &&
+        pelada?.organization_id &&
+        (pelada.creator_id === user.id ||
+          user.admin_orgs?.includes(pelada.organization_id)))
+    );
+  }, [pelada, isOrgAdmin, user]);
 
   useEffect(() => {
     if (pelada?.organization_id && user && !isAdmin) {
@@ -211,9 +213,7 @@ export default function PeladaDetailPage() {
             onAddPlayersFromOrg={handleAddPlayersFromOrg}
             organizationId={pelada.organization_id}
             allPlayerIdsInPelada={allPlayerIdsInPelada}
-            locked={
-              (pelada.status !== "open" && !isAdmin) || processing
-            }
+            locked={(pelada.status !== "open" && !isAdmin) || processing}
             isAdmin={isAdmin}
             totalPlayersInPelada={stats.totalPlayers}
             averagePelada={stats.averagePelada}

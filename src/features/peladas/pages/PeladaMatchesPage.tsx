@@ -1,5 +1,5 @@
 import { useParams, Link as RouterLink } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Paper,
   Button,
@@ -124,13 +124,16 @@ export default function PeladaMatchesPage() {
   } = usePeladaMatches(peladaId);
 
   // Derived admin status
-  const isAdmin =
-    pelada?.is_admin ||
-    isOrgAdmin ||
-    (user &&
-      pelada?.organization_id &&
-      (pelada.creator_id === user.id ||
-        user.admin_orgs?.includes(pelada.organization_id)));
+  const isAdmin = useMemo(() => {
+    return !!(
+      pelada?.is_admin ||
+      isOrgAdmin ||
+      (user &&
+        pelada?.organization_id &&
+        (pelada.creator_id === user.id ||
+          user.admin_orgs?.includes(pelada.organization_id)))
+    );
+  }, [pelada, isOrgAdmin, user]);
 
   useEffect(() => {
     if (pelada?.organization_id && user && !isAdmin) {

@@ -27,7 +27,10 @@ describe("OfflineSyncManager", () => {
     vi.spyOn(offlineQueueModule, "getOfflineQueue").mockReturnValue([]);
 
     const { container } = render(
-      <OfflineSyncManager peladaId={peladaId} onSyncComplete={mockOnSyncComplete} />
+      <OfflineSyncManager
+        peladaId={peladaId}
+        onSyncComplete={mockOnSyncComplete}
+      />,
     );
 
     expect(container.firstChild).toBeNull();
@@ -37,7 +40,12 @@ describe("OfflineSyncManager", () => {
     vi.spyOn(useNetworkModule, "useNetwork").mockReturnValue(false);
     vi.spyOn(offlineQueueModule, "getOfflineQueue").mockReturnValue([]);
 
-    render(<OfflineSyncManager peladaId={peladaId} onSyncComplete={mockOnSyncComplete} />);
+    render(
+      <OfflineSyncManager
+        peladaId={peladaId}
+        onSyncComplete={mockOnSyncComplete}
+      />,
+    );
 
     expect(screen.getByText(/Modo Offline ativo/)).toBeInTheDocument();
   });
@@ -49,13 +57,20 @@ describe("OfflineSyncManager", () => {
       { id: "2", type: "RECORD_EVENT", payload: {}, timestamp: Date.now() },
     ]);
 
-    render(<OfflineSyncManager peladaId={peladaId} onSyncComplete={mockOnSyncComplete} />);
+    render(
+      <OfflineSyncManager
+        peladaId={peladaId}
+        onSyncComplete={mockOnSyncComplete}
+      />,
+    );
 
     expect(screen.getByText(/Modo Offline ativo/)).toBeInTheDocument();
     expect(screen.getByText(/2/)).toBeInTheDocument();
     expect(screen.getByText(/ações pendentes/)).toBeInTheDocument();
     // Sync button should not be present when offline
-    expect(screen.queryByRole("button", { name: /Sincronizar Agora/ })).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: /Sincronizar Agora/ }),
+    ).toBeNull();
   });
 
   it("renders sync button when online with items in queue but sync fails or doesn't auto-clear instantly", () => {
@@ -66,7 +81,12 @@ describe("OfflineSyncManager", () => {
     ]);
     vi.spyOn(api, "put").mockRejectedValue(new Error("Prevent auto clear"));
 
-    render(<OfflineSyncManager peladaId={peladaId} onSyncComplete={mockOnSyncComplete} />);
+    render(
+      <OfflineSyncManager
+        peladaId={peladaId}
+        onSyncComplete={mockOnSyncComplete}
+      />,
+    );
 
     expect(screen.queryByText(/Modo Offline ativo/)).toBeNull();
     expect(screen.getByText(/1/)).toBeInTheDocument();
@@ -78,20 +98,39 @@ describe("OfflineSyncManager", () => {
     // Start offline so it doesn't auto-sync
     vi.spyOn(useNetworkModule, "useNetwork").mockReturnValue(false);
     vi.spyOn(offlineQueueModule, "getOfflineQueue").mockReturnValue([
-      { id: "1", type: "ADJUST_SCORE", payload: { matchId: 1, newHome: 2, newAway: 1, status: "running" }, timestamp: Date.now() },
+      {
+        id: "1",
+        type: "ADJUST_SCORE",
+        payload: { matchId: 1, newHome: 2, newAway: 1, status: "running" },
+        timestamp: Date.now(),
+      },
     ]);
     const dequeueSpy = vi.spyOn(offlineQueueModule, "dequeueAction");
     const updateScoreSpy = vi.spyOn(api, "put").mockResolvedValue({ data: {} });
 
-    const { rerender } = render(<OfflineSyncManager peladaId={peladaId} onSyncComplete={mockOnSyncComplete} />);
+    const { rerender } = render(
+      <OfflineSyncManager
+        peladaId={peladaId}
+        onSyncComplete={mockOnSyncComplete}
+      />,
+    );
 
     // Now go online
     vi.spyOn(useNetworkModule, "useNetwork").mockReturnValue(true);
-    rerender(<OfflineSyncManager peladaId={peladaId} onSyncComplete={mockOnSyncComplete} />);
+    rerender(
+      <OfflineSyncManager
+        peladaId={peladaId}
+        onSyncComplete={mockOnSyncComplete}
+      />,
+    );
 
     // Wait for the auto-sync process to finish (which happens when useNetwork turns true)
     await waitFor(() => {
-      expect(updateScoreSpy).toHaveBeenCalledWith("/api/matches/1/score", { home_score: 2, away_score: 1, status: "running" });
+      expect(updateScoreSpy).toHaveBeenCalledWith("/api/matches/1/score", {
+        home_score: 2,
+        away_score: 1,
+        status: "running",
+      });
       expect(dequeueSpy).toHaveBeenCalledWith(peladaId, "1");
       expect(mockOnSyncComplete).toHaveBeenCalled();
     });
@@ -100,25 +139,44 @@ describe("OfflineSyncManager", () => {
   it("stops sync and shows generic error when a non-network error occurs", async () => {
     vi.spyOn(useNetworkModule, "useNetwork").mockReturnValue(false);
     vi.spyOn(offlineQueueModule, "getOfflineQueue").mockReturnValue([
-      { id: "1", type: "RECORD_EVENT", payload: { matchId: 1, playerId: 2, type: "goal" }, timestamp: Date.now() },
+      {
+        id: "1",
+        type: "RECORD_EVENT",
+        payload: { matchId: 1, playerId: 2, type: "goal" },
+        timestamp: Date.now(),
+      },
     ]);
     const dequeueSpy = vi.spyOn(offlineQueueModule, "dequeueAction");
-    
-    // Mock API to throw an error
-    vi.spyOn(api, "post").mockRejectedValue(new Error("Server validation failed"));
 
-    const { rerender } = render(<OfflineSyncManager peladaId={peladaId} onSyncComplete={mockOnSyncComplete} />);
+    // Mock API to throw an error
+    vi.spyOn(api, "post").mockRejectedValue(
+      new Error("Server validation failed"),
+    );
+
+    const { rerender } = render(
+      <OfflineSyncManager
+        peladaId={peladaId}
+        onSyncComplete={mockOnSyncComplete}
+      />,
+    );
 
     // Go online to trigger auto-sync
     vi.spyOn(useNetworkModule, "useNetwork").mockReturnValue(true);
-    rerender(<OfflineSyncManager peladaId={peladaId} onSyncComplete={mockOnSyncComplete} />);
+    rerender(
+      <OfflineSyncManager
+        peladaId={peladaId}
+        onSyncComplete={mockOnSyncComplete}
+      />,
+    );
 
     await waitFor(() => {
       expect(api.post).toHaveBeenCalled();
       // Should not have dequeued
       expect(dequeueSpy).not.toHaveBeenCalled();
       // Should show error message
-      expect(screen.getByText(/Erro: Server validation failed/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Erro: Server validation failed/),
+      ).toBeInTheDocument();
       expect(mockOnSyncComplete).not.toHaveBeenCalled();
     });
   });
@@ -126,32 +184,57 @@ describe("OfflineSyncManager", () => {
   it("stops sync and shows specific message on network failure during sync", async () => {
     vi.spyOn(useNetworkModule, "useNetwork").mockReturnValue(false);
     vi.spyOn(offlineQueueModule, "getOfflineQueue").mockReturnValue([
-      { id: "1", type: "DELETE_EVENT", payload: { matchId: 1, playerId: 2, type: "goal" }, timestamp: Date.now() },
+      {
+        id: "1",
+        type: "DELETE_EVENT",
+        payload: { matchId: 1, playerId: 2, type: "goal" },
+        timestamp: Date.now(),
+      },
     ]);
-    
+
     // Mock API to throw a network error
     vi.spyOn(api, "delete").mockRejectedValue(new Error("Failed to fetch"));
 
-    const { rerender } = render(<OfflineSyncManager peladaId={peladaId} onSyncComplete={mockOnSyncComplete} />);
+    const { rerender } = render(
+      <OfflineSyncManager
+        peladaId={peladaId}
+        onSyncComplete={mockOnSyncComplete}
+      />,
+    );
 
     // Go online to trigger auto-sync
     vi.spyOn(useNetworkModule, "useNetwork").mockReturnValue(true);
-    rerender(<OfflineSyncManager peladaId={peladaId} onSyncComplete={mockOnSyncComplete} />);
+    rerender(
+      <OfflineSyncManager
+        peladaId={peladaId}
+        onSyncComplete={mockOnSyncComplete}
+      />,
+    );
 
     await waitFor(() => {
       expect(api.delete).toHaveBeenCalled();
-      expect(screen.getByText(/Conexão perdida durante a sincronização/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Conexão perdida durante a sincronização/),
+      ).toBeInTheDocument();
     });
   });
 
   it("listens to offlineQueueChanged event and updates state", async () => {
     vi.spyOn(useNetworkModule, "useNetwork").mockReturnValue(false);
-    
-    const getOfflineQueueSpy = vi.spyOn(offlineQueueModule, "getOfflineQueue")
-      .mockReturnValueOnce([]) // Initial load
-      .mockReturnValueOnce([{ id: "1", type: "END_MATCH", payload: {}, timestamp: Date.now() }]); // After event
 
-    const { unmount } = render(<OfflineSyncManager peladaId={peladaId} onSyncComplete={mockOnSyncComplete} />);
+    const getOfflineQueueSpy = vi
+      .spyOn(offlineQueueModule, "getOfflineQueue")
+      .mockReturnValueOnce([]) // Initial load
+      .mockReturnValueOnce([
+        { id: "1", type: "END_MATCH", payload: {}, timestamp: Date.now() },
+      ]); // After event
+
+    const { unmount } = render(
+      <OfflineSyncManager
+        peladaId={peladaId}
+        onSyncComplete={mockOnSyncComplete}
+      />,
+    );
 
     expect(screen.queryByText(/ação pendente/)).toBeNull();
 

@@ -61,8 +61,15 @@ export default function OrganizationDetailPage() {
       .getOrganization(orgId)
       .then((o) => {
         setOrg(o);
-        console.log("ORG LOADED:", o.id, "OWNER:", o.owner_id, "USER:", user.id);
-        
+        console.log(
+          "ORG LOADED:",
+          o.id,
+          "OWNER:",
+          o.owner_id,
+          "USER:",
+          user.id,
+        );
+
         // Check if owner
         if (o.owner_id && user && String(o.owner_id) === String(user.id)) {
           console.log("IS OWNER -> ADMIN");
@@ -72,7 +79,10 @@ export default function OrganizationDetailPage() {
 
         // Also check if user is in the admins list from backend
         endpoints.listAdminsByOrganization(orgId).then((admins) => {
-          console.log("ADMINS LIST:", admins.map(a => a.user_id));
+          console.log(
+            "ADMINS LIST:",
+            admins.map((a) => a.user_id),
+          );
           if (admins.some((a) => String(a.user_id) === String(user.id))) {
             console.log("IN ADMINS LIST -> ADMIN");
             setIsAdmin(true);

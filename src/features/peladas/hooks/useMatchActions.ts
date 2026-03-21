@@ -35,7 +35,7 @@ export function useMatchActions(
     setMatchEvents,
     setLineupsByMatch,
     setPelada,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } = data as any;
 
   const handleNetworkError = useCallback(

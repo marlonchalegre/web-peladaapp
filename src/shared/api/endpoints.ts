@@ -3,6 +3,7 @@ import { ApiClient } from "./client";
 export interface Organization {
   id: number;
   name: string;
+  owner_id?: number | null;
   waha_api_url?: string | null;
   waha_instance?: string | null;
   waha_group_id?: string | null;
@@ -55,6 +56,7 @@ export interface Pelada {
   when?: string | null;
   num_teams?: number | null;
   players_per_team?: number | null;
+  creator_id?: number | null;
   fixed_goalkeepers?: boolean | null;
   home_fixed_goalkeeper_id?: number | null;
   away_fixed_goalkeeper_id?: number | null;

@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useState, useEffect, type SyntheticEvent } from "react";
+import { useState, useEffect, useMemo, type SyntheticEvent } from "react";
 import {
   Container,
   Typography,
@@ -81,14 +81,17 @@ export default function AttendanceListPage() {
   } = useAttendance(peladaId);
 
   // Derived admin status
-  const isAnyAdmin =
-    pelada?.is_admin ||
-    isAdmin ||
-    isOrgAdmin ||
-    (user &&
-      pelada?.organization_id &&
-      (pelada.creator_id === user.id ||
-        user.admin_orgs?.includes(pelada.organization_id)));
+  const isAnyAdmin = useMemo(() => {
+    return !!(
+      pelada?.is_admin ||
+      isAdmin ||
+      isOrgAdmin ||
+      (user &&
+        pelada?.organization_id &&
+        (pelada.creator_id === user.id ||
+          user.admin_orgs?.includes(pelada.organization_id)))
+    );
+  }, [pelada, isAdmin, isOrgAdmin, user]);
 
   const onConfirmClose = () => {
     handleCloseAttendance();
