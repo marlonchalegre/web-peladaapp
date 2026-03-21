@@ -75,7 +75,7 @@ const StatCard = ({
               {subtitle}
             </Typography>
           </Box>
-          <Box sx={{ color: isDarkMode ? "primary.light" : "text.secondary" }}>
+          <Box sx={{ color: isDarkMode ? "primary.main" : "text.secondary" }}>
             {icon}
           </Box>
         </Box>
@@ -85,10 +85,15 @@ const StatCard = ({
             sx={{
               width: 56,
               height: 56,
-              bgcolor: isDarkMode ? alpha(theme.palette.primary.main, 0.2) : "grey.200",
-              color: isDarkMode ? "primary.light" : "grey.600",
+              bgcolor: isDarkMode
+                ? alpha(theme.palette.primary.main, 0.15)
+                : "grey.200",
+              color: isDarkMode ? "primary.main" : "grey.600",
               fontSize: "1.5rem",
               fontWeight: "bold",
+              border: isDarkMode
+                ? `1px solid ${alpha(theme.palette.primary.main, 0.3)}`
+                : "none",
             }}
           >
             {playerName.charAt(0)}

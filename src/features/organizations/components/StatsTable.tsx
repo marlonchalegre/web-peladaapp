@@ -314,7 +314,9 @@ export default function StatsTable({
                           height: 20,
                           fontSize: "0.65rem",
                           bgcolor: alpha(theme.palette.primary.main, 0.1),
-                          borderColor: theme.palette.primary.light,
+                          borderColor: isDarkMode
+                            ? alpha(theme.palette.primary.main, 0.4)
+                            : theme.palette.primary.light,
                           textTransform: "uppercase",
                           fontWeight: "bold",
                         }}
