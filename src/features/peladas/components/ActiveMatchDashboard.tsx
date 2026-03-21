@@ -131,7 +131,6 @@ export default function ActiveMatchDashboard(props: Props) {
 
   const { t } = useTranslation();
   const theme = useTheme();
-  const [loadingStats, setLoadingStats] = useState<Record<string, boolean>>({});
   const [isEditing, setIsEditing] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
 
@@ -150,38 +149,31 @@ export default function ActiveMatchDashboard(props: Props) {
     return matches.find((m) => m.status === "scheduled")?.id || null;
   }, [matches]);
 
-  const handleStatChange = async (
+  const handleStatChange = (
     playerId: number,
     type: "goal" | "assist" | "own_goal",
     diff: number,
     side: "home" | "away",
   ) => {
     if (diff === 0) return;
-    const loadingKey = `${playerId}-${type}`;
-    if (loadingStats[loadingKey]) return;
 
-    setLoadingStats((prev) => ({ ...prev, [loadingKey]: true }));
-    try {
-      const absDiff = Math.abs(diff);
-      for (let i = 0; i < absDiff; i++) {
-        if (diff > 0) {
-          await recordEvent(match.id, playerId, type, undefined, undefined);
-          if (type === "goal") {
-            await adjustScore(match.id, side, 1);
-          } else if (type === "own_goal") {
-            await adjustScore(match.id, side === "home" ? "away" : "home", 1);
-          }
-        } else {
-          await deleteEventAndRefresh(match.id, playerId, type);
-          if (type === "goal") {
-            await adjustScore(match.id, side, -1);
-          } else if (type === "own_goal") {
-            await adjustScore(match.id, side === "home" ? "away" : "home", -1);
-          }
+    const absDiff = Math.abs(diff);
+    for (let i = 0; i < absDiff; i++) {
+      if (diff > 0) {
+        recordEvent(match.id, playerId, type, undefined, undefined);
+        if (type === "goal") {
+          adjustScore(match.id, side, 1);
+        } else if (type === "own_goal") {
+          adjustScore(match.id, side === "home" ? "away" : "home", 1);
+        }
+      } else {
+        deleteEventAndRefresh(match.id, playerId, type);
+        if (type === "goal") {
+          adjustScore(match.id, side, -1);
+        } else if (type === "own_goal") {
+          adjustScore(match.id, side === "home" ? "away" : "home", -1);
         }
       }
-    } finally {
-      setLoadingStats((prev) => ({ ...prev, [loadingKey]: false }));
     }
   };
 
@@ -307,8 +299,7 @@ export default function ActiveMatchDashboard(props: Props) {
         {/* Players Section */}
         <Grid container spacing={2}>
           {/* Home Team */}
-          <Grid size={{ xs: 12, sm: 6 }}
- data-testid="home-team-match-section">
+          <Grid size={{ xs: 12, sm: 6 }} data-testid="home-team-match-section">
             <Box
               sx={{
                 mb: 1.5,
@@ -350,9 +341,6 @@ export default function ActiveMatchDashboard(props: Props) {
                   }
                   finished={effectiveFinished}
                   isAdmin={isAdmin}
-                  loadingGoals={!!loadingStats[`${p.player_id}-goal`]}
-                  loadingAssists={!!loadingStats[`${p.player_id}-assist`]}
-                  loadingOwnGoals={!!loadingStats[`${p.player_id}-own_goal`]}
                   onStatChange={(type, diff, side) =>
                     handleStatChange(p.player_id, type, diff, side)
                   }
@@ -369,8 +357,7 @@ export default function ActiveMatchDashboard(props: Props) {
           </Grid>
 
           {/* Away Team */}
-          <Grid size={{ xs: 12, sm: 6 }}
- data-testid="away-team-match-section">
+          <Grid size={{ xs: 12, sm: 6 }} data-testid="away-team-match-section">
             <Box
               sx={{
                 mb: 1.5,
@@ -412,9 +399,6 @@ export default function ActiveMatchDashboard(props: Props) {
                   }
                   finished={effectiveFinished}
                   isAdmin={isAdmin}
-                  loadingGoals={!!loadingStats[`${p.player_id}-goal`]}
-                  loadingAssists={!!loadingStats[`${p.player_id}-assist`]}
-                  loadingOwnGoals={!!loadingStats[`${p.player_id}-own_goal`]}
                   onStatChange={(type, diff, side) =>
                     handleStatChange(p.player_id, type, diff, side)
                   }

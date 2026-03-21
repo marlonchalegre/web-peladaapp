@@ -21,9 +21,6 @@ describe("MatchPlayerCard", () => {
     stats: { goals: 0, assists: 0, ownGoals: 0 },
     finished: false,
     isAdmin: true,
-    loadingGoals: false,
-    loadingAssists: false,
-    loadingOwnGoals: false,
     onStatChange: vi.fn(),
     onSubClick: vi.fn(),
   };

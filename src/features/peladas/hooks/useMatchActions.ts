@@ -90,6 +90,18 @@ export function useMatchActions(
       );
 
       setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
+
+      if (!navigator.onLine) {
+        enqueueAction(peladaId, "ADJUST_SCORE", {
+          matchId,
+          newHome,
+          newAway,
+          status,
+        });
+        setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
+        return;
+      }
+
       try {
         await endpoints.updateMatchScore(matchId, newHome, newAway, status);
       } catch (error: unknown) {
@@ -134,6 +146,13 @@ export function useMatchActions(
     );
 
     setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
+
+    if (!navigator.onLine) {
+      enqueueAction(peladaId, "DELETE_EVENT", { matchId, playerId, type });
+      setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
+      return;
+    }
+
     try {
       await endpoints.deleteMatchEvent(matchId, playerId, type);
       await refreshData();
@@ -173,6 +192,19 @@ export function useMatchActions(
     setMatchEvents((prev: MatchEvent[]) => [...prev, newEvent]);
 
     setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
+
+    if (!navigator.onLine) {
+      enqueueAction(peladaId, "RECORD_EVENT", {
+        matchId,
+        playerId,
+        type,
+        sessionTimeMs,
+        matchTimeMs,
+      });
+      setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
+      return;
+    }
+
     try {
       await endpoints.createMatchEvent(
         matchId,

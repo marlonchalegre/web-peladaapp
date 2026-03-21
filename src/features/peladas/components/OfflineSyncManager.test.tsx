@@ -65,8 +65,9 @@ describe("OfflineSyncManager", () => {
     );
 
     expect(screen.getByText(/Modo Offline ativo/)).toBeInTheDocument();
-    expect(screen.getByText(/2/)).toBeInTheDocument();
-    expect(screen.getByText(/ações pendentes/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Existem alterações pendentes de sincronização/),
+    ).toBeInTheDocument();
     // Sync button should not be present when offline
     expect(
       screen.queryByRole("button", { name: /Sincronizar Agora/ }),
@@ -243,8 +244,9 @@ describe("OfflineSyncManager", () => {
 
     await waitFor(() => {
       expect(getOfflineQueueSpy).toHaveBeenCalledTimes(2);
-      expect(screen.getByText(/1/)).toBeInTheDocument();
-      expect(screen.getByText(/ação pendente/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Existem alterações pendentes de sincronização/),
+      ).toBeInTheDocument();
     });
 
     unmount();

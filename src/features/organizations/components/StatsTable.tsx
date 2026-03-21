@@ -57,7 +57,9 @@ const StatBar = ({
           flexGrow: 1,
           position: "relative",
           height: 24,
-          bgcolor: isDarkMode ? alpha(theme.palette.common.white, 0.05) : "rgba(0,0,0,0.03)",
+          bgcolor: isDarkMode
+            ? alpha(theme.palette.common.white, 0.05)
+            : "rgba(0,0,0,0.03)",
           borderRadius: 1,
           overflow: "hidden",
         }}
@@ -231,7 +233,13 @@ export default function StatsTable({
     >
       <Table sx={{ minWidth: 650 }}>
         <TableHead>
-          <TableRow sx={{ bgcolor: isDarkMode ? alpha(theme.palette.common.white, 0.05) : "grey.50" }}>
+          <TableRow
+            sx={{
+              bgcolor: isDarkMode
+                ? alpha(theme.palette.common.white, 0.05)
+                : "grey.50",
+            }}
+          >
             <TableCell>
               <TableSortLabel
                 active={orderBy === "player_name"}

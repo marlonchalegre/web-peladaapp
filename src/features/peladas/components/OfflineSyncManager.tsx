@@ -176,8 +176,8 @@ export default function OfflineSyncManager({
           sx={{ mb: queue.length > 0 ? 1 : 0 }}
           data-testid="offline-banner"
         >
-          Modo Offline ativo. As alterações serão salvas localmente e
-          sincronizadas quando a conexão retornar.
+          Modo Offline ativo. Suas alterações serão sincronizadas quando a
+          conexão retornar.
         </Alert>
       )}
 
@@ -206,9 +206,15 @@ export default function OfflineSyncManager({
           }
         >
           <Typography variant="body2" data-testid="pending-actions-count">
-            <strong>{queue.length}</strong>{" "}
-            {queue.length === 1 ? "ação pendente" : "ações pendentes"} de
-            sincronização.
+            {isOnline ? (
+              <>
+                <strong>{queue.length}</strong>{" "}
+                {queue.length === 1 ? "ação pendente" : "ações pendentes"} de
+                sincronização.
+              </>
+            ) : (
+              "Existem alterações pendentes de sincronização."
+            )}
             {syncError && ` Erro: ${syncError}`}
           </Typography>
         </Alert>

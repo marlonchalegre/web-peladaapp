@@ -5,7 +5,6 @@ import {
   IconButton,
   Stack,
   Avatar,
-  CircularProgress,
   Tooltip,
   useTheme,
   alpha,
@@ -24,9 +23,6 @@ interface MatchPlayerCardProps {
   stats: { goals: number; assists: number; ownGoals: number };
   finished: boolean;
   isAdmin: boolean;
-  loadingGoals: boolean;
-  loadingAssists: boolean;
-  loadingOwnGoals: boolean;
   onStatChange: (
     type: "goal" | "assist" | "own_goal",
     diff: number,
@@ -42,9 +38,6 @@ export default function MatchPlayerCard({
   stats,
   finished,
   isAdmin,
-  loadingGoals,
-  loadingAssists,
-  loadingOwnGoals,
   onStatChange,
   onSubClick,
 }: MatchPlayerCardProps) {
@@ -108,7 +101,7 @@ export default function MatchPlayerCard({
       elevation={0}
       data-testid="player-row"
       sx={{
-        p: { xs: 1, sm: 1, md: 1.25 },
+        p: { xs: 1.25, sm: 1.5 },
         borderRadius: 3,
         border: "1px solid",
         borderColor: "divider",
@@ -120,56 +113,42 @@ export default function MatchPlayerCard({
         "&:hover": { bgcolor: "action.hover", boxShadow: 1 },
       }}
     >
-      <Stack
-        direction={{ xs: "column", md: "row" }}
-        justifyContent="space-between"
-        alignItems={{ xs: "stretch", md: "center" }}
-        sx={{ width: "100%", gap: { xs: 1, md: 1 } }}
-      >
-        {/* Top Section: Player Info */}
-        <Stack
-          direction="row"
-          spacing={{ xs: 1, sm: 1, md: 1.25 }}
-          alignItems="center"
-          sx={{ minWidth: 0, flexGrow: 1 }}
-        >
+      <Stack spacing={1.5}>
+        {/* Top Row: Sub Icon + Player Info */}
+        <Stack direction="row" spacing={1.5} alignItems="center">
           {showControls && (
             <Tooltip title={t("common.sub")}>
               <IconButton
                 onClick={onSubClick}
                 size="small"
-                sx={{ color: "text.disabled", p: 0.15 }}
+                sx={{
+                  color: teamColor,
+                  p: { xs: 0.4, sm: 0.6 },
+                  bgcolor: alpha(teamColor, 0.08),
+                  border: "1px solid",
+                  borderColor: alpha(teamColor, 0.12),
+                  "&:hover": {
+                    bgcolor: alpha(teamColor, 0.16),
+                    borderColor: alpha(teamColor, 0.2),
+                  },
+                }}
                 data-testid="sub-button"
               >
-                <SwapHorizIcon sx={{ fontSize: { xs: 18, sm: 18, md: 20 } }} />
+                <SwapHorizIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
               </IconButton>
             </Tooltip>
           )}
 
-          <Avatar
-            sx={{
-              bgcolor: "transparent",
-              color: teamColor,
-              border: "2px solid",
-              borderColor: teamColor,
-              fontWeight: "bold",
-              width: { xs: 28, sm: 30, md: 34 },
-              height: { xs: 28, sm: 30, md: 34 },
-              fontSize: { xs: "0.65rem", sm: "0.75rem", md: "0.8rem" },
-              flexShrink: 0,
-            }}
-          >
-            {playerName.substring(0, 2).toUpperCase()}
-          </Avatar>
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
             <Typography
               variant="body2"
               sx={{
                 fontWeight: "bold",
-                fontSize: { xs: "0.8rem", sm: "0.85rem", md: "0.9rem" },
+                fontSize: { xs: "0.85rem", sm: "1rem" },
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
+                lineHeight: 1.2,
               }}
               data-testid="player-name"
             >
@@ -180,8 +159,7 @@ export default function MatchPlayerCard({
               color="text.secondary"
               sx={{
                 display: "block",
-                mt: -0.25,
-                fontSize: "0.55rem",
+                fontSize: { xs: "0.65rem", sm: "0.75rem" },
                 fontWeight: "medium",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
@@ -193,14 +171,14 @@ export default function MatchPlayerCard({
           </Box>
         </Stack>
 
-        {/* Bottom/Right Section: Actions Container */}
+        {/* Bottom Row: Actions Container (Left Aligned) */}
         <Stack
           direction="row"
-          spacing={{ xs: 1, sm: 1.5, md: 1 }}
+          spacing={{ xs: 1.5, sm: 2 }}
           alignItems="center"
           sx={{
-            justifyContent: { xs: "flex-start", md: "flex-end" },
-            pl: { xs: showControls ? 9.5 : 5, md: 0 }, // Align with name on mobile/tablet
+            justifyContent: "flex-start",
+            pl: showControls ? 0 : 0, // Simplified, no offset needed in this vertical stack
             flexShrink: 0,
           }}
         >
@@ -227,8 +205,8 @@ export default function MatchPlayerCard({
                 border: "2px solid",
                 borderColor: "success.main",
                 borderRadius: showControls ? 1.5 : "50%",
-                width: showControls ? "auto" : { xs: 24, sm: 26, md: 30 },
-                height: showControls ? "auto" : { xs: 24, sm: 26, md: 30 },
+                width: showControls ? "auto" : { xs: 26, sm: 28, md: 32 },
+                height: showControls ? "auto" : { xs: 26, sm: 28, md: 32 },
                 overflow: "hidden",
                 bgcolor:
                   stats.goals > 0 && !showControls
@@ -241,38 +219,37 @@ export default function MatchPlayerCard({
                 <IconButton
                   size="small"
                   onClick={() => onStatChange("goal", -1, player.side)}
-                  disabled={stats.goals <= 0 || loadingGoals}
-                  sx={{ p: { xs: 0.25, sm: 0.3, md: 0.4 }, borderRadius: 0 }}
+                  disabled={stats.goals <= 0}
+                  sx={{ p: { xs: 0.4, sm: 0.6, md: 0.8 }, borderRadius: 0 }}
                   data-testid="stat-goals-decrement"
                 >
-                  <RemoveIcon sx={{ fontSize: { xs: 12, sm: 12, md: 14 } }} />
+                  <RemoveIcon sx={{ fontSize: { xs: 14, sm: 16, md: 18 } }} />
                 </IconButton>
               )}
               <Box
                 sx={{
-                  minWidth: showControls ? { xs: 18, sm: 20, md: 22 } : "auto",
+                  minWidth: showControls ? { xs: 20, sm: 24, md: 28 } : "auto",
                   textAlign: "center",
                   fontWeight: "bold",
-                  fontSize: { xs: "0.7rem", sm: "0.75rem", md: "0.8rem" },
+                  fontSize: { xs: "0.8rem", sm: "0.85rem", md: "1rem" },
                   color: stats.goals > 0 ? "success.main" : "text.secondary",
                 }}
                 data-testid="stat-goals-value"
               >
-                {loadingGoals ? <CircularProgress size={10} /> : stats.goals}
+                {stats.goals}
               </Box>
               {showControls && (
                 <IconButton
                   size="small"
                   onClick={() => onStatChange("goal", 1, player.side)}
-                  disabled={loadingGoals}
                   sx={{
-                    p: { xs: 0.25, sm: 0.3, md: 0.4 },
+                    p: { xs: 0.4, sm: 0.6, md: 0.8 },
                     borderRadius: 0,
                     color: "success.main",
                   }}
                   data-testid="stat-goals-increment"
                 >
-                  <AddIcon sx={{ fontSize: { xs: 12, sm: 12, md: 14 } }} />
+                  <AddIcon sx={{ fontSize: { xs: 14, sm: 16, md: 18 } }} />
                 </IconButton>
               )}
             </Stack>
@@ -301,8 +278,8 @@ export default function MatchPlayerCard({
                 border: "2px solid",
                 borderColor: "info.light",
                 borderRadius: showControls ? 1.5 : "50%",
-                width: showControls ? "auto" : { xs: 24, sm: 26, md: 30 },
-                height: showControls ? "auto" : { xs: 24, sm: 26, md: 30 },
+                width: showControls ? "auto" : { xs: 26, sm: 28, md: 32 },
+                height: showControls ? "auto" : { xs: 26, sm: 28, md: 32 },
                 overflow: "hidden",
                 bgcolor:
                   stats.assists > 0 && !showControls
@@ -315,42 +292,37 @@ export default function MatchPlayerCard({
                 <IconButton
                   size="small"
                   onClick={() => onStatChange("assist", -1, player.side)}
-                  disabled={stats.assists <= 0 || loadingAssists}
-                  sx={{ p: { xs: 0.25, sm: 0.3, md: 0.4 }, borderRadius: 0 }}
+                  disabled={stats.assists <= 0}
+                  sx={{ p: { xs: 0.4, sm: 0.6, md: 0.8 }, borderRadius: 0 }}
                   data-testid="stat-assists-decrement"
                 >
-                  <RemoveIcon sx={{ fontSize: { xs: 12, sm: 12, md: 14 } }} />
+                  <RemoveIcon sx={{ fontSize: { xs: 14, sm: 16, md: 18 } }} />
                 </IconButton>
               )}
               <Box
                 sx={{
-                  minWidth: showControls ? { xs: 18, sm: 20, md: 22 } : "auto",
+                  minWidth: showControls ? { xs: 20, sm: 24, md: 28 } : "auto",
                   textAlign: "center",
                   fontWeight: "bold",
-                  fontSize: { xs: "0.7rem", sm: "0.75rem", md: "0.8rem" },
+                  fontSize: { xs: "0.8rem", sm: "0.85rem", md: "1rem" },
                   color: stats.assists > 0 ? "info.main" : "text.secondary",
                 }}
                 data-testid="stat-assists-value"
               >
-                {loadingAssists ? (
-                  <CircularProgress size={10} />
-                ) : (
-                  stats.assists
-                )}
+                {stats.assists}
               </Box>
               {showControls && (
                 <IconButton
                   size="small"
                   onClick={() => onStatChange("assist", 1, player.side)}
-                  disabled={loadingAssists}
                   sx={{
-                    p: { xs: 0.25, sm: 0.3, md: 0.4 },
+                    p: { xs: 0.4, sm: 0.6, md: 0.8 },
                     borderRadius: 0,
                     color: "info.main",
                   }}
                   data-testid="stat-assists-increment"
                 >
-                  <AddIcon sx={{ fontSize: { xs: 12, sm: 12, md: 14 } }} />
+                  <AddIcon sx={{ fontSize: { xs: 14, sm: 16, md: 18 } }} />
                 </IconButton>
               )}
             </Stack>
@@ -379,8 +351,8 @@ export default function MatchPlayerCard({
                 border: "2px solid",
                 borderColor: stats.ownGoals > 0 ? "error.light" : "divider",
                 borderRadius: showControls ? 1.5 : "50%",
-                width: showControls ? "auto" : { xs: 24, sm: 26, md: 30 },
-                height: showControls ? "auto" : { xs: 24, sm: 26, md: 30 },
+                width: showControls ? "auto" : { xs: 26, sm: 28, md: 32 },
+                height: showControls ? "auto" : { xs: 26, sm: 28, md: 32 },
                 overflow: "hidden",
                 bgcolor:
                   stats.ownGoals > 0 && !showControls
@@ -393,42 +365,37 @@ export default function MatchPlayerCard({
                 <IconButton
                   size="small"
                   onClick={() => onStatChange("own_goal", -1, player.side)}
-                  disabled={stats.ownGoals <= 0 || loadingOwnGoals}
-                  sx={{ p: { xs: 0.25, sm: 0.3, md: 0.4 }, borderRadius: 0 }}
+                  disabled={stats.ownGoals <= 0}
+                  sx={{ p: { xs: 0.4, sm: 0.6, md: 0.8 }, borderRadius: 0 }}
                   data-testid="stat-own-goals-decrement"
                 >
-                  <RemoveIcon sx={{ fontSize: { xs: 12, sm: 12, md: 14 } }} />
+                  <RemoveIcon sx={{ fontSize: { xs: 14, sm: 16, md: 18 } }} />
                 </IconButton>
               )}
               <Box
                 sx={{
-                  minWidth: showControls ? { xs: 18, sm: 20, md: 22 } : "auto",
+                  minWidth: showControls ? { xs: 20, sm: 24, md: 28 } : "auto",
                   textAlign: "center",
                   fontWeight: "bold",
-                  fontSize: { xs: "0.7rem", sm: "0.75rem", md: "0.8rem" },
+                  fontSize: { xs: "0.8rem", sm: "0.85rem", md: "1rem" },
                   color: stats.ownGoals > 0 ? "error.main" : "text.secondary",
                 }}
                 data-testid="stat-own-goals-value"
               >
-                {loadingOwnGoals ? (
-                  <CircularProgress size={10} />
-                ) : (
-                  stats.ownGoals
-                )}
+                {stats.ownGoals}
               </Box>
               {showControls && (
                 <IconButton
                   size="small"
                   onClick={() => onStatChange("own_goal", 1, player.side)}
-                  disabled={loadingOwnGoals}
                   sx={{
-                    p: { xs: 0.25, sm: 0.3, md: 0.4 },
+                    p: { xs: 0.4, sm: 0.6, md: 0.8 },
                     borderRadius: 0,
                     color: stats.ownGoals > 0 ? "error.main" : "text.disabled",
                   }}
                   data-testid="stat-own-goals-increment"
                 >
-                  <AddIcon sx={{ fontSize: { xs: 12, sm: 12, md: 14 } }} />
+                  <AddIcon sx={{ fontSize: { xs: 14, sm: 16, md: 18 } }} />
                 </IconButton>
               )}
             </Stack>
