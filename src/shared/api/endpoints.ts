@@ -33,6 +33,8 @@ export interface Player {
   user_username?: string;
   user_email?: string;
   user_position?: string;
+  attendance_status?: AttendanceStatus;
+  attendance_updated_at?: string;
 }
 export interface OrganizationAdmin {
   id: number;
@@ -136,7 +138,7 @@ export interface PeladaDashboardDataResponse {
   player_stats: PlayerStats[] | null;
   team_players_map: Record<number, TeamPlayer[]>;
   match_lineups_map: Record<number, Record<number, MatchLineupEntry[]>>;
-  attendance?: { player_id: number; status: string }[];
+  attendance?: { player_id: number; status: string; updated_at?: string }[];
 }
 export interface VotingInfo {
   can_vote: boolean;
@@ -210,6 +212,7 @@ export interface Attendance {
   playerId?: number;
   status: string;
   Status?: string;
+  updated_at?: string;
   player?: Player & { user: User };
 }
 

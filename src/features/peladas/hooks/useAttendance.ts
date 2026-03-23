@@ -10,13 +10,33 @@ import {
   type AttendanceStatus,
 } from "../../../shared/api/endpoints";
 import { useAuth } from "../../../app/providers/AuthContext";
-import { sortPlayersByPosition } from "../utils/playerUtils";
+
+/**
+ * Sorts players by their attendance update time (FIFO - First In First Out).
+ * If update time is missing, it falls back to alphabetical sort by name.
+ */
+function sortPlayersByAttendanceTime(players: PlayerWithUser[]): PlayerWithUser[] {
+  return [...players].sort((a, b) => {
+    const timeA = a.attendance_updated_at ? new Date(a.attendance_updated_at).getTime() : Infinity;
+    const timeB = b.attendance_updated_at ? new Date(b.attendance_updated_at).getTime() : Infinity;
+
+    if (timeA !== timeB) {
+      return timeA - timeB;
+    }
+
+    // Alphabetical name sort (tie-breaker)
+    const nameA = a.user?.name || "";
+    const nameB = b.user?.name || "";
+    return nameA.localeCompare(nameB);
+  });
+}
 
 const endpoints = createApi(api);
 
 export type PlayerWithUser = Player & {
   user: User;
   attendance_status?: AttendanceStatus;
+  attendance_updated_at?: string;
 };
 
 export function useAttendance(peladaId: number) {
@@ -146,16 +166,16 @@ export function useAttendance(peladaId: number) {
     }
   };
 
-  const confirmed = sortPlayersByPosition(
+  const confirmed = sortPlayersByAttendanceTime(
     players.filter((p) => p.attendance_status === "confirmed"),
   );
-  const waitlist = sortPlayersByPosition(
+  const waitlist = sortPlayersByAttendanceTime(
     players.filter((p) => p.attendance_status === "waitlist"),
   );
-  const declined = sortPlayersByPosition(
+  const declined = sortPlayersByAttendanceTime(
     players.filter((p) => p.attendance_status === "declined"),
   );
-  const pending = sortPlayersByPosition(
+  const pending = sortPlayersByAttendanceTime(
     players.filter(
       (p) => !p.attendance_status || p.attendance_status === "pending",
     ),

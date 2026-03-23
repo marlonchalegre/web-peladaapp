@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { useTranslation } from "react-i18next";
 import { type AttendanceStatus } from "../../../shared/api/endpoints";
 import { type PlayerWithUser } from "../hooks/useAttendance";
@@ -80,6 +81,7 @@ export default function PlayerAttendanceCard({
               variant="body1"
               component="div"
               noWrap
+              data-testid="attendance-card-name"
               sx={{
                 fontWeight: 600,
                 lineHeight: 1.2,
@@ -140,6 +142,7 @@ export default function PlayerAttendanceCard({
                 {player.attendance_status !== "confirmed" && (
                   <IconButton
                     size="small"
+                    title={t("peladas.attendance.status.confirmed")}
                     onClick={() => onUpdate("confirmed")}
                     data-testid="attendance-card-confirm"
                     sx={{
@@ -147,16 +150,33 @@ export default function PlayerAttendanceCard({
                       "&:hover": {
                         color: "success.main",
                         bgcolor: "success.light",
-                        alpha: 0.1,
                       },
                     }}
                   >
                     <CheckCircleIcon fontSize="small" />
                   </IconButton>
                 )}
+                {player.attendance_status !== "waitlist" && (
+                  <IconButton
+                    size="small"
+                    title={t("peladas.attendance.status.waitlist")}
+                    onClick={() => onUpdate("waitlist")}
+                    data-testid="attendance-card-waitlist"
+                    sx={{
+                      color: "grey.400",
+                      "&:hover": {
+                        color: "warning.main",
+                        bgcolor: "warning.light",
+                      },
+                    }}
+                  >
+                    <AccessTimeIcon fontSize="small" />
+                  </IconButton>
+                )}
                 {player.attendance_status !== "declined" && (
                   <IconButton
                     size="small"
+                    title={t("peladas.attendance.status.declined")}
                     onClick={() => onUpdate("declined")}
                     data-testid="attendance-card-decline"
                     sx={{
@@ -164,7 +184,6 @@ export default function PlayerAttendanceCard({
                       "&:hover": {
                         color: "error.main",
                         bgcolor: "error.light",
-                        alpha: 0.1,
                       },
                     }}
                   >
