@@ -140,6 +140,7 @@ export default function PeladasList({
                         sx={{ display: "block", textDecoration: "none" }}
                         onClick={(e) => e.stopPropagation()}
                         data-testid={`pelada-link-${pelada.id}`}
+                        data-analytics-id="view-pelada-details-link"
                       >
                         <Typography
                           variant="body2"

@@ -200,6 +200,7 @@ export default function OrganizationDetailPage() {
             to={`/organizations/${orgId}/statistics`}
             variant="outlined"
             data-testid="org-statistics-button"
+            data-analytics-id="view-org-statistics-btn"
             sx={{
               minWidth: { xs: "40px", sm: "auto" },
               px: { xs: 0, sm: 2 },
@@ -223,6 +224,7 @@ export default function OrganizationDetailPage() {
               color="error"
               onClick={() => setLeaveDialogOpen(true)}
               data-testid="leave-org-button"
+              data-analytics-id="leave-org-btn"
               sx={{
                 minWidth: { xs: "40px", sm: "auto" },
                 px: { xs: 0, sm: 2 },
@@ -248,6 +250,7 @@ export default function OrganizationDetailPage() {
               variant="outlined"
               color="primary"
               data-testid="org-management-button"
+              data-analytics-id="manage-org-btn"
               sx={{
                 minWidth: { xs: "40px", sm: "auto" },
                 px: { xs: 0, sm: 2 },
@@ -362,6 +365,7 @@ export default function OrganizationDetailPage() {
             variant="contained"
             autoFocus
             data-testid="confirm-leave-org-button"
+            data-analytics-id="confirm-leave-org-btn"
           >
             {isLeaving
               ? t("common.loading", "Carregando...")

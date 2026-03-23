@@ -44,7 +44,7 @@ import PeladaMatchesPage from "./features/peladas/pages/PeladaMatchesPage";
 import PeladaVotingPage from "./features/peladas/pages/PeladaVotingPage";
 import PeladaVotingResultsPage from "./features/peladas/pages/PeladaVotingResultsPage";
 import UserProfilePage from "./features/user/pages/UserProfilePage";
-import { initGA, logPageView, logEvent } from "./lib/analytics";
+import { initGA, logPageView, logClickEvent } from "./lib/analytics";
 
 function AnalyticsTracker() {
   const location = useLocation();
@@ -52,23 +52,34 @@ function AnalyticsTracker() {
   useEffect(() => {
     initGA();
 
+    const getPageName = (path: string) => {
+      const parts = path.split("/").filter(Boolean);
+      if (parts.length === 0) return "Home";
+      return parts.map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join(" > ");
+    };
+
     const handleGlobalClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      const button = target.closest("button");
+      const clickable = target.closest("button, a, [role='button']");
 
-      if (button) {
-        const buttonText =
-          button.innerText?.trim() ||
-          button.getAttribute("aria-label") ||
-          button.getAttribute("data-testid") ||
-          "unnamed-button";
-        logEvent("Interaction", "Button Click", buttonText);
+      if (clickable) {
+        const analyticsId = clickable.getAttribute("data-analytics-id");
+        const elementText =
+          clickable.textContent?.trim() ||
+          clickable.getAttribute("aria-label") ||
+          clickable.getAttribute("title") ||
+          "unnamed-element";
+
+        const pageName = getPageName(location.pathname);
+        const elementName = analyticsId || clickable.tagName.toLowerCase();
+
+        logClickEvent(pageName, elementName, elementText);
       }
     };
 
     document.addEventListener("click", handleGlobalClick);
     return () => document.removeEventListener("click", handleGlobalClick);
-  }, []);
+  }, [location.pathname]);
 
   useEffect(() => {
     logPageView(location.pathname + location.search);

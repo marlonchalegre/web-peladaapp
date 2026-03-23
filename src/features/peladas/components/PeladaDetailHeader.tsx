@@ -145,6 +145,7 @@ export default function PeladaDetailHeader({
                     to={`/peladas/${pelada.id}/build-schedule`}
                     variant="contained"
                     data-testid="build-schedule-button"
+                    data-analytics-id="build-schedule-btn"
                     sx={{
                       textTransform: "none",
                       borderRadius: 2,
@@ -171,6 +172,7 @@ export default function PeladaDetailHeader({
                       to={`/peladas/${pelada.id}/build-schedule`}
                       variant="outlined"
                       data-testid="build-schedule-button-edit"
+                      data-analytics-id="edit-schedule-btn"
                       sx={{
                         textTransform: "none",
                         borderRadius: 2,
@@ -195,6 +197,7 @@ export default function PeladaDetailHeader({
                       onClick={onStartClick}
                       disabled={changingStatus || processing}
                       data-testid="start-pelada-button"
+                      data-analytics-id="start-pelada-btn"
                       sx={{
                         textTransform: "none",
                         borderRadius: 2,
@@ -227,6 +230,7 @@ export default function PeladaDetailHeader({
                   to={`/peladas/${pelada.id}/matches`}
                   variant="outlined"
                   data-testid="view-matches-button"
+                  data-analytics-id="view-matches-btn"
                   sx={{
                     textTransform: "none",
                     borderRadius: 2,
@@ -256,6 +260,7 @@ export default function PeladaDetailHeader({
               to={`/peladas/${pelada.id}/voting`}
               variant="contained"
               color={votingInfo.has_voted ? "success" : "secondary"}
+              data-analytics-id="vote-btn"
               sx={{
                 textTransform: "none",
                 borderRadius: 2,
@@ -285,6 +290,7 @@ export default function PeladaDetailHeader({
               to={`/peladas/${pelada.id}/results`}
               variant="outlined"
               color="primary"
+              data-analytics-id="view-results-btn"
               sx={{
                 textTransform: "none",
                 borderRadius: 2,

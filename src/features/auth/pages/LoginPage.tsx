@@ -98,6 +98,7 @@ export default function LoginPage() {
               disabled={loading}
               size="large"
               data-testid="login-submit"
+              data-analytics-id="login-submit-btn"
             >
               {loading
                 ? t("auth.login.button.loading")
@@ -108,6 +109,7 @@ export default function LoginPage() {
               <MLink
                 href={`/register${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`}
                 underline="hover"
+                data-analytics-id="register-link"
               >
                 {t("auth.login.link.register")}
               </MLink>
@@ -116,6 +118,7 @@ export default function LoginPage() {
               <MLink
                 href={`/first-access${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`}
                 underline="hover"
+                data-analytics-id="first-access-link"
               >
                 {t("auth.login.link.first_access")}
               </MLink>

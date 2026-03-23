@@ -155,6 +155,7 @@ export default function MemberOrganizationsList({
                         color="text.primary"
                         onClick={(e) => e.stopPropagation()}
                         data-testid={`org-link-${org.name}`}
+                        data-analytics-id="view-org-details-link"
                       >
                         {org.name}
                       </Link>

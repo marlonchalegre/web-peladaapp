@@ -74,6 +74,7 @@ export default function CreatePeladaForm({ organizationId, onCreate }: Props) {
             variant="contained"
             size="large"
             data-testid="create-pelada-submit"
+            data-analytics-id="create-pelada-submit-btn"
           >
             {t("organizations.form.pelada.submit")}
           </Button>

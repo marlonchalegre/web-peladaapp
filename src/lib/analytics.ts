@@ -14,12 +14,43 @@ export const logPageView = (path: string) => {
   }
 };
 
-export const logEvent = (category: string, action: string, label?: string) => {
+export interface AnalyticsEvent {
+  category: string;
+  action: string;
+  label?: string;
+  value?: number;
+  nonInteraction?: boolean;
+}
+
+export const logEvent = ({
+  category,
+  action,
+  label,
+  value,
+  nonInteraction,
+}: AnalyticsEvent) => {
   if (GA_MEASUREMENT_ID) {
     ReactGA.event({
       category,
       action,
       label,
+      value,
+      nonInteraction,
     });
   }
+};
+
+/**
+ * Specialized helper for logging button/link clicks with page context
+ */
+export const logClickEvent = (
+  pageName: string,
+  elementName: string,
+  elementText?: string
+) => {
+  logEvent({
+    category: "Interaction",
+    action: `Click: ${pageName}`,
+    label: `${elementName}${elementText ? ` (${elementText})` : ""}`,
+  });
 };

@@ -58,6 +58,7 @@ export default function AdminOrganizationsList({
           size="small"
           onClick={onCreate}
           data-testid="create-org-open-dialog"
+          data-analytics-id="create-org-open-btn"
           sx={{
             borderRadius: 2,
             textTransform: "none",
@@ -174,6 +175,7 @@ export default function AdminOrganizationsList({
                         color="text.primary"
                         onClick={(e) => e.stopPropagation()}
                         data-testid={`org-link-${org.name}`}
+                        data-analytics-id="view-org-details-link"
                       >
                         {org.name}
                       </Link>
@@ -218,6 +220,7 @@ export default function AdminOrganizationsList({
                         navigate(`/organizations/${org.id}/management`);
                       }}
                       data-testid={`manage-org-${org.id}`}
+                      data-analytics-id="manage-org-btn"
                     >
                       <GroupsIcon
                         sx={{ fontSize: "1.125rem", mr: { xs: 0, sm: 1 } }}

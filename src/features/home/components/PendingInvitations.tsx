@@ -49,6 +49,7 @@ export default function PendingInvitations({ invitations, onAccept }: Props) {
                 onClick={() => onAccept(inv.token)}
                 size="small"
                 data-testid={`accept-invitation-${inv.organization_name}`}
+                data-analytics-id="accept-invite-btn"
               >
                 {t("common.accept", "Aceitar")}
               </Button>
