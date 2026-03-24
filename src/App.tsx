@@ -55,7 +55,9 @@ function AnalyticsTracker() {
     const getPageName = (path: string) => {
       const parts = path.split("/").filter(Boolean);
       if (parts.length === 0) return "Home";
-      return parts.map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join(" > ");
+      return parts
+        .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
+        .join(" > ");
     };
 
     const handleGlobalClick = (event: MouseEvent) => {

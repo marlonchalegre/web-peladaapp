@@ -28,7 +28,7 @@ export interface Player {
   organization_id: number;
   grade?: number | null;
   position_id?: number | null;
-  member_type?: "mensalista" | "diarista";
+  member_type?: "mensalista" | "diarista" | "convidado";
   user_name?: string;
   user_username?: string;
   user_email?: string;

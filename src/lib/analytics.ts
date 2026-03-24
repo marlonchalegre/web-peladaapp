@@ -46,7 +46,7 @@ export const logEvent = ({
 export const logClickEvent = (
   pageName: string,
   elementName: string,
-  elementText?: string
+  elementText?: string,
 ) => {
   logEvent({
     category: "Interaction",

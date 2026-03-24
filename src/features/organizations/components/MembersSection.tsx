@@ -197,18 +197,25 @@ export default function MembersSection({
                     sx={{ minWidth: 120 }}
                   >
                     <Select
-                      value={player.member_type || "diarista"}
+                      value={player.member_type || "convidado"}
                       onChange={(e) =>
                         onUpdatePlayer(player.id, {
                           member_type: e.target.value as
                             | "mensalista"
-                            | "diarista",
+                            | "diarista"
+                            | "convidado",
                         })
                       }
                       disabled={actionLoading}
                       disableUnderline
                       sx={{ fontSize: "0.875rem" }}
                     >
+                      <MenuItem value="convidado">
+                        {t(
+                          "organizations.management.member_type.convidado",
+                          "Convidado",
+                        )}
+                      </MenuItem>
                       <MenuItem value="diarista">
                         {t(
                           "organizations.management.member_type.diarista",

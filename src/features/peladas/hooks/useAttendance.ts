@@ -12,19 +12,41 @@ import {
 import { useAuth } from "../../../app/providers/AuthContext";
 
 /**
- * Sorts players by their attendance update time (FIFO - First In First Out).
+ * Sorts players by their member type priority (mensalista > diarista > convidado)
+ * and then by their attendance update time (FIFO - First In First Out).
  * If update time is missing, it falls back to alphabetical sort by name.
  */
-function sortPlayersByAttendanceTime(players: PlayerWithUser[]): PlayerWithUser[] {
+function sortPlayersByAttendanceTime(
+  players: PlayerWithUser[],
+): PlayerWithUser[] {
+  const priority: Record<string, number> = {
+    mensalista: 1,
+    diarista: 2,
+    convidado: 3,
+  };
+
   return [...players].sort((a, b) => {
-    const timeA = a.attendance_updated_at ? new Date(a.attendance_updated_at).getTime() : Infinity;
-    const timeB = b.attendance_updated_at ? new Date(b.attendance_updated_at).getTime() : Infinity;
+    // 1. Sort by member type priority
+    const priorityA = priority[a.member_type || "convidado"] || 3;
+    const priorityB = priority[b.member_type || "convidado"] || 3;
+
+    if (priorityA !== priorityB) {
+      return priorityA - priorityB;
+    }
+
+    // 2. Sort by attendance time (FIFO)
+    const timeA = a.attendance_updated_at
+      ? new Date(a.attendance_updated_at).getTime()
+      : Infinity;
+    const timeB = b.attendance_updated_at
+      ? new Date(b.attendance_updated_at).getTime()
+      : Infinity;
 
     if (timeA !== timeB) {
       return timeA - timeB;
     }
 
-    // Alphabetical name sort (tie-breaker)
+    // 3. Alphabetical name sort (final tie-breaker)
     const nameA = a.user?.name || "";
     const nameB = b.user?.name || "";
     return nameA.localeCompare(nameB);

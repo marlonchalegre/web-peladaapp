@@ -36,7 +36,7 @@ describe("useAttendance sorting", () => {
     vi.clearAllMocks();
   });
 
-  it("should sort attendance lists by updated_at (FIFO)", async () => {
+  it("should sort attendance lists by member_type priority and then by updated_at (FIFO)", async () => {
     const mockData = {
       pelada: { id: 1, organization_id: 1, status: "attendance" },
       available_players: [
@@ -44,29 +44,33 @@ describe("useAttendance sorting", () => {
           id: 1,
           user_id: 101,
           attendance_status: "confirmed",
-          attendance_updated_at: "2026-03-23T10:00:00Z",
-          user: { name: "Zebra" },
+          attendance_updated_at: "2026-03-23T08:00:00Z",
+          user: { name: "Convidado 1" },
+          member_type: "convidado",
         },
         {
           id: 2,
           user_id: 102,
           attendance_status: "confirmed",
-          attendance_updated_at: "2026-03-23T09:00:00Z",
-          user: { name: "Albatross" },
+          attendance_updated_at: "2026-03-23T10:00:00Z",
+          user: { name: "Diarista 1" },
+          member_type: "diarista",
         },
         {
           id: 3,
           user_id: 103,
-          attendance_status: "waitlist",
-          attendance_updated_at: "2026-03-23T11:00:00Z",
-          user: { name: "Lion" },
+          attendance_status: "confirmed",
+          attendance_updated_at: "2026-03-23T09:00:00Z",
+          user: { name: "Mensalista 1" },
+          member_type: "mensalista",
         },
         {
           id: 4,
           user_id: 104,
-          attendance_status: "waitlist",
-          attendance_updated_at: "2026-03-23T10:30:00Z",
-          user: { name: "Tiger" },
+          attendance_status: "confirmed",
+          attendance_updated_at: "2026-03-23T07:00:00Z",
+          user: { name: "Diarista 2" },
+          member_type: "diarista",
         },
       ],
     };
@@ -79,13 +83,15 @@ describe("useAttendance sorting", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    // Confirmed should be sorted by time: Albatross (09:00) then Zebra (10:00)
-    expect(result.current.confirmed[0].user.name).toBe("Albatross");
-    expect(result.current.confirmed[1].user.name).toBe("Zebra");
-
-    // Waitlist should be sorted by time: Tiger (10:30) then Lion (11:00)
-    expect(result.current.waitlist[0].user.name).toBe("Tiger");
-    expect(result.current.waitlist[1].user.name).toBe("Lion");
+    // Order should be:
+    // 1. Mensalista 1 (priority 1)
+    // 2. Diarista 2 (priority 2, earlier time)
+    // 3. Diarista 1 (priority 2, later time)
+    // 4. Convidado 1 (priority 3)
+    expect(result.current.confirmed[0].user.name).toBe("Mensalista 1");
+    expect(result.current.confirmed[1].user.name).toBe("Diarista 2");
+    expect(result.current.confirmed[2].user.name).toBe("Diarista 1");
+    expect(result.current.confirmed[3].user.name).toBe("Convidado 1");
   });
 
   it("should fallback to alphabetical sort if updated_at is missing or equal", async () => {

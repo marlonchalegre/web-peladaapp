@@ -159,7 +159,8 @@
     },
     "member_types": {
       "mensalista": "Mensalista",
-      "diarista": "Diarista"
+      "diarista": "Diarista",
+      "convidado": "Convidado"
     }
   },
   "home": {
@@ -289,7 +290,8 @@
       "delete_confirm_instruction": "Por favor, digite o nome da organização \"{{name}}\" para confirmar.",
       "member_type": {
         "mensalista": "Mensalista",
-        "diarista": "Diarista"
+        "diarista": "Diarista",
+        "convidado": "Convidado"
       }
     },
     "ratings": {
