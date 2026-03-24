@@ -23,7 +23,36 @@
       "link": {
         "new_user": "New here?",
         "register": "Create account",
-        "first_access": "Invited? Complete registration"
+        "first_access": "Invited? Complete registration",
+        "forgot_password": "Forgot your password?"
+      }
+    },
+    "forgot_password": {
+      "title": "Recover Password",
+      "description": "Enter your email or username to receive a recovery link.",
+      "success": "If an account with that email exists, we've sent a link to reset your password.",
+      "error": {
+        "failed": "Failed to request recovery"
+      },
+      "button": {
+        "submit": "Send Link",
+        "loading": "Sending..."
+      },
+      "link": {
+        "back_to_login": "Back to Login"
+      }
+    },
+    "reset_password": {
+      "title": "Reset Password",
+      "description": "Enter your new password below.",
+      "success": "Password reset successfully!",
+      "error": {
+        "failed": "Failed to reset password",
+        "invalid_token": "Invalid or expired token"
+      },
+      "button": {
+        "submit": "Reset Password",
+        "loading": "Resetting..."
       }
     },
     "register": {

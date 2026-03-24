@@ -32,6 +32,8 @@ import ProtectedRoute from "./app/routing/ProtectedRoute";
 import LoginPage from "./features/auth/pages/LoginPage";
 import RegisterPage from "./features/auth/pages/RegisterPage";
 import FirstAccessPage from "./features/auth/pages/FirstAccessPage";
+import ForgotPasswordPage from "./features/auth/pages/ForgotPasswordPage";
+import ResetPasswordPage from "./features/auth/pages/ResetPasswordPage";
 import HomePage from "./features/home/pages/HomePage";
 import OrganizationDetailPage from "./features/organizations/pages/OrganizationDetailPage";
 import JoinOrganizationPage from "./features/organizations/pages/JoinOrganizationPage";
@@ -258,6 +260,8 @@ function AppLayout() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/first-access" element={<FirstAccessPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
 
             {/* Rotas protegidas sem Container global para permitir controle por página */}
             <Route element={<ProtectedRoute />}>

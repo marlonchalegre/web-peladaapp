@@ -23,7 +23,36 @@
       "link": {
         "new_user": "Novo aqui?",
         "register": "Criar conta",
-        "first_access": "Convidado? Complete o registro"
+        "first_access": "Convidado? Complete o registro",
+        "forgot_password": "Esqueceu sua senha?"
+      }
+    },
+    "forgot_password": {
+      "title": "Recuperar Senha",
+      "description": "Insira seu email ou username para receber um link de recuperação.",
+      "success": "Se uma conta com este email existir, enviamos um link para redefinir a senha.",
+      "error": {
+        "failed": "Falha ao solicitar recuperação"
+      },
+      "button": {
+        "submit": "Enviar Link",
+        "loading": "Enviando..."
+      },
+      "link": {
+        "back_to_login": "Voltar para Login"
+      }
+    },
+    "reset_password": {
+      "title": "Redefinir Senha",
+      "description": "Insira sua nova senha abaixo.",
+      "success": "Senha redefinida com sucesso!",
+      "error": {
+        "failed": "Falha ao redefinir senha",
+        "invalid_token": "Token inválido ou expirado"
+      },
+      "button": {
+        "submit": "Redefinir Senha",
+        "loading": "Redefinindo..."
       }
     },
     "register": {

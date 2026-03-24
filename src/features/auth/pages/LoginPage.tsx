@@ -116,11 +116,12 @@ export default function LoginPage() {
             </Typography>
             <Typography variant="body2" textAlign="center">
               <MLink
-                href={`/first-access${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`}
+                href={`/forgot-password${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`}
                 underline="hover"
-                data-analytics-id="first-access-link"
+                data-testid="forgot-password-link"
+                data-analytics-id="forgot-password-link"
               >
-                {t("auth.login.link.first_access")}
+                {t("auth.login.link.forgot_password")}
               </MLink>
             </Typography>
           </Stack>
