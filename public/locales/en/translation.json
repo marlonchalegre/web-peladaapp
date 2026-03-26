@@ -137,7 +137,9 @@
       "manage": "Manage",
       "view": "View",
       "save": "Save",
-      "saving": "Saving..."
+      "saving": "Saving...",
+      "disable": "Disable",
+      "enable": "Enable"
     },
     "date": {
       "tbd": "TBD"
@@ -641,8 +643,10 @@
       "button": {
         "back_to_pelada": "Back to Pelada",
         "save": "Save Votes",
-        "view_results": "View Results"
+        "view_results": "View Results",
+        "enable_voting": "Enable Voting"
       },
+      "disabled_players_title": "Disabled Players (Admin Only)",
       "status": {
         "title": "Voting Status",
         "voted": "Already Voted",

@@ -147,6 +147,7 @@ export interface VotingInfo {
     player_id: number;
     name: string;
     position?: string;
+    voting_enabled?: boolean;
     goals?: number;
     assists?: number;
     own_goals?: number;
@@ -213,6 +214,7 @@ export interface Attendance {
   status: string;
   Status?: string;
   updated_at?: string;
+  voting_enabled?: boolean;
   player?: Player & { user: User };
 }
 
@@ -372,6 +374,14 @@ export function createApi(client: ApiClient) {
       }),
     closeAttendance: (id: number) =>
       client.post<Pelada>(`/api/peladas/${id}/close-attendance`),
+    updateVotingEnabled: (id: number, playerId: number, enabled: boolean) =>
+      client.post<{ updated: number }>(
+        `/api/peladas/${id}/attendance/voting-enabled`,
+        {
+          player_id: playerId,
+          enabled,
+        },
+      ),
 
     startPeladaTimer: (id: number) =>
       client.post<Pelada>(`/api/peladas/${id}/timer/start`, {}),

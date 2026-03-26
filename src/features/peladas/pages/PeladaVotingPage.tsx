@@ -19,11 +19,18 @@ import {
   Paper,
   Grid,
   Snackbar,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PendingIcon from "@mui/icons-material/Pending";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import { api } from "../../../shared/api/client";
 import {
   createApi,
@@ -45,6 +52,7 @@ type PlayerVote = {
   goals: number;
   assists: number;
   own_goals: number;
+  voting_enabled: boolean;
 };
 
 export default function PeladaVotingPage() {
@@ -57,10 +65,12 @@ export default function PeladaVotingPage() {
   const [votingInfo, setVotingInfo] = useState<VotingInfo | null>(null);
   const [votingStatus, setVotingStatus] = useState<VotingStatus | null>(null);
   const [playerVotes, setPlayerVotes] = useState<PlayerVote[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [confirmToggle, setConfirmToggle] = useState<{playerId: number, name: string} | null>(null);
 
   useEffect(() => {
     if (!peladaId) return;
@@ -75,15 +85,17 @@ export default function PeladaVotingPage() {
           return;
         }
 
-        const [info, status] = await Promise.all([
+        const [info, status, details] = await Promise.all([
           endpoints.getVotingInfo(peladaId),
           endpoints.getVotingStatus(peladaId),
+          endpoints.getPeladaFullDetails(peladaId),
         ]);
 
         setVotingInfo(info);
         setVotingStatus(status);
+        setIsAdmin(details.pelada.is_admin || false);
 
-        if (!info.can_vote) {
+        if (!info.can_vote && !details.pelada.is_admin) {
           setError(info.message || t("peladas.voting.error.cannot_vote"));
           return;
         }
@@ -100,6 +112,7 @@ export default function PeladaVotingPage() {
             goals: p.goals ?? 0,
             assists: p.assists ?? 0,
             own_goals: p.own_goals ?? 0,
+            voting_enabled: p.voting_enabled ?? true,
           };
         });
         setPlayerVotes(votes);
@@ -123,8 +136,38 @@ export default function PeladaVotingPage() {
     );
   };
 
+  const handleToggleVoting = async (playerId: number, enabled: boolean) => {
+    try {
+      setSubmitting(true);
+      setError(null);
+      await endpoints.updateVotingEnabled(peladaId, playerId, enabled);
+      
+      // Update playerVotes state - keep in list but update voting_enabled and clear stars if disabled
+      setPlayerVotes(prev => prev.map(pv => pv.playerId === playerId ? { ...pv, voting_enabled: enabled, stars: enabled ? pv.stars : null } : pv));
+      
+      // Update votingInfo to reflect the change
+      setVotingInfo(prev => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          eligible_players: prev.eligible_players.map(p =>
+            p.player_id === playerId ? { ...p, voting_enabled: enabled } : p
+          ),
+        };
+      });
+      
+      setSuccess(enabled ? "Player enabled for voting" : "Player disabled from voting and previous votes removed");
+      setConfirmToggle(null);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to update voting status";
+      setError(message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const allVotesComplete =
-    playerVotes.length > 0 && playerVotes.every((pv) => pv.stars !== null);
+    playerVotes.length > 0 && playerVotes.filter(pv => pv.voting_enabled).every((pv) => pv.stars !== null);
 
   const handleSubmit = async () => {
     if (!allVotesComplete || !votingInfo?.voter_player_id) return;
@@ -134,10 +177,12 @@ export default function PeladaVotingPage() {
       setError(null);
       setSuccess(null);
 
-      const votes = playerVotes.map((pv) => ({
-        target_id: pv.playerId,
-        stars: pv.stars as number,
-      }));
+      const votes = playerVotes
+        .filter(pv => pv.voting_enabled)
+        .map((pv) => ({
+          target_id: pv.playerId,
+          stars: pv.stars as number,
+        }));
 
       await endpoints.batchCastVotes(peladaId, {
         voter_id: votingInfo.voter_player_id,
@@ -306,7 +351,13 @@ export default function PeladaVotingPage() {
                   key={pv.playerId}
                   variant="outlined"
                   data-testid={`voting-card-${pv.playerId}`}
-                  sx={{ borderRadius: 2 }}
+                  sx={{ 
+                    borderRadius: 2,
+                    opacity: pv.voting_enabled ? 1 : 0.6,
+                    bgcolor: pv.voting_enabled ? 'background.paper' : 'action.hover',
+                    transition: 'all 0.3s ease',
+                    border: pv.voting_enabled ? undefined : '1px dashed grey'
+                  }}
                 >
                   <CardContent>
                     <Grid container alignItems="center" spacing={2}>
@@ -319,16 +370,29 @@ export default function PeladaVotingPage() {
                             mb: 1,
                           }}
                         >
-                          <Typography variant="h6" fontWeight="bold">
+                          <Typography 
+                            variant="h6" 
+                            fontWeight="bold"
+                            sx={{ color: pv.voting_enabled ? 'text.primary' : 'text.secondary' }}
+                          >
                             {pv.playerName}
                           </Typography>
                           <Chip
                             label={t(positionKey)}
                             size="small"
                             variant="outlined"
-                            color="primary"
+                            color={pv.voting_enabled ? "primary" : "default"}
                             sx={{ fontSize: "0.7rem", fontWeight: "bold" }}
                           />
+                          {!pv.voting_enabled && (
+                            <Chip 
+                              label={t("common.actions.disable")}
+                              size="small" 
+                              color="error" 
+                              variant="filled"
+                              sx={{ fontSize: "0.7rem", fontWeight: "bold" }} 
+                            />
+                          )}
                         </Box>
                         <Stack direction="row" spacing={2}>
                           <Typography variant="body2" color="text.secondary">
@@ -362,18 +426,38 @@ export default function PeladaVotingPage() {
                             }
                             size="large"
                             max={5}
+                            disabled={!votingInfo?.can_vote || !pv.voting_enabled}
                             data-testid={`rating-${pv.playerId}`}
                           />
-                          {pv.stars !== null && (
-                            <Typography
-                              variant="caption"
-                              color="primary"
-                              fontWeight="bold"
-                              sx={{ mt: 0.5 }}
-                            >
-                              {pv.stars} {t("peladas.voting.stars")}
-                            </Typography>
-                          )}
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                            {pv.stars !== null && pv.voting_enabled && (
+                              <Typography
+                                variant="caption"
+                                color="primary"
+                                fontWeight="bold"
+                              >
+                                {pv.stars} {t("peladas.voting.stars")}
+                              </Typography>
+                            )}
+                            {isAdmin && (
+                              <Button
+                                size="small"
+                                color={pv.voting_enabled ? "error" : "success"}
+                                variant="outlined"
+                                startIcon={pv.voting_enabled ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                onClick={() => {
+                                  if (pv.voting_enabled) {
+                                    setConfirmToggle({ playerId: pv.playerId, name: pv.playerName });
+                                  } else {
+                                    handleToggleVoting(pv.playerId, true);
+                                  }
+                                }}
+                                sx={{ py: 0, height: 24, fontSize: '0.65rem' }}
+                              >
+                                {pv.voting_enabled ? t("common.actions.disable") : t("common.actions.enable")}
+                              </Button>
+                            )}
+                          </Box>
                         </Box>
                       </Grid>
                     </Grid>
@@ -513,6 +597,38 @@ export default function PeladaVotingPage() {
           {error}
         </Alert>
       </Snackbar>
+
+      <Dialog
+        open={!!confirmToggle}
+        onClose={() => setConfirmToggle(null)}
+        aria-labelledby="confirm-disable-title"
+        aria-describedby="confirm-disable-description"
+      >
+        <DialogTitle id="confirm-disable-title">
+          {t("common.actions.disable")} {confirmToggle?.name}?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="confirm-disable-description">
+            Tem certeza que deseja desativar a votação para este jogador?
+            <Box component="span" sx={{ display: 'block', mt: 1, fontWeight: 'bold', color: 'error.main' }}>
+              Todos os votos já recebidos por este jogador serão descartados.
+            </Box>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmToggle(null)}>
+            {t("common.cancel")}
+          </Button>
+          <Button 
+            onClick={() => confirmToggle && handleToggleVoting(confirmToggle.playerId, false)} 
+            color="error" 
+            variant="contained" 
+            autoFocus
+          >
+            {t("common.actions.disable")}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }

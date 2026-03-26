@@ -137,7 +137,9 @@
       "manage": "Gerenciar",
       "view": "Visualizar",
       "save": "Salvar",
-      "saving": "Salvando..."
+      "saving": "Salvando...",
+      "disable": "Desativar",
+      "enable": "Habilitar"
     },
     "date": {
       "tbd": "TBD"
@@ -643,8 +645,10 @@
       "button": {
         "back_to_pelada": "Voltar para Pelada",
         "save": "Salvar Votos",
-        "view_results": "Ver Resultados"
+        "view_results": "Ver Resultados",
+        "enable_voting": "Habilitar Votação"
       },
+      "disabled_players_title": "Jogadores Desativados (Apenas Admin)",
       "status": {
         "title": "Status da Votação",
         "voted": "Já votaram",
