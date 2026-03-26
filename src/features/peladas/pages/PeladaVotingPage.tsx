@@ -70,7 +70,10 @@ export default function PeladaVotingPage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [confirmToggle, setConfirmToggle] = useState<{playerId: number, name: string} | null>(null);
+  const [confirmToggle, setConfirmToggle] = useState<{
+    playerId: number;
+    name: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!peladaId) return;
@@ -141,25 +144,40 @@ export default function PeladaVotingPage() {
       setSubmitting(true);
       setError(null);
       await endpoints.updateVotingEnabled(peladaId, playerId, enabled);
-      
+
       // Update playerVotes state - keep in list but update voting_enabled and clear stars if disabled
-      setPlayerVotes(prev => prev.map(pv => pv.playerId === playerId ? { ...pv, voting_enabled: enabled, stars: enabled ? pv.stars : null } : pv));
-      
+      setPlayerVotes((prev) =>
+        prev.map((pv) =>
+          pv.playerId === playerId
+            ? {
+                ...pv,
+                voting_enabled: enabled,
+                stars: enabled ? pv.stars : null,
+              }
+            : pv,
+        ),
+      );
+
       // Update votingInfo to reflect the change
-      setVotingInfo(prev => {
+      setVotingInfo((prev) => {
         if (!prev) return prev;
         return {
           ...prev,
-          eligible_players: prev.eligible_players.map(p =>
-            p.player_id === playerId ? { ...p, voting_enabled: enabled } : p
+          eligible_players: prev.eligible_players.map((p) =>
+            p.player_id === playerId ? { ...p, voting_enabled: enabled } : p,
           ),
         };
       });
-      
-      setSuccess(enabled ? "Player enabled for voting" : "Player disabled from voting and previous votes removed");
+
+      setSuccess(
+        enabled
+          ? "Player enabled for voting"
+          : "Player disabled from voting and previous votes removed",
+      );
       setConfirmToggle(null);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Failed to update voting status";
+      const message =
+        err instanceof Error ? err.message : "Failed to update voting status";
       setError(message);
     } finally {
       setSubmitting(false);
@@ -167,7 +185,10 @@ export default function PeladaVotingPage() {
   };
 
   const allVotesComplete =
-    playerVotes.length > 0 && playerVotes.filter(pv => pv.voting_enabled).every((pv) => pv.stars !== null);
+    playerVotes.length > 0 &&
+    playerVotes
+      .filter((pv) => pv.voting_enabled)
+      .every((pv) => pv.stars !== null);
 
   const handleSubmit = async () => {
     if (!allVotesComplete || !votingInfo?.voter_player_id) return;
@@ -178,7 +199,7 @@ export default function PeladaVotingPage() {
       setSuccess(null);
 
       const votes = playerVotes
-        .filter(pv => pv.voting_enabled)
+        .filter((pv) => pv.voting_enabled)
         .map((pv) => ({
           target_id: pv.playerId,
           stars: pv.stars as number,
@@ -351,12 +372,14 @@ export default function PeladaVotingPage() {
                   key={pv.playerId}
                   variant="outlined"
                   data-testid={`voting-card-${pv.playerId}`}
-                  sx={{ 
+                  sx={{
                     borderRadius: 2,
                     opacity: pv.voting_enabled ? 1 : 0.6,
-                    bgcolor: pv.voting_enabled ? 'background.paper' : 'action.hover',
-                    transition: 'all 0.3s ease',
-                    border: pv.voting_enabled ? undefined : '1px dashed grey'
+                    bgcolor: pv.voting_enabled
+                      ? "background.paper"
+                      : "action.hover",
+                    transition: "all 0.3s ease",
+                    border: pv.voting_enabled ? undefined : "1px dashed grey",
                   }}
                 >
                   <CardContent>
@@ -370,10 +393,14 @@ export default function PeladaVotingPage() {
                             mb: 1,
                           }}
                         >
-                          <Typography 
-                            variant="h6" 
+                          <Typography
+                            variant="h6"
                             fontWeight="bold"
-                            sx={{ color: pv.voting_enabled ? 'text.primary' : 'text.secondary' }}
+                            sx={{
+                              color: pv.voting_enabled
+                                ? "text.primary"
+                                : "text.secondary",
+                            }}
                           >
                             {pv.playerName}
                           </Typography>
@@ -385,12 +412,12 @@ export default function PeladaVotingPage() {
                             sx={{ fontSize: "0.7rem", fontWeight: "bold" }}
                           />
                           {!pv.voting_enabled && (
-                            <Chip 
+                            <Chip
                               label={t("common.actions.disable")}
-                              size="small" 
-                              color="error" 
+                              size="small"
+                              color="error"
                               variant="filled"
-                              sx={{ fontSize: "0.7rem", fontWeight: "bold" }} 
+                              sx={{ fontSize: "0.7rem", fontWeight: "bold" }}
                             />
                           )}
                         </Box>
@@ -426,10 +453,19 @@ export default function PeladaVotingPage() {
                             }
                             size="large"
                             max={5}
-                            disabled={!votingInfo?.can_vote || !pv.voting_enabled}
+                            disabled={
+                              !votingInfo?.can_vote || !pv.voting_enabled
+                            }
                             data-testid={`rating-${pv.playerId}`}
                           />
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 1,
+                              mt: 0.5,
+                            }}
+                          >
                             {pv.stars !== null && pv.voting_enabled && (
                               <Typography
                                 variant="caption"
@@ -444,17 +480,28 @@ export default function PeladaVotingPage() {
                                 size="small"
                                 color={pv.voting_enabled ? "error" : "success"}
                                 variant="outlined"
-                                startIcon={pv.voting_enabled ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                                startIcon={
+                                  pv.voting_enabled ? (
+                                    <VisibilityOffIcon />
+                                  ) : (
+                                    <VisibilityIcon />
+                                  )
+                                }
                                 onClick={() => {
                                   if (pv.voting_enabled) {
-                                    setConfirmToggle({ playerId: pv.playerId, name: pv.playerName });
+                                    setConfirmToggle({
+                                      playerId: pv.playerId,
+                                      name: pv.playerName,
+                                    });
                                   } else {
                                     handleToggleVoting(pv.playerId, true);
                                   }
                                 }}
-                                sx={{ py: 0, height: 24, fontSize: '0.65rem' }}
+                                sx={{ py: 0, height: 24, fontSize: "0.65rem" }}
                               >
-                                {pv.voting_enabled ? t("common.actions.disable") : t("common.actions.enable")}
+                                {pv.voting_enabled
+                                  ? t("common.actions.disable")
+                                  : t("common.actions.enable")}
                               </Button>
                             )}
                           </Box>
@@ -610,7 +657,15 @@ export default function PeladaVotingPage() {
         <DialogContent>
           <DialogContentText id="confirm-disable-description">
             Tem certeza que deseja desativar a votação para este jogador?
-            <Box component="span" sx={{ display: 'block', mt: 1, fontWeight: 'bold', color: 'error.main' }}>
+            <Box
+              component="span"
+              sx={{
+                display: "block",
+                mt: 1,
+                fontWeight: "bold",
+                color: "error.main",
+              }}
+            >
               Todos os votos já recebidos por este jogador serão descartados.
             </Box>
           </DialogContentText>
@@ -619,10 +674,12 @@ export default function PeladaVotingPage() {
           <Button onClick={() => setConfirmToggle(null)}>
             {t("common.cancel")}
           </Button>
-          <Button 
-            onClick={() => confirmToggle && handleToggleVoting(confirmToggle.playerId, false)} 
-            color="error" 
-            variant="contained" 
+          <Button
+            onClick={() =>
+              confirmToggle && handleToggleVoting(confirmToggle.playerId, false)
+            }
+            color="error"
+            variant="contained"
             autoFocus
           >
             {t("common.actions.disable")}

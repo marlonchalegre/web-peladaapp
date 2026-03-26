@@ -59,11 +59,17 @@ describe("PeladaVotingPage", () => {
       total_voted: 0,
     };
 
+    const mockPeladaDetails = {
+      pelada: { id: 1, is_admin: false },
+    };
+
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/peladas/1/voting-info")
         return Promise.resolve(mockVotingInfo);
       if (path === "/api/peladas/1/voting-status")
         return Promise.resolve(mockVotingStatus);
+      if (path === "/api/peladas/1/full-details")
+        return Promise.resolve(mockPeladaDetails);
       return Promise.reject(new Error(`Not found: ${path}`));
     });
 
@@ -105,11 +111,17 @@ describe("PeladaVotingPage", () => {
       total_voted: 0,
     };
 
+    const mockPeladaDetails = {
+      pelada: { id: 1, is_admin: false },
+    };
+
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/peladas/1/voting-info")
         return Promise.resolve(mockVotingInfo);
       if (path === "/api/peladas/1/voting-status")
         return Promise.resolve(mockVotingStatus);
+      if (path === "/api/peladas/1/full-details")
+        return Promise.resolve(mockPeladaDetails);
       return Promise.reject(new Error(`Not found: ${path}`));
     });
 
@@ -144,11 +156,17 @@ describe("PeladaVotingPage", () => {
       total_voted: 0,
     };
 
+    const mockPeladaDetails = {
+      pelada: { id: 1, is_admin: false },
+    };
+
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/peladas/1/voting-info")
         return Promise.resolve(mockVotingInfo);
       if (path === "/api/peladas/1/voting-status")
         return Promise.resolve(mockVotingStatus);
+      if (path === "/api/peladas/1/full-details")
+        return Promise.resolve(mockPeladaDetails);
       return Promise.reject(new Error(`Not found: ${path}`));
     });
 
