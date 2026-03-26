@@ -546,6 +546,7 @@
         "start_pelada": "INICIAR PELADA",
         "build_schedule": "Montar Tabela",
         "vote": "Votar nos Jogadores",
+        "manage_voting": "Gerenciar Votação",
         "change_votes": "Alterar Votos",
         "view_results": "Ver Resultados",
         "copy_teams": "Escalação (Com Notas)",
@@ -640,7 +641,8 @@
       "info": {
         "already_voted": "Você já votou nesta pelada. Você pode alterar seus votos até o fim do período de votação.",
         "already_voted_view_change": "Você já votou. Você pode ver seus votos abaixo e alterá-los até o fim do período de votação.",
-        "instructions": "Vote em todos os jogadores que participaram da pelada (exceto você mesmo). O voto é obrigatório para todos os jogadores listados. Use de 1 a 5 estrelas."
+        "instructions": "Vote em todos os jogadores que participaram da pelada (exceto você mesmo). O voto é obrigatório para todos os jogadores listados. Use de 1 a 5 estrelas.",
+        "admin_instructions": "Como administrador, você pode habilitar ou desabilitar a votação para os jogadores que participaram desta pelada."
       },
       "button": {
         "back_to_pelada": "Voltar para Pelada",

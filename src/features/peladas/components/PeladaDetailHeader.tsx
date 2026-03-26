@@ -254,12 +254,12 @@ export default function PeladaDetailHeader({
             )}
           </Stack>
 
-          {votingInfo?.can_vote && (
+          {(votingInfo?.can_vote || pelada.is_admin) && (
             <Button
               component={RouterLink}
               to={`/peladas/${pelada.id}/voting`}
               variant="contained"
-              color={votingInfo.has_voted ? "success" : "secondary"}
+              color={votingInfo?.has_voted ? "success" : "secondary"}
               data-analytics-id="vote-btn"
               sx={{
                 textTransform: "none",
@@ -277,9 +277,11 @@ export default function PeladaDetailHeader({
                 component="span"
                 sx={{ display: { xs: "none", md: "inline" } }}
               >
-                {votingInfo.has_voted
-                  ? t("peladas.detail.button.change_votes")
-                  : t("peladas.detail.button.vote")}
+                {!votingInfo?.can_vote
+                  ? t("peladas.detail.button.manage_voting")
+                  : votingInfo.has_voted
+                    ? t("peladas.detail.button.change_votes")
+                    : t("peladas.detail.button.vote")}
               </Box>
             </Button>
           )}

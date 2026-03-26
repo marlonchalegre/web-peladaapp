@@ -358,7 +358,9 @@ export default function PeladaVotingPage() {
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 8 }}>
           <Alert severity="info" sx={{ mb: 3 }}>
-            {t("peladas.voting.info.instructions")}
+            {votingInfo?.can_vote
+              ? t("peladas.voting.info.instructions")
+              : t("peladas.voting.info.admin_instructions")}
           </Alert>
 
           <Stack spacing={2} sx={{ mb: 3 }}>
@@ -525,24 +527,27 @@ export default function PeladaVotingPage() {
               variant="outlined"
               onClick={() => navigate(`/peladas/${peladaId}`)}
               disabled={submitting}
+              fullWidth={!votingInfo?.can_vote}
             >
-              {t("common.cancel")}
+              {votingInfo?.can_vote ? t("common.cancel") : t("common.back")}
             </Button>
-            <Button
-              variant="contained"
-              onClick={handleSubmit}
-              disabled={!allVotesComplete || submitting}
-              data-testid="save-votes-button"
-              fullWidth
-              sx={{ fontWeight: "bold" }}
-            >
-              {submitting
-                ? t("common.sending")
-                : t("peladas.voting.button.save")}
-            </Button>
+            {votingInfo?.can_vote && (
+              <Button
+                variant="contained"
+                onClick={handleSubmit}
+                disabled={!allVotesComplete || submitting}
+                data-testid="save-votes-button"
+                fullWidth
+                sx={{ fontWeight: "bold" }}
+              >
+                {submitting
+                  ? t("common.sending")
+                  : t("peladas.voting.button.save")}
+              </Button>
+            )}
           </Stack>
 
-          {!allVotesComplete && playerVotes.length > 0 && (
+          {!allVotesComplete && playerVotes.length > 0 && votingInfo?.can_vote && (
             <Alert severity="warning" sx={{ mb: 3 }}>
               {t("peladas.voting.warning.incomplete")}
             </Alert>
