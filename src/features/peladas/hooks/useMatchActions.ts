@@ -125,7 +125,7 @@ export function useMatchActions(
         setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
       }
     },
-    [t, matchesRef, setMatches, setError, handleNetworkError],
+    [peladaId, t, matchesRef, setMatches, setError, handleNetworkError],
   );
 
   const deleteEventAndRefresh = async (

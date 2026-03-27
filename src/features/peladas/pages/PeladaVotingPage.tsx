@@ -547,11 +547,13 @@ export default function PeladaVotingPage() {
             )}
           </Stack>
 
-          {!allVotesComplete && playerVotes.length > 0 && votingInfo?.can_vote && (
-            <Alert severity="warning" sx={{ mb: 3 }}>
-              {t("peladas.voting.warning.incomplete")}
-            </Alert>
-          )}
+          {!allVotesComplete &&
+            playerVotes.length > 0 &&
+            votingInfo?.can_vote && (
+              <Alert severity="warning" sx={{ mb: 3 }}>
+                {t("peladas.voting.warning.incomplete")}
+              </Alert>
+            )}
         </Grid>
 
         <Grid size={{ xs: 12, md: 4 }}>
