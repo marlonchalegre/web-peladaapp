@@ -145,10 +145,14 @@ export class ApiClient {
 
   async post<T>(path: string, body?: unknown): Promise<T> {
     const url = new URL(`${this.baseUrl}${path}`, window.location.origin);
+    const jsonBody = body ? JSON.stringify(body) : undefined;
+    if (path.includes("finance/transactions")) {
+      console.log("POST to finance/transactions with body:", jsonBody);
+    }
     const res = await fetch(url.toString(), {
       method: "POST",
       headers: this.headers(),
-      body: body ? JSON.stringify(body) : undefined,
+      body: jsonBody,
     });
     return this.handleResponse<T>(res);
   }

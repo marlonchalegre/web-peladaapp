@@ -13,7 +13,12 @@ import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import type { DragEvent } from "react";
-import type { Player, User } from "../../../shared/api/endpoints";
+import type {
+  Player,
+  User,
+  Transaction,
+  OrganizationFinance,
+} from "../../../shared/api/endpoints";
 import { useTranslation } from "react-i18next";
 import { sortPlayersByPosition } from "../utils/playerUtils";
 import {
@@ -39,6 +44,9 @@ type AvailablePlayersPanelProps = {
   totalPlayersInPelada: number;
   averagePelada: number;
   balance: number;
+  peladaTransactions?: Transaction[];
+  organizationFinance?: OrganizationFinance;
+  onMarkPaid?: (playerId: number, amount: number) => void;
 };
 
 export default function AvailablePlayersPanel({
@@ -54,6 +62,9 @@ export default function AvailablePlayersPanel({
   totalPlayersInPelada,
   averagePelada,
   balance,
+  peladaTransactions = [],
+  organizationFinance,
+  onMarkPaid,
 }: AvailablePlayersPanelProps) {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
@@ -197,15 +208,31 @@ export default function AvailablePlayersPanel({
         />
 
         <Stack spacing={1} sx={{ minHeight: 100 }}>
-          {filteredPlayers.map((p) => (
-            <AvailablePlayerItem
-              key={p.id}
-              player={p}
-              score={scores[p.id] ?? p.grade ?? null}
-              locked={locked}
-              onDragStart={(e) => onDragStartPlayer(e, p.id)}
-            />
-          ))}
+          {filteredPlayers.map((p) => {
+            const isPaid = peladaTransactions.some(
+              (t: Transaction) =>
+                t.player_id === p.id &&
+                t.type === "income" &&
+                t.category === "diarista_fee" &&
+                t.status === "paid",
+            );
+            return (
+              <AvailablePlayerItem
+                key={p.id}
+                player={p}
+                score={scores[p.id] ?? p.grade ?? null}
+                locked={locked}
+                onDragStart={(e) => onDragStartPlayer(e, p.id)}
+                isPaid={isPaid}
+                isAdmin={isAdmin}
+                onMarkPaid={
+                  onMarkPaid && organizationFinance?.diarista_price
+                    ? () => onMarkPaid(p.id, organizationFinance.diarista_price)
+                    : undefined
+                }
+              />
+            );
+          })}
           {filteredPlayers.length === 0 && (
             <Typography
               variant="body2"

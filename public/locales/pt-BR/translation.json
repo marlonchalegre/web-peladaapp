@@ -290,9 +290,80 @@
       "sections": {
         "invitations": "Convites Ativos",
         "members": "Membros",
+        "finance": "Financeiro",
         "admins": "Administradores",
         "danger_zone": "Zona de Perigo",
         "waha": "WhatsApp (WAHA)"
+      },
+      "finance": {
+        "title": "Controle Financeiro",
+        "summary": {
+          "title": "Resumo",
+          "balance": "Saldo Total",
+          "income": "Receitas",
+          "expense": "Despesas",
+          "mensalistas_paid": "Mensalistas Pagos",
+          "mensalistas_pending": "Mensalistas Pendentes"
+        },
+        "monthly_fees": {
+          "title": "Mensalidades",
+          "month_select": "Mês",
+          "year_select": "Ano",
+          "player": "Jogador",
+          "status": "Status",
+          "paid": "Pago",
+          "pending": "Pendente",
+          "mark_as_paid": "Marcar como Pago",
+          "mark_as_unpaid": "Marcar como Pendente",
+          "success": "Status de pagamento atualizado!",
+          "confirm_payment": "Confirmar recebimento de {{amount}} de {{name}}?"
+        },
+        "transactions": {
+          "title": "Transações",
+          "add_button": "Nova Transação",
+          "date": "Data",
+          "description": "Descrição",
+          "category": "Categoria",
+          "amount": "Valor",
+          "type": "Tipo",
+          "player": "Jogador",
+          "income": "Receita",
+          "expense": "Despesa",
+          "empty": "Nenhuma transação encontrada.",
+          "recorded_by": "Registrado por",
+          "reversed": "Estornada",
+          "mark_as_reversed": "Estornar Transação",
+          "reverse_success": "Transação estornada com sucesso!",
+          "add_dialog": {
+            "title": "Nova Transação",
+            "income": "Receita (+)",
+            "expense": "Despesa (-)"
+          },
+          "error": {
+            "reverse_failed": "Erro ao estornar transação",
+            "add_failed": "Erro ao adicionar transação"
+          }
+        },
+        "config": {
+          "title": "Configuração",
+          "mensalista_price": "Valor Mensalidade (Mensalista)",
+          "diarista_price": "Valor Pelada (Diarista/Convidado)",
+          "currency": "Moeda",
+          "save_button": "Salvar Configuração",
+          "success": "Configuração financeira salva!",
+          "error": {
+            "save_failed": "Erro ao salvar configuração"
+          }
+        },
+        "categories": {
+          "monthly_fee": "Mensalidade",
+          "diarista_fee": "Pelada Avulsa",
+          "field_rent": "Aluguel de Campo",
+          "equipment": "Equipamentos",
+          "referee": "Juiz",
+          "barbecue": "Churrasco",
+          "other": "Outros"
+        }
       },
       "waha": {
         "title": "Configuração WhatsApp (WAHA)",

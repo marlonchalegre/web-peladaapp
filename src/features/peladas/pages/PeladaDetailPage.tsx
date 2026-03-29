@@ -61,7 +61,10 @@ export default function PeladaDetailPage() {
     handleToggleFixedGoalkeepers,
     handleUpdatePlayersPerTeam,
     handleAddPlayersFromOrg,
+    handleMarkPaid,
     allPlayerIdsInPelada,
+    peladaTransactions,
+    organizationFinance,
   } = usePeladaDetail(peladaId);
 
   // Derived admin status
@@ -199,7 +202,10 @@ export default function PeladaDetailPage() {
             onUpdatePlayersPerTeam={handleUpdatePlayersPerTeam}
             scores={scores}
             isAdminOverride={isAdmin}
-            fixedGoalkeepersEnabled={!!pelada.fixed_goalkeepers}
+            fixedGoalkeepersEnabled={pelada.fixed_goalkeepers ?? false}
+            peladaTransactions={peladaTransactions}
+            organizationFinance={organizationFinance || undefined}
+            onMarkPaid={handleMarkPaid}
           />
         </Grid>
 
@@ -218,6 +224,9 @@ export default function PeladaDetailPage() {
             totalPlayersInPelada={stats.totalPlayers}
             averagePelada={stats.averagePelada}
             balance={stats.balance}
+            peladaTransactions={peladaTransactions}
+            organizationFinance={organizationFinance || undefined}
+            onMarkPaid={handleMarkPaid}
           />
         </Grid>
       </Grid>

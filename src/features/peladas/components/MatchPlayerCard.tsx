@@ -13,6 +13,8 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import PaidIcon from "@mui/icons-material/Paid";
 import { useTranslation } from "react-i18next";
 import type { TeamPlayer, Player } from "../../../shared/api/endpoints";
 
@@ -29,6 +31,8 @@ interface MatchPlayerCardProps {
     side: "home" | "away",
   ) => void;
   onSubClick: () => void;
+  isPaid?: boolean;
+  onMarkPaid?: () => void;
 }
 
 export default function MatchPlayerCard({
@@ -40,6 +44,8 @@ export default function MatchPlayerCard({
   isAdmin,
   onStatChange,
   onSubClick,
+  isPaid,
+  onMarkPaid,
 }: MatchPlayerCardProps) {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -154,20 +160,96 @@ export default function MatchPlayerCard({
             >
               {playerName}
             </Typography>
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{
-                display: "block",
-                fontSize: { xs: "0.65rem", sm: "0.75rem" },
-                fontWeight: "medium",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {t(`common.positions.${positionKey}`).toUpperCase()}
-            </Typography>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{
+                  display: "block",
+                  fontSize: { xs: "0.65rem", sm: "0.75rem" },
+                  fontWeight: "medium",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {t(`common.positions.${positionKey}`).toUpperCase()}
+              </Typography>
+              {playerData &&
+                (playerData.member_type === "diarista" ||
+                  playerData.member_type === "convidado") &&
+                (() => {
+                  if (isPaid) {
+                    return (
+                      <Tooltip
+                        title={t(
+                          "organizations.management.finance.monthly_fees.paid",
+                          "Pago",
+                        )}
+                      >
+                        <Box
+                          sx={{
+                            color: "success.main",
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          <PaidIcon
+                            sx={{ fontSize: "1rem" }}
+                            data-testid="paid-icon"
+                          />
+                        </Box>
+                      </Tooltip>
+                    );
+                  } else if (isAdmin && onMarkPaid) {
+                    return (
+                      <Tooltip
+                        title={t(
+                          "organizations.management.finance.monthly_fees.mark_as_paid",
+                          "Marcar como Pago",
+                        )}
+                      >
+                        <IconButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onMarkPaid();
+                          }}
+                          data-testid="mark-as-paid-button"
+                          sx={{
+                            color: "warning.main",
+                            p: 0.25,
+                            "&:hover": {
+                              color: "success.main",
+                              bgcolor: "success.light",
+                            },
+                          }}
+                        >
+                          <AttachMoneyIcon sx={{ fontSize: "1rem" }} />
+                        </IconButton>
+                      </Tooltip>
+                    );
+                  } else {
+                    return (
+                      <Tooltip
+                        title={t(
+                          "organizations.management.finance.monthly_fees.pending",
+                          "Pendente",
+                        )}
+                      >
+                        <Box
+                          sx={{
+                            color: "warning.main",
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          <AttachMoneyIcon sx={{ fontSize: "1rem" }} />
+                        </Box>
+                      </Tooltip>
+                    );
+                  }
+                })()}
+            </Stack>
           </Box>
         </Stack>
 

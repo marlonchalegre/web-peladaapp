@@ -8,6 +8,8 @@ import {
   type Player,
   type User,
   type AttendanceStatus,
+  type OrganizationFinance,
+  type Transaction,
 } from "../../../shared/api/endpoints";
 import { useAuth } from "../../../app/providers/AuthContext";
 
@@ -75,6 +77,11 @@ export function useAttendance(peladaId: number) {
   const [updatingPlayers, setUpdatingPlayers] = useState<Set<number>>(
     new Set(),
   );
+  const [peladaTransactions, setPeladaTransactions] = useState<Transaction[]>(
+    [],
+  );
+  const [organizationFinance, setOrganizationFinance] =
+    useState<OrganizationFinance | null>(null);
 
   const fetchData = useCallback(
     async (background = false) => {
@@ -84,6 +91,16 @@ export function useAttendance(peladaId: number) {
         const data = await endpoints.getPeladaFullDetails(peladaId);
         setPelada(data.pelada);
         setPlayers(data.available_players);
+        setPeladaTransactions(data.pelada_transactions || []);
+
+        try {
+          const finance = await endpoints.getOrganizationFinance(
+            data.pelada.organization_id,
+          );
+          setOrganizationFinance(finance);
+        } catch (e) {
+          console.error("Failed to load finance settings", e);
+        }
 
         const userIsAdmin =
           user.admin_orgs?.includes(data.pelada.organization_id) ?? false;
@@ -188,6 +205,55 @@ export function useAttendance(peladaId: number) {
     }
   };
 
+  const handleMarkPaid = async (playerId: number, amount?: number) => {
+    if (!pelada) return;
+    try {
+      setUpdatingPlayers((prev) => new Set(prev).add(playerId));
+
+      const existingTx = peladaTransactions.find(
+        (t) =>
+          t.player_id === playerId &&
+          t.type === "income" &&
+          t.category === "diarista_fee" &&
+          t.status === "paid",
+      );
+
+      if (existingTx) {
+        // Chargeback: reverse the existing transaction
+        await endpoints.reverseTransaction(
+          pelada.organization_id,
+          existingTx.id,
+        );
+      } else {
+        // Payment: add new transaction
+        const finalAmount = amount ?? organizationFinance?.diarista_price ?? 0;
+        await endpoints.addTransaction(pelada.organization_id, {
+          player_id: playerId,
+          pelada_id: peladaId,
+          amount: finalAmount,
+          type: "income",
+          category: "diarista_fee",
+          description: `Pagamento Pelada ${peladaId}`,
+          payment_date: new Date().toISOString().split("T")[0],
+        });
+      }
+      await fetchData(true);
+    } catch (err: unknown) {
+      console.error(err);
+      const message =
+        err instanceof Error
+          ? err.message
+          : t("organizations.management.finance.transactions.error.add_failed");
+      setError(message);
+    } finally {
+      setUpdatingPlayers((prev) => {
+        const next = new Set(prev);
+        next.delete(playerId);
+        return next;
+      });
+    }
+  };
+
   const confirmed = sortPlayersByAttendanceTime(
     players.filter((p) => p.attendance_status === "confirmed"),
   );
@@ -224,8 +290,11 @@ export function useAttendance(peladaId: number) {
     updatingPlayers,
     currentPlayerAsPlayer,
     isUpdatingSelf,
+    peladaTransactions,
+    organizationFinance,
     handleUpdateAttendance,
     handleCloseAttendance,
     handleAddPlayersFromOrg,
+    handleMarkPaid,
   };
 }

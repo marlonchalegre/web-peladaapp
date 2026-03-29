@@ -136,6 +136,7 @@ export interface PeladaDashboardDataResponse {
   organization_players: Player[];
   match_events: MatchEvent[];
   player_stats: PlayerStats[] | null;
+  pelada_transactions?: Transaction[];
   team_players_map: Record<number, TeamPlayer[]>;
   match_lineups_map: Record<number, Record<number, MatchLineupEntry[]>>;
   attendance?: { player_id: number; status: string; updated_at?: string }[];
@@ -200,6 +201,49 @@ export interface BatchVoteResponse {
   votes_cast: number;
 }
 
+export interface OrganizationFinance {
+  id: number;
+  organization_id: number;
+  mensalista_price: number;
+  diarista_price: number;
+  currency: string;
+}
+
+export interface Transaction {
+  id: number;
+  organization_id: number;
+  player_id?: number | null;
+  player_name?: string | null;
+  pelada_id?: number | null;
+  amount: number;
+  type: "income" | "expense";
+  category: string;
+  description?: string | null;
+  payment_date: string;
+  created_by?: number | null;
+  creator_name?: string | null;
+  created_at?: string;
+  status?: "paid" | "reversed";
+}
+
+export interface MonthlyPayment {
+  id?: number;
+  organization_id: number;
+  player_id: number;
+  player_name: string;
+  member_type: string;
+  year: number;
+  month: number;
+  transaction_id?: number | null;
+  paid: boolean;
+}
+
+export interface FinanceSummary {
+  total_balance: number;
+  total_income: number;
+  total_expense: number;
+}
+
 export type AttendanceStatus =
   | "confirmed"
   | "declined"
@@ -239,6 +283,7 @@ export interface PeladaFullDetailsResponse {
   })[];
   scores: Record<number, number>;
   attendance: Attendance[];
+  pelada_transactions?: Transaction[];
   users_map: Record<number, User>;
   org_players_map: Record<number, Player>;
   voting_info: VotingInfo | null;
@@ -289,6 +334,58 @@ export function createApi(client: ApiClient) {
       client.get<OrganizationPlayerStats[]>(
         `/api/organizations/${id}/statistics`,
         { year },
+      ),
+
+    // Finance
+    getOrganizationFinance: (id: number) =>
+      client.get<OrganizationFinance>(`/api/organizations/${id}/finance`),
+    updateOrganizationFinance: (
+      id: number,
+      payload: Partial<OrganizationFinance>,
+    ) =>
+      client.put<{ message: string }>(
+        `/api/organizations/${id}/finance`,
+        payload,
+      ),
+    getFinanceSummary: (id: number) =>
+      client.get<FinanceSummary>(`/api/organizations/${id}/finance/summary`),
+    listTransactions: (id: number, page?: number, per_page?: number) =>
+      client
+        .getPaginated<Transaction[]>(
+          `/api/organizations/${id}/finance/transactions`,
+          {
+            page: page ?? 1,
+            per_page: per_page ?? 10,
+          },
+        )
+        .then((res) => ({
+          data: res.data,
+          total: res.total,
+        })),
+    addTransaction: (id: number, payload: Partial<Transaction>) =>
+      client.post<Transaction>(
+        `/api/organizations/${id}/finance/transactions`,
+        payload,
+      ),
+    reverseTransaction: (id: number, txId: number) =>
+      client.post<{ message: string }>(
+        `/api/organizations/${id}/finance/transactions/${txId}/reverse`,
+      ),
+    getMonthlyPayments: (id: number, year: number, month: number) =>
+      client.get<MonthlyPayment[]>(
+        `/api/organizations/${id}/finance/monthly-payments`,
+        { year, month },
+      ),
+    markMonthlyPayment: (
+      id: number,
+      payload: Partial<MonthlyPayment> & {
+        amount: number;
+        payment_date: string;
+      },
+    ) =>
+      client.post<{ message: string; transaction_id?: number }>(
+        `/api/organizations/${id}/finance/monthly-payments`,
+        payload,
       ),
 
     // Manual Stats

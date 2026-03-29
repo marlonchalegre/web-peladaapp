@@ -12,6 +12,8 @@ import {
   type MatchEvent,
   type PlayerStats,
   type Attendance,
+  type Transaction,
+  type OrganizationFinance,
 } from "../../../shared/api/endpoints";
 
 const endpoints = createApi(api);
@@ -51,6 +53,11 @@ export function usePeladaData(peladaId: number) {
   >(null);
   const [attendance, setAttendance] = useState<Attendance[]>([]);
   const [loadedPeladaId, setLoadedPeladaId] = useState<number | null>(null);
+  const [peladaTransactions, setPeladaTransactions] = useState<Transaction[]>(
+    [],
+  );
+  const [organizationFinance, setOrganizationFinance] =
+    useState<OrganizationFinance | null>(null);
 
   const fetchData = useCallback(
     async (isRefresh = false) => {
@@ -62,7 +69,7 @@ export function usePeladaData(peladaId: number) {
         setLoading(true);
       }
 
-      const applyData = (
+      const applyData = async (
         data: Awaited<ReturnType<typeof endpoints.getPeladaDashboardData>>,
       ) => {
         const isMatchesPage = location.pathname.endsWith("/matches");
@@ -94,6 +101,16 @@ export function usePeladaData(peladaId: number) {
         setMatchEvents(data.match_events);
         setPlayerStatsFromApi(data.player_stats);
         setAttendance(data.attendance || []);
+        setPeladaTransactions(data.pelada_transactions || []);
+
+        try {
+          const finance = await endpoints.getOrganizationFinance(
+            data.pelada.organization_id,
+          );
+          setOrganizationFinance(finance);
+        } catch (e) {
+          console.error("Failed to load finance settings", e);
+        }
 
         const nameMap: Record<number, string> = {};
         for (const u of data.users) nameMap[u.id] = u.name;
@@ -199,6 +216,8 @@ export function usePeladaData(peladaId: number) {
     setMatchEvents,
     playerStatsFromApi,
     attendance,
+    peladaTransactions,
+    organizationFinance,
     refreshData: () => fetchData(true),
   };
 }

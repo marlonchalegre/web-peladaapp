@@ -15,6 +15,8 @@ import {
   type Player,
   type VotingInfo,
   type User,
+  type Transaction,
+  type OrganizationFinance,
 } from "../../../shared/api/endpoints";
 import { useAuth } from "../../../app/providers/AuthContext";
 
@@ -44,6 +46,11 @@ export function usePeladaDetail(peladaId: number) {
   const [live, setLive] = useState("");
   const [votingInfo, setVotingInfo] = useState<VotingInfo | null>(null);
   const [scores, setScores] = useState<Record<number, number>>({});
+  const [peladaTransactions, setPeladaTransactions] = useState<Transaction[]>(
+    [],
+  );
+  const [organizationFinance, setOrganizationFinance] =
+    useState<OrganizationFinance | null>(null);
 
   // Dialog State
   const [startDialogOpen, setStartDialogOpen] = useState(false);
@@ -80,7 +87,17 @@ export function usePeladaDetail(peladaId: number) {
       setTeams(data.teams);
       setAvailablePlayers(data.available_players);
       setVotingInfo(data.voting_info);
+      setPeladaTransactions(data.pelada_transactions || []);
       if (data.scores) setScores(data.scores);
+
+      try {
+        const finance = await endpoints.getOrganizationFinance(
+          data.pelada.organization_id,
+        );
+        setOrganizationFinance(finance);
+      } catch (e) {
+        console.error("Failed to load finance settings", e);
+      }
 
       const playersByTeam: Record<
         number,
@@ -533,6 +550,32 @@ export function usePeladaDetail(peladaId: number) {
     }
   };
 
+  const handleMarkPaid = async (playerId: number, amount: number) => {
+    if (!pelada) return;
+    try {
+      setProcessing(true);
+      await endpoints.addTransaction(pelada.organization_id, {
+        player_id: playerId,
+        pelada_id: peladaId,
+        amount,
+        type: "income",
+        category: "diarista_fee",
+        description: `Pagamento Pelada ${peladaId}`,
+        payment_date: new Date().toISOString().split("T")[0],
+      });
+      await fetchPeladaData();
+    } catch (error: unknown) {
+      console.error(error);
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("organizations.management.finance.transactions.error.add_failed");
+      setError(message);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   const allPlayerIdsInPelada = useMemo(() => {
     const ids = new Set<number>();
     Object.values(teamPlayers)
@@ -556,6 +599,8 @@ export function usePeladaDetail(peladaId: number) {
     awayGk,
     votingInfo,
     scores,
+    peladaTransactions,
+    organizationFinance,
     error,
     processing,
     changingStatus,
@@ -579,6 +624,7 @@ export function usePeladaDetail(peladaId: number) {
     handleToggleFixedGoalkeepers,
     handleUpdatePlayersPerTeam,
     handleAddPlayersFromOrg,
+    handleMarkPaid,
     allPlayerIdsInPelada,
   };
 }

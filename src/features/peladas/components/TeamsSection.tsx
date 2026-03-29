@@ -13,7 +13,13 @@ import ShuffleIcon from "@mui/icons-material/Shuffle";
 import GroupsIcon from "@mui/icons-material/Groups";
 import PersonIcon from "@mui/icons-material/Person";
 import type { DragEvent } from "react";
-import type { Player, Team, User } from "../../../shared/api/endpoints";
+import type {
+  Player,
+  Team,
+  User,
+  Transaction,
+  OrganizationFinance,
+} from "../../../shared/api/endpoints";
 import TeamCard from "./TeamCard";
 import { useTranslation } from "react-i18next";
 
@@ -43,8 +49,10 @@ export type TeamsSectionProps = {
   scores: Record<number, number>;
   isAdminOverride?: boolean;
   fixedGoalkeepersEnabled?: boolean;
+  peladaTransactions?: Transaction[];
+  organizationFinance?: OrganizationFinance;
+  onMarkPaid?: (playerId: number, amount: number) => void;
 };
-
 export default function TeamsSection(props: TeamsSectionProps) {
   const { t } = useTranslation();
   const {
@@ -52,7 +60,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
     teamPlayers,
     playersPerTeam,
     creatingTeam,
-    locked = false,
+    locked,
     onCreateTeam,
     onDeleteTeam,
     onDragStartPlayer,
@@ -62,8 +70,11 @@ export default function TeamsSection(props: TeamsSectionProps) {
     onRandomizeTeams,
     onUpdatePlayersPerTeam,
     scores,
-    isAdminOverride = false,
-    fixedGoalkeepersEnabled = false,
+    isAdminOverride,
+    fixedGoalkeepersEnabled,
+    peladaTransactions = [],
+    organizationFinance,
+    onMarkPaid,
   } = props;
 
   return (
@@ -248,14 +259,19 @@ export default function TeamsSection(props: TeamsSectionProps) {
                   maxPlayers={playersPerTeam ?? 5}
                   onDelete={() => onDeleteTeam(t.id)}
                   onDrop={(e) => dropToTeam(e, t.id)}
-                  onDragStartPlayer={(e, pid) =>
-                    onDragStartPlayer(e, pid, t.id)
+                  onDragStartPlayer={(e, playerId) =>
+                    onDragStartPlayer(e, playerId, t.id)
                   }
-                  onSetGoalkeeper={(pid) => onSetGoalkeeper(t.id, pid)}
-                  onRemovePlayer={(pid) => onRemovePlayer(t.id, pid)}
+                  onSetGoalkeeper={(playerId) =>
+                    onSetGoalkeeper(t.id, playerId)
+                  }
+                  onRemovePlayer={(playerId) => onRemovePlayer(t.id, playerId)}
                   locked={locked}
                   fixedGoalkeepersEnabled={fixedGoalkeepersEnabled}
                   isAdminOverride={isAdminOverride}
+                  peladaTransactions={peladaTransactions}
+                  organizationFinance={organizationFinance}
+                  onMarkPaid={onMarkPaid}
                 />
               </Grid>
             );

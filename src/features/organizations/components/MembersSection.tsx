@@ -209,6 +209,7 @@ export default function MembersSection({
                       disabled={actionLoading}
                       disableUnderline
                       sx={{ fontSize: "0.875rem" }}
+                      data-testid={`member-type-select-${player.id}`}
                     >
                       <MenuItem value="convidado">
                         {t(

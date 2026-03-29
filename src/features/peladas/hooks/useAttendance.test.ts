@@ -4,14 +4,23 @@ import { useAttendance } from "./useAttendance";
 import { MemoryRouter } from "react-router-dom";
 
 // Mock the API endpoints using hoisted variables
-const { mockGetPeladaFullDetails, mockEndpoints } = vi.hoisted(() => ({
-  mockGetPeladaFullDetails: vi.fn(),
-  mockEndpoints: {
-    getPeladaFullDetails: vi.fn(),
-    updateAttendance: vi.fn(),
-    closeAttendance: vi.fn(),
-  },
-}));
+const { mockGetPeladaFullDetails, mockEndpoints, mockGetOrganizationFinance } =
+  vi.hoisted(() => ({
+    mockGetPeladaFullDetails: vi.fn(),
+    mockGetOrganizationFinance: vi
+      .fn()
+      .mockResolvedValue({
+        mensalista_price: 0,
+        diarista_price: 0,
+        currency: "BRL",
+      }),
+    mockEndpoints: {
+      getPeladaFullDetails: vi.fn(),
+      getOrganizationFinance: vi.fn(),
+      updateAttendance: vi.fn(),
+      closeAttendance: vi.fn(),
+    },
+  }));
 
 vi.mock("../../../shared/api/endpoints", async () => {
   const actual = await vi.importActual("../../../shared/api/endpoints");
@@ -20,6 +29,7 @@ vi.mock("../../../shared/api/endpoints", async () => {
     createApi: vi.fn(() => ({
       ...mockEndpoints,
       getPeladaFullDetails: mockGetPeladaFullDetails,
+      getOrganizationFinance: mockGetOrganizationFinance,
     })),
   };
 });

@@ -288,9 +288,83 @@
       "sections": {
         "invitations": "Active Invitations",
         "members": "Members",
+        "finance": "Finance",
         "admins": "Administrators",
         "danger_zone": "Danger Zone",
         "waha": "WhatsApp (WAHA)"
+      },
+      "finance": {
+        "title": "Financial Control",
+        "summary": {
+          "title": "Summary",
+          "balance": "Total Balance",
+          "income": "Income",
+          "expense": "Expenses",
+          "mensalistas_paid": "Mensalistas Paid",
+          "mensalistas_pending": "Mensalistas Pending"
+        },
+        "monthly_fees": {
+          "title": "Monthly Fees",
+          "month_select": "Month",
+          "year_select": "Year",
+          "player": "Player",
+          "status": "Status",
+          "paid": "Paid",
+          "pending": "Pending",
+          "mark_as_paid": "Mark as Paid",
+          "mark_as_unpaid": "Mark as Pending",
+          "success": "Payment status updated!",
+          "confirm_payment": "Confirm receipt of {{amount}} from {{name}}?"
+        },
+        "transactions": {
+          "title": "Transactions",
+          "add_button": "New Transaction",
+          "date": "Date",
+          "description": "Description",
+          "category": "Category",
+          "amount": "Amount",
+          "type": "Type",
+          "player": "Player",
+          "income": "Income",
+          "expense": "Expense",
+          "empty": "No transactions found.",
+          "recorded_by": "Recorded by",
+          "reversed": "Reversed",
+          "mark_as_reversed": "Reverse Transaction",
+          "reverse_success": "Transaction reversed successfully!",
+          "add_dialog": {
+            "title": "New Transaction",
+            "income": "Income (+)",
+            "expense": "Expense (-)"
+          },
+          "error": {
+            "reverse_failed": "Error reversing transaction",
+            "add_failed": "Error adding transaction"
+          }
+        },
+        "config": {
+          "title": "Configuration",
+          "mensalista_price": "Monthly Fee (Mensalista)",
+          "diarista_price": "Game Fee (Diarista/Guest)",
+          "currency": "Currency",
+          "save_button": "Save Configuration",
+          "success": "Finance settings saved!",
+          "error": {
+            "save_failed": "Error saving configuration"
+          }
+        },
+        "categories": {
+          "monthly_fee": "Monthly Fee",
+          "diarista_fee": "Individual Game",
+          "field_rent": "Field Rental",
+          "equipment": "Equipment",
+          "referee": "Referee",
+          "barbecue": "Barbecue",
+          "other": "Other"
+        },
+        "error": {
+          "load_failed": "Error loading financial data"
+        }
       },
       "waha": {
         "title": "WhatsApp Configuration (WAHA)",

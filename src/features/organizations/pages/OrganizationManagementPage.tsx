@@ -1,5 +1,5 @@
 import { useParams, useSearchParams } from "react-router-dom";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Container,
   Typography,
@@ -15,12 +15,15 @@ import MailIcon from "@mui/icons-material/Mail";
 import StarIcon from "@mui/icons-material/Star";
 import SettingsIcon from "@mui/icons-material/Settings";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../../app/providers/AuthContext";
 import { Loading } from "../../../shared/components/Loading";
 import AddPlayersDialog from "../components/AddPlayersDialog";
 import InvitePlayerDialog from "../components/InvitePlayerDialog";
 import { useOrganizationManagement } from "../hooks/useOrganizationManagement";
 import MembersSection from "../components/MembersSection";
+import FinanceSection from "../components/FinanceSection";
 import AdminsSection from "../components/AdminsSection";
 import InvitationsList from "../components/InvitationsList";
 import DangerZoneSection from "../components/DangerZoneSection";
@@ -130,7 +133,16 @@ export default function OrganizationManagementPage() {
     refreshPlayers,
     fetchData,
   } = useOrganizationManagement(orgId);
-  if (loading && !org) return <Loading message={t("common.loading")} />;
+
+  const { user } = useAuth();
+  const isAdmin = useMemo(() => {
+    if (!user || !admins) return false;
+    return admins.some((a) => a.user_id === user.id);
+  }, [user, admins]);
+  if (loading && !org)
+    return (
+      <Loading message={t("common.loading")} data-testid="org-mgmt-loading" />
+    );
   if (!org)
     return (
       <Container sx={{ mt: 4, px: { xs: 1, sm: 2 } }} disableGutters>
@@ -145,6 +157,7 @@ export default function OrganizationManagementPage() {
       maxWidth="lg"
       sx={{ py: { xs: 2, sm: 4 }, px: { xs: 0, sm: 2 } }}
       disableGutters
+      data-testid="org-mgmt-container"
     >
       <Box sx={{ px: { xs: 1.5, sm: 0 } }}>
         <BreadcrumbNav
@@ -159,7 +172,12 @@ export default function OrganizationManagementPage() {
         </Typography>
 
         {error && (
-          <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
+          <Alert
+            severity="error"
+            sx={{ mb: 3 }}
+            onClose={() => setError(null)}
+            data-testid="org-mgmt-error"
+          >
             {error}
           </Alert>
         )}
@@ -194,6 +212,20 @@ export default function OrganizationManagementPage() {
             }
             value="members"
             data-testid="mgmt-tab-members"
+          />
+          <Tab
+            icon={<AttachMoneyIcon />}
+            iconPosition="start"
+            label={
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
+                {t("organizations.management.sections.finance")}
+              </Box>
+            }
+            value="finance"
+            data-testid="mgmt-tab-finance"
           />
           <Tab
             icon={<StarIcon />}
@@ -286,6 +318,10 @@ export default function OrganizationManagementPage() {
             onPageChange={handlePageChange}
             onRowsPerPageChange={handleRowsPerPageChange}
           />
+        </TabPanel>
+
+        <TabPanel value={activeTab} index="finance">
+          <FinanceSection orgId={orgId} isAdmin={isAdmin} />
         </TabPanel>
 
         <TabPanel value={activeTab} index="ratings">

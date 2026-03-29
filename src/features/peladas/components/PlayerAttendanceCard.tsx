@@ -7,12 +7,18 @@ import {
   Stack,
   IconButton,
   CircularProgress,
+  Tooltip,
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import PaidIcon from "@mui/icons-material/Paid";
 import { useTranslation } from "react-i18next";
-import { type AttendanceStatus } from "../../../shared/api/endpoints";
+import {
+  type AttendanceStatus,
+  type OrganizationFinance,
+} from "../../../shared/api/endpoints";
 import { type PlayerWithUser } from "../hooks/useAttendance";
 
 interface PlayerAttendanceCardProps {
@@ -21,6 +27,9 @@ interface PlayerAttendanceCardProps {
   isCurrentUser: boolean;
   onUpdate: (status: AttendanceStatus) => void;
   isUpdating: boolean;
+  isPaid?: boolean;
+  organizationFinance?: OrganizationFinance;
+  onMarkPaid?: () => void;
   "data-testid"?: string;
 }
 
@@ -30,6 +39,9 @@ export default function PlayerAttendanceCard({
   isCurrentUser,
   onUpdate,
   isUpdating,
+  isPaid,
+  organizationFinance,
+  onMarkPaid,
   "data-testid": testId,
 }: PlayerAttendanceCardProps) {
   const { t } = useTranslation();
@@ -39,6 +51,9 @@ export default function PlayerAttendanceCard({
     .join("")
     .toUpperCase()
     .substring(0, 2);
+
+  const needsPayment =
+    player.member_type === "diarista" || player.member_type === "convidado";
 
   return (
     <Card
@@ -131,69 +146,133 @@ export default function PlayerAttendanceCard({
           </Box>
         </Box>
 
-        {isAdmin && (
-          <Stack direction="row" spacing={1}>
-            {isUpdating ? (
-              <Box sx={{ p: 0.5 }}>
-                <CircularProgress size={20} />
-              </Box>
+        <Stack direction="row" spacing={1} alignItems="center">
+          {needsPayment &&
+            (isPaid ? (
+              <Tooltip
+                title={t(
+                  "organizations.management.finance.monthly_fees.paid",
+                  "Pago",
+                )}
+              >
+                <Box
+                  sx={{
+                    color: "success.main",
+                    display: "flex",
+                    alignItems: "center",
+                    px: 1,
+                  }}
+                >
+                  <PaidIcon fontSize="small" data-testid="paid-icon" />
+                </Box>
+              </Tooltip>
+            ) : isAdmin && onMarkPaid ? (
+              <Tooltip
+                title={t(
+                  "organizations.management.finance.monthly_fees.mark_as_paid",
+                  "Marcar como Pago",
+                )}
+              >
+                <IconButton
+                  size="small"
+                  onClick={onMarkPaid}
+                  disabled={isUpdating || !organizationFinance?.diarista_price}
+                  data-testid="mark-as-paid-button"
+                  sx={{
+                    color: "warning.main",
+                    "&:hover": {
+                      color: "success.main",
+                      bgcolor: "success.light",
+                    },
+                  }}
+                >
+                  <AttachMoneyIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
             ) : (
-              <>
-                {player.attendance_status !== "confirmed" && (
-                  <IconButton
-                    size="small"
-                    title={t("peladas.attendance.status.confirmed")}
-                    onClick={() => onUpdate("confirmed")}
-                    data-testid="attendance-card-confirm"
-                    sx={{
-                      color: "grey.400",
-                      "&:hover": {
-                        color: "success.main",
-                        bgcolor: "success.light",
-                      },
-                    }}
-                  >
-                    <CheckCircleIcon fontSize="small" />
-                  </IconButton>
+              <Tooltip
+                title={t(
+                  "organizations.management.finance.monthly_fees.pending",
+                  "Pendente",
                 )}
-                {player.attendance_status !== "waitlist" && (
-                  <IconButton
-                    size="small"
-                    title={t("peladas.attendance.status.waitlist")}
-                    onClick={() => onUpdate("waitlist")}
-                    data-testid="attendance-card-waitlist"
-                    sx={{
-                      color: "grey.400",
-                      "&:hover": {
-                        color: "warning.main",
-                        bgcolor: "warning.light",
-                      },
-                    }}
-                  >
-                    <AccessTimeIcon fontSize="small" />
-                  </IconButton>
-                )}
-                {player.attendance_status !== "declined" && (
-                  <IconButton
-                    size="small"
-                    title={t("peladas.attendance.status.declined")}
-                    onClick={() => onUpdate("declined")}
-                    data-testid="attendance-card-decline"
-                    sx={{
-                      color: "grey.400",
-                      "&:hover": {
-                        color: "error.main",
-                        bgcolor: "error.light",
-                      },
-                    }}
-                  >
-                    <CancelIcon fontSize="small" />
-                  </IconButton>
-                )}
-              </>
-            )}
-          </Stack>
-        )}
+              >
+                <Box
+                  sx={{
+                    color: "warning.main",
+                    display: "flex",
+                    alignItems: "center",
+                    px: 1,
+                  }}
+                >
+                  <AttachMoneyIcon fontSize="small" />
+                </Box>
+              </Tooltip>
+            ))}
+
+          {isAdmin && (
+            <>
+              {isUpdating ? (
+                <Box sx={{ p: 0.5 }}>
+                  <CircularProgress size={20} />
+                </Box>
+              ) : (
+                <>
+                  {player.attendance_status !== "confirmed" && (
+                    <IconButton
+                      size="small"
+                      title={t("peladas.attendance.status.confirmed")}
+                      onClick={() => onUpdate("confirmed")}
+                      data-testid="attendance-card-confirm"
+                      sx={{
+                        color: "grey.400",
+                        "&:hover": {
+                          color: "success.main",
+                          bgcolor: "success.light",
+                        },
+                      }}
+                    >
+                      <CheckCircleIcon fontSize="small" />
+                    </IconButton>
+                  )}
+                  {player.attendance_status !== "waitlist" && (
+                    <IconButton
+                      size="small"
+                      title={t("peladas.attendance.status.waitlist")}
+                      onClick={() => onUpdate("waitlist")}
+                      data-testid="attendance-card-waitlist"
+                      sx={{
+                        color: "grey.400",
+                        "&:hover": {
+                          color: "warning.main",
+                          bgcolor: "warning.light",
+                        },
+                      }}
+                    >
+                      <AccessTimeIcon fontSize="small" />
+                    </IconButton>
+                  )}
+                  {player.attendance_status !== "declined" && (
+                    <IconButton
+                      size="small"
+                      title={t("peladas.attendance.status.declined")}
+                      onClick={() => onUpdate("declined")}
+                      data-testid="attendance-card-decline"
+                      sx={{
+                        color: "grey.400",
+                        "&:hover": {
+                          color: "error.main",
+                          bgcolor: "error.light",
+                        },
+                      }}
+                    >
+                      <CancelIcon fontSize="small" />
+                    </IconButton>
+                  )}
+                </>
+              )}
+            </>
+          )}
+        </Stack>
       </CardContent>
     </Card>
   );

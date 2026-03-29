@@ -24,6 +24,8 @@ import type {
   TeamPlayer,
   Player,
   Pelada,
+  Transaction,
+  OrganizationFinance,
 } from "../../../shared/api/endpoints";
 import MatchScoreHero from "./MatchScoreHero";
 import MatchPlayerCard from "./MatchPlayerCard";
@@ -94,6 +96,9 @@ type Props = {
   matches: Match[];
   onSelectMatch: (id: number) => void;
   teamNameById: Record<number, string>;
+  peladaTransactions?: Transaction[];
+  organizationFinance?: OrganizationFinance;
+  onMarkPaid?: (playerId: number, amount: number) => void;
 };
 
 export default function ActiveMatchDashboard(props: Props) {
@@ -127,6 +132,9 @@ export default function ActiveMatchDashboard(props: Props) {
     matches,
     onSelectMatch,
     teamNameById,
+    peladaTransactions = [],
+    organizationFinance,
+    onMarkPaid,
   } = props;
 
   const { t } = useTranslation();
@@ -326,33 +334,52 @@ export default function ActiveMatchDashboard(props: Props) {
               </Typography>
             </Box>
             <Stack spacing={1}>
-              {homeList.map((p) => (
-                <MatchPlayerCard
-                  key={p.player_id}
-                  player={p}
-                  playerName={getPlayerName(p.player_id)}
-                  playerData={orgPlayerIdToPlayer[p.player_id]}
-                  stats={
-                    statsMap[p.player_id] || {
-                      goals: 0,
-                      assists: 0,
-                      ownGoals: 0,
+              {homeList.map((p) => {
+                const isPaid = peladaTransactions.some(
+                  (t: Transaction) =>
+                    t.player_id === p.player_id &&
+                    t.type === "income" &&
+                    t.category === "diarista_fee" &&
+                    t.status === "paid",
+                );
+                return (
+                  <MatchPlayerCard
+                    key={p.player_id}
+                    player={p}
+                    playerName={getPlayerName(p.player_id)}
+                    playerData={orgPlayerIdToPlayer[p.player_id]}
+                    stats={
+                      statsMap[p.player_id] || {
+                        goals: 0,
+                        assists: 0,
+                        ownGoals: 0,
+                      }
                     }
-                  }
-                  finished={effectiveFinished}
-                  isAdmin={isAdmin}
-                  onStatChange={(type, diff, side) =>
-                    handleStatChange(p.player_id, type, diff, side)
-                  }
-                  onSubClick={() =>
-                    setSelectMenu({
-                      teamId: p.teamId,
-                      forPlayerId: p.player_id,
-                      type: p.isEmpty ? "add" : "replace",
-                    })
-                  }
-                />
-              ))}
+                    finished={effectiveFinished}
+                    isAdmin={isAdmin}
+                    onStatChange={(type, diff, side) =>
+                      handleStatChange(p.player_id, type, diff, side)
+                    }
+                    onSubClick={() =>
+                      setSelectMenu({
+                        teamId: p.teamId,
+                        forPlayerId: p.player_id,
+                        type: p.isEmpty ? "add" : "replace",
+                      })
+                    }
+                    isPaid={isPaid}
+                    onMarkPaid={
+                      onMarkPaid
+                        ? () =>
+                            onMarkPaid(
+                              p.player_id,
+                              organizationFinance?.diarista_price || 0,
+                            )
+                        : undefined
+                    }
+                  />
+                );
+              })}
             </Stack>
           </Grid>
 
@@ -384,33 +411,52 @@ export default function ActiveMatchDashboard(props: Props) {
               </Typography>
             </Box>
             <Stack spacing={1}>
-              {awayList.map((p) => (
-                <MatchPlayerCard
-                  key={p.player_id}
-                  player={p}
-                  playerName={getPlayerName(p.player_id)}
-                  playerData={orgPlayerIdToPlayer[p.player_id]}
-                  stats={
-                    statsMap[p.player_id] || {
-                      goals: 0,
-                      assists: 0,
-                      ownGoals: 0,
+              {awayList.map((p) => {
+                const isPaid = peladaTransactions.some(
+                  (t: Transaction) =>
+                    t.player_id === p.player_id &&
+                    t.type === "income" &&
+                    t.category === "diarista_fee" &&
+                    t.status === "paid",
+                );
+                return (
+                  <MatchPlayerCard
+                    key={p.player_id}
+                    player={p}
+                    playerName={getPlayerName(p.player_id)}
+                    playerData={orgPlayerIdToPlayer[p.player_id]}
+                    stats={
+                      statsMap[p.player_id] || {
+                        goals: 0,
+                        assists: 0,
+                        ownGoals: 0,
+                      }
                     }
-                  }
-                  finished={effectiveFinished}
-                  isAdmin={isAdmin}
-                  onStatChange={(type, diff, side) =>
-                    handleStatChange(p.player_id, type, diff, side)
-                  }
-                  onSubClick={() =>
-                    setSelectMenu({
-                      teamId: p.teamId,
-                      forPlayerId: p.player_id,
-                      type: p.isEmpty ? "add" : "replace",
-                    })
-                  }
-                />
-              ))}
+                    finished={effectiveFinished}
+                    isAdmin={isAdmin}
+                    onStatChange={(type, diff, side) =>
+                      handleStatChange(p.player_id, type, diff, side)
+                    }
+                    onSubClick={() =>
+                      setSelectMenu({
+                        teamId: p.teamId,
+                        forPlayerId: p.player_id,
+                        type: p.isEmpty ? "add" : "replace",
+                      })
+                    }
+                    isPaid={isPaid}
+                    onMarkPaid={
+                      onMarkPaid
+                        ? () =>
+                            onMarkPaid(
+                              p.player_id,
+                              organizationFinance?.diarista_price || 0,
+                            )
+                        : undefined
+                    }
+                  />
+                );
+              })}
             </Stack>
           </Grid>
         </Grid>

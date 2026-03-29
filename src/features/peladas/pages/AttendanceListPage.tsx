@@ -76,8 +76,11 @@ export default function AttendanceListPage() {
     updatingPlayers,
     currentPlayerAsPlayer,
     isUpdatingSelf,
+    peladaTransactions,
+    organizationFinance,
     handleUpdateAttendance,
     handleCloseAttendance,
+    handleMarkPaid,
   } = useAttendance(peladaId);
 
   // Derived admin status
@@ -345,6 +348,9 @@ export default function AttendanceListPage() {
               onUpdate={handleUpdateAttendance}
               updatingPlayers={updatingPlayers}
               hideHeader
+              peladaTransactions={peladaTransactions}
+              organizationFinance={organizationFinance || undefined}
+              onMarkPaid={handleMarkPaid}
             />
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={1}>
@@ -361,6 +367,9 @@ export default function AttendanceListPage() {
               onUpdate={handleUpdateAttendance}
               updatingPlayers={updatingPlayers}
               hideHeader
+              peladaTransactions={peladaTransactions}
+              organizationFinance={organizationFinance || undefined}
+              onMarkPaid={handleMarkPaid}
             />
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={2}>
@@ -374,6 +383,9 @@ export default function AttendanceListPage() {
               onUpdate={handleUpdateAttendance}
               updatingPlayers={updatingPlayers}
               hideHeader
+              peladaTransactions={peladaTransactions}
+              organizationFinance={organizationFinance || undefined}
+              onMarkPaid={handleMarkPaid}
             />
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={3}>
@@ -387,6 +399,9 @@ export default function AttendanceListPage() {
               onUpdate={handleUpdateAttendance}
               updatingPlayers={updatingPlayers}
               hideHeader
+              peladaTransactions={peladaTransactions}
+              organizationFinance={organizationFinance || undefined}
+              onMarkPaid={handleMarkPaid}
             />
           </CustomTabPanel>
         </Box>

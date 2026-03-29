@@ -1,4 +1,13 @@
-import { Paper, Box, Typography, Avatar } from "@mui/material";
+import {
+  Paper,
+  Box,
+  Typography,
+  Avatar,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import PaidIcon from "@mui/icons-material/Paid";
 import { type DragEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { type Player, type User } from "../../../shared/api/endpoints";
@@ -8,6 +17,9 @@ interface AvailablePlayerItemProps {
   score: number | null;
   locked?: boolean;
   onDragStart: (e: DragEvent<HTMLElement>) => void;
+  isPaid?: boolean;
+  isAdmin?: boolean;
+  onMarkPaid?: () => void;
 }
 
 export default function AvailablePlayerItem({
@@ -15,9 +27,14 @@ export default function AvailablePlayerItem({
   score,
   locked,
   onDragStart,
+  isPaid,
+  isAdmin,
+  onMarkPaid,
 }: AvailablePlayerItemProps) {
   const { t } = useTranslation();
   const scoreVal = typeof score === "number" ? score.toFixed(1) : "-";
+  const needsPayment =
+    player.member_type === "diarista" || player.member_type === "convidado";
 
   return (
     <Paper
@@ -75,6 +92,68 @@ export default function AvailablePlayerItem({
         </Typography>
       </Box>
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        {needsPayment &&
+          (isPaid ? (
+            <Tooltip
+              title={t(
+                "organizations.management.finance.monthly_fees.paid",
+                "Pago",
+              )}
+            >
+              <Box
+                sx={{
+                  color: "success.main",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <PaidIcon fontSize="small" data-testid="paid-icon" />
+              </Box>
+            </Tooltip>
+          ) : isAdmin && onMarkPaid ? (
+            <Tooltip
+              title={t(
+                "organizations.management.finance.monthly_fees.mark_as_paid",
+                "Marcar como Pago",
+              )}
+            >
+              <IconButton
+                size="small"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMarkPaid();
+                }}
+                data-testid="mark-as-paid-button"
+                sx={{
+                  color: "warning.main",
+                  p: 0.5,
+                  "&:hover": {
+                    color: "success.main",
+                    bgcolor: "success.light",
+                  },
+                }}
+              >
+                <AttachMoneyIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <Tooltip
+              title={t(
+                "organizations.management.finance.monthly_fees.pending",
+                "Pendente",
+              )}
+            >
+              <Box
+                sx={{
+                  color: "warning.main",
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <AttachMoneyIcon fontSize="small" />
+              </Box>
+            </Tooltip>
+          ))}
         <Box
           sx={{
             px: 1,

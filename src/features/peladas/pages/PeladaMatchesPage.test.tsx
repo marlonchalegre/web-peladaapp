@@ -148,6 +148,12 @@ describe("PeladaMatchesPage", () => {
         return Promise.resolve(mockDashboardData);
       if (path === "/api/organizations/101/admins")
         return Promise.resolve([{ user_id: 1, organization_id: 101 }]);
+      if (path === "/api/organizations/101/finance")
+        return Promise.resolve({
+          mensalista_price: 0,
+          diarista_price: 0,
+          currency: "BRL",
+        });
       return Promise.reject(new Error(`Not found: ${path}`));
     });
 

@@ -61,6 +61,12 @@ describe("PeladaDetailPage", () => {
       if (path === "/api/peladas/1/full-details")
         return Promise.resolve(mockFullDetails);
       if (path === "/api/organizations/101/admins") return Promise.resolve([]);
+      if (path === "/api/organizations/101/finance")
+        return Promise.resolve({
+          mensalista_price: 0,
+          diarista_price: 0,
+          currency: "BRL",
+        });
       return Promise.reject(new Error(`Not found: ${path}`));
     });
     (api.post as Mock).mockImplementation((path: string) => {

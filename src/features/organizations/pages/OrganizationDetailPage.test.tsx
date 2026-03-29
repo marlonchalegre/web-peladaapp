@@ -36,7 +36,7 @@ describe("OrganizationDetailPage", () => {
   });
 
   it("renders organization details and paginated peladas", async () => {
-    const mockOrg = { id: 1, name: "Test Org" };
+    const mockOrg = { id: 1, name: "Test Org", owner_id: 1 };
     const mockPeladas = {
       data: [
         { id: 1, organization_id: 1, status: "open" },
@@ -86,7 +86,7 @@ describe("OrganizationDetailPage", () => {
   });
 
   it("handles page change", async () => {
-    const mockOrg = { id: 1, name: "Test Org" };
+    const mockOrg = { id: 1, name: "Test Org", owner_id: 1 };
     const mockPeladasPage1 = {
       data: [{ id: 1, organization_id: 1, status: "open" }],
       total: 25,
@@ -148,7 +148,7 @@ describe("OrganizationDetailPage", () => {
   });
 
   it("creates teams and redirects after creating a pelada", async () => {
-    const mockOrg = { id: 1, name: "Test Org" };
+    const mockOrg = { id: 1, name: "Test Org", owner_id: 1 };
     const mockPeladas = {
       data: [],
       total: 0,

@@ -1,7 +1,11 @@
 import { Box, Typography, Stack } from "@mui/material";
 import { type ReactNode } from "react";
 import { type PlayerWithUser } from "../hooks/useAttendance";
-import { type AttendanceStatus } from "../../../shared/api/endpoints";
+import {
+  type AttendanceStatus,
+  type Transaction,
+  type OrganizationFinance,
+} from "../../../shared/api/endpoints";
 import PlayerAttendanceCard from "./PlayerAttendanceCard";
 
 interface AttendanceListColumnProps {
@@ -15,6 +19,9 @@ interface AttendanceListColumnProps {
   onUpdate: (status: AttendanceStatus, playerId: number) => void;
   updatingPlayers: Set<number>;
   hideHeader?: boolean;
+  peladaTransactions?: Transaction[];
+  organizationFinance?: OrganizationFinance;
+  onMarkPaid?: (playerId: number, amount: number) => void;
 }
 
 export default function AttendanceListColumn({
@@ -28,6 +35,9 @@ export default function AttendanceListColumn({
   onUpdate,
   updatingPlayers,
   hideHeader = false,
+  peladaTransactions = [],
+  organizationFinance,
+  onMarkPaid,
 }: AttendanceListColumnProps) {
   return (
     <Box sx={{ width: "100%" }}>
@@ -43,17 +53,34 @@ export default function AttendanceListColumn({
         </Box>
       )}
       <Stack spacing={2}>
-        {players.map((p) => (
-          <PlayerAttendanceCard
-            key={p.id}
-            player={p}
-            isAdmin={isAdmin}
-            isCurrentUser={p.user_id === currentUserId}
-            onUpdate={(status) => onUpdate(status, p.id)}
-            isUpdating={updatingPlayers.has(p.id)}
-            data-testid={`attendance-card-${p.user.username || p.user_id}`}
-          />
-        ))}
+        {players.map((p) => {
+          const isPaid = peladaTransactions.some(
+            (t: Transaction) =>
+              t.player_id === p.id &&
+              t.type === "income" &&
+              t.category === "diarista_fee" &&
+              t.status === "paid",
+          );
+          return (
+            <PlayerAttendanceCard
+              key={p.id}
+              player={p}
+              isAdmin={isAdmin}
+              isCurrentUser={p.user_id === currentUserId}
+              onUpdate={(status) => onUpdate(status, p.id)}
+              isUpdating={updatingPlayers.has(p.id)}
+              isPaid={isPaid}
+              organizationFinance={organizationFinance}
+              onMarkPaid={
+                onMarkPaid
+                  ? () =>
+                      onMarkPaid(p.id, organizationFinance?.diarista_price || 0)
+                  : undefined
+              }
+              data-testid={`attendance-card-${p.user.username || p.user_id}`}
+            />
+          );
+        })}
         {players.length === 0 && (
           <Typography
             variant="body2"
