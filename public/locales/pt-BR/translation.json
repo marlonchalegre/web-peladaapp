@@ -314,7 +314,8 @@
           "paid": "Pago",
           "pending": "Pendente",
           "mark_as_paid": "Marcar como Pago",
-          "mark_as_unpaid": "Marcar como Pendente",
+          "reverse": "Estornar",
+          "reverse_confirm": "Tem certeza que deseja estornar este pagamento? A transação financeira associada será marcada como estornada.",
           "success": "Status de pagamento atualizado!",
           "confirm_payment": "Confirmar recebimento de {{amount}} de {{name}}?"
         },

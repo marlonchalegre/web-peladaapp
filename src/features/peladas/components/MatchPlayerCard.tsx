@@ -33,6 +33,7 @@ interface MatchPlayerCardProps {
   onSubClick: () => void;
   isPaid?: boolean;
   onMarkPaid?: () => void;
+  onReversePayment?: () => void;
 }
 
 export default function MatchPlayerCard({
@@ -46,6 +47,7 @@ export default function MatchPlayerCard({
   onSubClick,
   isPaid,
   onMarkPaid,
+  onReversePayment,
 }: MatchPlayerCardProps) {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -182,10 +184,17 @@ export default function MatchPlayerCard({
                   if (isPaid) {
                     return (
                       <Tooltip
-                        title={t(
-                          "organizations.management.finance.monthly_fees.paid",
-                          "Pago",
-                        )}
+                        title={
+                          isAdmin && onReversePayment
+                            ? t(
+                                "organizations.management.finance.monthly_fees.reverse",
+                                "Estornar",
+                              )
+                            : t(
+                                "organizations.management.finance.monthly_fees.paid",
+                                "Pago",
+                              )
+                        }
                       >
                         <Box
                           sx={{
@@ -194,10 +203,34 @@ export default function MatchPlayerCard({
                             alignItems: "center",
                           }}
                         >
-                          <PaidIcon
-                            sx={{ fontSize: "1rem" }}
-                            data-testid="paid-icon"
-                          />
+                          {isAdmin && onReversePayment ? (
+                            <IconButton
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onReversePayment();
+                              }}
+                              data-testid="reverse-payment-button"
+                              size="small"
+                              sx={{
+                                color: "success.main",
+                                p: 0.25,
+                                "&:hover": {
+                                  color: "error.main",
+                                  bgcolor: "error.light",
+                                },
+                              }}
+                            >
+                              <PaidIcon
+                                sx={{ fontSize: "1rem" }}
+                                data-testid="paid-icon"
+                              />
+                            </IconButton>
+                          ) : (
+                            <PaidIcon
+                              sx={{ fontSize: "1rem" }}
+                              data-testid="paid-icon"
+                            />
+                          )}
                         </Box>
                       </Tooltip>
                     );

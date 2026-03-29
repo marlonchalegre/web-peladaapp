@@ -62,10 +62,27 @@ export default function PeladaDetailPage() {
     handleUpdatePlayersPerTeam,
     handleAddPlayersFromOrg,
     handleMarkPaid,
+    handleReversePayment,
     allPlayerIdsInPelada,
     peladaTransactions,
     organizationFinance,
   } = usePeladaDetail(peladaId);
+
+  const [isReverseDialogOpen, setIsReverseDialogOpen] = useState(false);
+  const [playerToReverse, setPlayerToReverse] = useState<number | null>(null);
+
+  const handleConfirmReverse = () => {
+    if (playerToReverse !== null) {
+      handleReversePayment(playerToReverse);
+      setPlayerToReverse(null);
+    }
+    setIsReverseDialogOpen(false);
+  };
+
+  const onReverseClick = (playerId: number) => {
+    setPlayerToReverse(playerId);
+    setIsReverseDialogOpen(true);
+  };
 
   // Derived admin status
   const isAdmin = useMemo(() => {
@@ -206,6 +223,7 @@ export default function PeladaDetailPage() {
             peladaTransactions={peladaTransactions}
             organizationFinance={organizationFinance || undefined}
             onMarkPaid={handleMarkPaid}
+            onReversePayment={onReverseClick}
           />
         </Grid>
 
@@ -227,6 +245,7 @@ export default function PeladaDetailPage() {
             peladaTransactions={peladaTransactions}
             organizationFinance={organizationFinance || undefined}
             onMarkPaid={handleMarkPaid}
+            onReversePayment={onReverseClick}
           />
         </Grid>
       </Grid>
@@ -245,6 +264,23 @@ export default function PeladaDetailPage() {
         description={t("peladas.dialog.start.confirm")}
         onConfirm={handleBeginPelada}
         onClose={() => setConfirmStartWithScheduleOpen(false)}
+      />
+
+      <PrettyConfirmDialog
+        open={isReverseDialogOpen}
+        onClose={() => {
+          setIsReverseDialogOpen(false);
+          setPlayerToReverse(null);
+        }}
+        onConfirm={handleConfirmReverse}
+        title={t("organizations.management.finance.monthly_fees.reverse")}
+        description={t(
+          "organizations.management.finance.monthly_fees.reverse_confirm",
+        )}
+        confirmLabel={t(
+          "organizations.management.finance.monthly_fees.reverse",
+        )}
+        severity="warning"
       />
     </Container>
   );

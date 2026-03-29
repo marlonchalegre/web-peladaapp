@@ -164,6 +164,48 @@ describe("FinanceSection", () => {
     });
   });
 
+  it("reverses monthly payment after confirmation", async () => {
+    render(<FinanceSection orgId={10} isAdmin={true} />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Alice")).toBeDefined();
+    });
+
+    const aliceRow = screen.getByTestId("monthly-payment-row-101");
+    const reverseBtn = aliceRow.querySelector("button");
+
+    if (reverseBtn) {
+      fireEvent.click(reverseBtn);
+    }
+
+    // Should show confirmation dialog
+    await waitFor(() => {
+      expect(
+        screen.getAllByText(
+          "organizations.management.finance.monthly_fees.reverse",
+        ).length,
+      ).toBeGreaterThan(0);
+    });
+
+    // The confirm button in PrettyConfirmDialog has color warning
+    const confirmBtn = screen.getByRole("button", {
+      name: "organizations.management.finance.monthly_fees.reverse",
+      pressed: undefined,
+    });
+
+    fireEvent.click(confirmBtn);
+
+    await waitFor(() => {
+      expect(mockApi.markMonthlyPayment).toHaveBeenCalledWith(
+        10,
+        expect.objectContaining({
+          player_id: 101,
+          paid: false,
+        }),
+      );
+    });
+  });
+
   it("updates finance configuration with float values", async () => {
     render(<FinanceSection orgId={10} isAdmin={true} />);
 

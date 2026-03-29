@@ -52,6 +52,7 @@ export type TeamsSectionProps = {
   peladaTransactions?: Transaction[];
   organizationFinance?: OrganizationFinance;
   onMarkPaid?: (playerId: number, amount: number) => void;
+  onReversePayment?: (playerId: number) => void;
 };
 export default function TeamsSection(props: TeamsSectionProps) {
   const { t } = useTranslation();
@@ -75,6 +76,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
     peladaTransactions = [],
     organizationFinance,
     onMarkPaid,
+    onReversePayment,
   } = props;
 
   return (
@@ -272,6 +274,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
                   peladaTransactions={peladaTransactions}
                   organizationFinance={organizationFinance}
                   onMarkPaid={onMarkPaid}
+                  onReversePayment={onReversePayment}
                 />
               </Grid>
             );

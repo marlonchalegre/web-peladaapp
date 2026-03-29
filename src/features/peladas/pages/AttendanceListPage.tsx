@@ -29,6 +29,7 @@ import { createApi } from "../../../shared/api/endpoints";
 import UserAttendanceStatus from "../components/UserAttendanceStatus";
 import AttendanceListColumn from "../components/AttendanceListColumn";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
+import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -81,7 +82,11 @@ export default function AttendanceListPage() {
     handleUpdateAttendance,
     handleCloseAttendance,
     handleMarkPaid,
+    handleReversePayment,
   } = useAttendance(peladaId);
+
+  const [isReverseDialogOpen, setIsReverseDialogOpen] = useState(false);
+  const [playerToReverse, setPlayerToReverse] = useState<number | null>(null);
 
   // Derived admin status
   const isAnyAdmin = useMemo(() => {
@@ -95,6 +100,19 @@ export default function AttendanceListPage() {
           user.admin_orgs?.includes(pelada.organization_id)))
     );
   }, [pelada, isAdmin, isOrgAdmin, user]);
+
+  const handleConfirmReverse = () => {
+    if (playerToReverse !== null) {
+      handleReversePayment(playerToReverse);
+      setPlayerToReverse(null);
+    }
+    setIsReverseDialogOpen(false);
+  };
+
+  const onReverseClick = (playerId: number) => {
+    setPlayerToReverse(playerId);
+    setIsReverseDialogOpen(true);
+  };
 
   const onConfirmClose = () => {
     handleCloseAttendance();
@@ -351,6 +369,7 @@ export default function AttendanceListPage() {
               peladaTransactions={peladaTransactions}
               organizationFinance={organizationFinance || undefined}
               onMarkPaid={handleMarkPaid}
+              onReversePayment={onReverseClick}
             />
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={1}>
@@ -370,6 +389,7 @@ export default function AttendanceListPage() {
               peladaTransactions={peladaTransactions}
               organizationFinance={organizationFinance || undefined}
               onMarkPaid={handleMarkPaid}
+              onReversePayment={onReverseClick}
             />
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={2}>
@@ -386,6 +406,7 @@ export default function AttendanceListPage() {
               peladaTransactions={peladaTransactions}
               organizationFinance={organizationFinance || undefined}
               onMarkPaid={handleMarkPaid}
+              onReversePayment={onReverseClick}
             />
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={3}>
@@ -402,6 +423,7 @@ export default function AttendanceListPage() {
               peladaTransactions={peladaTransactions}
               organizationFinance={organizationFinance || undefined}
               onMarkPaid={handleMarkPaid}
+              onReversePayment={onReverseClick}
             />
           </CustomTabPanel>
         </Box>
@@ -442,6 +464,23 @@ export default function AttendanceListPage() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <PrettyConfirmDialog
+        open={isReverseDialogOpen}
+        onClose={() => {
+          setIsReverseDialogOpen(false);
+          setPlayerToReverse(null);
+        }}
+        onConfirm={handleConfirmReverse}
+        title={t("organizations.management.finance.monthly_fees.reverse")}
+        description={t(
+          "organizations.management.finance.monthly_fees.reverse_confirm",
+        )}
+        confirmLabel={t(
+          "organizations.management.finance.monthly_fees.reverse",
+        )}
+        severity="warning"
+      />
     </Container>
   );
 }

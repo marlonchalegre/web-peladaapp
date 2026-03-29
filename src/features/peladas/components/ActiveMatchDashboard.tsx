@@ -99,6 +99,7 @@ type Props = {
   peladaTransactions?: Transaction[];
   organizationFinance?: OrganizationFinance;
   onMarkPaid?: (playerId: number, amount: number) => void;
+  onReversePayment?: (playerId: number) => void;
 };
 
 export default function ActiveMatchDashboard(props: Props) {
@@ -135,6 +136,7 @@ export default function ActiveMatchDashboard(props: Props) {
     peladaTransactions = [],
     organizationFinance,
     onMarkPaid,
+    onReversePayment,
   } = props;
 
   const { t } = useTranslation();
@@ -377,6 +379,11 @@ export default function ActiveMatchDashboard(props: Props) {
                             )
                         : undefined
                     }
+                    onReversePayment={
+                      onReversePayment
+                        ? () => onReversePayment(p.player_id)
+                        : undefined
+                    }
                   />
                 );
               })}
@@ -452,6 +459,11 @@ export default function ActiveMatchDashboard(props: Props) {
                               p.player_id,
                               organizationFinance?.diarista_price || 0,
                             )
+                        : undefined
+                    }
+                    onReversePayment={
+                      onReversePayment
+                        ? () => onReversePayment(p.player_id)
                         : undefined
                     }
                   />

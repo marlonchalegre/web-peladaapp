@@ -312,7 +312,8 @@
           "paid": "Paid",
           "pending": "Pending",
           "mark_as_paid": "Mark as Paid",
-          "mark_as_unpaid": "Mark as Pending",
+          "reverse": "Reverse",
+          "reverse_confirm": "Are you sure you want to reverse this payment? The associated financial transaction will be marked as reversed.",
           "success": "Payment status updated!",
           "confirm_payment": "Confirm receipt of {{amount}} from {{name}}?"
         },

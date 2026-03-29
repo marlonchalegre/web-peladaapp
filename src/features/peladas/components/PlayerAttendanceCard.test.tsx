@@ -144,4 +144,48 @@ describe("PlayerAttendanceCard", () => {
       screen.queryByTestId("attendance-card-decline"),
     ).not.toBeInTheDocument();
   });
+
+  it("shows payment icons for diaristas when admin", () => {
+    const diarista = { ...mockPlayer, member_type: "diarista" };
+    const onMarkPaid = vi.fn();
+    const onReversePayment = vi.fn();
+
+    const { rerender } = render(
+      <ThemeContextProvider>
+        <PlayerAttendanceCard
+          player={diarista as any}
+          isAdmin={true}
+          isCurrentUser={false}
+          onUpdate={() => {}}
+          isUpdating={false}
+          isPaid={false}
+          onMarkPaid={onMarkPaid}
+          onReversePayment={onReversePayment}
+        />
+      </ThemeContextProvider>,
+    );
+
+    expect(screen.getByTestId("mark-as-paid-button")).toBeInTheDocument();
+
+    rerender(
+      <ThemeContextProvider>
+        <PlayerAttendanceCard
+          player={diarista as any}
+          isAdmin={true}
+          isCurrentUser={false}
+          onUpdate={() => {}}
+          isUpdating={false}
+          isPaid={true}
+          onMarkPaid={onMarkPaid}
+          onReversePayment={onReversePayment}
+        />
+      </ThemeContextProvider>,
+    );
+
+    const reverseBtn = screen.getByTestId("reverse-payment-button");
+    expect(reverseBtn).toBeInTheDocument();
+
+    reverseBtn.click();
+    expect(onReversePayment).toHaveBeenCalled();
+  });
 });

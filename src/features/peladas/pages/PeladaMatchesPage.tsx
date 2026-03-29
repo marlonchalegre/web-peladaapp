@@ -124,7 +124,24 @@ export default function PeladaMatchesPage() {
     peladaTransactions,
     organizationFinance,
     handleMarkPaid,
+    handleReversePayment,
   } = usePeladaMatches(peladaId);
+
+  const [isReverseDialogOpen, setIsReverseDialogOpen] = useState(false);
+  const [playerToReverse, setPlayerToReverse] = useState<number | null>(null);
+
+  const handleConfirmReverse = () => {
+    if (playerToReverse !== null) {
+      handleReversePayment(playerToReverse);
+      setPlayerToReverse(null);
+    }
+    setIsReverseDialogOpen(false);
+  };
+
+  const onReverseClick = (playerId: number) => {
+    setPlayerToReverse(playerId);
+    setIsReverseDialogOpen(true);
+  };
 
   // Derived admin status
   const isAdmin = useMemo(() => {
@@ -499,6 +516,7 @@ export default function PeladaMatchesPage() {
                 peladaTransactions={peladaTransactions}
                 organizationFinance={organizationFinance || undefined}
                 onMarkPaid={handleMarkPaid}
+                onReversePayment={onReverseClick}
               />
             ) : (
               <Paper sx={{ p: 8, textAlign: "center", borderRadius: 4 }}>
@@ -619,6 +637,23 @@ export default function PeladaMatchesPage() {
         onConfirm={handleConfirmClosePelada}
         onClose={() => setClosePeladaConfirmOpen(false)}
         severity="error"
+      />
+
+      <PrettyConfirmDialog
+        open={isReverseDialogOpen}
+        onClose={() => {
+          setIsReverseDialogOpen(false);
+          setPlayerToReverse(null);
+        }}
+        onConfirm={handleConfirmReverse}
+        title={t("organizations.management.finance.monthly_fees.reverse")}
+        description={t(
+          "organizations.management.finance.monthly_fees.reverse_confirm",
+        )}
+        confirmLabel={t(
+          "organizations.management.finance.monthly_fees.reverse",
+        )}
+        severity="warning"
       />
     </Box>
   );

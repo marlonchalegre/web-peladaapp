@@ -210,6 +210,39 @@ export function useAttendance(peladaId: number) {
     try {
       setUpdatingPlayers((prev) => new Set(prev).add(playerId));
 
+      // Payment: add new transaction
+      const finalAmount = amount ?? organizationFinance?.diarista_price ?? 0;
+      await endpoints.addTransaction(pelada.organization_id, {
+        player_id: playerId,
+        pelada_id: peladaId,
+        amount: finalAmount,
+        type: "income",
+        category: "diarista_fee",
+        description: `Pagamento Pelada ${peladaId}`,
+        payment_date: new Date().toISOString().split("T")[0],
+      });
+      await fetchData(true);
+    } catch (err: unknown) {
+      console.error(err);
+      const message =
+        err instanceof Error
+          ? err.message
+          : t("organizations.management.finance.transactions.error.add_failed");
+      setError(message);
+    } finally {
+      setUpdatingPlayers((prev) => {
+        const next = new Set(prev);
+        next.delete(playerId);
+        return next;
+      });
+    }
+  };
+
+  const handleReversePayment = async (playerId: number) => {
+    if (!pelada) return;
+    try {
+      setUpdatingPlayers((prev) => new Set(prev).add(playerId));
+
       const existingTx = peladaTransactions.find(
         (t) =>
           t.player_id === playerId &&
@@ -219,31 +252,18 @@ export function useAttendance(peladaId: number) {
       );
 
       if (existingTx) {
-        // Chargeback: reverse the existing transaction
         await endpoints.reverseTransaction(
           pelada.organization_id,
           existingTx.id,
         );
-      } else {
-        // Payment: add new transaction
-        const finalAmount = amount ?? organizationFinance?.diarista_price ?? 0;
-        await endpoints.addTransaction(pelada.organization_id, {
-          player_id: playerId,
-          pelada_id: peladaId,
-          amount: finalAmount,
-          type: "income",
-          category: "diarista_fee",
-          description: `Pagamento Pelada ${peladaId}`,
-          payment_date: new Date().toISOString().split("T")[0],
-        });
+        await fetchData(true);
       }
-      await fetchData(true);
     } catch (err: unknown) {
       console.error(err);
       const message =
         err instanceof Error
           ? err.message
-          : t("organizations.management.finance.transactions.error.add_failed");
+          : t("organizations.management.finance.transactions.error.reverse_failed");
       setError(message);
     } finally {
       setUpdatingPlayers((prev) => {
@@ -296,5 +316,6 @@ export function useAttendance(peladaId: number) {
     handleCloseAttendance,
     handleAddPlayersFromOrg,
     handleMarkPaid,
+    handleReversePayment,
   };
 }

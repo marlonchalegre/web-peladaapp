@@ -38,6 +38,7 @@ import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import SaveIcon from "@mui/icons-material/Save";
 import UndoIcon from "@mui/icons-material/Undo";
 import { useTranslation } from "react-i18next";
+import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
 import { api as apiClient } from "../../../shared/api/client";
 import {
   createApi,
@@ -105,6 +106,11 @@ export default function FinanceSection({
     category: "other",
     payment_date: new Date().toISOString().split("T")[0],
   });
+
+  const [confirmReverseOpen, setConfirmReverseOpen] = useState(false);
+  const [selectedPayment, setSelectedPayment] = useState<MonthlyPayment | null>(
+    null,
+  );
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -204,13 +210,20 @@ export default function FinanceSection({
 
   const handleMarkPayment = async (player: MonthlyPayment, paid: boolean) => {
     if (!isAdmin) return;
+
+    if (!paid) {
+      setSelectedPayment(player);
+      setConfirmReverseOpen(true);
+      return;
+    }
+
     try {
       setSuccess(null);
       await api.markMonthlyPayment(orgId, {
         player_id: player.player_id,
         year: selectedYear,
         month: selectedMonth,
-        paid: paid,
+        paid: true,
         amount: parseFloat(mensalistaPriceStr.replace(",", ".")),
         payment_date: new Date().toISOString().split("T")[0],
       });
@@ -218,6 +231,33 @@ export default function FinanceSection({
       await fetchData();
     } catch (err) {
       console.error("Failed to mark payment", err);
+      setError(
+        t(
+          "organizations.management.finance.monthly_fees.error.update_failed",
+          "Erro ao atualizar pagamento",
+        ),
+      );
+    }
+  };
+
+  const handleConfirmReverse = async () => {
+    if (!isAdmin || !selectedPayment) return;
+    try {
+      setSuccess(null);
+      setConfirmReverseOpen(false);
+      await api.markMonthlyPayment(orgId, {
+        player_id: selectedPayment.player_id,
+        year: selectedYear,
+        month: selectedMonth,
+        paid: false,
+        amount: parseFloat(mensalistaPriceStr.replace(",", ".")),
+        payment_date: new Date().toISOString().split("T")[0],
+      });
+      setSuccess(t("organizations.management.finance.monthly_fees.success"));
+      setSelectedPayment(null);
+      await fetchData();
+    } catch (err) {
+      console.error("Failed to reverse payment", err);
       setError(
         t(
           "organizations.management.finance.monthly_fees.error.update_failed",
@@ -486,7 +526,7 @@ export default function FinanceSection({
                         >
                           {mp.paid
                             ? t(
-                                "organizations.management.finance.monthly_fees.mark_as_unpaid",
+                                "organizations.management.finance.monthly_fees.reverse",
                               )
                             : t(
                                 "organizations.management.finance.monthly_fees.mark_as_paid",
@@ -899,6 +939,23 @@ export default function FinanceSection({
           </Button>
         </DialogActions>
       </Dialog>
+
+      <PrettyConfirmDialog
+        open={confirmReverseOpen}
+        onClose={() => {
+          setConfirmReverseOpen(false);
+          setSelectedPayment(null);
+        }}
+        onConfirm={handleConfirmReverse}
+        title={t("organizations.management.finance.monthly_fees.reverse")}
+        description={t(
+          "organizations.management.finance.monthly_fees.reverse_confirm",
+        )}
+        confirmLabel={t(
+          "organizations.management.finance.monthly_fees.reverse",
+        )}
+        severity="warning"
+      />
     </Paper>
   );
 }

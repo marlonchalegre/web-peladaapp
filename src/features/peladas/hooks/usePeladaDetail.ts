@@ -576,6 +576,39 @@ export function usePeladaDetail(peladaId: number) {
     }
   };
 
+  const handleReversePayment = async (playerId: number) => {
+    if (!pelada) return;
+    try {
+      setProcessing(true);
+      const existingTx = peladaTransactions.find(
+        (t) =>
+          t.player_id === playerId &&
+          t.type === "income" &&
+          t.category === "diarista_fee" &&
+          t.status === "paid",
+      );
+
+      if (existingTx) {
+        await endpoints.reverseTransaction(
+          pelada.organization_id,
+          existingTx.id,
+        );
+        await fetchPeladaData();
+      }
+    } catch (error: unknown) {
+      console.error(error);
+      const message =
+        error instanceof Error
+          ? error.message
+          : t(
+              "organizations.management.finance.transactions.error.reverse_failed",
+            );
+      setError(message);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   const allPlayerIdsInPelada = useMemo(() => {
     const ids = new Set<number>();
     Object.values(teamPlayers)
@@ -625,6 +658,7 @@ export function usePeladaDetail(peladaId: number) {
     handleUpdatePlayersPerTeam,
     handleAddPlayersFromOrg,
     handleMarkPaid,
+    handleReversePayment,
     allPlayerIdsInPelada,
   };
 }

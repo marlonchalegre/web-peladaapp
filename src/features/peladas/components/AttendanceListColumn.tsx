@@ -22,9 +22,10 @@ interface AttendanceListColumnProps {
   peladaTransactions?: Transaction[];
   organizationFinance?: OrganizationFinance;
   onMarkPaid?: (playerId: number, amount: number) => void;
-}
+  onReversePayment?: (playerId: number) => void;
+  }
 
-export default function AttendanceListColumn({
+  export default function AttendanceListColumn({
   icon,
   title,
   count,
@@ -34,11 +35,12 @@ export default function AttendanceListColumn({
   currentUserId,
   onUpdate,
   updatingPlayers,
-  hideHeader = false,
-  peladaTransactions = [],
+  hideHeader,
+  peladaTransactions,
   organizationFinance,
   onMarkPaid,
-}: AttendanceListColumnProps) {
+  onReversePayment,
+  }: AttendanceListColumnProps) {
   return (
     <Box sx={{ width: "100%" }}>
       {!hideHeader && (
@@ -76,6 +78,9 @@ export default function AttendanceListColumn({
                   ? () =>
                       onMarkPaid(p.id, organizationFinance?.diarista_price || 0)
                   : undefined
+              }
+              onReversePayment={
+                onReversePayment ? () => onReversePayment(p.id) : undefined
               }
               data-testid={`attendance-card-${p.user.username || p.user_id}`}
             />

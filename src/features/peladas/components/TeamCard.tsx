@@ -51,6 +51,7 @@ type TeamCardProps = {
   peladaTransactions?: Transaction[];
   organizationFinance?: OrganizationFinance;
   onMarkPaid?: (playerId: number, amount: number) => void;
+  onReversePayment?: (playerId: number) => void;
 };
 
 export default function TeamCard({
@@ -69,6 +70,7 @@ export default function TeamCard({
   peladaTransactions = [],
   organizationFinance,
   onMarkPaid,
+  onReversePayment,
 }: TeamCardProps) {
   const { t } = useTranslation();
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
@@ -90,6 +92,24 @@ export default function TeamCard({
 
   const selectedPlayer = players.find((p) => p.id === selectedPlayerId);
 
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .substring(0, 2);
+  };
+
+  const stringToColor = (string: string) => {
+    let hash = 0;
+    for (let i = 0; i < string.length; i++) {
+      hash = string.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const color = `hsl(${hash % 360}, 60%, 45%)`;
+    return color;
+  };
+
   return (
     <Paper
       elevation={0}
@@ -100,82 +120,46 @@ export default function TeamCard({
         display: "flex",
         flexDirection: "column",
         borderRadius: 4,
-        borderColor: "divider",
-        bgcolor: "background.paper",
-        boxShadow: "0 2px 12px rgba(0,0,0,0.03)",
         overflow: "hidden",
-        transition: "all 0.2s ease-in-out",
-        "&.droppable--over": {
+        borderWidth: 2,
+        transition: "all 0.2s",
+        "&:hover": {
           borderColor: "primary.main",
-          bgcolor: "primary.lighter",
-          transform: "translateY(-4px)",
-          boxShadow: "0 8px 24px rgba(25, 118, 210, 0.12)",
+          boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
         },
       }}
-      className={locked ? undefined : "droppable"}
-      onDragOver={locked ? undefined : (e) => e.preventDefault()}
-      onDragEnter={
-        locked
-          ? undefined
-          : (e) => e.currentTarget.classList.add("droppable--over")
-      }
-      onDragLeave={
-        locked
-          ? undefined
-          : (e) => e.currentTarget.classList.remove("droppable--over")
-      }
-      onDrop={
-        locked
-          ? undefined
-          : async (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              const target = e.currentTarget;
-              try {
-                await onDrop(e);
-              } finally {
-                target.classList.remove("droppable--over");
-              }
-            }
-      }
+      onDragOver={(e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+      }}
+      onDrop={onDrop}
     >
-      {/* Header */}
+      {/* Team Header */}
       <Box
         sx={{
           p: 2,
-          pb: 1.5,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          bgcolor: "rgba(0,0,0,0.02)",
+          bgcolor: "background.paper",
           borderBottom: "1px solid",
           borderColor: "divider",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
         <Box>
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 800,
-              fontSize: "1.15rem",
-              color: "text.primary",
-              letterSpacing: -0.5,
-            }}
-            data-testid="team-card-name"
-          >
+          <Typography variant="h6" sx={{ fontWeight: 800, lineHeight: 1.2 }}>
             {team.name}
           </Typography>
           {averageScore !== null && (
             <Chip
-              label={t("peladas.team_card.average", {
-                score: averageScore.toFixed(1),
-              })}
+              icon={<SportsScoreIcon sx={{ fontSize: "0.9rem !important" }} />}
+              label={`${t("peladas.team_card.average")}: ${averageScore.toFixed(1)}`}
               size="small"
               sx={{
                 mt: 0.5,
                 height: 20,
                 fontSize: "0.65rem",
-                fontWeight: 900,
+                fontWeight: 700,
                 bgcolor: "primary.main",
                 color: "white",
                 borderRadius: 1,
@@ -289,10 +273,17 @@ export default function TeamCard({
                     if (isPaid) {
                       return (
                         <Tooltip
-                          title={t(
-                            "organizations.management.finance.monthly_fees.paid",
-                            "Pago",
-                          )}
+                          title={
+                            isAdminOverride && onReversePayment
+                              ? t(
+                                  "organizations.management.finance.monthly_fees.reverse",
+                                  "Estornar",
+                                )
+                              : t(
+                                  "organizations.management.finance.monthly_fees.paid",
+                                  "Pago",
+                                )
+                          }
                         >
                           <Box
                             sx={{
@@ -301,7 +292,28 @@ export default function TeamCard({
                               alignItems: "center",
                             }}
                           >
-                            <PaidIcon fontSize="small" />
+                            {isAdminOverride && onReversePayment ? (
+                              <IconButton
+                                size="small"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onReversePayment(p.id);
+                                }}
+                                data-testid="reverse-payment-button"
+                                sx={{
+                                  color: "success.main",
+                                  p: 0.5,
+                                  "&:hover": {
+                                    color: "error.main",
+                                    bgcolor: "error.light",
+                                  },
+                                }}
+                              >
+                                <PaidIcon fontSize="small" />
+                              </IconButton>
+                            ) : (
+                              <PaidIcon fontSize="small" />
+                            )}
                           </Box>
                         </Tooltip>
                       );
@@ -322,6 +334,7 @@ export default function TeamCard({
                                 organizationFinance?.diarista_price || 0,
                               );
                             }}
+                            data-testid="mark-as-paid-button"
                             sx={{
                               color: "warning.main",
                               p: 0.5,
@@ -335,48 +348,25 @@ export default function TeamCard({
                           </IconButton>
                         </Tooltip>
                       );
-                    } else {
-                      return (
-                        <Tooltip
-                          title={t(
-                            "organizations.management.finance.monthly_fees.pending",
-                            "Pendente",
-                          )}
-                        >
-                          <Box
-                            sx={{
-                              color: "warning.main",
-                              display: "flex",
-                              alignItems: "center",
-                            }}
-                          >
-                            <AttachMoneyIcon fontSize="small" />
-                          </Box>
-                        </Tooltip>
-                      );
                     }
+                    return null;
                   })()}
-                <Box
+                <Typography
+                  variant="caption"
                   sx={{
-                    px: 1,
-                    py: 0.25,
-                    bgcolor: "success.lighter",
-                    color: "success.main",
+                    minWidth: 24,
+                    textAlign: "right",
                     fontWeight: 800,
-                    borderRadius: 1.5,
-                    fontSize: "0.75rem",
-                    border: "1px solid",
-                    borderColor: "success.light",
+                    color: "primary.main",
                   }}
                 >
-                  {p.displayScore ?? "-"}
-                </Box>
+                  {p.displayScore}
+                </Typography>
                 {!locked && isAdminOverride && (
                   <IconButton
                     size="small"
                     onClick={(e) => handleOpenMenu(e, p.id)}
-                    sx={{ p: 0.5, color: "text.disabled" }}
-                    aria-label={`more-${p.user?.name}`}
+                    sx={{ p: 0.5 }}
                   >
                     <MoreVertIcon fontSize="small" />
                   </IconButton>
@@ -386,32 +376,26 @@ export default function TeamCard({
           );
         })}
 
-        {/* Placeholder for "Arraste um jogador" */}
-        {!locked &&
+        {emptySlots > 0 &&
           Array.from({ length: emptySlots }).map((_, i) => (
             <Box
-              key={`placeholder-${i}`}
+              key={`empty-${i}`}
               sx={{
-                p: 2,
+                height: 44,
                 borderRadius: 2.5,
-                bgcolor: "background.default",
-                color: "text.disabled",
+                border: "1px dashed",
+                borderColor: "divider",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                height: 56,
-                fontSize: "0.8rem",
-                fontWeight: 600,
-                border: "1.5px dashed",
-                borderColor: "divider",
-                transition: "all 0.2s",
-                "&:hover": {
-                  borderColor: "text.disabled",
-                  bgcolor: "action.hover",
-                },
+                color: "text.disabled",
+                bgcolor: "action.hover",
+                opacity: 0.5,
               }}
             >
-              {t("peladas.team_card.drag_placeholder")}
+              <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                {t("peladas.team_card.empty_slot")}
+              </Typography>
             </Box>
           ))}
       </Stack>
@@ -420,65 +404,37 @@ export default function TeamCard({
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}
         onClose={handleCloseMenu}
+        onClick={handleCloseMenu}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+        PaperProps={{
+          elevation: 3,
+          sx: { borderRadius: 2, minWidth: 180 },
+        }}
       >
-        {fixedGoalkeepersEnabled &&
-          selectedPlayer &&
-          !selectedPlayer.is_goalkeeper && (
-            <MenuItem
-              onClick={async () => {
-                if (selectedPlayerId && onSetGoalkeeper) {
-                  await onSetGoalkeeper(selectedPlayerId);
-                }
-                handleCloseMenu();
-              }}
-            >
-              <ListItemIcon>
-                <SportsScoreIcon fontSize="small" color="primary" />
-              </ListItemIcon>
-              <ListItemText>
-                {t("peladas.teams.menu.set_goalkeeper")}
-              </ListItemText>
-            </MenuItem>
-          )}
         <MenuItem
-          onClick={async () => {
-            if (selectedPlayerId && onRemovePlayer) {
-              await onRemovePlayer(selectedPlayerId);
-            }
-            handleCloseMenu();
+          onClick={() => {
+            if (selectedPlayerId) onSetGoalkeeper?.(selectedPlayerId);
           }}
+          disabled={selectedPlayer?.is_goalkeeper}
+        >
+          <ListItemIcon>
+            <SportsScoreIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("peladas.team_card.set_goalkeeper")}</ListItemText>
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            if (selectedPlayerId) onRemovePlayer?.(selectedPlayerId);
+          }}
+          sx={{ color: "error.main" }}
         >
           <ListItemIcon>
             <DeleteOutlineIcon fontSize="small" color="error" />
           </ListItemIcon>
-          <ListItemText sx={{ color: "error.main" }}>
-            {t("peladas.teams.menu.remove_player")}
-          </ListItemText>
+          <ListItemText>{t("peladas.team_card.remove_player")}</ListItemText>
         </MenuItem>
       </Menu>
     </Paper>
   );
-}
-
-// Helpers
-function stringToColor(string: string) {
-  let hash = 0;
-  for (let i = 0; i < string.length; i++) {
-    hash = string.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  let color = "#";
-  for (let i = 0; i < 3; i++) {
-    const value = (hash >> (i * 8)) & 0xff;
-    color += `00${value.toString(16)}`.slice(-2);
-  }
-  return color;
-}
-
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
 }

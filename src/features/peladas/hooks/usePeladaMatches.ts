@@ -32,6 +32,29 @@ export function usePeladaMatches(peladaId: number) {
   const handleMarkPaid = async (playerId: number, amount?: number) => {
     if (!pelada) return;
     try {
+      // Payment: add new transaction
+      const finalAmount = amount ?? organizationFinance?.diarista_price ?? 0;
+      await endpoints.addTransaction(pelada.organization_id, {
+        player_id: playerId,
+        pelada_id: peladaId,
+        amount: finalAmount,
+        type: "income",
+        category: "diarista_fee",
+        description: `Pagamento Pelada ${peladaId}`,
+        payment_date: new Date().toISOString().split("T")[0],
+      });
+      await refreshData();
+    } catch (error: unknown) {
+      console.error(error);
+      const message =
+        error instanceof Error ? error.message : "Erro ao registrar pagamento.";
+      data.setError(message);
+    }
+  };
+
+  const handleReversePayment = async (playerId: number) => {
+    if (!pelada) return;
+    try {
       const existingTx = peladaTransactions.find(
         (t) =>
           t.player_id === playerId &&
@@ -41,29 +64,16 @@ export function usePeladaMatches(peladaId: number) {
       );
 
       if (existingTx) {
-        // Chargeback: reverse the existing transaction
         await endpoints.reverseTransaction(
           pelada.organization_id,
           existingTx.id,
         );
-      } else {
-        // Payment: add new transaction
-        const finalAmount = amount ?? organizationFinance?.diarista_price ?? 0;
-        await endpoints.addTransaction(pelada.organization_id, {
-          player_id: playerId,
-          pelada_id: peladaId,
-          amount: finalAmount,
-          type: "income",
-          category: "diarista_fee",
-          description: `Pagamento Pelada ${peladaId}`,
-          payment_date: new Date().toISOString().split("T")[0],
-        });
+        await refreshData();
       }
-      await refreshData();
     } catch (error: unknown) {
       console.error(error);
       const message =
-        error instanceof Error ? error.message : "Erro ao registrar pagamento.";
+        error instanceof Error ? error.message : "Erro ao estornar pagamento.";
       data.setError(message);
     }
   };
@@ -307,6 +317,7 @@ export function usePeladaMatches(peladaId: number) {
     pauseMatchTimer: actions.pauseMatchTimer,
     resetMatchTimer: actions.resetMatchTimer,
     handleMarkPaid,
+    handleReversePayment,
     peladaTransactions,
     organizationFinance,
   };

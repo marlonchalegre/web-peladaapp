@@ -20,6 +20,7 @@ interface AvailablePlayerItemProps {
   isPaid?: boolean;
   isAdmin?: boolean;
   onMarkPaid?: () => void;
+  onReversePayment?: () => void;
 }
 
 export default function AvailablePlayerItem({
@@ -30,6 +31,7 @@ export default function AvailablePlayerItem({
   isPaid,
   isAdmin,
   onMarkPaid,
+  onReversePayment,
 }: AvailablePlayerItemProps) {
   const { t } = useTranslation();
   const scoreVal = typeof score === "number" ? score.toFixed(1) : "-";
@@ -95,10 +97,17 @@ export default function AvailablePlayerItem({
         {needsPayment &&
           (isPaid ? (
             <Tooltip
-              title={t(
-                "organizations.management.finance.monthly_fees.paid",
-                "Pago",
-              )}
+              title={
+                isAdmin && onReversePayment
+                  ? t(
+                      "organizations.management.finance.monthly_fees.reverse",
+                      "Estornar",
+                    )
+                  : t(
+                      "organizations.management.finance.monthly_fees.paid",
+                      "Pago",
+                    )
+              }
             >
               <Box
                 sx={{
@@ -107,7 +116,28 @@ export default function AvailablePlayerItem({
                   alignItems: "center",
                 }}
               >
-                <PaidIcon fontSize="small" data-testid="paid-icon" />
+                {isAdmin && onReversePayment ? (
+                  <IconButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onReversePayment();
+                    }}
+                    data-testid="reverse-payment-button"
+                    size="small"
+                    sx={{
+                      color: "success.main",
+                      p: 0.5,
+                      "&:hover": {
+                        color: "error.main",
+                        bgcolor: "error.light",
+                      },
+                    }}
+                  >
+                    <PaidIcon fontSize="small" data-testid="paid-icon" />
+                  </IconButton>
+                ) : (
+                  <PaidIcon fontSize="small" data-testid="paid-icon" />
+                )}
               </Box>
             </Tooltip>
           ) : isAdmin && onMarkPaid ? (

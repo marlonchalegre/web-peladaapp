@@ -97,7 +97,7 @@ describe("AvailablePlayersPanel", () => {
     );
 
     const searchInput = screen.getByPlaceholderText(
-      "peladas.panel.available.filter_placeholder",
+      "peladas.available.search_placeholder",
     );
     fireEvent.change(searchInput, { target: { value: "Alice" } });
 
@@ -147,7 +147,7 @@ describe("AvailablePlayersPanel", () => {
       </ThemeContextProvider>,
     );
 
-    const copyButton = screen.getByText("common.copy");
+    const copyButton = screen.getByText("peladas.available.button.copy_list");
     fireEvent.click(copyButton);
 
     await waitFor(() => {

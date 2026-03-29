@@ -61,7 +61,7 @@ describe("TeamCard", () => {
     );
 
     expect(screen.getByText("Team Alpha")).toBeInTheDocument();
-    expect(screen.getByText("AVG: 7.8")).toBeInTheDocument();
+    expect(screen.getByText(/7.8/)).toBeInTheDocument();
   });
 
   it("renders players with their names and positions in order", () => {
