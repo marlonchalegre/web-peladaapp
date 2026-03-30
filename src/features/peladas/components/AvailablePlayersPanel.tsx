@@ -197,6 +197,7 @@ export default function AvailablePlayersPanel({
             startIcon={<GroupAddIcon />}
             onClick={() => setAddDialogOpen(true)}
             disabled={locked}
+            data-testid="invite-player-button"
             sx={{
               textTransform: "none",
               borderRadius: 2.5,
@@ -217,6 +218,7 @@ export default function AvailablePlayersPanel({
           startIcon={<ContentCopyIcon />}
           onClick={handleCopyPlayers}
           disabled={players.length === 0}
+          data-testid="copy-players-button"
           sx={{
             textTransform: "none",
             color: "text.secondary",
@@ -279,7 +281,7 @@ export default function AvailablePlayersPanel({
         onClose={() => setAddDialogOpen(false)}
         onAdd={onAddPlayersFromOrg}
         organizationId={organizationId}
-        excludeUserIds={allPlayerIdsInPelada}
+        excludePlayerIds={allPlayerIdsInPelada}
       />
     </Box>
   );

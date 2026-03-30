@@ -46,7 +46,6 @@ type TeamCardProps = {
   onSetGoalkeeper?: (playerId: number) => Promise<void>;
   onRemovePlayer?: (playerId: number) => Promise<void>;
   locked?: boolean;
-  fixedGoalkeepersEnabled?: boolean;
   isAdminOverride?: boolean;
   peladaTransactions?: Transaction[];
   organizationFinance?: OrganizationFinance;
@@ -65,7 +64,6 @@ export default function TeamCard({
   onSetGoalkeeper,
   onRemovePlayer,
   locked,
-  fixedGoalkeepersEnabled,
   isAdminOverride = false,
   peladaTransactions = [],
   organizationFinance,
@@ -147,7 +145,11 @@ export default function TeamCard({
         }}
       >
         <Box>
-          <Typography variant="h6" sx={{ fontWeight: 800, lineHeight: 1.2 }}>
+          <Typography
+            variant="h6"
+            sx={{ fontWeight: 800, lineHeight: 1.2 }}
+            data-testid="team-card-name"
+          >
             {team.name}
           </Typography>
           {averageScore !== null && (

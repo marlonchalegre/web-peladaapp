@@ -23,9 +23,9 @@ interface AttendanceListColumnProps {
   organizationFinance?: OrganizationFinance;
   onMarkPaid?: (playerId: number, amount: number) => void;
   onReversePayment?: (playerId: number) => void;
-  }
+}
 
-  export default function AttendanceListColumn({
+export default function AttendanceListColumn({
   icon,
   title,
   count,
@@ -40,7 +40,7 @@ interface AttendanceListColumnProps {
   organizationFinance,
   onMarkPaid,
   onReversePayment,
-  }: AttendanceListColumnProps) {
+}: AttendanceListColumnProps) {
   return (
     <Box sx={{ width: "100%" }}>
       {!hideHeader && (
@@ -56,7 +56,7 @@ interface AttendanceListColumnProps {
       )}
       <Stack spacing={2}>
         {players.map((p) => {
-          const isPaid = peladaTransactions.some(
+          const isPaid = peladaTransactions?.some(
             (t: Transaction) =>
               t.player_id === p.id &&
               t.type === "income" &&

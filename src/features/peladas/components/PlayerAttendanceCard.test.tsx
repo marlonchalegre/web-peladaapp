@@ -153,7 +153,7 @@ describe("PlayerAttendanceCard", () => {
     const { rerender } = render(
       <ThemeContextProvider>
         <PlayerAttendanceCard
-          player={diarista as any}
+          player={diarista as PlayerWithUser}
           isAdmin={true}
           isCurrentUser={false}
           onUpdate={() => {}}
@@ -170,7 +170,7 @@ describe("PlayerAttendanceCard", () => {
     rerender(
       <ThemeContextProvider>
         <PlayerAttendanceCard
-          player={diarista as any}
+          player={diarista as PlayerWithUser}
           isAdmin={true}
           isCurrentUser={false}
           onUpdate={() => {}}

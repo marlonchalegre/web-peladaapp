@@ -219,7 +219,6 @@ export default function PeladaDetailPage() {
             onUpdatePlayersPerTeam={handleUpdatePlayersPerTeam}
             scores={scores}
             isAdminOverride={isAdmin}
-            fixedGoalkeepersEnabled={pelada.fixed_goalkeepers ?? false}
             peladaTransactions={peladaTransactions}
             organizationFinance={organizationFinance || undefined}
             onMarkPaid={handleMarkPaid}

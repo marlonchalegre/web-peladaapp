@@ -7,13 +7,11 @@ import { MemoryRouter } from "react-router-dom";
 const { mockGetPeladaFullDetails, mockEndpoints, mockGetOrganizationFinance } =
   vi.hoisted(() => ({
     mockGetPeladaFullDetails: vi.fn(),
-    mockGetOrganizationFinance: vi
-      .fn()
-      .mockResolvedValue({
-        mensalista_price: 0,
-        diarista_price: 0,
-        currency: "BRL",
-      }),
+    mockGetOrganizationFinance: vi.fn().mockResolvedValue({
+      mensalista_price: 0,
+      diarista_price: 0,
+      currency: "BRL",
+    }),
     mockEndpoints: {
       getPeladaFullDetails: vi.fn(),
       getOrganizationFinance: vi.fn(),

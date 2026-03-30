@@ -32,13 +32,11 @@ vi.mock("../../../shared/api/client", () => ({
 describe("FinanceSection - Calculation Scenarios", () => {
   const mockApi = {
     getFinanceSummary: vi.fn(),
-    getOrganizationFinance: vi
-      .fn()
-      .mockResolvedValue({
-        mensalista_price: 70,
-        diarista_price: 20,
-        currency: "BRL",
-      }),
+    getOrganizationFinance: vi.fn().mockResolvedValue({
+      mensalista_price: 70,
+      diarista_price: 20,
+      currency: "BRL",
+    }),
     listTransactions: vi.fn().mockResolvedValue({ data: [], total: 0 }),
     getMonthlyPayments: vi.fn().mockResolvedValue([]),
     addTransaction: vi.fn().mockResolvedValue({}),

@@ -263,7 +263,9 @@ export function useAttendance(peladaId: number) {
       const message =
         err instanceof Error
           ? err.message
-          : t("organizations.management.finance.transactions.error.reverse_failed");
+          : t(
+              "organizations.management.finance.transactions.error.reverse_failed",
+            );
       setError(message);
     } finally {
       setUpdatingPlayers((prev) => {

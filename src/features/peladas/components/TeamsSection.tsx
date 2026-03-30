@@ -48,7 +48,6 @@ export type TeamsSectionProps = {
   onUpdatePlayersPerTeam?: (count: number) => Promise<void>;
   scores: Record<number, number>;
   isAdminOverride?: boolean;
-  fixedGoalkeepersEnabled?: boolean;
   peladaTransactions?: Transaction[];
   organizationFinance?: OrganizationFinance;
   onMarkPaid?: (playerId: number, amount: number) => void;
@@ -72,7 +71,6 @@ export default function TeamsSection(props: TeamsSectionProps) {
     onUpdatePlayersPerTeam,
     scores,
     isAdminOverride,
-    fixedGoalkeepersEnabled,
     peladaTransactions = [],
     organizationFinance,
     onMarkPaid,
@@ -269,7 +267,6 @@ export default function TeamsSection(props: TeamsSectionProps) {
                   }
                   onRemovePlayer={(playerId) => onRemovePlayer(t.id, playerId)}
                   locked={locked}
-                  fixedGoalkeepersEnabled={fixedGoalkeepersEnabled}
                   isAdminOverride={isAdminOverride}
                   peladaTransactions={peladaTransactions}
                   organizationFinance={organizationFinance}
