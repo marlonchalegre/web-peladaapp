@@ -83,21 +83,32 @@ export default function ScheduleBuilderPage() {
 
       // Try to load existing plan for THIS pelada
       const existingPlan = await endpoints.getSchedulePlan(peladaId);
+      let currentMatchesPerTeam = 2;
+
       if (existingPlan && existingPlan.length > 0) {
         setMatches(existingPlan.map((p) => ({ home: p.home, away: p.away })));
         const totalMatches = existingPlan.length;
         const teamCount = data.teams.length;
         if (teamCount > 0) {
-          setMatchesPerTeam(Math.round((totalMatches * 2) / teamCount));
+          currentMatchesPerTeam = Math.round((totalMatches * 2) / teamCount);
+          setMatchesPerTeam(currentMatchesPerTeam);
         }
         setIsFromFormat(false);
-      } else if (data.teams.length >= 2) {
-        // No plan yet, fetch suggested options
-        const preview = await endpoints.getSchedulePreview(peladaId, 2);
-        setMatches(preview.matches);
+      }
+
+      if (data.teams.length >= 2) {
+        // Always fetch suggestions so they are available in the menu
+        const preview = await endpoints.getSchedulePreview(
+          peladaId,
+          currentMatchesPerTeam,
+        );
+        // Only set matches if there was no existing plan
+        if (!existingPlan || existingPlan.length === 0) {
+          setMatches(preview.matches);
+          setIsFromFormat(preview.is_from_format);
+        }
         setTemplateMatches(preview.template_matches || null);
         setRandomMatches(preview.random_matches || null);
-        setIsFromFormat(preview.is_from_format);
       }
     } catch (err: unknown) {
       const message =
@@ -150,12 +161,28 @@ export default function ScheduleBuilderPage() {
     handleCloseMagicMenu();
   };
 
-  const handleUseRandom = () => {
-    if (randomMatches) {
-      setMatches(randomMatches);
-      setIsFromFormat(false);
-    }
+  const handleUseRandom = async () => {
     handleCloseMagicMenu();
+    try {
+      setLoading(true);
+      // Fetch a fresh preview to ensure randomness/regeneration
+      const preview = await endpoints.getSchedulePreview(
+        peladaId,
+        matchesPerTeam,
+      );
+      setMatches(preview.random_matches || preview.matches);
+      setRandomMatches(preview.random_matches || null);
+      setTemplateMatches(preview.template_matches || null);
+      setIsFromFormat(false);
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : t("peladas.detail.schedule.error.preview_failed");
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleMoveUp = (index: number) => {
@@ -306,6 +333,9 @@ export default function ScheduleBuilderPage() {
                 onChange={(e) => {
                   const val = Number(e.target.value);
                   setMatchesPerTeam(val);
+                  // Clear stale suggestions
+                  setTemplateMatches(null);
+                  setRandomMatches(null);
                   handleFetchOptions(val);
                 }}
                 disabled={loading || teams.length < 2}
@@ -321,16 +351,27 @@ export default function ScheduleBuilderPage() {
               </Select>
             </FormControl>
 
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<AutoFixHighIcon />}
-              onClick={handleMagicClick}
+            <Tooltip title={t("peladas.detail.schedule.button.suggestions")}>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<AutoFixHighIcon />}
+                onClick={handleMagicClick}
+                disabled={loading || teams.length < 2}
+                sx={{ borderRadius: 2, py: 1, px: 3, fontWeight: "bold" }}
+              >
+                {t("peladas.detail.schedule.button.suggestions")}
+              </Button>
+            </Tooltip>
+
+            <IconButton
+              onClick={() => handleFetchOptions()}
               disabled={loading || teams.length < 2}
-              sx={{ borderRadius: 2, py: 1, px: 3, fontWeight: "bold" }}
+              color="primary"
+              sx={{ bgcolor: "action.selected" }}
             >
-              {t("peladas.detail.schedule.button.suggestions")}
-            </Button>
+              <HistoryIcon />
+            </IconButton>
 
             <Menu
               anchorEl={anchorEl}
