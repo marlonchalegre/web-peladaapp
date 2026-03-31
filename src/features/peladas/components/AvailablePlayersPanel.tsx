@@ -6,6 +6,7 @@ import {
   TextField,
   InputAdornment,
   Button,
+  Grid,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
@@ -17,6 +18,7 @@ import type {
   User,
   Transaction,
   OrganizationFinance,
+  Team,
 } from "../../../shared/api/endpoints";
 import { sortPlayersByPosition } from "../utils/playerUtils";
 import {
@@ -38,13 +40,14 @@ type AvailablePlayersPanelProps = {
   allPlayerIdsInPelada: number[];
   locked?: boolean;
   isAdmin?: boolean;
-  totalPlayersInPelada: number;
-  averagePelada: number;
-  balance: number;
   peladaTransactions?: Transaction[];
   organizationFinance?: OrganizationFinance;
   onMarkPaid?: (playerId: number, amount: number) => void;
   onReversePayment?: (playerId: number) => void;
+  teams?: Team[];
+  onMoveToTeam?: (playerId: number, teamId: number) => void;
+  onMoveToFixedGk?: (playerId: number, side: "home" | "away") => void;
+  hasFixedGoalkeepers?: boolean;
 };
 
 export default function AvailablePlayersPanel({
@@ -57,13 +60,14 @@ export default function AvailablePlayersPanel({
   allPlayerIdsInPelada,
   locked,
   isAdmin = false,
-  totalPlayersInPelada,
-  averagePelada,
-  balance,
   peladaTransactions = [],
   organizationFinance,
   onMarkPaid,
   onReversePayment,
+  teams = [],
+  onMoveToTeam,
+  onMoveToFixedGk,
+  hasFixedGoalkeepers = false,
 }: AvailablePlayersPanelProps) {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
@@ -107,27 +111,67 @@ export default function AvailablePlayersPanel({
         onDrop={onDropToBench}
       >
         <Stack
-          direction="row"
+          direction={{ xs: "column", sm: "row" }}
           justifyContent="space-between"
-          alignItems="center"
+          alignItems={{ xs: "stretch", sm: "center" }}
           sx={{ mb: 2.5 }}
+          spacing={2}
         >
-          <Typography variant="h6" fontWeight="800">
-            {t("peladas.available.title")}
-          </Typography>
-          <Box
-            sx={{
-              bgcolor: "primary.lighter",
-              color: "primary.main",
-              px: 1.5,
-              py: 0.5,
-              borderRadius: 2,
-              fontWeight: "bold",
-              fontSize: "0.85rem",
-            }}
-          >
-            {players.length}
-          </Box>
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Typography variant="h6" fontWeight="800">
+              {t("peladas.available.title")}
+            </Typography>
+            <Box
+              sx={{
+                bgcolor: "primary.lighter",
+                color: "primary.main",
+                px: 1.5,
+                py: 0.5,
+                borderRadius: 2,
+                fontWeight: "bold",
+                fontSize: "0.85rem",
+              }}
+            >
+              {players.length}
+            </Box>
+          </Stack>
+
+          <Stack direction="row" spacing={1}>
+            {isAdmin && (
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<GroupAddIcon />}
+                onClick={() => setAddDialogOpen(true)}
+                disabled={locked}
+                data-testid="invite-player-button"
+                sx={{
+                  textTransform: "none",
+                  borderRadius: 2,
+                  fontWeight: "bold",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {t("peladas.available.button.add_players")}
+              </Button>
+            )}
+            <Button
+              variant="text"
+              size="small"
+              startIcon={<ContentCopyIcon />}
+              onClick={handleCopyPlayers}
+              disabled={players.length === 0}
+              data-testid="copy-players-button"
+              sx={{
+                textTransform: "none",
+                color: "text.secondary",
+                fontWeight: "bold",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {t("peladas.available.button.copy_list")}
+            </Button>
+          </Stack>
         </Stack>
 
         <TextField
@@ -149,7 +193,7 @@ export default function AvailablePlayersPanel({
           }}
         />
 
-        <Stack spacing={1.5} sx={{ mb: 3 }}>
+        <Grid container spacing={2}>
           {filteredPlayers.map((p) => {
             const isPaid = peladaTransactions.some(
               (t: Transaction) =>
@@ -159,121 +203,62 @@ export default function AvailablePlayersPanel({
                 t.status === "paid",
             );
             return (
-              <AvailablePlayerItem
-                key={p.id}
-                player={p}
-                score={scores[p.id] ?? p.grade ?? null}
-                locked={locked}
-                onDragStart={(e) => onDragStartPlayer(e, p.id)}
-                isPaid={isPaid}
-                isAdmin={isAdmin}
-                onMarkPaid={
-                  onMarkPaid && organizationFinance?.diarista_price
-                    ? () => onMarkPaid(p.id, organizationFinance.diarista_price)
-                    : undefined
-                }
-                onReversePayment={
-                  onReversePayment ? () => onReversePayment(p.id) : undefined
-                }
-              />
+              <Grid key={p.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+                <AvailablePlayerItem
+                  player={p}
+                  score={scores[p.id] ?? p.grade ?? null}
+                  locked={locked}
+                  onDragStart={(e) => onDragStartPlayer(e, p.id)}
+                  isPaid={isPaid}
+                  isAdmin={isAdmin}
+                  onMarkPaid={
+                    onMarkPaid && organizationFinance?.diarista_price
+                      ? () =>
+                          onMarkPaid(p.id, organizationFinance.diarista_price)
+                      : undefined
+                  }
+                  onReversePayment={
+                    onReversePayment ? () => onReversePayment(p.id) : undefined
+                  }
+                  teams={teams}
+                  onMoveToTeam={onMoveToTeam}
+                  onMoveToFixedGk={onMoveToFixedGk}
+                  hasFixedGoalkeepers={hasFixedGoalkeepers}
+                />
+              </Grid>
             );
           })}
-          {filteredPlayers.length === 0 && (
-            <Typography
-              variant="body2"
-              color="text.disabled"
-              align="center"
-              sx={{ py: 4 }}
-            >
-              Nenhum jogador encontrado
-            </Typography>
+          {players.length === 0 && (
+            <Grid size={{ xs: 12 }}>
+              <Typography
+                variant="body1"
+                color="text.disabled"
+                align="center"
+                sx={{
+                  py: 6,
+                  border: "2px dashed",
+                  borderColor: "divider",
+                  borderRadius: 4,
+                  fontWeight: "bold",
+                }}
+              >
+                {t("peladas.available.bench_is_empty")}
+              </Typography>
+            </Grid>
           )}
-        </Stack>
-
-        {isAdmin && (
-          <Button
-            fullWidth
-            variant="outlined"
-            startIcon={<GroupAddIcon />}
-            onClick={() => setAddDialogOpen(true)}
-            disabled={locked}
-            data-testid="invite-player-button"
-            sx={{
-              textTransform: "none",
-              borderRadius: 2.5,
-              py: 1,
-              fontWeight: "bold",
-              borderWidth: 2,
-              mb: 1,
-              "&:hover": { borderWidth: 2 },
-            }}
-          >
-            {t("peladas.available.button.add_players")}
-          </Button>
-        )}
-
-        <Button
-          fullWidth
-          variant="text"
-          startIcon={<ContentCopyIcon />}
-          onClick={handleCopyPlayers}
-          disabled={players.length === 0}
-          data-testid="copy-players-button"
-          sx={{
-            textTransform: "none",
-            color: "text.secondary",
-            fontWeight: "bold",
-          }}
-        >
-          {t("peladas.available.button.copy_list")}
-        </Button>
-      </Paper>
-
-      {/* Stats Summary below panel */}
-      <Paper
-        elevation={0}
-        sx={{
-          mt: 2,
-          p: 2,
-          borderRadius: 4,
-          border: "1px solid",
-          borderColor: "divider",
-          bgcolor: "background.paper",
-        }}
-      >
-        <Stack spacing={1.5}>
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Typography variant="caption" color="text.secondary">
-              Total de Jogadores
-            </Typography>
-            <Typography variant="caption" fontWeight="bold">
-              {totalPlayersInPelada}
-            </Typography>
-          </Box>
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Typography variant="caption" color="text.secondary">
-              Média da Pelada
-            </Typography>
-            <Typography variant="caption" fontWeight="bold">
-              {averagePelada.toFixed(1)}
-            </Typography>
-          </Box>
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Typography variant="caption" color="text.secondary">
-              Saldo Previsto
-            </Typography>
-            <Typography
-              variant="caption"
-              fontWeight="bold"
-              color={balance >= 0 ? "success.main" : "error.main"}
-            >
-              {new Intl.NumberFormat("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              }).format(balance)}
-            </Typography>
-          </Box>
-        </Stack>
+          {players.length > 0 && filteredPlayers.length === 0 && (
+            <Grid size={{ xs: 12 }}>
+              <Typography
+                variant="body2"
+                color="text.disabled"
+                align="center"
+                sx={{ py: 4 }}
+              >
+                {t("peladas.available.no_players_found")}
+              </Typography>
+            </Grid>
+          )}
+        </Grid>
       </Paper>
 
       <AddPlayersFromOrgDialog

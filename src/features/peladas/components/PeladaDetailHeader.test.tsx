@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import PeladaDetailHeader from "./PeladaDetailHeader";
 import type { Pelada } from "../../../shared/api/endpoints";
 import { ThemeContextProvider } from "../../../app/providers/ThemeProvider";
@@ -31,6 +31,9 @@ describe("PeladaDetailHeader", () => {
             onCopyClipboard={() => {}}
             onCopyAnnouncement={() => {}}
             onToggleFixedGk={() => {}}
+            onUpdatePlayersPerTeam={() => {}}
+            onRandomizeTeams={() => {}}
+            playersPerTeam={5}
             changingStatus={false}
             processing={false}
             isAdminOverride={true}
@@ -57,6 +60,9 @@ describe("PeladaDetailHeader", () => {
             onCopyClipboard={() => {}}
             onCopyAnnouncement={() => {}}
             onToggleFixedGk={() => {}}
+            onUpdatePlayersPerTeam={() => {}}
+            onRandomizeTeams={() => {}}
+            playersPerTeam={5}
             changingStatus={false}
             processing={false}
             isAdminOverride={true}
@@ -82,6 +88,9 @@ describe("PeladaDetailHeader", () => {
             onCopyClipboard={() => {}}
             onCopyAnnouncement={() => {}}
             onToggleFixedGk={() => {}}
+            onUpdatePlayersPerTeam={() => {}}
+            onRandomizeTeams={() => {}}
+            playersPerTeam={5}
             changingStatus={false}
             processing={false}
             isAdminOverride={true}
@@ -107,6 +116,9 @@ describe("PeladaDetailHeader", () => {
             onCopyClipboard={() => {}}
             onCopyAnnouncement={() => {}}
             onToggleFixedGk={() => {}}
+            onUpdatePlayersPerTeam={() => {}}
+            onRandomizeTeams={() => {}}
+            playersPerTeam={5}
             changingStatus={false}
             processing={false}
             isAdminOverride={false}
@@ -131,6 +143,9 @@ describe("PeladaDetailHeader", () => {
             onCopyClipboard={() => {}}
             onCopyAnnouncement={() => {}}
             onToggleFixedGk={() => {}}
+            onUpdatePlayersPerTeam={() => {}}
+            onRandomizeTeams={() => {}}
+            playersPerTeam={5}
             changingStatus={false}
             processing={false}
             isAdminOverride={false}
@@ -142,5 +157,115 @@ describe("PeladaDetailHeader", () => {
     expect(
       screen.getByText("peladas.detail.button.view_matches"),
     ).toBeInTheDocument();
+  });
+
+  it("hides Manage Voting button when status is open even for admin", () => {
+    render(
+      <MemoryRouter>
+        <ThemeContextProvider>
+          <PeladaDetailHeader
+            pelada={{ ...mockPelada, is_admin: true }}
+            votingInfo={null}
+            onStartClick={() => {}}
+            onCopyClipboard={() => {}}
+            onCopyAnnouncement={() => {}}
+            onToggleFixedGk={() => {}}
+            onUpdatePlayersPerTeam={() => {}}
+            onRandomizeTeams={() => {}}
+            playersPerTeam={5}
+            changingStatus={false}
+            processing={false}
+          />
+        </ThemeContextProvider>
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.queryByText("peladas.detail.button.manage_voting"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows Manage Voting button when status is NOT open for admin", () => {
+    render(
+      <MemoryRouter>
+        <ThemeContextProvider>
+          <PeladaDetailHeader
+            pelada={{ ...mockPelada, status: "closed", is_admin: true }}
+            votingInfo={null}
+            onStartClick={() => {}}
+            onCopyClipboard={() => {}}
+            onCopyAnnouncement={() => {}}
+            onToggleFixedGk={() => {}}
+            onUpdatePlayersPerTeam={() => {}}
+            onRandomizeTeams={() => {}}
+            playersPerTeam={5}
+            changingStatus={false}
+            processing={false}
+          />
+        </ThemeContextProvider>
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByText("peladas.detail.button.manage_voting"),
+    ).toBeInTheDocument();
+  });
+
+  it("calls onUpdatePlayersPerTeam when stepper buttons are clicked", () => {
+    const onUpdate = vi.fn();
+    render(
+      <MemoryRouter>
+        <ThemeContextProvider>
+          <PeladaDetailHeader
+            pelada={mockPelada}
+            votingInfo={null}
+            onStartClick={() => {}}
+            onCopyClipboard={() => {}}
+            onCopyAnnouncement={() => {}}
+            onToggleFixedGk={() => {}}
+            onUpdatePlayersPerTeam={onUpdate}
+            onRandomizeTeams={() => {}}
+            playersPerTeam={5}
+            changingStatus={false}
+            processing={false}
+            isAdminOverride={true}
+          />
+        </ThemeContextProvider>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("5")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("players-per-team-increment"));
+    expect(onUpdate).toHaveBeenCalledWith(6);
+
+    fireEvent.click(screen.getByTestId("players-per-team-decrement"));
+    expect(onUpdate).toHaveBeenCalledWith(4);
+  });
+  it("calls onRandomizeTeams when randomize button is clicked", () => {
+    const onRandomize = vi.fn();
+    render(
+      <MemoryRouter>
+        <ThemeContextProvider>
+          <PeladaDetailHeader
+            pelada={mockPelada}
+            votingInfo={null}
+            onStartClick={() => {}}
+            onCopyClipboard={() => {}}
+            onCopyAnnouncement={() => {}}
+            onToggleFixedGk={() => {}}
+            onUpdatePlayersPerTeam={() => {}}
+            onRandomizeTeams={onRandomize}
+            playersPerTeam={5}
+            changingStatus={false}
+            processing={false}
+            isAdminOverride={true}
+          />
+        </ThemeContextProvider>
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(screen.getByTestId("randomize-teams-button"));
+    expect(onRandomize).toHaveBeenCalled();
   });
 });

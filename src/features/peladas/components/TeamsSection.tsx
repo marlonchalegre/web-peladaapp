@@ -1,18 +1,14 @@
 import {
   Button,
   Typography,
-  Stack,
   Box,
+  Stack,
   CircularProgress,
-  TextField,
-  InputAdornment,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import AddIcon from "@mui/icons-material/Add";
-import ShuffleIcon from "@mui/icons-material/Shuffle";
 import GroupsIcon from "@mui/icons-material/Groups";
-import PersonIcon from "@mui/icons-material/Person";
-import type { DragEvent } from "react";
+import { type DragEvent } from "react";
 import type {
   Player,
   Team,
@@ -42,12 +38,12 @@ export type TeamsSectionProps = {
     e: DragEvent<HTMLElement>,
     targetTeamId: number,
   ) => Promise<void>;
-  onSetGoalkeeper: (teamId: number, playerId: number) => Promise<void>;
-  onRemovePlayer: (teamId: number, playerId: number) => Promise<void>;
-  onRandomizeTeams: () => Promise<void>;
-  onUpdatePlayersPerTeam?: (count: number) => Promise<void>;
+  onMoveToTeam?: (playerId: number, teamId: number) => void;
+  onSendToBench?: (playerId: number) => void;
+  onMoveToFixedGk?: (playerId: number, side: "home" | "away") => void;
   scores: Record<number, number>;
   isAdminOverride?: boolean;
+  hasFixedGoalkeepers?: boolean;
   peladaTransactions?: Transaction[];
   organizationFinance?: OrganizationFinance;
   onMarkPaid?: (playerId: number, amount: number) => void;
@@ -65,12 +61,12 @@ export default function TeamsSection(props: TeamsSectionProps) {
     onDeleteTeam,
     onDragStartPlayer,
     dropToTeam,
-    onSetGoalkeeper,
-    onRemovePlayer,
-    onRandomizeTeams,
-    onUpdatePlayersPerTeam,
+    onMoveToTeam,
+    onSendToBench,
+    onMoveToFixedGk,
     scores,
     isAdminOverride,
+    hasFixedGoalkeepers,
     peladaTransactions = [],
     organizationFinance,
     onMarkPaid,
@@ -82,11 +78,9 @@ export default function TeamsSection(props: TeamsSectionProps) {
       <Box
         sx={{
           display: "flex",
-          flexDirection: { xs: "column", sm: "row" },
           justifyContent: "space-between",
-          alignItems: { xs: "stretch", sm: "center" },
-          mb: 4,
-          gap: 2,
+          alignItems: "center",
+          mb: 3,
         }}
       >
         <Stack direction="row" spacing={1.5} alignItems="center">
@@ -111,102 +105,9 @@ export default function TeamsSection(props: TeamsSectionProps) {
             {t("peladas.teams.title")}
           </Typography>
         </Stack>
-
-        {!locked && isAdminOverride && (
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-            <TextField
-              size="small"
-              type="number"
-              label={t("organizations.form.pelada.players_per_team")}
-              value={playersPerTeam ?? 5}
-              onChange={(e) => {
-                const val = parseInt(e.target.value, 10);
-                if (!isNaN(val) && val > 0) {
-                  onUpdatePlayersPerTeam?.(val);
-                }
-              }}
-              sx={{
-                width: { xs: "100%", sm: 160 },
-                "& .MuiOutlinedInput-root": { borderRadius: 2 },
-              }}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <PersonIcon fontSize="small" color="action" />
-                  </InputAdornment>
-                ),
-              }}
-              inputProps={{ min: 1 }}
-              data-testid="players-per-team-input"
-            />
-
-            <Stack direction="row" spacing={1}>
-              <Button
-                variant="outlined"
-                onClick={async () => {
-                  await onRandomizeTeams();
-                }}
-                disabled={creatingTeam}
-                data-testid="randomize-teams-button"
-                sx={{
-                  textTransform: "none",
-                  borderRadius: 2,
-                  fontWeight: "bold",
-                  flex: 1,
-                  minWidth: { xs: "40px", sm: "auto" },
-                  px: { xs: 1.5, md: 2 },
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <ShuffleIcon sx={{ mr: { xs: 0, md: 1 } }} />
-                <Box
-                  component="span"
-                  sx={{ display: { xs: "none", md: "inline" } }}
-                >
-                  {t("peladas.teams.button.randomize")}
-                </Box>
-              </Button>
-              <Button
-                variant="contained"
-                onClick={async () => {
-                  await onCreateTeam(
-                    t("peladas.teams.default_name", {
-                      number: teams.length + 1,
-                    }),
-                  );
-                }}
-                disabled={creatingTeam}
-                data-testid="create-team-button"
-                sx={{
-                  textTransform: "none",
-                  borderRadius: 2,
-                  bgcolor: "primary.main",
-                  fontWeight: 800,
-                  boxShadow: "0 4px 12px rgba(25, 118, 210, 0.2)",
-                  px: { xs: 1.5, md: 2 },
-                  minWidth: { xs: "40px", sm: "auto" },
-                  flex: 1,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <AddIcon sx={{ mr: { xs: 0, md: 1 } }} />
-                <Box
-                  component="span"
-                  sx={{ display: { xs: "none", md: "inline" } }}
-                >
-                  {t("peladas.teams.button.create")}
-                </Box>
-              </Button>
-            </Stack>
-          </Stack>
-        )}
       </Box>
 
-      <Box sx={{ position: "relative" }}>
+      <Box sx={{ position: "relative", mt: 2 }}>
         {creatingTeam && (
           <Box
             sx={{
@@ -262,12 +163,13 @@ export default function TeamsSection(props: TeamsSectionProps) {
                   onDragStartPlayer={(e, playerId) =>
                     onDragStartPlayer(e, playerId, t.id)
                   }
-                  onSetGoalkeeper={(playerId) =>
-                    onSetGoalkeeper(t.id, playerId)
-                  }
-                  onRemovePlayer={(playerId) => onRemovePlayer(t.id, playerId)}
+                  onMoveToTeam={onMoveToTeam}
+                  onSendToBench={onSendToBench}
+                  onMoveToFixedGk={onMoveToFixedGk}
+                  teams={teams}
                   locked={locked}
                   isAdminOverride={isAdminOverride}
+                  hasFixedGoalkeepers={hasFixedGoalkeepers}
                   peladaTransactions={peladaTransactions}
                   organizationFinance={organizationFinance}
                   onMarkPaid={onMarkPaid}

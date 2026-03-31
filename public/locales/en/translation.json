@@ -148,6 +148,7 @@
     "year": "Year",
     "filters": "Filters",
     "player": "Player",
+    "recommended": "Recommended",
     "goals": "Goals",
     "goal": "Goal",
     "assists": "Assists",
@@ -548,6 +549,19 @@
       "match_short": "Match"
     },
     "available": {
+      "title": "Players",
+      "search_placeholder": "Search player...",
+      "no_players_found": "No players found",
+      "bench_is_empty": "Bench is empty, you can move players to here",
+      "button": {
+        "add_players": "Add players",
+        "copy_list": "Copy list"
+      },
+      "stats": {
+        "total_players": "Total Players",
+        "average_pelada": "Pelada Average",
+        "expected_balance": "Expected Balance"
+      },
       "error": {
         "add_failed": "Error adding players"
       }
@@ -617,14 +631,16 @@
       "button": {
         "view_matches": "View Matches",
         "start_pelada": "START PELADA",
-        "build_schedule": "Build Schedule",
+        "build_schedule": "Schedule",
         "vote": "Vote on Players",
         "manage_voting": "Manage Voting",
         "change_votes": "Change Votes",
         "view_results": "View Results",
         "copy_teams": "Lineup (With Grades)",
-        "copy_announcement": "Lineup (No Grades)"
+        "copy_announcement": "Lineup (No Grades)",
+        "randomize": "RANDOMIZE"
       },
+      "per_team": "PER TEAM",
       "schedule": {
         "subtitle": "Customize match sequence and details",
         "config": "Configuration",
@@ -664,6 +680,10 @@
         "title": "Start pelada",
         "matches_per_team": "Matches per team",
         "confirm": "Are you sure you want to start the pelada with the generated schedule?"
+      },
+      "swap": {
+        "title": "Substitute Player",
+        "description": "{{incomingPlayer}} will replace which player in {{teamName}}?"
       }
     },
     "matches": {
@@ -780,12 +800,6 @@
       }
     },
     "panel": {
-      "technical_summary": {
-        "title": "Technical Summary",
-        "balance": "Overall Balance",
-        "total_players": "TOTAL PLAYERS",
-        "average": "AVERAGE PELADA"
-      },
       "available": {
         "title": "Players",
         "filter_placeholder": "Filter by name...",
@@ -819,7 +833,11 @@
       },
       "menu": {
         "set_goalkeeper": "Set as Goalkeeper",
-        "remove_player": "Remove from Team"
+        "remove_player": "Remove from Team",
+        "move_to": "Move to {{name}}",
+        "send_to_bench": "Send to Bench",
+        "move_to_home_gk": "Move to Home GK",
+        "move_to_away_gk": "Move to Away GK"
       },
       "fixed_goalkeepers_title": "Session Fixed Goalkeepers",
       "home_goalkeeper": "GOALKEEPER (HOME)",
@@ -830,7 +848,10 @@
     "team_card": {
       "average": "AVG: {{score}}",
       "delete": "Delete team",
-      "drag_placeholder": "Drag a player"
+      "drag_placeholder": "Drag a player",
+      "empty_slot": "Empty slot",
+      "set_goalkeeper": "Set as Goalkeeper",
+      "remove_player": "Remove from Team"
     }
   },
   "pelada": {

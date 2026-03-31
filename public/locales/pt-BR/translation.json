@@ -148,6 +148,7 @@
     "year": "Ano",
     "filters": "Filtros",
     "player": "Jogador",
+    "recommended": "Recomendado",
     "goals": "Gols",
     "goal": "Gol",
     "assists": "Assistências",
@@ -547,6 +548,19 @@
       "match_short": "Part."
     },
     "available": {
+      "title": "Jogadores",
+      "search_placeholder": "Buscar jogador...",
+      "no_players_found": "Nenhum jogador encontrado",
+      "bench_is_empty": "O banco está vazio, você pode mover jogadores para cá",
+      "button": {
+        "add_players": "Adicionar jogadores",
+        "copy_list": "Copiar lista"
+      },
+      "stats": {
+        "total_players": "Total de Jogadores",
+        "average_pelada": "Média da Pelada",
+        "expected_balance": "Saldo Previsto"
+      },
       "error": {
         "add_failed": "Erro ao adicionar jogadores"
       }
@@ -616,14 +630,16 @@
       "button": {
         "view_matches": "Ver Partidas",
         "start_pelada": "INICIAR PELADA",
-        "build_schedule": "Montar Tabela",
+        "build_schedule": "Tabela",
         "vote": "Votar nos Jogadores",
         "manage_voting": "Gerenciar Votação",
         "change_votes": "Alterar Votos",
         "view_results": "Ver Resultados",
         "copy_teams": "Escalação (Com Notas)",
-        "copy_announcement": "Escalação (Sem Notas)"
+        "copy_announcement": "Escalação (Sem Notas)",
+        "randomize": "RANDOMIZAR"
       },
+      "per_team": "POR TIME",
       "schedule": {
         "subtitle": "Personalize a sequência e os detalhes das partidas",
         "config": "Configuração",
@@ -662,7 +678,11 @@
       "start": {
         "title": "Iniciar pelada",
         "matches_per_team": "Partidas por time",
-        "confirm": "Tem certeza que deseja iniciar a pelada com a tabela montada?"
+        "confirm": "Tem certeza que deseja iniciar a pelada com a tabela gerada?"
+      },
+      "swap": {
+        "title": "Substituir Jogador",
+        "description": "{{incomingPlayer}} irá substituir qual jogador no {{teamName}}?"
       }
     },
     "matches": {
@@ -779,12 +799,6 @@
       }
     },
     "panel": {
-      "technical_summary": {
-        "title": "Resumo Técnico",
-        "balance": "Equilíbrio Geral",
-        "total_players": "TOTAL JOGADORES",
-        "average": "MÉDIA PELADA"
-      },
       "available": {
         "title": "Jogadores",
         "filter_placeholder": "Filtrar por nome...",
@@ -818,7 +832,11 @@
       },
       "menu": {
         "set_goalkeeper": "Definir como Goleiro",
-        "remove_player": "Remover do Time"
+        "remove_player": "Remover do Time",
+        "move_to": "Mover para {{name}}",
+        "send_to_bench": "Enviar para o Banco",
+        "move_to_home_gk": "Mover para Goleiro (Casa)",
+        "move_to_away_gk": "Mover para Goleiro (Fora)"
       },
       "fixed_goalkeepers_title": "Goleiros Fixos da Sessão",
       "home_goalkeeper": "GOLEIRO (CASA)",
@@ -829,7 +847,10 @@
     "team_card": {
       "average": "MÉDIA: {{score}}",
       "delete": "Excluir time",
-      "drag_placeholder": "Arraste um jogador"
+      "drag_placeholder": "Arraste um jogador",
+      "empty_slot": "Vaga disponível",
+      "set_goalkeeper": "Definir como Goleiro",
+      "remove_player": "Remover do Time"
     }
   },
   "pelada": {

@@ -63,9 +63,6 @@ describe("AvailablePlayersPanel", () => {
           onAddPlayersFromOrg={async () => {}}
           organizationId={1}
           allPlayerIdsInPelada={[101, 102]}
-          totalPlayersInPelada={2}
-          averagePelada={8.5}
-          balance={100}
           isAdmin={true}
         />
       </ThemeContextProvider>,
@@ -88,9 +85,6 @@ describe("AvailablePlayersPanel", () => {
           onAddPlayersFromOrg={async () => {}}
           organizationId={1}
           allPlayerIdsInPelada={[101, 102]}
-          totalPlayersInPelada={2}
-          averagePelada={8.5}
-          balance={100}
           isAdmin={true}
         />
       </ThemeContextProvider>,
@@ -116,9 +110,6 @@ describe("AvailablePlayersPanel", () => {
           onAddPlayersFromOrg={async () => {}}
           organizationId={1}
           allPlayerIdsInPelada={[101, 102]}
-          totalPlayersInPelada={2}
-          averagePelada={8.5}
-          balance={100}
         />
       </ThemeContextProvider>,
     );
@@ -139,9 +130,6 @@ describe("AvailablePlayersPanel", () => {
           onAddPlayersFromOrg={async () => {}}
           organizationId={1}
           allPlayerIdsInPelada={[101, 102]}
-          totalPlayersInPelada={2}
-          averagePelada={8.5}
-          balance={100}
           isAdmin={true}
         />
       </ThemeContextProvider>,
@@ -154,5 +142,25 @@ describe("AvailablePlayersPanel", () => {
       expect(navigator.clipboard.writeText).toHaveBeenCalled();
       expect(window.alert).toHaveBeenCalledWith("common.actions.copy_success");
     });
+  });
+
+  it("renders empty bench message when players list is empty", () => {
+    render(
+      <ThemeContextProvider>
+        <AvailablePlayersPanel
+          players={[]}
+          scores={{}}
+          onDropToBench={() => {}}
+          onDragStartPlayer={() => {}}
+          onAddPlayersFromOrg={async () => {}}
+          organizationId={1}
+          allPlayerIdsInPelada={[]}
+        />
+      </ThemeContextProvider>,
+    );
+
+    expect(
+      screen.getByText("peladas.available.bench_is_empty"),
+    ).toBeInTheDocument();
   });
 });

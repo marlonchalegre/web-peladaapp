@@ -163,46 +163,6 @@ export function usePeladaDetail(peladaId: number) {
     );
   }, [pelada?.away_fixed_goalkeeper_id, availablePlayers]);
 
-  const stats = useMemo(() => {
-    const allPlayers = [...benchPlayers, ...Object.values(teamPlayers).flat()];
-    const totalPlayers = allPlayers.length + globalGkIds.size;
-
-    const validScores = allPlayers
-      .map((p) => scores[p.id] ?? p.grade)
-      .filter((s): s is number => typeof s === "number");
-
-    const averagePelada =
-      validScores.length > 0
-        ? validScores.reduce((a, b) => a + b, 0) / validScores.length
-        : 0;
-
-    let balance = 0;
-    const teamIds = Object.keys(teamPlayers).map(Number);
-    if (teamIds.length > 1) {
-      const teamAvgs = teamIds.map((tid) => {
-        const tps = teamPlayers[tid];
-        const tScores = tps
-          .map((p) => scores[p.id] ?? p.grade)
-          .filter((s): s is number => typeof s === "number");
-        return tScores.length > 0
-          ? tScores.reduce((a, b) => a + b, 0) / tScores.length
-          : 0;
-      });
-
-      const max = Math.max(...teamAvgs);
-      const min = Math.min(...teamAvgs);
-      if (max === 0) {
-        balance = 100;
-      } else {
-        balance = Math.round((min / max) * 100);
-      }
-    } else if (teamIds.length <= 1) {
-      balance = 100;
-    }
-
-    return { totalPlayers, averagePelada, balance };
-  }, [benchPlayers, teamPlayers, scores, globalGkIds]);
-
   function onDragStartPlayer(
     e: DragEvent<HTMLElement>,
     playerId: number,
@@ -609,6 +569,50 @@ export function usePeladaDetail(peladaId: number) {
     }
   };
 
+  const handlePerformSwap = async (
+    incomingPlayerId: number,
+    targetTeamId: number,
+    sourceTeamId: number | null,
+    playerToReplaceId: number,
+  ) => {
+    setProcessing(true);
+    try {
+      // 1. Remove player to be replaced from target team
+      await endpoints.removePlayerFromTeam(targetTeamId, playerToReplaceId);
+
+      // 2. If incoming player was in a team, remove them first
+      if (sourceTeamId != null) {
+        await endpoints.removePlayerFromTeam(sourceTeamId, incomingPlayerId);
+      } else {
+        // If it was a global GK, unset it
+        if (incomingPlayerId === pelada?.home_fixed_goalkeeper_id) {
+          await api.put(`/api/peladas/${peladaId}`, {
+            home_fixed_goalkeeper_id: null,
+          });
+        } else if (incomingPlayerId === pelada?.away_fixed_goalkeeper_id) {
+          await api.put(`/api/peladas/${peladaId}`, {
+            away_fixed_goalkeeper_id: null,
+          });
+        }
+      }
+
+      // 3. Add incoming player to target team
+      await endpoints.addPlayerToTeam(targetTeamId, incomingPlayerId, false);
+
+      // 4. If incoming player came from a team, move the replaced player to that source team
+      if (sourceTeamId != null) {
+        await endpoints.addPlayerToTeam(sourceTeamId, playerToReplaceId, false);
+      }
+
+      await fetchPeladaData();
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Swap failed";
+      setError(message);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   const allPlayerIdsInPelada = useMemo(() => {
     const ids = new Set<number>();
     Object.values(teamPlayers)
@@ -638,7 +642,6 @@ export function usePeladaDetail(peladaId: number) {
     processing,
     changingStatus,
     live,
-    stats,
     startDialogOpen,
     setStartDialogOpen,
     matchesPerTeam,
@@ -654,11 +657,13 @@ export function usePeladaDetail(peladaId: number) {
     handleBeginPelada,
     handleCreateTeam,
     handleDeleteTeam,
+    handlePerformSwap,
     handleToggleFixedGoalkeepers,
     handleUpdatePlayersPerTeam,
     handleAddPlayersFromOrg,
     handleMarkPaid,
     handleReversePayment,
     allPlayerIdsInPelada,
+    fetchPeladaData,
   };
 }

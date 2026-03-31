@@ -29,6 +29,9 @@ describe("Admin Actions Visibility", () => {
     onCopyClipboard: vi.fn(),
     onCopyAnnouncement: vi.fn(),
     onToggleFixedGk: vi.fn(),
+    onUpdatePlayersPerTeam: vi.fn(),
+    onRandomizeTeams: vi.fn(),
+    playersPerTeam: 5,
 
     changingStatus: false,
 
@@ -45,7 +48,6 @@ describe("Admin Actions Visibility", () => {
     dropToTeam: vi.fn(),
     onSetGoalkeeper: vi.fn(),
     onRemovePlayer: vi.fn(),
-    onRandomizeTeams: vi.fn(),
     scores: {},
   };
 
@@ -112,10 +114,21 @@ describe("Admin Actions Visibility", () => {
         screen.queryByTestId("start-pelada-button"),
       ).not.toBeInTheDocument();
     });
+
+    it("shows Randomize button for admins when open", () => {
+      render(
+        <MemoryRouter>
+          <ThemeContextProvider>
+            <PeladaDetailHeader {...headerProps} isAdminOverride={true} />
+          </ThemeContextProvider>
+        </MemoryRouter>,
+      );
+      expect(screen.getByTestId("randomize-teams-button")).toBeInTheDocument();
+    });
   });
 
   describe("TeamsSection", () => {
-    it("shows Randomize and Create Team buttons for admins when open", () => {
+    it("shows nothing special for admins when open (randomize is in header now)", () => {
       render(
         <ThemeContextProvider>
           <TeamsSection
@@ -125,43 +138,24 @@ describe("Admin Actions Visibility", () => {
           />
         </ThemeContextProvider>,
       );
-      expect(screen.getByTestId("randomize-teams-button")).toBeInTheDocument();
-      expect(screen.getByTestId("create-team-button")).toBeInTheDocument();
-    });
-
-    it("hides Randomize and Create Team buttons for non-admins", () => {
-      render(
-        <ThemeContextProvider>
-          <TeamsSection
-            {...teamsSectionProps}
-            locked={false}
-            isAdminOverride={false}
-          />
-        </ThemeContextProvider>,
-      );
       expect(
         screen.queryByTestId("randomize-teams-button"),
       ).not.toBeInTheDocument();
-      expect(
-        screen.queryByTestId("create-team-button"),
-      ).not.toBeInTheDocument();
     });
 
-    it("hides buttons when locked (running/closed) even for admins", () => {
+    it("hides header randomize button for non-admins", () => {
       render(
-        <ThemeContextProvider>
-          <TeamsSection
-            {...teamsSectionProps}
-            locked={true}
-            isAdminOverride={true}
-          />
-        </ThemeContextProvider>,
+        <MemoryRouter>
+          <ThemeContextProvider>
+            <PeladaDetailHeader
+              {...headerProps}
+              isAdminOverride={false}
+            />
+          </ThemeContextProvider>
+        </MemoryRouter>,
       );
       expect(
         screen.queryByTestId("randomize-teams-button"),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.queryByTestId("create-team-button"),
       ).not.toBeInTheDocument();
     });
   });
