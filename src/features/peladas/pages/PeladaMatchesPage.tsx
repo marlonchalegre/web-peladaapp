@@ -122,7 +122,6 @@ export default function PeladaMatchesPage() {
     resetMatchTimer,
     refreshStats,
     peladaTransactions,
-    organizationFinance,
   } = usePeladaMatches(peladaId);
 
   // Derived admin status
@@ -496,7 +495,6 @@ export default function PeladaMatchesPage() {
                 onSelectMatch={setSelectedMatchId}
                 teamNameById={teamNameById}
                 peladaTransactions={peladaTransactions}
-                organizationFinance={organizationFinance || undefined}
               />
             ) : (
               <Paper sx={{ p: 8, textAlign: "center", borderRadius: 4 }}>
