@@ -20,7 +20,6 @@ import {
   MenuItem as MuiMenuItem,
   FormControl,
   Chip,
-  Menu,
   InputLabel,
   Card,
   CardContent,
@@ -33,7 +32,6 @@ import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import SaveIcon from "@mui/icons-material/Save";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
 import HistoryIcon from "@mui/icons-material/History";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
@@ -59,16 +57,9 @@ export default function ScheduleBuilderPage() {
   const [error, setError] = useState<string | null>(null);
   const [teams, setTeams] = useState<Team[]>([]);
   const [matches, setMatches] = useState<PlannedMatch[]>([]);
-  const [templateMatches, setTemplateMatches] = useState<PlannedMatch[] | null>(
-    null,
-  );
   const [matchesPerTeam, setMatchesPerTeam] = useState<number>(2);
   const [organizationId, setOrganizationId] = useState<number | null>(null);
   const [isFromFormat, setIsFromFormat] = useState(false);
-
-  // Magic Menu State
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const openMagicMenu = Boolean(anchorEl);
 
   const fetchInitialData = useCallback(async () => {
     try {
@@ -93,17 +84,15 @@ export default function ScheduleBuilderPage() {
       }
 
       if (data.teams.length >= 2) {
-        // Always fetch suggestions so they are available in the menu
-        const preview = await endpoints.getSchedulePreview(
-          peladaId,
-          currentMatchesPerTeam,
-        );
-        // Only set matches if there was no existing plan
+        // Fetch algorithmic default if no plan exists
         if (!existingPlan || existingPlan.length === 0) {
+          const preview = await endpoints.getSchedulePreview(
+            peladaId,
+            currentMatchesPerTeam,
+          );
           setMatches(preview.matches);
           setIsFromFormat(preview.is_from_format);
         }
-        setTemplateMatches(preview.template_matches || null);
       }
     } catch (err: unknown) {
       const message =
@@ -126,7 +115,6 @@ export default function ScheduleBuilderPage() {
       setLoading(true);
       const preview = await endpoints.getSchedulePreview(peladaId, val);
       setMatches(preview.matches);
-      setTemplateMatches(preview.template_matches || null);
       setIsFromFormat(preview.is_from_format);
     } catch (err: unknown) {
       const message =
@@ -139,34 +127,14 @@ export default function ScheduleBuilderPage() {
     }
   };
 
-  const handleMagicClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleCloseMagicMenu = () => {
-    setAnchorEl(null);
-  };
-
-  const handleUseTemplate = () => {
-    if (templateMatches) {
-      setMatches(templateMatches);
-      setIsFromFormat(true);
-    }
-    handleCloseMagicMenu();
-  };
-
   const handleResetToDefault = async () => {
-    handleCloseMagicMenu();
     try {
       setLoading(true);
-      // Fetch a fresh preview from the server
       const preview = await endpoints.getSchedulePreview(
         peladaId,
         matchesPerTeam,
       );
-      // Use 'matches' as the system's default response
       setMatches(preview.matches);
-      setTemplateMatches(preview.template_matches || null);
       setIsFromFormat(preview.is_from_format);
     } catch (err: unknown) {
       const message =
@@ -327,8 +295,6 @@ export default function ScheduleBuilderPage() {
                 onChange={(e) => {
                   const val = Number(e.target.value);
                   setMatchesPerTeam(val);
-                  // Clear stale suggestions
-                  setTemplateMatches(null);
                   handleFetchOptions(val);
                 }}
                 disabled={loading || teams.length < 2}
@@ -344,63 +310,16 @@ export default function ScheduleBuilderPage() {
               </Select>
             </FormControl>
 
-            <Tooltip title={t("peladas.detail.schedule.button.suggestions")}>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<AutoFixHighIcon />}
-                onClick={handleMagicClick}
-                disabled={loading || teams.length < 2}
-                sx={{ borderRadius: 2, py: 1, px: 3, fontWeight: "bold" }}
-              >
-                {t("peladas.detail.schedule.button.suggestions")}
-              </Button>
-            </Tooltip>
-
-            <IconButton
-              onClick={() => handleFetchOptions()}
-              disabled={loading || teams.length < 2}
+            <Button
+              variant="contained"
               color="primary"
-              sx={{ bgcolor: "action.selected" }}
+              startIcon={<HistoryIcon />}
+              onClick={handleResetToDefault}
+              disabled={loading || teams.length < 2}
+              sx={{ borderRadius: 2, py: 1, px: 3, fontWeight: "bold" }}
             >
-              <HistoryIcon />
-            </IconButton>
-
-            <Menu
-              anchorEl={anchorEl}
-              open={openMagicMenu}
-              onClose={handleCloseMagicMenu}
-              PaperProps={{ sx: { borderRadius: 2, minWidth: 220, mt: 1 } }}
-            >
-              <MuiMenuItem
-                onClick={handleUseTemplate}
-                disabled={!templateMatches}
-              >
-                <HistoryIcon sx={{ mr: 2, color: "success.main" }} />
-                <Box>
-                  <Typography variant="body2" fontWeight="bold">
-                    {t("peladas.detail.schedule.button.use_template")}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {templateMatches
-                      ? t("peladas.detail.schedule.badge.template")
-                      : t("peladas.detail.schedule.no_template")}
-                  </Typography>
-                </Box>
-              </MuiMenuItem>
-              <Divider />
-              <MuiMenuItem onClick={handleResetToDefault}>
-                <HistoryIcon sx={{ mr: 2, color: "primary.main" }} />
-                <Box>
-                  <Typography variant="body2" fontWeight="bold">
-                    {t("peladas.detail.schedule.button.use_random")}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {t("peladas.detail.schedule.random_tip")}
-                  </Typography>
-                </Box>
-              </MuiMenuItem>
-            </Menu>
+              {t("peladas.detail.schedule.button.use_random")}
+            </Button>
 
             <Box sx={{ flexGrow: 1 }} />
 
