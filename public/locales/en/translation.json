@@ -653,7 +653,7 @@
           "add_match": "New Match",
           "refresh": "Refresh Options",
           "use_template": "Load Last Saved",
-          "use_random": "Generate New Random",
+          "use_random": "Reset to Default",
           "suggestions": "Schedule Suggestions"
         },
         "badge": {
@@ -672,7 +672,7 @@
         "matches_per_team_label": "Matches per Team",
         "no_template": "No saved template for this configuration.",
         "planned_matches": "Planned Matches",
-        "random_tip": "Generate new balanced suggestion"
+        "random_tip": "Reset schedule to algorithmic default"
       }
     },
     "dialog": {

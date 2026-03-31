@@ -652,7 +652,7 @@
           "add_match": "Nova Partida",
           "refresh": "Atualizar Opções",
           "use_template": "Carregar Último Salvo",
-          "use_random": "Gerar Novo Aleatório",
+          "use_random": "Redefinir para o Padrão",
           "suggestions": "Sugestões de Tabela"
         },
         "badge": {
@@ -671,7 +671,7 @@
         "matches_per_team_label": "Partidas por Time",
         "no_template": "Nenhum modelo salvo para esta configuração.",
         "planned_matches": "Partidas Planejadas",
-        "random_tip": "Gerar nova sugestão equilibrada"
+        "random_tip": "Redefinir tabela para o padrão algorítmico"
       }
     },
     "dialog": {

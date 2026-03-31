@@ -35,7 +35,6 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
 import HistoryIcon from "@mui/icons-material/History";
-import CasinoIcon from "@mui/icons-material/Casino";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
@@ -61,9 +60,6 @@ export default function ScheduleBuilderPage() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [matches, setMatches] = useState<PlannedMatch[]>([]);
   const [templateMatches, setTemplateMatches] = useState<PlannedMatch[] | null>(
-    null,
-  );
-  const [randomMatches, setRandomMatches] = useState<PlannedMatch[] | null>(
     null,
   );
   const [matchesPerTeam, setMatchesPerTeam] = useState<number>(2);
@@ -108,7 +104,6 @@ export default function ScheduleBuilderPage() {
           setIsFromFormat(preview.is_from_format);
         }
         setTemplateMatches(preview.template_matches || null);
-        setRandomMatches(preview.random_matches || null);
       }
     } catch (err: unknown) {
       const message =
@@ -132,7 +127,6 @@ export default function ScheduleBuilderPage() {
       const preview = await endpoints.getSchedulePreview(peladaId, val);
       setMatches(preview.matches);
       setTemplateMatches(preview.template_matches || null);
-      setRandomMatches(preview.random_matches || null);
       setIsFromFormat(preview.is_from_format);
     } catch (err: unknown) {
       const message =
@@ -161,19 +155,19 @@ export default function ScheduleBuilderPage() {
     handleCloseMagicMenu();
   };
 
-  const handleUseRandom = async () => {
+  const handleResetToDefault = async () => {
     handleCloseMagicMenu();
     try {
       setLoading(true);
-      // Fetch a fresh preview to ensure randomness/regeneration
+      // Fetch a fresh preview from the server
       const preview = await endpoints.getSchedulePreview(
         peladaId,
         matchesPerTeam,
       );
-      setMatches(preview.random_matches || preview.matches);
-      setRandomMatches(preview.random_matches || null);
+      // Use 'matches' as the system's default response
+      setMatches(preview.matches);
       setTemplateMatches(preview.template_matches || null);
-      setIsFromFormat(false);
+      setIsFromFormat(preview.is_from_format);
     } catch (err: unknown) {
       const message =
         err instanceof Error
@@ -335,7 +329,6 @@ export default function ScheduleBuilderPage() {
                   setMatchesPerTeam(val);
                   // Clear stale suggestions
                   setTemplateMatches(null);
-                  setRandomMatches(null);
                   handleFetchOptions(val);
                 }}
                 disabled={loading || teams.length < 2}
@@ -396,8 +389,8 @@ export default function ScheduleBuilderPage() {
                 </Box>
               </MuiMenuItem>
               <Divider />
-              <MuiMenuItem onClick={handleUseRandom} disabled={!randomMatches}>
-                <CasinoIcon sx={{ mr: 2, color: "primary.main" }} />
+              <MuiMenuItem onClick={handleResetToDefault}>
+                <HistoryIcon sx={{ mr: 2, color: "primary.main" }} />
                 <Box>
                   <Typography variant="body2" fontWeight="bold">
                     {t("peladas.detail.schedule.button.use_random")}
