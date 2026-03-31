@@ -147,10 +147,7 @@ describe("Admin Actions Visibility", () => {
       render(
         <MemoryRouter>
           <ThemeContextProvider>
-            <PeladaDetailHeader
-              {...headerProps}
-              isAdminOverride={false}
-            />
+            <PeladaDetailHeader {...headerProps} isAdminOverride={false} />
           </ThemeContextProvider>
         </MemoryRouter>,
       );

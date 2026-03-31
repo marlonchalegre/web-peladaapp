@@ -32,8 +32,6 @@ interface MatchPlayerCardProps {
   ) => void;
   onSubClick: () => void;
   isPaid?: boolean;
-  onMarkPaid?: () => void;
-  onReversePayment?: () => void;
 }
 
 export default function MatchPlayerCard({
@@ -46,8 +44,6 @@ export default function MatchPlayerCard({
   onStatChange,
   onSubClick,
   isPaid,
-  onMarkPaid,
-  onReversePayment,
 }: MatchPlayerCardProps) {
   const { t } = useTranslation();
   const theme = useTheme();
@@ -184,17 +180,10 @@ export default function MatchPlayerCard({
                   if (isPaid) {
                     return (
                       <Tooltip
-                        title={
-                          isAdmin && onReversePayment
-                            ? t(
-                                "organizations.management.finance.monthly_fees.reverse",
-                                "Estornar",
-                              )
-                            : t(
-                                "organizations.management.finance.monthly_fees.paid",
-                                "Pago",
-                              )
-                        }
+                        title={t(
+                          "organizations.management.finance.monthly_fees.paid",
+                          "Pago",
+                        )}
                       >
                         <Box
                           sx={{
@@ -203,62 +192,11 @@ export default function MatchPlayerCard({
                             alignItems: "center",
                           }}
                         >
-                          {isAdmin && onReversePayment ? (
-                            <IconButton
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onReversePayment();
-                              }}
-                              data-testid="reverse-payment-button"
-                              size="small"
-                              sx={{
-                                color: "success.main",
-                                p: 0.25,
-                                "&:hover": {
-                                  color: "error.main",
-                                  bgcolor: "error.light",
-                                },
-                              }}
-                            >
-                              <PaidIcon
-                                sx={{ fontSize: "1rem" }}
-                                data-testid="paid-icon"
-                              />
-                            </IconButton>
-                          ) : (
-                            <PaidIcon
-                              sx={{ fontSize: "1rem" }}
-                              data-testid="paid-icon"
-                            />
-                          )}
+                          <PaidIcon
+                            sx={{ fontSize: "1rem" }}
+                            data-testid="paid-icon"
+                          />
                         </Box>
-                      </Tooltip>
-                    );
-                  } else if (isAdmin && onMarkPaid) {
-                    return (
-                      <Tooltip
-                        title={t(
-                          "organizations.management.finance.monthly_fees.mark_as_paid",
-                          "Marcar como Pago",
-                        )}
-                      >
-                        <IconButton
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onMarkPaid();
-                          }}
-                          data-testid="mark-as-paid-button"
-                          sx={{
-                            color: "warning.main",
-                            p: 0.25,
-                            "&:hover": {
-                              color: "success.main",
-                              bgcolor: "success.light",
-                            },
-                          }}
-                        >
-                          <AttachMoneyIcon sx={{ fontSize: "1rem" }} />
-                        </IconButton>
                       </Tooltip>
                     );
                   } else {

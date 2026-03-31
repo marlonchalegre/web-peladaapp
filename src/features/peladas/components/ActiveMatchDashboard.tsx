@@ -25,7 +25,6 @@ import type {
   Player,
   Pelada,
   Transaction,
-  OrganizationFinance,
 } from "../../../shared/api/endpoints";
 import MatchScoreHero from "./MatchScoreHero";
 import MatchPlayerCard from "./MatchPlayerCard";
@@ -97,9 +96,6 @@ type Props = {
   onSelectMatch: (id: number) => void;
   teamNameById: Record<number, string>;
   peladaTransactions?: Transaction[];
-  organizationFinance?: OrganizationFinance;
-  onMarkPaid?: (playerId: number, amount: number) => void;
-  onReversePayment?: (playerId: number) => void;
 };
 
 export default function ActiveMatchDashboard(props: Props) {
@@ -134,9 +130,6 @@ export default function ActiveMatchDashboard(props: Props) {
     onSelectMatch,
     teamNameById,
     peladaTransactions = [],
-    organizationFinance,
-    onMarkPaid,
-    onReversePayment,
   } = props;
 
   const { t } = useTranslation();
@@ -370,20 +363,6 @@ export default function ActiveMatchDashboard(props: Props) {
                       })
                     }
                     isPaid={isPaid}
-                    onMarkPaid={
-                      onMarkPaid
-                        ? () =>
-                            onMarkPaid(
-                              p.player_id,
-                              organizationFinance?.diarista_price || 0,
-                            )
-                        : undefined
-                    }
-                    onReversePayment={
-                      onReversePayment
-                        ? () => onReversePayment(p.player_id)
-                        : undefined
-                    }
                   />
                 );
               })}
@@ -452,20 +431,6 @@ export default function ActiveMatchDashboard(props: Props) {
                       })
                     }
                     isPaid={isPaid}
-                    onMarkPaid={
-                      onMarkPaid
-                        ? () =>
-                            onMarkPaid(
-                              p.player_id,
-                              organizationFinance?.diarista_price || 0,
-                            )
-                        : undefined
-                    }
-                    onReversePayment={
-                      onReversePayment
-                        ? () => onReversePayment(p.player_id)
-                        : undefined
-                    }
                   />
                 );
               })}
