@@ -24,7 +24,6 @@ import type {
   TeamPlayer,
   Player,
   Pelada,
-  Transaction,
 } from "../../../shared/api/endpoints";
 import MatchScoreHero from "./MatchScoreHero";
 import MatchPlayerCard from "./MatchPlayerCard";
@@ -95,7 +94,6 @@ type Props = {
   matches: Match[];
   onSelectMatch: (id: number) => void;
   teamNameById: Record<number, string>;
-  peladaTransactions?: Transaction[];
 };
 
 export default function ActiveMatchDashboard(props: Props) {
@@ -129,7 +127,6 @@ export default function ActiveMatchDashboard(props: Props) {
     matches,
     onSelectMatch,
     teamNameById,
-    peladaTransactions = [],
   } = props;
 
   const { t } = useTranslation();
@@ -330,13 +327,6 @@ export default function ActiveMatchDashboard(props: Props) {
             </Box>
             <Stack spacing={1}>
               {homeList.map((p) => {
-                const isPaid = peladaTransactions.some(
-                  (t: Transaction) =>
-                    t.player_id === p.player_id &&
-                    t.type === "income" &&
-                    t.category === "diarista_fee" &&
-                    t.status === "paid",
-                );
                 return (
                   <MatchPlayerCard
                     key={p.player_id}
@@ -362,7 +352,6 @@ export default function ActiveMatchDashboard(props: Props) {
                         type: p.isEmpty ? "add" : "replace",
                       })
                     }
-                    isPaid={isPaid}
                   />
                 );
               })}
@@ -398,13 +387,6 @@ export default function ActiveMatchDashboard(props: Props) {
             </Box>
             <Stack spacing={1}>
               {awayList.map((p) => {
-                const isPaid = peladaTransactions.some(
-                  (t: Transaction) =>
-                    t.player_id === p.player_id &&
-                    t.type === "income" &&
-                    t.category === "diarista_fee" &&
-                    t.status === "paid",
-                );
                 return (
                   <MatchPlayerCard
                     key={p.player_id}
@@ -430,7 +412,6 @@ export default function ActiveMatchDashboard(props: Props) {
                         type: p.isEmpty ? "add" : "replace",
                       })
                     }
-                    isPaid={isPaid}
                   />
                 );
               })}

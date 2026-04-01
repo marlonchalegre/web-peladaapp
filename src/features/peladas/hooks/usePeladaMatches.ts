@@ -20,8 +20,6 @@ export function usePeladaMatches(peladaId: number) {
     matchEvents,
     playerStatsFromApi,
     attendance,
-    peladaTransactions,
-    organizationFinance,
     refreshData,
   } = data;
 
@@ -263,7 +261,5 @@ export function usePeladaMatches(peladaId: number) {
     startMatchTimer: actions.startMatchTimer,
     pauseMatchTimer: actions.pauseMatchTimer,
     resetMatchTimer: actions.resetMatchTimer,
-    peladaTransactions,
-    organizationFinance,
   };
 }
