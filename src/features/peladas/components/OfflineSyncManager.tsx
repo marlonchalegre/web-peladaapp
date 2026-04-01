@@ -139,7 +139,8 @@ export default function OfflineSyncManager({
       if (
         error instanceof Error &&
         error.message &&
-        error.message.includes("Failed to fetch")
+        (error.message.includes("Failed to fetch") ||
+          error.message.includes("Network timeout"))
       ) {
         setSyncError("Conexão perdida durante a sincronização.");
       } else {

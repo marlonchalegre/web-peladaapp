@@ -43,7 +43,8 @@ export function useMatchActions(
       if (
         error instanceof Error &&
         (error.message.includes("Failed to fetch") ||
-          error.message.includes("Network Error"))
+          error.message.includes("Network Error") ||
+          error.message.includes("Network timeout"))
       ) {
         enqueueAction(peladaId, actionType as OfflineActionType, payload);
         return true; // handled
@@ -55,6 +56,7 @@ export function useMatchActions(
 
   const adjustScore = useCallback(
     async (matchId: number, team: "home" | "away", delta: 1 | -1 = 1) => {
+      // Use latest available match data from ref
       const match = matchesRef.current.find((m: Match) => m.id === matchId);
       if (!match) return;
 
@@ -89,6 +91,18 @@ export function useMatchActions(
         ),
       );
 
+      // Update ref immediately to allow rapid clicks to use updated data
+      matchesRef.current = matchesRef.current.map((m: Match) =>
+        m.id === matchId
+          ? {
+              ...m,
+              home_score: newHome,
+              away_score: newAway,
+              status: status === "scheduled" ? m.status : status,
+            }
+          : m,
+      );
+
       setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
 
       if (!navigator.onLine) {
@@ -118,7 +132,6 @@ export function useMatchActions(
               ? error.message
               : t("peladas.matches.error.update_score_failed"),
           );
-          // Optionally revert state here if needed
           throw error;
         }
       } finally {
@@ -261,17 +274,18 @@ export function useMatchActions(
       };
     });
 
+    const payload = { matchId, teamId, playerId };
+    if (!navigator.onLine) {
+      enqueueAction(peladaId, "ADD_PLAYER_TO_TEAM", payload);
+      setSelectMenu(null);
+      return;
+    }
+
     try {
       await endpoints.addMatchLineupPlayer(matchId, teamId, playerId);
       await refreshData();
     } catch (error: unknown) {
-      if (
-        !handleNetworkError(error, "ADD_PLAYER_TO_TEAM", {
-          matchId,
-          teamId,
-          playerId,
-        })
-      ) {
+      if (!handleNetworkError(error, "ADD_PLAYER_TO_TEAM", payload)) {
         setError(
           error instanceof Error
             ? error.message
@@ -304,6 +318,13 @@ export function useMatchActions(
       };
     });
 
+    const payload = { matchId, teamId, outPlayerId, inPlayerId };
+    if (!navigator.onLine) {
+      enqueueAction(peladaId, "REPLACE_PLAYER", payload);
+      setSelectMenu(null);
+      return;
+    }
+
     try {
       await endpoints.replaceMatchLineupPlayer(
         matchId,
@@ -313,14 +334,7 @@ export function useMatchActions(
       );
       await refreshData();
     } catch (error: unknown) {
-      if (
-        !handleNetworkError(error, "REPLACE_PLAYER", {
-          matchId,
-          teamId,
-          outPlayerId,
-          inPlayerId,
-        })
-      ) {
+      if (!handleNetworkError(error, "REPLACE_PLAYER", payload)) {
         setError(
           error instanceof Error
             ? error.message
@@ -339,6 +353,12 @@ export function useMatchActions(
     setPelada((prev: Pelada | null) =>
       prev ? { ...prev, status: "closed" as Pelada["status"] } : prev,
     );
+
+    if (!navigator.onLine) {
+      enqueueAction(peladaId, "CLOSE_PELADA", { peladaId });
+      setClosing(false);
+      return;
+    }
 
     try {
       await endpoints.closePelada(peladaId);
@@ -368,6 +388,18 @@ export function useMatchActions(
     );
 
     setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
+
+    const payload = {
+      matchId,
+      homeScore: match.home_score,
+      awayScore: match.away_score,
+    };
+    if (!navigator.onLine) {
+      enqueueAction(peladaId, "END_MATCH", payload);
+      setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
+      return;
+    }
+
     try {
       if (match.timer_status === "running") {
         await endpoints.pauseMatchTimer(matchId);
@@ -380,13 +412,7 @@ export function useMatchActions(
       );
       await refreshData();
     } catch (error: unknown) {
-      if (
-        !handleNetworkError(error, "END_MATCH", {
-          matchId,
-          homeScore: match.home_score,
-          awayScore: match.away_score,
-        })
-      ) {
+      if (!handleNetworkError(error, "END_MATCH", payload)) {
         setError(
           error instanceof Error
             ? error.message
@@ -405,6 +431,12 @@ export function useMatchActions(
         ? { ...prev, timer_status: "running" as Pelada["timer_status"] }
         : prev,
     );
+
+    if (!navigator.onLine) {
+      enqueueAction(peladaId, "START_PELADA_TIMER", { peladaId });
+      return;
+    }
+
     try {
       await endpoints.startPeladaTimer(peladaId);
       await refreshData();
@@ -419,6 +451,12 @@ export function useMatchActions(
         ? { ...prev, timer_status: "paused" as Pelada["timer_status"] }
         : prev,
     );
+
+    if (!navigator.onLine) {
+      enqueueAction(peladaId, "PAUSE_PELADA_TIMER", { peladaId });
+      return;
+    }
+
     try {
       await endpoints.pausePeladaTimer(peladaId);
       await refreshData();
@@ -437,6 +475,12 @@ export function useMatchActions(
           }
         : prev,
     );
+
+    if (!navigator.onLine) {
+      enqueueAction(peladaId, "RESET_PELADA_TIMER", { peladaId });
+      return;
+    }
+
     try {
       await endpoints.resetPeladaTimer(peladaId);
       await refreshData();
@@ -454,6 +498,12 @@ export function useMatchActions(
             : m,
         ),
       );
+
+      if (!navigator.onLine) {
+        enqueueAction(peladaId, "START_MATCH_TIMER", { matchId });
+        return;
+      }
+
       try {
         await endpoints.startMatchTimer(matchId);
         await refreshData();
@@ -461,7 +511,7 @@ export function useMatchActions(
         handleNetworkError(err, "START_MATCH_TIMER", { matchId });
       }
     },
-    [refreshData, setMatches, handleNetworkError],
+    [peladaId, refreshData, setMatches, handleNetworkError],
   );
 
   const pauseMatchTimer = useCallback(
@@ -473,6 +523,12 @@ export function useMatchActions(
             : m,
         ),
       );
+
+      if (!navigator.onLine) {
+        enqueueAction(peladaId, "PAUSE_MATCH_TIMER", { matchId });
+        return;
+      }
+
       try {
         await endpoints.pauseMatchTimer(matchId);
         await refreshData();
@@ -480,7 +536,7 @@ export function useMatchActions(
         handleNetworkError(err, "PAUSE_MATCH_TIMER", { matchId });
       }
     },
-    [refreshData, setMatches, handleNetworkError],
+    [peladaId, refreshData, setMatches, handleNetworkError],
   );
 
   const resetMatchTimer = useCallback(
@@ -496,6 +552,12 @@ export function useMatchActions(
             : m,
         ),
       );
+
+      if (!navigator.onLine) {
+        enqueueAction(peladaId, "RESET_MATCH_TIMER", { matchId });
+        return;
+      }
+
       try {
         await endpoints.resetMatchTimer(matchId);
         await refreshData();
@@ -503,7 +565,7 @@ export function useMatchActions(
         handleNetworkError(err, "RESET_MATCH_TIMER", { matchId });
       }
     },
-    [refreshData, setMatches, handleNetworkError],
+    [peladaId, refreshData, setMatches, handleNetworkError],
   );
 
   return {

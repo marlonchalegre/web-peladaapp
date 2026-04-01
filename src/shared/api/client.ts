@@ -84,6 +84,30 @@ export class ApiClient {
     return (await res.json()) as T;
   }
 
+  private async fetchWithTimeout(
+    url: string,
+    options: RequestInit,
+    timeout = 10000,
+  ): Promise<Response> {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+      clearTimeout(id);
+      return response;
+    } catch (error: unknown) {
+      clearTimeout(id);
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error("Network timeout: The request took too long to complete");
+      }
+      throw error;
+    }
+  }
+
   async get<T>(
     path: string,
     params?: Record<string, string | number>,
@@ -99,7 +123,7 @@ export class ApiClient {
         url.searchParams.append(key, String(params[key])),
       );
     }
-    const res = await fetch(url.toString(), {
+    const res = await this.fetchWithTimeout(url.toString(), {
       method: "GET",
       headers: this.headers(),
     });
@@ -127,7 +151,7 @@ export class ApiClient {
         url.searchParams.append(key, String(params[key])),
       );
     }
-    const res = await fetch(url.toString(), {
+    const res = await this.fetchWithTimeout(url.toString(), {
       method: "GET",
       headers: this.headers(),
     });
@@ -149,7 +173,7 @@ export class ApiClient {
     if (path.includes("finance/transactions")) {
       console.log("POST to finance/transactions with body:", jsonBody);
     }
-    const res = await fetch(url.toString(), {
+    const res = await this.fetchWithTimeout(url.toString(), {
       method: "POST",
       headers: this.headers(),
       body: jsonBody,
@@ -159,7 +183,7 @@ export class ApiClient {
 
   async put<T>(path: string, body?: unknown): Promise<T> {
     const url = new URL(`${this.baseUrl}${path}`, window.location.origin);
-    const res = await fetch(url.toString(), {
+    const res = await this.fetchWithTimeout(url.toString(), {
       method: "PUT",
       headers: this.headers(),
       body: body ? JSON.stringify(body) : undefined,
@@ -169,7 +193,7 @@ export class ApiClient {
 
   async delete<T>(path: string, body?: unknown): Promise<T> {
     const url = new URL(`${this.baseUrl}${path}`, window.location.origin);
-    const res = await fetch(url.toString(), {
+    const res = await this.fetchWithTimeout(url.toString(), {
       method: "DELETE",
       headers: this.headers(),
       body: body ? JSON.stringify(body) : undefined,
