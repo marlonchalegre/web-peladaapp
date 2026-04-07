@@ -28,6 +28,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
+import { getLocalizedErrorMessage } from "../../../shared/utils/error-handler";
 
 export default function UserProfilePage() {
   const { t } = useTranslation();
@@ -125,11 +126,7 @@ export default function UserProfilePage() {
       setPassword("");
       setConfirmPassword("");
     } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : t("user.profile.error.update_failed");
-      setError(message);
+      setError(getLocalizedErrorMessage(error, t, "user.profile.error.update_failed"));
     } finally {
       setLoading(false);
     }
@@ -143,11 +140,7 @@ export default function UserProfilePage() {
       signOut();
       navigate("/login");
     } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : t("user.profile.error.delete_failed");
-      setError(message);
+      setError(getLocalizedErrorMessage(error, t, "user.profile.error.delete_failed"));
       setLoading(false);
       setDeleteDialogOpen(false);
     }

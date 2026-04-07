@@ -15,6 +15,7 @@ import { register, login } from "../../../shared/api/client";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { getLocalizedErrorMessage } from "../../../shared/utils/error-handler";
 
 const POSITIONS = ["Striker", "Midfielder", "Defender", "Goalkeeper"];
 
@@ -49,11 +50,7 @@ export default function RegisterPage() {
       navigate(redirect);
     } catch (error: unknown) {
       console.error("Registration/Login failed:", error);
-      const message =
-        error instanceof Error
-          ? error.message
-          : t("auth.register.error.failed");
-      setError(message);
+      setError(getLocalizedErrorMessage(error, t, "auth.register.error.failed"));
     } finally {
       setLoading(false);
     }

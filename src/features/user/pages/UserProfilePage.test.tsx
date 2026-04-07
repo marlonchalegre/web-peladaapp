@@ -160,4 +160,32 @@ describe("UserProfilePage", () => {
       });
     });
   });
+
+  it("handles duplicate email error with friendly message", async () => {
+    (getUser as Mock).mockResolvedValue(defaultUser);
+    (updateUserProfile as Mock).mockRejectedValue(
+      new Error("Email already exists"),
+    );
+
+    render(
+      <MemoryRouter>
+        <UserProfilePage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("test@example.com")).toBeInTheDocument();
+    });
+
+    const emailInput = screen.getByLabelText(/common.fields.email/i);
+    fireEvent.change(emailInput, { target: { value: "duplicate@example.com" } });
+
+    fireEvent.click(screen.getByText("user.profile.button.save"));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("common.errors.email_already_exists"),
+      ).toBeInTheDocument();
+    });
+  });
 });

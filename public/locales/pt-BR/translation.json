@@ -193,6 +193,12 @@
       "mensalista": "Mensalista",
       "diarista": "Diarista",
       "convidado": "Convidado"
+    },
+    "errors": {
+      "email_already_exists": "Este email já está sendo usado por outro usuário.",
+      "username_already_exists": "Este username já está sendo usado por outro usuário.",
+      "server_error": "Ocorreu um erro no servidor. Por favor, tente novamente mais tarde.",
+      "unexpected": "Ocorreu um erro inesperado."
     }
   },
   "home": {

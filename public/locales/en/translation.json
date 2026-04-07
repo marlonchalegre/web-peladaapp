@@ -193,6 +193,12 @@
       "mensalista": "Mensalista",
       "diarista": "Diarista",
       "convidado": "Guest"
+    },
+    "errors": {
+      "email_already_exists": "This email is already taken by another user.",
+      "username_already_exists": "This username is already taken by another user.",
+      "server_error": "A server error occurred. Please try again later.",
+      "unexpected": "An unexpected error occurred."
     }
   },
   "home": {
