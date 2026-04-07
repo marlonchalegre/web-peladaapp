@@ -1,4 +1,4 @@
-import { TFunction } from "i18next";
+import type { TFunction } from "i18next";
 
 /**
  * Maps common API error messages to localized strings.
