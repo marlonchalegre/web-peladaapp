@@ -26,6 +26,7 @@ export function PWAInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+  const [showIOSPrompt, setShowIOSPrompt] = useState(false);
 
   const {
     needRefresh: [needRefresh, setNeedRefresh],
@@ -40,6 +41,17 @@ export function PWAInstallPrompt() {
   });
 
   useEffect(() => {
+    // Detect if device is iOS
+    const isIOS =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+
+    // Detect if app is already in standalone mode (installed)
+    const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
+
+    if (isIOS && !isStandalone) {
+      setShowIOSPrompt(true);
+    }
+
     const handleBeforeInstallPrompt = (e: Event) => {
       // Prevent Chrome 67 and earlier from automatically showing the prompt
       e.preventDefault();
@@ -76,6 +88,7 @@ export function PWAInstallPrompt() {
 
   const handleClose = () => {
     setShowInstallPrompt(false);
+    setShowIOSPrompt(false);
     setNeedRefresh(false);
   };
 
@@ -90,20 +103,30 @@ export function PWAInstallPrompt() {
         <Alert
           severity="info"
           action={
-            <Button
-              color="inherit"
-              size="small"
-              onClick={() => updateServiceWorker(true)}
-            >
-              {t("common.update")}
-            </Button>
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <Button
+                color="inherit"
+                size="small"
+                onClick={() => updateServiceWorker(true)}
+              >
+                {t("common.update")}
+              </Button>
+              <IconButton
+                size="small"
+                aria-label="close"
+                color="inherit"
+                onClick={handleClose}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </Box>
           }
         >
           {t("app.new_version_available")}
         </Alert>
       </Snackbar>
 
-      {/* Prompt for install */}
+      {/* Prompt for install (Android/Desktop) */}
       <Snackbar
         open={showInstallPrompt}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
@@ -128,6 +151,29 @@ export function PWAInstallPrompt() {
           }
         >
           <Typography variant="body2">{t("app.install_prompt")}</Typography>
+        </Alert>
+      </Snackbar>
+
+      {/* Prompt for manual install (iOS) */}
+      <Snackbar
+        open={showIOSPrompt}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity="info"
+          icon={<DownloadIcon />}
+          action={
+            <IconButton
+              size="small"
+              aria-label="close"
+              color="inherit"
+              onClick={handleClose}
+            >
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          }
+        >
+          <Typography variant="body2">{t("app.ios_install_prompt")}</Typography>
         </Alert>
       </Snackbar>
     </>

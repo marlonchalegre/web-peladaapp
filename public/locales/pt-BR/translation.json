@@ -4,7 +4,8 @@
     "version": "Versão: {{version}}",
     "development": "versão de desenvolvimento",
     "new_version_available": "Uma nova versão está disponível!",
-    "install_prompt": "Instale o Pelada App para uma melhor experiência!"
+    "install_prompt": "Instale o Pelada App para uma melhor experiência!",
+    "ios_install_prompt": "Para instalar no iPhone/iPad: Toque em 'Compartilhar' e depois em 'Adicionar à Tela de Início'"
   },
   "navigation": {
     "home": "Início",

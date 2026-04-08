@@ -4,7 +4,8 @@
     "version": "Version: {{version}}",
     "development": "development version",
     "new_version_available": "A new version is available!",
-    "install_prompt": "Install Pelada App for a better experience!"
+    "install_prompt": "Install Pelada App for a better experience!",
+    "ios_install_prompt": "To install on iPhone/iPad: Tap 'Share' and then 'Add to Home Screen'"
   },
   "navigation": {
     "home": "Home",
