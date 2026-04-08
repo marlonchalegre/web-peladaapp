@@ -156,22 +156,26 @@ export default defineConfig({
     },
   },
   build: {
+    sourcemap: true,
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: [
-            "react",
-            "react-dom",
-            "react-router-dom",
-            "axios",
-            "i18next",
-          ],
-          mui: [
-            "@mui/material",
-            "@mui/icons-material",
-            "@emotion/react",
-            "@emotion/styled",
-          ],
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (id.includes("@mui")) {
+              return "mui";
+            }
+            if (
+              id.includes("react") ||
+              id.includes("react-dom") ||
+              id.includes("react-router")
+            ) {
+              return "react-core";
+            }
+            if (id.includes("axios") || id.includes("i18next")) {
+              return "utils";
+            }
+            return "vendor";
+          }
         },
       },
     },
