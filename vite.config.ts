@@ -8,6 +8,8 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
+      manifestFilename: "manifest.json",
+      injectRegister: "script",
       devOptions: {
         enabled: true,
       },
@@ -17,7 +19,6 @@ export default defineConfig({
         "apple-icon-180.png",
         "manifest-icon-192.maskable.png",
         "manifest-icon-512.maskable.png",
-        "apple-splash-*.png",
       ],
       manifest: {
         name: "Pelada App",
@@ -29,6 +30,8 @@ export default defineConfig({
         orientation: "portrait",
         scope: "/",
         start_url: "/",
+        id: "/",
+        lang: "pt-BR",
         categories: ["sports", "productivity"],
         shortcuts: [
           {
@@ -36,45 +39,65 @@ export default defineConfig({
             short_name: "Início",
             description: "Ir para a página inicial",
             url: "/",
-            icons: [{ src: "manifest-icon-192.maskable.png", sizes: "192x192" }],
+            icons: [
+              { src: "/manifest-icon-192.maskable.png", sizes: "192x192" },
+            ],
           },
           {
             name: "Meu Perfil",
             short_name: "Perfil",
             description: "Ver meu perfil",
             url: "/profile",
-            icons: [{ src: "manifest-icon-192.maskable.png", sizes: "192x192" }],
+            icons: [
+              { src: "/manifest-icon-192.maskable.png", sizes: "192x192" },
+            ],
           },
         ],
         icons: [
           {
-            src: "manifest-icon-192.maskable.png",
+            src: "/manifest-icon-192.maskable.png",
             sizes: "192x192",
             type: "image/png",
             purpose: "any",
           },
           {
-            src: "manifest-icon-512.maskable.png",
+            src: "/manifest-icon-512.maskable.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "any",
           },
           {
-            src: "manifest-icon-192.maskable.png",
+            src: "/manifest-icon-192.maskable.png",
             sizes: "192x192",
             type: "image/png",
             purpose: "maskable",
           },
           {
-            src: "manifest-icon-512.maskable.png",
+            src: "/manifest-icon-512.maskable.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "maskable",
           },
         ],
+        screenshots: [
+          {
+            src: "/apple-splash-1125-2436.png",
+            sizes: "1125x2436",
+            type: "image/png",
+            form_factor: "narrow",
+            label: "Página Inicial do Pelada App no Celular",
+          },
+          {
+            src: "/apple-splash-2436-1125.png",
+            sizes: "2436x1125",
+            type: "image/png",
+            form_factor: "wide",
+            label: "Página Inicial do Pelada App no Tablet",
+          },
+        ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,json}"],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

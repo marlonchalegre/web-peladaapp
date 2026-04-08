@@ -50,7 +50,9 @@ export default function RegisterPage() {
       navigate(redirect);
     } catch (error: unknown) {
       console.error("Registration/Login failed:", error);
-      setError(getLocalizedErrorMessage(error, t, "auth.register.error.failed"));
+      setError(
+        getLocalizedErrorMessage(error, t, "auth.register.error.failed"),
+      );
     } finally {
       setLoading(false);
     }

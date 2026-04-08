@@ -2,7 +2,9 @@
   "app": {
     "title": "Pelada App",
     "version": "Versão: {{version}}",
-    "development": "versão de desenvolvimento"
+    "development": "versão de desenvolvimento",
+    "new_version_available": "Uma nova versão está disponível!",
+    "install_prompt": "Instale o Pelada App para uma melhor experiência!"
   },
   "navigation": {
     "home": "Início",
@@ -99,6 +101,8 @@
     "copied": "Copiado!",
     "cancel": "Cancelar",
     "confirm": "Confirmar",
+    "update": "Atualizar",
+    "install": "Instalar",
     "delete": "Excluir",
     "create": "Criar",
     "add": "Adicionar",

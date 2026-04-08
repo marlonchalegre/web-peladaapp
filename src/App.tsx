@@ -47,6 +47,7 @@ import PeladaVotingPage from "./features/peladas/pages/PeladaVotingPage";
 import PeladaVotingResultsPage from "./features/peladas/pages/PeladaVotingResultsPage";
 import UserProfilePage from "./features/user/pages/UserProfilePage";
 import { initGA, logPageView, logClickEvent } from "./lib/analytics";
+import { PWAInstallPrompt } from "./shared/components/PWAInstallPrompt";
 
 function AnalyticsTracker() {
   const location = useLocation();
@@ -305,6 +306,7 @@ function AppLayout() {
           </Routes>
         </Box>
         <Footer />
+        <PWAInstallPrompt />
       </Box>
     </BrowserRouter>
   );

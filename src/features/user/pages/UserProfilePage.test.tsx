@@ -178,7 +178,9 @@ describe("UserProfilePage", () => {
     });
 
     const emailInput = screen.getByLabelText(/common.fields.email/i);
-    fireEvent.change(emailInput, { target: { value: "duplicate@example.com" } });
+    fireEvent.change(emailInput, {
+      target: { value: "duplicate@example.com" },
+    });
 
     fireEvent.click(screen.getByText("user.profile.button.save"));
 

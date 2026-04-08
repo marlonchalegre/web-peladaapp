@@ -126,7 +126,9 @@ export default function UserProfilePage() {
       setPassword("");
       setConfirmPassword("");
     } catch (error: unknown) {
-      setError(getLocalizedErrorMessage(error, t, "user.profile.error.update_failed"));
+      setError(
+        getLocalizedErrorMessage(error, t, "user.profile.error.update_failed"),
+      );
     } finally {
       setLoading(false);
     }
@@ -140,7 +142,9 @@ export default function UserProfilePage() {
       signOut();
       navigate("/login");
     } catch (error: unknown) {
-      setError(getLocalizedErrorMessage(error, t, "user.profile.error.delete_failed"));
+      setError(
+        getLocalizedErrorMessage(error, t, "user.profile.error.delete_failed"),
+      );
       setLoading(false);
       setDeleteDialogOpen(false);
     }

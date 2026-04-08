@@ -10,7 +10,7 @@ import type { TFunction } from "i18next";
 export function getLocalizedErrorMessage(
   error: unknown,
   t: TFunction,
-  fallback?: string
+  fallback?: string,
 ): string {
   if (!(error instanceof Error)) {
     return fallback ? t(fallback) : t("common.errors.unexpected");
