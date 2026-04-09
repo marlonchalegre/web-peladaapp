@@ -26,7 +26,13 @@ export function PWAInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
-  const [showIOSPrompt, setShowIOSPrompt] = useState(false);
+
+  // Detect if device is iOS and not already in standalone mode
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window);
+  const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
+
+  // Use state but initialize it based on the detection to avoid extra render cycle or effect warning
+  const [showIOSPrompt, setShowIOSPrompt] = useState(isIOS && !isStandalone);
 
   const {
     needRefresh: [needRefresh, setNeedRefresh],
@@ -41,17 +47,6 @@ export function PWAInstallPrompt() {
   });
 
   useEffect(() => {
-    // Detect if device is iOS
-    const isIOS =
-      /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
-
-    // Detect if app is already in standalone mode (installed)
-    const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
-
-    if (isIOS && !isStandalone) {
-      setShowIOSPrompt(true);
-    }
-
     const handleBeforeInstallPrompt = (e: Event) => {
       // Prevent Chrome 67 and earlier from automatically showing the prompt
       e.preventDefault();

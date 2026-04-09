@@ -34,6 +34,9 @@ export default defineConfig({
         id: "/",
         lang: "pt-BR",
         categories: ["sports", "productivity"],
+        launch_handler: {
+          client_mode: "navigate-existing",
+        },
         shortcuts: [
           {
             name: "Início",
