@@ -19,6 +19,7 @@ export default defineConfig({
         "apple-icon-180.png",
         "manifest-icon-192.maskable.png",
         "manifest-icon-512.maskable.png",
+        "apple-splash-*.png",
       ],
       manifest: {
         name: "Pelada App",
@@ -157,27 +158,5 @@ export default defineConfig({
   },
   build: {
     sourcemap: true,
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes("node_modules")) {
-            if (id.includes("@mui")) {
-              return "mui";
-            }
-            if (
-              id.includes("react") ||
-              id.includes("react-dom") ||
-              id.includes("react-router")
-            ) {
-              return "react-core";
-            }
-            if (id.includes("axios") || id.includes("i18next")) {
-              return "utils";
-            }
-            return "vendor";
-          }
-        },
-      },
-    },
   },
 });
