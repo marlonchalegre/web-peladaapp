@@ -28,7 +28,8 @@ export function PWAInstallPrompt() {
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
 
   // Detect if device is iOS and not already in standalone mode
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window);
+  const isIOS =
+    /iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window);
   const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
 
   // Use state but initialize it based on the detection to avoid extra render cycle or effect warning

@@ -317,4 +317,3 @@ export function getUserAvatarUrl(
   if (!filename) return undefined;
   return `${api.apiBaseUrl || ""}/api/user/${userId}/avatar?t=${encodeURIComponent(filename)}`;
 }
-

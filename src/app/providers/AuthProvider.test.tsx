@@ -27,7 +27,11 @@ vi.mock("react-router-dom", () => ({
 
 // Mock jwt-decode to avoid parsing errors with dummy tokens
 vi.mock("jwt-decode", () => ({
-  jwtDecode: vi.fn(() => ({ id: 1, email: "test@example.com", admin_orgs: [] })),
+  jwtDecode: vi.fn(() => ({
+    id: 1,
+    email: "test@example.com",
+    admin_orgs: [],
+  })),
 }));
 
 // Helper component to test the auth context
@@ -66,7 +70,11 @@ describe("AuthProvider", () => {
     localStorage.clear();
     vi.resetAllMocks();
     // Restore default implementation
-    vi.mocked(jwtDecode).mockImplementation(() => ({ id: 1, email: "test@example.com", admin_orgs: [] }));
+    vi.mocked(jwtDecode).mockImplementation(() => ({
+      id: 1,
+      email: "test@example.com",
+      admin_orgs: [],
+    }));
   });
 
   afterEach(() => {

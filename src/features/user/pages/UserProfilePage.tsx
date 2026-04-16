@@ -19,10 +19,7 @@ import {
   MenuItem,
   IconButton,
 } from "@mui/material";
-import {
-  PhotoCamera,
-  Delete as DeleteIcon,
-} from "@mui/icons-material";
+import { PhotoCamera, Delete as DeleteIcon } from "@mui/icons-material";
 import {
   updateUserProfile,
   getUser,
@@ -96,14 +93,16 @@ export default function UserProfilePage() {
     try {
       const result = await uploadUserAvatar(authUser.id, file);
       setAvatarFilename(result.avatar_filename);
-      
+
       // Update AuthContext
       if (token) {
         signIn(token, { ...authUser, avatar_filename: result.avatar_filename });
       }
       setSuccess(t("user.profile.success.avatar_updated"));
     } catch (err: unknown) {
-      setError(getLocalizedErrorMessage(err, t, "user.profile.error.upload_failed"));
+      setError(
+        getLocalizedErrorMessage(err, t, "user.profile.error.upload_failed"),
+      );
     } finally {
       setLoading(false);
     }
@@ -111,20 +110,22 @@ export default function UserProfilePage() {
 
   const handleAvatarDelete = async () => {
     if (!authUser) return;
-    
+
     setLoading(true);
     setError(null);
     try {
       await deleteUserAvatar(authUser.id);
       setAvatarFilename(null);
-      
+
       // Update AuthContext
       if (token) {
         signIn(token, { ...authUser, avatar_filename: null });
       }
       setSuccess(t("user.profile.success.avatar_deleted"));
     } catch (err: unknown) {
-      setError(getLocalizedErrorMessage(err, t, "user.profile.error.delete_failed"));
+      setError(
+        getLocalizedErrorMessage(err, t, "user.profile.error.delete_failed"),
+      );
     } finally {
       setLoading(false);
     }
@@ -234,52 +235,77 @@ export default function UserProfilePage() {
 
         <Divider sx={{ my: 3 }} />
 
-        <Box sx={{ mb: 4, display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <Typography variant="subtitle2" color="text.secondary" gutterBottom sx={{ alignSelf: "flex-start", mb: 2 }}>
+        <Box
+          sx={{
+            mb: 4,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <Typography
+            variant="subtitle2"
+            color="text.secondary"
+            gutterBottom
+            sx={{ alignSelf: "flex-start", mb: 2 }}
+          >
             {t("user.profile.section.change_avatar")}
           </Typography>
-          
+
           <Box sx={{ position: "relative", display: "inline-block" }}>
             <SecureAvatar
               userId={authUser?.id || 0}
               filename={avatarFilename}
-              sx={{ 
-                width: 100, 
-                height: 100, 
+              sx={{
+                width: 100,
+                height: 100,
                 fontSize: "2rem",
                 bgcolor: "primary.main",
                 border: "2px solid",
-                borderColor: "divider"
+                borderColor: "divider",
               }}
               fallbackText={name.charAt(0).toUpperCase()}
             />
-            
-            <Box sx={{ position: "absolute", bottom: -10, right: -10, display: "flex", gap: 0.5 }}>
+
+            <Box
+              sx={{
+                position: "absolute",
+                bottom: -10,
+                right: -10,
+                display: "flex",
+                gap: 0.5,
+              }}
+            >
               <IconButton
                 color="primary"
                 aria-label="upload picture"
                 component="label"
                 disabled={loading}
-                sx={{ 
-                  bgcolor: "background.paper", 
+                sx={{
+                  bgcolor: "background.paper",
                   boxShadow: 2,
-                  "&:hover": { bgcolor: "grey.100" }
+                  "&:hover": { bgcolor: "grey.100" },
                 }}
               >
-                <input hidden accept="image/*" type="file" onChange={handleAvatarUpload} />
+                <input
+                  hidden
+                  accept="image/*"
+                  type="file"
+                  onChange={handleAvatarUpload}
+                />
                 <PhotoCamera />
               </IconButton>
-              
+
               {avatarFilename && (
                 <IconButton
                   color="error"
                   aria-label="delete picture"
                   disabled={loading}
                   onClick={handleAvatarDelete}
-                  sx={{ 
-                    bgcolor: "background.paper", 
+                  sx={{
+                    bgcolor: "background.paper",
                     boxShadow: 2,
-                    "&:hover": { bgcolor: "grey.100" }
+                    "&:hover": { bgcolor: "grey.100" },
                   }}
                 >
                   <DeleteIcon />

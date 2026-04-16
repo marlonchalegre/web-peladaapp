@@ -1,20 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Avatar, type AvatarProps } from "@mui/material";
 import { api } from "../api/client";
+import { avatarCache } from "../utils/avatar-cache";
 
 interface SecureAvatarProps extends AvatarProps {
   userId: number;
   filename?: string | null;
   fallbackText?: string;
 }
-
-// Global cache for Blob URLs to avoid redundant fetches and memory usage
-// key: full url, value: { blobUrl: string, refCount: number }
-interface CacheEntry {
-  blobUrl: string;
-  refCount: number;
-}
-const avatarCache: Record<string, CacheEntry> = {};
 
 /**
  * A wrapper around MUI Avatar that fetches the image using an authenticated request.
@@ -53,8 +46,8 @@ export const SecureAvatar: React.FC<SecureAvatarProps> = ({
       try {
         const response = await fetch(cacheKey, {
           headers: {
-            "Authorization": `Token ${localStorage.getItem("authToken")}`
-          }
+            Authorization: `Token ${localStorage.getItem("authToken")}`,
+          },
         });
 
         if (!response.ok) {
@@ -89,10 +82,10 @@ export const SecureAvatar: React.FC<SecureAvatarProps> = ({
       if (cleanupTimeoutId) {
         clearTimeout(cleanupTimeoutId);
       }
-      
+
       if (filename && avatarCache[cacheKey]) {
         avatarCache[cacheKey].refCount--;
-        
+
         // Only revoke if nobody else is using this image
         // We use a small timeout to prevent revoking/recreating during quick navigation
         if (avatarCache[cacheKey].refCount <= 0) {
@@ -111,13 +104,14 @@ export const SecureAvatar: React.FC<SecureAvatarProps> = ({
     <Avatar
       {...props}
       src={imageUrl}
+      data-testid="secure-avatar"
       sx={{
         ...sx,
         opacity: loading ? 0.6 : 1,
-        transition: "opacity 0.2s"
+        transition: "opacity 0.2s",
       }}
     >
-      {fallbackText || (props.children)}
+      {fallbackText || props.children}
     </Avatar>
   );
 };
