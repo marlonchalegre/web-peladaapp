@@ -17,12 +17,20 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  IconButton,
 } from "@mui/material";
+import {
+  PhotoCamera,
+  Delete as DeleteIcon,
+} from "@mui/icons-material";
 import {
   updateUserProfile,
   getUser,
   deleteUser,
+  uploadUserAvatar,
+  deleteUserAvatar,
 } from "../../../shared/api/client";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -38,6 +46,7 @@ export default function UserProfilePage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [position, setPosition] = useState("");
+  const [avatarFilename, setAvatarFilename] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -60,6 +69,7 @@ export default function UserProfilePage() {
         setUsername(userData.username);
         setEmail(userData.email || "");
         setPosition(userData.position || "");
+        setAvatarFilename(userData.avatar_filename || null);
       } catch (error) {
         console.error("Failed to load user profile:", error);
         setError(t("user.profile.error.load_failed"));
@@ -70,6 +80,55 @@ export default function UserProfilePage() {
 
     loadUserProfile();
   }, [authUser, navigate, t]);
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !authUser) return;
+
+    // Check size (2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      setError(t("user.profile.error.file_too_large"));
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await uploadUserAvatar(authUser.id, file);
+      setAvatarFilename(result.avatar_filename);
+      
+      // Update AuthContext
+      if (token) {
+        signIn(token, { ...authUser, avatar_filename: result.avatar_filename });
+      }
+      setSuccess(t("user.profile.success.avatar_updated"));
+    } catch (err: unknown) {
+      setError(getLocalizedErrorMessage(err, t, "user.profile.error.upload_failed"));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAvatarDelete = async () => {
+    if (!authUser) return;
+    
+    setLoading(true);
+    setError(null);
+    try {
+      await deleteUserAvatar(authUser.id);
+      setAvatarFilename(null);
+      
+      // Update AuthContext
+      if (token) {
+        signIn(token, { ...authUser, avatar_filename: null });
+      }
+      setSuccess(t("user.profile.success.avatar_deleted"));
+    } catch (err: unknown) {
+      setError(getLocalizedErrorMessage(err, t, "user.profile.error.delete_failed"));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -171,6 +230,63 @@ export default function UserProfilePage() {
           <Typography variant="body2" color="text.secondary" gutterBottom>
             {t("user.profile.subtitle")}
           </Typography>
+        </Box>
+
+        <Divider sx={{ my: 3 }} />
+
+        <Box sx={{ mb: 4, display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Typography variant="subtitle2" color="text.secondary" gutterBottom sx={{ alignSelf: "flex-start", mb: 2 }}>
+            {t("user.profile.section.change_avatar")}
+          </Typography>
+          
+          <Box sx={{ position: "relative", display: "inline-block" }}>
+            <SecureAvatar
+              userId={authUser?.id || 0}
+              filename={avatarFilename}
+              sx={{ 
+                width: 100, 
+                height: 100, 
+                fontSize: "2rem",
+                bgcolor: "primary.main",
+                border: "2px solid",
+                borderColor: "divider"
+              }}
+              fallbackText={name.charAt(0).toUpperCase()}
+            />
+            
+            <Box sx={{ position: "absolute", bottom: -10, right: -10, display: "flex", gap: 0.5 }}>
+              <IconButton
+                color="primary"
+                aria-label="upload picture"
+                component="label"
+                disabled={loading}
+                sx={{ 
+                  bgcolor: "background.paper", 
+                  boxShadow: 2,
+                  "&:hover": { bgcolor: "grey.100" }
+                }}
+              >
+                <input hidden accept="image/*" type="file" onChange={handleAvatarUpload} />
+                <PhotoCamera />
+              </IconButton>
+              
+              {avatarFilename && (
+                <IconButton
+                  color="error"
+                  aria-label="delete picture"
+                  disabled={loading}
+                  onClick={handleAvatarDelete}
+                  sx={{ 
+                    bgcolor: "background.paper", 
+                    boxShadow: 2,
+                    "&:hover": { bgcolor: "grey.100" }
+                  }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              )}
+            </Box>
+          </Box>
         </Box>
 
         <Divider sx={{ my: 3 }} />

@@ -44,6 +44,10 @@ export class ApiClient {
         : null;
   }
 
+  get apiBaseUrl(): string {
+    return this.baseUrl;
+  }
+
   setToken(token: string | null) {
     this.token = token;
   }
@@ -216,6 +220,7 @@ export type User = {
   email?: string;
   admin_orgs?: number[];
   position?: string;
+  avatar_filename?: string | null;
 };
 
 export type UserProfileUpdate = {
@@ -224,6 +229,7 @@ export type UserProfileUpdate = {
   email?: string;
   password?: string;
   position?: string;
+  avatar_filename?: string | null;
 };
 
 export const api = new ApiClient();
@@ -276,3 +282,39 @@ export async function updateUserProfile(
 export async function deleteUser(userId: number): Promise<void> {
   return api.delete<void>(`/api/user/${userId}`);
 }
+
+export async function uploadUserAvatar(
+  id: number,
+  file: File,
+): Promise<{ avatar_filename: string }> {
+  const formData = new FormData();
+  formData.append("avatar", file);
+
+  const res = await fetch(`${api.apiBaseUrl || ""}/api/user/${id}/avatar`, {
+    method: "POST",
+    headers: {
+      Authorization: `Token ${localStorage.getItem("authToken")}`,
+    },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.message || "Failed to upload avatar");
+  }
+
+  return res.json();
+}
+
+export async function deleteUserAvatar(id: number): Promise<void> {
+  return api.delete(`/api/user/${id}/avatar`);
+}
+
+export function getUserAvatarUrl(
+  userId: number,
+  filename?: string | null,
+): string | undefined {
+  if (!filename) return undefined;
+  return `${api.apiBaseUrl || ""}/api/user/${userId}/avatar?t=${encodeURIComponent(filename)}`;
+}
+

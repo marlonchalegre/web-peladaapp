@@ -8,11 +8,11 @@ import {
   ListItemText,
   ListItemIcon,
   TextField,
-  Avatar,
   Box,
 } from "@mui/material";
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import type { Player } from "../../../shared/api/endpoints";
 
 interface PlayerSelectMenuProps {
@@ -92,16 +92,17 @@ export default function PlayerSelectMenu({
                     data-testid={`bench-player-item-${player.id}`}
                   >
                     <ListItemIcon>
-                      <Avatar
+                      <SecureAvatar
+                        userId={player.user_id}
+                        filename={player.avatar_filename}
                         sx={{
                           width: 40,
                           height: 40,
                           fontSize: "0.9rem",
                           fontWeight: "bold",
                         }}
-                      >
-                        {name.substring(0, 2).toUpperCase()}
-                      </Avatar>
+                        fallbackText={name.substring(0, 2).toUpperCase()}
+                      />
                     </ListItemIcon>
                     <ListItemText
                       primary={name}

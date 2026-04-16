@@ -12,7 +12,6 @@ import {
   Typography,
   Box,
   IconButton,
-  Avatar,
   Menu,
   MenuItem,
   Tooltip,
@@ -29,6 +28,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import "dayjs/locale/pt-br";
 import ProtectedRoute from "./app/routing/ProtectedRoute";
+import { SecureAvatar } from "./shared/components/SecureAvatar";
 import LoginPage from "./features/auth/pages/LoginPage";
 import RegisterPage from "./features/auth/pages/RegisterPage";
 import FirstAccessPage from "./features/auth/pages/FirstAccessPage";
@@ -204,16 +204,17 @@ function AppLayout() {
                     sx={{ p: 0, ml: 1 }}
                     data-testid="user-settings-button"
                   >
-                    <Avatar
+                    <SecureAvatar
+                      userId={user?.id || 0}
+                      filename={user?.avatar_filename}
                       sx={{
                         bgcolor: "primary.dark",
                         width: 36,
                         height: 36,
                         fontSize: "0.9rem",
                       }}
-                    >
-                      {user?.name?.charAt(0).toUpperCase() || "U"}
-                    </Avatar>
+                      fallbackText={user?.name?.charAt(0).toUpperCase() || "U"}
+                    />
                   </IconButton>
                 </Tooltip>
                 <Menu

@@ -11,7 +11,6 @@ import {
   Tooltip,
   Box,
   Stack,
-  Avatar,
   Divider,
 } from "@mui/material";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
@@ -20,10 +19,13 @@ import AssistantIcon from "@mui/icons-material/Assistant";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import { useTranslation } from "react-i18next";
 import { useMemo } from "react";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 
 export type PlayerStatRow = {
   playerId: number;
+  userId?: number;
   name: string;
+  avatar_filename?: string | null;
   goals: number;
   assists: number;
   ownGoals: number;
@@ -93,16 +95,17 @@ const HighlightCard = ({
           }}
         >
           <Stack direction="row" alignItems="center" spacing={1.5}>
-            <Avatar
+            <SecureAvatar
+              userId={p.userId || 0}
+              filename={p.avatar_filename}
               sx={{
                 width: 32,
                 height: 32,
                 fontSize: "0.875rem",
                 bgcolor: `${color}.main`,
               }}
-            >
-              {p.name.substring(0, 2).toUpperCase()}
-            </Avatar>
+              fallbackText={p.name.substring(0, 2).toUpperCase()}
+            />
             <Typography variant="body2" fontWeight="bold">
               {p.name}
             </Typography>

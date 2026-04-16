@@ -11,7 +11,6 @@ import {
   Box,
   Grid,
   Paper,
-  Avatar,
   Table,
   TableBody,
   TableCell,
@@ -28,8 +27,9 @@ import RestaurantIcon from "@mui/icons-material/Restaurant";
 import GroupIcon from "@mui/icons-material/Group";
 import axios from "axios";
 import { api } from "../../../shared/api/client";
-import { createApi, type VotingResults } from "../../../shared/api/endpoints";
+import { type VotingResults, createApi } from "../../../shared/api/endpoints";
 import { useTranslation } from "react-i18next";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import { Loading } from "../../../shared/components/Loading";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 
@@ -268,7 +268,9 @@ export default function PeladaVotingResultsPage() {
                 <Grid size={{ xs: 4 }}>
                   {results.mvp[1] && (
                     <Box sx={{ textAlign: "center" }}>
-                      <Avatar
+                      <SecureAvatar
+                        userId={results.mvp[1].user_id || 0}
+                        filename={results.mvp[1].avatar_filename}
                         sx={{
                           bgcolor: "grey.400",
                           width: 56,
@@ -276,9 +278,8 @@ export default function PeladaVotingResultsPage() {
                           mx: "auto",
                           mb: 1,
                         }}
-                      >
-                        2
-                      </Avatar>
+                        fallbackText={results.mvp[1].name.charAt(0)}
+                      />
                       <Typography variant="subtitle2" fontWeight="bold" noWrap>
                         {results.mvp[1].name}
                       </Typography>
@@ -304,7 +305,9 @@ export default function PeladaVotingResultsPage() {
                       <EmojiEventsIcon
                         sx={{ color: "gold", fontSize: 40, mb: 1 }}
                       />
-                      <Avatar
+                      <SecureAvatar
+                        userId={results.mvp[0].user_id || 0}
+                        filename={results.mvp[0].avatar_filename}
                         sx={{
                           bgcolor: "gold",
                           width: 80,
@@ -313,9 +316,8 @@ export default function PeladaVotingResultsPage() {
                           mb: 1,
                           border: "4px solid gold",
                         }}
-                      >
-                        1
-                      </Avatar>
+                        fallbackText={results.mvp[0].name.charAt(0)}
+                      />
                       <Typography variant="h6" fontWeight="bold" noWrap>
                         {results.mvp[0].name}
                       </Typography>
@@ -343,7 +345,9 @@ export default function PeladaVotingResultsPage() {
                 <Grid size={{ xs: 4 }}>
                   {results.mvp[2] && (
                     <Box sx={{ textAlign: "center" }}>
-                      <Avatar
+                      <SecureAvatar
+                        userId={results.mvp[2].user_id || 0}
+                        filename={results.mvp[2].avatar_filename}
                         sx={{
                           bgcolor: "brown",
                           width: 56,
@@ -351,9 +355,8 @@ export default function PeladaVotingResultsPage() {
                           mx: "auto",
                           mb: 1,
                         }}
-                      >
-                        3
-                      </Avatar>
+                        fallbackText={results.mvp[2].name.charAt(0)}
+                      />
                       <Typography variant="subtitle2" fontWeight="bold" noWrap>
                         {results.mvp[2].name}
                       </Typography>

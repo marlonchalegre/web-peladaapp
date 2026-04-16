@@ -21,6 +21,7 @@ export interface User {
   email?: string;
   admin_orgs?: number[];
   position?: string;
+  avatar_filename?: string | null;
 }
 export interface Player {
   id: number;
@@ -31,10 +32,10 @@ export interface Player {
   member_type?: "mensalista" | "diarista" | "convidado";
   user_name?: string;
   user_username?: string;
-  user_email?: string;
   user_position?: string;
-  attendance_status?: AttendanceStatus;
-  attendance_updated_at?: string;
+  avatar_filename?: string | null;
+  position_name?: string;
+  user_email?: string;
 }
 export interface OrganizationAdmin {
   id: number;
@@ -148,6 +149,7 @@ export interface VotingInfo {
     player_id: number;
     name: string;
     position?: string;
+    avatar_filename?: string | null;
     voting_enabled?: boolean;
     goals?: number;
     assists?: number;
@@ -160,8 +162,10 @@ export interface VotingInfo {
 
 export interface PlayerResult {
   player_id: number;
+  user_id?: number;
   name: string;
   position?: string;
+  avatar_filename?: string | null;
   average_stars: number;
   goals: number;
   assists: number;
@@ -257,6 +261,7 @@ export interface Attendance {
   playerId?: number;
   status: string;
   Status?: string;
+  avatar_filename?: string | null;
   updated_at?: string;
   voting_enabled?: boolean;
   player?: Player & { user: User };

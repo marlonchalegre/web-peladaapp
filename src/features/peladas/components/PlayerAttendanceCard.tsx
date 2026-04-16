@@ -2,7 +2,6 @@ import {
   Card,
   CardContent,
   Box,
-  Avatar,
   Typography,
   Stack,
   IconButton,
@@ -15,6 +14,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import PaidIcon from "@mui/icons-material/Paid";
 import { useTranslation } from "react-i18next";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import {
   type AttendanceStatus,
   type OrganizationFinance,
@@ -78,7 +78,9 @@ export default function PlayerAttendanceCard({
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", minWidth: 0 }}>
-          <Avatar
+          <SecureAvatar
+            userId={player.user.id}
+            filename={player.user.avatar_filename || player.avatar_filename}
             sx={{
               width: 36,
               height: 36,
@@ -90,9 +92,8 @@ export default function PlayerAttendanceCard({
               border: isCurrentUser ? "none" : "1px solid",
               borderColor: "divider",
             }}
-          >
-            {initials}
-          </Avatar>
+            fallbackText={initials}
+          />
           <Box sx={{ minWidth: 0 }}>
             <Typography
               variant="body1"

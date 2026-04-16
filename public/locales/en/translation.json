@@ -882,6 +882,7 @@
       "title": "Profile Settings",
       "subtitle": "Update your personal information. Your user score cannot be modified.",
       "section": {
+        "change_avatar": "Profile Picture",
         "change_password": "Change password (leave blank to keep current)",
         "danger_zone": "Danger Zone"
       },
@@ -904,6 +905,8 @@
       },
       "success": {
         "updated": "Profile updated successfully!",
+        "avatar_updated": "Profile picture updated!",
+        "avatar_deleted": "Profile picture removed.",
         "deleted": "Account deleted successfully."
       },
       "error": {
@@ -914,7 +917,9 @@
         "not_authenticated": "User not authenticated",
         "no_changes": "No changes detected",
         "update_failed": "Failed to update profile",
-        "delete_failed": "Failed to delete account"
+        "upload_failed": "Failed to upload profile picture",
+        "delete_failed": "Failed to delete account",
+        "file_too_large": "File too large. Maximum 2MB."
       }
     }
   }
