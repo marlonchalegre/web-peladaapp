@@ -9,7 +9,6 @@ import {
   TableBody,
   Box,
   Typography,
-  Avatar,
   Stack,
   Chip,
   useMediaQuery,
@@ -20,6 +19,7 @@ import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import HandshakeIcon from "@mui/icons-material/Handshake";
 import { useTranslation } from "react-i18next";
 import { type OrganizationPlayerStats } from "../../../shared/api/endpoints";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 
 interface StatsTableProps {
   stats: OrganizationPlayerStats[];
@@ -150,14 +150,15 @@ export default function StatsTable({
               alignItems="center"
               sx={{ mb: 2 }}
             >
-              <Avatar
+              <SecureAvatar
+                userId={row.user_id}
+                filename={row.avatar_filename}
+                fallbackText={row.player_name.charAt(0)}
                 sx={{
                   bgcolor: isDarkMode ? "grey.800" : "grey.200",
                   color: isDarkMode ? "grey.300" : "grey.600",
                 }}
-              >
-                {row.player_name.charAt(0)}
-              </Avatar>
+              />
               <Box>
                 <Typography variant="subtitle1" fontWeight="bold">
                   {row.player_name}
@@ -297,14 +298,15 @@ export default function StatsTable({
             <TableRow key={row.player_id} hover>
               <TableCell>
                 <Stack direction="row" spacing={2} alignItems="center">
-                  <Avatar
+                  <SecureAvatar
+                    userId={row.user_id}
+                    filename={row.avatar_filename}
+                    fallbackText={row.player_name.charAt(0)}
                     sx={{
                       bgcolor: isDarkMode ? "grey.800" : "grey.200",
                       color: isDarkMode ? "grey.300" : "grey.600",
                     }}
-                  >
-                    {row.player_name.charAt(0)}
-                  </Avatar>
+                  />
                   <Box>
                     <Typography variant="body1" fontWeight="bold">
                       {row.player_name}

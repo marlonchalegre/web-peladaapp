@@ -3,7 +3,6 @@ import {
   Card,
   CardContent,
   Typography,
-  Avatar,
   Stack,
   useMediaQuery,
   useTheme,
@@ -14,6 +13,7 @@ import HandshakeIcon from "@mui/icons-material/Handshake";
 import StarIcon from "@mui/icons-material/Star";
 import { useTranslation } from "react-i18next";
 import { type OrganizationPlayerStats } from "../../../shared/api/endpoints";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 
 interface TopStatsCardsProps {
   stats: OrganizationPlayerStats[];
@@ -24,6 +24,8 @@ interface StatCardProps {
   subtitle: string;
   icon: React.ReactNode;
   playerName: string;
+  userId?: number;
+  avatarFilename?: string | null;
   value: string | number;
   unit: string;
 }
@@ -33,6 +35,8 @@ const StatCard = ({
   subtitle,
   icon,
   playerName,
+  userId,
+  avatarFilename,
   value,
   unit,
 }: StatCardProps) => {
@@ -81,7 +85,10 @@ const StatCard = ({
         </Box>
 
         <Stack direction="row" spacing={2} alignItems="center">
-          <Avatar
+          <SecureAvatar
+            userId={userId}
+            filename={avatarFilename}
+            fallbackText={playerName.charAt(0)}
             sx={{
               width: 56,
               height: 56,
@@ -95,9 +102,7 @@ const StatCard = ({
                 ? `1px solid ${alpha(theme.palette.primary.main, 0.3)}`
                 : "none",
             }}
-          >
-            {playerName.charAt(0)}
-          </Avatar>
+          />
           <Box>
             <Typography
               variant="subtitle1"
@@ -150,6 +155,8 @@ export default function TopStatsCards({ stats }: TopStatsCardsProps) {
         subtitle="Top Scorer"
         icon={<SportsSoccerIcon />}
         playerName={topScorer?.player_name || "-"}
+        userId={topScorer?.user_id}
+        avatarFilename={topScorer?.avatar_filename}
         value={topScorer?.goal || 0}
         unit={t("common.goals")}
       />
@@ -158,6 +165,8 @@ export default function TopStatsCards({ stats }: TopStatsCardsProps) {
         subtitle="Top Assister"
         icon={<HandshakeIcon />}
         playerName={topAssister?.player_name || "-"}
+        userId={topAssister?.user_id}
+        avatarFilename={topAssister?.avatar_filename}
         value={topAssister?.assist || 0}
         unit={t("common.assists")}
       />
@@ -166,6 +175,8 @@ export default function TopStatsCards({ stats }: TopStatsCardsProps) {
         subtitle="Most Valuable Player"
         icon={<StarIcon />}
         playerName={topMvp?.player_name || "-"}
+        userId={topMvp?.user_id}
+        avatarFilename={topMvp?.avatar_filename}
         value={topMvp?.avg_rating?.toFixed(1) || "0.0"}
         unit={t("organizations.stats.cards.rating")}
       />

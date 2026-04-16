@@ -116,8 +116,10 @@ export interface PlayerStats {
 }
 export interface OrganizationPlayerStats {
   player_id: number;
+  user_id?: number;
   player_name: string;
   player_position?: string;
+  avatar_filename?: string | null;
   peladas_played: number;
   goal: number;
   assist: number;

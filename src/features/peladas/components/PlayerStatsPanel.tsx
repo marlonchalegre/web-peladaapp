@@ -96,7 +96,7 @@ const HighlightCard = ({
         >
           <Stack direction="row" alignItems="center" spacing={1.5}>
             <SecureAvatar
-              userId={p.userId || 0}
+              userId={p.userId}
               filename={p.avatar_filename}
               sx={{
                 width: 32,
@@ -251,7 +251,17 @@ export default function PlayerStatsPanel({
                 hover
                 sx={{ bgcolor: index % 2 === 1 ? "action.hover" : "inherit" }}
               >
-                <TableCell sx={{ whiteSpace: "nowrap" }}>{p.name}</TableCell>
+                <TableCell sx={{ whiteSpace: "nowrap" }}>
+                  <Stack direction="row" alignItems="center" spacing={1.5}>
+                    <SecureAvatar
+                      userId={p.userId}
+                      filename={p.avatar_filename}
+                      sx={{ width: 28, height: 28, fontSize: "0.75rem" }}
+                      fallbackText={p.name.charAt(0)}
+                    />
+                    <Typography variant="body2">{p.name}</Typography>
+                  </Stack>
+                </TableCell>
                 <TableCell align="center">{p.matchesPlayed ?? "-"}</TableCell>
                 <TableCell align="center" sx={{ fontWeight: "bold" }}>
                   {p.goals}

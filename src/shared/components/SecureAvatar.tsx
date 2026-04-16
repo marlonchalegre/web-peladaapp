@@ -4,7 +4,7 @@ import { api } from "../api/client";
 import { avatarCache } from "../utils/avatar-cache";
 
 interface SecureAvatarProps extends AvatarProps {
-  userId: number;
+  userId?: number;
   filename?: string | null;
   fallbackText?: string;
 }
@@ -26,14 +26,18 @@ export const SecureAvatar: React.FC<SecureAvatarProps> = ({
   useEffect(() => {
     let active = true;
     let cleanupTimeoutId: NodeJS.Timeout | undefined;
+
+    if (!userId || !filename) {
+      setImageUrl(undefined);
+      setLoading(false);
+      return () => {
+        active = false;
+      };
+    }
+
     const cacheKey = `${api.apiBaseUrl || ""}/api/user/${userId}/avatar?t=${filename}`;
 
     const fetchImage = async () => {
-      if (!filename) {
-        setImageUrl(undefined);
-        return;
-      }
-
       // 1. Check Cache
       const existing = avatarCache[cacheKey];
       if (existing) {
@@ -83,7 +87,7 @@ export const SecureAvatar: React.FC<SecureAvatarProps> = ({
         clearTimeout(cleanupTimeoutId);
       }
 
-      if (filename && avatarCache[cacheKey]) {
+      if (avatarCache[cacheKey]) {
         avatarCache[cacheKey].refCount--;
 
         // Only revoke if nobody else is using this image
