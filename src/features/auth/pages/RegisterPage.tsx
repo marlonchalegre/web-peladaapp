@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import {
   Box,
@@ -23,7 +23,7 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { t } = useTranslation();
-  const { signIn } = useAuth();
+  const { signIn, isAuthenticated } = useAuth();
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -31,6 +31,13 @@ export default function RegisterPage() {
   const [position, setPosition] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const redirect = searchParams.get("redirect") || "/";
+      navigate(redirect, { replace: true });
+    }
+  }, [isAuthenticated, navigate, searchParams]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();

@@ -24,7 +24,7 @@ const POSITIONS = ["Striker", "Midfielder", "Defender", "Goalkeeper"];
 export default function FirstAccessPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { signIn } = useAuth();
+  const { signIn, isAuthenticated } = useAuth();
   const [searchParams] = useSearchParams();
 
   const [name, setName] = useState("");
@@ -34,6 +34,13 @@ export default function FirstAccessPage() {
   const [position, setPosition] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const redirect = searchParams.get("redirect") || "/";
+      navigate(redirect, { replace: true });
+    }
+  }, [isAuthenticated, navigate, searchParams]);
 
   useEffect(() => {
     const emailParam = searchParams.get("email");

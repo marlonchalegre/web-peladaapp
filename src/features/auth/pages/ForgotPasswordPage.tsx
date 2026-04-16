@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { FormEvent } from "react";
 import {
   Box,
@@ -11,16 +11,26 @@ import {
   Link as MLink,
 } from "@mui/material";
 import { forgotPassword } from "../../../shared/api/client";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../../app/providers/AuthContext";
 
 export default function ForgotPasswordPage() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const redirect = searchParams.get("redirect") || "/";
+      navigate(redirect, { replace: true });
+    }
+  }, [isAuthenticated, navigate, searchParams]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();

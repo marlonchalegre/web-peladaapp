@@ -14,47 +14,69 @@ type TokenPayload = {
   id: number;
   email: string;
   admin_orgs?: number[];
+  exp?: number;
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(() => {
-    return localStorage.getItem("authToken");
+    const storedToken = localStorage.getItem("authToken");
+    if (!storedToken) return null;
+
+    try {
+      const payload = jwtDecode<TokenPayload>(storedToken);
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("authUser");
+        return null;
+      }
+      return storedToken;
+    } catch (e) {
+      console.error("Failed to decode stored token", e);
+      localStorage.removeItem("authToken");
+      localStorage.removeItem("authUser");
+      return null;
+    }
   });
 
   const [user, setUser] = useState<User | null>(() => {
-    const stored = localStorage.getItem("authUser");
     const storedToken = localStorage.getItem("authToken");
+    if (!storedToken) return null;
 
+    const stored = localStorage.getItem("authUser");
     let u: User | null = null;
     if (stored) {
       u = JSON.parse(stored) as User;
     }
 
-    if (storedToken) {
-      try {
-        const payload = jwtDecode<TokenPayload>(storedToken);
-        if (u) {
-          // Merge admin_orgs from token if they are missing or different
-          if (
-            payload.admin_orgs &&
-            (!u.admin_orgs || u.admin_orgs.length === 0)
-          ) {
-            u.admin_orgs = payload.admin_orgs;
-          }
-        } else if (payload) {
-          // We have a token but no user object in storage,
-          // we'll need to refresh it but let's provide a skeleton
-          u = {
-            id: payload.id,
-            email: payload.email,
-            name: "",
-            username: "",
-            admin_orgs: payload.admin_orgs,
-          };
-        }
-      } catch (e) {
-        console.error("Failed to decode stored token", e);
+    try {
+      const payload = jwtDecode<TokenPayload>(storedToken);
+
+      // Check expiration again to be safe and consistent
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        return null;
       }
+
+      if (u) {
+        // Merge admin_orgs from token if they are missing or different
+        if (
+          payload.admin_orgs &&
+          (!u.admin_orgs || u.admin_orgs.length === 0)
+        ) {
+          u.admin_orgs = payload.admin_orgs;
+        }
+      } else if (payload) {
+        // We have a token but no user object in storage,
+        // we'll need to refresh it but let's provide a skeleton
+        u = {
+          id: payload.id,
+          email: payload.email,
+          name: "",
+          username: "",
+          admin_orgs: payload.admin_orgs,
+        };
+      }
+    } catch {
+      return null;
     }
     return u;
   });
