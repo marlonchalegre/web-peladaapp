@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import WahaConfigSection from "./WahaConfigSection";
-import { createApi } from "../../../shared/api/endpoints";
 
 // Mock react-i18next
 vi.mock("react-i18next", () => ({

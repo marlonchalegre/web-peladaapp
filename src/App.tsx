@@ -48,6 +48,7 @@ import PeladaVotingResultsPage from "./features/peladas/pages/PeladaVotingResult
 import UserProfilePage from "./features/user/pages/UserProfilePage";
 import { initGA, logPageView, logClickEvent } from "./lib/analytics";
 import { PWAInstallPrompt } from "./shared/components/PWAInstallPrompt";
+import { PullToRefresh } from "./shared/components/PullToRefresh";
 
 function AnalyticsTracker() {
   const location = useLocation();
@@ -257,54 +258,56 @@ function AppLayout() {
           </AppBar>
         )}
         <Box component="main" sx={{ flexGrow: 1 }}>
-          <Routes>
-            {/* Rotas públicas sem Container para permitir centralização própria */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/first-access" element={<FirstAccessPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <PullToRefresh>
+            <Routes>
+              {/* Rotas públicas sem Container para permitir centralização própria */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/first-access" element={<FirstAccessPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-            {/* Rotas protegidas sem Container global para permitir controle por página */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/join/:token" element={<JoinOrganizationPage />} />
-              <Route
-                path="/organizations/:id"
-                element={<OrganizationDetailPage />}
-              />
-              <Route
-                path="/organizations/:id/statistics"
-                element={<OrganizationStatisticsPage />}
-              />
-              <Route
-                path="/organizations/:id/management"
-                element={<OrganizationManagementPage />}
-              />
-              <Route path="/peladas/:id" element={<PeladaDetailPage />} />
-              <Route
-                path="/peladas/:id/build-schedule"
-                element={<ScheduleBuilderPage />}
-              />
-              <Route
-                path="/peladas/:id/attendance"
-                element={<AttendanceListPage />}
-              />
-              <Route
-                path="/peladas/:id/matches"
-                element={<PeladaMatchesPage />}
-              />
-              <Route
-                path="/peladas/:id/voting"
-                element={<PeladaVotingPage />}
-              />
-              <Route
-                path="/peladas/:id/results"
-                element={<PeladaVotingResultsPage />}
-              />
-              <Route path="/profile" element={<UserProfilePage />} />
-            </Route>
-          </Routes>
+              {/* Rotas protegidas sem Container global para permitir controle por página */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/join/:token" element={<JoinOrganizationPage />} />
+                <Route
+                  path="/organizations/:id"
+                  element={<OrganizationDetailPage />}
+                />
+                <Route
+                  path="/organizations/:id/statistics"
+                  element={<OrganizationStatisticsPage />}
+                />
+                <Route
+                  path="/organizations/:id/management"
+                  element={<OrganizationManagementPage />}
+                />
+                <Route path="/peladas/:id" element={<PeladaDetailPage />} />
+                <Route
+                  path="/peladas/:id/build-schedule"
+                  element={<ScheduleBuilderPage />}
+                />
+                <Route
+                  path="/peladas/:id/attendance"
+                  element={<AttendanceListPage />}
+                />
+                <Route
+                  path="/peladas/:id/matches"
+                  element={<PeladaMatchesPage />}
+                />
+                <Route
+                  path="/peladas/:id/voting"
+                  element={<PeladaVotingPage />}
+                />
+                <Route
+                  path="/peladas/:id/results"
+                  element={<PeladaVotingResultsPage />}
+                />
+                <Route path="/profile" element={<UserProfilePage />} />
+              </Route>
+            </Routes>
+          </PullToRefresh>
         </Box>
         <Footer />
         <PWAInstallPrompt />

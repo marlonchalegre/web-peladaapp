@@ -11,6 +11,10 @@
 
 body {
   margin: 0;
+  overscroll-behavior-y: contain;
+}
+
+#root {
   min-width: 320px;
   min-height: 100vh;
 }
