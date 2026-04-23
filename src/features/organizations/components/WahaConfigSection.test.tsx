@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import WahaConfigSection from "./WahaConfigSection";
+import type { Organization } from "../../../shared/api/endpoints";
 
 // Mock react-i18next
 vi.mock("react-i18next", () => ({
@@ -42,7 +43,7 @@ describe("WahaConfigSection", () => {
   });
 
   it("renders with initial values including use_all_mention", () => {
-    render(<WahaConfigSection organization={mockOrganization as any} />);
+    render(<WahaConfigSection organization={mockOrganization as Organization} />);
 
     expect(screen.getByDisplayValue("http://localhost:3000")).toBeInTheDocument();
     
@@ -54,7 +55,7 @@ describe("WahaConfigSection", () => {
   it("submits the form with updated use_all_mention value", async () => {
     mockUpdateOrganization.mockResolvedValue({});
     
-    render(<WahaConfigSection organization={mockOrganization as any} />);
+    render(<WahaConfigSection organization={mockOrganization as Organization} />);
 
     const toggle = screen.getByRole("switch", { name: "organizations.management.waha.use_all_mention" });
     fireEvent.click(toggle);
