@@ -620,6 +620,7 @@ export function createApi(client: ApiClient) {
       email: string;
       password?: string;
       position?: string;
+      phone?: string;
     }) =>
       client.post<{ token: string; user: User }>("/auth/first-access", payload),
 

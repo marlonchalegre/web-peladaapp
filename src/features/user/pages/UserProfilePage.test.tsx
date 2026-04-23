@@ -31,6 +31,7 @@ describe("UserProfilePage", () => {
     name: "Test User",
     username: "testuser",
     email: "test@example.com",
+    phone: "5511999999999",
     position: "Goalkeeper",
   };
 
@@ -44,7 +45,7 @@ describe("UserProfilePage", () => {
     });
   });
 
-  it("loads and displays user profile with position", async () => {
+  it("loads and displays user profile with position and phone", async () => {
     (getUser as Mock).mockResolvedValue(defaultUser);
 
     render(
@@ -57,9 +58,42 @@ describe("UserProfilePage", () => {
       expect(screen.getByDisplayValue("Test User")).toBeInTheDocument();
       expect(screen.getByDisplayValue("testuser")).toBeInTheDocument();
       expect(screen.getByDisplayValue("test@example.com")).toBeInTheDocument();
+      expect(screen.getByDisplayValue("5511999999999")).toBeInTheDocument();
       expect(
         screen.getByText("common.positions.goalkeeper"),
       ).toBeInTheDocument();
+    });
+  });
+
+  it("updates user profile phone", async () => {
+    (getUser as Mock).mockResolvedValue(defaultUser);
+
+    (updateUserProfile as Mock).mockResolvedValue({
+      ...defaultUser,
+      phone: "123456789",
+    });
+
+    render(
+      <MemoryRouter>
+        <UserProfilePage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("5511999999999")).toBeInTheDocument();
+    });
+
+    const phoneInput = screen.getByLabelText(/common.fields.phone/i);
+    fireEvent.change(phoneInput, {
+      target: { value: "123456789" },
+    });
+
+    fireEvent.click(screen.getByText("user.profile.button.save"));
+
+    await waitFor(() => {
+      expect(updateUserProfile).toHaveBeenCalledWith(1, {
+        phone: "123456789",
+      });
     });
   });
 

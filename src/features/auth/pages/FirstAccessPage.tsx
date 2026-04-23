@@ -30,6 +30,7 @@ export default function FirstAccessPage() {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState(searchParams.get("email") || "");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [position, setPosition] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -64,6 +65,7 @@ export default function FirstAccessPage() {
         username,
         email,
         password,
+        phone: phone || undefined,
         position: position || undefined,
       });
       signIn(token, user);
@@ -144,6 +146,18 @@ export default function FirstAccessPage() {
               fullWidth
               autoFocus
               inputProps={{ "data-testid": "first-access-name" }}
+            />
+            <TextField
+              id="phone"
+              label={
+                t("common.fields.phone") + " (" + t("common.optional") + ")"
+              }
+              type="tel"
+              autoComplete="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              fullWidth
+              inputProps={{ "data-testid": "first-access-phone" }}
             />
             <TextField
               id="password"

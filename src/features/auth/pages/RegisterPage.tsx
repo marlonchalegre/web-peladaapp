@@ -27,6 +27,7 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [position, setPosition] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -50,6 +51,7 @@ export default function RegisterPage() {
         email || undefined,
         password,
         position || undefined,
+        phone || undefined,
       );
       const { token, user } = await login(username, password);
       signIn(token, user);
@@ -122,6 +124,18 @@ export default function RegisterPage() {
               onChange={(e) => setEmail(e.target.value)}
               fullWidth
               inputProps={{ "data-testid": "register-email" }}
+            />
+            <TextField
+              id="phone"
+              label={
+                t("common.fields.phone") + " (" + t("common.optional") + ")"
+              }
+              type="tel"
+              autoComplete="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              fullWidth
+              inputProps={{ "data-testid": "register-phone" }}
             />
             <TextField
               id="password"

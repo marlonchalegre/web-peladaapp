@@ -218,6 +218,7 @@ export type User = {
   name: string;
   username: string;
   email?: string;
+  phone?: string;
   admin_orgs?: number[];
   position?: string;
   avatar_filename?: string | null;
@@ -228,6 +229,7 @@ export type UserProfileUpdate = {
   username?: string;
   email?: string;
   password?: string;
+  phone?: string;
   position?: string;
   avatar_filename?: string | null;
 };
@@ -258,6 +260,7 @@ export async function register(
   email: string | undefined,
   password: string,
   position?: string,
+  phone?: string,
 ): Promise<void> {
   await api.post("/auth/register", {
     name,
@@ -265,6 +268,7 @@ export async function register(
     email,
     password,
     position,
+    phone,
   });
 }
 

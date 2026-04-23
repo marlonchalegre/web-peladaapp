@@ -26,6 +26,7 @@ import {
   deleteUser,
   uploadUserAvatar,
   deleteUserAvatar,
+  type UserProfileUpdate,
 } from "../../../shared/api/client";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import { useAuth } from "../../../app/providers/AuthContext";
@@ -42,6 +43,7 @@ export default function UserProfilePage() {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [position, setPosition] = useState("");
   const [avatarFilename, setAvatarFilename] = useState<string | null>(null);
   const [password, setPassword] = useState("");
@@ -65,6 +67,7 @@ export default function UserProfilePage() {
         setName(userData.name);
         setUsername(userData.username);
         setEmail(userData.email || "");
+        setPhone(userData.phone || "");
         setPosition(userData.position || "");
         setAvatarFilename(userData.avatar_filename || null);
       } catch (error) {
@@ -159,14 +162,17 @@ export default function UserProfilePage() {
         name?: string;
         username?: string;
         email?: string;
+        phone?: string;
         password?: string;
         position?: string;
       } = {};
 
       if (name !== authUser.name) updates.name = name;
       if (username !== authUser.username) updates.username = username;
-      if (email !== authUser.email) updates.email = email;
-      if (position !== authUser.position) updates.position = position;
+      if (email !== (authUser.email || "")) updates.email = email;
+      if (phone !== (authUser.phone || "")) updates.phone = phone;
+      if (position !== (authUser.position || ""))
+        updates.position = position as UserProfileUpdate["position"];
       if (password) updates.password = password;
 
       if (Object.keys(updates).length === 0) {
@@ -356,6 +362,18 @@ export default function UserProfilePage() {
               fullWidth
               disabled={loading}
               inputProps={{ "data-testid": "profile-email" }}
+            />
+
+            <TextField
+              id="phone"
+              label={t("common.fields.phone")}
+              type="tel"
+              autoComplete="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              fullWidth
+              disabled={loading}
+              inputProps={{ "data-testid": "profile-phone" }}
             />
 
             <FormControl fullWidth disabled={loading}>

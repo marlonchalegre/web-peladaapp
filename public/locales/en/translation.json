@@ -173,6 +173,7 @@
     "fields": {
       "username": "Username",
       "email": "Email",
+      "phone": "Mobile Phone",
       "password": "Password",
       "name": "Name",
       "position": "Position",

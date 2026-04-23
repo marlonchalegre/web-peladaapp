@@ -13,6 +13,7 @@ import type { Organization } from "../../shared/api/endpoints";
 type TokenPayload = {
   id: number;
   email: string;
+  phone?: string;
   admin_orgs?: number[];
   exp?: number;
 };
@@ -70,6 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         u = {
           id: payload.id,
           email: payload.email,
+          phone: payload.phone,
           name: "",
           username: "",
           admin_orgs: payload.admin_orgs,
@@ -138,7 +140,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             .filter((org) => org.role === "admin")
             .map((org) => org.id);
 
-          setUser({ ...freshUser, admin_orgs: adminOrgsList });
+          setUser({
+            ...freshUser,
+            admin_orgs: adminOrgsList,
+            phone: freshUser.phone,
+          });
         } catch (e) {
           console.error("Failed to refresh user data", e);
         }
