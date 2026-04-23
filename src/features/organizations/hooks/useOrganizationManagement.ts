@@ -285,7 +285,7 @@ export function useOrganizationManagement(orgId: number) {
     setActionLoading(true);
     try {
       await endpoints.deleteOrganization(orgId);
-      navigate("/");
+      navigate("/home");
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       setError(message);

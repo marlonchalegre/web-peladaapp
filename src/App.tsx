@@ -5,6 +5,7 @@ import {
   Route,
   Link as RouterLink,
   useLocation,
+  useNavigate,
 } from "react-router-dom";
 import {
   AppBar,
@@ -46,6 +47,7 @@ import PeladaMatchesPage from "./features/peladas/pages/PeladaMatchesPage";
 import PeladaVotingPage from "./features/peladas/pages/PeladaVotingPage";
 import PeladaVotingResultsPage from "./features/peladas/pages/PeladaVotingResultsPage";
 import UserProfilePage from "./features/user/pages/UserProfilePage";
+import WelcomePage from "./features/auth/pages/WelcomePage";
 import { initGA, logPageView, logClickEvent } from "./lib/analytics";
 import { PWAInstallPrompt } from "./shared/components/PWAInstallPrompt";
 import { PullToRefresh } from "./shared/components/PullToRefresh";
@@ -120,6 +122,7 @@ function Footer() {
 
 function AppLayout() {
   const { isAuthenticated, user, signOut } = useAuth();
+  const navigate = useNavigate();
   const { mode, toggleTheme } = useAppTheme();
   const { t } = useTranslation();
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
@@ -135,10 +138,11 @@ function AppLayout() {
   const handleLogout = () => {
     handleCloseUserMenu();
     signOut();
+    navigate("/");
   };
 
   return (
-    <BrowserRouter>
+    <>
       <AnalyticsTracker />
       <Box
         sx={{
@@ -162,7 +166,7 @@ function AppLayout() {
             <Toolbar>
               <Box
                 component={RouterLink}
-                to="/"
+                to="/home"
                 sx={{
                   display: "flex",
                   alignItems: "center",
@@ -261,6 +265,7 @@ function AppLayout() {
           <PullToRefresh>
             <Routes>
               {/* Rotas públicas sem Container para permitir centralização própria */}
+              <Route path="/" element={<WelcomePage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/first-access" element={<FirstAccessPage />} />
@@ -269,7 +274,7 @@ function AppLayout() {
 
               {/* Rotas protegidas sem Container global para permitir controle por página */}
               <Route element={<ProtectedRoute />}>
-                <Route path="/" element={<HomePage />} />
+                <Route path="/home" element={<HomePage />} />
                 <Route path="/join/:token" element={<JoinOrganizationPage />} />
                 <Route
                   path="/organizations/:id"
@@ -312,7 +317,7 @@ function AppLayout() {
         <Footer />
         <PWAInstallPrompt />
       </Box>
-    </BrowserRouter>
+    </>
   );
 }
 
@@ -324,7 +329,9 @@ export default function App() {
         dateAdapter={AdapterDayjs}
         adapterLocale={i18n.language === "pt-BR" ? "pt-br" : "en"}
       >
-        <AppLayout />
+        <BrowserRouter>
+          <AppLayout />
+        </BrowserRouter>
       </LocalizationProvider>
     </AuthProvider>
   );

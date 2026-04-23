@@ -128,7 +128,7 @@ export default function OrganizationDetailPage() {
     setIsLeaving(true);
     try {
       await endpoints.leaveOrganization(orgId);
-      navigate("/");
+      navigate("/home");
     } catch (error: unknown) {
       const message =
         error instanceof Error

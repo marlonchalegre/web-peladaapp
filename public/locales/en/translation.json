@@ -924,5 +924,34 @@
         "file_too_large": "File too large. Maximum 2MB."
       }
     }
+  },
+  "welcome": {
+    "title": "Organize your soccer matches professionally",
+    "subtitle": "Match management, balanced team draws, automatic statistics, and MVP voting. All in one place.",
+    "cta": {
+      "login": "Login",
+      "register": "Create Free Account"
+    },
+    "features": {
+      "management": {
+        "title": "Complete Management",
+        "description": "Control attendance, monthly fees, and invitations quickly and easily."
+      },
+      "teams": {
+        "title": "Balanced Teams",
+        "description": "Intelligent algorithm that draws teams based on players' technical level."
+      },
+      "stats": {
+        "title": "Stats & MVP",
+        "description": "Track goals, assists, and vote for the best players after the game."
+      }
+    },
+    "mock": {
+      "match_day": "Match Day",
+      "confirmed": "Confirmed",
+      "team_a": "Team A",
+      "team_b": "Team B",
+      "mvp_vote": "Vote for MVP"
+    }
   }
 }

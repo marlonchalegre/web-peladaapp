@@ -38,7 +38,7 @@ export default function FirstAccessPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      const redirect = searchParams.get("redirect") || "/";
+      const redirect = searchParams.get("redirect") || "/home";
       navigate(redirect, { replace: true });
     }
   }, [isAuthenticated, navigate, searchParams]);
@@ -69,7 +69,7 @@ export default function FirstAccessPage() {
         position: position || undefined,
       });
       signIn(token, user);
-      const redirect = searchParams.get("redirect") || "/";
+      const redirect = searchParams.get("redirect") || "/home";
       navigate(redirect);
     } catch (error: unknown) {
       const message =

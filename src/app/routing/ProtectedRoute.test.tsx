@@ -132,7 +132,7 @@ describe("ProtectedRoute", () => {
           <Routes>
             <Route path="/login" element={<div>Login Page</div>} />
             <Route element={<ProtectedRoute />}>
-              <Route path="/" element={<div>Home</div>} />
+              <Route path="/home" element={<div>Home</div>} />
               <Route path="/organizations" element={<div>Organizations</div>} />
               <Route path="/profile" element={<div>Profile</div>} />
             </Route>

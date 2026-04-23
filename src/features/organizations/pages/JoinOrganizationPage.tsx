@@ -83,7 +83,7 @@ export default function JoinOrganizationPage() {
         <Alert severity="error">
           {error || t("organizations.invitation.error.invalid_token")}
         </Alert>
-        <Button onClick={() => navigate("/")} sx={{ mt: 2 }}>
+        <Button onClick={() => navigate("/home")} sx={{ mt: 2 }}>
           {t("common.back_to_home")}
         </Button>
       </Container>
@@ -125,7 +125,7 @@ export default function JoinOrganizationPage() {
           </Button>
           <Button
             variant="outlined"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/home")}
             disabled={joining}
             fullWidth
             data-testid="cancel-join-button"

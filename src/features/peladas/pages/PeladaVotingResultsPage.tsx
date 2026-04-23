@@ -147,7 +147,7 @@ export default function PeladaVotingResultsPage() {
               label: results.organization_name || t("common.organization"),
               path: results.organization_id
                 ? `/organizations/${results.organization_id}`
-                : "/",
+                : "/home",
             },
             {
               label: t("peladas.detail.title", { id: peladaId }),

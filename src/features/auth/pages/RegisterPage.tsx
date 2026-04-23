@@ -35,7 +35,7 @@ export default function RegisterPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      const redirect = searchParams.get("redirect") || "/";
+      const redirect = searchParams.get("redirect") || "/home";
       navigate(redirect, { replace: true });
     }
   }, [isAuthenticated, navigate, searchParams]);
@@ -55,7 +55,7 @@ export default function RegisterPage() {
       );
       const { token, user } = await login(username, password);
       signIn(token, user);
-      const redirect = searchParams.get("redirect") || "/";
+      const redirect = searchParams.get("redirect") || "/home";
       navigate(redirect);
     } catch (error: unknown) {
       console.error("Registration/Login failed:", error);

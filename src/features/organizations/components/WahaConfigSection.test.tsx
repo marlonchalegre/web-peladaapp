@@ -43,21 +43,31 @@ describe("WahaConfigSection", () => {
   });
 
   it("renders with initial values including use_all_mention", () => {
-    render(<WahaConfigSection organization={mockOrganization as Organization} />);
+    render(
+      <WahaConfigSection organization={mockOrganization as Organization} />,
+    );
 
-    expect(screen.getByDisplayValue("http://localhost:3000")).toBeInTheDocument();
-    
+    expect(
+      screen.getByDisplayValue("http://localhost:3000"),
+    ).toBeInTheDocument();
+
     // In MUI, Switch is a role="switch"
-    const toggle = screen.getByRole("switch", { name: "organizations.management.waha.use_all_mention" });
+    const toggle = screen.getByRole("switch", {
+      name: "organizations.management.waha.use_all_mention",
+    });
     expect(toggle).toBeChecked();
   });
 
   it("submits the form with updated use_all_mention value", async () => {
     mockUpdateOrganization.mockResolvedValue({});
-    
-    render(<WahaConfigSection organization={mockOrganization as Organization} />);
 
-    const toggle = screen.getByRole("switch", { name: "organizations.management.waha.use_all_mention" });
+    render(
+      <WahaConfigSection organization={mockOrganization as Organization} />,
+    );
+
+    const toggle = screen.getByRole("switch", {
+      name: "organizations.management.waha.use_all_mention",
+    });
     fireEvent.click(toggle);
     expect(toggle).not.toBeChecked();
 
@@ -68,7 +78,7 @@ describe("WahaConfigSection", () => {
         mockOrganization.id,
         expect.objectContaining({
           waha_use_all_mention: false,
-        })
+        }),
       );
     });
   });

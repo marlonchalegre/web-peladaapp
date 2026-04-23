@@ -44,7 +44,7 @@ export default function BreadcrumbNav({ items }: Props) {
       >
         <Link
           component={RouterLink}
-          to="/"
+          to="/home"
           color="inherit"
           sx={{
             display: "flex",

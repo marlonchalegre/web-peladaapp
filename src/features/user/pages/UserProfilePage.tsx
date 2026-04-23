@@ -206,7 +206,7 @@ export default function UserProfilePage() {
     try {
       await deleteUser(authUser.id);
       signOut();
-      navigate("/login");
+      navigate("/");
     } catch (error: unknown) {
       setError(
         getLocalizedErrorMessage(error, t, "user.profile.error.delete_failed"),
@@ -450,7 +450,7 @@ export default function UserProfilePage() {
             <Box display="flex" gap={2} justifyContent="flex-end">
               <Button
                 variant="outlined"
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/home")}
                 disabled={loading}
               >
                 {t("common.cancel")}

@@ -27,7 +27,7 @@ export default function ForgotPasswordPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      const redirect = searchParams.get("redirect") || "/";
+      const redirect = searchParams.get("redirect") || "/home";
       navigate(redirect, { replace: true });
     }
   }, [isAuthenticated, navigate, searchParams]);

@@ -62,7 +62,7 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
         setPullDistance(0);
       }
     },
-    [isPulling, isRefreshing, pullThreshold]
+    [isPulling, isRefreshing, pullThreshold],
   );
 
   const handleTouchEnd = useCallback(() => {

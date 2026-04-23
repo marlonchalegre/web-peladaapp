@@ -923,5 +923,34 @@
         "file_too_large": "Arquivo muito grande. Máximo 2MB."
       }
     }
+  },
+  "welcome": {
+    "title": "Organize seu futebol de forma profissional",
+    "subtitle": "Gestão de peladas, sorteio de times equilibrados, estatísticas automáticas e votação de MVP. Tudo em um só lugar.",
+    "cta": {
+      "login": "Entrar",
+      "register": "Criar Conta Grátis"
+    },
+    "features": {
+      "management": {
+        "title": "Gestão Completa",
+        "description": "Controle presenças, mensalidades e convites de forma simples e rápida."
+      },
+      "teams": {
+        "title": "Times Equilibrados",
+        "description": "Algoritmo inteligente que sorteia os times baseado no nível técnico dos jogadores."
+      },
+      "stats": {
+        "title": "Estatísticas & MVP",
+        "description": "Acompanhe gols, assistências e vote nos melhores da partida após o jogo."
+      }
+    },
+    "mock": {
+      "match_day": "Dia de Jogo",
+      "confirmed": "Confirmados",
+      "team_a": "Time A",
+      "team_b": "Time B",
+      "mvp_vote": "Vote no MVP"
+    }
   }
 }

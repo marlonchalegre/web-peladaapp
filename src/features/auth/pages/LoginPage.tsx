@@ -27,7 +27,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      const redirect = searchParams.get("redirect") || "/";
+      const redirect = searchParams.get("redirect") || "/home";
       navigate(redirect, { replace: true });
     }
   }, [isAuthenticated, navigate, searchParams]);
@@ -39,7 +39,7 @@ export default function LoginPage() {
     try {
       const { token, user } = await login(email, password);
       signIn(token, user);
-      const redirect = searchParams.get("redirect") || "/";
+      const redirect = searchParams.get("redirect") || "/home";
       navigate(redirect);
     } catch (error: unknown) {
       const message =
