@@ -16,6 +16,7 @@ import { useAuth } from "../../../app/providers/AuthContext";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getLocalizedErrorMessage } from "../../../shared/utils/error-handler";
+import { PhoneInput } from "../../../shared/components/PhoneInput";
 
 const POSITIONS = ["Striker", "Midfielder", "Defender", "Goalkeeper"];
 
@@ -125,17 +126,15 @@ export default function RegisterPage() {
               fullWidth
               inputProps={{ "data-testid": "register-email" }}
             />
-            <TextField
+            <PhoneInput
               id="phone"
               label={
                 t("common.fields.phone") + " (" + t("common.optional") + ")"
               }
-              type="tel"
-              autoComplete="tel"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(val) => setPhone(val)}
               fullWidth
-              inputProps={{ "data-testid": "register-phone" }}
+              data-testid="register-phone"
             />
             <TextField
               id="password"

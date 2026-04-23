@@ -58,7 +58,7 @@ describe("UserProfilePage", () => {
       expect(screen.getByDisplayValue("Test User")).toBeInTheDocument();
       expect(screen.getByDisplayValue("testuser")).toBeInTheDocument();
       expect(screen.getByDisplayValue("test@example.com")).toBeInTheDocument();
-      expect(screen.getByDisplayValue("5511999999999")).toBeInTheDocument();
+      expect(screen.getByDisplayValue("(11) 99999-9999")).toBeInTheDocument();
       expect(
         screen.getByText("common.positions.goalkeeper"),
       ).toBeInTheDocument();
@@ -80,7 +80,7 @@ describe("UserProfilePage", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByDisplayValue("5511999999999")).toBeInTheDocument();
+      expect(screen.getByDisplayValue("(11) 99999-9999")).toBeInTheDocument();
     });
 
     const phoneInput = screen.getByLabelText(/common.fields.phone/i);
@@ -92,7 +92,7 @@ describe("UserProfilePage", () => {
 
     await waitFor(() => {
       expect(updateUserProfile).toHaveBeenCalledWith(1, {
-        phone: "123456789",
+        phone: "+55123456789",
       });
     });
   });

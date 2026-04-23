@@ -35,6 +35,7 @@ import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 import { getLocalizedErrorMessage } from "../../../shared/utils/error-handler";
+import { PhoneInput } from "../../../shared/components/PhoneInput";
 
 export default function UserProfilePage() {
   const { t } = useTranslation();
@@ -364,16 +365,14 @@ export default function UserProfilePage() {
               inputProps={{ "data-testid": "profile-email" }}
             />
 
-            <TextField
+            <PhoneInput
               id="phone"
               label={t("common.fields.phone")}
-              type="tel"
-              autoComplete="tel"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(val) => setPhone(val)}
               fullWidth
               disabled={loading}
-              inputProps={{ "data-testid": "profile-phone" }}
+              data-testid="profile-phone"
             />
 
             <FormControl fullWidth disabled={loading}>

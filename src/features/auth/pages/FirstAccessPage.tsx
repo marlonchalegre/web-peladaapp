@@ -16,6 +16,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api } from "../../../shared/api/client";
 import { createApi } from "../../../shared/api/endpoints";
+import { PhoneInput } from "../../../shared/components/PhoneInput";
 
 const endpoints = createApi(api);
 
@@ -147,17 +148,15 @@ export default function FirstAccessPage() {
               autoFocus
               inputProps={{ "data-testid": "first-access-name" }}
             />
-            <TextField
+            <PhoneInput
               id="phone"
               label={
                 t("common.fields.phone") + " (" + t("common.optional") + ")"
               }
-              type="tel"
-              autoComplete="tel"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(val) => setPhone(val)}
               fullWidth
-              inputProps={{ "data-testid": "first-access-phone" }}
+              data-testid="first-access-phone"
             />
             <TextField
               id="password"

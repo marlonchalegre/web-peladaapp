@@ -25,7 +25,7 @@ describe("ProtectedRoute", () => {
       <AuthContext.Provider value={authValue}>
         <MemoryRouter initialEntries={["/protected"]}>
           <Routes>
-            <Route path="/login" element={<div>Login Page</div>} />
+            <Route path="/" element={<div>Welcome Page</div>} />
             <Route element={<ProtectedRoute />}>
               <Route path="/protected" element={<div>Protected Content</div>} />
             </Route>
@@ -34,7 +34,7 @@ describe("ProtectedRoute", () => {
       </AuthContext.Provider>,
     );
 
-    expect(screen.getByText("Login Page")).toBeInTheDocument();
+    expect(screen.getByText("Welcome Page")).toBeInTheDocument();
     expect(screen.queryByText("Protected Content")).not.toBeInTheDocument();
   });
 
@@ -67,7 +67,7 @@ describe("ProtectedRoute", () => {
     expect(screen.queryByText("Login Page")).not.toBeInTheDocument();
   });
 
-  it("redirects to /login when token is null", () => {
+  it("redirects to / when token is null", () => {
     const authValue = mockAuthContext({
       isAuthenticated: false,
       token: null,
@@ -77,7 +77,7 @@ describe("ProtectedRoute", () => {
       <AuthContext.Provider value={authValue}>
         <MemoryRouter initialEntries={["/organizations"]}>
           <Routes>
-            <Route path="/login" element={<div>Login Page</div>} />
+            <Route path="/" element={<div>Welcome Page</div>} />
             <Route element={<ProtectedRoute />}>
               <Route path="/organizations" element={<div>Organizations</div>} />
             </Route>
@@ -86,11 +86,11 @@ describe("ProtectedRoute", () => {
       </AuthContext.Provider>,
     );
 
-    expect(screen.getByText("Login Page")).toBeInTheDocument();
+    expect(screen.getByText("Welcome Page")).toBeInTheDocument();
     expect(screen.queryByText("Organizations")).not.toBeInTheDocument();
   });
 
-  it("redirects to /login when user is null even if token exists", () => {
+  it("redirects to / when user is null even if token exists", () => {
     const authValue = mockAuthContext({
       isAuthenticated: false, // This should be false if user is null
       token: "some-token",
@@ -101,7 +101,7 @@ describe("ProtectedRoute", () => {
       <AuthContext.Provider value={authValue}>
         <MemoryRouter initialEntries={["/profile"]}>
           <Routes>
-            <Route path="/login" element={<div>Login Page</div>} />
+            <Route path="/" element={<div>Welcome Page</div>} />
             <Route element={<ProtectedRoute />}>
               <Route path="/profile" element={<div>Profile Page</div>} />
             </Route>
@@ -110,7 +110,7 @@ describe("ProtectedRoute", () => {
       </AuthContext.Provider>,
     );
 
-    expect(screen.getByText("Login Page")).toBeInTheDocument();
+    expect(screen.getByText("Welcome Page")).toBeInTheDocument();
     expect(screen.queryByText("Profile Page")).not.toBeInTheDocument();
   });
 

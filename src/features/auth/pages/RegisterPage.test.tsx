@@ -70,7 +70,7 @@ describe("RegisterPage", () => {
         "new@example.com",
         "pass123",
         undefined,
-        "123456789",
+        "+55123456789",
       );
       expect(mockSignIn).toHaveBeenCalledWith("token", { id: 1 });
     });
