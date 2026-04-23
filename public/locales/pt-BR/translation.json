@@ -391,7 +391,7 @@
         "attendance_reminder_enabled": "Lembrete de presença (2x ao dia)",
         "vote_reminder_enabled": "Lembrete de votação (2x ao dia)",
         "vote_ended_msg_enabled": "Notificar quando a votação encerrar",
-        "use_all_mention_fallback": "Mencionar todos (@all) se faltarem celulares",
+        "use_all_mention": "Mencionar todos (@all) nos lembretes",
         "save_success": "Configuração salva com sucesso!",
         "test_connection": "Testar Conexão",
         "test_success": "Mensagem de teste enviada!",
