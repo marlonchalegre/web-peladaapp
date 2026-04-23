@@ -392,6 +392,7 @@
         "attendance_reminder_enabled": "Attendance reminder (2x daily)",
         "vote_reminder_enabled": "Voting reminder (2x daily)",
         "vote_ended_msg_enabled": "Notify when voting ends",
+        "use_all_mention_fallback": "Tag everyone (@all) if phone numbers are missing",
         "save_success": "Configuration saved successfully!",
         "test_connection": "Test Connection",
         "test_success": "Test message sent!",

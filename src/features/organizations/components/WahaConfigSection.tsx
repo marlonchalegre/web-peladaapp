@@ -46,6 +46,8 @@ export default function WahaConfigSection({
       organization.waha_vote_reminder_enabled || false,
     waha_vote_ended_msg_enabled:
       organization.waha_vote_ended_msg_enabled || false,
+    waha_use_all_mention_fallback:
+      organization.waha_use_all_mention_fallback ?? true,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -243,9 +245,22 @@ export default function WahaConfigSection({
                   )}
                 />
               </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={formData.waha_use_all_mention_fallback}
+                      onChange={handleChange}
+                      name="waha_use_all_mention_fallback"
+                    />
+                  }
+                  label={t(
+                    "organizations.management.waha.use_all_mention_fallback",
+                  )}
+                />
+              </Grid>
             </>
           )}
-
           <Grid size={{ xs: 12 }}>
             <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
               <Button

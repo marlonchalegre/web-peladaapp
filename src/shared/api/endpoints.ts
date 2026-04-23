@@ -13,6 +13,7 @@ export interface Organization {
   waha_attendance_reminder_enabled?: boolean | null;
   waha_vote_reminder_enabled?: boolean | null;
   waha_vote_ended_msg_enabled?: boolean | null;
+  waha_use_all_mention_fallback?: boolean | null;
 }
 export interface User {
   id: number;
