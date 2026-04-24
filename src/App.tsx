@@ -210,8 +210,8 @@ function AppLayout() {
                     data-testid="user-settings-button"
                   >
                     <SecureAvatar
-                      userId={user?.id || 0}
-                      filename={user?.avatar_filename}
+                      userId={user?.id}
+                      filename={user?.avatar_filename || (user as any)?.["avatar-filename"]}
                       sx={{
                         bgcolor: "primary.dark",
                         width: 36,

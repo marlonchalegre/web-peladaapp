@@ -80,7 +80,9 @@ export default function PlayerAttendanceCard({
         <Box sx={{ display: "flex", alignItems: "center", minWidth: 0 }}>
           <SecureAvatar
             userId={player.user.id}
-            filename={player.user.avatar_filename || player.avatar_filename}
+            filename={
+              player.user.avatar_filename || player.user_avatar_filename
+            }
             sx={{
               width: 36,
               height: 36,

@@ -34,7 +34,7 @@ export interface Player {
   user_name?: string;
   user_username?: string;
   user_position?: string;
-  avatar_filename?: string | null;
+  user_avatar_filename?: string | null;
   position_name?: string;
   user_email?: string;
 }
@@ -46,6 +46,7 @@ export interface OrganizationAdmin {
   user_username?: string;
   user_email?: string;
   user_position?: string;
+  user_avatar_filename?: string | null;
   organization_name?: string;
   created_at?: string;
 }

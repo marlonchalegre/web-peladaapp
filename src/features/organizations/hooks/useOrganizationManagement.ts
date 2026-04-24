@@ -307,6 +307,7 @@ export function useOrganizationManagement(orgId: number) {
           username: p.user_username,
           email: p.user_email || "",
           position: p.user_position,
+          avatar_filename: p.user_avatar_filename,
         });
       }
     });
@@ -320,6 +321,7 @@ export function useOrganizationManagement(orgId: number) {
           username: a.user_username,
           email: a.user_email || "",
           position: a.user_position,
+          avatar_filename: a.user_avatar_filename,
         });
       }
     });

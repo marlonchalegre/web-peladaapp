@@ -16,6 +16,7 @@ import {
   Select,
   MenuItem,
   FormControl,
+  ListItemAvatar,
 } from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import EmailIcon from "@mui/icons-material/Email";
@@ -23,6 +24,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
 import { useTranslation } from "react-i18next";
 import { type User, type Player } from "../../../shared/api/endpoints";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 
 interface MembersSectionProps {
   players: Player[];
@@ -180,6 +182,14 @@ export default function MembersSection({
 
             return (
               <ListItem key={player.id} divider sx={{ px: 0 }}>
+                <ListItemAvatar>
+                  <SecureAvatar
+                    userId={user?.id}
+                    filename={user?.avatar_filename}
+                    sx={{ width: 40, height: 40 }}
+                    fallbackText={user?.name?.charAt(0).toUpperCase()}
+                  />
+                </ListItemAvatar>
                 <ListItemText
                   primary={
                     <Typography fontWeight="medium">

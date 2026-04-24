@@ -94,7 +94,7 @@ export default function PlayerSelectMenu({
                     <ListItemIcon>
                       <SecureAvatar
                         userId={player.user_id}
-                        filename={player.avatar_filename}
+                        filename={player.user_avatar_filename}
                         sx={{
                           width: 40,
                           height: 40,

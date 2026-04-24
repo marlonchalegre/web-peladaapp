@@ -14,6 +14,7 @@ type TokenPayload = {
   id: number;
   email: string;
   phone?: string;
+  avatar_filename?: string | null;
   admin_orgs?: number[];
   exp?: number;
 };
@@ -72,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           id: payload.id,
           email: payload.email,
           phone: payload.phone,
+          avatar_filename: payload.avatar_filename,
           name: "",
           username: "",
           admin_orgs: payload.admin_orgs,
@@ -144,6 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             ...freshUser,
             admin_orgs: adminOrgsList,
             phone: freshUser.phone,
+            avatar_filename: freshUser.avatar_filename,
           });
         } catch (e) {
           console.error("Failed to refresh user data", e);

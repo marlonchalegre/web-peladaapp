@@ -28,6 +28,9 @@ export const SecureAvatar: React.FC<SecureAvatarProps> = ({
     let cleanupTimeoutId: NodeJS.Timeout | undefined;
 
     if (!userId || !filename) {
+      if (filename === "") {
+         console.warn("SecureAvatar: Empty filename for user", userId);
+      }
       setImageUrl(undefined);
       setLoading(false);
       return () => {
@@ -35,7 +38,7 @@ export const SecureAvatar: React.FC<SecureAvatarProps> = ({
       };
     }
 
-    const cacheKey = `${api.apiBaseUrl || ""}/api/user/${userId}/avatar?t=${filename}`;
+    const cacheKey = `${api.apiBaseUrl || ""}/api/user/${userId}/avatar?t=${encodeURIComponent(filename)}`;
 
     const fetchImage = async () => {
       // 1. Check Cache
