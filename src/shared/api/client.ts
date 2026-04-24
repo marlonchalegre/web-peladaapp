@@ -58,6 +58,8 @@ export class ApiClient {
 
   private headers(): HeadersInit {
     const headers: HeadersInit = { "Content-Type": "application/json" };
+    // We still support header-based auth for flexibility/dev, 
+    // but the backend will now prioritize the cookie if present.
     if (this.token) headers["Authorization"] = `Token ${this.token}`;
     return headers;
   }
@@ -99,6 +101,7 @@ export class ApiClient {
     try {
       const response = await fetch(url, {
         ...options,
+        credentials: "same-origin", // Enable cookie support
         signal: controller.signal,
       });
       clearTimeout(id);
@@ -243,6 +246,10 @@ export async function login(
   return api.post<LoginResponse>("/auth/login", { email, password });
 }
 
+export async function logout(): Promise<void> {
+  await api.post("/auth/logout");
+}
+
 export async function forgotPassword(email: string): Promise<void> {
   await api.post("/auth/forgot-password", { email });
 }
@@ -296,9 +303,7 @@ export async function uploadUserAvatar(
 
   const res = await fetch(`${api.apiBaseUrl || ""}/api/user/${id}/avatar`, {
     method: "POST",
-    headers: {
-      Authorization: `Token ${localStorage.getItem("authToken")}`,
-    },
+    credentials: "same-origin",
     body: formData,
   });
 

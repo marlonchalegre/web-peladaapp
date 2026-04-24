@@ -6,7 +6,7 @@ import {
   type ReactNode,
 } from "react";
 import { jwtDecode } from "jwt-decode";
-import { api, type User } from "../../shared/api/client";
+import { api, type User, logout } from "../../shared/api/client";
 import { AuthContext, type AuthContextValue } from "./AuthContext";
 import type { Organization } from "../../shared/api/endpoints";
 
@@ -85,7 +85,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return u;
   });
 
-  const signOut = useCallback(() => {
+  const signOut = useCallback(async () => {
+    try {
+      await logout();
+    } catch (e) {
+      console.error("Failed to logout from server", e);
+    }
     setToken(null);
     setUser(null);
     localStorage.removeItem("authToken");
