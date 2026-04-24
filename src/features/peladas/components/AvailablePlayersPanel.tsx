@@ -17,7 +17,6 @@ import type {
   Player,
   User,
   Transaction,
-  OrganizationFinance,
   Team,
 } from "../../../shared/api/endpoints";
 import { sortPlayersByPosition } from "../utils/playerUtils";
@@ -41,7 +40,6 @@ type AvailablePlayersPanelProps = {
   locked?: boolean;
   isAdmin?: boolean;
   peladaTransactions?: Transaction[];
-  organizationFinance?: OrganizationFinance;
   onMarkPaid?: (playerId: number, amount: number) => void;
   onReversePayment?: (playerId: number) => void;
   teams?: Team[];
@@ -49,6 +47,8 @@ type AvailablePlayersPanelProps = {
   onMoveToFixedGk?: (playerId: number, side: "home" | "away") => void;
   hasFixedGoalkeepers?: boolean;
 };
+
+import { useOrganizationFinance } from "../../../shared/hooks/useOrganizationFinance";
 
 export default function AvailablePlayersPanel({
   players,
@@ -61,7 +61,6 @@ export default function AvailablePlayersPanel({
   locked,
   isAdmin = false,
   peladaTransactions = [],
-  organizationFinance,
   onMarkPaid,
   onReversePayment,
   teams = [],
@@ -72,6 +71,7 @@ export default function AvailablePlayersPanel({
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const { organizationFinance } = useOrganizationFinance(organizationId);
 
   const handleCopyPlayers = async () => {
     const text = generateAvailablePlayersText(players, scores);

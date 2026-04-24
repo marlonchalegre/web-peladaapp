@@ -69,7 +69,6 @@ export default function PeladaDetailPage() {
     handleReversePayment,
     allPlayerIdsInPelada,
     peladaTransactions,
-    organizationFinance,
   } = usePeladaDetail(peladaId);
 
   const [pendingSwap, setPendingSwap] = useState<{
@@ -360,6 +359,7 @@ export default function PeladaDetailPage() {
             playersPerTeam={pelada.players_per_team ?? undefined}
             creatingTeam={processing}
             locked={pelada.status !== "open"}
+            organizationId={pelada.organization_id}
             onCreateTeam={handleCreateTeam}
             onDeleteTeam={handleDeleteTeam}
             onDragStartPlayer={onDragStartPlayer}
@@ -371,7 +371,6 @@ export default function PeladaDetailPage() {
             isAdminOverride={isAdmin}
             hasFixedGoalkeepers={!!pelada.fixed_goalkeepers}
             peladaTransactions={peladaTransactions}
-            organizationFinance={organizationFinance || undefined}
             onMarkPaid={handleMarkPaid}
             onReversePayment={onReverseClick}
           />
@@ -390,7 +389,6 @@ export default function PeladaDetailPage() {
             locked={(pelada.status !== "open" && !isAdmin) || processing}
             isAdmin={isAdmin}
             peladaTransactions={peladaTransactions}
-            organizationFinance={organizationFinance || undefined}
             onMarkPaid={handleMarkPaid}
             onReversePayment={onReverseClick}
             teams={teams}

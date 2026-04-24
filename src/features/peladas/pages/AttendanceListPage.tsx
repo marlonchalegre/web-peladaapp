@@ -78,7 +78,6 @@ export default function AttendanceListPage() {
     currentPlayerAsPlayer,
     isUpdatingSelf,
     peladaTransactions,
-    organizationFinance,
     handleUpdateAttendance,
     handleCloseAttendance,
     handleMarkPaid,
@@ -367,7 +366,6 @@ export default function AttendanceListPage() {
               updatingPlayers={updatingPlayers}
               hideHeader
               peladaTransactions={peladaTransactions}
-              organizationFinance={organizationFinance || undefined}
               onMarkPaid={handleMarkPaid}
               onReversePayment={onReverseClick}
             />
@@ -387,7 +385,6 @@ export default function AttendanceListPage() {
               updatingPlayers={updatingPlayers}
               hideHeader
               peladaTransactions={peladaTransactions}
-              organizationFinance={organizationFinance || undefined}
               onMarkPaid={handleMarkPaid}
               onReversePayment={onReverseClick}
             />
@@ -404,7 +401,6 @@ export default function AttendanceListPage() {
               updatingPlayers={updatingPlayers}
               hideHeader
               peladaTransactions={peladaTransactions}
-              organizationFinance={organizationFinance || undefined}
               onMarkPaid={handleMarkPaid}
               onReversePayment={onReverseClick}
             />
@@ -421,7 +417,6 @@ export default function AttendanceListPage() {
               updatingPlayers={updatingPlayers}
               hideHeader
               peladaTransactions={peladaTransactions}
-              organizationFinance={organizationFinance || undefined}
               onMarkPaid={handleMarkPaid}
               onReversePayment={onReverseClick}
             />

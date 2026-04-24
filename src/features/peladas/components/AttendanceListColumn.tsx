@@ -4,7 +4,6 @@ import { type PlayerWithUser } from "../hooks/useAttendance";
 import {
   type AttendanceStatus,
   type Transaction,
-  type OrganizationFinance,
 } from "../../../shared/api/endpoints";
 import PlayerAttendanceCard from "./PlayerAttendanceCard";
 
@@ -20,7 +19,6 @@ interface AttendanceListColumnProps {
   updatingPlayers: Set<number>;
   hideHeader?: boolean;
   peladaTransactions?: Transaction[];
-  organizationFinance?: OrganizationFinance;
   onMarkPaid?: (playerId: number, amount: number) => void;
   onReversePayment?: (playerId: number) => void;
 }
@@ -36,8 +34,7 @@ export default function AttendanceListColumn({
   onUpdate,
   updatingPlayers,
   hideHeader,
-  peladaTransactions,
-  organizationFinance,
+  peladaTransactions = [],
   onMarkPaid,
   onReversePayment,
 }: AttendanceListColumnProps) {
@@ -72,12 +69,8 @@ export default function AttendanceListColumn({
               onUpdate={(status) => onUpdate(status, p.id)}
               isUpdating={updatingPlayers.has(p.id)}
               isPaid={isPaid}
-              organizationFinance={organizationFinance}
               onMarkPaid={
-                onMarkPaid
-                  ? () =>
-                      onMarkPaid(p.id, organizationFinance?.diarista_price || 0)
-                  : undefined
+                onMarkPaid ? (amount) => onMarkPaid(p.id, amount) : undefined
               }
               onReversePayment={
                 onReversePayment ? () => onReversePayment(p.id) : undefined

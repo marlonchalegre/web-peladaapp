@@ -26,7 +26,6 @@ import type {
   Team,
   User,
   Transaction,
-  OrganizationFinance,
 } from "../../../shared/api/endpoints";
 import { useTranslation } from "react-i18next";
 import { sortPlayersByPosition } from "../utils/playerUtils";
@@ -53,10 +52,12 @@ type TeamCardProps = {
   isAdminOverride?: boolean;
   hasFixedGoalkeepers?: boolean;
   peladaTransactions?: Transaction[];
-  organizationFinance?: OrganizationFinance;
+  teamOrganizationId?: number; // Add teamOrganizationId since we removed organizationFinance from prop
   onMarkPaid?: (playerId: number, amount: number) => void;
   onReversePayment?: (playerId: number) => void;
 };
+
+import { useOrganizationFinance } from "../../../shared/hooks/useOrganizationFinance";
 
 export default function TeamCard({
   team,
@@ -74,13 +75,15 @@ export default function TeamCard({
   isAdminOverride = false,
   hasFixedGoalkeepers = false,
   peladaTransactions = [],
-  organizationFinance,
+  teamOrganizationId,
   onMarkPaid,
   onReversePayment,
 }: TeamCardProps) {
   const { t } = useTranslation();
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
   const [selectedPlayerId, setSelectedPlayerId] = useState<null | number>(null);
+
+  const { organizationFinance } = useOrganizationFinance(teamOrganizationId);
 
   const handleOpenMenu = (event: MouseEvent<HTMLElement>, playerId: number) => {
     setMenuAnchor(event.currentTarget);

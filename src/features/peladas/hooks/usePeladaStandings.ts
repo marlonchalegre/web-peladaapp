@@ -170,7 +170,8 @@ export function usePeladaStandings(
           ? userIdToName[userId]
           : `Player #${playerId}`;
       const base = statsMap[playerId];
-      const avatar = orgPlayerIdToPlayer[playerId]?.user_avatar_filename ?? null;
+      const avatar =
+        orgPlayerIdToPlayer[playerId]?.user_avatar_filename ?? null;
       stats.push({
         playerId,
         userId,

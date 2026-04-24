@@ -15,10 +15,7 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import PaidIcon from "@mui/icons-material/Paid";
 import { useTranslation } from "react-i18next";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
-import {
-  type AttendanceStatus,
-  type OrganizationFinance,
-} from "../../../shared/api/endpoints";
+import { type AttendanceStatus } from "../../../shared/api/endpoints";
 import { type PlayerWithUser } from "../hooks/useAttendance";
 
 interface PlayerAttendanceCardProps {
@@ -28,11 +25,12 @@ interface PlayerAttendanceCardProps {
   onUpdate: (status: AttendanceStatus) => void;
   isUpdating: boolean;
   isPaid?: boolean;
-  organizationFinance?: OrganizationFinance;
-  onMarkPaid?: () => void;
+  onMarkPaid?: (amount: number) => void;
   onReversePayment?: () => void;
   "data-testid"?: string;
 }
+
+import { useOrganizationFinance } from "../../../shared/hooks/useOrganizationFinance";
 
 export default function PlayerAttendanceCard({
   player,
@@ -41,12 +39,14 @@ export default function PlayerAttendanceCard({
   onUpdate,
   isUpdating,
   isPaid,
-  organizationFinance,
   onMarkPaid,
   onReversePayment,
   "data-testid": testId,
 }: PlayerAttendanceCardProps) {
   const { t } = useTranslation();
+  const { organizationFinance } = useOrganizationFinance(
+    player.organization_id,
+  );
   const initials = player.user.name
     .split(" ")
     .map((n) => n[0])
@@ -208,7 +208,9 @@ export default function PlayerAttendanceCard({
               >
                 <IconButton
                   size="small"
-                  onClick={onMarkPaid}
+                  onClick={() =>
+                    onMarkPaid?.(organizationFinance?.diarista_price || 0)
+                  }
                   disabled={isUpdating || !organizationFinance?.diarista_price}
                   data-testid="mark-as-paid-button"
                   sx={{

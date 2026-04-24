@@ -18,7 +18,10 @@ import {
 
 const endpoints = createApi(api);
 
-export function usePeladaData(peladaId: number) {
+export function usePeladaData(
+  peladaId: number,
+  opts?: { includeFinance?: boolean },
+) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -58,6 +61,8 @@ export function usePeladaData(peladaId: number) {
   );
   const [organizationFinance, setOrganizationFinance] =
     useState<OrganizationFinance | null>(null);
+
+  const includeFinance = opts?.includeFinance;
 
   const fetchData = useCallback(
     async (isRefresh = false) => {
@@ -103,13 +108,15 @@ export function usePeladaData(peladaId: number) {
         setAttendance(data.attendance || []);
         setPeladaTransactions(data.pelada_transactions || []);
 
-        try {
-          const finance = await endpoints.getOrganizationFinance(
-            data.pelada.organization_id,
-          );
-          setOrganizationFinance(finance);
-        } catch (e) {
-          console.error("Failed to load finance settings", e);
+        if (includeFinance) {
+          try {
+            const finance = await endpoints.getOrganizationFinance(
+              data.pelada.organization_id,
+            );
+            setOrganizationFinance(finance);
+          } catch (e) {
+            console.error("Failed to load finance settings", e);
+          }
         }
 
         const nameMap: Record<number, string> = {};
@@ -189,7 +196,7 @@ export function usePeladaData(peladaId: number) {
         if (!isRefresh) setLoading(false);
       }
     },
-    [peladaId, loadedPeladaId, navigate, t, location.pathname],
+    [peladaId, loadedPeladaId, navigate, t, location.pathname, includeFinance],
   );
 
   useEffect(() => {

@@ -16,7 +16,6 @@ import {
   type VotingInfo,
   type User,
   type Transaction,
-  type OrganizationFinance,
 } from "../../../shared/api/endpoints";
 import { useAuth } from "../../../app/providers/AuthContext";
 
@@ -49,8 +48,6 @@ export function usePeladaDetail(peladaId: number) {
   const [peladaTransactions, setPeladaTransactions] = useState<Transaction[]>(
     [],
   );
-  const [organizationFinance, setOrganizationFinance] =
-    useState<OrganizationFinance | null>(null);
 
   // Dialog State
   const [startDialogOpen, setStartDialogOpen] = useState(false);
@@ -89,15 +86,6 @@ export function usePeladaDetail(peladaId: number) {
       setVotingInfo(data.voting_info);
       setPeladaTransactions(data.pelada_transactions || []);
       if (data.scores) setScores(data.scores);
-
-      try {
-        const finance = await endpoints.getOrganizationFinance(
-          data.pelada.organization_id,
-        );
-        setOrganizationFinance(finance);
-      } catch (e) {
-        console.error("Failed to load finance settings", e);
-      }
 
       const playersByTeam: Record<
         number,
@@ -637,7 +625,6 @@ export function usePeladaDetail(peladaId: number) {
     votingInfo,
     scores,
     peladaTransactions,
-    organizationFinance,
     error,
     processing,
     changingStatus,

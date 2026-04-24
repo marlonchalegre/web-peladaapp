@@ -29,7 +29,7 @@ export const SecureAvatar: React.FC<SecureAvatarProps> = ({
 
     if (!userId || !filename) {
       if (filename === "") {
-         console.warn("SecureAvatar: Empty filename for user", userId);
+        console.warn("SecureAvatar: Empty filename for user", userId);
       }
       setImageUrl(undefined);
       setLoading(false);

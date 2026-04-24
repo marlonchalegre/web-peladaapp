@@ -8,7 +8,6 @@ import {
   type Player,
   type User,
   type AttendanceStatus,
-  type OrganizationFinance,
   type Transaction,
 } from "../../../shared/api/endpoints";
 import { useAuth } from "../../../app/providers/AuthContext";
@@ -57,6 +56,8 @@ function sortPlayersByAttendanceTime(
 
 const endpoints = createApi(api);
 
+import { useOrganizationFinance } from "../../../shared/hooks/useOrganizationFinance";
+
 export type PlayerWithUser = Player & {
   user: User;
   attendance_status?: AttendanceStatus;
@@ -80,8 +81,10 @@ export function useAttendance(peladaId: number) {
   const [peladaTransactions, setPeladaTransactions] = useState<Transaction[]>(
     [],
   );
-  const [organizationFinance, setOrganizationFinance] =
-    useState<OrganizationFinance | null>(null);
+
+  const { organizationFinance } = useOrganizationFinance(
+    pelada?.organization_id,
+  );
 
   const fetchData = useCallback(
     async (background = false) => {
@@ -92,15 +95,6 @@ export function useAttendance(peladaId: number) {
         setPelada(data.pelada);
         setPlayers(data.available_players);
         setPeladaTransactions(data.pelada_transactions || []);
-
-        try {
-          const finance = await endpoints.getOrganizationFinance(
-            data.pelada.organization_id,
-          );
-          setOrganizationFinance(finance);
-        } catch (e) {
-          console.error("Failed to load finance settings", e);
-        }
 
         const userIsAdmin =
           user.admin_orgs?.includes(data.pelada.organization_id) ?? false;

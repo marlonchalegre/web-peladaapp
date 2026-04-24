@@ -14,7 +14,6 @@ import type {
   Team,
   User,
   Transaction,
-  OrganizationFinance,
 } from "../../../shared/api/endpoints";
 import TeamCard from "./TeamCard";
 import { useTranslation } from "react-i18next";
@@ -45,7 +44,7 @@ export type TeamsSectionProps = {
   isAdminOverride?: boolean;
   hasFixedGoalkeepers?: boolean;
   peladaTransactions?: Transaction[];
-  organizationFinance?: OrganizationFinance;
+  organizationId?: number; // Add organizationId
   onMarkPaid?: (playerId: number, amount: number) => void;
   onReversePayment?: (playerId: number) => void;
 };
@@ -68,7 +67,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
     isAdminOverride,
     hasFixedGoalkeepers,
     peladaTransactions = [],
-    organizationFinance,
+    organizationId,
     onMarkPaid,
     onReversePayment,
   } = props;
@@ -171,7 +170,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
                   isAdminOverride={isAdminOverride}
                   hasFixedGoalkeepers={hasFixedGoalkeepers}
                   peladaTransactions={peladaTransactions}
-                  organizationFinance={organizationFinance}
+                  teamOrganizationId={organizationId}
                   onMarkPaid={onMarkPaid}
                   onReversePayment={onReversePayment}
                 />

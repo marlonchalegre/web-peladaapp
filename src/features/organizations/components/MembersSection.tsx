@@ -16,7 +16,8 @@ import {
   Select,
   MenuItem,
   FormControl,
-  ListItemAvatar, Avatar,
+  ListItemAvatar,
+  Avatar,
 } from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import EmailIcon from "@mui/icons-material/Email";
@@ -56,7 +57,6 @@ export default function MembersSection({
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
 
-
   const filteredPlayers = useMemo(() => {
     return players.filter((player) => {
       const user = usersMap.get(player.user_id);
@@ -66,15 +66,12 @@ export default function MembersSection({
     });
   }, [players, usersMap, searchTerm]);
 
-
   const paginatedPlayers = useMemo(() => {
     return filteredPlayers.slice(
       page * rowsPerPage,
       page * rowsPerPage + rowsPerPage,
     );
   }, [filteredPlayers, page, rowsPerPage]);
-
-
 
   const handleChangePage = (_event: unknown, newPage: number) => {
     onPageChange(newPage);
@@ -187,18 +184,26 @@ export default function MembersSection({
             return (
               <ListItem key={player.id} divider sx={{ px: 0 }}>
                 <ListItemAvatar>
-                  {((user?.avatar_filename ?? player.user_avatar_filename) ? (
+                  {(user?.avatar_filename ?? player.user_avatar_filename) ? (
                     <SecureAvatar
                       userId={user?.id ?? player.user_id}
-                      filename={user?.avatar_filename ?? player.user_avatar_filename}
+                      filename={
+                        user?.avatar_filename ?? player.user_avatar_filename
+                      }
                       sx={{ width: 40, height: 40 }}
-                      fallbackText={((user?.name ?? player.user_name ?? "").charAt(0) || "").toUpperCase()}
+                      fallbackText={(
+                        (user?.name ?? player.user_name ?? "").charAt(0) || ""
+                      ).toUpperCase()}
                     />
                   ) : (
-                    <Avatar sx={{ width: 40, height: 40, bgcolor: "primary.dark" }}>
-                      {((user?.name ?? player.user_name ?? "").charAt(0) || "").toUpperCase()}
+                    <Avatar
+                      sx={{ width: 40, height: 40, bgcolor: "primary.dark" }}
+                    >
+                      {(
+                        (user?.name ?? player.user_name ?? "").charAt(0) || ""
+                      ).toUpperCase()}
                     </Avatar>
-                  ))}
+                  )}
                 </ListItemAvatar>
                 <ListItemText
                   primary={
