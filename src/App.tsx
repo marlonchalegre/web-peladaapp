@@ -211,7 +211,7 @@ function AppLayout() {
                   >
                     <SecureAvatar
                       userId={user?.id}
-                      filename={user?.avatar_filename || (user as any)?.["avatar-filename"]}
+                      filename={user?.avatar_filename || ((user as unknown as Record<string, unknown>)?.["avatar-filename"] as string | undefined)}
                       sx={{
                         bgcolor: "primary.dark",
                         width: 36,

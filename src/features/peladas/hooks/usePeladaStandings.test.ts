@@ -45,7 +45,7 @@ describe("usePeladaStandings Tie-breaking logic", () => {
     // Time B: 1W 0D 1L, 3 pts, GS: 3, GC: 4, GD: -1
 
     const { result } = renderHook(() =>
-      usePeladaStandings(matches2, mockTeams, [], null, {}, {}, {}, {}),
+      usePeladaStandings(matches2, mockTeams, [], null, {}, {}, {}, {}, {}),
     );
 
     // Time A should be first due to GD (+1 vs -1)
@@ -88,7 +88,7 @@ describe("usePeladaStandings Tie-breaking logic", () => {
     const teams = [...mockTeams, { id: 3, pelada_id: 1, name: "Time C" }];
 
     const { result } = renderHook(() =>
-      usePeladaStandings(matches2, teams, [], null, {}, {}, {}, {}),
+      usePeladaStandings(matches2, teams, [], null, {}, {}, {}, {}, {}),
     );
 
     // Time B should be first due to GS (4 vs 3) since GD is both 3

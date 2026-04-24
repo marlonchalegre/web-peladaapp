@@ -32,6 +32,7 @@ export function usePeladaMatches(peladaId: number) {
     lineupsByMatch,
     orgPlayerIdToUserId,
     userIdToName,
+    orgPlayerIdToPlayer,
   );
 
   const actions = useMatchActions(peladaId, data);

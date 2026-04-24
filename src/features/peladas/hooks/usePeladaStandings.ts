@@ -5,6 +5,7 @@ import {
   type MatchEvent,
   type PlayerStats,
   type TeamPlayer,
+  type Player,
 } from "../../../shared/api/endpoints";
 import { type StandingRow } from "../components/StandingsPanel";
 import { type PlayerStatRow } from "../components/PlayerStatsPanel";
@@ -53,6 +54,7 @@ export function usePeladaStandings(
   lineupsByMatch: Record<number, Record<number, TeamPlayer[]>>,
   orgPlayerIdToUserId: Record<number, number>,
   userIdToName: Record<number, string>,
+  orgPlayerIdToPlayer: Record<number, Player>,
 ) {
   const [playerSort, setPlayerSort] = useState<{
     by: "default" | "goals" | "assists";
@@ -168,14 +170,17 @@ export function usePeladaStandings(
           ? userIdToName[userId]
           : `Player #${playerId}`;
       const base = statsMap[playerId];
+      const avatar = orgPlayerIdToPlayer[playerId]?.user_avatar_filename ?? null;
       stats.push({
         playerId,
+        userId,
         name,
         goals: base?.goals || 0,
         assists: base?.assists || 0,
         ownGoals: base?.ownGoals || 0,
         goalsConceded: goalsConcededMap[playerId],
         matchesPlayed: matchesPlayedMap[playerId] || 0,
+        avatar_filename: avatar,
       });
     }
 
@@ -206,6 +211,7 @@ export function usePeladaStandings(
     lineupsByMatch,
     orgPlayerIdToUserId,
     userIdToName,
+    orgPlayerIdToPlayer,
     playerSort,
   ]);
 
