@@ -72,7 +72,6 @@ export interface Pelada {
   timer_started_at?: string | null;
   timer_accumulated_ms?: number | null;
   timer_status?: TimerStatus | null;
-  vote_ended_message_sent?: boolean;
 }
 
 export interface Team {
