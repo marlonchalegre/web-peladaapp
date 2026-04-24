@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -16,6 +16,7 @@ import {
   Menu,
   MenuItem,
   Tooltip,
+  CircularProgress,
 } from "@mui/material";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
@@ -30,27 +31,72 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import "dayjs/locale/pt-br";
 import ProtectedRoute from "./app/routing/ProtectedRoute";
 import { SecureAvatar } from "./shared/components/SecureAvatar";
-import LoginPage from "./features/auth/pages/LoginPage";
-import RegisterPage from "./features/auth/pages/RegisterPage";
-import FirstAccessPage from "./features/auth/pages/FirstAccessPage";
-import ForgotPasswordPage from "./features/auth/pages/ForgotPasswordPage";
-import ResetPasswordPage from "./features/auth/pages/ResetPasswordPage";
-import HomePage from "./features/home/pages/HomePage";
-import OrganizationDetailPage from "./features/organizations/pages/OrganizationDetailPage";
-import JoinOrganizationPage from "./features/organizations/pages/JoinOrganizationPage";
-import OrganizationStatisticsPage from "./features/organizations/pages/OrganizationStatisticsPage";
-import OrganizationManagementPage from "./features/organizations/pages/OrganizationManagementPage";
-import PeladaDetailPage from "./features/peladas/pages/PeladaDetailPage";
-import ScheduleBuilderPage from "./features/peladas/pages/ScheduleBuilderPage";
-import AttendanceListPage from "./features/peladas/pages/AttendanceListPage";
-import PeladaMatchesPage from "./features/peladas/pages/PeladaMatchesPage";
-import PeladaVotingPage from "./features/peladas/pages/PeladaVotingPage";
-import PeladaVotingResultsPage from "./features/peladas/pages/PeladaVotingResultsPage";
-import UserProfilePage from "./features/user/pages/UserProfilePage";
-import WelcomePage from "./features/auth/pages/WelcomePage";
 import { initGA, logPageView, logClickEvent } from "./lib/analytics";
 import { PWAInstallPrompt } from "./shared/components/PWAInstallPrompt";
 import { PullToRefresh } from "./shared/components/PullToRefresh";
+
+// Lazy load pages to reduce initial bundle size
+const LoginPage = lazy(() => import("./features/auth/pages/LoginPage"));
+const RegisterPage = lazy(() => import("./features/auth/pages/RegisterPage"));
+const FirstAccessPage = lazy(
+  () => import("./features/auth/pages/FirstAccessPage"),
+);
+const ForgotPasswordPage = lazy(
+  () => import("./features/auth/pages/ForgotPasswordPage"),
+);
+const ResetPasswordPage = lazy(
+  () => import("./features/auth/pages/ResetPasswordPage"),
+);
+const HomePage = lazy(() => import("./features/home/pages/HomePage"));
+const OrganizationDetailPage = lazy(
+  () => import("./features/organizations/pages/OrganizationDetailPage"),
+);
+const JoinOrganizationPage = lazy(
+  () => import("./features/organizations/pages/JoinOrganizationPage"),
+);
+const OrganizationStatisticsPage = lazy(
+  () => import("./features/organizations/pages/OrganizationStatisticsPage"),
+);
+const OrganizationManagementPage = lazy(
+  () => import("./features/organizations/pages/OrganizationManagementPage"),
+);
+const PeladaDetailPage = lazy(
+  () => import("./features/peladas/pages/PeladaDetailPage"),
+);
+const ScheduleBuilderPage = lazy(
+  () => import("./features/peladas/pages/ScheduleBuilderPage"),
+);
+const AttendanceListPage = lazy(
+  () => import("./features/peladas/pages/AttendanceListPage"),
+);
+const PeladaMatchesPage = lazy(
+  () => import("./features/peladas/pages/PeladaMatchesPage"),
+);
+const PeladaVotingPage = lazy(
+  () => import("./features/peladas/pages/PeladaVotingPage"),
+);
+const PeladaVotingResultsPage = lazy(
+  () => import("./features/peladas/pages/PeladaVotingResultsPage"),
+);
+const UserProfilePage = lazy(
+  () => import("./features/user/pages/UserProfilePage"),
+);
+const WelcomePage = lazy(() => import("./features/auth/pages/WelcomePage"));
+
+function PageLoading() {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "80vh",
+      }}
+    >
+      <CircularProgress />
+    </Box>
+  );
+}
 
 function AnalyticsTracker() {
   const location = useLocation();
@@ -268,55 +314,63 @@ function AppLayout() {
         )}
         <Box component="main" sx={{ flexGrow: 1 }}>
           <PullToRefresh>
-            <Routes>
-              {/* Rotas públicas sem Container para permitir centralização própria */}
-              <Route path="/" element={<WelcomePage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/first-access" element={<FirstAccessPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Suspense fallback={<PageLoading />}>
+              <Routes>
+                {/* Rotas públicas */}
+                <Route path="/" element={<WelcomePage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/first-access" element={<FirstAccessPage />} />
+                <Route
+                  path="/forgot-password"
+                  element={<ForgotPasswordPage />}
+                />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-              {/* Rotas protegidas sem Container global para permitir controle por página */}
-              <Route element={<ProtectedRoute />}>
-                <Route path="/home" element={<HomePage />} />
-                <Route path="/join/:token" element={<JoinOrganizationPage />} />
-                <Route
-                  path="/organizations/:id"
-                  element={<OrganizationDetailPage />}
-                />
-                <Route
-                  path="/organizations/:id/statistics"
-                  element={<OrganizationStatisticsPage />}
-                />
-                <Route
-                  path="/organizations/:id/management"
-                  element={<OrganizationManagementPage />}
-                />
-                <Route path="/peladas/:id" element={<PeladaDetailPage />} />
-                <Route
-                  path="/peladas/:id/build-schedule"
-                  element={<ScheduleBuilderPage />}
-                />
-                <Route
-                  path="/peladas/:id/attendance"
-                  element={<AttendanceListPage />}
-                />
-                <Route
-                  path="/peladas/:id/matches"
-                  element={<PeladaMatchesPage />}
-                />
-                <Route
-                  path="/peladas/:id/voting"
-                  element={<PeladaVotingPage />}
-                />
-                <Route
-                  path="/peladas/:id/results"
-                  element={<PeladaVotingResultsPage />}
-                />
-                <Route path="/profile" element={<UserProfilePage />} />
-              </Route>
-            </Routes>
+                {/* Rotas protegidas */}
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/home" element={<HomePage />} />
+                  <Route
+                    path="/join/:token"
+                    element={<JoinOrganizationPage />}
+                  />
+                  <Route
+                    path="/organizations/:id"
+                    element={<OrganizationDetailPage />}
+                  />
+                  <Route
+                    path="/organizations/:id/statistics"
+                    element={<OrganizationStatisticsPage />}
+                  />
+                  <Route
+                    path="/organizations/:id/management"
+                    element={<OrganizationManagementPage />}
+                  />
+                  <Route path="/peladas/:id" element={<PeladaDetailPage />} />
+                  <Route
+                    path="/peladas/:id/build-schedule"
+                    element={<ScheduleBuilderPage />}
+                  />
+                  <Route
+                    path="/peladas/:id/attendance"
+                    element={<AttendanceListPage />}
+                  />
+                  <Route
+                    path="/peladas/:id/matches"
+                    element={<PeladaMatchesPage />}
+                  />
+                  <Route
+                    path="/peladas/:id/voting"
+                    element={<PeladaVotingPage />}
+                  />
+                  <Route
+                    path="/peladas/:id/results"
+                    element={<PeladaVotingResultsPage />}
+                  />
+                  <Route path="/profile" element={<UserProfilePage />} />
+                </Route>
+              </Routes>
+            </Suspense>
           </PullToRefresh>
         </Box>
         <Footer />
