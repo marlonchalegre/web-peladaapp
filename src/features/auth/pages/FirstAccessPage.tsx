@@ -60,16 +60,19 @@ export default function FirstAccessPage() {
     e.preventDefault();
     setError(null);
     setLoading(true);
+    const tokenParam = searchParams.get("token") || "";
+    console.log(`SUBMITTING FIRST ACCESS: email=${email}, token=${tokenParam}`);
     try {
-      const { token, user } = await endpoints.firstAccess({
+      const { token: authToken, user } = await endpoints.firstAccess({
         name,
         username,
         email,
         password,
+        token: tokenParam,
         phone: phone || undefined,
         position: position || undefined,
       });
-      signIn(token, user);
+      signIn(authToken, user);
       const redirect = searchParams.get("redirect") || "/home";
       navigate(redirect);
     } catch (error: unknown) {

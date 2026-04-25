@@ -21,7 +21,12 @@ type Props = {
   open: boolean;
   onClose: () => void;
   onInvite: (email?: string, name?: string) => Promise<void>;
-  invitedUser: { email?: string; name?: string; isNew: boolean } | null;
+  invitedUser: {
+    email?: string;
+    name?: string;
+    token?: string;
+    isNew: boolean;
+  } | null;
   onClearInvited: () => void;
   publicInviteLink: string | null;
   onFetchPublicLink: () => Promise<void>;
@@ -53,8 +58,8 @@ export default function InvitePlayerDialog({
     }
   };
 
-  const invitationLink = invitedUser?.email
-    ? `${window.location.origin}/first-access?email=${encodeURIComponent(invitedUser.email)}`
+  const invitationLink = invitedUser?.token
+    ? `${window.location.origin}/first-access?token=${invitedUser.token}&email=${encodeURIComponent(invitedUser.email || "")}`
     : "";
 
   const copyToClipboard = (text: string) => {

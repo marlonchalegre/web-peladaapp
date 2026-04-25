@@ -58,7 +58,7 @@ export class ApiClient {
 
   private headers(): HeadersInit {
     const headers: HeadersInit = { "Content-Type": "application/json" };
-    // We still support header-based auth for flexibility/dev, 
+    // We still support header-based auth for flexibility/dev,
     // but the backend will now prioritize the cookie if present.
     if (this.token) headers["Authorization"] = `Token ${this.token}`;
     return headers;
@@ -225,6 +225,7 @@ export type User = {
   admin_orgs?: number[];
   position?: string;
   avatar_filename?: string | null;
+  token?: string; // Add token field for first-access
 };
 
 export type UserProfileUpdate = {

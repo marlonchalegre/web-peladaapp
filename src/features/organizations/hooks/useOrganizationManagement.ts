@@ -30,6 +30,7 @@ export function useOrganizationManagement(orgId: number) {
   const [invitedUser, setInvitedUser] = useState<{
     email?: string;
     name?: string;
+    token?: string;
     isNew: boolean;
   } | null>(null);
   const [selectedUserIds, setSelectedUserIds] = useState<Set<number>>(
@@ -269,6 +270,7 @@ export function useOrganizationManagement(orgId: number) {
       setInvitedUser({
         email: result.email,
         name: result.name,
+        token: result.token,
         isNew: result.is_new_user,
       });
       await fetchData(true);

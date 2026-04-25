@@ -323,6 +323,7 @@ export function createApi(client: ApiClient) {
         user_id: number;
         email?: string;
         name?: string;
+        token: string;
         is_new_user: boolean;
         organization_id: number;
       }>(`/api/organizations/${id}/invite`, { email, name }),
@@ -619,6 +620,7 @@ export function createApi(client: ApiClient) {
       name: string;
       username: string;
       email: string;
+      token: string;
       password?: string;
       position?: string;
       phone?: string;
