@@ -19,7 +19,6 @@ import {
   Select,
   MenuItem as MuiMenuItem,
   FormControl,
-  Chip,
   InputLabel,
   Card,
   CardContent,
@@ -59,7 +58,6 @@ export default function ScheduleBuilderPage() {
   const [matches, setMatches] = useState<PlannedMatch[]>([]);
   const [matchesPerTeam, setMatchesPerTeam] = useState<number>(2);
   const [organizationId, setOrganizationId] = useState<number | null>(null);
-  const [isFromFormat, setIsFromFormat] = useState(false);
 
   const fetchInitialData = useCallback(async () => {
     try {
@@ -68,31 +66,16 @@ export default function ScheduleBuilderPage() {
       setTeams(data.teams);
       setOrganizationId(data.pelada.organization_id);
 
-      // Try to load existing plan for THIS pelada
-      const existingPlan = await endpoints.getSchedulePlan(peladaId);
-      let currentMatchesPerTeam = 2;
-
-      if (existingPlan && existingPlan.length > 0) {
-        setMatches(existingPlan.map((p) => ({ home: p.home, away: p.away })));
-        const totalMatches = existingPlan.length;
-        const teamCount = data.teams.length;
-        if (teamCount > 0) {
-          currentMatchesPerTeam = Math.round((totalMatches * 2) / teamCount);
-          setMatchesPerTeam(currentMatchesPerTeam);
-        }
-        setIsFromFormat(false);
-      }
+      const currentMatchesPerTeam = 2;
+      setMatchesPerTeam(currentMatchesPerTeam);
 
       if (data.teams.length >= 2) {
-        // Fetch algorithmic default if no plan exists
-        if (!existingPlan || existingPlan.length === 0) {
-          const preview = await endpoints.getSchedulePreview(
-            peladaId,
-            currentMatchesPerTeam,
-          );
-          setMatches(preview.matches);
-          setIsFromFormat(preview.is_from_format);
-        }
+        // Always fetch algorithmic default
+        const preview = await endpoints.getSchedulePreview(
+          peladaId,
+          currentMatchesPerTeam,
+        );
+        setMatches(preview.matches);
       }
     } catch (err: unknown) {
       const message =
@@ -115,7 +98,6 @@ export default function ScheduleBuilderPage() {
       setLoading(true);
       const preview = await endpoints.getSchedulePreview(peladaId, val);
       setMatches(preview.matches);
-      setIsFromFormat(preview.is_from_format);
     } catch (err: unknown) {
       const message =
         err instanceof Error
@@ -135,7 +117,6 @@ export default function ScheduleBuilderPage() {
         matchesPerTeam,
       );
       setMatches(preview.matches);
-      setIsFromFormat(preview.is_from_format);
     } catch (err: unknown) {
       const message =
         err instanceof Error
@@ -154,7 +135,6 @@ export default function ScheduleBuilderPage() {
     newMatches[index] = newMatches[index - 1];
     newMatches[index - 1] = temp;
     setMatches(newMatches);
-    setIsFromFormat(false);
   };
 
   const handleMoveDown = (index: number) => {
@@ -164,7 +144,6 @@ export default function ScheduleBuilderPage() {
     newMatches[index] = newMatches[index + 1];
     newMatches[index + 1] = temp;
     setMatches(newMatches);
-    setIsFromFormat(false);
   };
 
   const handleSwap = (index: number) => {
@@ -172,7 +151,6 @@ export default function ScheduleBuilderPage() {
     const m = newMatches[index];
     newMatches[index] = { home: m.away, away: m.home };
     setMatches(newMatches);
-    setIsFromFormat(false);
   };
 
   const handleUpdateMatch = (
@@ -183,19 +161,16 @@ export default function ScheduleBuilderPage() {
     const newMatches = [...matches];
     newMatches[index] = { ...newMatches[index], [field]: teamId };
     setMatches(newMatches);
-    setIsFromFormat(false);
   };
 
   const handleAddMatch = () => {
     if (teams.length < 2) return;
     setMatches([...matches, { home: teams[0].id, away: teams[1].id }]);
-    setIsFromFormat(false);
   };
 
   const handleRemoveMatch = (index: number) => {
     const newMatches = matches.filter((_, i) => i !== index);
     setMatches(newMatches);
-    setIsFromFormat(false);
   };
 
   const handleSave = async () => {
@@ -207,7 +182,7 @@ export default function ScheduleBuilderPage() {
 
     try {
       setSaving(true);
-      await endpoints.saveSchedulePlan(peladaId, matchesPerTeam, matches);
+      await endpoints.saveSchedulePlan(peladaId, matches);
       navigate(`/peladas/${peladaId}`);
     } catch (err: unknown) {
       const message =
@@ -349,15 +324,6 @@ export default function ScheduleBuilderPage() {
         <Typography variant="h6" fontWeight="bold">
           {t("peladas.detail.schedule.planned_matches")}
         </Typography>
-        {isFromFormat && (
-          <Chip
-            label={t("peladas.detail.schedule.badge.template")}
-            color="success"
-            size="small"
-            variant="filled"
-            sx={{ fontWeight: "bold" }}
-          />
-        )}
       </Box>
 
       <TableContainer
@@ -558,7 +524,9 @@ export default function ScheduleBuilderPage() {
             boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
           }}
         >
-          {saving ? t("common.actions.saving") : t("common.actions.save")}
+          {saving
+            ? t("common.actions.using")
+            : t("peladas.detail.schedule.button.use")}
         </Button>
       </Box>
     </Container>

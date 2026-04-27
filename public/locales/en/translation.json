@@ -143,6 +143,8 @@
       "view": "View",
       "save": "Save",
       "saving": "Saving...",
+      "use": "Use",
+      "using": "Using...",
       "disable": "Disable",
       "enable": "Enable"
     },
@@ -667,6 +669,7 @@
           "refresh": "Refresh Options",
           "use_template": "Load Last Saved",
           "use_random": "Reset to Default",
+          "use": "Use Schedule",
           "suggestions": "Schedule Suggestions"
         },
         "badge": {

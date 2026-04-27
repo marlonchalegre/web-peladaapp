@@ -506,13 +506,8 @@ export function createApi(client: ApiClient) {
       }>(`/api/peladas/${id}/schedule/preview`, {
         matches_per_team: matchesPerTeam,
       }),
-    saveSchedulePlan: (
-      id: number,
-      matchesPerTeam: number,
-      matches: { home: number; away: number }[],
-    ) =>
+    saveSchedulePlan: (id: number, matches: { home: number; away: number }[]) =>
       client.post<{ status: string }>(`/api/peladas/${id}/schedule`, {
-        matches_per_team: matchesPerTeam,
         matches,
       }),
     getSchedulePlan: (id: number) =>

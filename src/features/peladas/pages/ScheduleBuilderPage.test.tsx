@@ -44,7 +44,6 @@ describe("ScheduleBuilderPage", () => {
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/peladas/1/full-details")
         return Promise.resolve(mockFullDetails);
-      if (path === "/api/peladas/1/schedule") return Promise.resolve([]);
       if (path.includes("/schedule/preview"))
         return Promise.resolve(mockPreview);
       return Promise.reject(new Error(`Not found: ${path}`));
@@ -78,7 +77,6 @@ describe("ScheduleBuilderPage", () => {
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/peladas/1/full-details")
         return Promise.resolve(detailsNoTeams);
-      if (path === "/api/peladas/1/schedule") return Promise.resolve([]);
       return Promise.reject(new Error(`Not found: ${path}`));
     });
 
@@ -104,7 +102,6 @@ describe("ScheduleBuilderPage", () => {
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/peladas/1/full-details")
         return Promise.resolve(mockFullDetails);
-      if (path === "/api/peladas/1/schedule") return Promise.resolve([]);
       if (path.includes("/schedule/preview"))
         return Promise.resolve(mockPreview);
       return Promise.reject(new Error(`Not found: ${path}`));
@@ -150,7 +147,6 @@ describe("ScheduleBuilderPage", () => {
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/peladas/1/full-details")
         return Promise.resolve(mockFullDetails);
-      if (path === "/api/peladas/1/schedule") return Promise.resolve([]);
       if (path.includes("/schedule/preview"))
         return Promise.resolve(mockPreview);
       return Promise.reject(new Error(`Not found: ${path}`));
@@ -179,7 +175,7 @@ describe("ScheduleBuilderPage", () => {
 
     await waitFor(() => {
       const saveButton = screen
-        .getByText("common.actions.save")
+        .getByText("peladas.detail.schedule.button.use")
         .closest("button");
       expect(saveButton).toBeDisabled();
     });
@@ -189,7 +185,6 @@ describe("ScheduleBuilderPage", () => {
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/peladas/1/full-details")
         return Promise.resolve(mockFullDetails);
-      if (path === "/api/peladas/1/schedule") return Promise.resolve([]);
       if (path.includes("/schedule/preview"))
         return Promise.resolve(mockPreview);
       return Promise.reject(new Error(`Not found: ${path}`));
@@ -209,8 +204,8 @@ describe("ScheduleBuilderPage", () => {
       </MemoryRouter>,
     );
 
-    await waitFor(() => screen.getByText("common.actions.save"));
-    fireEvent.click(screen.getByText("common.actions.save"));
+    await waitFor(() => screen.getByText("peladas.detail.schedule.button.use"));
+    fireEvent.click(screen.getByText("peladas.detail.schedule.button.use"));
 
     await waitFor(() => {
       expect(api.post).toHaveBeenCalledWith(

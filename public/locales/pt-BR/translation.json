@@ -143,6 +143,8 @@
       "view": "Visualizar",
       "save": "Salvar",
       "saving": "Salvando...",
+      "use": "Usar",
+      "using": "Usando...",
       "disable": "Desativar",
       "enable": "Habilitar"
     },
@@ -666,6 +668,7 @@
           "refresh": "Atualizar Opções",
           "use_template": "Carregar Último Salvo",
           "use_random": "Redefinir para o Padrão",
+          "use": "Usar Tabela",
           "suggestions": "Sugestões de Tabela"
         },
         "badge": {
