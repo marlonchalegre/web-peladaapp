@@ -61,7 +61,6 @@ export default function FirstAccessPage() {
     setError(null);
     setLoading(true);
     const tokenParam = searchParams.get("token") || "";
-    console.log(`SUBMITTING FIRST ACCESS: email=${email}, token=${tokenParam}`);
     try {
       const { token: authToken, user } = await endpoints.firstAccess({
         name,

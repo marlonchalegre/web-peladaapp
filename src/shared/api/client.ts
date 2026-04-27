@@ -179,9 +179,6 @@ export class ApiClient {
   async post<T>(path: string, body?: unknown): Promise<T> {
     const url = new URL(`${this.baseUrl}${path}`, window.location.origin);
     const jsonBody = body ? JSON.stringify(body) : undefined;
-    if (path.includes("finance/transactions")) {
-      console.log("POST to finance/transactions with body:", jsonBody);
-    }
     const res = await this.fetchWithTimeout(url.toString(), {
       method: "POST",
       headers: this.headers(),
@@ -304,7 +301,7 @@ export async function uploadUserAvatar(
 
   const res = await fetch(`${api.apiBaseUrl || ""}/api/user/${id}/avatar`, {
     method: "POST",
-    credentials: "same-origin",
+    credentials: "include",
     body: formData,
   });
 
