@@ -59,8 +59,10 @@ describe("PeladaVotingResultsPage Restricted Access", () => {
     ).toBeInTheDocument();
 
     // Should NOT show the "Vote Now" button as it was removed
-    expect(screen.queryByText(/peladas\.detail\.button\.vote/i)).not.toBeInTheDocument();
-    
+    expect(
+      screen.queryByText(/peladas\.detail\.button\.vote/i),
+    ).not.toBeInTheDocument();
+
     // Should show the "Back" button
     expect(screen.getByText(/common\.back/i)).toBeInTheDocument();
   });
