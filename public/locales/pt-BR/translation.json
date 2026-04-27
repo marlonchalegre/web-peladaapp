@@ -776,7 +776,8 @@
         "error": {
           "load_failed": "Falha ao carregar resultados",
           "not_found": "Resultados não encontrados",
-          "still_voting": "A votação ainda está em andamento. Os resultados estarão disponíveis assim que o período de votação encerrar."
+          "still_voting": "A votação ainda está em andamento. Os resultados estarão disponíveis assim que o período de votação encerrar.",
+          "not_voted": "Você participou desta pelada mas não votou durante o período permitido. Por isso, você não tem mais acesso aos resultados desta partida."
         }
       },
       "stars": "estrelas",

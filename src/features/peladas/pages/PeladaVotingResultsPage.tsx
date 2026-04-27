@@ -19,12 +19,17 @@ import {
   TableRow,
   Chip,
   CircularProgress,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import GroupIcon from "@mui/icons-material/Group";
+import LockIcon from "@mui/icons-material/Lock";
 import axios from "axios";
 import { api } from "../../../shared/api/client";
 import { type VotingResults, createApi } from "../../../shared/api/endpoints";
@@ -43,6 +48,7 @@ export default function PeladaVotingResultsPage() {
   const [results, setResults] = useState<VotingResults | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isRestricted, setIsRestricted] = useState(false);
 
   useEffect(() => {
     if (!peladaId) return;
@@ -52,14 +58,24 @@ export default function PeladaVotingResultsPage() {
         setLoading(true);
         const data = await endpoints.getVotingResults(peladaId);
         setResults(data);
+        setIsRestricted(false);
       } catch (error: unknown) {
         let message = t("peladas.voting.results.error.load_failed");
         if (axios.isAxiosError(error) && error.response?.status === 400) {
           message = t("peladas.voting.results.error.still_voting");
-        } else if (error instanceof Error) {
-          message = error.message;
+          setError(message);
+        } else if (
+          axios.isAxiosError(error) &&
+          error.response?.status === 403
+        ) {
+          setIsRestricted(true);
+          setError(null);
+        } else {
+          if (error instanceof Error) {
+            message = error.message;
+          }
+          setError(message);
         }
-        setError(message);
       } finally {
         setLoading(false);
       }
@@ -68,11 +84,65 @@ export default function PeladaVotingResultsPage() {
     loadData();
   }, [peladaId, t]);
 
+  // Dummy data for the blurred background when restricted
+  const dummyResults: VotingResults = {
+    mvp: Array(10)
+      .fill(null)
+      .map((_, i) => ({
+        player_id: i,
+        user_id: 0,
+        name: "Player Name",
+        average_stars: 4.5 - i * 0.2,
+        position: "Midfielder",
+        goals: Math.max(0, 3 - i),
+        assists: Math.max(0, 2 - i),
+        own_goals: 0,
+        avatar_filename: null,
+      })),
+    striker: Array(3)
+      .fill(null)
+      .map((_, i) => ({
+        player_id: i,
+        user_id: 0,
+        name: "Striker Name",
+        goals: 3 - i,
+        average_stars: 4.0,
+        assists: 0,
+        own_goals: 0,
+        avatar_filename: null,
+      })),
+    garcom: Array(3)
+      .fill(null)
+      .map((_, i) => ({
+        player_id: i + 10,
+        user_id: 0,
+        name: "Assister Name",
+        assists: 3 - i,
+        average_stars: 4.0,
+        goals: 0,
+        own_goals: 0,
+        avatar_filename: null,
+      })),
+    total_voted: 5,
+    total_eligible: 10,
+    voters: Array(10)
+      .fill(null)
+      .map((_, i) => ({
+        player_id: i,
+        name: "Voter Name",
+        has_voted: i < 5,
+      })),
+    organization_id: 0,
+    organization_name: "Organization Name",
+  };
+
+  const displayResults = isRestricted ? dummyResults : results;
+
   if (loading) {
     return <Loading message={t("common.loading")} />;
   }
 
-  if (error || !results) {
+  if (error || (!displayResults && !isRestricted)) {
     return (
       <Container
         maxWidth="lg"
@@ -131,7 +201,7 @@ export default function PeladaVotingResultsPage() {
   }
 
   const participationRate = Math.round(
-    (results.total_voted / results.total_eligible) * 100,
+    (displayResults!.total_voted / displayResults!.total_eligible) * 100,
   );
 
   return (
@@ -140,13 +210,66 @@ export default function PeladaVotingResultsPage() {
       sx={{ py: { xs: 2, sm: 4 }, px: { xs: 1, sm: 2 } }}
       disableGutters
     >
-      <Box sx={{ mt: 2, mb: 2, px: { xs: 1.5, sm: 0 } }}>
+      {isRestricted && (
+        <Dialog
+          open={true}
+          aria-labelledby="restricted-results-title"
+          PaperProps={{
+            sx: { borderRadius: 4, p: 2, maxWidth: "400px" },
+          }}
+        >
+          <DialogTitle id="restricted-results-title" textAlign="center">
+            <LockIcon color="warning" sx={{ fontSize: 60, mb: 2 }} />
+            <Typography variant="h5" component="div" fontWeight="bold">
+              {t("common.actions.view", "Resultados Restritos")}
+            </Typography>
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="body1" textAlign="center" sx={{ mb: 2 }}>
+              {t(
+                "peladas.voting.results.error.not_voted",
+                "Você participou desta pelada mas não votou. Por isso, você não tem acesso aos resultados.",
+              )}
+            </Typography>
+          </DialogContent>
+          <DialogActions
+            sx={{
+              flexDirection: "column",
+              gap: 1,
+              px: 3,
+              pb: 3,
+            }}
+          >
+            <Button
+              variant="contained"
+              fullWidth
+              component={RouterLink}
+              to={`/peladas/${peladaId}`}
+              sx={{ borderRadius: 2, py: 1.5 }}
+            >
+              {t("common.back", "Voltar")}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
+
+      <Box
+        sx={{
+          mt: 2,
+          mb: 2,
+          px: { xs: 1.5, sm: 0 },
+          filter: isRestricted ? "blur(12px)" : "none",
+          pointerEvents: isRestricted ? "none" : "auto",
+          transition: "filter 0.3s ease",
+        }}
+      >
         <BreadcrumbNav
           items={[
             {
-              label: results.organization_name || t("common.organization"),
-              path: results.organization_id
-                ? `/organizations/${results.organization_id}`
+              label:
+                displayResults!.organization_name || t("common.organization"),
+              path: displayResults!.organization_id
+                ? `/organizations/${displayResults!.organization_id}`
                 : "/home",
             },
             {
@@ -166,6 +289,8 @@ export default function PeladaVotingResultsPage() {
           mt: 4,
           mb: 4,
           px: { xs: 1.5, sm: 0 },
+          filter: isRestricted ? "blur(12px)" : "none",
+          pointerEvents: isRestricted ? "none" : "auto",
         }}
       >
         <Typography variant="h3" fontWeight="bold">
@@ -196,7 +321,14 @@ export default function PeladaVotingResultsPage() {
         </Box>
       </Box>
 
-      <Box sx={{ px: { xs: 1.5, sm: 0 } }}>
+      <Box
+        sx={{
+          px: { xs: 1.5, sm: 0 },
+          filter: isRestricted ? "blur(12px)" : "none",
+          pointerEvents: isRestricted ? "none" : "auto",
+          userSelect: isRestricted ? "none" : "auto",
+        }}
+      >
         <Grid container spacing={4}>
           {/* Participation Card */}
           <Grid size={{ xs: 12, md: 4 }}>
@@ -242,7 +374,8 @@ export default function PeladaVotingResultsPage() {
                 {t("peladas.voting.results.participation")}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                {results.total_voted} {t("common.of")} {results.total_eligible}{" "}
+                {displayResults!.total_voted} {t("common.of")}{" "}
+                {displayResults!.total_eligible}{" "}
                 {t("peladas.voting.results.players_voted")}
               </Typography>
             </Paper>
@@ -266,11 +399,11 @@ export default function PeladaVotingResultsPage() {
               <Grid container spacing={2} alignItems="flex-end">
                 {/* 2nd Place */}
                 <Grid size={{ xs: 4 }}>
-                  {results.mvp[1] && (
+                  {displayResults!.mvp[1] && (
                     <Box sx={{ textAlign: "center" }}>
                       <SecureAvatar
-                        userId={results.mvp[1].user_id || 0}
-                        filename={results.mvp[1].avatar_filename}
+                        userId={displayResults!.mvp[1].user_id || 0}
+                        filename={displayResults!.mvp[1].avatar_filename}
                         sx={{
                           bgcolor: "grey.400",
                           width: 56,
@@ -278,13 +411,13 @@ export default function PeladaVotingResultsPage() {
                           mx: "auto",
                           mb: 1,
                         }}
-                        fallbackText={results.mvp[1].name.charAt(0)}
+                        fallbackText={displayResults!.mvp[1].name.charAt(0)}
                       />
                       <Typography variant="subtitle2" fontWeight="bold" noWrap>
-                        {results.mvp[1].name}
+                        {displayResults!.mvp[1].name}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {results.mvp[1].average_stars.toFixed(1)} ★
+                        {displayResults!.mvp[1].average_stars.toFixed(1)} ★
                       </Typography>
                       <Box
                         sx={{
@@ -300,14 +433,14 @@ export default function PeladaVotingResultsPage() {
 
                 {/* 1st Place */}
                 <Grid size={{ xs: 4 }}>
-                  {results.mvp[0] && (
+                  {displayResults!.mvp[0] && (
                     <Box sx={{ textAlign: "center" }}>
                       <EmojiEventsIcon
                         sx={{ color: "gold", fontSize: 40, mb: 1 }}
                       />
                       <SecureAvatar
-                        userId={results.mvp[0].user_id || 0}
-                        filename={results.mvp[0].avatar_filename}
+                        userId={displayResults!.mvp[0].user_id || 0}
+                        filename={displayResults!.mvp[0].avatar_filename}
                         sx={{
                           bgcolor: "gold",
                           width: 80,
@@ -316,17 +449,17 @@ export default function PeladaVotingResultsPage() {
                           mb: 1,
                           border: "4px solid gold",
                         }}
-                        fallbackText={results.mvp[0].name.charAt(0)}
+                        fallbackText={displayResults!.mvp[0].name.charAt(0)}
                       />
                       <Typography variant="h6" fontWeight="bold" noWrap>
-                        {results.mvp[0].name}
+                        {displayResults!.mvp[0].name}
                       </Typography>
                       <Typography
                         variant="subtitle1"
                         color="primary"
                         fontWeight="bold"
                       >
-                        {results.mvp[0].average_stars.toFixed(1)} ★
+                        {displayResults!.mvp[0].average_stars.toFixed(1)} ★
                       </Typography>
                       <Box
                         sx={{
@@ -343,11 +476,11 @@ export default function PeladaVotingResultsPage() {
 
                 {/* 3rd Place */}
                 <Grid size={{ xs: 4 }}>
-                  {results.mvp[2] && (
+                  {displayResults!.mvp[2] && (
                     <Box sx={{ textAlign: "center" }}>
                       <SecureAvatar
-                        userId={results.mvp[2].user_id || 0}
-                        filename={results.mvp[2].avatar_filename}
+                        userId={displayResults!.mvp[2].user_id || 0}
+                        filename={displayResults!.mvp[2].avatar_filename}
                         sx={{
                           bgcolor: "brown",
                           width: 56,
@@ -355,13 +488,13 @@ export default function PeladaVotingResultsPage() {
                           mx: "auto",
                           mb: 1,
                         }}
-                        fallbackText={results.mvp[2].name.charAt(0)}
+                        fallbackText={displayResults!.mvp[2].name.charAt(0)}
                       />
                       <Typography variant="subtitle2" fontWeight="bold" noWrap>
-                        {results.mvp[2].name}
+                        {displayResults!.mvp[2].name}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        {results.mvp[2].average_stars.toFixed(1)} ★
+                        {displayResults!.mvp[2].average_stars.toFixed(1)} ★
                       </Typography>
                       <Box
                         sx={{
@@ -391,7 +524,7 @@ export default function PeladaVotingResultsPage() {
                   </Typography>
                 </Box>
                 <Stack spacing={2}>
-                  {results.striker.slice(0, 3).map((s, i) => (
+                  {displayResults!.striker.slice(0, 3).map((s, i) => (
                     <Box
                       key={s.player_id}
                       sx={{
@@ -416,7 +549,7 @@ export default function PeladaVotingResultsPage() {
                       />
                     </Box>
                   ))}
-                  {results.striker.length === 0 && (
+                  {displayResults!.striker.length === 0 && (
                     <Typography color="text.secondary">
                       {t("peladas.voting.results.no_awards")}
                     </Typography>
@@ -438,7 +571,7 @@ export default function PeladaVotingResultsPage() {
                   </Typography>
                 </Box>
                 <Stack spacing={2}>
-                  {results.garcom.slice(0, 3).map((g, i) => (
+                  {displayResults!.garcom.slice(0, 3).map((g, i) => (
                     <Box
                       key={g.player_id}
                       sx={{
@@ -463,7 +596,7 @@ export default function PeladaVotingResultsPage() {
                       />
                     </Box>
                   ))}
-                  {results.garcom.length === 0 && (
+                  {displayResults!.garcom.length === 0 && (
                     <Typography color="text.secondary">
                       {t("peladas.voting.results.no_awards")}
                     </Typography>
@@ -503,7 +636,7 @@ export default function PeladaVotingResultsPage() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {results.mvp.map((p, i) => {
+                  {displayResults!.mvp.map((p, i) => {
                     const positionKey = p.position
                       ? `common.positions.${p.position.toLowerCase()}`
                       : "common.positions.unknown";
@@ -566,7 +699,7 @@ export default function PeladaVotingResultsPage() {
                 </Typography>
               </Box>
               <Grid container spacing={2}>
-                {results.voters.map((v) => (
+                {displayResults!.voters.map((v) => (
                   <Grid size={{ xs: 6, sm: 4, md: 3 }} key={v.player_id}>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       {v.has_voted ? (
