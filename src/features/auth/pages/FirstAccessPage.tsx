@@ -29,8 +29,16 @@ export default function FirstAccessPage() {
   const [searchParams] = useSearchParams();
 
   const [name, setName] = useState("");
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState(searchParams.get("email") || "");
+  const [email, setEmail] = useState(() => {
+    return searchParams.get("email") || "";
+  });
+  const [username, setUsername] = useState(() => {
+    const emailParam = searchParams.get("email");
+    if (emailParam && !emailParam.includes("@")) {
+      return emailParam;
+    }
+    return "";
+  });
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [position, setPosition] = useState("");
@@ -43,18 +51,6 @@ export default function FirstAccessPage() {
       navigate(redirect, { replace: true });
     }
   }, [isAuthenticated, navigate, searchParams]);
-
-  useEffect(() => {
-    const emailParam = searchParams.get("email");
-    if (emailParam) {
-      setEmail(emailParam);
-      // Also default username to email if it's not an actual email address
-      // (as it was used for handles before)
-      if (!emailParam.includes("@")) {
-        setUsername(emailParam);
-      }
-    }
-  }, [searchParams]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();

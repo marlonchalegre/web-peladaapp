@@ -79,11 +79,8 @@ export function useHomeDashboard() {
       setAdminOrgs(adminOrgsList);
       setMemberOrgs(memberOrgsList);
 
-      // Update local user object if it's missing the new org in admin_orgs
-      // This is a local backup if refreshUser didn't update the context fast enough
-      if (user && adminOrgsList.length > (user.admin_orgs?.length || 0)) {
-        user.admin_orgs = adminOrgsList.map((o) => o.id);
-      }
+      // Note: We avoid direct mutation of the 'user' object here.
+      // If admin_orgs needs to stay in sync, it should be updated via AuthContext/refreshUser.
     } catch (err) {
       const message =
         err instanceof Error ? err.message : t("home.error.load_failed");

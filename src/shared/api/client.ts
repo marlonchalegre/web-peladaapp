@@ -111,6 +111,7 @@ export class ApiClient {
       if (error instanceof Error && error.name === "AbortError") {
         throw new Error(
           "Network timeout: The request took too long to complete",
+          { cause: error },
         );
       }
       throw error;

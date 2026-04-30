@@ -59,7 +59,46 @@ interface SummaryCardProps {
   color: string;
   icon: React.ReactNode;
   testId: string;
+  currency?: string;
 }
+
+const SummaryCard = ({
+  title,
+  value,
+  color,
+  icon,
+  testId,
+  currency = "BRL",
+}: SummaryCardProps) => (
+  <Card variant="outlined" sx={{ height: "100%" }} data-testid={testId}>
+    <CardContent>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Typography color="text.secondary" gutterBottom variant="overline">
+          {title}
+        </Typography>
+        {icon}
+      </Box>
+      <Typography
+        variant="h5"
+        fontWeight="bold"
+        color={color}
+        data-testid={`${testId}-value`}
+        data-amount={value}
+      >
+        {new Intl.NumberFormat("pt-BR", {
+          style: "currency",
+          currency: currency,
+        }).format(value)}
+      </Typography>
+    </CardContent>
+  </Card>
+);
 
 export default function FinanceSection({
   orgId,
@@ -290,43 +329,6 @@ export default function FinanceSection({
     }
   };
 
-  const SummaryCard = ({
-    title,
-    value,
-    color,
-    icon,
-    testId,
-  }: SummaryCardProps) => (
-    <Card variant="outlined" sx={{ height: "100%" }} data-testid={testId}>
-      <CardContent>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Typography color="text.secondary" gutterBottom variant="overline">
-            {title}
-          </Typography>
-          {icon}
-        </Box>
-        <Typography
-          variant="h5"
-          fontWeight="bold"
-          color={color}
-          data-testid={`${testId}-value`}
-          data-amount={value}
-        >
-          {new Intl.NumberFormat("pt-BR", {
-            style: "currency",
-            currency: finance?.currency || "BRL",
-          }).format(value)}
-        </Typography>
-      </CardContent>
-    </Card>
-  );
-
   if (loading && !summary && transactions.length === 0)
     return <CircularProgress data-testid="finance-loading" />;
 
@@ -371,6 +373,7 @@ export default function FinanceSection({
             }
             icon={<AccountBalanceWalletIcon color="primary" />}
             testId="summary-balance"
+            currency={finance?.currency}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
@@ -380,6 +383,7 @@ export default function FinanceSection({
             color="success.main"
             icon={<TrendingUpIcon color="success" />}
             testId="summary-income"
+            currency={finance?.currency}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
@@ -389,6 +393,7 @@ export default function FinanceSection({
             color="error.main"
             icon={<TrendingDownIcon color="error" />}
             testId="summary-expense"
+            currency={finance?.currency}
           />
         </Grid>
       </Grid>
