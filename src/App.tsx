@@ -33,7 +33,6 @@ import ProtectedRoute from "./app/routing/ProtectedRoute";
 import { SecureAvatar } from "./shared/components/SecureAvatar";
 import { initGA, logPageView, logClickEvent } from "./lib/analytics";
 import { PWAInstallPrompt } from "./shared/components/PWAInstallPrompt";
-import { PullToRefresh } from "./shared/components/PullToRefresh";
 
 // Lazy load pages to reduce initial bundle size
 const LoginPage = lazy(() => import("./features/auth/pages/LoginPage"));
@@ -200,7 +199,7 @@ function AppLayout() {
         sx={{
           display: "flex",
           flexDirection: "column",
-          minHeight: "100vh",
+          minHeight: "100%",
           bgcolor: "background.default",
         }}
       >
@@ -319,68 +318,59 @@ function AppLayout() {
           </AppBar>
         )}
         <Box component="main" sx={{ flexGrow: 1 }}>
-          <PullToRefresh>
-            <Suspense fallback={<PageLoading />}>
-              <Routes>
-                {/* Rotas públicas */}
-                <Route path="/" element={<WelcomePage />} />
-                <Route path="/login" element={<LoginPage />} />
-                <Route path="/register" element={<RegisterPage />} />
-                <Route path="/first-access" element={<FirstAccessPage />} />
-                <Route
-                  path="/forgot-password"
-                  element={<ForgotPasswordPage />}
-                />
-                <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Suspense fallback={<PageLoading />}>
+            <Routes>
+              {/* Rotas públicas */}
+              <Route path="/" element={<WelcomePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/first-access" element={<FirstAccessPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-                {/* Rotas protegidas */}
-                <Route element={<ProtectedRoute />}>
-                  <Route path="/home" element={<HomePage />} />
-                  <Route
-                    path="/join/:token"
-                    element={<JoinOrganizationPage />}
-                  />
-                  <Route
-                    path="/organizations/:id"
-                    element={<OrganizationDetailPage />}
-                  />
-                  <Route
-                    path="/organizations/:id/statistics"
-                    element={<OrganizationStatisticsPage />}
-                  />
-                  <Route
-                    path="/organizations/:id/management"
-                    element={<OrganizationManagementPage />}
-                  />
-                  <Route path="/peladas/:id" element={<PeladaDetailPage />} />
-                  <Route
-                    path="/peladas/:id/build-schedule"
-                    element={<ScheduleBuilderPage />}
-                  />
-                  <Route
-                    path="/peladas/:id/attendance"
-                    element={<AttendanceListPage />}
-                  />
-                  <Route
-                    path="/peladas/:id/matches"
-                    element={<PeladaMatchesPage />}
-                  />
-                  <Route
-                    path="/peladas/:id/voting"
-                    element={<PeladaVotingPage />}
-                  />
-                  <Route
-                    path="/peladas/:id/results"
-                    element={<PeladaVotingResultsPage />}
-                  />
-                  <Route path="/profile" element={<UserProfilePage />} />
-                </Route>
-              </Routes>
-            </Suspense>
-          </PullToRefresh>
+              {/* Rotas protegidas */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/home" element={<HomePage />} />
+                <Route path="/join/:token" element={<JoinOrganizationPage />} />
+                <Route
+                  path="/organizations/:id"
+                  element={<OrganizationDetailPage />}
+                />
+                <Route
+                  path="/organizations/:id/statistics"
+                  element={<OrganizationStatisticsPage />}
+                />
+                <Route
+                  path="/organizations/:id/management"
+                  element={<OrganizationManagementPage />}
+                />
+                <Route path="/peladas/:id" element={<PeladaDetailPage />} />
+                <Route
+                  path="/peladas/:id/build-schedule"
+                  element={<ScheduleBuilderPage />}
+                />
+                <Route
+                  path="/peladas/:id/attendance"
+                  element={<AttendanceListPage />}
+                />
+                <Route
+                  path="/peladas/:id/matches"
+                  element={<PeladaMatchesPage />}
+                />
+                <Route
+                  path="/peladas/:id/voting"
+                  element={<PeladaVotingPage />}
+                />
+                <Route
+                  path="/peladas/:id/results"
+                  element={<PeladaVotingResultsPage />}
+                />
+                <Route path="/profile" element={<UserProfilePage />} />
+              </Route>
+            </Routes>
+          </Suspense>
         </Box>
-        <Footer />
-        <PWAInstallPrompt />
+        <Footer /> <PWAInstallPrompt />
       </Box>
     </>
   );

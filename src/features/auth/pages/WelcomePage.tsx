@@ -177,7 +177,7 @@ export default function WelcomePage() {
   }
 
   return (
-    <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
+    <Box sx={{ bgcolor: "background.default", minHeight: "100%" }}>
       {/* Hero Section */}
       <Box
         sx={{

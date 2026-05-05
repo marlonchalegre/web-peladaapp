@@ -261,7 +261,7 @@ export default function PeladaMatchesPage() {
   if (error) return <Alert severity="error">{error}</Alert>;
 
   return (
-    <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
+    <Box sx={{ bgcolor: "background.default", minHeight: "100%" }}>
       <Container
         maxWidth="lg"
         sx={{ py: { xs: 2, sm: 3 }, px: { xs: 1, sm: 2 } }}
