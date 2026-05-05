@@ -113,7 +113,7 @@ function MockVoting() {
   const { t } = useTranslation();
   return (
     <Paper sx={{ p: 2, borderRadius: 2, height: "100%" }}>
-      <Typography variant="subtitle2" textAlign="center" gutterBottom>
+      <Typography variant="subtitle2" align="center" gutterBottom>
         {t("welcome.mock.mvp_vote")}
       </Typography>
       <Stack alignItems="center" spacing={1}>
@@ -232,7 +232,7 @@ export default function WelcomePage() {
       <Container maxWidth="lg" sx={{ py: 8 }}>
         <Grid container spacing={4}>
           <Grid size={{ xs: 12, sm: 4 }}>
-            <Stack alignItems="center" textAlign="center" spacing={2}>
+            <Stack alignItems="center" align="center" spacing={2}>
               <Avatar
                 sx={{
                   bgcolor: alpha(theme.palette.primary.main, 0.1),
@@ -252,7 +252,7 @@ export default function WelcomePage() {
             </Stack>
           </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
-            <Stack alignItems="center" textAlign="center" spacing={2}>
+            <Stack alignItems="center" align="center" spacing={2}>
               <Avatar
                 sx={{
                   bgcolor: alpha(theme.palette.primary.main, 0.1),
@@ -272,7 +272,7 @@ export default function WelcomePage() {
             </Stack>
           </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
-            <Stack alignItems="center" textAlign="center" spacing={2}>
+            <Stack alignItems="center" align="center" spacing={2}>
               <Avatar
                 sx={{
                   bgcolor: alpha(theme.palette.primary.main, 0.1),

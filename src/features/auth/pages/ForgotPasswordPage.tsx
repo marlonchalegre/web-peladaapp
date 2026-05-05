@@ -66,7 +66,7 @@ export default function ForgotPasswordPage() {
       >
         {success ? (
           <Stack spacing={2}>
-            <Typography variant="h5" component="h1" textAlign="center">
+            <Typography variant="h5" component="h1" align="center">
               {t("auth.forgot_password.title")}
             </Typography>
             <Alert severity="success">
@@ -86,7 +86,7 @@ export default function ForgotPasswordPage() {
               <Typography
                 variant="h5"
                 component="h1"
-                textAlign="center"
+                align="center"
                 gutterBottom
               >
                 {t("auth.forgot_password.title")}
@@ -94,7 +94,7 @@ export default function ForgotPasswordPage() {
               <Typography
                 variant="body2"
                 color="text.secondary"
-                textAlign="center"
+                align="center"
               >
                 {t("auth.forgot_password.description")}
               </Typography>
@@ -126,7 +126,7 @@ export default function ForgotPasswordPage() {
                   ? t("auth.forgot_password.button.loading")
                   : t("auth.forgot_password.button.submit")}
               </Button>
-              <Typography variant="body2" textAlign="center">
+              <Typography variant="body2" align="center">
                 <MLink
                   href={`/login${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`}
                   underline="hover"

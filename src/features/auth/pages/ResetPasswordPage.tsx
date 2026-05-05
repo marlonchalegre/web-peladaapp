@@ -105,7 +105,7 @@ export default function ResetPasswordPage() {
             <Typography
               variant="h5"
               component="h1"
-              textAlign="center"
+              align="center"
               gutterBottom
             >
               {t("auth.reset_password.title")}
@@ -113,7 +113,7 @@ export default function ResetPasswordPage() {
             <Typography
               variant="body2"
               color="text.secondary"
-              textAlign="center"
+              align="center"
             >
               {t("auth.reset_password.description")}
             </Typography>

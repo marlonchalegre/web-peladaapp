@@ -393,7 +393,7 @@ export default function MatchReportSummary({
                 variant="caption"
                 color="text.secondary"
                 display="block"
-                textAlign="center"
+                align="center"
                 sx={{ mt: 1 }}
               >
                 {t("peladas.dashboard.summary.next_match_desc", {

@@ -220,14 +220,14 @@ export default function PeladaVotingResultsPage() {
             }
           }}
         >
-          <DialogTitle id="restricted-results-title" textAlign="center">
+          <DialogTitle id="restricted-results-title" align="center">
             <LockIcon color="warning" sx={{ fontSize: 60, mb: 2 }} />
             <Typography variant="h5" component="div" fontWeight="bold">
               {t("common.actions.view", "Resultados Restritos")}
             </Typography>
           </DialogTitle>
           <DialogContent>
-            <Typography variant="body1" textAlign="center" sx={{ mb: 2 }}>
+            <Typography variant="body1" align="center" sx={{ mb: 2 }}>
               {t(
                 "peladas.voting.results.error.not_voted",
                 "Você participou desta pelada mas não votou. Por isso, você não tem acesso aos resultados.",

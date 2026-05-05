@@ -69,7 +69,7 @@ export default function LoginPage() {
             <Typography
               variant="h5"
               component="h1"
-              textAlign="center"
+              align="center"
               gutterBottom
             >
               {t("auth.login.title")}
@@ -115,7 +115,7 @@ export default function LoginPage() {
                 ? t("auth.login.button.loading")
                 : t("auth.login.button.submit")}
             </Button>
-            <Typography variant="body2" textAlign="center">
+            <Typography variant="body2" align="center">
               {t("auth.login.link.new_user")}{" "}
               <MLink
                 href={`/register${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`}
@@ -125,7 +125,7 @@ export default function LoginPage() {
                 {t("auth.login.link.register")}
               </MLink>
             </Typography>
-            <Typography variant="body2" textAlign="center">
+            <Typography variant="body2" align="center">
               <MLink
                 href={`/forgot-password${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`}
                 underline="hover"

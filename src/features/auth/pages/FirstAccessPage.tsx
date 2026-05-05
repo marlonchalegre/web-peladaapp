@@ -100,7 +100,7 @@ export default function FirstAccessPage() {
             <Typography
               variant="h5"
               component="h1"
-              textAlign="center"
+              align="center"
               gutterBottom
             >
               {t("auth.first_access.title")}
@@ -108,7 +108,7 @@ export default function FirstAccessPage() {
             <Typography
               variant="body2"
               color="text.secondary"
-              textAlign="center"
+              align="center"
             >
               {t("auth.first_access.description")}
             </Typography>
@@ -208,7 +208,7 @@ export default function FirstAccessPage() {
                 ? t("auth.first_access.button.loading")
                 : t("auth.first_access.button.submit")}
             </Button>
-            <Typography variant="body2" textAlign="center">
+            <Typography variant="body2" align="center">
               <MLink
                 href={`/login${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`}
                 underline="hover"
