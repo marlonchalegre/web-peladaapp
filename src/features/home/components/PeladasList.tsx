@@ -186,7 +186,7 @@ export default function PeladasList({
                         {pelada.organization_name || pelada.organization_id}
                       </Typography>
                     </TableCell>
-                    <TableCell sx={{ py: 2.5 }}>
+                    <TableCell sx={{ py: 2.5, width: { xs: '120px', sm: '160px' }, px: { xs: 2, sm: 3 }, textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       <Chip
                         label={t(
                           `pelada.status.${pelada.status}`,
@@ -199,17 +199,25 @@ export default function PeladasList({
                           fontWeight: 500,
                           borderRadius: 1,
                           height: "auto",
+                          maxWidth: { xs: 80, sm: 140 },
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          display: "inline-block",
+                          mx: "auto",
                           "& .MuiChip-label": {
                             display: "block",
-                            whiteSpace: "normal",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
                             textAlign: "center",
                             py: 0.5,
                             px: 1,
+                            fontSize: { xs: "0.72rem", sm: "0.875rem" },
                           },
                         }}
                       />
                     </TableCell>
-                    <TableCell sx={{ py: 2.5 }}>
+                    <TableCell sx={{ py: 2.5, width: { xs: '24px', sm: '40px' }, textAlign: 'center' }}>
                       <ChevronRightIcon sx={{ color: "grey.300" }} />
                     </TableCell>
                   </TableRow>
