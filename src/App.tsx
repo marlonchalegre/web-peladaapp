@@ -33,6 +33,7 @@ import ProtectedRoute from "./app/routing/ProtectedRoute";
 import { SecureAvatar } from "./shared/components/SecureAvatar";
 import { initGA, logPageView, logClickEvent } from "./lib/analytics";
 import { PWAInstallPrompt } from "./shared/components/PWAInstallPrompt";
+import { PullToRefresh } from "./shared/components/PullToRefresh";
 
 // Lazy load pages to reduce initial bundle size
 const LoginPage = lazy(() => import("./features/auth/pages/LoginPage"));
@@ -159,7 +160,6 @@ function Footer() {
       }}
     >
       <Typography
-        component="span"
         variant="body2"
         sx={{
           color: "text.secondary",
@@ -300,7 +300,7 @@ function AppLayout() {
                     onClick={handleCloseUserMenu}
                     data-testid="profile-menu-item"
                   >
-                    <Typography component="span" align="center">
+                    <Typography align="center">
                       {t("navigation.profile")}
                     </Typography>
                   </MenuItem>
@@ -308,9 +308,7 @@ function AppLayout() {
                     onClick={handleLogout}
                     data-testid="logout-menu-item"
                   >
-                    <Typography component="span" align="center">
-                      {t("auth.logout")}
-                    </Typography>
+                    <Typography align="center">{t("auth.logout")}</Typography>
                   </MenuItem>
                 </Menu>
               </Box>
@@ -318,57 +316,65 @@ function AppLayout() {
           </AppBar>
         )}
         <Box component="main" sx={{ flexGrow: 1 }}>
-          <Suspense fallback={<PageLoading />}>
-            <Routes>
-              {/* Rotas públicas */}
-              <Route path="/" element={<WelcomePage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/first-access" element={<FirstAccessPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <PullToRefresh>
+            <Suspense fallback={<PageLoading />}>
+              <Routes>
+                {/* Rotas públicas */}
+                <Route path="/" element={<WelcomePage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/first-access" element={<FirstAccessPage />} />
+                <Route
+                  path="/forgot-password"
+                  element={<ForgotPasswordPage />}
+                />
+                <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-              {/* Rotas protegidas */}
-              <Route element={<ProtectedRoute />}>
-                <Route path="/home" element={<HomePage />} />
-                <Route path="/join/:token" element={<JoinOrganizationPage />} />
-                <Route
-                  path="/organizations/:id"
-                  element={<OrganizationDetailPage />}
-                />
-                <Route
-                  path="/organizations/:id/statistics"
-                  element={<OrganizationStatisticsPage />}
-                />
-                <Route
-                  path="/organizations/:id/management"
-                  element={<OrganizationManagementPage />}
-                />
-                <Route path="/peladas/:id" element={<PeladaDetailPage />} />
-                <Route
-                  path="/peladas/:id/build-schedule"
-                  element={<ScheduleBuilderPage />}
-                />
-                <Route
-                  path="/peladas/:id/attendance"
-                  element={<AttendanceListPage />}
-                />
-                <Route
-                  path="/peladas/:id/matches"
-                  element={<PeladaMatchesPage />}
-                />
-                <Route
-                  path="/peladas/:id/voting"
-                  element={<PeladaVotingPage />}
-                />
-                <Route
-                  path="/peladas/:id/results"
-                  element={<PeladaVotingResultsPage />}
-                />
-                <Route path="/profile" element={<UserProfilePage />} />
-              </Route>
-            </Routes>
-          </Suspense>
+                {/* Rotas protegidas */}
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/home" element={<HomePage />} />
+                  <Route
+                    path="/join/:token"
+                    element={<JoinOrganizationPage />}
+                  />
+                  <Route
+                    path="/organizations/:id"
+                    element={<OrganizationDetailPage />}
+                  />
+                  <Route
+                    path="/organizations/:id/statistics"
+                    element={<OrganizationStatisticsPage />}
+                  />
+                  <Route
+                    path="/organizations/:id/management"
+                    element={<OrganizationManagementPage />}
+                  />
+                  <Route path="/peladas/:id" element={<PeladaDetailPage />} />
+                  <Route
+                    path="/peladas/:id/build-schedule"
+                    element={<ScheduleBuilderPage />}
+                  />
+                  <Route
+                    path="/peladas/:id/attendance"
+                    element={<AttendanceListPage />}
+                  />
+                  <Route
+                    path="/peladas/:id/matches"
+                    element={<PeladaMatchesPage />}
+                  />
+                  <Route
+                    path="/peladas/:id/voting"
+                    element={<PeladaVotingPage />}
+                  />
+                  <Route
+                    path="/peladas/:id/results"
+                    element={<PeladaVotingResultsPage />}
+                  />
+                  <Route path="/profile" element={<UserProfilePage />} />
+                </Route>
+              </Routes>
+            </Suspense>
+          </PullToRefresh>
         </Box>
         <Footer /> <PWAInstallPrompt />
       </Box>

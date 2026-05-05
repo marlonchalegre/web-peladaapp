@@ -106,7 +106,6 @@ export default function ResetPasswordPage() {
               {t("auth.reset_password.title")}
             </Typography>
             <Typography
-              component="span"
               variant="body2"
               align="center"
               sx={{

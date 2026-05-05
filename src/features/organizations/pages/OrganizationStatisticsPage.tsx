@@ -113,7 +113,6 @@ export default function OrganizationStatisticsPage() {
         }}
       >
         <Typography
-          component="span"
           variant={isMobile ? "h5" : "h4"}
           sx={{
             fontWeight: "bold",

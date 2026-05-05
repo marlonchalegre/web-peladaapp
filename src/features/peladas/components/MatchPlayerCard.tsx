@@ -77,7 +77,6 @@ export default function MatchPlayerCard({
             <PersonAddIcon fontSize="small" />
           </Avatar>
           <Typography
-            component="span"
             variant="body2"
             sx={{
               color: "text.secondary",
@@ -159,7 +158,6 @@ export default function MatchPlayerCard({
 
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
             <Typography
-              component="span"
               variant="body2"
               sx={{
                 fontWeight: "bold",
@@ -181,7 +179,6 @@ export default function MatchPlayerCard({
               }}
             >
               <Typography
-                component="span"
                 variant="caption"
                 sx={{
                   color: "text.secondary",
@@ -216,7 +213,6 @@ export default function MatchPlayerCard({
           {/* Goal Controls/Stats */}
           <Box sx={{ textAlign: "center", flexShrink: 0 }}>
             <Typography
-              component="span"
               variant="caption"
               sx={{
                 display: "block",
@@ -292,7 +288,6 @@ export default function MatchPlayerCard({
           {/* Assist Controls/Stats */}
           <Box sx={{ textAlign: "center", flexShrink: 0 }}>
             <Typography
-              component="span"
               variant="caption"
               sx={{
                 display: "block",
@@ -368,7 +363,6 @@ export default function MatchPlayerCard({
           {/* Own Goal Controls/Stats */}
           <Box sx={{ textAlign: "center", flexShrink: 0 }}>
             <Typography
-              component="span"
               variant="caption"
               sx={{
                 display: "block",

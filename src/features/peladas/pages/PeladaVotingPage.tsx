@@ -285,7 +285,6 @@ export default function PeladaVotingPage() {
         }}
       >
         <Typography
-          component="span"
           variant="h4"
           sx={{
             fontWeight: "bold",
@@ -404,7 +403,6 @@ export default function PeladaVotingPage() {
                           }}
                         >
                           <Typography
-                            component="span"
                             variant="h6"
                             sx={{
                               fontWeight: "bold",
@@ -435,7 +433,6 @@ export default function PeladaVotingPage() {
                         </Box>
                         <Stack direction="row" spacing={2}>
                           <Typography
-                            component="span"
                             variant="body2"
                             sx={{
                               color: "text.secondary",
@@ -444,7 +441,6 @@ export default function PeladaVotingPage() {
                             <strong>{t("common.goals")}:</strong> {pv.goals}
                           </Typography>
                           <Typography
-                            component="span"
                             variant="body2"
                             sx={{
                               color: "text.secondary",
@@ -454,11 +450,7 @@ export default function PeladaVotingPage() {
                             {pv.assists}
                           </Typography>
                           {pv.own_goals > 0 && (
-                            <Typography
-                              component="span"
-                              variant="body2"
-                              color="error"
-                            >
+                            <Typography variant="body2" color="error">
                               <strong>{t("common.own_goals_short")}:</strong>{" "}
                               {pv.own_goals}
                             </Typography>
@@ -496,7 +488,6 @@ export default function PeladaVotingPage() {
                           >
                             {pv.stars !== null && pv.voting_enabled && (
                               <Typography
-                                component="span"
                                 variant="caption"
                                 color="primary"
                                 sx={{
@@ -588,7 +579,6 @@ export default function PeladaVotingPage() {
         <Grid size={{ xs: 12, md: 4 }}>
           <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
             <Typography
-              component="span"
               variant="subtitle1"
               gutterBottom
               sx={{
@@ -601,7 +591,6 @@ export default function PeladaVotingPage() {
 
             <Box sx={{ mb: 3 }}>
               <Typography
-                component="span"
                 variant="caption"
                 gutterBottom
                 sx={{
@@ -623,11 +612,7 @@ export default function PeladaVotingPage() {
                   </ListItem>
                 ))}
                 {votersByStatus.voted.length === 0 && (
-                  <Typography
-                    component="span"
-                    variant="caption"
-                    sx={{ px: 1, py: 1 }}
-                  >
+                  <Typography variant="caption" sx={{ px: 1, py: 1 }}>
                     {t("peladas.voting.status.none")}
                   </Typography>
                 )}
@@ -636,7 +621,6 @@ export default function PeladaVotingPage() {
 
             <Box>
               <Typography
-                component="span"
                 variant="caption"
                 gutterBottom
                 sx={{

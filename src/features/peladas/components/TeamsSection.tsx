@@ -104,7 +104,6 @@ export default function TeamsSection(props: TeamsSectionProps) {
             <GroupsIcon fontSize="small" />
           </Box>
           <Typography
-            component="span"
             variant="h5"
             sx={{ fontWeight: 800, letterSpacing: -0.5 }}
           >
@@ -245,18 +244,10 @@ export default function TeamsSection(props: TeamsSectionProps) {
                 >
                   <AddIcon fontSize="large" />
                 </Box>
-                <Typography
-                  component="span"
-                  variant="h6"
-                  sx={{ fontWeight: 700 }}
-                >
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
                   {t("peladas.teams.button.add_placeholder")}
                 </Typography>
-                <Typography
-                  component="span"
-                  variant="caption"
-                  sx={{ mt: 0.5, opacity: 0.7 }}
-                >
+                <Typography variant="caption" sx={{ mt: 0.5, opacity: 0.7 }}>
                   Adicione um novo time para equilibrar a pelada
                 </Typography>
               </Button>

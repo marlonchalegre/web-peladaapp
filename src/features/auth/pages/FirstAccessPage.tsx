@@ -101,7 +101,6 @@ export default function FirstAccessPage() {
               {t("auth.first_access.title")}
             </Typography>
             <Typography
-              component="span"
               variant="body2"
               align="center"
               sx={{
@@ -206,7 +205,7 @@ export default function FirstAccessPage() {
                 ? t("auth.first_access.button.loading")
                 : t("auth.first_access.button.submit")}
             </Button>
-            <Typography component="span" variant="body2" align="center">
+            <Typography variant="body2" align="center">
               <MLink
                 href={`/login${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`}
                 underline="hover"

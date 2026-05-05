@@ -99,7 +99,6 @@ export default function MatchScoreHero({
         >
           {/* Home Team Name */}
           <Typography
-            component="span"
             variant="h6"
             sx={{
               fontWeight: "bold",
@@ -122,17 +121,12 @@ export default function MatchScoreHero({
             }}
           >
             <Box sx={scoreBoxStyle(theme.palette.home.main)}>
-              <Typography
-                component="span"
-                variant="h4"
-                sx={{ fontWeight: "bold" }}
-              >
+              <Typography variant="h4" sx={{ fontWeight: "bold" }}>
                 {match.home_score ?? 0}
               </Typography>
             </Box>
 
             <Typography
-              component="span"
               variant="h5"
               sx={{
                 color: "text.disabled",
@@ -143,11 +137,7 @@ export default function MatchScoreHero({
             </Typography>
 
             <Box sx={scoreBoxStyle(theme.palette.away.main)}>
-              <Typography
-                component="span"
-                variant="h4"
-                sx={{ fontWeight: "bold" }}
-              >
+              <Typography variant="h4" sx={{ fontWeight: "bold" }}>
                 {match.away_score ?? 0}
               </Typography>
             </Box>
@@ -155,7 +145,6 @@ export default function MatchScoreHero({
 
           {/* Away Team Name */}
           <Typography
-            component="span"
             variant="h6"
             sx={{
               fontWeight: "bold",
@@ -172,7 +161,6 @@ export default function MatchScoreHero({
 
         {/* Mobile Team Names */}
         <Typography
-          component="span"
           variant="subtitle2"
           sx={{
             fontWeight: "bold",
@@ -200,7 +188,6 @@ export default function MatchScoreHero({
           }}
         >
           <Typography
-            component="span"
             variant="h5"
             sx={{
               fontFamily: "monospace",

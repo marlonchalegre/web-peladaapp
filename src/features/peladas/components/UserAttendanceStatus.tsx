@@ -72,7 +72,6 @@ export default function UserAttendanceStatus({
       >
         <Box>
           <Typography
-            component="span"
             variant="h4"
             sx={{
               fontWeight: 800,
@@ -82,11 +81,7 @@ export default function UserAttendanceStatus({
           >
             {t("common.hello")}, {firstName}! 👋
           </Typography>
-          <Typography
-            component="span"
-            variant="body1"
-            sx={{ opacity: 0.9, fontWeight: 500 }}
-          >
+          <Typography variant="body1" sx={{ opacity: 0.9, fontWeight: 500 }}>
             {getStatusMessage()}
           </Typography>
         </Box>

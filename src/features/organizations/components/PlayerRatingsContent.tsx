@@ -104,7 +104,6 @@ export default function PlayerRatingsContent({
   return (
     <Box>
       <Typography
-        component="span"
         variant="h5"
         gutterBottom
         sx={{
@@ -114,7 +113,6 @@ export default function PlayerRatingsContent({
         {t("organizations.ratings.title", { name: orgName })}
       </Typography>
       <Typography
-        component="span"
         variant="body1"
         sx={{
           color: "text.secondary",
@@ -164,7 +162,6 @@ export default function PlayerRatingsContent({
               <TableRow>
                 <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
                   <Typography
-                    component="span"
                     sx={{
                       color: "text.secondary",
                     }}
@@ -179,7 +176,6 @@ export default function PlayerRatingsContent({
                   <TableCell>
                     <Box sx={{ display: "flex", flexDirection: "column" }}>
                       <Typography
-                        component="span"
                         variant="subtitle1"
                         sx={{
                           fontWeight: "medium",
@@ -188,7 +184,6 @@ export default function PlayerRatingsContent({
                         {player.user_name}
                       </Typography>
                       <Typography
-                        component="span"
                         variant="body2"
                         sx={{
                           color: "text.secondary",
@@ -218,7 +213,6 @@ export default function PlayerRatingsContent({
                   </TableCell>
                   <TableCell align="right">
                     <Typography
-                      component="span"
                       variant="body2"
                       color="primary"
                       data-testid={`grade-${player.id}`}

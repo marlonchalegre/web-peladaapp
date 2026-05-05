@@ -46,10 +46,9 @@ export default function AttendanceListColumn({
       {!hideHeader && (
         <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
           {icon}
-          <Typography component="span" variant="h6" sx={{ fontWeight: "bold" }}>
+          <Typography variant="h6" sx={{ fontWeight: "bold" }}>
             {title}{" "}
             <Typography
-              component="span"
               sx={{
                 color: "text.secondary",
               }}
@@ -90,7 +89,6 @@ export default function AttendanceListColumn({
         })}
         {players.length === 0 && (
           <Typography
-            component="span"
             variant="body2"
             sx={{
               color: "text.secondary",

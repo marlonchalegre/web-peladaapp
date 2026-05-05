@@ -127,7 +127,6 @@ export default function AvailablePlayersPanel({
             }}
           >
             <Typography
-              component="span"
               variant="h6"
               sx={{
                 fontWeight: "800",
@@ -245,7 +244,6 @@ export default function AvailablePlayersPanel({
           {players.length === 0 && (
             <Grid size={{ xs: 12 }}>
               <Typography
-                component="span"
                 variant="body1"
                 align="center"
                 sx={{
@@ -264,7 +262,6 @@ export default function AvailablePlayersPanel({
           {players.length > 0 && filteredPlayers.length === 0 && (
             <Grid size={{ xs: 12 }}>
               <Typography
-                component="span"
                 variant="body2"
                 align="center"
                 sx={{

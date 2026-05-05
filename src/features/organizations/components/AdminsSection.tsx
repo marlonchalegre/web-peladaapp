@@ -44,13 +44,13 @@ export default function AdminsSection({
 
   return (
     <Paper variant="outlined" sx={{ p: 3 }}>
-      <Typography component="span" variant="h5" gutterBottom>
+      <Typography variant="h5" gutterBottom>
         {t("organizations.management.sections.admins")}
       </Typography>
       <Divider sx={{ mb: 2 }} />
 
       <Box sx={{ mb: 3 }}>
-        <Typography component="span" variant="subtitle2" gutterBottom>
+        <Typography variant="subtitle2" gutterBottom>
           {t("organizations.dialog.manage_admins.add_section_title")}
         </Typography>
         <Box sx={{ display: "flex", gap: 1 }}>
@@ -113,7 +113,7 @@ export default function AdminsSection({
         </Box>
       </Box>
 
-      <Typography component="span" variant="subtitle2" gutterBottom>
+      <Typography variant="subtitle2" gutterBottom>
         {t("organizations.dialog.manage_admins.current_admins_title")}
       </Typography>
       <List>

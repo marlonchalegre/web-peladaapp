@@ -82,7 +82,6 @@ export default function ExportStatsDialog({
       <DialogTitle>{t("organizations.stats.export.dialog_title")}</DialogTitle>
       <DialogContent>
         <Typography
-          component="span"
           variant="body2"
           sx={{
             color: "text.secondary",

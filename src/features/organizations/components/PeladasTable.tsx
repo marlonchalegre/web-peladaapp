@@ -32,7 +32,6 @@ export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
     return (
       <Box sx={{ p: 4, textAlign: "center" }}>
         <Typography
-          component="span"
           sx={{
             color: "text.secondary",
           }}
@@ -115,7 +114,6 @@ export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
               >
                 <TableCell sx={{ py: 2 }}>
                   <Typography
-                    component="span"
                     variant="body2"
                     sx={{
                       fontWeight: 500,
@@ -128,7 +126,6 @@ export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
                       : t("common.date.tbd", "TBD")}
                   </Typography>
                   <Typography
-                    component="span"
                     variant="caption"
                     sx={{
                       color: "text.secondary",

@@ -168,7 +168,6 @@ export default function OrganizationManagementPage() {
         />
 
         <Typography
-          component="span"
           variant="h4"
           gutterBottom
           color="primary"

@@ -80,7 +80,6 @@ const SummaryCard = ({
         }}
       >
         <Typography
-          component="span"
           gutterBottom
           variant="overline"
           sx={{
@@ -92,7 +91,6 @@ const SummaryCard = ({
         {icon}
       </Box>
       <Typography
-        component="span"
         variant="h5"
         color={color}
         data-testid={`${testId}-value`}
@@ -345,7 +343,6 @@ export default function FinanceSection({
   return (
     <Paper variant="outlined" sx={{ p: { xs: 2, sm: 3 } }}>
       <Typography
-        component="span"
         variant="h5"
         gutterBottom
         sx={{
@@ -609,7 +606,6 @@ export default function FinanceSection({
                   <TableRow key="empty-transactions">
                     <TableCell colSpan={5} align="center">
                       <Typography
-                        component="span"
                         variant="body2"
                         sx={{ py: 2, color: "text.secondary" }}
                       >
@@ -658,7 +654,6 @@ export default function FinanceSection({
                         }}
                       >
                         <Typography
-                          component="span"
                           variant="body2"
                           sx={{
                             fontWeight: "medium",
@@ -670,7 +665,6 @@ export default function FinanceSection({
                         </Typography>
                         {tx.player_name && (
                           <Typography
-                            component="span"
                             variant="caption"
                             sx={{
                               display: "block",
@@ -685,7 +679,6 @@ export default function FinanceSection({
                         )}
                         {tx.creator_name && (
                           <Typography
-                            component="span"
                             variant="caption"
                             sx={{
                               display: "block",
@@ -713,7 +706,6 @@ export default function FinanceSection({
                       </TableCell>
                       <TableCell align="right">
                         <Typography
-                          component="span"
                           color={
                             tx.status === "reversed"
                               ? "text.disabled"

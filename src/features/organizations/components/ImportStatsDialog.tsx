@@ -266,7 +266,6 @@ export default function ImportStatsDialog({
       <DialogContent sx={{ minHeight: "400px" }}>
         <Box sx={{ mb: 3, mt: 1 }}>
           <Typography
-            component="span"
             variant="body2"
             sx={{
               color: "text.secondary",

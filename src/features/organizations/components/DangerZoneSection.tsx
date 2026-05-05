@@ -16,11 +16,11 @@ export default function DangerZoneSection({
 
   return (
     <Paper variant="outlined" sx={{ p: 3, borderColor: "error.main" }}>
-      <Typography component="span" variant="h5" color="error" gutterBottom>
+      <Typography variant="h5" color="error" gutterBottom>
         {t("organizations.management.sections.danger_zone")}
       </Typography>
       <Divider sx={{ mb: 2 }} />
-      <Typography component="span" variant="body2" sx={{ mb: 2 }}>
+      <Typography variant="body2" sx={{ mb: 2 }}>
         {t("organizations.management.delete_description")}
       </Typography>
       <Button

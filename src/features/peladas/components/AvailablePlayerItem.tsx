@@ -111,7 +111,6 @@ export default function AvailablePlayerItem({
       )}
       <Box sx={{ flexGrow: 1, minWidth: 0 }}>
         <Typography
-          component="span"
           variant="body2"
           sx={{
             fontWeight: 700,
@@ -126,7 +125,6 @@ export default function AvailablePlayerItem({
           {player.user.name}
         </Typography>
         <Typography
-          component="span"
           variant="caption"
           sx={{
             color: "text.secondary",

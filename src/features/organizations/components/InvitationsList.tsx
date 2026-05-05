@@ -55,7 +55,6 @@ export default function InvitationsList({
         }}
       >
         <Typography
-          component="span"
           variant="h5"
           sx={{
             fontWeight: "bold",
@@ -104,7 +103,6 @@ export default function InvitationsList({
             <LinkIcon sx={{ mr: 1 }} />
             <Box>
               <Typography
-                component="span"
                 variant="subtitle2"
                 sx={{
                   fontWeight: "bold",
@@ -113,7 +111,6 @@ export default function InvitationsList({
                 {t("organizations.dialog.invite_player.public_link")}
               </Typography>
               <Typography
-                component="span"
                 variant="body2"
                 sx={{
                   wordBreak: "break-all",
@@ -169,7 +166,6 @@ export default function InvitationsList({
       <List>
         {invitations.filter((inv) => !!inv.email).length === 0 ? (
           <Typography
-            component="span"
             sx={{
               color: "text.secondary",
               textAlign: "center",
@@ -204,7 +200,6 @@ export default function InvitationsList({
                   secondary={
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <Typography
-                        component="span"
                         variant="body2"
                         sx={{
                           color: "text.secondary",

@@ -66,7 +66,6 @@ export default function StatsFilters({
         data-testid="filters-header"
       >
         <Typography
-          component="span"
           variant="h5"
           sx={{
             fontWeight: "bold",

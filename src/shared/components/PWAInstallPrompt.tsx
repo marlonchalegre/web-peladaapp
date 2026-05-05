@@ -146,9 +146,7 @@ export function PWAInstallPrompt() {
             </Box>
           }
         >
-          <Typography component="span" variant="body2">
-            {t("app.install_prompt")}
-          </Typography>
+          <Typography variant="body2">{t("app.install_prompt")}</Typography>
         </Alert>
       </Snackbar>
 
@@ -171,9 +169,7 @@ export function PWAInstallPrompt() {
             </IconButton>
           }
         >
-          <Typography component="span" variant="body2">
-            {t("app.ios_install_prompt")}
-          </Typography>
+          <Typography variant="body2">{t("app.ios_install_prompt")}</Typography>
         </Alert>
       </Snackbar>
     </>

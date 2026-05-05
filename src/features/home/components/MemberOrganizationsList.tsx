@@ -31,7 +31,6 @@ export default function MemberOrganizationsList({
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <GroupsIcon sx={{ mr: 1.5, color: "text.secondary" }} />
         <Typography
-          component="span"
           variant="h6"
           sx={{ fontWeight: 600, color: "text.primary" }}
         >
@@ -69,7 +68,6 @@ export default function MemberOrganizationsList({
             <InfoIcon />
           </Avatar>
           <Typography
-            component="span"
             variant="body1"
             sx={{
               color: "text.secondary",
@@ -169,7 +167,6 @@ export default function MemberOrganizationsList({
                   <TableCell sx={{ py: 2.5 }}>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
                       <Typography
-                        component="span"
                         variant="body2"
                         sx={{
                           color: "text.secondary",

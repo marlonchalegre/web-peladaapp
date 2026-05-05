@@ -233,12 +233,7 @@ export default function PeladaVotingResultsPage() {
             </Typography>
           </DialogTitle>
           <DialogContent>
-            <Typography
-              component="span"
-              variant="body1"
-              align="center"
-              sx={{ mb: 2 }}
-            >
+            <Typography variant="body1" align="center" sx={{ mb: 2 }}>
               {t(
                 "peladas.voting.results.error.not_voted",
                 "Você participou desta pelada mas não votou. Por isso, você não tem acesso aos resultados.",
@@ -305,7 +300,6 @@ export default function PeladaVotingResultsPage() {
         }}
       >
         <Typography
-          component="span"
           variant="h3"
           sx={{
             fontWeight: "bold",
@@ -393,7 +387,6 @@ export default function PeladaVotingResultsPage() {
                 </Box>
               </Box>
               <Typography
-                component="span"
                 variant="h6"
                 sx={{
                   fontWeight: "bold",
@@ -402,7 +395,6 @@ export default function PeladaVotingResultsPage() {
                 {t("peladas.voting.results.participation")}
               </Typography>
               <Typography
-                component="span"
                 variant="body2"
                 sx={{
                   color: "text.secondary",
@@ -426,7 +418,6 @@ export default function PeladaVotingResultsPage() {
               >
                 <EmojiEventsIcon color="primary" fontSize="large" />
                 <Typography
-                  component="span"
                   variant="h5"
                   sx={{
                     fontWeight: "bold",
@@ -460,7 +451,6 @@ export default function PeladaVotingResultsPage() {
                         fallbackText={displayResults!.mvp[1].name.charAt(0)}
                       />
                       <Typography
-                        component="span"
                         variant="subtitle2"
                         noWrap
                         sx={{
@@ -470,7 +460,6 @@ export default function PeladaVotingResultsPage() {
                         {displayResults!.mvp[1].name}
                       </Typography>
                       <Typography
-                        component="span"
                         variant="caption"
                         sx={{
                           color: "text.secondary",
@@ -511,7 +500,6 @@ export default function PeladaVotingResultsPage() {
                         fallbackText={displayResults!.mvp[0].name.charAt(0)}
                       />
                       <Typography
-                        component="span"
                         variant="h6"
                         noWrap
                         sx={{
@@ -521,7 +509,6 @@ export default function PeladaVotingResultsPage() {
                         {displayResults!.mvp[0].name}
                       </Typography>
                       <Typography
-                        component="span"
                         variant="subtitle1"
                         color="primary"
                         sx={{
@@ -560,7 +547,6 @@ export default function PeladaVotingResultsPage() {
                         fallbackText={displayResults!.mvp[2].name.charAt(0)}
                       />
                       <Typography
-                        component="span"
                         variant="subtitle2"
                         noWrap
                         sx={{
@@ -570,7 +556,6 @@ export default function PeladaVotingResultsPage() {
                         {displayResults!.mvp[2].name}
                       </Typography>
                       <Typography
-                        component="span"
                         variant="caption"
                         sx={{
                           color: "text.secondary",
@@ -602,7 +587,6 @@ export default function PeladaVotingResultsPage() {
                 >
                   <SportsSoccerIcon color="error" />
                   <Typography
-                    component="span"
                     variant="h6"
                     sx={{
                       fontWeight: "bold",
@@ -625,7 +609,6 @@ export default function PeladaVotingResultsPage() {
                         sx={{ display: "flex", alignItems: "center", gap: 2 }}
                       >
                         <Typography
-                          component="span"
                           sx={{
                             fontWeight: "bold",
                             color: "text.secondary",
@@ -634,7 +617,6 @@ export default function PeladaVotingResultsPage() {
                           {i + 1}º
                         </Typography>
                         <Typography
-                          component="span"
                           sx={{
                             fontWeight: "medium",
                           }}
@@ -652,7 +634,6 @@ export default function PeladaVotingResultsPage() {
                   ))}
                   {displayResults!.striker.length === 0 && (
                     <Typography
-                      component="span"
                       sx={{
                         color: "text.secondary",
                       }}
@@ -673,7 +654,6 @@ export default function PeladaVotingResultsPage() {
                 >
                   <RestaurantIcon color="info" />
                   <Typography
-                    component="span"
                     variant="h6"
                     sx={{
                       fontWeight: "bold",
@@ -696,7 +676,6 @@ export default function PeladaVotingResultsPage() {
                         sx={{ display: "flex", alignItems: "center", gap: 2 }}
                       >
                         <Typography
-                          component="span"
                           sx={{
                             fontWeight: "bold",
                             color: "text.secondary",
@@ -705,7 +684,6 @@ export default function PeladaVotingResultsPage() {
                           {i + 1}º
                         </Typography>
                         <Typography
-                          component="span"
                           sx={{
                             fontWeight: "medium",
                           }}
@@ -723,7 +701,6 @@ export default function PeladaVotingResultsPage() {
                   ))}
                   {displayResults!.garcom.length === 0 && (
                     <Typography
-                      component="span"
                       sx={{
                         color: "text.secondary",
                       }}
@@ -739,7 +716,6 @@ export default function PeladaVotingResultsPage() {
           {/* Full Ranking Table */}
           <Grid size={{ xs: 12 }}>
             <Typography
-              component="span"
               variant="h5"
               sx={{
                 fontWeight: "bold",
@@ -805,7 +781,6 @@ export default function PeladaVotingResultsPage() {
                             }}
                           >
                             <Typography
-                              component="span"
                               color="primary"
                               sx={{
                                 fontWeight: "bold",
@@ -814,7 +789,6 @@ export default function PeladaVotingResultsPage() {
                               {p.average_stars.toFixed(1)}
                             </Typography>
                             <Typography
-                              component="span"
                               variant="caption"
                               sx={{
                                 color: "text.secondary",
@@ -842,7 +816,6 @@ export default function PeladaVotingResultsPage() {
               >
                 <GroupIcon color="action" />
                 <Typography
-                  component="span"
                   variant="h6"
                   sx={{
                     fontWeight: "bold",

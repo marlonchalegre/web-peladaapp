@@ -15,11 +15,7 @@ export default function PendingInvitations({ invitations, onAccept }: Props) {
 
   return (
     <Box sx={{ mb: 4 }}>
-      <Typography
-        component="span"
-        variant="h5"
-        sx={{ mb: 2, fontWeight: "bold" }}
-      >
+      <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
         {t("home.sections.pending_invitations.title", "Convites Pendentes")}
       </Typography>
       <Paper variant="outlined" sx={{ p: 0, overflow: "hidden" }}>
@@ -38,7 +34,6 @@ export default function PendingInvitations({ invitations, onAccept }: Props) {
             >
               <Box>
                 <Typography
-                  component="span"
                   variant="subtitle1"
                   sx={{
                     fontWeight: "bold",
@@ -47,7 +42,6 @@ export default function PendingInvitations({ invitations, onAccept }: Props) {
                   {inv.organization_name}
                 </Typography>
                 <Typography
-                  component="span"
                   variant="body2"
                   sx={{
                     color: "text.secondary",

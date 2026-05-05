@@ -35,12 +35,7 @@ export default function MatchHistoryList({
         flexDirection: "column",
       }}
     >
-      <Typography
-        component="span"
-        variant="h6"
-        gutterBottom
-        sx={{ fontWeight: "bold" }}
-      >
+      <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
         {t("peladas.matches.history_title")}
       </Typography>
       <Paper variant="outlined" sx={{ flex: 1, overflowY: "auto" }}>
@@ -69,7 +64,6 @@ export default function MatchHistoryList({
                   }}
                 >
                   <Typography
-                    component="span"
                     variant="caption"
                     sx={{
                       color: "text.secondary",
@@ -90,7 +84,6 @@ export default function MatchHistoryList({
                     }}
                   >
                     <Typography
-                      component="span"
                       variant="body2"
                       sx={{
                         fontWeight: "bold",
@@ -102,7 +95,6 @@ export default function MatchHistoryList({
                         })}
                     </Typography>
                     <Typography
-                      component="span"
                       variant="body2"
                       sx={{
                         fontWeight: "bold",
@@ -112,7 +104,6 @@ export default function MatchHistoryList({
                       {m.home_score ?? 0} x {m.away_score ?? 0}
                     </Typography>
                     <Typography
-                      component="span"
                       variant="body2"
                       sx={{
                         fontWeight: "bold",

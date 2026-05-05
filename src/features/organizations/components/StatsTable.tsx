@@ -101,7 +101,6 @@ const StatBar = ({
             </Box>
           )}
           <Typography
-            component="span"
             variant="body2"
             sx={{
               fontWeight: "medium",
@@ -131,7 +130,6 @@ export default function StatsTable({
     return (
       <Paper sx={{ p: 4, textAlign: "center", borderRadius: 4 }}>
         <Typography
-          component="span"
           sx={{
             color: "text.secondary",
           }}
@@ -171,7 +169,6 @@ export default function StatsTable({
               />
               <Box>
                 <Typography
-                  component="span"
                   variant="subtitle1"
                   sx={{
                     fontWeight: "bold",
@@ -181,7 +178,6 @@ export default function StatsTable({
                 </Typography>
                 {row.player_position && (
                   <Typography
-                    component="span"
                     variant="caption"
                     sx={{
                       color: "text.secondary",
@@ -199,7 +195,6 @@ export default function StatsTable({
             <Stack spacing={1.5}>
               <Box>
                 <Typography
-                  component="span"
                   variant="caption"
                   sx={{
                     color: "text.secondary",
@@ -214,7 +209,6 @@ export default function StatsTable({
 
               <Box>
                 <Typography
-                  component="span"
                   variant="caption"
                   sx={{
                     color: "text.secondary",
@@ -233,7 +227,6 @@ export default function StatsTable({
 
               <Box>
                 <Typography
-                  component="span"
                   variant="caption"
                   sx={{
                     color: "text.secondary",
@@ -349,7 +342,6 @@ export default function StatsTable({
                   />
                   <Box>
                     <Typography
-                      component="span"
                       variant="body1"
                       sx={{
                         fontWeight: "bold",

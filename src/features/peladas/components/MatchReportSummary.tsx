@@ -126,7 +126,6 @@ export default function MatchReportSummary({
             <SportsSoccerIcon sx={{ fontSize: 18 }} />
             {h.goals > 1 && (
               <Typography
-                component="span"
                 variant="caption"
                 sx={{ fontWeight: "bold", ml: 0.3, fontSize: "0.75rem" }}
               >
@@ -146,7 +145,6 @@ export default function MatchReportSummary({
             <AssistWalkerIcon sx={{ fontSize: 18 }} />
             {h.assists > 1 && (
               <Typography
-                component="span"
                 variant="caption"
                 sx={{ fontWeight: "bold", ml: 0.3, fontSize: "0.75rem" }}
               >
@@ -166,7 +164,6 @@ export default function MatchReportSummary({
             <GavelIcon sx={{ fontSize: 18 }} />
             {h.ownGoals > 1 && (
               <Typography
-                component="span"
                 variant="caption"
                 sx={{ fontWeight: "bold", ml: 0.3, fontSize: "0.75rem" }}
               >
@@ -191,7 +188,6 @@ export default function MatchReportSummary({
       >
         {align === "right" && icons}
         <Typography
-          component="span"
           variant="body2"
           sx={{
             fontWeight: h.goals > 0 ? "bold" : "normal",
@@ -235,7 +231,6 @@ export default function MatchReportSummary({
           {/* Header */}
           <Box sx={{ textAlign: "center" }}>
             <Typography
-              component="span"
               variant="overline"
               sx={{
                 color: "text.secondary",
@@ -245,11 +240,7 @@ export default function MatchReportSummary({
             >
               {t("peladas.dashboard.summary.title", { seq: match.sequence })}
             </Typography>
-            <Typography
-              component="span"
-              variant="h4"
-              sx={{ fontWeight: 900, mt: 1 }}
-            >
+            <Typography variant="h4" sx={{ fontWeight: 900, mt: 1 }}>
               {t("peladas.dashboard.summary.match_finished")}
             </Typography>
           </Box>
@@ -270,7 +261,6 @@ export default function MatchReportSummary({
           >
             <Box sx={{ textAlign: "center", flex: 1 }}>
               <Typography
-                component="span"
                 variant="subtitle1"
                 sx={{ fontWeight: "bold", mb: 1 }}
               >
@@ -280,11 +270,7 @@ export default function MatchReportSummary({
             </Box>
 
             <Box sx={{ textAlign: "center", px: 4 }}>
-              <Typography
-                component="span"
-                variant="h2"
-                sx={{ fontWeight: 900 }}
-              >
+              <Typography variant="h2" sx={{ fontWeight: 900 }}>
                 {match.home_score} - {match.away_score}
               </Typography>
               <Chip
@@ -297,7 +283,6 @@ export default function MatchReportSummary({
 
             <Box sx={{ textAlign: "center", flex: 1 }}>
               <Typography
-                component="span"
                 variant="subtitle1"
                 sx={{ fontWeight: "bold", mb: 1 }}
               >
@@ -310,7 +295,6 @@ export default function MatchReportSummary({
           {/* Highlights */}
           <Box sx={{ width: "100%" }} data-testid="match-summary-highlights">
             <Typography
-              component="span"
               variant="subtitle2"
               gutterBottom
               sx={{
@@ -330,7 +314,6 @@ export default function MatchReportSummary({
                   {homeHighlights.map((h) => renderHighlightItem(h, "left"))}
                   {homeHighlights.length === 0 && (
                     <Typography
-                      component="span"
                       variant="body2"
                       sx={{
                         color: "text.disabled",
@@ -346,7 +329,6 @@ export default function MatchReportSummary({
                   {awayHighlights.map((h) => renderHighlightItem(h, "right"))}
                   {awayHighlights.length === 0 && (
                     <Typography
-                      component="span"
                       variant="body2"
                       sx={{
                         color: "text.disabled",
@@ -376,7 +358,6 @@ export default function MatchReportSummary({
               }}
             >
               <Typography
-                component="span"
                 variant="caption"
                 gutterBottom
                 sx={{
@@ -419,7 +400,6 @@ export default function MatchReportSummary({
                   {nextHomeName}
                 </Typography>
                 <Typography
-                  component="span"
                   variant="body2"
                   sx={{
                     color: "text.secondary",
@@ -451,7 +431,6 @@ export default function MatchReportSummary({
                 </Typography>
               </Stack>
               <Typography
-                component="span"
                 variant="caption"
                 align="center"
                 sx={{

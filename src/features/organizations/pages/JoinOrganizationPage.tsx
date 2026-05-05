@@ -93,11 +93,10 @@ export default function JoinOrganizationPage() {
   return (
     <Container maxWidth="sm" sx={{ py: 8 }}>
       <Paper sx={{ p: 4, textAlign: "center" }}>
-        <Typography component="span" variant="h4" gutterBottom>
+        <Typography variant="h4" gutterBottom>
           {t("organizations.invitation.join_title")}
         </Typography>
         <Typography
-          component="span"
           variant="h5"
           color="primary"
           gutterBottom
@@ -106,7 +105,6 @@ export default function JoinOrganizationPage() {
           {invitation.organization_name}
         </Typography>
         <Typography
-          component="span"
           variant="body1"
           sx={{
             color: "text.secondary",

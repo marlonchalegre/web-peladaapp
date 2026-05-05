@@ -94,7 +94,6 @@ export default function MembersSection({
         }}
       >
         <Typography
-          component="span"
           variant="h5"
           sx={{
             fontWeight: "bold",
@@ -175,7 +174,6 @@ export default function MembersSection({
       <List>
         {paginatedPlayers.length === 0 ? (
           <Typography
-            component="span"
             sx={{
               color: "text.secondary",
               py: 2,
@@ -218,7 +216,6 @@ export default function MembersSection({
                 <ListItemText
                   primary={
                     <Typography
-                      component="span"
                       sx={{
                         fontWeight: "medium",
                       }}

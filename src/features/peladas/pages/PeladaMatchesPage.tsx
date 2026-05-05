@@ -497,7 +497,6 @@ export default function PeladaMatchesPage() {
             ) : (
               <Paper sx={{ p: 8, textAlign: "center", borderRadius: 4 }}>
                 <Typography
-                  component="span"
                   variant="h5"
                   sx={{
                     color: "text.secondary",
@@ -524,7 +523,6 @@ export default function PeladaMatchesPage() {
                   }}
                 >
                   <Typography
-                    component="span"
                     variant="body2"
                     sx={{
                       color: "text.secondary",

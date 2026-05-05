@@ -235,11 +235,10 @@ export default function UserProfilePage() {
       </Box>
       <Paper sx={{ p: { xs: 2, sm: 4 } }}>
         <Box sx={{ px: { xs: 0.5, sm: 0 } }}>
-          <Typography component="span" variant="h4" gutterBottom>
+          <Typography variant="h4" gutterBottom>
             {t("user.profile.title")}
           </Typography>
           <Typography
-            component="span"
             variant="body2"
             gutterBottom
             sx={{
@@ -261,7 +260,6 @@ export default function UserProfilePage() {
           }}
         >
           <Typography
-            component="span"
             variant="subtitle2"
             gutterBottom
             sx={{
@@ -441,7 +439,6 @@ export default function UserProfilePage() {
 
             <Divider sx={{ my: 2 }}>
               <Typography
-                component="span"
                 variant="caption"
                 sx={{
                   color: "text.secondary",
@@ -511,7 +508,6 @@ export default function UserProfilePage() {
         <Divider sx={{ my: 4 }} />
 
         <Typography
-          component="span"
           variant="caption"
           color="error"
           sx={{ display: "block", mb: 2 }}

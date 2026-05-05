@@ -264,7 +264,7 @@ export default function OrganizationDetailPage() {
         {/* Create Pelada Section */}
         {isAdmin && (
           <Paper variant="outlined" sx={{ p: 3 }}>
-            <Typography component="span" variant="h5" gutterBottom>
+            <Typography variant="h5" gutterBottom>
               {t("organizations.detail.section.new_pelada")}
             </Typography>
             <CreatePeladaForm

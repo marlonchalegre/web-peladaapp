@@ -57,7 +57,6 @@ function StandingsHighlights({ standings }: { standings: StandingRow[] }) {
       >
         <TrendingUpIcon color="primary" />
         <Typography
-          component="span"
           variant="h6"
           sx={{
             fontWeight: "bold",
@@ -90,7 +89,6 @@ function StandingsHighlights({ standings }: { standings: StandingRow[] }) {
             <EmojiEventsIcon fontSize="small" />
           </Box>
           <Typography
-            component="span"
             variant="subtitle2"
             sx={{
               fontWeight: "bold",
@@ -136,7 +134,6 @@ function StandingsHighlights({ standings }: { standings: StandingRow[] }) {
             </Avatar>
             <Box>
               <Typography
-                component="span"
                 variant="subtitle1"
                 sx={{
                   fontWeight: "800",
@@ -147,7 +144,6 @@ function StandingsHighlights({ standings }: { standings: StandingRow[] }) {
                   t("peladas.matches.team_fallback", { id: champion.teamId })}
               </Typography>
               <Typography
-                component="span"
                 variant="caption"
                 sx={{
                   color: "text.secondary",
@@ -179,7 +175,6 @@ export default function StandingsPanel({ standings, showHighlights }: Props) {
         }}
       >
         <Typography
-          component="span"
           variant="subtitle1"
           sx={{
             fontWeight: "bold",

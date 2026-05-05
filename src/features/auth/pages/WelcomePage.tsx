@@ -30,12 +30,7 @@ function MockMatchAttendance() {
   const { t } = useTranslation();
   return (
     <Paper sx={{ p: 2, borderRadius: 2, height: "100%" }}>
-      <Typography
-        component="span"
-        variant="subtitle2"
-        color="primary"
-        gutterBottom
-      >
+      <Typography variant="subtitle2" color="primary" gutterBottom>
         {t("welcome.mock.match_day")}
       </Typography>
       <Stack spacing={1}>
@@ -55,9 +50,7 @@ function MockMatchAttendance() {
               borderRadius: 1,
             }}
           >
-            <Typography component="span" variant="body2">
-              {p.name}
-            </Typography>
+            <Typography variant="body2">{p.name}</Typography>
             <Chip
               label={t(`peladas.attendance.status.${p.status}`)}
               size="small"
@@ -80,11 +73,7 @@ function MockTeams() {
     <Paper sx={{ p: 2, borderRadius: 2, height: "100%" }}>
       <Grid container spacing={1}>
         <Grid size={6}>
-          <Typography
-            component="span"
-            variant="caption"
-            sx={{ fontWeight: "bold" }}
-          >
+          <Typography variant="caption" sx={{ fontWeight: "bold" }}>
             {t("welcome.mock.team_a")}
           </Typography>
           <Stack component="div" spacing={0.5} sx={{ mt: 1 }}>
@@ -98,11 +87,7 @@ function MockTeams() {
           </Stack>
         </Grid>
         <Grid size={6}>
-          <Typography
-            component="span"
-            variant="caption"
-            sx={{ fontWeight: "bold" }}
-          >
+          <Typography variant="caption" sx={{ fontWeight: "bold" }}>
             {t("welcome.mock.team_b")}
           </Typography>
           <Stack
@@ -134,12 +119,7 @@ function MockVoting() {
   const { t } = useTranslation();
   return (
     <Paper sx={{ p: 2, borderRadius: 2, height: "100%" }}>
-      <Typography
-        component="span"
-        variant="subtitle2"
-        align="center"
-        gutterBottom
-      >
+      <Typography variant="subtitle2" align="center" gutterBottom>
         {t("welcome.mock.mvp_vote")}
       </Typography>
       <Stack
@@ -151,11 +131,7 @@ function MockVoting() {
         <Avatar sx={{ bgcolor: "primary.dark", width: 48, height: 48 }}>
           R
         </Avatar>
-        <Typography
-          component="span"
-          variant="body2"
-          sx={{ fontWeight: "bold" }}
-        >
+        <Typography variant="body2" sx={{ fontWeight: "bold" }}>
           Ronaldinho
         </Typography>
         <Rating value={5} readOnly size="small" />
@@ -216,7 +192,6 @@ export default function WelcomePage() {
                   </Typography>
                 </Box>
                 <Typography
-                  component="span"
                   variant="h4"
                   sx={{
                     lineHeight: 1.2,
@@ -227,7 +202,6 @@ export default function WelcomePage() {
                   {t("welcome.title")}
                 </Typography>
                 <Typography
-                  component="span"
                   variant="h6"
                   sx={{
                     color: "text.secondary",
@@ -296,7 +270,6 @@ export default function WelcomePage() {
                 <GroupIcon fontSize="large" />
               </Avatar>
               <Typography
-                component="span"
                 variant="h6"
                 sx={{
                   fontWeight: "bold",
@@ -305,7 +278,6 @@ export default function WelcomePage() {
                 {t("welcome.features.management.title")}
               </Typography>
               <Typography
-                component="span"
                 variant="body2"
                 sx={{
                   color: "text.secondary",
@@ -333,7 +305,6 @@ export default function WelcomePage() {
                 <SportsSoccerIcon fontSize="large" />
               </Avatar>
               <Typography
-                component="span"
                 variant="h6"
                 sx={{
                   fontWeight: "bold",
@@ -342,7 +313,6 @@ export default function WelcomePage() {
                 {t("welcome.features.teams.title")}
               </Typography>
               <Typography
-                component="span"
                 variant="body2"
                 sx={{
                   color: "text.secondary",
@@ -370,7 +340,6 @@ export default function WelcomePage() {
                 <AssessmentIcon fontSize="large" />
               </Avatar>
               <Typography
-                component="span"
                 variant="h6"
                 sx={{
                   fontWeight: "bold",
@@ -379,7 +348,6 @@ export default function WelcomePage() {
                 {t("welcome.features.stats.title")}
               </Typography>
               <Typography
-                component="span"
                 variant="body2"
                 sx={{
                   color: "text.secondary",

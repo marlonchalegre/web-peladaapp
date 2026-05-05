@@ -227,7 +227,6 @@ export default function AttendanceListPage() {
             {t("peladas.attendance.title")}
           </Typography>
           <Typography
-            component="span"
             variant="body1"
             sx={{
               color: "text.secondary",

@@ -66,7 +66,6 @@ export default function StatInput({
           <CircularProgress size={16} />
         ) : (
           <Typography
-            component="span"
             variant="body2"
             data-testid={testIdPrefix ? `${testIdPrefix}-value` : undefined}
             sx={{

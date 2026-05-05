@@ -82,7 +82,6 @@ export default function InvitePlayerDialog({
           <Stack spacing={3} sx={{ mt: 1 }}>
             <Box>
               <Typography
-                component="span"
                 variant="subtitle1"
                 gutterBottom
                 sx={{
@@ -92,7 +91,6 @@ export default function InvitePlayerDialog({
                 {t("organizations.dialog.invite_player.personal_invite")}
               </Typography>
               <Typography
-                component="span"
                 variant="body2"
                 gutterBottom
                 sx={{
@@ -131,7 +129,6 @@ export default function InvitePlayerDialog({
 
             <Box>
               <Typography
-                component="span"
                 variant="subtitle1"
                 gutterBottom
                 sx={{
@@ -141,7 +138,6 @@ export default function InvitePlayerDialog({
                 {t("organizations.dialog.invite_player.public_link")}
               </Typography>
               <Typography
-                component="span"
                 variant="body2"
                 gutterBottom
                 sx={{
@@ -164,7 +160,6 @@ export default function InvitePlayerDialog({
                   }}
                 >
                   <Typography
-                    component="span"
                     variant="body2"
                     sx={{ flexGrow: 1, wordBreak: "break-all", mr: 1 }}
                     data-testid="public-invite-link-text"
@@ -211,7 +206,7 @@ export default function InvitePlayerDialog({
                 >
                   {t("organizations.dialog.invite_player.new_user_success")}
                 </Alert>
-                <Typography component="span" variant="body2" gutterBottom>
+                <Typography variant="body2" gutterBottom>
                   {t("organizations.dialog.invite_player.share_link")}
                 </Typography>
                 <Box
@@ -225,7 +220,6 @@ export default function InvitePlayerDialog({
                   }}
                 >
                   <Typography
-                    component="span"
                     variant="body2"
                     sx={{ flexGrow: 1, wordBreak: "break-all", mr: 1 }}
                     data-testid="invitation-link-text"

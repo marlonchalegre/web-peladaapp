@@ -37,7 +37,7 @@ export default function DeleteOrganizationDialog({
         {t("organizations.management.delete_confirm_title")}
       </DialogTitle>
       <DialogContent dividers>
-        <Typography component="span" variant="body2" sx={{ mb: 2 }}>
+        <Typography variant="body2" sx={{ mb: 2 }}>
           {t("organizations.management.delete_confirm_instruction", {
             name: orgName,
           })}

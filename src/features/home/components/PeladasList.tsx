@@ -38,7 +38,6 @@ export default function PeladasList({
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <SportsSoccerIcon sx={{ mr: 1.5, color: "primary.main" }} />
         <Typography
-          component="span"
           variant="h6"
           sx={{ fontWeight: 600, color: "text.primary" }}
         >
@@ -101,7 +100,6 @@ export default function PeladasList({
               <TableRow>
                 <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
                   <Typography
-                    component="span"
                     sx={{
                       color: "text.secondary",
                     }}
@@ -148,7 +146,6 @@ export default function PeladasList({
                         data-analytics-id="view-pelada-details-link"
                       >
                         <Typography
-                          component="span"
                           variant="body2"
                           sx={{
                             color: "primary.main",
@@ -162,7 +159,6 @@ export default function PeladasList({
                             : t("common.date.tbd", "TBD")}
                         </Typography>
                         <Typography
-                          component="span"
                           variant="caption"
                           sx={{ color: "text.secondary" }}
                         >
@@ -181,7 +177,6 @@ export default function PeladasList({
                     </TableCell>
                     <TableCell sx={{ py: 2.5 }}>
                       <Typography
-                        component="span"
                         variant="body2"
                         sx={{
                           fontWeight: 500,

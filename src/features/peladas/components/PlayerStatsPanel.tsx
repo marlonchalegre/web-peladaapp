@@ -76,7 +76,6 @@ const HighlightCard = ({
         {icon}
       </Box>
       <Typography
-        component="span"
         variant="subtitle2"
         sx={{
           fontWeight: "bold",
@@ -124,7 +123,6 @@ const HighlightCard = ({
               fallbackText={p.name.substring(0, 2).toUpperCase()}
             />
             <Typography
-              component="span"
               variant="body2"
               sx={{
                 fontWeight: "bold",
@@ -134,7 +132,6 @@ const HighlightCard = ({
             </Typography>
           </Stack>
           <Typography
-            component="span"
             variant="h6"
             color={`${color}.main`}
             sx={{
@@ -178,7 +175,6 @@ function StatsHighlights({ stats }: { stats: PlayerStatRow[] }) {
       >
         <TrendingUpIcon color="primary" />
         <Typography
-          component="span"
           variant="h6"
           sx={{
             fontWeight: "bold",
@@ -231,7 +227,6 @@ export default function PlayerStatsPanel({
         }}
       >
         <Typography
-          component="span"
           variant="subtitle1"
           sx={{
             fontWeight: "bold",
@@ -316,9 +311,7 @@ export default function PlayerStatsPanel({
                       sx={{ width: 28, height: 28, fontSize: "0.75rem" }}
                       fallbackText={p.name.charAt(0)}
                     />
-                    <Typography component="span" variant="body2">
-                      {p.name}
-                    </Typography>
+                    <Typography variant="body2">{p.name}</Typography>
                   </Stack>
                 </TableCell>
                 <TableCell align="center">{p.matchesPlayed ?? "-"}</TableCell>

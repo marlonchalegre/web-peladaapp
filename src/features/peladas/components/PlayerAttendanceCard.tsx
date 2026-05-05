@@ -123,7 +123,6 @@ export default function PlayerAttendanceCard({
             >
               {isCurrentUser && (
                 <Typography
-                  component="span"
                   variant="caption"
                   sx={{
                     color: "primary.main",
@@ -134,7 +133,6 @@ export default function PlayerAttendanceCard({
                 </Typography>
               )}
               <Typography
-                component="span"
                 variant="caption"
                 sx={{
                   color: "text.secondary",
@@ -151,7 +149,6 @@ export default function PlayerAttendanceCard({
               </Typography>
               {player.member_type && (
                 <Typography
-                  component="span"
                   variant="caption"
                   sx={{
                     color: "text.secondary",

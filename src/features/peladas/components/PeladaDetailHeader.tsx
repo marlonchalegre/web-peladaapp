@@ -123,7 +123,6 @@ export default function PeladaDetailHeader({
               </IconButton>
               <Box sx={{ textAlign: "center", minWidth: { xs: 50, sm: 80 } }}>
                 <Typography
-                  component="span"
                   variant="caption"
                   sx={{
                     display: "block",
@@ -136,7 +135,6 @@ export default function PeladaDetailHeader({
                   {t("peladas.detail.per_team")}
                 </Typography>
                 <Typography
-                  component="span"
                   variant="h6"
                   sx={{ fontWeight: 900, lineHeight: 1 }}
                 >
@@ -169,7 +167,6 @@ export default function PeladaDetailHeader({
               }
               label={
                 <Typography
-                  component="span"
                   variant="body2"
                   sx={{
                     fontWeight: 900,

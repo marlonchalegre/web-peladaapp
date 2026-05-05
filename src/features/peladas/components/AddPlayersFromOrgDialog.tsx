@@ -108,7 +108,6 @@ export default function AddPlayersFromOrgDialog({
       <DialogTitle>{t("peladas.panel.available.add_dialog.title")}</DialogTitle>
       <DialogContent dividers>
         <Typography
-          component="span"
           variant="body2"
           sx={{
             color: "text.secondary",

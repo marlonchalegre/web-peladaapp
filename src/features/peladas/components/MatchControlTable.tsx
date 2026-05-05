@@ -210,7 +210,6 @@ export default function MatchControlTable({
             ) : (
               <>
                 <Typography
-                  component="span"
                   variant="overline"
                   data-testid="match-status-text"
                   sx={{
@@ -271,7 +270,6 @@ export default function MatchControlTable({
                         sx={{ py: 0.5, textAlign: "center" }}
                       >
                         <Typography
-                          component="span"
                           variant="overline"
                           sx={{
                             color: "text.secondary",

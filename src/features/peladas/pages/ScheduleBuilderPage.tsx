@@ -226,7 +226,6 @@ export default function ScheduleBuilderPage() {
         >
           <Box>
             <Typography
-              component="span"
               variant="h4"
               gutterBottom
               sx={{
@@ -236,7 +235,6 @@ export default function ScheduleBuilderPage() {
               {t("peladas.detail.button.build_schedule")}
             </Typography>
             <Typography
-              component="span"
               variant="body1"
               sx={{
                 color: "text.secondary",
@@ -335,7 +333,6 @@ export default function ScheduleBuilderPage() {
         }}
       >
         <Typography
-          component="span"
           variant="h6"
           sx={{
             fontWeight: "bold",
@@ -396,7 +393,6 @@ export default function ScheduleBuilderPage() {
                 >
                   <TableCell align="center">
                     <Typography
-                      component="span"
                       variant="body2"
                       color={isInvalid ? "error.main" : "text.secondary"}
                       sx={{
@@ -441,7 +437,6 @@ export default function ScheduleBuilderPage() {
                       }}
                     >
                       <Typography
-                        component="span"
                         variant="caption"
                         color={isInvalid ? "white" : "text.secondary"}
                         sx={{

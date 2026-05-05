@@ -103,7 +103,6 @@ export default function FixedGoalkeepersSection({
         }}
       >
         <Typography
-          component="span"
           variant="caption"
           sx={{
             fontWeight: 800,
@@ -141,7 +140,6 @@ export default function FixedGoalkeepersSection({
           </Avatar>
           <Box sx={{ flexGrow: 1 }}>
             <Typography
-              component="span"
               variant="h6"
               sx={{ fontWeight: 800, lineHeight: 1.2, color: "primary.dark" }}
             >
@@ -181,7 +179,7 @@ export default function FixedGoalkeepersSection({
           }}
         >
           <PersonAddIcon sx={{ mb: 0.5, fontSize: 28 }} />
-          <Typography component="span" variant="body2" sx={{ fontWeight: 700 }}>
+          <Typography variant="body2" sx={{ fontWeight: 700 }}>
             {t("peladas.teams.drag_gk_here")}
           </Typography>
         </Box>
@@ -213,11 +211,7 @@ export default function FixedGoalkeepersSection({
         >
           <SecurityIcon fontSize="small" />
         </Box>
-        <Typography
-          component="span"
-          variant="h5"
-          sx={{ fontWeight: 800, letterSpacing: -0.5 }}
-        >
+        <Typography variant="h5" sx={{ fontWeight: 800, letterSpacing: -0.5 }}>
           {t("peladas.teams.fixed_goalkeepers_title")}
         </Typography>
       </Stack>

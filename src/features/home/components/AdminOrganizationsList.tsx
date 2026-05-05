@@ -44,7 +44,6 @@ export default function AdminOrganizationsList({
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <SecurityIcon sx={{ mr: 1.5, color: "secondary.main" }} />
           <Typography
-            component="span"
             variant="h6"
             sx={{ fontWeight: 600, color: "text.primary" }}
           >
@@ -121,7 +120,6 @@ export default function AdminOrganizationsList({
               <TableRow>
                 <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
                   <Typography
-                    component="span"
                     sx={{
                       color: "text.secondary",
                     }}
@@ -198,7 +196,6 @@ export default function AdminOrganizationsList({
                         }}
                       />
                       <Typography
-                        component="span"
                         variant="body2"
                         sx={{
                           color: "text.secondary",

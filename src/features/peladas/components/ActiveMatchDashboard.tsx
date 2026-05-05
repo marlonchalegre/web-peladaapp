@@ -326,7 +326,6 @@ export default function ActiveMatchDashboard(props: Props) {
                 }}
               />
               <Typography
-                component="span"
                 variant="subtitle2"
                 sx={{
                   fontWeight: "bold",
@@ -389,7 +388,6 @@ export default function ActiveMatchDashboard(props: Props) {
                 }}
               />
               <Typography
-                component="span"
                 variant="subtitle2"
                 sx={{
                   fontWeight: "bold",
@@ -462,7 +460,6 @@ export default function ActiveMatchDashboard(props: Props) {
       >
         <Box sx={{ width: 320, p: 2 }}>
           <Typography
-            component="span"
             variant="h6"
             sx={{
               fontWeight: "bold",
@@ -553,7 +550,6 @@ export default function ActiveMatchDashboard(props: Props) {
                           {m.sequence}
                         </Avatar>
                         <Typography
-                          component="span"
                           variant="caption"
                           color={
                             isSelected
@@ -598,7 +594,6 @@ export default function ActiveMatchDashboard(props: Props) {
                       }}
                     >
                       <Typography
-                        component="span"
                         variant="body2"
                         sx={{
                           flex: 1,
@@ -626,7 +621,6 @@ export default function ActiveMatchDashboard(props: Props) {
                         }}
                       >
                         <Typography
-                          component="span"
                           variant="body2"
                           sx={{
                             fontWeight: "900",
@@ -635,7 +629,6 @@ export default function ActiveMatchDashboard(props: Props) {
                           {m.home_score}
                         </Typography>
                         <Typography
-                          component="span"
                           variant="caption"
                           sx={{
                             color: "text.disabled",
@@ -645,7 +638,6 @@ export default function ActiveMatchDashboard(props: Props) {
                           x
                         </Typography>
                         <Typography
-                          component="span"
                           variant="body2"
                           sx={{
                             fontWeight: "900",
@@ -656,7 +648,6 @@ export default function ActiveMatchDashboard(props: Props) {
                       </Box>
 
                       <Typography
-                        component="span"
                         variant="body2"
                         sx={{
                           flex: 1,

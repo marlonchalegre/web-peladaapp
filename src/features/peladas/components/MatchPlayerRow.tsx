@@ -83,7 +83,6 @@ export default function MatchPlayerRow({
               }}
             />
             <Typography
-              component="span"
               variant="body2"
               sx={{
                 color: "text.secondary",
@@ -106,7 +105,6 @@ export default function MatchPlayerRow({
               }}
             >
               <Typography
-                component="span"
                 variant="caption"
                 sx={{
                   display: "block",
@@ -117,7 +115,6 @@ export default function MatchPlayerRow({
               </Typography>
               {benchPlayers.length === 0 && (
                 <Typography
-                  component="span"
                   variant="caption"
                   sx={{
                     color: "text.secondary",
@@ -160,7 +157,6 @@ export default function MatchPlayerRow({
         </TableCell>
         <TableCell colSpan={3} align="center">
           <Typography
-            component="span"
             variant="caption"
             sx={{
               color: "text.secondary",
@@ -191,11 +187,7 @@ export default function MatchPlayerRow({
               borderRadius: 1,
             }}
           />
-          <Typography
-            component="span"
-            variant="body2"
-            data-testid="player-name"
-          >
+          <Typography variant="body2" data-testid="player-name">
             {playerName}
           </Typography>
           {(item.is_goalkeeper === true ||
@@ -220,7 +212,6 @@ export default function MatchPlayerRow({
             }}
           >
             <Typography
-              component="span"
               variant="caption"
               sx={{
                 display: "block",

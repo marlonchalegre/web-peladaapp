@@ -143,7 +143,6 @@ export default function AddPlayersDialog({
             </Button>
             <Box sx={{ flexGrow: 1 }} />
             <Typography
-              component="span"
               variant="caption"
               sx={{
                 color: "text.secondary",
@@ -157,7 +156,6 @@ export default function AddPlayersDialog({
             {users.length === 0 && !loading && (
               <Box sx={{ p: 2, textAlign: "center" }}>
                 <Typography
-                  component="span"
                   sx={{
                     color: "text.secondary",
                   }}

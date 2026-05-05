@@ -72,7 +72,6 @@ export default function BreadcrumbNav({ items }: Props) {
                 }}
               >
                 <Typography
-                  component="span"
                   variant="body2"
                   sx={{ fontWeight: "bold", fontSize: "0.85rem" }}
                 >

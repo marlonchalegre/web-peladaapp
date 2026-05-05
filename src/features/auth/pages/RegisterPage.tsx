@@ -183,7 +183,7 @@ export default function RegisterPage() {
                 ? t("auth.register.button.loading")
                 : t("auth.register.button.submit")}
             </Button>
-            <Typography component="span" variant="body2" align="center">
+            <Typography variant="body2" align="center">
               {t("auth.register.link.existing_user")}{" "}
               <MLink
                 href={`/login${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`}

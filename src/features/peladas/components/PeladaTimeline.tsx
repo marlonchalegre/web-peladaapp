@@ -66,7 +66,6 @@ export default function PeladaTimeline({
     return (
       <Box sx={{ p: 4, textAlign: "center" }}>
         <Typography
-          component="span"
           sx={{
             color: "text.secondary",
           }}
@@ -98,14 +97,12 @@ export default function PeladaTimeline({
               }}
             >
               <Typography
-                component="span"
                 variant="caption"
                 sx={{ fontWeight: "bold", display: "block" }}
               >
                 {formatMs(event.session_time_ms)}
               </Typography>
               <Typography
-                component="span"
                 variant="caption"
                 sx={{
                   color: "text.disabled",
@@ -127,7 +124,6 @@ export default function PeladaTimeline({
             <TimelineContent sx={{ py: "12px", px: 2 }}>
               <Typography
                 variant="body1"
-                component="span"
                 sx={{ fontWeight: isGoal ? "bold" : "normal" }}
               >
                 {event.event_type === "own_goal"

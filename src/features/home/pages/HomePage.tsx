@@ -69,11 +69,7 @@ export default function HomePage() {
             </Box>
             !
           </Typography>
-          <Typography
-            component="span"
-            variant="body1"
-            sx={{ color: "text.secondary" }}
-          >
+          <Typography variant="body1" sx={{ color: "text.secondary" }}>
             {t(
               "home.welcome.subtitle",
               "Aqui está o resumo das suas atividades.",

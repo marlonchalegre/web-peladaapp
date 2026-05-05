@@ -69,7 +69,6 @@ const StatCard = ({
         >
           <Box>
             <Typography
-              component="span"
               variant="h6"
               sx={{
                 fontWeight: "bold",
@@ -80,7 +79,6 @@ const StatCard = ({
               {title}
             </Typography>
             <Typography
-              component="span"
               variant="body2"
               sx={{
                 color: "text.secondary",
@@ -121,7 +119,6 @@ const StatCard = ({
           />
           <Box>
             <Typography
-              component="span"
               variant="subtitle1"
               sx={{
                 fontWeight: "bold",
@@ -132,7 +129,6 @@ const StatCard = ({
             </Typography>
             <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.5 }}>
               <Typography
-                component="span"
                 variant="h5"
                 sx={{
                   fontWeight: "bold",
@@ -142,7 +138,6 @@ const StatCard = ({
                 {value}
               </Typography>
               <Typography
-                component="span"
                 variant="body2"
                 sx={{
                   color: "text.secondary",

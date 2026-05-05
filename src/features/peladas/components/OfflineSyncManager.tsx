@@ -206,11 +206,7 @@ export default function OfflineSyncManager({
             ) : undefined
           }
         >
-          <Typography
-            component="span"
-            variant="body2"
-            data-testid="pending-actions-count"
-          >
+          <Typography variant="body2" data-testid="pending-actions-count">
             {isOnline ? (
               <>
                 <strong>{queue.length}</strong>{" "}
