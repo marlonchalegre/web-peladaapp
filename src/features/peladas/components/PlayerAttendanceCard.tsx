@@ -99,7 +99,7 @@ export default function PlayerAttendanceCard({
             fallbackText={initials}
           />
           <Box sx={{ minWidth: 0 }}>
-            <Typography component="span"               variant="body1"
+            <Typography variant="body1"
               component="div"
               noWrap
               data-testid="attendance-card-name"

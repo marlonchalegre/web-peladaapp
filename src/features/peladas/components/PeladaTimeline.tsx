@@ -112,7 +112,7 @@ export default function PeladaTimeline({
               {index < sortedEvents.length - 1 && <TimelineConnector />}
             </TimelineSeparator>
             <TimelineContent sx={{ py: "12px", px: 2 }}>
-              <Typography component="span"                 variant="body1"
+              <Typography variant="body1"
                 component="span"
                 sx={{ fontWeight: isGoal ? "bold" : "normal" }}
               >

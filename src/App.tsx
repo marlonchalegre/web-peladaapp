@@ -227,7 +227,7 @@ function AppLayout() {
                   alt="Pelada App Logo"
                   sx={{ height: 32, mr: 1.5 }}
                 />
-                <Typography component="span"                   variant="h6"
+                <Typography variant="h6"
                   component="div"
                   sx={{
                     fontWeight: 700,

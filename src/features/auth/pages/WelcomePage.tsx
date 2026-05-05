@@ -162,7 +162,7 @@ export default function WelcomePage() {
                     alt="Logo"
                     sx={{ width: 64, height: 64 }}
                   />
-                  <Typography component="span"                     variant="h3"
+                  <Typography variant="h3"
                     component="h1"
                     fontWeight={800}
                     color="primary"

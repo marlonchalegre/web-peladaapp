@@ -173,7 +173,7 @@ export default function OrganizationDetailPage() {
           px: { xs: 1, sm: 0 },
         }}
       >
-        <Typography component="span"           variant="h4"
+        <Typography variant="h4"
           component="h1"
           color="primary.main"
           fontWeight="bold"

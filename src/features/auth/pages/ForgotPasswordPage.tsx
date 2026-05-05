@@ -83,7 +83,7 @@ export default function ForgotPasswordPage() {
         ) : (
           <form onSubmit={onSubmit}>
             <Stack spacing={2}>
-              <Typography component="span"                 variant="h5"
+              <Typography variant="h5"
                 component="h1"
                 align="center"
                 gutterBottom

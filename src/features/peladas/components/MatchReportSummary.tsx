@@ -331,7 +331,7 @@ export default function MatchReportSummary({
                 alignItems="center"
                 justifyContent="center"
               >
-                <Typography component="span"                   variant="body1"
+                <Typography variant="body1"
                   component="div"
                   data-testid="next-home-team"
                   sx={{
@@ -355,7 +355,7 @@ export default function MatchReportSummary({
                 <Typography component="span" variant="body2" color="text.secondary">
                   vs
                 </Typography>
-                <Typography component="span"                   variant="body1"
+                <Typography variant="body1"
                   component="div"
                   data-testid="next-away-team"
                   sx={{

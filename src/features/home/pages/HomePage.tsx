@@ -58,7 +58,7 @@ export default function HomePage() {
         }}
       >
         <Box>
-          <Typography component="span"             variant="h4"
+          <Typography variant="h4"
             component="h1"
             sx={{ fontWeight: 700, color: "text.primary", mb: 1 }}
           >
