@@ -210,7 +210,7 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
                       <Typography component="span" sx={{ fontSize: "1.2rem" }}>
                         {country?.flag}
                       </Typography>
-                      <Typography component="span"                         component="span"
+                      <Typography component="span"
                         variant="body2"
                         color="text.secondary"
                       >
