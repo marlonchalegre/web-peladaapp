@@ -47,7 +47,7 @@ export const LanguageSwitcher: React.FC = () => {
         slotProps={{
           list: {
             "aria-labelledby": "language-button",
-          }
+          },
         }}
       >
         <MenuItem

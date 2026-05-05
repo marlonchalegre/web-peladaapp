@@ -48,7 +48,12 @@ export default function AttendanceListColumn({
           {icon}
           <Typography component="span" variant="h6" sx={{ fontWeight: "bold" }}>
             {title}{" "}
-            <Typography component="span" color="text.secondary">
+            <Typography
+              component="span"
+              sx={{
+                color: "text.secondary",
+              }}
+            >
               ({count})
             </Typography>
           </Typography>
@@ -84,9 +89,15 @@ export default function AttendanceListColumn({
           );
         })}
         {players.length === 0 && (
-          <Typography component="span"             variant="body2"
-            color="text.secondary"
-            sx={{ fontStyle: "italic", textAlign: "center", py: 2 }}
+          <Typography
+            component="span"
+            variant="body2"
+            sx={{
+              color: "text.secondary",
+              fontStyle: "italic",
+              textAlign: "center",
+              py: 2,
+            }}
           >
             {emptyMessage}
           </Typography>

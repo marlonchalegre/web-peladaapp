@@ -68,13 +68,24 @@ const StatCard = ({
           }}
         >
           <Box>
-            <Typography component="span"               variant="h6"
-              fontWeight="bold"
-              sx={{ mb: 0.5, color: "text.primary" }}
+            <Typography
+              component="span"
+              variant="h6"
+              sx={{
+                fontWeight: "bold",
+                mb: 0.5,
+                color: "text.primary",
+              }}
             >
               {title}
             </Typography>
-            <Typography component="span" variant="body2" color="text.secondary">
+            <Typography
+              component="span"
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+              }}
+            >
               {subtitle}
             </Typography>
           </Box>
@@ -83,7 +94,13 @@ const StatCard = ({
           </Box>
         </Box>
 
-        <Stack direction="row" spacing={2} alignItems="center">
+        <Stack
+          direction="row"
+          spacing={2}
+          sx={{
+            alignItems: "center",
+          }}
+        >
           <SecureAvatar
             userId={userId}
             filename={avatarFilename}
@@ -103,20 +120,34 @@ const StatCard = ({
             }}
           />
           <Box>
-            <Typography component="span"               variant="subtitle1"
-              fontWeight="bold"
-              sx={{ color: "text.primary" }}
+            <Typography
+              component="span"
+              variant="subtitle1"
+              sx={{
+                fontWeight: "bold",
+                color: "text.primary",
+              }}
             >
               {playerName}
             </Typography>
             <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.5 }}>
-              <Typography component="span"                 variant="h5"
-                fontWeight="bold"
-                sx={{ color: "text.primary" }}
+              <Typography
+                component="span"
+                variant="h5"
+                sx={{
+                  fontWeight: "bold",
+                  color: "text.primary",
+                }}
               >
                 {value}
               </Typography>
-              <Typography component="span" variant="body2" color="text.secondary">
+              <Typography
+                component="span"
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {unit}
               </Typography>
             </Box>

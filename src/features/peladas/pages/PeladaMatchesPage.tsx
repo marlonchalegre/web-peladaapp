@@ -317,8 +317,8 @@ export default function PeladaMatchesPage() {
           <Stack
             direction="row"
             spacing={1}
-            flexWrap="wrap"
             sx={{
+              flexWrap: "wrap",
               flex: 1,
               justifyContent: { xs: "center", md: "flex-end" },
               width: { xs: "100%", md: "auto" },
@@ -496,7 +496,13 @@ export default function PeladaMatchesPage() {
               />
             ) : (
               <Paper sx={{ p: 8, textAlign: "center", borderRadius: 4 }}>
-                <Typography component="span" variant="h5" color="text.secondary">
+                <Typography
+                  component="span"
+                  variant="h5"
+                  sx={{
+                    color: "text.secondary",
+                  }}
+                >
                   {t("peladas.matches.select_match_hint")}
                 </Typography>
               </Paper>
@@ -517,9 +523,13 @@ export default function PeladaMatchesPage() {
                     textAlign: "center",
                   }}
                 >
-                  <Typography component="span"                     variant="body2"
-                    color="text.secondary"
-                    sx={{ mb: 2 }}
+                  <Typography
+                    component="span"
+                    variant="body2"
+                    sx={{
+                      color: "text.secondary",
+                      mb: 2,
+                    }}
                   >
                     Ao encerrar a pelada, todas as partidas serão finalizadas e
                     a classificação será consolidada.
@@ -581,7 +591,6 @@ export default function PeladaMatchesPage() {
           />
         )}
       </Container>
-
       {/* Pretty Confirm Dialogs */}
       <PrettyConfirmDialog
         open={Boolean(resetConfirmOpen)}
@@ -595,7 +604,6 @@ export default function PeladaMatchesPage() {
         onClose={() => setResetConfirmOpen(null)}
         severity="warning"
       />
-
       <PrettyConfirmDialog
         open={Boolean(endMatchConfirmOpen)}
         title={t("common.confirm")}
@@ -604,7 +612,6 @@ export default function PeladaMatchesPage() {
         onClose={() => setEndMatchConfirmOpen(null)}
         severity="error"
       />
-
       <PrettyConfirmDialog
         open={closePeladaConfirmOpen}
         title={t("common.confirm")}

@@ -47,15 +47,34 @@ function StandingsHighlights({ standings }: { standings: StandingRow[] }) {
 
   return (
     <Box sx={{ p: 2.5, bgcolor: "action.hover" }}>
-      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
+      <Stack
+        direction="row"
+        spacing={1}
+        sx={{
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
         <TrendingUpIcon color="primary" />
-        <Typography component="span" variant="h6" fontWeight="bold">
+        <Typography
+          component="span"
+          variant="h6"
+          sx={{
+            fontWeight: "bold",
+          }}
+        >
           {t("peladas.dashboard.summary.highlights")}
         </Typography>
       </Stack>
-
       <Box sx={{ flex: 1, maxWidth: { xs: "100%", sm: "300px" } }}>
-        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{
+            alignItems: "center",
+            mb: 1.5,
+          }}
+        >
           <Box
             sx={{
               display: "flex",
@@ -70,10 +89,15 @@ function StandingsHighlights({ standings }: { standings: StandingRow[] }) {
           >
             <EmojiEventsIcon fontSize="small" />
           </Box>
-          <Typography component="span"             variant="subtitle2"
-            fontWeight="bold"
-            color="text.secondary"
-            sx={{ textTransform: "uppercase", letterSpacing: 1 }}
+          <Typography
+            component="span"
+            variant="subtitle2"
+            sx={{
+              fontWeight: "bold",
+              color: "text.secondary",
+              textTransform: "uppercase",
+              letterSpacing: 1,
+            }}
           >
             {t("common.champion")}
           </Typography>
@@ -93,7 +117,13 @@ function StandingsHighlights({ standings }: { standings: StandingRow[] }) {
             boxShadow: "0 4px 12px rgba(237, 108, 2, 0.1)",
           }}
         >
-          <Stack direction="row" alignItems="center" spacing={2}>
+          <Stack
+            direction="row"
+            spacing={2}
+            sx={{
+              alignItems: "center",
+            }}
+          >
             <Avatar
               sx={{
                 width: 40,
@@ -105,11 +135,24 @@ function StandingsHighlights({ standings }: { standings: StandingRow[] }) {
               <EmojiEventsIcon />
             </Avatar>
             <Box>
-              <Typography component="span" variant="subtitle1" fontWeight="800" lineHeight={1.2}>
+              <Typography
+                component="span"
+                variant="subtitle1"
+                sx={{
+                  fontWeight: "800",
+                  lineHeight: 1.2,
+                }}
+              >
                 {champion.name ||
                   t("peladas.matches.team_fallback", { id: champion.teamId })}
               </Typography>
-              <Typography component="span" variant="caption" color="text.secondary">
+              <Typography
+                component="span"
+                variant="caption"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {champion.wins}V {champion.draws}E {champion.losses}D
               </Typography>
             </Box>
@@ -127,7 +170,6 @@ export default function StandingsPanel({ standings, showHighlights }: Props) {
   return (
     <Paper variant="outlined" sx={{ mb: 2, overflow: "hidden" }}>
       {showHighlights && <StandingsHighlights standings={standings} />}
-
       <Box
         sx={{
           bgcolor: "action.hover",
@@ -136,7 +178,13 @@ export default function StandingsPanel({ standings, showHighlights }: Props) {
           borderColor: "divider",
         }}
       >
-        <Typography component="span" variant="subtitle1" fontWeight="bold">
+        <Typography
+          component="span"
+          variant="subtitle1"
+          sx={{
+            fontWeight: "bold",
+          }}
+        >
           {t("peladas.panel.standings.title")}
         </Typography>
       </Box>

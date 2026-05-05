@@ -49,7 +49,6 @@ export default function StatInput({
       >
         <RemoveIcon fontSize="small" />
       </IconButton>
-
       <Box
         sx={{
           width: 32,
@@ -66,15 +65,18 @@ export default function StatInput({
         {loading ? (
           <CircularProgress size={16} />
         ) : (
-          <Typography component="span"             variant="body2"
-            fontWeight="bold"
+          <Typography
+            component="span"
+            variant="body2"
             data-testid={testIdPrefix ? `${testIdPrefix}-value` : undefined}
+            sx={{
+              fontWeight: "bold",
+            }}
           >
             {value}
           </Typography>
         )}
       </Box>
-
       <IconButton
         size="small"
         onClick={() => onChange(1)}

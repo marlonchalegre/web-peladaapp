@@ -37,13 +37,14 @@ export default function PeladasList({
     <Box sx={{ mb: 5 }}>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <SportsSoccerIcon sx={{ mr: 1.5, color: "primary.main" }} />
-        <Typography component="span"           variant="h6"
+        <Typography
+          component="span"
+          variant="h6"
           sx={{ fontWeight: 600, color: "text.primary" }}
         >
           {t("home.sections.peladas.title", "Minhas Peladas")}
         </Typography>
       </Box>
-
       <Paper
         elevation={0}
         sx={{
@@ -99,7 +100,12 @@ export default function PeladasList({
             {peladas.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
-                  <Typography component="span" color="text.secondary">
+                  <Typography
+                    component="span"
+                    sx={{
+                      color: "text.secondary",
+                    }}
+                  >
                     {t(
                       "home.sections.peladas.empty",
                       "Nenhuma pelada encontrada.",
@@ -141,7 +147,9 @@ export default function PeladasList({
                         data-testid={`pelada-link-${pelada.id}`}
                         data-analytics-id="view-pelada-details-link"
                       >
-                        <Typography component="span"                           variant="body2"
+                        <Typography
+                          component="span"
+                          variant="body2"
                           sx={{
                             color: "primary.main",
                             fontWeight: 500,
@@ -153,7 +161,9 @@ export default function PeladasList({
                               )
                             : t("common.date.tbd", "TBD")}
                         </Typography>
-                        <Typography component="span"                           variant="caption"
+                        <Typography
+                          component="span"
+                          variant="caption"
                           sx={{ color: "text.secondary" }}
                         >
                           {pelada.scheduled_at
@@ -170,9 +180,13 @@ export default function PeladasList({
                       </Link>
                     </TableCell>
                     <TableCell sx={{ py: 2.5 }}>
-                      <Typography component="span"                         variant="body2"
-                        fontWeight={500}
-                        color="text.primary"
+                      <Typography
+                        component="span"
+                        variant="body2"
+                        sx={{
+                          fontWeight: 500,
+                          color: "text.primary",
+                        }}
                       >
                         {pelada.organization_name || pelada.organization_id}
                       </Typography>

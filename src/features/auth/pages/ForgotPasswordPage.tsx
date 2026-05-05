@@ -83,16 +83,21 @@ export default function ForgotPasswordPage() {
         ) : (
           <form onSubmit={onSubmit}>
             <Stack spacing={2}>
-              <Typography variant="h5"
+              <Typography
+                variant="h5"
                 component="h1"
                 align="center"
                 gutterBottom
               >
                 {t("auth.forgot_password.title")}
               </Typography>
-              <Typography component="span"                 variant="body2"
-                color="text.secondary"
+              <Typography
+                component="span"
+                variant="body2"
                 align="center"
+                sx={{
+                  color: "text.secondary",
+                }}
               >
                 {t("auth.forgot_password.description")}
               </Typography>
@@ -109,7 +114,7 @@ export default function ForgotPasswordPage() {
                 required
                 fullWidth
                 slotProps={{
-                  htmlInput: { "data-testid": "forgot-password-email" }
+                  htmlInput: { "data-testid": "forgot-password-email" },
                 }}
               />
               <Button

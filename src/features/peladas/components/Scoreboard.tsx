@@ -40,28 +40,66 @@ export default function Scoreboard({
         </Typography>
         <Stack
           direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{ mt: 1, px: 4 }}
+          sx={{
+            justifyContent: "space-between",
+            alignItems: "center",
+            mt: 1,
+            px: 4,
+          }}
         >
-          <Stack alignItems="center">
-            <Typography component="span" variant="overline" sx={{ opacity: 0.9, lineHeight: 1 }}>
+          <Stack
+            sx={{
+              alignItems: "center",
+            }}
+          >
+            <Typography
+              component="span"
+              variant="overline"
+              sx={{ opacity: 0.9, lineHeight: 1 }}
+            >
               HOME
             </Typography>
-            <Typography component="span" variant="h5" fontWeight="bold">
+            <Typography
+              component="span"
+              variant="h5"
+              sx={{
+                fontWeight: "bold",
+              }}
+            >
               {homeTeamName}
             </Typography>
           </Stack>
 
-          <Typography component="span" variant="h3" fontWeight="bold" sx={{ px: 2 }}>
+          <Typography
+            component="span"
+            variant="h3"
+            sx={{
+              fontWeight: "bold",
+              px: 2,
+            }}
+          >
             {homeScore ?? 0} x {awayScore ?? 0}
           </Typography>
 
-          <Stack alignItems="center">
-            <Typography component="span" variant="overline" sx={{ opacity: 0.9, lineHeight: 1 }}>
+          <Stack
+            sx={{
+              alignItems: "center",
+            }}
+          >
+            <Typography
+              component="span"
+              variant="overline"
+              sx={{ opacity: 0.9, lineHeight: 1 }}
+            >
               AWAY
             </Typography>
-            <Typography component="span" variant="h5" fontWeight="bold">
+            <Typography
+              component="span"
+              variant="h5"
+              sx={{
+                fontWeight: "bold",
+              }}
+            >
               {awayTeamName}
             </Typography>
           </Stack>

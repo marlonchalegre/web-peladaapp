@@ -170,9 +170,12 @@ export default function MatchControlTable({
     >
       <Stack
         direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        sx={{ p: 2, pb: 1 }}
+        sx={{
+          justifyContent: "space-between",
+          alignItems: "center",
+          p: 2,
+          pb: 1,
+        }}
       >
         <Box />
         {!isMatchFinished && !isPeladaClosed ? (
@@ -188,7 +191,13 @@ export default function MatchControlTable({
             </Button>
           )
         ) : (
-          <Stack direction="row" spacing={2} alignItems="center">
+          <Stack
+            direction="row"
+            spacing={2}
+            sx={{
+              alignItems: "center",
+            }}
+          >
             {isEditing ? (
               <Button
                 variant="contained"
@@ -200,10 +209,14 @@ export default function MatchControlTable({
               </Button>
             ) : (
               <>
-                <Typography component="span"                   variant="overline"
-                  color="text.secondary"
-                  sx={{ fontWeight: "bold" }}
+                <Typography
+                  component="span"
+                  variant="overline"
                   data-testid="match-status-text"
+                  sx={{
+                    color: "text.secondary",
+                    fontWeight: "bold",
+                  }}
                 >
                   {t("peladas.dashboard.status.finished")}
                 </Typography>
@@ -257,9 +270,14 @@ export default function MatchControlTable({
                         colSpan={5}
                         sx={{ py: 0.5, textAlign: "center" }}
                       >
-                        <Typography component="span"                           variant="overline"
-                          color="text.secondary"
-                          sx={{ fontWeight: "bold", letterSpacing: 2 }}
+                        <Typography
+                          component="span"
+                          variant="overline"
+                          sx={{
+                            color: "text.secondary",
+                            fontWeight: "bold",
+                            letterSpacing: 2,
+                          }}
                         >
                           VS
                         </Typography>

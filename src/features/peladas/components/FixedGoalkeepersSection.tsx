@@ -10,7 +10,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import SecurityIcon from "@mui/icons-material/Security";
 import { useTranslation } from "react-i18next";
 import type { Player, User } from "../../../shared/api/endpoints";
@@ -102,7 +102,9 @@ export default function FixedGoalkeepersSection({
           px: 1,
         }}
       >
-        <Typography component="span"           variant="caption"
+        <Typography
+          component="span"
+          variant="caption"
           sx={{
             fontWeight: 800,
             color: player ? "primary.main" : "text.secondary",
@@ -118,10 +120,12 @@ export default function FixedGoalkeepersSection({
         <Stack
           direction="row"
           spacing={2}
-          alignItems="center"
           draggable={!locked}
           onDragStart={(e) => onDragStartPlayer(e, player.id, null)}
-          sx={{ cursor: locked ? "default" : "grab" }}
+          sx={{
+            alignItems: "center",
+            cursor: locked ? "default" : "grab",
+          }}
         >
           <Avatar
             sx={{
@@ -136,7 +140,9 @@ export default function FixedGoalkeepersSection({
             {player.user?.name?.[0].toUpperCase() || "G"}
           </Avatar>
           <Box sx={{ flexGrow: 1 }}>
-            <Typography component="span"               variant="h6"
+            <Typography
+              component="span"
+              variant="h6"
               sx={{ fontWeight: 800, lineHeight: 1.2, color: "primary.dark" }}
             >
               {player.user?.name}
@@ -160,7 +166,7 @@ export default function FixedGoalkeepersSection({
                   "&:hover": { bgcolor: "rgba(211, 47, 47, 0.1)" },
                 }}
               >
-                <DeleteOutlineIcon fontSize="small" />
+                <DeleteOutlinedIcon fontSize="small" />
               </IconButton>
             </Tooltip>
           )}
@@ -185,7 +191,14 @@ export default function FixedGoalkeepersSection({
 
   return (
     <Box sx={{ mb: 6 }}>
-      <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
+      <Stack
+        direction="row"
+        spacing={1.5}
+        sx={{
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
         <Box
           sx={{
             width: 32,
@@ -200,7 +213,11 @@ export default function FixedGoalkeepersSection({
         >
           <SecurityIcon fontSize="small" />
         </Box>
-        <Typography component="span" variant="h5" sx={{ fontWeight: 800, letterSpacing: -0.5 }}>
+        <Typography
+          component="span"
+          variant="h5"
+          sx={{ fontWeight: 800, letterSpacing: -0.5 }}
+        >
           {t("peladas.teams.fixed_goalkeepers_title")}
         </Typography>
       </Stack>

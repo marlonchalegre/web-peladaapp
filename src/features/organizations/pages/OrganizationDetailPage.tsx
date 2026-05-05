@@ -173,10 +173,13 @@ export default function OrganizationDetailPage() {
           px: { xs: 1, sm: 0 },
         }}
       >
-        <Typography variant="h4"
+        <Typography
+          variant="h4"
           component="h1"
-          color="primary.main"
-          fontWeight="bold"
+          sx={{
+            color: "primary.main",
+            fontWeight: "bold",
+          }}
         >
           {org.name}
         </Typography>
@@ -257,7 +260,6 @@ export default function OrganizationDetailPage() {
           )}
         </Stack>
       </Box>
-
       <Stack spacing={4}>
         {/* Create Pelada Section */}
         {isAdmin && (
@@ -319,7 +321,6 @@ export default function OrganizationDetailPage() {
           />
         </Paper>
       </Stack>
-
       {/* Confirmation Dialog */}
       <Dialog
         open={leaveDialogOpen}

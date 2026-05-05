@@ -102,16 +102,16 @@ export default function ResetPasswordPage() {
       >
         <form onSubmit={onSubmit}>
           <Stack spacing={2}>
-            <Typography variant="h5"
-              component="h1"
-              align="center"
-              gutterBottom
-            >
+            <Typography variant="h5" component="h1" align="center" gutterBottom>
               {t("auth.reset_password.title")}
             </Typography>
-            <Typography component="span"               variant="body2"
-              color="text.secondary"
+            <Typography
+              component="span"
+              variant="body2"
               align="center"
+              sx={{
+                color: "text.secondary",
+              }}
             >
               {t("auth.reset_password.description")}
             </Typography>
@@ -132,7 +132,7 @@ export default function ResetPasswordPage() {
               fullWidth
               disabled={success}
               slotProps={{
-                htmlInput: { "data-testid": "reset-password-input" }
+                htmlInput: { "data-testid": "reset-password-input" },
               }}
             />
             <TextField
@@ -145,7 +145,7 @@ export default function ResetPasswordPage() {
               fullWidth
               disabled={success}
               slotProps={{
-                htmlInput: { "data-testid": "reset-password-confirm" }
+                htmlInput: { "data-testid": "reset-password-confirm" },
               }}
             />
             <Button

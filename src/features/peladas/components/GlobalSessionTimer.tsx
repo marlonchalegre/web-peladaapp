@@ -61,7 +61,9 @@ export default function GlobalSessionTimer({
     >
       <TimerIcon color="action" fontSize="small" />
       <Box>
-        <Typography component="span"           variant="caption"
+        <Typography
+          component="span"
+          variant="caption"
           sx={{
             display: "block",
             lineHeight: 1,
@@ -72,7 +74,9 @@ export default function GlobalSessionTimer({
         >
           {t("peladas.timeline.session_timer")}
         </Typography>
-        <Typography component="span"           variant="h5"
+        <Typography
+          component="span"
+          variant="h5"
           sx={{
             fontFamily: "monospace",
             fontWeight: "bold",

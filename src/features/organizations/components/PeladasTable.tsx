@@ -31,7 +31,12 @@ export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
   if (!peladas.length) {
     return (
       <Box sx={{ p: 4, textAlign: "center" }}>
-        <Typography component="span" color="text.secondary">
+        <Typography
+          component="span"
+          sx={{
+            color: "text.secondary",
+          }}
+        >
           {t("organizations.peladas.empty")}
         </Typography>
       </Box>
@@ -109,14 +114,26 @@ export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
                 }}
               >
                 <TableCell sx={{ py: 2 }}>
-                  <Typography component="span" variant="body2" fontWeight={500}>
+                  <Typography
+                    component="span"
+                    variant="body2"
+                    sx={{
+                      fontWeight: 500,
+                    }}
+                  >
                     {p.scheduled_at
                       ? new Date(p.scheduled_at).toLocaleDateString(
                           t("common.locale_code", "pt-BR"),
                         )
                       : t("common.date.tbd", "TBD")}
                   </Typography>
-                  <Typography component="span" variant="caption" color="text.secondary">
+                  <Typography
+                    component="span"
+                    variant="caption"
+                    sx={{
+                      color: "text.secondary",
+                    }}
+                  >
                     {p.scheduled_at
                       ? new Date(p.scheduled_at).toLocaleTimeString(
                           t("common.locale_code", "pt-BR"),
@@ -135,9 +152,11 @@ export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
                     to={peladaLink}
                     underline="hover"
                     color="primary"
-                    fontWeight={600}
                     onClick={(e) => e.stopPropagation()}
                     data-testid={`pelada-link-${p.id}`}
+                    sx={{
+                      fontWeight: 600,
+                    }}
                   >
                     {t("organizations.peladas.item_name", { id: p.id })}
                   </Link>
@@ -161,8 +180,10 @@ export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
                   <Stack
                     direction="row"
                     spacing={1}
-                    justifyContent="flex-end"
                     onClick={(e) => e.stopPropagation()}
+                    sx={{
+                      justifyContent: "flex-end",
+                    }}
                   >
                     <Tooltip title={t("common.actions.view", "Visualizar")}>
                       <IconButton

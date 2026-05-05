@@ -28,7 +28,7 @@ export default function CreateOrganizationForm({ onCreate }: Props) {
           required
           size="small"
           slotProps={{
-            htmlInput: { "data-testid": "org-name-input" }
+            htmlInput: { "data-testid": "org-name-input" },
           }}
         />
         <Button

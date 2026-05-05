@@ -100,9 +100,13 @@ const StatBar = ({
               {icon}
             </Box>
           )}
-          <Typography component="span"             variant="body2"
-            fontWeight="medium"
-            sx={{ color: "text.primary" }}
+          <Typography
+            component="span"
+            variant="body2"
+            sx={{
+              fontWeight: "medium",
+              color: "text.primary",
+            }}
           >
             {value}
           </Typography>
@@ -126,7 +130,12 @@ export default function StatsTable({
   if (stats.length === 0) {
     return (
       <Paper sx={{ p: 4, textAlign: "center", borderRadius: 4 }}>
-        <Typography component="span" color="text.secondary">
+        <Typography
+          component="span"
+          sx={{
+            color: "text.secondary",
+          }}
+        >
           {t("organizations.stats.empty")}
         </Typography>
       </Paper>
@@ -146,8 +155,10 @@ export default function StatsTable({
             <Stack
               direction="row"
               spacing={2}
-              alignItems="center"
-              sx={{ mb: 2 }}
+              sx={{
+                alignItems: "center",
+                mb: 2,
+              }}
             >
               <SecureAvatar
                 userId={row.user_id}
@@ -159,11 +170,23 @@ export default function StatsTable({
                 }}
               />
               <Box>
-                <Typography component="span" variant="subtitle1" fontWeight="bold">
+                <Typography
+                  component="span"
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: "bold",
+                  }}
+                >
                   {row.player_name}
                 </Typography>
                 {row.player_position && (
-                  <Typography component="span" variant="caption" color="text.secondary">
+                  <Typography
+                    component="span"
+                    variant="caption"
+                    sx={{
+                      color: "text.secondary",
+                    }}
+                  >
                     {t(
                       `common.positions.${row.player_position.toLowerCase()}`,
                       { defaultValue: row.player_position },
@@ -175,9 +198,14 @@ export default function StatsTable({
 
             <Stack spacing={1.5}>
               <Box>
-                <Typography component="span"                   variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "block", mb: 0.5 }}
+                <Typography
+                  component="span"
+                  variant="caption"
+                  sx={{
+                    color: "text.secondary",
+                    display: "block",
+                    mb: 0.5,
+                  }}
                 >
                   {t("organizations.stats.table.peladas")}
                 </Typography>
@@ -185,9 +213,14 @@ export default function StatsTable({
               </Box>
 
               <Box>
-                <Typography component="span"                   variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "block", mb: 0.5 }}
+                <Typography
+                  component="span"
+                  variant="caption"
+                  sx={{
+                    color: "text.secondary",
+                    display: "block",
+                    mb: 0.5,
+                  }}
                 >
                   {t("common.goals")}
                 </Typography>
@@ -199,9 +232,14 @@ export default function StatsTable({
               </Box>
 
               <Box>
-                <Typography component="span"                   variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "block", mb: 0.5 }}
+                <Typography
+                  component="span"
+                  variant="caption"
+                  sx={{
+                    color: "text.secondary",
+                    display: "block",
+                    mb: 0.5,
+                  }}
                 >
                   {t("common.assists")}
                 </Typography>
@@ -293,7 +331,13 @@ export default function StatsTable({
           {stats.map((row) => (
             <TableRow key={row.player_id} hover>
               <TableCell>
-                <Stack direction="row" spacing={2} alignItems="center">
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  sx={{
+                    alignItems: "center",
+                  }}
+                >
                   <SecureAvatar
                     userId={row.user_id}
                     filename={row.avatar_filename}
@@ -304,7 +348,13 @@ export default function StatsTable({
                     }}
                   />
                   <Box>
-                    <Typography component="span" variant="body1" fontWeight="bold">
+                    <Typography
+                      component="span"
+                      variant="body1"
+                      sx={{
+                        fontWeight: "bold",
+                      }}
+                    >
                       {row.player_name}
                     </Typography>
                     {row.player_position && (

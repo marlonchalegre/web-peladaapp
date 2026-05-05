@@ -68,7 +68,13 @@ export default function MatchPlayerRow({
     return (
       <TableRow hover>
         <TableCell>
-          <Stack direction="row" alignItems="center" spacing={1}>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{
+              alignItems: "center",
+            }}
+          >
             <Box
               sx={{
                 width: 4,
@@ -76,9 +82,13 @@ export default function MatchPlayerRow({
                 bgcolor: item.side === "home" ? "home.main" : "away.main",
               }}
             />
-            <Typography component="span"               variant="body2"
-              color="text.secondary"
-              fontStyle="italic"
+            <Typography
+              component="span"
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+                fontStyle: "italic",
+              }}
             >
               {t("peladas.dashboard.empty_slot")}
             </Typography>
@@ -95,11 +105,24 @@ export default function MatchPlayerRow({
                 overflow: "auto",
               }}
             >
-              <Typography component="span" variant="caption" display="block" sx={{ mb: 1 }}>
+              <Typography
+                component="span"
+                variant="caption"
+                sx={{
+                  display: "block",
+                  mb: 1,
+                }}
+              >
                 {t("peladas.dashboard.add_player")}
               </Typography>
               {benchPlayers.length === 0 && (
-                <Typography component="span" variant="caption" color="text.secondary">
+                <Typography
+                  component="span"
+                  variant="caption"
+                  sx={{
+                    color: "text.secondary",
+                  }}
+                >
                   {t("peladas.dashboard.no_bench_players")}
                 </Typography>
               )}
@@ -136,7 +159,13 @@ export default function MatchPlayerRow({
           </IconButton>
         </TableCell>
         <TableCell colSpan={3} align="center">
-          <Typography component="span" variant="caption" color="text.secondary">
+          <Typography
+            component="span"
+            variant="caption"
+            sx={{
+              color: "text.secondary",
+            }}
+          >
             -
           </Typography>
         </TableCell>
@@ -147,7 +176,13 @@ export default function MatchPlayerRow({
   return (
     <TableRow hover data-testid="player-row">
       <TableCell>
-        <Stack direction="row" alignItems="center" spacing={1}>
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{
+            alignItems: "center",
+          }}
+        >
           <Box
             sx={{
               width: 4,
@@ -156,7 +191,11 @@ export default function MatchPlayerRow({
               borderRadius: 1,
             }}
           />
-          <Typography component="span" variant="body2" data-testid="player-name">
+          <Typography
+            component="span"
+            variant="body2"
+            data-testid="player-name"
+          >
             {playerName}
           </Typography>
           {(item.is_goalkeeper === true ||
@@ -180,7 +219,14 @@ export default function MatchPlayerRow({
               overflow: "auto",
             }}
           >
-            <Typography component="span" variant="caption" display="block" sx={{ mb: 1 }}>
+            <Typography
+              component="span"
+              variant="caption"
+              sx={{
+                display: "block",
+                mb: 1,
+              }}
+            >
               {t("peladas.dashboard.replace_with")}
             </Typography>
             {benchPlayers.map((bp) => (
@@ -222,7 +268,13 @@ export default function MatchPlayerRow({
         </IconButton>
       </TableCell>
       <TableCell align="center">
-        <Stack direction="row" alignItems="center" justifyContent="center">
+        <Stack
+          direction="row"
+          sx={{
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <StatInput
             value={stats.goals}
             disabled={finished || updating}
@@ -233,7 +285,13 @@ export default function MatchPlayerRow({
         </Stack>
       </TableCell>
       <TableCell align="center">
-        <Stack direction="row" alignItems="center" justifyContent="center">
+        <Stack
+          direction="row"
+          sx={{
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <StatInput
             value={stats.assists}
             disabled={finished || updating}
@@ -244,7 +302,13 @@ export default function MatchPlayerRow({
         </Stack>
       </TableCell>
       <TableCell align="center">
-        <Stack direction="row" alignItems="center" justifyContent="center">
+        <Stack
+          direction="row"
+          sx={{
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <StatInput
             value={stats.ownGoals}
             disabled={finished || updating}

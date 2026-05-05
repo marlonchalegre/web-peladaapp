@@ -75,8 +75,10 @@ export default function PeladaDetailHeader({
     <Box sx={{ mb: 4, pt: 1 }}>
       <Stack
         direction={{ xs: "column", lg: "row" }}
-        alignItems={{ xs: "stretch", lg: "center" }}
         spacing={2}
+        sx={{
+          alignItems: { xs: "stretch", lg: "center" },
+        }}
       >
         {pelada.status === "open" && isAdminOverride ? (
           <Paper
@@ -103,7 +105,13 @@ export default function PeladaDetailHeader({
             }}
           >
             {/* Players Per Team Stepper */}
-            <Stack direction="row" alignItems="center" spacing={1}>
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{
+                alignItems: "center",
+              }}
+            >
               <IconButton
                 size="small"
                 onClick={() => onUpdatePlayersPerTeam(playersPerTeam - 1)}
@@ -114,7 +122,9 @@ export default function PeladaDetailHeader({
                 <RemoveIcon fontSize="small" />
               </IconButton>
               <Box sx={{ textAlign: "center", minWidth: { xs: 50, sm: 80 } }}>
-                <Typography component="span"                   variant="caption"
+                <Typography
+                  component="span"
+                  variant="caption"
                   sx={{
                     display: "block",
                     fontWeight: 900,
@@ -125,7 +135,9 @@ export default function PeladaDetailHeader({
                 >
                   {t("peladas.detail.per_team")}
                 </Typography>
-                <Typography component="span"                   variant="h6"
+                <Typography
+                  component="span"
+                  variant="h6"
                   sx={{ fontWeight: 900, lineHeight: 1 }}
                 >
                   {playersPerTeam}
@@ -156,7 +168,9 @@ export default function PeladaDetailHeader({
                 />
               }
               label={
-                <Typography component="span"                   variant="body2"
+                <Typography
+                  component="span"
+                  variant="body2"
                   sx={{
                     fontWeight: 900,
                     fontSize: { xs: "0.65rem", sm: "0.75rem" },
@@ -178,8 +192,10 @@ export default function PeladaDetailHeader({
             <Stack
               direction="row"
               spacing={{ xs: 1, sm: 1.5 }}
-              alignItems="center"
-              sx={{ flexShrink: 0 }}
+              sx={{
+                alignItems: "center",
+                flexShrink: 0,
+              }}
             >
               {/* Export/Copy Menu */}
               <Tooltip title={t("common.actions.export")}>
@@ -307,7 +323,7 @@ export default function PeladaDetailHeader({
           </Paper>
         ) : (
           /* Non-admin or non-open status view */
-          (<Stack
+          <Stack
             direction="row"
             spacing={1.5}
             sx={{ width: "100%", justifyContent: "flex-end" }}
@@ -369,7 +385,7 @@ export default function PeladaDetailHeader({
                 {t("peladas.detail.button.view_results")}
               </Button>
             )}
-          </Stack>)
+          </Stack>
         )}
       </Stack>
       <Menu

@@ -118,7 +118,13 @@ export default function AddPlayersDialog({
             autoFocus
           />
 
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{
+              alignItems: "center",
+            }}
+          >
             <Button
               variant="outlined"
               size="small"
@@ -136,7 +142,13 @@ export default function AddPlayersDialog({
               {t("organizations.dialog.add_players.clear_selection")}
             </Button>
             <Box sx={{ flexGrow: 1 }} />
-            <Typography component="span" variant="caption" color="text.secondary">
+            <Typography
+              component="span"
+              variant="caption"
+              sx={{
+                color: "text.secondary",
+              }}
+            >
               {t("common.selected", { count: selectedIds.size })}
             </Typography>
           </Stack>
@@ -144,7 +156,12 @@ export default function AddPlayersDialog({
           <List sx={{ maxHeight: 320, minHeight: 100, overflow: "auto" }}>
             {users.length === 0 && !loading && (
               <Box sx={{ p: 2, textAlign: "center" }}>
-                <Typography component="span" color="text.secondary">
+                <Typography
+                  component="span"
+                  sx={{
+                    color: "text.secondary",
+                  }}
+                >
                   {searchQuery
                     ? t("organizations.dialog.add_players.no_results")
                     : t("organizations.dialog.add_players.empty_users")}

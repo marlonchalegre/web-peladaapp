@@ -30,7 +30,12 @@ function MockMatchAttendance() {
   const { t } = useTranslation();
   return (
     <Paper sx={{ p: 2, borderRadius: 2, height: "100%" }}>
-      <Typography component="span" variant="subtitle2" color="primary" gutterBottom>
+      <Typography
+        component="span"
+        variant="subtitle2"
+        color="primary"
+        gutterBottom
+      >
         {t("welcome.mock.match_day")}
       </Typography>
       <Stack spacing={1}>
@@ -50,7 +55,9 @@ function MockMatchAttendance() {
               borderRadius: 1,
             }}
           >
-            <Typography component="span" variant="body2">{p.name}</Typography>
+            <Typography component="span" variant="body2">
+              {p.name}
+            </Typography>
             <Chip
               label={t(`peladas.attendance.status.${p.status}`)}
               size="small"
@@ -73,23 +80,37 @@ function MockTeams() {
     <Paper sx={{ p: 2, borderRadius: 2, height: "100%" }}>
       <Grid container spacing={1}>
         <Grid size={6}>
-          <Typography component="span" variant="caption" sx={{ fontWeight: 'bold' }}>
+          <Typography
+            component="span"
+            variant="caption"
+            sx={{ fontWeight: "bold" }}
+          >
             {t("welcome.mock.team_a")}
           </Typography>
-          <Stack spacing={0.5} mt={1}>
+          <Stack component="div" spacing={0.5} sx={{ mt: 1 }}>
             {[1, 2, 3].map((v) => (
               <Box
                 key={v}
+                component="div"
                 sx={{ height: 8, bgcolor: "primary.main", borderRadius: 4 }}
               />
             ))}
           </Stack>
         </Grid>
         <Grid size={6}>
-          <Typography component="span" variant="caption" sx={{ fontWeight: 'bold' }}>
+          <Typography
+            component="span"
+            variant="caption"
+            sx={{ fontWeight: "bold" }}
+          >
             {t("welcome.mock.team_b")}
           </Typography>
-          <Stack spacing={0.5} mt={1}>
+          <Stack
+            spacing={0.5}
+            sx={{
+              mt: 1,
+            }}
+          >
             {[1, 2, 3].map((v) => (
               <Box
                 key={v}
@@ -113,14 +134,28 @@ function MockVoting() {
   const { t } = useTranslation();
   return (
     <Paper sx={{ p: 2, borderRadius: 2, height: "100%" }}>
-      <Typography component="span" variant="subtitle2" align="center" gutterBottom>
+      <Typography
+        component="span"
+        variant="subtitle2"
+        align="center"
+        gutterBottom
+      >
         {t("welcome.mock.mvp_vote")}
       </Typography>
-      <Stack alignItems="center" spacing={1}>
+      <Stack
+        spacing={1}
+        sx={{
+          alignItems: "center",
+        }}
+      >
         <Avatar sx={{ bgcolor: "primary.dark", width: 48, height: 48 }}>
           R
         </Avatar>
-        <Typography component="span" variant="body2" sx={{ fontWeight: 'bold' }}>
+        <Typography
+          component="span"
+          variant="body2"
+          sx={{ fontWeight: "bold" }}
+        >
           Ronaldinho
         </Typography>
         <Rating value={5} readOnly size="small" />
@@ -152,7 +187,13 @@ export default function WelcomePage() {
         }}
       >
         <Container maxWidth="lg">
-          <Grid container spacing={4} alignItems="center">
+          <Grid
+            container
+            spacing={4}
+            sx={{
+              alignItems: "center",
+            }}
+          >
             <Grid size={{ xs: 12, md: 7 }}>
               <Stack spacing={3}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -162,15 +203,21 @@ export default function WelcomePage() {
                     alt="Logo"
                     sx={{ width: 64, height: 64 }}
                   />
-                  <Typography variant="h3"
+                  <Typography
+                    variant="h3"
                     component="h1"
                     color="primary"
-                    sx={{ fontSize: { xs: "2.5rem", md: "3.5rem" }, fontWeight: 800 }}
+                    sx={{
+                      fontSize: { xs: "2.5rem", md: "3.5rem" },
+                      fontWeight: 800,
+                    }}
                   >
                     PeladaApp
                   </Typography>
                 </Box>
-                <Typography component="span"                   variant="h4"
+                <Typography
+                  component="span"
+                  variant="h4"
                   sx={{
                     lineHeight: 1.2,
                     fontSize: { xs: "1.75rem", md: "2.5rem" },
@@ -179,9 +226,14 @@ export default function WelcomePage() {
                 >
                   {t("welcome.title")}
                 </Typography>
-                <Typography component="span"                   variant="h6"
-                  color="text.secondary"
-                  sx={{ fontWeight: 400, maxWidth: 600 }}
+                <Typography
+                  component="span"
+                  variant="h6"
+                  sx={{
+                    color: "text.secondary",
+                    fontWeight: 400,
+                    maxWidth: 600,
+                  }}
                 >
                   {t("welcome.subtitle")}
                 </Typography>
@@ -223,12 +275,16 @@ export default function WelcomePage() {
           </Grid>
         </Container>
       </Box>
-
       {/* Features Grid */}
       <Container maxWidth="lg" sx={{ py: 8 }}>
         <Grid container spacing={4}>
           <Grid size={{ xs: 12, sm: 4 }}>
-            <Stack alignItems="center" align="center" spacing={2}>
+            <Stack
+              spacing={2}
+              sx={{
+                alignItems: "center",
+              }}
+            >
               <Avatar
                 sx={{
                   bgcolor: alpha(theme.palette.primary.main, 0.1),
@@ -239,16 +295,33 @@ export default function WelcomePage() {
               >
                 <GroupIcon fontSize="large" />
               </Avatar>
-              <Typography component="span" variant="h6" fontWeight="bold">
+              <Typography
+                component="span"
+                variant="h6"
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
                 {t("welcome.features.management.title")}
               </Typography>
-              <Typography component="span" variant="body2" color="text.secondary">
+              <Typography
+                component="span"
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {t("welcome.features.management.description")}
               </Typography>
             </Stack>
           </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
-            <Stack alignItems="center" align="center" spacing={2}>
+            <Stack
+              spacing={2}
+              sx={{
+                alignItems: "center",
+              }}
+            >
               <Avatar
                 sx={{
                   bgcolor: alpha(theme.palette.primary.main, 0.1),
@@ -259,16 +332,33 @@ export default function WelcomePage() {
               >
                 <SportsSoccerIcon fontSize="large" />
               </Avatar>
-              <Typography component="span" variant="h6" fontWeight="bold">
+              <Typography
+                component="span"
+                variant="h6"
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
                 {t("welcome.features.teams.title")}
               </Typography>
-              <Typography component="span" variant="body2" color="text.secondary">
+              <Typography
+                component="span"
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {t("welcome.features.teams.description")}
               </Typography>
             </Stack>
           </Grid>
           <Grid size={{ xs: 12, sm: 4 }}>
-            <Stack alignItems="center" align="center" spacing={2}>
+            <Stack
+              spacing={2}
+              sx={{
+                alignItems: "center",
+              }}
+            >
               <Avatar
                 sx={{
                   bgcolor: alpha(theme.palette.primary.main, 0.1),
@@ -279,10 +369,22 @@ export default function WelcomePage() {
               >
                 <AssessmentIcon fontSize="large" />
               </Avatar>
-              <Typography component="span" variant="h6" fontWeight="bold">
+              <Typography
+                component="span"
+                variant="h6"
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
                 {t("welcome.features.stats.title")}
               </Typography>
-              <Typography component="span" variant="body2" color="text.secondary">
+              <Typography
+                component="span"
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {t("welcome.features.stats.description")}
               </Typography>
             </Stack>

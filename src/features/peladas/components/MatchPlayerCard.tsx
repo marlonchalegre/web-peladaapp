@@ -60,7 +60,13 @@ export default function MatchPlayerCard({
           minHeight: { xs: 60, sm: 60, md: 80 },
         }}
       >
-        <Stack direction="row" spacing={2} alignItems="center">
+        <Stack
+          direction="row"
+          spacing={2}
+          sx={{
+            alignItems: "center",
+          }}
+        >
           <Avatar
             sx={{
               bgcolor: "text.disabled",
@@ -70,7 +76,13 @@ export default function MatchPlayerCard({
           >
             <PersonAddIcon fontSize="small" />
           </Avatar>
-          <Typography component="span" variant="body2" color="text.secondary">
+          <Typography
+            component="span"
+            variant="body2"
+            sx={{
+              color: "text.secondary",
+            }}
+          >
             {t("peladas.dashboard.empty_slot")}
           </Typography>
         </Stack>
@@ -115,7 +127,13 @@ export default function MatchPlayerCard({
     >
       <Stack spacing={1.5}>
         {/* Top Row: Sub Icon + Player Info */}
-        <Stack direction="row" spacing={1.5} alignItems="center">
+        <Stack
+          direction="row"
+          spacing={1.5}
+          sx={{
+            alignItems: "center",
+          }}
+        >
           {showControls && (
             <Tooltip title={t("common.sub")}>
               <IconButton
@@ -140,7 +158,9 @@ export default function MatchPlayerCard({
           )}
 
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-            <Typography component="span"               variant="body2"
+            <Typography
+              component="span"
+              variant="body2"
               sx={{
                 fontWeight: "bold",
                 fontSize: { xs: "0.85rem", sm: "1rem" },
@@ -153,10 +173,18 @@ export default function MatchPlayerCard({
             >
               {playerName}
             </Typography>
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Typography component="span"                 variant="caption"
-                color="text.secondary"
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{
+                alignItems: "center",
+              }}
+            >
+              <Typography
+                component="span"
+                variant="caption"
                 sx={{
+                  color: "text.secondary",
                   display: "block",
                   fontSize: { xs: "0.65rem", sm: "0.75rem" },
                   fontWeight: "medium",
@@ -175,16 +203,21 @@ export default function MatchPlayerCard({
         <Stack
           direction="row"
           spacing={{ xs: 1.5, sm: 2 }}
-          alignItems="center"
           sx={{
+            alignItems: "center",
             justifyContent: "flex-start",
-            pl: showControls ? 0 : 0, // Simplified, no offset needed in this vertical stack
+
+            // Simplified, no offset needed in this vertical stack
+            pl: showControls ? 0 : 0,
+
             flexShrink: 0,
           }}
         >
           {/* Goal Controls/Stats */}
           <Box sx={{ textAlign: "center", flexShrink: 0 }}>
-            <Typography component="span"               variant="caption"
+            <Typography
+              component="span"
+              variant="caption"
               sx={{
                 display: "block",
                 fontSize: "0.5rem",
@@ -198,19 +231,21 @@ export default function MatchPlayerCard({
             </Typography>
             <Stack
               direction="row"
-              alignItems="center"
-              justifyContent="center"
               sx={{
+                alignItems: "center",
+                justifyContent: "center",
                 border: "2px solid",
                 borderColor: "success.main",
                 borderRadius: showControls ? 1.5 : "50%",
                 width: showControls ? "auto" : { xs: 26, sm: 28, md: 32 },
                 height: showControls ? "auto" : { xs: 26, sm: 28, md: 32 },
                 overflow: "hidden",
+
                 bgcolor:
                   stats.goals > 0 && !showControls
                     ? alpha(theme.palette.success.main, 0.05)
                     : "background.paper",
+
                 transition: "all 0.2s",
               }}
             >
@@ -256,7 +291,9 @@ export default function MatchPlayerCard({
 
           {/* Assist Controls/Stats */}
           <Box sx={{ textAlign: "center", flexShrink: 0 }}>
-            <Typography component="span"               variant="caption"
+            <Typography
+              component="span"
+              variant="caption"
               sx={{
                 display: "block",
                 fontSize: "0.5rem",
@@ -270,19 +307,21 @@ export default function MatchPlayerCard({
             </Typography>
             <Stack
               direction="row"
-              alignItems="center"
-              justifyContent="center"
               sx={{
+                alignItems: "center",
+                justifyContent: "center",
                 border: "2px solid",
                 borderColor: "info.light",
                 borderRadius: showControls ? 1.5 : "50%",
                 width: showControls ? "auto" : { xs: 26, sm: 28, md: 32 },
                 height: showControls ? "auto" : { xs: 26, sm: 28, md: 32 },
                 overflow: "hidden",
+
                 bgcolor:
                   stats.assists > 0 && !showControls
                     ? alpha(theme.palette.primary.main, 0.05)
                     : "background.paper",
+
                 transition: "all 0.2s",
               }}
             >
@@ -328,7 +367,9 @@ export default function MatchPlayerCard({
 
           {/* Own Goal Controls/Stats */}
           <Box sx={{ textAlign: "center", flexShrink: 0 }}>
-            <Typography component="span"               variant="caption"
+            <Typography
+              component="span"
+              variant="caption"
               sx={{
                 display: "block",
                 fontSize: "0.5rem",
@@ -342,19 +383,21 @@ export default function MatchPlayerCard({
             </Typography>
             <Stack
               direction="row"
-              alignItems="center"
-              justifyContent="center"
               sx={{
+                alignItems: "center",
+                justifyContent: "center",
                 border: "2px solid",
                 borderColor: stats.ownGoals > 0 ? "error.light" : "divider",
                 borderRadius: showControls ? 1.5 : "50%",
                 width: showControls ? "auto" : { xs: 26, sm: 28, md: 32 },
                 height: showControls ? "auto" : { xs: 26, sm: 28, md: 32 },
                 overflow: "hidden",
+
                 bgcolor:
                   stats.ownGoals > 0 && !showControls
                     ? alpha(theme.palette.error.main, 0.05)
                     : "background.paper",
+
                 transition: "all 0.2s",
               }}
             >

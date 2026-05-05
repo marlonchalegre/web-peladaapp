@@ -64,12 +64,16 @@ export default function UserAttendanceStatus({
     >
       <Stack
         direction={{ xs: "column", md: "row" }}
-        justifyContent="space-between"
-        alignItems={{ xs: "flex-start", md: "center" }}
-        gap={3}
+        sx={{
+          justifyContent: "space-between",
+          alignItems: { xs: "flex-start", md: "center" },
+          gap: 3,
+        }}
       >
         <Box>
-          <Typography component="span"             variant="h4"
+          <Typography
+            component="span"
+            variant="h4"
             sx={{
               fontWeight: 800,
               mb: 0.5,
@@ -78,7 +82,11 @@ export default function UserAttendanceStatus({
           >
             {t("common.hello")}, {firstName}! 👋
           </Typography>
-          <Typography component="span" variant="body1" sx={{ opacity: 0.9, fontWeight: 500 }}>
+          <Typography
+            component="span"
+            variant="body1"
+            sx={{ opacity: 0.9, fontWeight: 500 }}
+          >
             {getStatusMessage()}
           </Typography>
         </Box>

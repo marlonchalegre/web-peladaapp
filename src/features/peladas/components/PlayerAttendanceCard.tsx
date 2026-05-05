@@ -99,7 +99,8 @@ export default function PlayerAttendanceCard({
             fallbackText={initials}
           />
           <Box sx={{ minWidth: 0 }}>
-            <Typography variant="body1"
+            <Typography
+              variant="body1"
               component="div"
               noWrap
               data-testid="attendance-card-name"
@@ -115,20 +116,31 @@ export default function PlayerAttendanceCard({
             <Stack
               direction="row"
               spacing={1}
-              alignItems="center"
-              sx={{ flexWrap: "wrap" }}
+              sx={{
+                alignItems: "center",
+                flexWrap: "wrap",
+              }}
             >
               {isCurrentUser && (
-                <Typography component="span"                   variant="caption"
-                  color="primary.main"
-                  sx={{ fontWeight: "bold" }}
+                <Typography
+                  component="span"
+                  variant="caption"
+                  sx={{
+                    color: "primary.main",
+                    fontWeight: "bold",
+                  }}
                 >
                   {t("common.you")}
                 </Typography>
               )}
-              <Typography component="span"                 variant="caption"
-                color="text.secondary"
-                sx={{ display: "flex", alignItems: "center" }}
+              <Typography
+                component="span"
+                variant="caption"
+                sx={{
+                  color: "text.secondary",
+                  display: "flex",
+                  alignItems: "center",
+                }}
               >
                 {isCurrentUser && " • "}
                 {t(
@@ -138,9 +150,14 @@ export default function PlayerAttendanceCard({
                 )}
               </Typography>
               {player.member_type && (
-                <Typography component="span"                   variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "flex", alignItems: "center" }}
+                <Typography
+                  component="span"
+                  variant="caption"
+                  sx={{
+                    color: "text.secondary",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
                 >
                   • {t(`common.member_types.${player.member_type}`)}
                 </Typography>
@@ -149,7 +166,13 @@ export default function PlayerAttendanceCard({
           </Box>
         </Box>
 
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{
+            alignItems: "center",
+          }}
+        >
           {needsPayment &&
             (isPaid ? (
               <Tooltip

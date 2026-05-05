@@ -81,10 +81,24 @@ export default function InvitePlayerDialog({
         {!invitedUser ? (
           <Stack spacing={3} sx={{ mt: 1 }}>
             <Box>
-              <Typography component="span" variant="subtitle1" fontWeight="bold" gutterBottom>
+              <Typography
+                component="span"
+                variant="subtitle1"
+                gutterBottom
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
                 {t("organizations.dialog.invite_player.personal_invite")}
               </Typography>
-              <Typography component="span" variant="body2" color="text.secondary" gutterBottom>
+              <Typography
+                component="span"
+                variant="body2"
+                gutterBottom
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {t("organizations.dialog.invite_player.description")}
               </Typography>
               <Stack spacing={1.5}>
@@ -98,7 +112,7 @@ export default function InvitePlayerDialog({
                   disabled={loading}
                   autoFocus
                   slotProps={{
-                    htmlInput: { "data-testid": "invite-email-input" }
+                    htmlInput: { "data-testid": "invite-email-input" },
                   }}
                 />
                 <Button
@@ -116,10 +130,24 @@ export default function InvitePlayerDialog({
             <Divider />
 
             <Box>
-              <Typography component="span" variant="subtitle1" fontWeight="bold" gutterBottom>
+              <Typography
+                component="span"
+                variant="subtitle1"
+                gutterBottom
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
                 {t("organizations.dialog.invite_player.public_link")}
               </Typography>
-              <Typography component="span" variant="body2" color="text.secondary" gutterBottom>
+              <Typography
+                component="span"
+                variant="body2"
+                gutterBottom
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {t(
                   "organizations.dialog.invite_player.public_link_description",
                 )}
@@ -135,7 +163,9 @@ export default function InvitePlayerDialog({
                     mt: 1,
                   }}
                 >
-                  <Typography component="span"                     variant="body2"
+                  <Typography
+                    component="span"
+                    variant="body2"
                     sx={{ flexGrow: 1, wordBreak: "break-all", mr: 1 }}
                     data-testid="public-invite-link-text"
                   >
@@ -194,7 +224,9 @@ export default function InvitePlayerDialog({
                     mt: 1,
                   }}
                 >
-                  <Typography component="span"                     variant="body2"
+                  <Typography
+                    component="span"
+                    variant="body2"
                     sx={{ flexGrow: 1, wordBreak: "break-all", mr: 1 }}
                     data-testid="invitation-link-text"
                   >

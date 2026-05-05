@@ -96,16 +96,23 @@ export default function JoinOrganizationPage() {
         <Typography component="span" variant="h4" gutterBottom>
           {t("organizations.invitation.join_title")}
         </Typography>
-        <Typography component="span"           variant="h5"
+        <Typography
+          component="span"
+          variant="h5"
           color="primary"
           gutterBottom
           sx={{ fontWeight: "bold", my: 3 }}
         >
           {invitation.organization_name}
         </Typography>
-        <Typography component="span" variant="body1" color="text.secondary" sx={{
-          marginBottom: "16px"
-        }}>
+        <Typography
+          component="span"
+          variant="body1"
+          sx={{
+            color: "text.secondary",
+            marginBottom: "16px",
+          }}
+        >
           {t("organizations.invitation.join_description", {
             name: invitation.organization_name,
           })}

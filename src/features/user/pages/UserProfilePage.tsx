@@ -223,9 +223,12 @@ export default function UserProfilePage() {
 
   return (
     <Box
-      maxWidth={600}
-      mx="auto"
-      sx={{ py: { xs: 2, sm: 4 }, px: { xs: 0, sm: 2 } }}
+      sx={{
+        maxWidth: 600,
+        mx: "auto",
+        py: { xs: 2, sm: 4 },
+        px: { xs: 0, sm: 2 },
+      }}
     >
       <Box sx={{ px: { xs: 1.5, sm: 0 } }}>
         <BreadcrumbNav items={[{ label: t("navigation.profile") }]} />
@@ -235,7 +238,14 @@ export default function UserProfilePage() {
           <Typography component="span" variant="h4" gutterBottom>
             {t("user.profile.title")}
           </Typography>
-          <Typography component="span" variant="body2" color="text.secondary" gutterBottom>
+          <Typography
+            component="span"
+            variant="body2"
+            gutterBottom
+            sx={{
+              color: "text.secondary",
+            }}
+          >
             {t("user.profile.subtitle")}
           </Typography>
         </Box>
@@ -250,10 +260,15 @@ export default function UserProfilePage() {
             alignItems: "center",
           }}
         >
-          <Typography component="span"             variant="subtitle2"
-            color="text.secondary"
+          <Typography
+            component="span"
+            variant="subtitle2"
             gutterBottom
-            sx={{ alignSelf: "flex-start", mb: 2 }}
+            sx={{
+              color: "text.secondary",
+              alignSelf: "flex-start",
+              mb: 2,
+            }}
           >
             {t("user.profile.section.change_avatar")}
           </Typography>
@@ -342,7 +357,7 @@ export default function UserProfilePage() {
               fullWidth
               disabled={loading}
               slotProps={{
-                htmlInput: { "data-testid": "profile-name" }
+                htmlInput: { "data-testid": "profile-name" },
               }}
             />
 
@@ -356,7 +371,7 @@ export default function UserProfilePage() {
               fullWidth
               disabled={loading}
               slotProps={{
-                htmlInput: { "data-testid": "profile-username" }
+                htmlInput: { "data-testid": "profile-username" },
               }}
             />
 
@@ -370,7 +385,7 @@ export default function UserProfilePage() {
               fullWidth
               disabled={loading}
               slotProps={{
-                htmlInput: { "data-testid": "profile-email" }
+                htmlInput: { "data-testid": "profile-email" },
               }}
             />
 
@@ -425,7 +440,13 @@ export default function UserProfilePage() {
             </FormControl>
 
             <Divider sx={{ my: 2 }}>
-              <Typography component="span" variant="caption" color="text.secondary">
+              <Typography
+                component="span"
+                variant="caption"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {t("user.profile.section.change_password")}
               </Typography>
             </Divider>
@@ -441,7 +462,7 @@ export default function UserProfilePage() {
               disabled={loading}
               helperText={t("user.profile.hint.password")}
               slotProps={{
-                htmlInput: { "data-testid": "profile-new-password" }
+                htmlInput: { "data-testid": "profile-new-password" },
               }}
             />
 
@@ -455,11 +476,17 @@ export default function UserProfilePage() {
               fullWidth
               disabled={loading || !password}
               slotProps={{
-                htmlInput: { "data-testid": "profile-confirm-password" }
+                htmlInput: { "data-testid": "profile-confirm-password" },
               }}
             />
 
-            <Box display="flex" gap={2} justifyContent="flex-end">
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                justifyContent: "flex-end",
+              }}
+            >
               <Button
                 variant="outlined"
                 onClick={() => navigate("/home")}
@@ -483,7 +510,9 @@ export default function UserProfilePage() {
 
         <Divider sx={{ my: 4 }} />
 
-        <Typography component="span"           variant="caption"
+        <Typography
+          component="span"
+          variant="caption"
           color="error"
           sx={{ display: "block", mb: 2 }}
         >

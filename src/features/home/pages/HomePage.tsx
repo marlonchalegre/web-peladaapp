@@ -58,7 +58,8 @@ export default function HomePage() {
         }}
       >
         <Box>
-          <Typography variant="h4"
+          <Typography
+            variant="h4"
             component="h1"
             sx={{ fontWeight: 700, color: "text.primary", mb: 1 }}
           >
@@ -68,7 +69,11 @@ export default function HomePage() {
             </Box>
             !
           </Typography>
-          <Typography component="span" variant="body1" sx={{ color: "text.secondary" }}>
+          <Typography
+            component="span"
+            variant="body1"
+            sx={{ color: "text.secondary" }}
+          >
             {t(
               "home.welcome.subtitle",
               "Aqui está o resumo das suas atividades.",

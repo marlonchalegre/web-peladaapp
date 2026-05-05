@@ -97,16 +97,16 @@ export default function FirstAccessPage() {
       >
         <form onSubmit={onSubmit}>
           <Stack spacing={2}>
-            <Typography variant="h5"
-              component="h1"
-              align="center"
-              gutterBottom
-            >
+            <Typography variant="h5" component="h1" align="center" gutterBottom>
               {t("auth.first_access.title")}
             </Typography>
-            <Typography component="span"               variant="body2"
-              color="text.secondary"
+            <Typography
+              component="span"
+              variant="body2"
               align="center"
+              sx={{
+                color: "text.secondary",
+              }}
             >
               {t("auth.first_access.description")}
             </Typography>
@@ -122,7 +122,7 @@ export default function FirstAccessPage() {
               fullWidth
               disabled={!!searchParams.get("email") && email.includes("@")}
               slotProps={{
-                htmlInput: { "data-testid": "first-access-email" }
+                htmlInput: { "data-testid": "first-access-email" },
               }}
             />
             <TextField
@@ -134,7 +134,7 @@ export default function FirstAccessPage() {
               required
               fullWidth
               slotProps={{
-                htmlInput: { "data-testid": "first-access-username" }
+                htmlInput: { "data-testid": "first-access-username" },
               }}
             />
             <TextField
@@ -147,7 +147,7 @@ export default function FirstAccessPage() {
               fullWidth
               autoFocus
               slotProps={{
-                htmlInput: { "data-testid": "first-access-name" }
+                htmlInput: { "data-testid": "first-access-name" },
               }}
             />
             <PhoneInput
@@ -170,7 +170,7 @@ export default function FirstAccessPage() {
               required
               fullWidth
               slotProps={{
-                htmlInput: { "data-testid": "first-access-password" }
+                htmlInput: { "data-testid": "first-access-password" },
               }}
             />
             <TextField

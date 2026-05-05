@@ -105,7 +105,14 @@ export default function WahaConfigSection({
         <Typography component="span" variant="h6" gutterBottom>
           {t("organizations.management.waha.title")}
         </Typography>
-        <Typography component="span" variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+        <Typography
+          component="span"
+          variant="body2"
+          sx={{
+            color: "text.secondary",
+            mb: 3,
+          }}
+        >
           {t("organizations.management.waha.subtitle")}
         </Typography>
 

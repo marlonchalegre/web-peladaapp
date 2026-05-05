@@ -66,11 +66,7 @@ export default function LoginPage() {
       >
         <form onSubmit={onSubmit}>
           <Stack spacing={2}>
-            <Typography variant="h5"
-              component="h1"
-              align="center"
-              gutterBottom
-            >
+            <Typography variant="h5" component="h1" align="center" gutterBottom>
               {t("auth.login.title")}
             </Typography>
             {error && <Alert severity="error">{error}</Alert>}
@@ -86,7 +82,7 @@ export default function LoginPage() {
               required
               fullWidth
               slotProps={{
-                htmlInput: { "data-testid": "login-email" }
+                htmlInput: { "data-testid": "login-email" },
               }}
             />
             <TextField
@@ -99,7 +95,7 @@ export default function LoginPage() {
               required
               fullWidth
               slotProps={{
-                htmlInput: { "data-testid": "login-password" }
+                htmlInput: { "data-testid": "login-password" },
               }}
             />
             <Button

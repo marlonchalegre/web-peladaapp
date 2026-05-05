@@ -110,7 +110,9 @@ export default function AvailablePlayerItem({
         </IconButton>
       )}
       <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-        <Typography component="span"           variant="body2"
+        <Typography
+          component="span"
+          variant="body2"
           sx={{
             fontWeight: 700,
             color: "text.primary",
@@ -123,9 +125,14 @@ export default function AvailablePlayerItem({
         >
           {player.user.name}
         </Typography>
-        <Typography component="span"           variant="caption"
-          color="text.secondary"
-          sx={{ fontWeight: 500, fontSize: "0.7rem" }}
+        <Typography
+          component="span"
+          variant="caption"
+          sx={{
+            color: "text.secondary",
+            fontWeight: 500,
+            fontSize: "0.7rem",
+          }}
         >
           {player.user.position
             ? t(`common.positions.${player.user.position.toLowerCase()}`)
@@ -251,9 +258,11 @@ export default function AvailablePlayerItem({
             onClose={handleCloseMenu}
             transformOrigin={{ horizontal: "left", vertical: "top" }}
             anchorOrigin={{ horizontal: "left", vertical: "bottom" }}
-            PaperProps={{
-              elevation: 3,
-              sx: { borderRadius: 2, minWidth: 180 },
+            slotProps={{
+              paper: {
+                elevation: 3,
+                sx: { borderRadius: 2, minWidth: 180 },
+              },
             }}
           >
             {teams.map((team) => (

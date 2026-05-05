@@ -79,16 +79,27 @@ const SummaryCard = ({
           alignItems: "center",
         }}
       >
-        <Typography component="span" color="text.secondary" gutterBottom variant="overline">
+        <Typography
+          component="span"
+          gutterBottom
+          variant="overline"
+          sx={{
+            color: "text.secondary",
+          }}
+        >
           {title}
         </Typography>
         {icon}
       </Box>
-      <Typography component="span"         variant="h5"
-        fontWeight="bold"
+      <Typography
+        component="span"
+        variant="h5"
         color={color}
         data-testid={`${testId}-value`}
         data-amount={value}
+        sx={{
+          fontWeight: "bold",
+        }}
       >
         {new Intl.NumberFormat("pt-BR", {
           style: "currency",
@@ -333,7 +344,14 @@ export default function FinanceSection({
 
   return (
     <Paper variant="outlined" sx={{ p: { xs: 2, sm: 3 } }}>
-      <Typography component="span" variant="h5" fontWeight="bold" gutterBottom>
+      <Typography
+        component="span"
+        variant="h5"
+        gutterBottom
+        sx={{
+          fontWeight: "bold",
+        }}
+      >
         {t("organizations.management.finance.title")}
       </Typography>
       {error && (
@@ -433,7 +451,7 @@ export default function FinanceSection({
                   SelectDisplayProps: {
                     "data-testid": "month-select",
                   } as React.HTMLAttributes<HTMLDivElement>,
-                }
+                },
               }}
             >
               {Array.from({ length: 12 }, (_, i) => (
@@ -460,7 +478,7 @@ export default function FinanceSection({
                   SelectDisplayProps: {
                     "data-testid": "year-select",
                   } as React.HTMLAttributes<HTMLDivElement>,
-                }
+                },
               }}
             >
               {[2024, 2025, 2026, 2027].map((y) => (
@@ -590,7 +608,9 @@ export default function FinanceSection({
                 {transactions.length === 0 ? (
                   <TableRow key="empty-transactions">
                     <TableCell colSpan={5} align="center">
-                      <Typography component="span"                         variant="body2"
+                      <Typography
+                        component="span"
+                        variant="body2"
                         sx={{ py: 2, color: "text.secondary" }}
                       >
                         {t(
@@ -637,15 +657,25 @@ export default function FinanceSection({
                             tx.status === "reversed" ? "line-through" : "none",
                         }}
                       >
-                        <Typography component="span" variant="body2" fontWeight="medium">
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          sx={{
+                            fontWeight: "medium",
+                          }}
+                        >
                           {tx.description}
                           {tx.status === "reversed" &&
                             ` (${t("organizations.management.finance.transactions.reversed")})`}
                         </Typography>
                         {tx.player_name && (
-                          <Typography component="span"                             variant="caption"
-                            display="block"
-                            color="text.secondary"
+                          <Typography
+                            component="span"
+                            variant="caption"
+                            sx={{
+                              display: "block",
+                              color: "text.secondary",
+                            }}
                           >
                             {t(
                               "organizations.management.finance.transactions.player",
@@ -654,10 +684,14 @@ export default function FinanceSection({
                           </Typography>
                         )}
                         {tx.creator_name && (
-                          <Typography component="span"                             variant="caption"
-                            display="block"
-                            color="primary.main"
-                            sx={{ fontStyle: "italic" }}
+                          <Typography
+                            component="span"
+                            variant="caption"
+                            sx={{
+                              display: "block",
+                              color: "primary.main",
+                              fontStyle: "italic",
+                            }}
                           >
                             {t(
                               "organizations.management.finance.transactions.recorded_by",
@@ -678,7 +712,8 @@ export default function FinanceSection({
                         />
                       </TableCell>
                       <TableCell align="right">
-                        <Typography component="span"                           fontWeight="bold"
+                        <Typography
+                          component="span"
                           color={
                             tx.status === "reversed"
                               ? "text.disabled"
@@ -688,6 +723,8 @@ export default function FinanceSection({
                           }
                           data-testid="transaction-amount"
                           sx={{
+                            fontWeight: "bold",
+
                             textDecoration:
                               tx.status === "reversed"
                                 ? "line-through"
@@ -761,8 +798,9 @@ export default function FinanceSection({
                     ),
                   },
 
-                  htmlInput: { "data-testid": "mensalista-price-input" }
-                }} />
+                  htmlInput: { "data-testid": "mensalista-price-input" },
+                }}
+              />
             </Grid>
             <Grid size={12}>
               <TextField
@@ -781,8 +819,9 @@ export default function FinanceSection({
                     ),
                   },
 
-                  htmlInput: { "data-testid": "diarista-price-input" }
-                }} />
+                  htmlInput: { "data-testid": "diarista-price-input" },
+                }}
+              />
             </Grid>
             <Grid size={12}>
               <TextField
@@ -798,7 +837,7 @@ export default function FinanceSection({
                     SelectDisplayProps: {
                       "data-testid": "currency-select",
                     } as React.HTMLAttributes<HTMLDivElement>,
-                  }
+                  },
                 }}
               >
                 <MenuItem value="BRL" data-testid="currency-option-BRL">
@@ -854,7 +893,7 @@ export default function FinanceSection({
                   SelectDisplayProps: {
                     "data-testid": "tx-type-select",
                   } as React.HTMLAttributes<HTMLDivElement>,
-                }
+                },
               }}
             >
               <MenuItem value="income" data-testid="tx-type-income">
@@ -874,7 +913,7 @@ export default function FinanceSection({
               value={txAmountStr}
               onChange={(e) => setTxAmountStr(e.target.value)}
               slotProps={{
-                htmlInput: { "data-testid": "tx-amount-input" }
+                htmlInput: { "data-testid": "tx-amount-input" },
               }}
             />
             <TextField
@@ -890,7 +929,7 @@ export default function FinanceSection({
                   SelectDisplayProps: {
                     "data-testid": "tx-category-select",
                   } as React.HTMLAttributes<HTMLDivElement>,
-                }
+                },
               }}
             >
               {(
@@ -919,7 +958,7 @@ export default function FinanceSection({
                 setNewTx({ ...newTx, description: e.target.value })
               }
               slotProps={{
-                htmlInput: { "data-testid": "tx-description-input" }
+                htmlInput: { "data-testid": "tx-description-input" },
               }}
             />
             <TextField
@@ -932,8 +971,9 @@ export default function FinanceSection({
               }
               slotProps={{
                 htmlInput: { "data-testid": "tx-date-input" },
-                inputLabel: { shrink: true }
-              }} />
+                inputLabel: { shrink: true },
+              }}
+            />
           </Box>
         </DialogContent>
         <DialogActions>

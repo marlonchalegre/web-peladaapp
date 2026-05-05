@@ -107,7 +107,14 @@ export default function AddPlayersFromOrgDialog({
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>{t("peladas.panel.available.add_dialog.title")}</DialogTitle>
       <DialogContent dividers>
-        <Typography component="span" variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        <Typography
+          component="span"
+          variant="body2"
+          sx={{
+            color: "text.secondary",
+            mb: 2,
+          }}
+        >
           {t("peladas.panel.available.add_dialog.description")}
         </Typography>
 
@@ -127,7 +134,7 @@ export default function AddPlayersFromOrgDialog({
                   <SearchIcon fontSize="small" />
                 </InputAdornment>
               ),
-            }
+            },
           }}
         />
 

@@ -103,10 +103,24 @@ export default function PlayerRatingsContent({
 
   return (
     <Box>
-      <Typography component="span" variant="h5" gutterBottom fontWeight="bold">
+      <Typography
+        component="span"
+        variant="h5"
+        gutterBottom
+        sx={{
+          fontWeight: "bold",
+        }}
+      >
         {t("organizations.ratings.title", { name: orgName })}
       </Typography>
-      <Typography component="span" variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+      <Typography
+        component="span"
+        variant="body1"
+        sx={{
+          color: "text.secondary",
+          mb: 3,
+        }}
+      >
         {t("organizations.ratings.subtitle")}
       </Typography>
       <Box sx={{ mb: 3 }}>
@@ -126,7 +140,7 @@ export default function PlayerRatingsContent({
                   <SearchIcon color="action" />
                 </InputAdornment>
               ),
-            }
+            },
           }}
         />
       </Box>
@@ -149,7 +163,12 @@ export default function PlayerRatingsContent({
             {paginatedPlayers.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
-                  <Typography component="span" color="text.secondary">
+                  <Typography
+                    component="span"
+                    sx={{
+                      color: "text.secondary",
+                    }}
+                  >
                     {t("organizations.list.empty")}
                   </Typography>
                 </TableCell>
@@ -159,10 +178,22 @@ export default function PlayerRatingsContent({
                 <TableRow key={player.id} hover>
                   <TableCell>
                     <Box sx={{ display: "flex", flexDirection: "column" }}>
-                      <Typography component="span" variant="subtitle1" fontWeight="medium">
+                      <Typography
+                        component="span"
+                        variant="subtitle1"
+                        sx={{
+                          fontWeight: "medium",
+                        }}
+                      >
                         {player.user_name}
                       </Typography>
-                      <Typography component="span" variant="body2" color="text.secondary">
+                      <Typography
+                        component="span"
+                        variant="body2"
+                        sx={{
+                          color: "text.secondary",
+                        }}
+                      >
                         @{player.user_username}
                       </Typography>
                     </Box>
@@ -181,15 +212,19 @@ export default function PlayerRatingsContent({
                       data-testid={`rating-input-${player.id}`}
                       sx={{ width: 80 }}
                       slotProps={{
-                        htmlInput: { min: 0, max: 10, step: 0.5 }
+                        htmlInput: { min: 0, max: 10, step: 0.5 },
                       }}
                     />
                   </TableCell>
                   <TableCell align="right">
-                    <Typography component="span"                       variant="body2"
-                      fontWeight="bold"
+                    <Typography
+                      component="span"
+                      variant="body2"
                       color="primary"
                       data-testid={`grade-${player.id}`}
+                      sx={{
+                        fontWeight: "bold",
+                      }}
                     >
                       {player.grade ? player.grade.toFixed(1) : "-"}
                     </Typography>

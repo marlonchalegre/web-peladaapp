@@ -84,11 +84,7 @@ export default function RegisterPage() {
       >
         <form onSubmit={onSubmit}>
           <Stack spacing={2}>
-            <Typography variant="h5"
-              component="h1"
-              align="center"
-              gutterBottom
-            >
+            <Typography variant="h5" component="h1" align="center" gutterBottom>
               {t("auth.register.title")}
             </Typography>
             {error && <Alert severity="error">{error}</Alert>}
@@ -102,7 +98,7 @@ export default function RegisterPage() {
               fullWidth
               autoFocus
               slotProps={{
-                htmlInput: { "data-testid": "register-name" }
+                htmlInput: { "data-testid": "register-name" },
               }}
             />
             <TextField
@@ -114,7 +110,7 @@ export default function RegisterPage() {
               required
               fullWidth
               slotProps={{
-                htmlInput: { "data-testid": "register-username" }
+                htmlInput: { "data-testid": "register-username" },
               }}
             />
             <TextField
@@ -128,7 +124,7 @@ export default function RegisterPage() {
               onChange={(e) => setEmail(e.target.value)}
               fullWidth
               slotProps={{
-                htmlInput: { "data-testid": "register-email" }
+                htmlInput: { "data-testid": "register-email" },
               }}
             />
             <PhoneInput
@@ -151,7 +147,7 @@ export default function RegisterPage() {
               required
               fullWidth
               slotProps={{
-                htmlInput: { "data-testid": "register-password" }
+                htmlInput: { "data-testid": "register-password" },
               }}
             />
             <TextField

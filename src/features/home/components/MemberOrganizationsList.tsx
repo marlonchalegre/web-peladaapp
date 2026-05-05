@@ -30,7 +30,9 @@ export default function MemberOrganizationsList({
     <Box>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <GroupsIcon sx={{ mr: 1.5, color: "text.secondary" }} />
-        <Typography component="span"           variant="h6"
+        <Typography
+          component="span"
+          variant="h6"
           sx={{ fontWeight: 600, color: "text.primary" }}
         >
           {t(
@@ -39,7 +41,6 @@ export default function MemberOrganizationsList({
           )}
         </Typography>
       </Box>
-
       {organizations.length === 0 ? (
         <Box
           sx={{
@@ -67,9 +68,13 @@ export default function MemberOrganizationsList({
           >
             <InfoIcon />
           </Avatar>
-          <Typography component="span"             variant="body1"
-            color="text.secondary"
-            sx={{ maxWidth: 400 }}
+          <Typography
+            component="span"
+            variant="body1"
+            sx={{
+              color: "text.secondary",
+              maxWidth: 400,
+            }}
           >
             {t(
               "home.sections.member_orgs.empty_desc",
@@ -149,11 +154,13 @@ export default function MemberOrganizationsList({
                         to={`/organizations/${org.id}`}
                         underline="hover"
                         variant="body2"
-                        fontWeight={600}
-                        color="text.primary"
                         onClick={(e) => e.stopPropagation()}
                         data-testid={`org-link-${org.name}`}
                         data-analytics-id="view-org-details-link"
+                        sx={{
+                          fontWeight: 600,
+                          color: "text.primary",
+                        }}
                       >
                         {org.name}
                       </Link>
@@ -161,7 +168,13 @@ export default function MemberOrganizationsList({
                   </TableCell>
                   <TableCell sx={{ py: 2.5 }}>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <Typography component="span" variant="body2" color="text.secondary">
+                      <Typography
+                        component="span"
+                        variant="body2"
+                        sx={{
+                          color: "text.secondary",
+                        }}
+                      >
                         {t("common.roles.player", "Jogador")}
                       </Typography>
                     </Box>

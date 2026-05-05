@@ -54,7 +54,13 @@ export default function InvitationsList({
           mb: 2,
         }}
       >
-        <Typography component="span" variant="h5" fontWeight="bold">
+        <Typography
+          component="span"
+          variant="h5"
+          sx={{
+            fontWeight: "bold",
+          }}
+        >
           {t(
             "organizations.management.sections.invitations",
             "Active Invitations",
@@ -97,10 +103,18 @@ export default function InvitationsList({
           <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
             <LinkIcon sx={{ mr: 1 }} />
             <Box>
-              <Typography component="span" variant="subtitle2" fontWeight="bold">
+              <Typography
+                component="span"
+                variant="subtitle2"
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
                 {t("organizations.dialog.invite_player.public_link")}
               </Typography>
-              <Typography component="span"                 variant="body2"
+              <Typography
+                component="span"
+                variant="body2"
                 sx={{
                   wordBreak: "break-all",
                   opacity: 0.9,
@@ -154,8 +168,13 @@ export default function InvitationsList({
       <Divider sx={{ mb: 2 }} />
       <List>
         {invitations.filter((inv) => !!inv.email).length === 0 ? (
-          <Typography component="span"             color="text.secondary"
-            sx={{ textAlign: "center", py: 2 }}
+          <Typography
+            component="span"
+            sx={{
+              color: "text.secondary",
+              textAlign: "center",
+              py: 2,
+            }}
           >
             {t(
               "organizations.invitation.empty",
@@ -184,7 +203,13 @@ export default function InvitationsList({
                   }
                   secondary={
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <Typography component="span" variant="body2" color="text.secondary">
+                      <Typography
+                        component="span"
+                        variant="body2"
+                        sx={{
+                          color: "text.secondary",
+                        }}
+                      >
                         {new Date(inv.created_at).toLocaleDateString(
                           t("common.locale_code", "pt-BR"),
                         )}
@@ -201,7 +226,7 @@ export default function InvitationsList({
                     </Box>
                   }
                   slotProps={{
-                    secondary: { component: "div" }
+                    secondary: { component: "div" },
                   }}
                 />
                 <ListItemSecondaryAction>

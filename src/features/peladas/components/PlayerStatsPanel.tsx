@@ -53,7 +53,14 @@ const HighlightCard = ({
   color: string;
 }) => (
   <Box sx={{ flex: 1, minWidth: { xs: "100%", sm: "200px" } }}>
-    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
+    <Stack
+      direction="row"
+      spacing={1}
+      sx={{
+        alignItems: "center",
+        mb: 1.5,
+      }}
+    >
       <Box
         sx={{
           display: "flex",
@@ -68,10 +75,15 @@ const HighlightCard = ({
       >
         {icon}
       </Box>
-      <Typography component="span"         variant="subtitle2"
-        fontWeight="bold"
-        color="text.secondary"
-        sx={{ textTransform: "uppercase", letterSpacing: 1 }}
+      <Typography
+        component="span"
+        variant="subtitle2"
+        sx={{
+          fontWeight: "bold",
+          color: "text.secondary",
+          textTransform: "uppercase",
+          letterSpacing: 1,
+        }}
       >
         {title}
       </Typography>
@@ -93,7 +105,13 @@ const HighlightCard = ({
             borderRadius: 2,
           }}
         >
-          <Stack direction="row" alignItems="center" spacing={1.5}>
+          <Stack
+            direction="row"
+            spacing={1.5}
+            sx={{
+              alignItems: "center",
+            }}
+          >
             <SecureAvatar
               userId={p.userId}
               filename={p.avatar_filename}
@@ -105,11 +123,24 @@ const HighlightCard = ({
               }}
               fallbackText={p.name.substring(0, 2).toUpperCase()}
             />
-            <Typography component="span" variant="body2" fontWeight="bold">
+            <Typography
+              component="span"
+              variant="body2"
+              sx={{
+                fontWeight: "bold",
+              }}
+            >
               {p.name}
             </Typography>
           </Stack>
-          <Typography component="span" variant="h6" fontWeight="black" color={`${color}.main`}>
+          <Typography
+            component="span"
+            variant="h6"
+            color={`${color}.main`}
+            sx={{
+              fontWeight: "black",
+            }}
+          >
             {count}
           </Typography>
         </Paper>
@@ -137,13 +168,25 @@ function StatsHighlights({ stats }: { stats: PlayerStatRow[] }) {
 
   return (
     <Box sx={{ p: 2.5, bgcolor: "action.hover" }}>
-      <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
+      <Stack
+        direction="row"
+        spacing={1}
+        sx={{
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
         <TrendingUpIcon color="primary" />
-        <Typography component="span" variant="h6" fontWeight="bold">
+        <Typography
+          component="span"
+          variant="h6"
+          sx={{
+            fontWeight: "bold",
+          }}
+        >
           {t("peladas.dashboard.summary.highlights")}
         </Typography>
       </Stack>
-
       <Stack direction={{ xs: "column", sm: "row" }} spacing={3}>
         {topScorers.length > 0 && (
           <HighlightCard
@@ -179,7 +222,6 @@ export default function PlayerStatsPanel({
   return (
     <Paper variant="outlined" sx={{ overflow: "hidden" }}>
       {showHighlights && <StatsHighlights stats={playerStats} />}
-
       <Box
         sx={{
           bgcolor: "action.hover",
@@ -188,7 +230,13 @@ export default function PlayerStatsPanel({
           borderColor: "divider",
         }}
       >
-        <Typography component="span" variant="subtitle1" fontWeight="bold">
+        <Typography
+          component="span"
+          variant="subtitle1"
+          sx={{
+            fontWeight: "bold",
+          }}
+        >
           {t("peladas.panel.stats.title")}
         </Typography>
       </Box>
@@ -205,8 +253,10 @@ export default function PlayerStatsPanel({
               <TableCell align="center" sx={{ fontWeight: "bold" }}>
                 <Stack
                   direction="row"
-                  alignItems="center"
-                  justifyContent="center"
+                  sx={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
                 >
                   {t("common.goals")}
                   <Tooltip title={t("peladas.panel.stats.sort.goals")}>
@@ -223,8 +273,10 @@ export default function PlayerStatsPanel({
               <TableCell align="center" sx={{ fontWeight: "bold" }}>
                 <Stack
                   direction="row"
-                  alignItems="center"
-                  justifyContent="center"
+                  sx={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
                 >
                   {t("common.assists_short")}
                   <Tooltip title={t("peladas.panel.stats.sort.assists")}>
@@ -251,14 +303,22 @@ export default function PlayerStatsPanel({
                 sx={{ bgcolor: index % 2 === 1 ? "action.hover" : "inherit" }}
               >
                 <TableCell sx={{ whiteSpace: "nowrap" }}>
-                  <Stack direction="row" alignItems="center" spacing={1.5}>
+                  <Stack
+                    direction="row"
+                    spacing={1.5}
+                    sx={{
+                      alignItems: "center",
+                    }}
+                  >
                     <SecureAvatar
                       userId={p.userId}
                       filename={p.avatar_filename}
                       sx={{ width: 28, height: 28, fontSize: "0.75rem" }}
                       fallbackText={p.name.charAt(0)}
                     />
-                    <Typography component="span" variant="body2">{p.name}</Typography>
+                    <Typography component="span" variant="body2">
+                      {p.name}
+                    </Typography>
                   </Stack>
                 </TableCell>
                 <TableCell align="center">{p.matchesPlayed ?? "-"}</TableCell>

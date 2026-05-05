@@ -219,32 +219,44 @@ export default function ScheduleBuilderPage() {
 
         <Stack
           direction="row"
-          justifyContent="space-between"
-          alignItems="center"
+          sx={{
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
         >
           <Box>
-            <Typography component="span" variant="h4" fontWeight="bold" gutterBottom>
+            <Typography
+              component="span"
+              variant="h4"
+              gutterBottom
+              sx={{
+                fontWeight: "bold",
+              }}
+            >
               {t("peladas.detail.button.build_schedule")}
             </Typography>
-            <Typography component="span" variant="body1" color="text.secondary">
+            <Typography
+              component="span"
+              variant="body1"
+              sx={{
+                color: "text.secondary",
+              }}
+            >
               {t("peladas.detail.schedule.subtitle")}
             </Typography>
           </Box>
         </Stack>
       </Box>
-
       {error && (
         <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
           {error}
         </Alert>
       )}
-
       {teams.length < 2 && (
         <Alert severity="warning" sx={{ mb: 3 }}>
           {t("peladas.detail.schedule.warning.not_enough_teams")}
         </Alert>
       )}
-
       <Card
         sx={{
           mb: 4,
@@ -256,7 +268,9 @@ export default function ScheduleBuilderPage() {
           <Stack
             direction={{ xs: "column", sm: "row" }}
             spacing={3}
-            alignItems={{ xs: "stretch", sm: "center" }}
+            sx={{
+              alignItems: { xs: "stretch", sm: "center" },
+            }}
           >
             <FormControl sx={{ minWidth: 200 }} size="small">
               <InputLabel id="matches-per-team-label">
@@ -312,7 +326,6 @@ export default function ScheduleBuilderPage() {
           </Stack>
         </CardContent>
       </Card>
-
       <Box
         sx={{
           mb: 2,
@@ -321,11 +334,16 @@ export default function ScheduleBuilderPage() {
           alignItems: "center",
         }}
       >
-        <Typography component="span" variant="h6" fontWeight="bold">
+        <Typography
+          component="span"
+          variant="h6"
+          sx={{
+            fontWeight: "bold",
+          }}
+        >
           {t("peladas.detail.schedule.planned_matches")}
         </Typography>
       </Box>
-
       <TableContainer
         component={Paper}
         sx={{
@@ -377,9 +395,13 @@ export default function ScheduleBuilderPage() {
                   sx={isInvalid ? { bgcolor: "error.lighter" } : {}}
                 >
                   <TableCell align="center">
-                    <Typography component="span"                       variant="body2"
-                      fontWeight="bold"
+                    <Typography
+                      component="span"
+                      variant="body2"
                       color={isInvalid ? "error.main" : "text.secondary"}
+                      sx={{
+                        fontWeight: "bold",
+                      }}
                     >
                       {index + 1}
                     </Typography>
@@ -418,9 +440,13 @@ export default function ScheduleBuilderPage() {
                         justifyContent: "center",
                       }}
                     >
-                      <Typography component="span"                         variant="caption"
-                        fontWeight="bold"
+                      <Typography
+                        component="span"
+                        variant="caption"
                         color={isInvalid ? "white" : "text.secondary"}
+                        sx={{
+                          fontWeight: "bold",
+                        }}
                       >
                         VS
                       </Typography>
@@ -452,7 +478,9 @@ export default function ScheduleBuilderPage() {
                     <Stack
                       direction="row"
                       spacing={0.5}
-                      justifyContent="center"
+                      sx={{
+                        justifyContent: "center",
+                      }}
                     >
                       <Tooltip title={t("peladas.detail.schedule.button.swap")}>
                         <IconButton
@@ -503,7 +531,6 @@ export default function ScheduleBuilderPage() {
           </TableBody>
         </Table>
       </TableContainer>
-
       <Box sx={{ mt: 4, display: "flex", justifyContent: "flex-end" }}>
         <Button
           variant="contained"

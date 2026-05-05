@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import PeopleIcon from "@mui/icons-material/People";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import HelpOutlinedIcon from "@mui/icons-material/HelpOutlined";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import { useTranslation } from "react-i18next";
@@ -219,13 +219,20 @@ export default function AttendanceListPage() {
         </Box>
 
         <Box sx={{ mb: 4, px: { xs: 1.5, sm: 0 } }}>
-          <Typography variant="h4"
+          <Typography
+            variant="h4"
             component="h1"
             sx={{ fontWeight: 800, mb: 1, letterSpacing: -0.5 }}
           >
             {t("peladas.attendance.title")}
           </Typography>
-          <Typography component="span" variant="body1" color="text.secondary">
+          <Typography
+            component="span"
+            variant="body1"
+            sx={{
+              color: "text.secondary",
+            }}
+          >
             {t("peladas.attendance.subtitle")}
           </Typography>
         </Box>
@@ -318,7 +325,7 @@ export default function AttendanceListPage() {
                       },
                     }}
                   >
-                    <HelpOutlineIcon />
+                    <HelpOutlinedIcon />
                   </Badge>
                 }
                 iconPosition="start"
@@ -427,7 +434,6 @@ export default function AttendanceListPage() {
           </CustomTabPanel>
         </Box>
       </div>
-
       <Dialog
         open={isConfirmDialogOpen}
         onClose={() => setIsConfirmDialogOpen(false)}
@@ -463,7 +469,6 @@ export default function AttendanceListPage() {
           </Button>
         </DialogActions>
       </Dialog>
-
       <PrettyConfirmDialog
         open={isReverseDialogOpen}
         onClose={() => {

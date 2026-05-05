@@ -15,7 +15,11 @@ export default function PendingInvitations({ invitations, onAccept }: Props) {
 
   return (
     <Box sx={{ mb: 4 }}>
-      <Typography component="span" variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
+      <Typography
+        component="span"
+        variant="h5"
+        sx={{ mb: 2, fontWeight: "bold" }}
+      >
         {t("home.sections.pending_invitations.title", "Convites Pendentes")}
       </Typography>
       <Paper variant="outlined" sx={{ p: 0, overflow: "hidden" }}>
@@ -33,10 +37,22 @@ export default function PendingInvitations({ invitations, onAccept }: Props) {
               }}
             >
               <Box>
-                <Typography component="span" variant="subtitle1" fontWeight="bold">
+                <Typography
+                  component="span"
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: "bold",
+                  }}
+                >
                   {inv.organization_name}
                 </Typography>
-                <Typography component="span" variant="body2" color="text.secondary">
+                <Typography
+                  component="span"
+                  variant="body2"
+                  sx={{
+                    color: "text.secondary",
+                  }}
+                >
                   {t(
                     "home.sections.pending_invitations.invited_to_join",
                     "Você foi convidado para participar desta organização.",

@@ -39,7 +39,7 @@ export default function StartPeladaDialog({
           value={matchesPerTeam}
           onChange={(e) => onMatchesChange(e.target.value)}
           slotProps={{
-            htmlInput: { min: 1 }
+            htmlInput: { min: 1 },
           }}
         />
       </DialogContent>

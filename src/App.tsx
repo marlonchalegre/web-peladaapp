@@ -159,7 +159,13 @@ function Footer() {
         textAlign: "center",
       }}
     >
-      <Typography component="span" variant="body2" color="text.secondary">
+      <Typography
+        component="span"
+        variant="body2"
+        sx={{
+          color: "text.secondary",
+        }}
+      >
         {t("app.version", { version })}
       </Typography>
     </Box>
@@ -227,7 +233,8 @@ function AppLayout() {
                   alt="Pelada App Logo"
                   sx={{ height: 32, mr: 1.5 }}
                 />
-                <Typography variant="h6"
+                <Typography
+                  variant="h6"
                   component="div"
                   sx={{
                     fontWeight: 700,

@@ -93,7 +93,13 @@ export default function MembersSection({
           mb: 2,
         }}
       >
-        <Typography component="span" variant="h5" fontWeight="bold">
+        <Typography
+          component="span"
+          variant="h5"
+          sx={{
+            fontWeight: "bold",
+          }}
+        >
           {t("organizations.management.sections.members")}
         </Typography>
         <Box sx={{ display: "flex", gap: 1 }}>
@@ -162,14 +168,19 @@ export default function MembersSection({
                   <SearchIcon color="action" />
                 </InputAdornment>
               ),
-            }
+            },
           }}
         />
       </Box>
       <List>
         {paginatedPlayers.length === 0 ? (
-          <Typography component="span"             color="text.secondary"
-            sx={{ py: 2, textAlign: "center" }}
+          <Typography
+            component="span"
+            sx={{
+              color: "text.secondary",
+              py: 2,
+              textAlign: "center",
+            }}
           >
             {t("organizations.list.empty")}
           </Typography>
@@ -206,7 +217,12 @@ export default function MembersSection({
                 </ListItemAvatar>
                 <ListItemText
                   primary={
-                    <Typography component="span" fontWeight="medium">
+                    <Typography
+                      component="span"
+                      sx={{
+                        fontWeight: "medium",
+                      }}
+                    >
                       {user?.name || `User #${player.user_id}`}
                     </Typography>
                   }

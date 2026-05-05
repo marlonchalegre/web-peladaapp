@@ -68,7 +68,7 @@ export default function PlayerSelectMenu({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             slotProps={{
-              htmlInput: { "data-testid": "player-select-search" }
+              htmlInput: { "data-testid": "player-select-search" },
             }}
           />
         </Box>
@@ -110,14 +110,17 @@ export default function PlayerSelectMenu({
                       primary={name}
                       secondary={getPositionLabel(player)}
                       slotProps={{
-                        primary: { fontWeight: "bold" },
+                        primary: { sx: { fontWeight: "bold" } },
 
                         secondary: {
-                          fontSize: "0.7rem",
-                          fontWeight: "bold",
-                          color: "primary.main",
-                        }
-                      }} />
+                          sx: {
+                            fontSize: "0.7rem",
+                            fontWeight: "bold",
+                            color: "primary.main",
+                          },
+                        },
+                      }}
+                    />
                   </ListItemButton>
                 </ListItem>
               );

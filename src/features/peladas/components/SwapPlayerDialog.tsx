@@ -57,7 +57,11 @@ export default function SwapPlayerDialog({
         {t("peladas.dialog.swap.title", "Substitute Player")}
       </DialogTitle>
       <DialogContent>
-        <Typography component="span" variant="body2" sx={{ mb: 2, color: "text.secondary" }}>
+        <Typography
+          component="span"
+          variant="body2"
+          sx={{ mb: 2, color: "text.secondary" }}
+        >
           {t("peladas.dialog.swap.description", {
             incomingPlayer: incomingPlayer?.user?.name || "",
             teamName: targetTeamName,
@@ -108,7 +112,9 @@ export default function SwapPlayerDialog({
                       <Box
                         sx={{ display: "flex", alignItems: "center", gap: 1 }}
                       >
-                        <Typography component="span"                           variant="body2"
+                        <Typography
+                          component="span"
+                          variant="body2"
                           sx={{ fontWeight: isSamePosition ? 800 : 500 }}
                         >
                           {player.user?.name || ""}

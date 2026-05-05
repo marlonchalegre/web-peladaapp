@@ -49,7 +49,9 @@ export const Loading = ({ message, fullScreen = false }: LoadingProps) => {
         />
       </Box>
       {message && (
-        <Typography component="span"           variant="body1"
+        <Typography
+          component="span"
+          variant="body1"
           sx={{
             mt: 3,
             color: "text.secondary",
