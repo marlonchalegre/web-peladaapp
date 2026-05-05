@@ -4,6 +4,7 @@ import { type PlayerWithUser } from "../hooks/useAttendance";
 import {
   type AttendanceStatus,
   type Transaction,
+  type OrganizationFinance,
 } from "../../../shared/api/endpoints";
 import PlayerAttendanceCard from "./PlayerAttendanceCard";
 
@@ -21,6 +22,7 @@ interface AttendanceListColumnProps {
   peladaTransactions?: Transaction[];
   onMarkPaid?: (playerId: number, amount: number) => void;
   onReversePayment?: (playerId: number) => void;
+  organizationFinance?: OrganizationFinance | null;
 }
 
 export default function AttendanceListColumn({
@@ -37,6 +39,7 @@ export default function AttendanceListColumn({
   peladaTransactions = [],
   onMarkPaid,
   onReversePayment,
+  organizationFinance,
 }: AttendanceListColumnProps) {
   return (
     <Box sx={{ width: "100%" }}>
@@ -75,6 +78,7 @@ export default function AttendanceListColumn({
               onReversePayment={
                 onReversePayment ? () => onReversePayment(p.id) : undefined
               }
+              organizationFinance={organizationFinance}
               data-testid={`attendance-card-${p.user.username || p.user_id}`}
             />
           );

@@ -39,9 +39,10 @@ export default function SwapPlayerDialog({
 }: SwapPlayerDialogProps) {
   const { t } = useTranslation();
 
-  const getInitials = (name: string) => {
-    return name
+  const getInitials = (name?: string | null) => {
+    return (name || "")
       .split(" ")
+      .filter(Boolean)
       .map((n) => n[0])
       .slice(0, 2)
       .join("")
@@ -58,15 +59,15 @@ export default function SwapPlayerDialog({
       <DialogContent>
         <Typography variant="body2" sx={{ mb: 2, color: "text.secondary" }}>
           {t("peladas.dialog.swap.description", {
-            incomingPlayer: incomingPlayer?.user.name,
+            incomingPlayer: incomingPlayer?.user?.name || "",
             teamName: targetTeamName,
           })}
         </Typography>
         <List sx={{ pt: 0 }}>
           {sortedPlayers.map((player) => {
             const isSamePosition =
-              incomingPlayer?.user.position &&
-              player.user.position &&
+              incomingPlayer?.user?.position &&
+              player.user?.position &&
               incomingPlayer.user.position.toLowerCase() ===
                 player.user.position.toLowerCase();
 
@@ -99,7 +100,7 @@ export default function SwapPlayerDialog({
                         fontSize: "0.85rem",
                       }}
                     >
-                      {getInitials(player.user.name)}
+                      {getInitials(player.user?.name)}
                     </Avatar>
                   </ListItemAvatar>
                   <ListItemText
@@ -111,7 +112,7 @@ export default function SwapPlayerDialog({
                           variant="body2"
                           sx={{ fontWeight: isSamePosition ? 800 : 500 }}
                         >
-                          {player.user.name}
+                          {player.user?.name || ""}
                         </Typography>
                         {isSamePosition && (
                           <CheckCircleIcon
@@ -125,7 +126,7 @@ export default function SwapPlayerDialog({
                       </Box>
                     }
                     secondary={
-                      player.user.position
+                      player.user?.position
                         ? t(
                             `common.positions.${player.user.position.toLowerCase()}`,
                           )

@@ -64,7 +64,7 @@ export default function OrganizationStatisticsPage() {
   useEffect(() => {
     if (!orgId || !user) return;
     const userIsAdmin = user.admin_orgs?.includes(orgId) ?? false;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+
     setIsAdmin(userIsAdmin);
 
     endpoints.listAdminsByOrganization(orgId).then((admins) => {

@@ -327,7 +327,11 @@ export default function UserProfilePage() {
         <form onSubmit={onSubmit}>
           <Stack spacing={3}>
             {error && <Alert severity="error">{error}</Alert>}
-            {success && <Alert severity="success">{success}</Alert>}
+            {success && (
+              <Alert severity="success" data-testid="profile-success-alert">
+                {success}
+              </Alert>
+            )}
 
             <TextField
               id="name"

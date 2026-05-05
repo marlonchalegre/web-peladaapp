@@ -552,6 +552,12 @@
     }
   },
   "peladas": {
+    "admin": {
+      "start": {
+        "title": "Confirmar Início da Pelada",
+        "confirm": "Tem certeza que deseja iniciar esta pelada com o cronograma planejado? Todas as partidas começarão de acordo com a sequência configurada."
+      }
+    },
     "error": {
       "not_found": "Pelada não encontrada"
     },

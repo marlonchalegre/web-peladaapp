@@ -553,6 +553,12 @@
     }
   },
   "peladas": {
+    "admin": {
+      "start": {
+        "title": "Confirm Start Pelada",
+        "confirm": "Are you sure you want to start this pelada with the planned schedule? All matches will begin according to the configured sequence."
+      }
+    },
     "error": {
       "not_found": "Pelada not found"
     },

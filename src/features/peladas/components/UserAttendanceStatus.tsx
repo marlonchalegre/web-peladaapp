@@ -24,7 +24,7 @@ export default function UserAttendanceStatus({
   onUpdate,
 }: UserAttendanceStatusProps) {
   const { t } = useTranslation();
-  const firstName = player.user.name.split(" ")[0];
+  const firstName = (player.user?.name || "").split(" ")[0];
 
   const getStatusMessage = () => {
     switch (player.attendance_status) {

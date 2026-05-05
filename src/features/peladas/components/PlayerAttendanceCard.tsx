@@ -15,7 +15,10 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import PaidIcon from "@mui/icons-material/Paid";
 import { useTranslation } from "react-i18next";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
-import { type AttendanceStatus } from "../../../shared/api/endpoints";
+import {
+  type AttendanceStatus,
+  type OrganizationFinance,
+} from "../../../shared/api/endpoints";
 import { type PlayerWithUser } from "../hooks/useAttendance";
 
 interface PlayerAttendanceCardProps {
@@ -27,10 +30,9 @@ interface PlayerAttendanceCardProps {
   isPaid?: boolean;
   onMarkPaid?: (amount: number) => void;
   onReversePayment?: () => void;
+  organizationFinance?: OrganizationFinance | null;
   "data-testid"?: string;
 }
-
-import { useOrganizationFinance } from "../../../shared/hooks/useOrganizationFinance";
 
 export default function PlayerAttendanceCard({
   player,
@@ -41,14 +43,14 @@ export default function PlayerAttendanceCard({
   isPaid,
   onMarkPaid,
   onReversePayment,
+  organizationFinance,
   "data-testid": testId,
 }: PlayerAttendanceCardProps) {
   const { t } = useTranslation();
-  const { organizationFinance } = useOrganizationFinance(
-    player.organization_id,
-  );
-  const initials = player.user.name
+  const name = player.user?.name || "";
+  const initials = name
     .split(" ")
+    .filter(Boolean)
     .map((n) => n[0])
     .join("")
     .toUpperCase()
@@ -79,9 +81,9 @@ export default function PlayerAttendanceCard({
       >
         <Box sx={{ display: "flex", alignItems: "center", minWidth: 0 }}>
           <SecureAvatar
-            userId={player.user.id}
+            userId={player.user?.id}
             filename={
-              player.user.avatar_filename || player.user_avatar_filename
+              player.user?.avatar_filename || player.user_avatar_filename
             }
             sx={{
               width: 36,
@@ -109,7 +111,7 @@ export default function PlayerAttendanceCard({
                 textOverflow: "ellipsis",
               }}
             >
-              {player.user.name}
+              {name}
             </Typography>
             <Stack
               direction="row"
@@ -133,7 +135,7 @@ export default function PlayerAttendanceCard({
               >
                 {isCurrentUser && " • "}
                 {t(
-                  player.user.position
+                  player.user?.position
                     ? `common.positions.${player.user.position.toLowerCase()}`
                     : "common.positions.unknown",
                 )}

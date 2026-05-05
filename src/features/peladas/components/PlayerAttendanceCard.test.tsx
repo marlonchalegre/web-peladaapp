@@ -104,6 +104,26 @@ describe("PlayerAttendanceCard", () => {
     expect(screen.queryByText(/common.member_types/)).not.toBeInTheDocument();
   });
 
+  it("handles null user name without crashing", () => {
+    const playerNullName = {
+      ...mockPlayer,
+      user: { ...mockPlayer.user, name: null as unknown as string },
+    };
+    render(
+      <ThemeContextProvider>
+        <PlayerAttendanceCard
+          player={playerNullName as PlayerWithUser}
+          isAdmin={false}
+          isCurrentUser={false}
+          onUpdate={() => {}}
+          isUpdating={false}
+        />
+      </ThemeContextProvider>,
+    );
+
+    expect(screen.queryByTestId("attendance-card-name")).toHaveTextContent("");
+  });
+
   it("shows action buttons only when user is admin", () => {
     const { rerender } = render(
       <ThemeContextProvider>
