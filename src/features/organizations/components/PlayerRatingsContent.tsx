@@ -109,7 +109,6 @@ export default function PlayerRatingsContent({
       <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
         {t("organizations.ratings.subtitle")}
       </Typography>
-
       <Box sx={{ mb: 3 }}>
         <TextField
           fullWidth
@@ -120,16 +119,17 @@ export default function PlayerRatingsContent({
             setSearchTerm(e.target.value);
             setPage(0);
           }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon color="action" />
-              </InputAdornment>
-            ),
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon color="action" />
+                </InputAdornment>
+              ),
+            }
           }}
         />
       </Box>
-
       <TableContainer component={Paper} variant="outlined">
         <Table>
           <TableHead>
@@ -171,7 +171,6 @@ export default function PlayerRatingsContent({
                     <TextField
                       type="number"
                       size="small"
-                      inputProps={{ min: 0, max: 10, step: 0.5 }}
                       value={player.grade || 0}
                       onChange={(e) => {
                         const val = parseFloat(e.target.value);
@@ -181,6 +180,9 @@ export default function PlayerRatingsContent({
                       }}
                       data-testid={`rating-input-${player.id}`}
                       sx={{ width: 80 }}
+                      slotProps={{
+                        htmlInput: { min: 0, max: 10, step: 0.5 }
+                      }}
                     />
                   </TableCell>
                   <TableCell align="right">
@@ -209,7 +211,6 @@ export default function PlayerRatingsContent({
           labelRowsPerPage={t("common.pagination.rows_per_page")}
         />
       </TableContainer>
-
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}

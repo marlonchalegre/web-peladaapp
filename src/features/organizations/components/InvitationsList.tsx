@@ -80,7 +80,6 @@ export default function InvitationsList({
           </Box>
         </Button>
       </Box>
-
       {publicInviteLink && (
         <Box
           sx={{
@@ -153,7 +152,6 @@ export default function InvitationsList({
           </Box>
         </Box>
       )}
-
       <Divider sx={{ mb: 2 }} />
       <List>
         {invitations.filter((inv) => !!inv.email).length === 0 ? (
@@ -186,7 +184,6 @@ export default function InvitationsList({
                       "Public Invite Link",
                     )
                   }
-                  secondaryTypographyProps={{ component: "div" }}
                   secondary={
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <Typography variant="body2" color="text.secondary">
@@ -205,6 +202,9 @@ export default function InvitationsList({
                       />
                     </Box>
                   }
+                  slotProps={{
+                    secondary: { component: "div" }
+                  }}
                 />
                 <ListItemSecondaryAction>
                   <Tooltip title={t("common.copy_link", "Copy Link")}>

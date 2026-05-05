@@ -110,7 +110,9 @@ export default function ForgotPasswordPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 fullWidth
-                inputProps={{ "data-testid": "forgot-password-email" }}
+                slotProps={{
+                  htmlInput: { "data-testid": "forgot-password-email" }
+                }}
               />
               <Button
                 type="submit"

@@ -50,7 +50,9 @@ export default function DeleteOrganizationDialog({
           placeholder={orgName}
           autoComplete="off"
           onPaste={(e) => e.preventDefault()}
-          inputProps={{ "data-testid": "confirm-org-name-input" }}
+          slotProps={{
+            htmlInput: { "data-testid": "confirm-org-name-input" }
+          }}
         />
       </DialogContent>
       <DialogActions>

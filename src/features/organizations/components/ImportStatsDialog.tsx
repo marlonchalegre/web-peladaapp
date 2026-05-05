@@ -291,7 +291,9 @@ export default function ImportStatsDialog({
                   </ListItemIcon>
                   <ListItemText
                     primary={text}
-                    primaryTypographyProps={{ variant: "caption" }}
+                    slotProps={{
+                      primary: { variant: "caption" }
+                    }}
                   />
                 </ListItem>
               ))}
@@ -427,14 +429,18 @@ export default function ImportStatsDialog({
                                 variant="standard"
                                 error={row.notFound}
                                 placeholder={t("common.player")}
-                                inputProps={{
-                                  ...params.inputProps,
-                                  "data-testid": `player-autocomplete-input-${index}`,
-                                }}
                                 sx={{
                                   "& .MuiInput-root": {
                                     fontSize: "0.875rem",
                                   },
+                                }}
+                                slotProps={{
+                                  ...params.slotProps,
+
+                                  htmlInput: {
+                                    ...params.slotProps.htmlInput,
+                                    "data-testid": `player-autocomplete-input-${index}`,
+                                  }
                                 }}
                               />
                             )}

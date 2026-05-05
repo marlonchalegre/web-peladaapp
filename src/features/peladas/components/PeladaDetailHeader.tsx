@@ -310,7 +310,7 @@ export default function PeladaDetailHeader({
           </Paper>
         ) : (
           /* Non-admin or non-open status view */
-          <Stack
+          (<Stack
             direction="row"
             spacing={1.5}
             sx={{ width: "100%", justifyContent: "flex-end" }}
@@ -332,7 +332,6 @@ export default function PeladaDetailHeader({
                 {t("peladas.detail.button.view_matches")}
               </Button>
             )}
-
             {(votingInfo?.can_vote || pelada.is_admin) &&
               pelada.status !== "open" &&
               pelada.status !== "attendance" && (
@@ -356,7 +355,6 @@ export default function PeladaDetailHeader({
                       : t("peladas.detail.button.vote")}
                 </Button>
               )}
-
             {pelada.status === "closed" && !votingInfo?.can_vote && (
               <Button
                 component={RouterLink}
@@ -374,10 +372,9 @@ export default function PeladaDetailHeader({
                 {t("peladas.detail.button.view_results")}
               </Button>
             )}
-          </Stack>
+          </Stack>)
         )}
       </Stack>
-
       <Menu
         anchorEl={exportAnchor}
         open={Boolean(exportAnchor)}

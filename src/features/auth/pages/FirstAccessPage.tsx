@@ -123,7 +123,9 @@ export default function FirstAccessPage() {
               required
               fullWidth
               disabled={!!searchParams.get("email") && email.includes("@")}
-              inputProps={{ "data-testid": "first-access-email" }}
+              slotProps={{
+                htmlInput: { "data-testid": "first-access-email" }
+              }}
             />
             <TextField
               id="username"
@@ -133,7 +135,9 @@ export default function FirstAccessPage() {
               onChange={(e) => setUsername(e.target.value)}
               required
               fullWidth
-              inputProps={{ "data-testid": "first-access-username" }}
+              slotProps={{
+                htmlInput: { "data-testid": "first-access-username" }
+              }}
             />
             <TextField
               id="name"
@@ -144,7 +148,9 @@ export default function FirstAccessPage() {
               required
               fullWidth
               autoFocus
-              inputProps={{ "data-testid": "first-access-name" }}
+              slotProps={{
+                htmlInput: { "data-testid": "first-access-name" }
+              }}
             />
             <PhoneInput
               id="phone"
@@ -165,7 +171,9 @@ export default function FirstAccessPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               fullWidth
-              inputProps={{ "data-testid": "first-access-password" }}
+              slotProps={{
+                htmlInput: { "data-testid": "first-access-password" }
+              }}
             />
             <TextField
               id="position"

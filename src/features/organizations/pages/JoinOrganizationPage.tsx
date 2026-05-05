@@ -104,7 +104,9 @@ export default function JoinOrganizationPage() {
         >
           {invitation.organization_name}
         </Typography>
-        <Typography variant="body1" color="text.secondary" paragraph>
+        <Typography variant="body1" color="text.secondary" sx={{
+          marginBottom: "16px"
+        }}>
           {t("organizations.invitation.join_description", {
             name: invitation.organization_name,
           })}

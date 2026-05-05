@@ -133,7 +133,9 @@ export default function ResetPasswordPage() {
               required
               fullWidth
               disabled={success}
-              inputProps={{ "data-testid": "reset-password-input" }}
+              slotProps={{
+                htmlInput: { "data-testid": "reset-password-input" }
+              }}
             />
             <TextField
               id="confirm-password"
@@ -144,7 +146,9 @@ export default function ResetPasswordPage() {
               required
               fullWidth
               disabled={success}
-              inputProps={{ "data-testid": "reset-password-confirm" }}
+              slotProps={{
+                htmlInput: { "data-testid": "reset-password-confirm" }
+              }}
             />
             <Button
               type="submit"

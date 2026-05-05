@@ -44,8 +44,10 @@ export const LanguageSwitcher: React.FC = () => {
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
-        MenuListProps={{
-          "aria-labelledby": "language-button",
+        slotProps={{
+          list: {
+            "aria-labelledby": "language-button",
+          }
         }}
       >
         <MenuItem

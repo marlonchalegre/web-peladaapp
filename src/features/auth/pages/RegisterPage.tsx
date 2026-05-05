@@ -102,7 +102,9 @@ export default function RegisterPage() {
               required
               fullWidth
               autoFocus
-              inputProps={{ "data-testid": "register-name" }}
+              slotProps={{
+                htmlInput: { "data-testid": "register-name" }
+              }}
             />
             <TextField
               id="username"
@@ -112,7 +114,9 @@ export default function RegisterPage() {
               onChange={(e) => setUsername(e.target.value)}
               required
               fullWidth
-              inputProps={{ "data-testid": "register-username" }}
+              slotProps={{
+                htmlInput: { "data-testid": "register-username" }
+              }}
             />
             <TextField
               id="email"
@@ -124,7 +128,9 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               fullWidth
-              inputProps={{ "data-testid": "register-email" }}
+              slotProps={{
+                htmlInput: { "data-testid": "register-email" }
+              }}
             />
             <PhoneInput
               id="phone"
@@ -145,7 +151,9 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               fullWidth
-              inputProps={{ "data-testid": "register-password" }}
+              slotProps={{
+                htmlInput: { "data-testid": "register-password" }
+              }}
             />
             <TextField
               id="position"

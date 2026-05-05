@@ -27,7 +27,9 @@ export default function CreateOrganizationForm({ onCreate }: Props) {
           label={t("common.fields.name")}
           required
           size="small"
-          inputProps={{ "data-testid": "org-name-input" }}
+          slotProps={{
+            htmlInput: { "data-testid": "org-name-input" }
+          }}
         />
         <Button
           type="submit"

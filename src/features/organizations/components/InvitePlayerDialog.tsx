@@ -97,7 +97,9 @@ export default function InvitePlayerDialog({
                   onChange={(e) => setHandle(e.target.value)}
                   disabled={loading}
                   autoFocus
-                  inputProps={{ "data-testid": "invite-email-input" }}
+                  slotProps={{
+                    htmlInput: { "data-testid": "invite-email-input" }
+                  }}
                 />
                 <Button
                   onClick={handleInvite}

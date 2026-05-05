@@ -67,7 +67,9 @@ export default function PlayerSelectMenu({
             placeholder={t("common.select_placeholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            inputProps={{ "data-testid": "player-select-search" }}
+            slotProps={{
+              htmlInput: { "data-testid": "player-select-search" }
+            }}
           />
         </Box>
         <List sx={{ pt: 0, maxHeight: 400, overflow: "auto" }}>
@@ -106,14 +108,16 @@ export default function PlayerSelectMenu({
                     </ListItemIcon>
                     <ListItemText
                       primary={name}
-                      primaryTypographyProps={{ fontWeight: "bold" }}
                       secondary={getPositionLabel(player)}
-                      secondaryTypographyProps={{
-                        fontSize: "0.7rem",
-                        fontWeight: "bold",
-                        color: "primary.main",
-                      }}
-                    />
+                      slotProps={{
+                        primary: { fontWeight: "bold" },
+
+                        secondary: {
+                          fontSize: "0.7rem",
+                          fontWeight: "bold",
+                          color: "primary.main",
+                        }
+                      }} />
                   </ListItemButton>
                 </ListItem>
               );

@@ -199,8 +199,10 @@ export default function MatchReportSummary({
       onClose={onClose}
       maxWidth="sm"
       fullWidth
-      PaperProps={{
-        sx: { borderRadius: 4, p: 1 },
+      slotProps={{
+        paper: {
+          sx: { borderRadius: 4, p: 1 },
+        }
       }}
     >
       <Box sx={{ position: "absolute", right: 8, top: 8 }}>
@@ -208,7 +210,6 @@ export default function MatchReportSummary({
           <CloseIcon />
         </IconButton>
       </Box>
-
       <DialogContent>
         <Stack spacing={4} alignItems="center" sx={{ py: 2 }}>
           {/* Header */}

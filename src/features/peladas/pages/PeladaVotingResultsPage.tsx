@@ -214,8 +214,10 @@ export default function PeladaVotingResultsPage() {
         <Dialog
           open={true}
           aria-labelledby="restricted-results-title"
-          PaperProps={{
-            sx: { borderRadius: 4, p: 2, maxWidth: "400px" },
+          slotProps={{
+            paper: {
+              sx: { borderRadius: 4, p: 2, maxWidth: "400px" },
+            }
           }}
         >
           <DialogTitle id="restricted-results-title" textAlign="center">
@@ -252,7 +254,6 @@ export default function PeladaVotingResultsPage() {
           </DialogActions>
         </Dialog>
       )}
-
       <Box
         sx={{
           mt: 2,
@@ -280,7 +281,6 @@ export default function PeladaVotingResultsPage() {
           ]}
         />
       </Box>
-
       <Box
         sx={{
           display: "flex",
@@ -320,7 +320,6 @@ export default function PeladaVotingResultsPage() {
           </Button>
         </Box>
       </Box>
-
       <Box
         sx={{
           px: { xs: 1.5, sm: 0 },

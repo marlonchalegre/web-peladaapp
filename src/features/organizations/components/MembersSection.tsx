@@ -144,7 +144,6 @@ export default function MembersSection({
         </Box>
       </Box>
       <Divider sx={{ mb: 2 }} />
-
       <Box sx={{ mb: 2 }}>
         <TextField
           fullWidth
@@ -156,16 +155,17 @@ export default function MembersSection({
             setSearchTerm(e.target.value);
             onPageChange(0);
           }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon color="action" />
-              </InputAdornment>
-            ),
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon color="action" />
+                </InputAdornment>
+              ),
+            }
           }}
         />
       </Box>
-
       <List>
         {paginatedPlayers.length === 0 ? (
           <Typography
@@ -271,7 +271,6 @@ export default function MembersSection({
           })
         )}
       </List>
-
       {filteredPlayers.length > 0 && (
         <TablePagination
           component="div"

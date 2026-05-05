@@ -342,7 +342,9 @@ export default function UserProfilePage() {
               required
               fullWidth
               disabled={loading}
-              inputProps={{ "data-testid": "profile-name" }}
+              slotProps={{
+                htmlInput: { "data-testid": "profile-name" }
+              }}
             />
 
             <TextField
@@ -354,7 +356,9 @@ export default function UserProfilePage() {
               required
               fullWidth
               disabled={loading}
-              inputProps={{ "data-testid": "profile-username" }}
+              slotProps={{
+                htmlInput: { "data-testid": "profile-username" }
+              }}
             />
 
             <TextField
@@ -366,7 +370,9 @@ export default function UserProfilePage() {
               onChange={(e) => setEmail(e.target.value)}
               fullWidth
               disabled={loading}
-              inputProps={{ "data-testid": "profile-email" }}
+              slotProps={{
+                htmlInput: { "data-testid": "profile-email" }
+              }}
             />
 
             <PhoneInput
@@ -435,7 +441,9 @@ export default function UserProfilePage() {
               fullWidth
               disabled={loading}
               helperText={t("user.profile.hint.password")}
-              inputProps={{ "data-testid": "profile-new-password" }}
+              slotProps={{
+                htmlInput: { "data-testid": "profile-new-password" }
+              }}
             />
 
             <TextField
@@ -447,7 +455,9 @@ export default function UserProfilePage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               fullWidth
               disabled={loading || !password}
-              inputProps={{ "data-testid": "profile-confirm-password" }}
+              slotProps={{
+                htmlInput: { "data-testid": "profile-confirm-password" }
+              }}
             />
 
             <Box display="flex" gap={2} justifyContent="flex-end">
@@ -493,7 +503,6 @@ export default function UserProfilePage() {
           {t("user.profile.button.delete_account")}
         </Button>
       </Paper>
-
       <Dialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}

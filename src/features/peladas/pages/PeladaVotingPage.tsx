@@ -275,7 +275,6 @@ export default function PeladaVotingPage() {
           ]}
         />
       </Box>
-
       <Box
         sx={{
           display: "flex",
@@ -337,7 +336,6 @@ export default function PeladaVotingPage() {
           )}
         </Box>
       </Box>
-
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
@@ -348,13 +346,11 @@ export default function PeladaVotingPage() {
           {success}
         </Alert>
       )}
-
       {votingInfo?.has_voted && (
         <Alert severity="info" sx={{ mb: 2 }}>
           {t("peladas.voting.info.already_voted_view_change")}
         </Alert>
       )}
-
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 8 }}>
           <Alert severity="info" sx={{ mb: 3 }}>
@@ -610,7 +606,9 @@ export default function PeladaVotingPage() {
                     </ListItemIcon>
                     <ListItemText
                       primary={v.name}
-                      primaryTypographyProps={{ color: "text.secondary" }}
+                      slotProps={{
+                        primary: { color: "text.secondary" }
+                      }}
                     />
                   </ListItem>
                 ))}
@@ -619,7 +617,6 @@ export default function PeladaVotingPage() {
           </Paper>
         </Grid>
       </Grid>
-
       <Snackbar
         open={!!success}
         autoHideDuration={6000}
@@ -635,7 +632,6 @@ export default function PeladaVotingPage() {
           {success}
         </Alert>
       </Snackbar>
-
       <Snackbar
         open={!!error && !!votingInfo}
         autoHideDuration={6000}
@@ -651,7 +647,6 @@ export default function PeladaVotingPage() {
           {error}
         </Alert>
       </Snackbar>
-
       <Dialog
         open={!!confirmToggle}
         onClose={() => setConfirmToggle(null)}
