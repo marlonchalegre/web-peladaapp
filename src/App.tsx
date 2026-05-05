@@ -199,7 +199,7 @@ function AppLayout() {
         sx={{
           display: "flex",
           flexDirection: "column",
-          minHeight: "100%",
+          minHeight: "100vh",
           bgcolor: "background.default",
         }}
       >
