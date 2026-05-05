@@ -39,9 +39,9 @@ export default function BreadcrumbNav({ items }: Props) {
         }
         aria-label="breadcrumb"
         sx={{
-          display: 'flex',
-          alignItems: 'center',
-          height: '100%',
+          display: "flex",
+          alignItems: "center",
+          height: "100%",
           whiteSpace: "nowrap",
           "& .MuiBreadcrumbs-ol": { flexWrap: "nowrap" },
         }}
@@ -69,22 +69,26 @@ export default function BreadcrumbNav({ items }: Props) {
                 key={index}
                 sx={{
                   bgcolor: "primary.light",
-                  color: "primary.contrastText",
-                  px: { xs: 1, sm: 1.5 },
-                  py: 0,
-                  height: { xs: 28, sm: 'auto' },
-                  borderRadius: 1.5,
-                  maxWidth: { xs: 140, sm: 'none' },
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  display: 'inline-flex',
-                  alignItems: 'center',
+                  color: "primary.main",
+                  px: { xs: 1.25, sm: 2 },
+                  py: { xs: 0.25, sm: 0.5 },
+                  borderRadius: 10,
+                  maxWidth: { xs: 160, sm: "none" },
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  display: "inline-flex",
+                  alignItems: "center",
                 }}
               >
                 <Typography
                   variant="body2"
-                  sx={{ fontWeight: "bold", fontSize: { xs: "0.75rem", sm: "0.85rem" }, textTransform: 'none', lineHeight: 1 }}
+                  sx={{
+                    fontWeight: "bold",
+                    fontSize: { xs: "0.75rem", sm: "0.85rem" },
+                    textTransform: "none",
+                    lineHeight: 1.2,
+                  }}
                 >
                   {item.label}
                 </Typography>

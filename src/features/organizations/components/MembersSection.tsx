@@ -189,7 +189,11 @@ export default function MembersSection({
               : "common.positions.unknown";
 
             return (
-              <ListItem key={player.id} divider sx={{ px: 0, pr: { xs: 1, sm: 4 }, alignItems: 'center' }}>
+              <ListItem
+                key={player.id}
+                divider
+                sx={{ px: 0, pr: { xs: 1, sm: 4 }, alignItems: "center" }}
+              >
                 <ListItemAvatar>
                   {(user?.avatar_filename ?? player.user_avatar_filename) ? (
                     <SecureAvatar
@@ -197,14 +201,21 @@ export default function MembersSection({
                       filename={
                         user?.avatar_filename ?? player.user_avatar_filename
                       }
-                      sx={{ width: { xs: 36, sm: 40 }, height: { xs: 36, sm: 40 } }}
+                      sx={{
+                        width: { xs: 36, sm: 40 },
+                        height: { xs: 36, sm: 40 },
+                      }}
                       fallbackText={(
                         (user?.name ?? player.user_name ?? "").charAt(0) || ""
                       ).toUpperCase()}
                     />
                   ) : (
                     <Avatar
-                      sx={{ width: { xs: 36, sm: 40 }, height: { xs: 36, sm: 40 }, bgcolor: "primary.dark" }}
+                      sx={{
+                        width: { xs: 36, sm: 40 },
+                        height: { xs: 36, sm: 40 },
+                        bgcolor: "primary.dark",
+                      }}
                     >
                       {(
                         (user?.name ?? player.user_name ?? "").charAt(0) || ""
@@ -234,7 +245,10 @@ export default function MembersSection({
                   <FormControl
                     size="small"
                     variant="standard"
-                    sx={{ minWidth: { xs: 64, sm: 120 }, width: { xs: 64, sm: 'auto' } }}
+                    sx={{
+                      minWidth: { xs: 64, sm: 120 },
+                      width: { xs: 64, sm: "auto" },
+                    }}
                   >
                     <Select
                       value={player.member_type || "convidado"}
@@ -248,7 +262,7 @@ export default function MembersSection({
                       }
                       disabled={actionLoading}
                       disableUnderline
-                      sx={{ fontSize: "0.85rem", width: '100%' }}
+                      sx={{ fontSize: "0.85rem", width: "100%" }}
                       data-testid={`member-type-select-${player.id}`}
                     >
                       <MenuItem value="convidado">
@@ -299,15 +313,15 @@ export default function MembersSection({
           sx={{
             width: "100%",
             px: { xs: 1, sm: 0 },
-            '.MuiTablePagination-toolbar': {
+            ".MuiTablePagination-toolbar": {
               px: { xs: 0, sm: 1 },
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
             },
-            '.MuiTablePagination-actions': {
+            ".MuiTablePagination-actions": {
               mr: 0,
-              transform: { xs: 'translateX(-6px)', sm: 'translateX(0)' },
+              transform: { xs: "translateX(-6px)", sm: "translateX(0)" },
               pr: { xs: 0, sm: 0 },
             },
           }}

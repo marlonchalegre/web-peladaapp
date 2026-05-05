@@ -186,7 +186,17 @@ export default function PeladasList({
                         {pelada.organization_name || pelada.organization_id}
                       </Typography>
                     </TableCell>
-                    <TableCell sx={{ py: 2.5, width: { xs: '120px', sm: '160px' }, px: { xs: 2, sm: 3 }, textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <TableCell
+                      sx={{
+                        py: 2.5,
+                        width: { xs: "120px", sm: "160px" },
+                        px: { xs: 2, sm: 3 },
+                        textAlign: "center",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
                       <Chip
                         label={t(
                           `pelada.status.${pelada.status}`,
@@ -217,7 +227,13 @@ export default function PeladasList({
                         }}
                       />
                     </TableCell>
-                    <TableCell sx={{ py: 2.5, width: { xs: '24px', sm: '40px' }, textAlign: 'center' }}>
+                    <TableCell
+                      sx={{
+                        py: 2.5,
+                        width: { xs: "24px", sm: "40px" },
+                        textAlign: "center",
+                      }}
+                    >
                       <ChevronRightIcon sx={{ color: "grey.300" }} />
                     </TableCell>
                   </TableRow>

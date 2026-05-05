@@ -235,6 +235,14 @@ export default function ActiveMatchDashboard(props: Props) {
     [awayPlayers, match.away_team_id, generateTeamList],
   );
 
+  const nextMatch = useMemo(() => {
+    return (
+      matches
+        .filter((m) => m.status === "scheduled" && m.sequence > match.sequence)
+        .sort((a, b) => a.sequence - b.sequence)[0] || null
+    );
+  }, [matches, match.sequence]);
+
   return (
     <Box sx={{ pb: 8 }}>
       <Stack spacing={2}>
@@ -269,6 +277,64 @@ export default function ActiveMatchDashboard(props: Props) {
             >
               {t("peladas.dashboard.button.history")}
             </Button>
+
+            {nextMatch && (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  px: { xs: 1.5, sm: 2 },
+                  py: { xs: 0.6, sm: 0.8 },
+                  bgcolor: "background.paper",
+                  borderRadius: 10,
+                  border: "1px solid",
+                  borderColor: "divider",
+                  boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                  maxWidth: { xs: "220px", sm: "none" },
+                  height: "30.75px", // Match MUI small button height roughly
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "text.secondary",
+                    fontWeight: "800",
+                    fontSize: { xs: "0.6rem", sm: "0.65rem" },
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    display: { xs: "none", sm: "block" },
+                  }}
+                >
+                  {t("peladas.dashboard.summary.next_up")}:
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: "bold",
+                    fontSize: { xs: "0.75rem", sm: "0.85rem" },
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <Box component="span" sx={{ color: "home.main" }}>
+                    {teamNameById[nextMatch.home_team_id] || "Home"}
+                  </Box>
+                  <Box
+                    component="span"
+                    sx={{ color: "text.disabled", mx: 1, fontWeight: "500" }}
+                  >
+                    vs
+                  </Box>
+                  <Box component="span" sx={{ color: "away.main" }}>
+                    {teamNameById[nextMatch.away_team_id] || "Away"}
+                  </Box>
+                </Typography>
+              </Box>
+            )}
           </Stack>
 
           {isAdmin && finished && (
