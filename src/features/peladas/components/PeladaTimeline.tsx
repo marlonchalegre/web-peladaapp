@@ -65,7 +65,7 @@ export default function PeladaTimeline({
   if (events.length === 0) {
     return (
       <Box sx={{ p: 4, textAlign: "center" }}>
-        <Typography color="text.secondary">
+        <Typography component="span" color="text.secondary">
           {t("peladas.timeline.no_events")}
         </Typography>
       </Box>
@@ -92,13 +92,12 @@ export default function PeladaTimeline({
               variant="body2"
               color="text.secondary"
             >
-              <Typography
-                variant="caption"
+              <Typography component="span"                 variant="caption"
                 sx={{ fontWeight: "bold", display: "block" }}
               >
                 {formatMs(event.session_time_ms)}
               </Typography>
-              <Typography variant="caption" color="text.disabled">
+              <Typography component="span" variant="caption" color="text.disabled">
                 {t("peladas.timeline.match_short")}{" "}
                 {formatMs(event.match_time_ms)}
               </Typography>
@@ -113,8 +112,7 @@ export default function PeladaTimeline({
               {index < sortedEvents.length - 1 && <TimelineConnector />}
             </TimelineSeparator>
             <TimelineContent sx={{ py: "12px", px: 2 }}>
-              <Typography
-                variant="body1"
+              <Typography component="span"                 variant="body1"
                 component="span"
                 sx={{ fontWeight: isGoal ? "bold" : "normal" }}
               >

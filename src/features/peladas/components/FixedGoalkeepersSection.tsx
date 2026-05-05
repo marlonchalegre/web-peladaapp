@@ -102,8 +102,7 @@ export default function FixedGoalkeepersSection({
           px: 1,
         }}
       >
-        <Typography
-          variant="caption"
+        <Typography component="span"           variant="caption"
           sx={{
             fontWeight: 800,
             color: player ? "primary.main" : "text.secondary",
@@ -137,8 +136,7 @@ export default function FixedGoalkeepersSection({
             {player.user?.name?.[0].toUpperCase() || "G"}
           </Avatar>
           <Box sx={{ flexGrow: 1 }}>
-            <Typography
-              variant="h6"
+            <Typography component="span"               variant="h6"
               sx={{ fontWeight: 800, lineHeight: 1.2, color: "primary.dark" }}
             >
               {player.user?.name}
@@ -177,7 +175,7 @@ export default function FixedGoalkeepersSection({
           }}
         >
           <PersonAddIcon sx={{ mb: 0.5, fontSize: 28 }} />
-          <Typography variant="body2" sx={{ fontWeight: 700 }}>
+          <Typography component="span" variant="body2" sx={{ fontWeight: 700 }}>
             {t("peladas.teams.drag_gk_here")}
           </Typography>
         </Box>
@@ -202,7 +200,7 @@ export default function FixedGoalkeepersSection({
         >
           <SecurityIcon fontSize="small" />
         </Box>
-        <Typography variant="h5" sx={{ fontWeight: 800, letterSpacing: -0.5 }}>
+        <Typography component="span" variant="h5" sx={{ fontWeight: 800, letterSpacing: -0.5 }}>
           {t("peladas.teams.fixed_goalkeepers_title")}
         </Typography>
       </Stack>

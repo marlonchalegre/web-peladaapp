@@ -232,10 +232,10 @@ export default function UserProfilePage() {
       </Box>
       <Paper sx={{ p: { xs: 2, sm: 4 } }}>
         <Box sx={{ px: { xs: 0.5, sm: 0 } }}>
-          <Typography variant="h4" gutterBottom>
+          <Typography component="span" variant="h4" gutterBottom>
             {t("user.profile.title")}
           </Typography>
-          <Typography variant="body2" color="text.secondary" gutterBottom>
+          <Typography component="span" variant="body2" color="text.secondary" gutterBottom>
             {t("user.profile.subtitle")}
           </Typography>
         </Box>
@@ -250,8 +250,7 @@ export default function UserProfilePage() {
             alignItems: "center",
           }}
         >
-          <Typography
-            variant="subtitle2"
+          <Typography component="span"             variant="subtitle2"
             color="text.secondary"
             gutterBottom
             sx={{ alignSelf: "flex-start", mb: 2 }}
@@ -426,7 +425,7 @@ export default function UserProfilePage() {
             </FormControl>
 
             <Divider sx={{ my: 2 }}>
-              <Typography variant="caption" color="text.secondary">
+              <Typography component="span" variant="caption" color="text.secondary">
                 {t("user.profile.section.change_password")}
               </Typography>
             </Divider>
@@ -484,8 +483,7 @@ export default function UserProfilePage() {
 
         <Divider sx={{ my: 4 }} />
 
-        <Typography
-          variant="caption"
+        <Typography component="span"           variant="caption"
           color="error"
           sx={{ display: "block", mb: 2 }}
         >

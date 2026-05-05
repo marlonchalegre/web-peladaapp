@@ -102,10 +102,10 @@ export default function WahaConfigSection({
   return (
     <Box component="form" onSubmit={handleSubmit}>
       <Paper sx={{ p: 3, mb: 3 }}>
-        <Typography variant="h6" gutterBottom>
+        <Typography component="span" variant="h6" gutterBottom>
           {t("organizations.management.waha.title")}
         </Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+        <Typography component="span" variant="body2" color="text.secondary" sx={{ mb: 3 }}>
           {t("organizations.management.waha.subtitle")}
         </Typography>
 

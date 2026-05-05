@@ -76,8 +76,7 @@ export default function MatchPlayerRow({
                 bgcolor: item.side === "home" ? "home.main" : "away.main",
               }}
             />
-            <Typography
-              variant="body2"
+            <Typography component="span"               variant="body2"
               color="text.secondary"
               fontStyle="italic"
             >
@@ -96,11 +95,11 @@ export default function MatchPlayerRow({
                 overflow: "auto",
               }}
             >
-              <Typography variant="caption" display="block" sx={{ mb: 1 }}>
+              <Typography component="span" variant="caption" display="block" sx={{ mb: 1 }}>
                 {t("peladas.dashboard.add_player")}
               </Typography>
               {benchPlayers.length === 0 && (
-                <Typography variant="caption" color="text.secondary">
+                <Typography component="span" variant="caption" color="text.secondary">
                   {t("peladas.dashboard.no_bench_players")}
                 </Typography>
               )}
@@ -137,7 +136,7 @@ export default function MatchPlayerRow({
           </IconButton>
         </TableCell>
         <TableCell colSpan={3} align="center">
-          <Typography variant="caption" color="text.secondary">
+          <Typography component="span" variant="caption" color="text.secondary">
             -
           </Typography>
         </TableCell>
@@ -157,7 +156,7 @@ export default function MatchPlayerRow({
               borderRadius: 1,
             }}
           />
-          <Typography variant="body2" data-testid="player-name">
+          <Typography component="span" variant="body2" data-testid="player-name">
             {playerName}
           </Typography>
           {(item.is_goalkeeper === true ||
@@ -181,7 +180,7 @@ export default function MatchPlayerRow({
               overflow: "auto",
             }}
           >
-            <Typography variant="caption" display="block" sx={{ mb: 1 }}>
+            <Typography component="span" variant="caption" display="block" sx={{ mb: 1 }}>
               {t("peladas.dashboard.replace_with")}
             </Typography>
             {benchPlayers.map((bp) => (

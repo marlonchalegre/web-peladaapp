@@ -265,7 +265,7 @@ export default function ImportStatsDialog({
       <DialogTitle>{t("organizations.stats.import.title")}</DialogTitle>
       <DialogContent sx={{ minHeight: "400px" }}>
         <Box sx={{ mb: 3, mt: 1 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Typography component="span" variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             {t("organizations.stats.import.description")}
           </Typography>
 

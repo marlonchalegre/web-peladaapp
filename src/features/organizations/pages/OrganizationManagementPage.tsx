@@ -167,7 +167,7 @@ export default function OrganizationManagementPage() {
           ]}
         />
 
-        <Typography variant="h4" gutterBottom fontWeight="bold" color="primary">
+        <Typography component="span" variant="h4" gutterBottom fontWeight="bold" color="primary">
           {t("organizations.management.title", { name: org.name })}
         </Typography>
 

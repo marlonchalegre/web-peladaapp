@@ -35,7 +35,7 @@ export default function MatchHistoryList({
         flexDirection: "column",
       }}
     >
-      <Typography variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
+      <Typography component="span" variant="h6" gutterBottom sx={{ fontWeight: "bold" }}>
         {t("peladas.matches.history_title")}
       </Typography>
       <Paper variant="outlined" sx={{ flex: 1, overflowY: "auto" }}>
@@ -63,7 +63,7 @@ export default function MatchHistoryList({
                     py: 2,
                   }}
                 >
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography component="span" variant="caption" color="text.secondary">
                     {t("peladas.matches.history_item_title", {
                       sequence: m.sequence,
                       teamName: teamNameById[m.home_team_id] || "Time",
@@ -76,20 +76,19 @@ export default function MatchHistoryList({
                     alignItems="center"
                     sx={{ mt: 1 }}
                   >
-                    <Typography variant="body2" fontWeight="bold">
+                    <Typography component="span" variant="body2" fontWeight="bold">
                       {teamNameById[m.home_team_id] ||
                         t("peladas.matches.team_fallback", {
                           id: m.home_team_id,
                         })}
                     </Typography>
-                    <Typography
-                      variant="body2"
+                    <Typography component="span"                       variant="body2"
                       fontWeight="bold"
                       sx={{ mx: 1 }}
                     >
                       {m.home_score ?? 0} x {m.away_score ?? 0}
                     </Typography>
-                    <Typography variant="body2" fontWeight="bold">
+                    <Typography component="span" variant="body2" fontWeight="bold">
                       {teamNameById[m.away_team_id] ||
                         t("peladas.matches.team_fallback", {
                           id: m.away_team_id,

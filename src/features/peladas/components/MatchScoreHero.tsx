@@ -91,8 +91,7 @@ export default function MatchScoreHero({
           sx={{ width: "100%" }}
         >
           {/* Home Team Name */}
-          <Typography
-            variant="h6"
+          <Typography component="span"             variant="h6"
             sx={{
               fontWeight: "bold",
               color: "text.primary",
@@ -112,13 +111,12 @@ export default function MatchScoreHero({
             data-testid="match-score-display"
           >
             <Box sx={scoreBoxStyle(theme.palette.home.main)}>
-              <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+              <Typography component="span" variant="h4" sx={{ fontWeight: "bold" }}>
                 {match.home_score ?? 0}
               </Typography>
             </Box>
 
-            <Typography
-              variant="h5"
+            <Typography component="span"               variant="h5"
               color="text.disabled"
               sx={{ fontWeight: "bold" }}
             >
@@ -126,15 +124,14 @@ export default function MatchScoreHero({
             </Typography>
 
             <Box sx={scoreBoxStyle(theme.palette.away.main)}>
-              <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+              <Typography component="span" variant="h4" sx={{ fontWeight: "bold" }}>
                 {match.away_score ?? 0}
               </Typography>
             </Box>
           </Stack>
 
           {/* Away Team Name */}
-          <Typography
-            variant="h6"
+          <Typography component="span"             variant="h6"
             sx={{
               fontWeight: "bold",
               color: "text.primary",
@@ -149,8 +146,7 @@ export default function MatchScoreHero({
         </Stack>
 
         {/* Mobile Team Names */}
-        <Typography
-          variant="subtitle2"
+        <Typography component="span"           variant="subtitle2"
           sx={{
             fontWeight: "bold",
             color: "text.primary",
@@ -176,8 +172,7 @@ export default function MatchScoreHero({
             gap: 1,
           }}
         >
-          <Typography
-            variant="h5"
+          <Typography component="span"             variant="h5"
             sx={{
               fontFamily: "monospace",
               fontWeight: "bold",

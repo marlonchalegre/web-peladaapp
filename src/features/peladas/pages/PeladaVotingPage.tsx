@@ -284,7 +284,7 @@ export default function PeladaVotingPage() {
           mb: 2,
         }}
       >
-        <Typography variant="h4" fontWeight="bold">
+        <Typography component="span" variant="h4" fontWeight="bold">
           {t("peladas.voting.title", { id: peladaId })}
         </Typography>
         <Box sx={{ display: "flex", gap: 1 }}>
@@ -391,8 +391,7 @@ export default function PeladaVotingPage() {
                             mb: 1,
                           }}
                         >
-                          <Typography
-                            variant="h6"
+                          <Typography component="span"                             variant="h6"
                             fontWeight="bold"
                             sx={{
                               color: pv.voting_enabled
@@ -420,15 +419,15 @@ export default function PeladaVotingPage() {
                           )}
                         </Box>
                         <Stack direction="row" spacing={2}>
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography component="span" variant="body2" color="text.secondary">
                             <strong>{t("common.goals")}:</strong> {pv.goals}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography component="span" variant="body2" color="text.secondary">
                             <strong>{t("common.assists_short")}:</strong>{" "}
                             {pv.assists}
                           </Typography>
                           {pv.own_goals > 0 && (
-                            <Typography variant="body2" color="error">
+                            <Typography component="span" variant="body2" color="error">
                               <strong>{t("common.own_goals_short")}:</strong>{" "}
                               {pv.own_goals}
                             </Typography>
@@ -465,8 +464,7 @@ export default function PeladaVotingPage() {
                             }}
                           >
                             {pv.stars !== null && pv.voting_enabled && (
-                              <Typography
-                                variant="caption"
+                              <Typography component="span"                                 variant="caption"
                                 color="primary"
                                 fontWeight="bold"
                               >
@@ -554,14 +552,13 @@ export default function PeladaVotingPage() {
 
         <Grid size={{ xs: 12, md: 4 }}>
           <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+            <Typography component="span" variant="subtitle1" fontWeight="bold" gutterBottom>
               {t("peladas.voting.status.title")}
             </Typography>
             <Divider sx={{ mb: 2 }} />
 
             <Box sx={{ mb: 3 }}>
-              <Typography
-                variant="caption"
+              <Typography component="span"                 variant="caption"
                 color="text.secondary"
                 fontWeight="bold"
                 display="block"
@@ -580,7 +577,7 @@ export default function PeladaVotingPage() {
                   </ListItem>
                 ))}
                 {votersByStatus.voted.length === 0 && (
-                  <Typography variant="caption" sx={{ px: 1, py: 1 }}>
+                  <Typography component="span" variant="caption" sx={{ px: 1, py: 1 }}>
                     {t("peladas.voting.status.none")}
                   </Typography>
                 )}
@@ -588,8 +585,7 @@ export default function PeladaVotingPage() {
             </Box>
 
             <Box>
-              <Typography
-                variant="caption"
+              <Typography component="span"                 variant="caption"
                 color="text.secondary"
                 fontWeight="bold"
                 display="block"

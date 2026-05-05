@@ -68,14 +68,13 @@ const StatCard = ({
           }}
         >
           <Box>
-            <Typography
-              variant="h6"
+            <Typography component="span"               variant="h6"
               fontWeight="bold"
               sx={{ mb: 0.5, color: "text.primary" }}
             >
               {title}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography component="span" variant="body2" color="text.secondary">
               {subtitle}
             </Typography>
           </Box>
@@ -104,22 +103,20 @@ const StatCard = ({
             }}
           />
           <Box>
-            <Typography
-              variant="subtitle1"
+            <Typography component="span"               variant="subtitle1"
               fontWeight="bold"
               sx={{ color: "text.primary" }}
             >
               {playerName}
             </Typography>
             <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.5 }}>
-              <Typography
-                variant="h5"
+              <Typography component="span"                 variant="h5"
                 fontWeight="bold"
                 sx={{ color: "text.primary" }}
               >
                 {value}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography component="span" variant="body2" color="text.secondary">
                 {unit}
               </Typography>
             </Box>

@@ -97,16 +97,14 @@ export default function FirstAccessPage() {
       >
         <form onSubmit={onSubmit}>
           <Stack spacing={2}>
-            <Typography
-              variant="h5"
+            <Typography component="span"               variant="h5"
               component="h1"
               align="center"
               gutterBottom
             >
               {t("auth.first_access.title")}
             </Typography>
-            <Typography
-              variant="body2"
+            <Typography component="span"               variant="body2"
               color="text.secondary"
               align="center"
             >
@@ -208,7 +206,7 @@ export default function FirstAccessPage() {
                 ? t("auth.first_access.button.loading")
                 : t("auth.first_access.button.submit")}
             </Button>
-            <Typography variant="body2" align="center">
+            <Typography component="span" variant="body2" align="center">
               <MLink
                 href={`/login${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`}
                 underline="hover"

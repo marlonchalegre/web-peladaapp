@@ -30,7 +30,7 @@ function MockMatchAttendance() {
   const { t } = useTranslation();
   return (
     <Paper sx={{ p: 2, borderRadius: 2, height: "100%" }}>
-      <Typography variant="subtitle2" color="primary" gutterBottom>
+      <Typography component="span" variant="subtitle2" color="primary" gutterBottom>
         {t("welcome.mock.match_day")}
       </Typography>
       <Stack spacing={1}>
@@ -50,7 +50,7 @@ function MockMatchAttendance() {
               borderRadius: 1,
             }}
           >
-            <Typography variant="body2">{p.name}</Typography>
+            <Typography component="span" variant="body2">{p.name}</Typography>
             <Chip
               label={t(`peladas.attendance.status.${p.status}`)}
               size="small"
@@ -73,7 +73,7 @@ function MockTeams() {
     <Paper sx={{ p: 2, borderRadius: 2, height: "100%" }}>
       <Grid container spacing={1}>
         <Grid size={6}>
-          <Typography variant="caption" fontWeight="bold">
+          <Typography component="span" variant="caption" fontWeight="bold">
             {t("welcome.mock.team_a")}
           </Typography>
           <Stack spacing={0.5} mt={1}>
@@ -86,7 +86,7 @@ function MockTeams() {
           </Stack>
         </Grid>
         <Grid size={6}>
-          <Typography variant="caption" fontWeight="bold">
+          <Typography component="span" variant="caption" fontWeight="bold">
             {t("welcome.mock.team_b")}
           </Typography>
           <Stack spacing={0.5} mt={1}>
@@ -113,14 +113,14 @@ function MockVoting() {
   const { t } = useTranslation();
   return (
     <Paper sx={{ p: 2, borderRadius: 2, height: "100%" }}>
-      <Typography variant="subtitle2" align="center" gutterBottom>
+      <Typography component="span" variant="subtitle2" align="center" gutterBottom>
         {t("welcome.mock.mvp_vote")}
       </Typography>
       <Stack alignItems="center" spacing={1}>
         <Avatar sx={{ bgcolor: "primary.dark", width: 48, height: 48 }}>
           R
         </Avatar>
-        <Typography variant="body2" fontWeight="bold">
+        <Typography component="span" variant="body2" fontWeight="bold">
           Ronaldinho
         </Typography>
         <Rating value={5} readOnly size="small" />
@@ -162,8 +162,7 @@ export default function WelcomePage() {
                     alt="Logo"
                     sx={{ width: 64, height: 64 }}
                   />
-                  <Typography
-                    variant="h3"
+                  <Typography component="span"                     variant="h3"
                     component="h1"
                     fontWeight={800}
                     color="primary"
@@ -172,8 +171,7 @@ export default function WelcomePage() {
                     PeladaApp
                   </Typography>
                 </Box>
-                <Typography
-                  variant="h4"
+                <Typography component="span"                   variant="h4"
                   fontWeight={700}
                   sx={{
                     lineHeight: 1.2,
@@ -182,8 +180,7 @@ export default function WelcomePage() {
                 >
                   {t("welcome.title")}
                 </Typography>
-                <Typography
-                  variant="h6"
+                <Typography component="span"                   variant="h6"
                   color="text.secondary"
                   sx={{ fontWeight: 400, maxWidth: 600 }}
                 >
@@ -243,10 +240,10 @@ export default function WelcomePage() {
               >
                 <GroupIcon fontSize="large" />
               </Avatar>
-              <Typography variant="h6" fontWeight="bold">
+              <Typography component="span" variant="h6" fontWeight="bold">
                 {t("welcome.features.management.title")}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography component="span" variant="body2" color="text.secondary">
                 {t("welcome.features.management.description")}
               </Typography>
             </Stack>
@@ -263,10 +260,10 @@ export default function WelcomePage() {
               >
                 <SportsSoccerIcon fontSize="large" />
               </Avatar>
-              <Typography variant="h6" fontWeight="bold">
+              <Typography component="span" variant="h6" fontWeight="bold">
                 {t("welcome.features.teams.title")}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography component="span" variant="body2" color="text.secondary">
                 {t("welcome.features.teams.description")}
               </Typography>
             </Stack>
@@ -283,10 +280,10 @@ export default function WelcomePage() {
               >
                 <AssessmentIcon fontSize="large" />
               </Avatar>
-              <Typography variant="h6" fontWeight="bold">
+              <Typography component="span" variant="h6" fontWeight="bold">
                 {t("welcome.features.stats.title")}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography component="span" variant="body2" color="text.secondary">
                 {t("welcome.features.stats.description")}
               </Typography>
             </Stack>

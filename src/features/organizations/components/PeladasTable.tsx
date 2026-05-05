@@ -31,7 +31,7 @@ export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
   if (!peladas.length) {
     return (
       <Box sx={{ p: 4, textAlign: "center" }}>
-        <Typography color="text.secondary">
+        <Typography component="span" color="text.secondary">
           {t("organizations.peladas.empty")}
         </Typography>
       </Box>
@@ -109,14 +109,14 @@ export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
                 }}
               >
                 <TableCell sx={{ py: 2 }}>
-                  <Typography variant="body2" fontWeight={500}>
+                  <Typography component="span" variant="body2" fontWeight={500}>
                     {p.scheduled_at
                       ? new Date(p.scheduled_at).toLocaleDateString(
                           t("common.locale_code", "pt-BR"),
                         )
                       : t("common.date.tbd", "TBD")}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography component="span" variant="caption" color="text.secondary">
                     {p.scheduled_at
                       ? new Date(p.scheduled_at).toLocaleTimeString(
                           t("common.locale_code", "pt-BR"),

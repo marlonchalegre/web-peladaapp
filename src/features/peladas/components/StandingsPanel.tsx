@@ -49,7 +49,7 @@ function StandingsHighlights({ standings }: { standings: StandingRow[] }) {
     <Box sx={{ p: 2.5, bgcolor: "action.hover" }}>
       <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
         <TrendingUpIcon color="primary" />
-        <Typography variant="h6" fontWeight="bold">
+        <Typography component="span" variant="h6" fontWeight="bold">
           {t("peladas.dashboard.summary.highlights")}
         </Typography>
       </Stack>
@@ -70,8 +70,7 @@ function StandingsHighlights({ standings }: { standings: StandingRow[] }) {
           >
             <EmojiEventsIcon fontSize="small" />
           </Box>
-          <Typography
-            variant="subtitle2"
+          <Typography component="span"             variant="subtitle2"
             fontWeight="bold"
             color="text.secondary"
             sx={{ textTransform: "uppercase", letterSpacing: 1 }}
@@ -106,11 +105,11 @@ function StandingsHighlights({ standings }: { standings: StandingRow[] }) {
               <EmojiEventsIcon />
             </Avatar>
             <Box>
-              <Typography variant="subtitle1" fontWeight="800" lineHeight={1.2}>
+              <Typography component="span" variant="subtitle1" fontWeight="800" lineHeight={1.2}>
                 {champion.name ||
                   t("peladas.matches.team_fallback", { id: champion.teamId })}
               </Typography>
-              <Typography variant="caption" color="text.secondary">
+              <Typography component="span" variant="caption" color="text.secondary">
                 {champion.wins}V {champion.draws}E {champion.losses}D
               </Typography>
             </Box>
@@ -137,7 +136,7 @@ export default function StandingsPanel({ standings, showHighlights }: Props) {
           borderColor: "divider",
         }}
       >
-        <Typography variant="subtitle1" fontWeight="bold">
+        <Typography component="span" variant="subtitle1" fontWeight="bold">
           {t("peladas.panel.standings.title")}
         </Typography>
       </Box>

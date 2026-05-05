@@ -113,7 +113,7 @@ export default function OrganizationStatisticsPage() {
           px: { xs: 1, sm: 0 },
         }}
       >
-        <Typography variant={isMobile ? "h5" : "h4"} fontWeight="bold">
+        <Typography component="span" variant={isMobile ? "h5" : "h4"} fontWeight="bold">
           {t("organizations.stats.title", { name: org.name })}
         </Typography>
 

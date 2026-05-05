@@ -54,7 +54,7 @@ export default function InvitationsList({
           mb: 2,
         }}
       >
-        <Typography variant="h5" fontWeight="bold">
+        <Typography component="span" variant="h5" fontWeight="bold">
           {t(
             "organizations.management.sections.invitations",
             "Active Invitations",
@@ -97,11 +97,10 @@ export default function InvitationsList({
           <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
             <LinkIcon sx={{ mr: 1 }} />
             <Box>
-              <Typography variant="subtitle2" fontWeight="bold">
+              <Typography component="span" variant="subtitle2" fontWeight="bold">
                 {t("organizations.dialog.invite_player.public_link")}
               </Typography>
-              <Typography
-                variant="body2"
+              <Typography component="span"                 variant="body2"
                 sx={{
                   wordBreak: "break-all",
                   opacity: 0.9,
@@ -155,8 +154,7 @@ export default function InvitationsList({
       <Divider sx={{ mb: 2 }} />
       <List>
         {invitations.filter((inv) => !!inv.email).length === 0 ? (
-          <Typography
-            color="text.secondary"
+          <Typography component="span"             color="text.secondary"
             sx={{ textAlign: "center", py: 2 }}
           >
             {t(
@@ -186,7 +184,7 @@ export default function InvitationsList({
                   }
                   secondary={
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography component="span" variant="body2" color="text.secondary">
                         {new Date(inv.created_at).toLocaleDateString(
                           t("common.locale_code", "pt-BR"),
                         )}

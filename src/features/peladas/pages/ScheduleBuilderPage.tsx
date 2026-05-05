@@ -223,10 +223,10 @@ export default function ScheduleBuilderPage() {
           alignItems="center"
         >
           <Box>
-            <Typography variant="h4" fontWeight="bold" gutterBottom>
+            <Typography component="span" variant="h4" fontWeight="bold" gutterBottom>
               {t("peladas.detail.button.build_schedule")}
             </Typography>
-            <Typography variant="body1" color="text.secondary">
+            <Typography component="span" variant="body1" color="text.secondary">
               {t("peladas.detail.schedule.subtitle")}
             </Typography>
           </Box>
@@ -321,7 +321,7 @@ export default function ScheduleBuilderPage() {
           alignItems: "center",
         }}
       >
-        <Typography variant="h6" fontWeight="bold">
+        <Typography component="span" variant="h6" fontWeight="bold">
           {t("peladas.detail.schedule.planned_matches")}
         </Typography>
       </Box>
@@ -377,8 +377,7 @@ export default function ScheduleBuilderPage() {
                   sx={isInvalid ? { bgcolor: "error.lighter" } : {}}
                 >
                   <TableCell align="center">
-                    <Typography
-                      variant="body2"
+                    <Typography component="span"                       variant="body2"
                       fontWeight="bold"
                       color={isInvalid ? "error.main" : "text.secondary"}
                     >
@@ -419,8 +418,7 @@ export default function ScheduleBuilderPage() {
                         justifyContent: "center",
                       }}
                     >
-                      <Typography
-                        variant="caption"
+                      <Typography component="span"                         variant="caption"
                         fontWeight="bold"
                         color={isInvalid ? "white" : "text.secondary"}
                       >

@@ -68,8 +68,7 @@ const HighlightCard = ({
       >
         {icon}
       </Box>
-      <Typography
-        variant="subtitle2"
+      <Typography component="span"         variant="subtitle2"
         fontWeight="bold"
         color="text.secondary"
         sx={{ textTransform: "uppercase", letterSpacing: 1 }}
@@ -106,11 +105,11 @@ const HighlightCard = ({
               }}
               fallbackText={p.name.substring(0, 2).toUpperCase()}
             />
-            <Typography variant="body2" fontWeight="bold">
+            <Typography component="span" variant="body2" fontWeight="bold">
               {p.name}
             </Typography>
           </Stack>
-          <Typography variant="h6" fontWeight="black" color={`${color}.main`}>
+          <Typography component="span" variant="h6" fontWeight="black" color={`${color}.main`}>
             {count}
           </Typography>
         </Paper>
@@ -140,7 +139,7 @@ function StatsHighlights({ stats }: { stats: PlayerStatRow[] }) {
     <Box sx={{ p: 2.5, bgcolor: "action.hover" }}>
       <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 3 }}>
         <TrendingUpIcon color="primary" />
-        <Typography variant="h6" fontWeight="bold">
+        <Typography component="span" variant="h6" fontWeight="bold">
           {t("peladas.dashboard.summary.highlights")}
         </Typography>
       </Stack>
@@ -189,7 +188,7 @@ export default function PlayerStatsPanel({
           borderColor: "divider",
         }}
       >
-        <Typography variant="subtitle1" fontWeight="bold">
+        <Typography component="span" variant="subtitle1" fontWeight="bold">
           {t("peladas.panel.stats.title")}
         </Typography>
       </Box>
@@ -259,7 +258,7 @@ export default function PlayerStatsPanel({
                       sx={{ width: 28, height: 28, fontSize: "0.75rem" }}
                       fallbackText={p.name.charAt(0)}
                     />
-                    <Typography variant="body2">{p.name}</Typography>
+                    <Typography component="span" variant="body2">{p.name}</Typography>
                   </Stack>
                 </TableCell>
                 <TableCell align="center">{p.matchesPlayed ?? "-"}</TableCell>

@@ -118,7 +118,7 @@ export default function AvailablePlayersPanel({
           spacing={2}
         >
           <Stack direction="row" spacing={1.5} alignItems="center">
-            <Typography variant="h6" fontWeight="800">
+            <Typography component="span" variant="h6" fontWeight="800">
               {t("peladas.available.title")}
             </Typography>
             <Box
@@ -230,8 +230,7 @@ export default function AvailablePlayersPanel({
           })}
           {players.length === 0 && (
             <Grid size={{ xs: 12 }}>
-              <Typography
-                variant="body1"
+              <Typography component="span"                 variant="body1"
                 color="text.disabled"
                 align="center"
                 sx={{
@@ -248,8 +247,7 @@ export default function AvailablePlayersPanel({
           )}
           {players.length > 0 && filteredPlayers.length === 0 && (
             <Grid size={{ xs: 12 }}>
-              <Typography
-                variant="body2"
+              <Typography component="span"                 variant="body2"
                 color="text.disabled"
                 align="center"
                 sx={{ py: 4 }}

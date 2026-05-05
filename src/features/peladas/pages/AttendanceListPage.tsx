@@ -219,14 +219,13 @@ export default function AttendanceListPage() {
         </Box>
 
         <Box sx={{ mb: 4, px: { xs: 1.5, sm: 0 } }}>
-          <Typography
-            variant="h4"
+          <Typography component="span"             variant="h4"
             component="h1"
             sx={{ fontWeight: 800, mb: 1, letterSpacing: -0.5 }}
           >
             {t("peladas.attendance.title")}
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography component="span" variant="body1" color="text.secondary">
             {t("peladas.attendance.subtitle")}
           </Typography>
         </Box>

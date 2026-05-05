@@ -66,8 +66,7 @@ export default function StatInput({
         {loading ? (
           <CircularProgress size={16} />
         ) : (
-          <Typography
-            variant="body2"
+          <Typography component="span"             variant="body2"
             fontWeight="bold"
             data-testid={testIdPrefix ? `${testIdPrefix}-value` : undefined}
           >

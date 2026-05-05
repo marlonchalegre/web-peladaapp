@@ -99,8 +99,7 @@ export default function PlayerAttendanceCard({
             fallbackText={initials}
           />
           <Box sx={{ minWidth: 0 }}>
-            <Typography
-              variant="body1"
+            <Typography component="span"               variant="body1"
               component="div"
               noWrap
               data-testid="attendance-card-name"
@@ -120,16 +119,14 @@ export default function PlayerAttendanceCard({
               sx={{ flexWrap: "wrap" }}
             >
               {isCurrentUser && (
-                <Typography
-                  variant="caption"
+                <Typography component="span"                   variant="caption"
                   color="primary.main"
                   sx={{ fontWeight: "bold" }}
                 >
                   {t("common.you")}
                 </Typography>
               )}
-              <Typography
-                variant="caption"
+              <Typography component="span"                 variant="caption"
                 color="text.secondary"
                 sx={{ display: "flex", alignItems: "center" }}
               >
@@ -141,8 +138,7 @@ export default function PlayerAttendanceCard({
                 )}
               </Typography>
               {player.member_type && (
-                <Typography
-                  variant="caption"
+                <Typography component="span"                   variant="caption"
                   color="text.secondary"
                   sx={{ display: "flex", alignItems: "center" }}
                 >

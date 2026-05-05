@@ -496,7 +496,7 @@ export default function PeladaMatchesPage() {
               />
             ) : (
               <Paper sx={{ p: 8, textAlign: "center", borderRadius: 4 }}>
-                <Typography variant="h5" color="text.secondary">
+                <Typography component="span" variant="h5" color="text.secondary">
                   {t("peladas.matches.select_match_hint")}
                 </Typography>
               </Paper>
@@ -517,8 +517,7 @@ export default function PeladaMatchesPage() {
                     textAlign: "center",
                   }}
                 >
-                  <Typography
-                    variant="body2"
+                  <Typography component="span"                     variant="body2"
                     color="text.secondary"
                     sx={{ mb: 2 }}
                   >

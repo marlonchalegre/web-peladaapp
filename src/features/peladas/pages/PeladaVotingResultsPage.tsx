@@ -227,7 +227,7 @@ export default function PeladaVotingResultsPage() {
             </Typography>
           </DialogTitle>
           <DialogContent>
-            <Typography variant="body1" align="center" sx={{ mb: 2 }}>
+            <Typography component="span" variant="body1" align="center" sx={{ mb: 2 }}>
               {t(
                 "peladas.voting.results.error.not_voted",
                 "Você participou desta pelada mas não votou. Por isso, você não tem acesso aos resultados.",
@@ -293,7 +293,7 @@ export default function PeladaVotingResultsPage() {
           pointerEvents: isRestricted ? "none" : "auto",
         }}
       >
-        <Typography variant="h3" fontWeight="bold">
+        <Typography component="span" variant="h3" fontWeight="bold">
           {t("peladas.voting.results.hero_title")}
         </Typography>
         <Box sx={{ display: "flex", gap: 1 }}>
@@ -369,10 +369,10 @@ export default function PeladaVotingResultsPage() {
                   </Typography>
                 </Box>
               </Box>
-              <Typography variant="h6" fontWeight="bold">
+              <Typography component="span" variant="h6" fontWeight="bold">
                 {t("peladas.voting.results.participation")}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography component="span" variant="body2" color="text.secondary">
                 {displayResults!.total_voted} {t("common.of")}{" "}
                 {displayResults!.total_eligible}{" "}
                 {t("peladas.voting.results.players_voted")}
@@ -390,7 +390,7 @@ export default function PeladaVotingResultsPage() {
                 sx={{ display: "flex", alignItems: "center", gap: 1, mb: 3 }}
               >
                 <EmojiEventsIcon color="primary" fontSize="large" />
-                <Typography variant="h5" fontWeight="bold">
+                <Typography component="span" variant="h5" fontWeight="bold">
                   {t("peladas.voting.results.mvp_title")}
                 </Typography>
               </Box>
@@ -412,10 +412,10 @@ export default function PeladaVotingResultsPage() {
                         }}
                         fallbackText={displayResults!.mvp[1].name.charAt(0)}
                       />
-                      <Typography variant="subtitle2" fontWeight="bold" noWrap>
+                      <Typography component="span" variant="subtitle2" fontWeight="bold" noWrap>
                         {displayResults!.mvp[1].name}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography component="span" variant="caption" color="text.secondary">
                         {displayResults!.mvp[1].average_stars.toFixed(1)} ★
                       </Typography>
                       <Box
@@ -450,11 +450,10 @@ export default function PeladaVotingResultsPage() {
                         }}
                         fallbackText={displayResults!.mvp[0].name.charAt(0)}
                       />
-                      <Typography variant="h6" fontWeight="bold" noWrap>
+                      <Typography component="span" variant="h6" fontWeight="bold" noWrap>
                         {displayResults!.mvp[0].name}
                       </Typography>
-                      <Typography
-                        variant="subtitle1"
+                      <Typography component="span"                         variant="subtitle1"
                         color="primary"
                         fontWeight="bold"
                       >
@@ -489,10 +488,10 @@ export default function PeladaVotingResultsPage() {
                         }}
                         fallbackText={displayResults!.mvp[2].name.charAt(0)}
                       />
-                      <Typography variant="subtitle2" fontWeight="bold" noWrap>
+                      <Typography component="span" variant="subtitle2" fontWeight="bold" noWrap>
                         {displayResults!.mvp[2].name}
                       </Typography>
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography component="span" variant="caption" color="text.secondary">
                         {displayResults!.mvp[2].average_stars.toFixed(1)} ★
                       </Typography>
                       <Box
@@ -518,7 +517,7 @@ export default function PeladaVotingResultsPage() {
                   sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}
                 >
                   <SportsSoccerIcon color="error" />
-                  <Typography variant="h6" fontWeight="bold">
+                  <Typography component="span" variant="h6" fontWeight="bold">
                     {t("peladas.voting.results.top_scorer")}
                   </Typography>
                 </Box>
@@ -535,10 +534,10 @@ export default function PeladaVotingResultsPage() {
                       <Box
                         sx={{ display: "flex", alignItems: "center", gap: 2 }}
                       >
-                        <Typography fontWeight="bold" color="text.secondary">
+                        <Typography component="span" fontWeight="bold" color="text.secondary">
                           {i + 1}º
                         </Typography>
-                        <Typography fontWeight="medium">{s.name}</Typography>
+                        <Typography component="span" fontWeight="medium">{s.name}</Typography>
                       </Box>
                       <Chip
                         label={`${s.goals} Gols`}
@@ -549,7 +548,7 @@ export default function PeladaVotingResultsPage() {
                     </Box>
                   ))}
                   {displayResults!.striker.length === 0 && (
-                    <Typography color="text.secondary">
+                    <Typography component="span" color="text.secondary">
                       {t("peladas.voting.results.no_awards")}
                     </Typography>
                   )}
@@ -565,7 +564,7 @@ export default function PeladaVotingResultsPage() {
                   sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}
                 >
                   <RestaurantIcon color="info" />
-                  <Typography variant="h6" fontWeight="bold">
+                  <Typography component="span" variant="h6" fontWeight="bold">
                     {t("peladas.voting.results.top_assists")}
                   </Typography>
                 </Box>
@@ -582,10 +581,10 @@ export default function PeladaVotingResultsPage() {
                       <Box
                         sx={{ display: "flex", alignItems: "center", gap: 2 }}
                       >
-                        <Typography fontWeight="bold" color="text.secondary">
+                        <Typography component="span" fontWeight="bold" color="text.secondary">
                           {i + 1}º
                         </Typography>
-                        <Typography fontWeight="medium">{g.name}</Typography>
+                        <Typography component="span" fontWeight="medium">{g.name}</Typography>
                       </Box>
                       <Chip
                         label={`${g.assists} Assis.`}
@@ -596,7 +595,7 @@ export default function PeladaVotingResultsPage() {
                     </Box>
                   ))}
                   {displayResults!.garcom.length === 0 && (
-                    <Typography color="text.secondary">
+                    <Typography component="span" color="text.secondary">
                       {t("peladas.voting.results.no_awards")}
                     </Typography>
                   )}
@@ -607,7 +606,7 @@ export default function PeladaVotingResultsPage() {
 
           {/* Full Ranking Table */}
           <Grid size={{ xs: 12 }}>
-            <Typography variant="h5" fontWeight="bold" sx={{ mb: 2, mt: 2 }}>
+            <Typography component="span" variant="h5" fontWeight="bold" sx={{ mb: 2, mt: 2 }}>
               {t("peladas.voting.results.full_ranking")}
             </Typography>
             <TableContainer
@@ -665,11 +664,10 @@ export default function PeladaVotingResultsPage() {
                               gap: 0.5,
                             }}
                           >
-                            <Typography fontWeight="bold" color="primary">
+                            <Typography component="span" fontWeight="bold" color="primary">
                               {p.average_stars.toFixed(1)}
                             </Typography>
-                            <Typography
-                              variant="caption"
+                            <Typography component="span"                               variant="caption"
                               color="text.secondary"
                             >
                               ★
@@ -693,7 +691,7 @@ export default function PeladaVotingResultsPage() {
                 sx={{ display: "flex", alignItems: "center", gap: 1, mb: 3 }}
               >
                 <GroupIcon color="action" />
-                <Typography variant="h6" fontWeight="bold">
+                <Typography component="span" variant="h6" fontWeight="bold">
                   {t("peladas.voting.results.voter_transparency")}
                 </Typography>
               </Box>

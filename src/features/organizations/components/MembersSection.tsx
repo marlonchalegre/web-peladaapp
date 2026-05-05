@@ -93,7 +93,7 @@ export default function MembersSection({
           mb: 2,
         }}
       >
-        <Typography variant="h5" fontWeight="bold">
+        <Typography component="span" variant="h5" fontWeight="bold">
           {t("organizations.management.sections.members")}
         </Typography>
         <Box sx={{ display: "flex", gap: 1 }}>
@@ -168,8 +168,7 @@ export default function MembersSection({
       </Box>
       <List>
         {paginatedPlayers.length === 0 ? (
-          <Typography
-            color="text.secondary"
+          <Typography component="span"             color="text.secondary"
             sx={{ py: 2, textAlign: "center" }}
           >
             {t("organizations.list.empty")}
@@ -207,7 +206,7 @@ export default function MembersSection({
                 </ListItemAvatar>
                 <ListItemText
                   primary={
-                    <Typography fontWeight="medium">
+                    <Typography component="span" fontWeight="medium">
                       {user?.name || `User #${player.user_id}`}
                     </Typography>
                   }

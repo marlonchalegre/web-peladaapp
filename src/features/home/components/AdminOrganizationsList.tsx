@@ -43,8 +43,7 @@ export default function AdminOrganizationsList({
       >
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <SecurityIcon sx={{ mr: 1.5, color: "secondary.main" }} />
-          <Typography
-            variant="h6"
+          <Typography component="span"             variant="h6"
             sx={{ fontWeight: 600, color: "text.primary" }}
           >
             {t(
@@ -120,7 +119,7 @@ export default function AdminOrganizationsList({
             {organizations.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
-                  <Typography color="text.secondary">
+                  <Typography component="span" color="text.secondary">
                     {t(
                       "home.sections.admin_orgs.empty",
                       "Nenhuma organização administrada.",
@@ -190,7 +189,7 @@ export default function AdminOrganizationsList({
                           color: "text.secondary",
                         }}
                       />
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography component="span" variant="body2" color="text.secondary">
                         {t("common.roles.admin", "Administrador")}
                       </Typography>
                     </Box>

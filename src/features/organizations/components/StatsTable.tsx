@@ -100,8 +100,7 @@ const StatBar = ({
               {icon}
             </Box>
           )}
-          <Typography
-            variant="body2"
+          <Typography component="span"             variant="body2"
             fontWeight="medium"
             sx={{ color: "text.primary" }}
           >
@@ -127,7 +126,7 @@ export default function StatsTable({
   if (stats.length === 0) {
     return (
       <Paper sx={{ p: 4, textAlign: "center", borderRadius: 4 }}>
-        <Typography color="text.secondary">
+        <Typography component="span" color="text.secondary">
           {t("organizations.stats.empty")}
         </Typography>
       </Paper>
@@ -160,11 +159,11 @@ export default function StatsTable({
                 }}
               />
               <Box>
-                <Typography variant="subtitle1" fontWeight="bold">
+                <Typography component="span" variant="subtitle1" fontWeight="bold">
                   {row.player_name}
                 </Typography>
                 {row.player_position && (
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography component="span" variant="caption" color="text.secondary">
                     {t(
                       `common.positions.${row.player_position.toLowerCase()}`,
                       { defaultValue: row.player_position },
@@ -176,8 +175,7 @@ export default function StatsTable({
 
             <Stack spacing={1.5}>
               <Box>
-                <Typography
-                  variant="caption"
+                <Typography component="span"                   variant="caption"
                   color="text.secondary"
                   sx={{ display: "block", mb: 0.5 }}
                 >
@@ -187,8 +185,7 @@ export default function StatsTable({
               </Box>
 
               <Box>
-                <Typography
-                  variant="caption"
+                <Typography component="span"                   variant="caption"
                   color="text.secondary"
                   sx={{ display: "block", mb: 0.5 }}
                 >
@@ -202,8 +199,7 @@ export default function StatsTable({
               </Box>
 
               <Box>
-                <Typography
-                  variant="caption"
+                <Typography component="span"                   variant="caption"
                   color="text.secondary"
                   sx={{ display: "block", mb: 0.5 }}
                 >
@@ -308,7 +304,7 @@ export default function StatsTable({
                     }}
                   />
                   <Box>
-                    <Typography variant="body1" fontWeight="bold">
+                    <Typography component="span" variant="body1" fontWeight="bold">
                       {row.player_name}
                     </Typography>
                     {row.player_position && (

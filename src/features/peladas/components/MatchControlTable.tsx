@@ -200,8 +200,7 @@ export default function MatchControlTable({
               </Button>
             ) : (
               <>
-                <Typography
-                  variant="overline"
+                <Typography component="span"                   variant="overline"
                   color="text.secondary"
                   sx={{ fontWeight: "bold" }}
                   data-testid="match-status-text"
@@ -258,8 +257,7 @@ export default function MatchControlTable({
                         colSpan={5}
                         sx={{ py: 0.5, textAlign: "center" }}
                       >
-                        <Typography
-                          variant="overline"
+                        <Typography component="span"                           variant="overline"
                           color="text.secondary"
                           sx={{ fontWeight: "bold", letterSpacing: 2 }}
                         >

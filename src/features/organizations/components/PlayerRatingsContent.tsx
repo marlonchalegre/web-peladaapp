@@ -103,10 +103,10 @@ export default function PlayerRatingsContent({
 
   return (
     <Box>
-      <Typography variant="h5" gutterBottom fontWeight="bold">
+      <Typography component="span" variant="h5" gutterBottom fontWeight="bold">
         {t("organizations.ratings.title", { name: orgName })}
       </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+      <Typography component="span" variant="body1" color="text.secondary" sx={{ mb: 3 }}>
         {t("organizations.ratings.subtitle")}
       </Typography>
       <Box sx={{ mb: 3 }}>
@@ -149,7 +149,7 @@ export default function PlayerRatingsContent({
             {paginatedPlayers.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
-                  <Typography color="text.secondary">
+                  <Typography component="span" color="text.secondary">
                     {t("organizations.list.empty")}
                   </Typography>
                 </TableCell>
@@ -159,10 +159,10 @@ export default function PlayerRatingsContent({
                 <TableRow key={player.id} hover>
                   <TableCell>
                     <Box sx={{ display: "flex", flexDirection: "column" }}>
-                      <Typography variant="subtitle1" fontWeight="medium">
+                      <Typography component="span" variant="subtitle1" fontWeight="medium">
                         {player.user_name}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography component="span" variant="body2" color="text.secondary">
                         @{player.user_username}
                       </Typography>
                     </Box>
@@ -186,8 +186,7 @@ export default function PlayerRatingsContent({
                     />
                   </TableCell>
                   <TableCell align="right">
-                    <Typography
-                      variant="body2"
+                    <Typography component="span"                       variant="body2"
                       fontWeight="bold"
                       color="primary"
                       data-testid={`grade-${player.id}`}

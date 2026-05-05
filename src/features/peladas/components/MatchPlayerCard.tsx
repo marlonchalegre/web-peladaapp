@@ -70,7 +70,7 @@ export default function MatchPlayerCard({
           >
             <PersonAddIcon fontSize="small" />
           </Avatar>
-          <Typography variant="body2" color="text.secondary">
+          <Typography component="span" variant="body2" color="text.secondary">
             {t("peladas.dashboard.empty_slot")}
           </Typography>
         </Stack>
@@ -140,8 +140,7 @@ export default function MatchPlayerCard({
           )}
 
           <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-            <Typography
-              variant="body2"
+            <Typography component="span"               variant="body2"
               sx={{
                 fontWeight: "bold",
                 fontSize: { xs: "0.85rem", sm: "1rem" },
@@ -155,8 +154,7 @@ export default function MatchPlayerCard({
               {playerName}
             </Typography>
             <Stack direction="row" spacing={1} alignItems="center">
-              <Typography
-                variant="caption"
+              <Typography component="span"                 variant="caption"
                 color="text.secondary"
                 sx={{
                   display: "block",
@@ -186,8 +184,7 @@ export default function MatchPlayerCard({
         >
           {/* Goal Controls/Stats */}
           <Box sx={{ textAlign: "center", flexShrink: 0 }}>
-            <Typography
-              variant="caption"
+            <Typography component="span"               variant="caption"
               sx={{
                 display: "block",
                 fontSize: "0.5rem",
@@ -259,8 +256,7 @@ export default function MatchPlayerCard({
 
           {/* Assist Controls/Stats */}
           <Box sx={{ textAlign: "center", flexShrink: 0 }}>
-            <Typography
-              variant="caption"
+            <Typography component="span"               variant="caption"
               sx={{
                 display: "block",
                 fontSize: "0.5rem",
@@ -332,8 +328,7 @@ export default function MatchPlayerCard({
 
           {/* Own Goal Controls/Stats */}
           <Box sx={{ textAlign: "center", flexShrink: 0 }}>
-            <Typography
-              variant="caption"
+            <Typography component="span"               variant="caption"
               sx={{
                 display: "block",
                 fontSize: "0.5rem",

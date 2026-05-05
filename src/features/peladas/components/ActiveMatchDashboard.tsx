@@ -317,8 +317,7 @@ export default function ActiveMatchDashboard(props: Props) {
                   borderRadius: 1,
                 }}
               />
-              <Typography
-                variant="subtitle2"
+              <Typography component="span"                 variant="subtitle2"
                 fontWeight="bold"
                 color="text.secondary"
               >
@@ -377,8 +376,7 @@ export default function ActiveMatchDashboard(props: Props) {
                   borderRadius: 1,
                 }}
               />
-              <Typography
-                variant="subtitle2"
+              <Typography component="span"                 variant="subtitle2"
                 fontWeight="bold"
                 color="text.secondary"
               >
@@ -449,7 +447,7 @@ export default function ActiveMatchDashboard(props: Props) {
         data-testid="history-drawer"
       >
         <Box sx={{ width: 320, p: 2 }}>
-          <Typography variant="h6" fontWeight="bold" sx={{ mb: 3, px: 1 }}>
+          <Typography component="span" variant="h6" fontWeight="bold" sx={{ mb: 3, px: 1 }}>
             {t("peladas.matches.history_title")}
           </Typography>
           <List sx={{ px: 0 }}>
@@ -526,8 +524,7 @@ export default function ActiveMatchDashboard(props: Props) {
                         >
                           {m.sequence}
                         </Avatar>
-                        <Typography
-                          variant="caption"
+                        <Typography component="span"                           variant="caption"
                           fontWeight="bold"
                           color={
                             isSelected
@@ -568,8 +565,7 @@ export default function ActiveMatchDashboard(props: Props) {
                         gap: 1,
                       }}
                     >
-                      <Typography
-                        variant="body2"
+                      <Typography component="span"                         variant="body2"
                         sx={{
                           flex: 1,
                           textAlign: "right",
@@ -595,23 +591,21 @@ export default function ActiveMatchDashboard(props: Props) {
                           justifyContent: "center",
                         }}
                       >
-                        <Typography variant="body2" fontWeight="900">
+                        <Typography component="span" variant="body2" fontWeight="900">
                           {m.home_score}
                         </Typography>
-                        <Typography
-                          variant="caption"
+                        <Typography component="span"                           variant="caption"
                           color="text.disabled"
                           fontWeight="bold"
                         >
                           x
                         </Typography>
-                        <Typography variant="body2" fontWeight="900">
+                        <Typography component="span" variant="body2" fontWeight="900">
                           {m.away_score}
                         </Typography>
                       </Box>
 
-                      <Typography
-                        variant="body2"
+                      <Typography component="span"                         variant="body2"
                         sx={{
                           flex: 1,
                           textAlign: "left",

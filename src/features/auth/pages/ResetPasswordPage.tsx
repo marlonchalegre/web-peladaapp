@@ -102,16 +102,14 @@ export default function ResetPasswordPage() {
       >
         <form onSubmit={onSubmit}>
           <Stack spacing={2}>
-            <Typography
-              variant="h5"
+            <Typography component="span"               variant="h5"
               component="h1"
               align="center"
               gutterBottom
             >
               {t("auth.reset_password.title")}
             </Typography>
-            <Typography
-              variant="body2"
+            <Typography component="span"               variant="body2"
               color="text.secondary"
               align="center"
             >

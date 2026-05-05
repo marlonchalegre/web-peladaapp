@@ -65,7 +65,7 @@ export default function StatsFilters({
         onClick={() => setExpanded(!expanded)}
         data-testid="filters-header"
       >
-        <Typography variant="h5" fontWeight="bold">
+        <Typography component="span" variant="h5" fontWeight="bold">
           {t("common.filters")}
         </Typography>
 

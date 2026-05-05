@@ -71,8 +71,7 @@ export default function BreadcrumbNav({ items }: Props) {
                   borderRadius: 1.5,
                 }}
               >
-                <Typography
-                  variant="body2"
+                <Typography component="span"                   variant="body2"
                   sx={{ fontWeight: "bold", fontSize: "0.85rem" }}
                 >
                   {item.label}

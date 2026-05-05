@@ -32,7 +32,7 @@ export default function Scoreboard({
       }}
     >
       <Box sx={{ p: 2 }}>
-        <Typography variant="caption" sx={{ opacity: 0.8 }}>
+        <Typography component="span" variant="caption" sx={{ opacity: 0.8 }}>
           {t("peladas.matches.history_item_title", {
             sequence: sequence,
             teamName: homeTeamName,
@@ -45,23 +45,23 @@ export default function Scoreboard({
           sx={{ mt: 1, px: 4 }}
         >
           <Stack alignItems="center">
-            <Typography variant="overline" sx={{ opacity: 0.9, lineHeight: 1 }}>
+            <Typography component="span" variant="overline" sx={{ opacity: 0.9, lineHeight: 1 }}>
               HOME
             </Typography>
-            <Typography variant="h5" fontWeight="bold">
+            <Typography component="span" variant="h5" fontWeight="bold">
               {homeTeamName}
             </Typography>
           </Stack>
 
-          <Typography variant="h3" fontWeight="bold" sx={{ px: 2 }}>
+          <Typography component="span" variant="h3" fontWeight="bold" sx={{ px: 2 }}>
             {homeScore ?? 0} x {awayScore ?? 0}
           </Typography>
 
           <Stack alignItems="center">
-            <Typography variant="overline" sx={{ opacity: 0.9, lineHeight: 1 }}>
+            <Typography component="span" variant="overline" sx={{ opacity: 0.9, lineHeight: 1 }}>
               AWAY
             </Typography>
-            <Typography variant="h5" fontWeight="bold">
+            <Typography component="span" variant="h5" fontWeight="bold">
               {awayTeamName}
             </Typography>
           </Stack>

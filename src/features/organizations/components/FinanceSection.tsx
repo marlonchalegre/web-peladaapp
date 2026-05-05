@@ -79,13 +79,12 @@ const SummaryCard = ({
           alignItems: "center",
         }}
       >
-        <Typography color="text.secondary" gutterBottom variant="overline">
+        <Typography component="span" color="text.secondary" gutterBottom variant="overline">
           {title}
         </Typography>
         {icon}
       </Box>
-      <Typography
-        variant="h5"
+      <Typography component="span"         variant="h5"
         fontWeight="bold"
         color={color}
         data-testid={`${testId}-value`}
@@ -334,7 +333,7 @@ export default function FinanceSection({
 
   return (
     <Paper variant="outlined" sx={{ p: { xs: 2, sm: 3 } }}>
-      <Typography variant="h5" fontWeight="bold" gutterBottom>
+      <Typography component="span" variant="h5" fontWeight="bold" gutterBottom>
         {t("organizations.management.finance.title")}
       </Typography>
       {error && (
@@ -591,8 +590,7 @@ export default function FinanceSection({
                 {transactions.length === 0 ? (
                   <TableRow key="empty-transactions">
                     <TableCell colSpan={5} align="center">
-                      <Typography
-                        variant="body2"
+                      <Typography component="span"                         variant="body2"
                         sx={{ py: 2, color: "text.secondary" }}
                       >
                         {t(
@@ -639,14 +637,13 @@ export default function FinanceSection({
                             tx.status === "reversed" ? "line-through" : "none",
                         }}
                       >
-                        <Typography variant="body2" fontWeight="medium">
+                        <Typography component="span" variant="body2" fontWeight="medium">
                           {tx.description}
                           {tx.status === "reversed" &&
                             ` (${t("organizations.management.finance.transactions.reversed")})`}
                         </Typography>
                         {tx.player_name && (
-                          <Typography
-                            variant="caption"
+                          <Typography component="span"                             variant="caption"
                             display="block"
                             color="text.secondary"
                           >
@@ -657,8 +654,7 @@ export default function FinanceSection({
                           </Typography>
                         )}
                         {tx.creator_name && (
-                          <Typography
-                            variant="caption"
+                          <Typography component="span"                             variant="caption"
                             display="block"
                             color="primary.main"
                             sx={{ fontStyle: "italic" }}
@@ -682,8 +678,7 @@ export default function FinanceSection({
                         />
                       </TableCell>
                       <TableCell align="right">
-                        <Typography
-                          fontWeight="bold"
+                        <Typography component="span"                           fontWeight="bold"
                           color={
                             tx.status === "reversed"
                               ? "text.disabled"

@@ -30,8 +30,7 @@ export default function MemberOrganizationsList({
     <Box>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <GroupsIcon sx={{ mr: 1.5, color: "text.secondary" }} />
-        <Typography
-          variant="h6"
+        <Typography component="span"           variant="h6"
           sx={{ fontWeight: 600, color: "text.primary" }}
         >
           {t(
@@ -68,8 +67,7 @@ export default function MemberOrganizationsList({
           >
             <InfoIcon />
           </Avatar>
-          <Typography
-            variant="body1"
+          <Typography component="span"             variant="body1"
             color="text.secondary"
             sx={{ maxWidth: 400 }}
           >
@@ -163,7 +161,7 @@ export default function MemberOrganizationsList({
                   </TableCell>
                   <TableCell sx={{ py: 2.5 }}>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography component="span" variant="body2" color="text.secondary">
                         {t("common.roles.player", "Jogador")}
                       </Typography>
                     </Box>

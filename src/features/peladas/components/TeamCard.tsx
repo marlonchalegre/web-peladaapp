@@ -136,8 +136,7 @@ export default function TeamCard({
         }}
       >
         <Box>
-          <Typography
-            variant="h6"
+          <Typography component="span"             variant="h6"
             sx={{ fontWeight: 800, lineHeight: 1.2 }}
             data-testid="team-card-name"
           >
@@ -227,15 +226,13 @@ export default function TeamCard({
               )}
               <Box sx={{ flexGrow: 1 }}>
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <Typography
-                    variant="body2"
+                  <Typography component="span"                     variant="body2"
                     sx={{ fontWeight: 700, color: "text.primary" }}
                   >
                     {p.user?.name || "Unknown"}
                   </Typography>
                 </Stack>
-                <Typography
-                  variant="caption"
+                <Typography component="span"                   variant="caption"
                   color="text.secondary"
                   sx={{ fontSize: "0.7rem", display: "block", fontWeight: 500 }}
                 >
@@ -336,8 +333,7 @@ export default function TeamCard({
                     }
                     return null;
                   })()}
-                <Typography
-                  variant="caption"
+                <Typography component="span"                   variant="caption"
                   sx={{
                     minWidth: 24,
                     textAlign: "right",
@@ -369,7 +365,7 @@ export default function TeamCard({
                 opacity: 0.5,
               }}
             >
-              <Typography variant="caption" sx={{ fontWeight: 600 }}>
+              <Typography component="span" variant="caption" sx={{ fontWeight: 600 }}>
                 {t("peladas.team_card.empty_slot")}
               </Typography>
             </Box>
