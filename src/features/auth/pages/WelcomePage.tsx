@@ -73,7 +73,7 @@ function MockTeams() {
     <Paper sx={{ p: 2, borderRadius: 2, height: "100%" }}>
       <Grid container spacing={1}>
         <Grid size={6}>
-          <Typography component="span" variant="caption" fontWeight="bold">
+          <Typography component="span" variant="caption" sx={{ fontWeight: 'bold' }}>
             {t("welcome.mock.team_a")}
           </Typography>
           <Stack spacing={0.5} mt={1}>
@@ -86,7 +86,7 @@ function MockTeams() {
           </Stack>
         </Grid>
         <Grid size={6}>
-          <Typography component="span" variant="caption" fontWeight="bold">
+          <Typography component="span" variant="caption" sx={{ fontWeight: 'bold' }}>
             {t("welcome.mock.team_b")}
           </Typography>
           <Stack spacing={0.5} mt={1}>
@@ -120,7 +120,7 @@ function MockVoting() {
         <Avatar sx={{ bgcolor: "primary.dark", width: 48, height: 48 }}>
           R
         </Avatar>
-        <Typography component="span" variant="body2" fontWeight="bold">
+        <Typography component="span" variant="body2" sx={{ fontWeight: 'bold' }}>
           Ronaldinho
         </Typography>
         <Rating value={5} readOnly size="small" />
@@ -164,18 +164,17 @@ export default function WelcomePage() {
                   />
                   <Typography variant="h3"
                     component="h1"
-                    fontWeight={800}
                     color="primary"
-                    sx={{ fontSize: { xs: "2.5rem", md: "3.5rem" } }}
+                    sx={{ fontSize: { xs: "2.5rem", md: "3.5rem" }, fontWeight: 800 }}
                   >
                     PeladaApp
                   </Typography>
                 </Box>
                 <Typography component="span"                   variant="h4"
-                  fontWeight={700}
                   sx={{
                     lineHeight: 1.2,
                     fontSize: { xs: "1.75rem", md: "2.5rem" },
+                    fontWeight: 700,
                   }}
                 >
                   {t("welcome.title")}
