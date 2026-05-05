@@ -295,7 +295,7 @@ function AppLayout() {
                     onClick={handleCloseUserMenu}
                     data-testid="profile-menu-item"
                   >
-                    <Typography textAlign="center">
+                    <Typography component="span" align="center">
                       {t("navigation.profile")}
                     </Typography>
                   </MenuItem>
@@ -303,7 +303,7 @@ function AppLayout() {
                     onClick={handleLogout}
                     data-testid="logout-menu-item"
                   >
-                    <Typography textAlign="center">
+                    <Typography component="span" align="center">
                       {t("auth.logout")}
                     </Typography>
                   </MenuItem>
