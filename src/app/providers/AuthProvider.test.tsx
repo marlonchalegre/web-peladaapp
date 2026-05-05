@@ -15,9 +15,9 @@ import { api } from "../../shared/api/client";
 // Mock the api client
 vi.mock("../../shared/api/client", () => ({
   api: {
-    setToken: vi.fn(),
     setAuthErrorHandler: vi.fn(),
   },
+  logout: vi.fn(),
 }));
 
 // Mock react-router-dom
@@ -43,7 +43,7 @@ function TestComponent() {
       <div data-testid="authenticated">
         {isAuthenticated ? "true" : "false"}
       </div>
-      <div data-testid="token">{token || "null"}</div>
+      <div data-testid="token">{token === null ? "null" : "not-null"}</div>
       <div data-testid="user">{user?.name || "null"}</div>
       <button
         onClick={() =>
@@ -93,8 +93,7 @@ describe("AuthProvider", () => {
     expect(screen.getByTestId("user")).toHaveTextContent("null");
   });
 
-  it("initializes with authentication when localStorage has token and user", () => {
-    const mockToken = "stored-token";
+  it("initializes with authentication when localStorage has user", () => {
     const mockUser = {
       id: 1,
       name: "Stored User",
@@ -102,7 +101,6 @@ describe("AuthProvider", () => {
       email: "stored@example.com",
     };
 
-    localStorage.setItem("authToken", mockToken);
     localStorage.setItem("authUser", JSON.stringify(mockUser));
 
     render(
@@ -112,21 +110,7 @@ describe("AuthProvider", () => {
     );
 
     expect(screen.getByTestId("authenticated")).toHaveTextContent("true");
-    expect(screen.getByTestId("token")).toHaveTextContent(mockToken);
     expect(screen.getByTestId("user")).toHaveTextContent(mockUser.name);
-  });
-
-  it("sets token in api client when token changes", () => {
-    const mockToken = "test-token";
-    localStorage.setItem("authToken", mockToken);
-
-    render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>,
-    );
-
-    expect(api.setToken).toHaveBeenCalledWith(mockToken);
   });
 
   it("sets up auth error handler on mount", () => {
@@ -151,19 +135,17 @@ describe("AuthProvider", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("authenticated")).toHaveTextContent("true");
-      expect(screen.getByTestId("token")).toHaveTextContent("test-token");
       expect(screen.getByTestId("user")).toHaveTextContent("Test User");
     });
 
-    // Check localStorage
-    expect(localStorage.getItem("authToken")).toBe("test-token");
+    // Check localStorage - should NOT have authToken
+    expect(localStorage.getItem("authToken")).toBeNull();
     const storedUser = JSON.parse(localStorage.getItem("authUser") || "{}");
     expect(storedUser.name).toBe("Test User");
   });
 
   it("clears authentication state when signOut is called", async () => {
     // Set initial auth state
-    localStorage.setItem("authToken", "initial-token");
     localStorage.setItem(
       "authUser",
       JSON.stringify({
@@ -188,7 +170,6 @@ describe("AuthProvider", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("authenticated")).toHaveTextContent("false");
-      expect(screen.getByTestId("token")).toHaveTextContent("null");
       expect(screen.getByTestId("user")).toHaveTextContent("null");
     });
 
@@ -197,76 +178,7 @@ describe("AuthProvider", () => {
     expect(localStorage.getItem("authUser")).toBeNull();
   });
 
-  it("considers user authenticated only when both token and user exist", () => {
-    // If only token exists, AuthProvider creates a skeleton user from it
-    // so isAuthenticated will actually be true.
-    // To test "false", we need a scenario where skeleton creation fails.
-    vi.mocked(jwtDecode).mockImplementation(() => {
-      throw new Error("Invalid token");
-    });
-
-    localStorage.setItem("authToken", "invalid-token");
-
-    const { rerender } = render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>,
-    );
-
-    expect(screen.getByTestId("authenticated")).toHaveTextContent("false");
-
-    // Clear and set user only
-    localStorage.clear();
-    localStorage.setItem(
-      "authUser",
-      JSON.stringify({
-        id: 1,
-        name: "User",
-        username: "user1",
-        email: "user@example.com",
-      }),
-    );
-
-    rerender(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>,
-    );
-
-    expect(screen.getByTestId("authenticated")).toHaveTextContent("false");
-  });
-
-  it("calls api.setToken with null when token is cleared", async () => {
-    localStorage.setItem("authToken", "initial-token");
-    localStorage.setItem(
-      "authUser",
-      JSON.stringify({
-        id: 1,
-        name: "User",
-        username: "user1",
-        email: "user@example.com",
-      }),
-    );
-
-    const { getByText } = render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>,
-    );
-
-    // Clear mocks from initialization
-    vi.clearAllMocks();
-
-    const signOutButton = getByText("Sign Out");
-    signOutButton.click();
-
-    await waitFor(() => {
-      expect(api.setToken).toHaveBeenCalledWith(null);
-    });
-  });
-
   it("handles auth error by clearing authentication", async () => {
-    localStorage.setItem("authToken", "expired-token");
     localStorage.setItem(
       "authUser",
       JSON.stringify({
@@ -291,7 +203,6 @@ describe("AuthProvider", () => {
 
     await waitFor(() => {
       expect(screen.getByTestId("authenticated")).toHaveTextContent("false");
-      expect(screen.getByTestId("token")).toHaveTextContent("null");
       expect(screen.getByTestId("user")).toHaveTextContent("null");
     });
 

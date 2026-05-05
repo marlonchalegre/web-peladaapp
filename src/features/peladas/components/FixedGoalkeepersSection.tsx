@@ -211,7 +211,11 @@ export default function FixedGoalkeepersSection({
         >
           <SecurityIcon fontSize="small" />
         </Box>
-        <Typography variant="h5" sx={{ fontWeight: 800, letterSpacing: -0.5 }}>
+        <Typography
+          variant="h5"
+          data-testid="fixed-goalkeepers-title"
+          sx={{ fontWeight: 800, letterSpacing: -0.5 }}
+        >
           {t("peladas.teams.fixed_goalkeepers_title")}
         </Typography>
       </Stack>

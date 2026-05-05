@@ -5,7 +5,7 @@ export type AuthContextValue = {
   token: string | null;
   user: User | null;
   isAuthenticated: boolean;
-  signIn: (token: string, user: User) => void;
+  signIn: (token: string | null | undefined, user: User) => void;
   refreshUser: () => Promise<void>;
   signOut: () => void;
 };

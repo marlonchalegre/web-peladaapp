@@ -439,6 +439,7 @@ export default function TeamCard({
         {hasFixedGoalkeepers && [
           <MenuItem
             key="move-to-home-gk"
+            data-testid="move-to-home-gk-item"
             onClick={() => {
               if (selectedPlayerId) onMoveToFixedGk?.(selectedPlayerId, "home");
               handleCloseMenu();
@@ -453,6 +454,7 @@ export default function TeamCard({
           </MenuItem>,
           <MenuItem
             key="move-to-away-gk"
+            data-testid="move-to-away-gk-item"
             onClick={() => {
               if (selectedPlayerId) onMoveToFixedGk?.(selectedPlayerId, "away");
               handleCloseMenu();

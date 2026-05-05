@@ -11,14 +11,12 @@ vi.mock("../api/client", () => ({
 }));
 
 describe("SecureAvatar", () => {
-  const mockToken = "fake-jwt-token";
   const userId = 123;
   const filename = "avatar.png";
 
   beforeEach(() => {
     vi.clearAllMocks();
     clearAvatarCache();
-    localStorage.setItem("authToken", mockToken);
 
     // Mock fetch
     global.fetch = vi.fn().mockResolvedValue({
@@ -41,7 +39,7 @@ describe("SecureAvatar", () => {
     localStorage.clear();
   });
 
-  it("fetches the image with correct headers and displays it", async () => {
+  it("fetches the image with correct credentials and displays it", async () => {
     render(
       <SecureAvatar userId={userId} filename={filename} fallbackText="T" />,
     );
@@ -50,9 +48,7 @@ describe("SecureAvatar", () => {
       expect(global.fetch).toHaveBeenCalledWith(
         expect.stringContaining(`/api/user/${userId}/avatar`),
         expect.objectContaining({
-          headers: {
-            Authorization: `Token ${mockToken}`,
-          },
+          credentials: "same-origin",
         }),
       );
     });

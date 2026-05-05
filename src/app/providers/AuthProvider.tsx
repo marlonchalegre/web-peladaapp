@@ -20,69 +20,16 @@ type TokenPayload = {
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(() => {
-    const storedToken = localStorage.getItem("authToken");
-    if (!storedToken) return null;
+  const [user, setUser] = useState<User | null>(() => {
+    const stored = localStorage.getItem("authUser");
+    if (!stored) return null;
 
     try {
-      const payload = jwtDecode<TokenPayload>(storedToken);
-      if (payload.exp && payload.exp * 1000 < Date.now()) {
-        localStorage.removeItem("authToken");
-        localStorage.removeItem("authUser");
-        return null;
-      }
-      return storedToken;
-    } catch (e) {
-      console.error("Failed to decode stored token", e);
-      localStorage.removeItem("authToken");
+      return JSON.parse(stored) as User;
+    } catch {
       localStorage.removeItem("authUser");
       return null;
     }
-  });
-
-  const [user, setUser] = useState<User | null>(() => {
-    const storedToken = localStorage.getItem("authToken");
-    if (!storedToken) return null;
-
-    const stored = localStorage.getItem("authUser");
-    let u: User | null = null;
-    if (stored) {
-      u = JSON.parse(stored) as User;
-    }
-
-    try {
-      const payload = jwtDecode<TokenPayload>(storedToken);
-
-      // Check expiration again to be safe and consistent
-      if (payload.exp && payload.exp * 1000 < Date.now()) {
-        return null;
-      }
-
-      if (u) {
-        // Merge admin_orgs from token if they are missing or different
-        if (
-          payload.admin_orgs &&
-          (!u.admin_orgs || u.admin_orgs.length === 0)
-        ) {
-          u.admin_orgs = payload.admin_orgs;
-        }
-      } else if (payload) {
-        // We have a token but no user object in storage,
-        // we'll need to refresh it but let's provide a skeleton
-        u = {
-          id: payload.id,
-          email: payload.email,
-          phone: payload.phone,
-          avatar_filename: payload.avatar_filename,
-          name: "",
-          username: "",
-          admin_orgs: payload.admin_orgs,
-        };
-      }
-    } catch {
-      return null;
-    }
-    return u;
   });
 
   const signOut = useCallback(async () => {
@@ -91,17 +38,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (e) {
       console.error("Failed to logout from server", e);
     }
-    setToken(null);
     setUser(null);
-    localStorage.removeItem("authToken");
     localStorage.removeItem("authUser");
   }, []);
-
-  useEffect(() => {
-    if (token) localStorage.setItem("authToken", token);
-    else localStorage.removeItem("authToken");
-    api.setToken(token);
-  }, [token]);
 
   useEffect(() => {
     if (user) {
@@ -114,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Setup global auth error handler
   useEffect(() => {
     const handleAuthError = () => {
-      // Clear invalid token and redirect to login
+      // Clear invalid session and redirect to login
       signOut();
     };
 
@@ -123,17 +62,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AuthContextValue>(
     () => ({
-      token,
+      token: null, // Token is now handled by cookies
       user,
-      isAuthenticated: Boolean(token && user),
-      signIn: (t, u) => {
+      isAuthenticated: Boolean(user),
+      signIn: (t: string | null | undefined, u: User) => {
+        // We still receive the token in signIn for backward compatibility
+        // and to extract additional info if needed, but we don't store it.
         try {
-          const payload = jwtDecode<TokenPayload>(t);
-          u.admin_orgs = payload.admin_orgs;
+          if (t) {
+            const payload = jwtDecode<TokenPayload>(t);
+            u.admin_orgs = payload.admin_orgs;
+          }
         } catch (e) {
           console.error("Failed to decode token", e);
         }
-        setToken(t);
         setUser(u);
       },
       refreshUser: async () => {
@@ -160,7 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       signOut,
     }),
-    [token, user, signOut],
+    [user, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

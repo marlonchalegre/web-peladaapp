@@ -31,25 +31,15 @@ export class ApiError extends Error {
 }
 
 export class ApiClient {
-  private token: string | null;
   private baseUrl: string;
   private onAuthError?: () => void;
 
   constructor(config?: ApiConfig) {
     this.baseUrl = config?.baseUrl ?? getBaseUrl();
-    // Initialize token early to avoid first-render race conditions
-    this.token =
-      typeof window !== "undefined"
-        ? localStorage.getItem("authToken") || null
-        : null;
   }
 
   get apiBaseUrl(): string {
     return this.baseUrl;
-  }
-
-  setToken(token: string | null) {
-    this.token = token;
   }
 
   setAuthErrorHandler(handler: () => void) {
@@ -57,11 +47,7 @@ export class ApiClient {
   }
 
   private headers(): HeadersInit {
-    const headers: HeadersInit = { "Content-Type": "application/json" };
-    // We still support header-based auth for flexibility/dev,
-    // but the backend will now prioritize the cookie if present.
-    if (this.token) headers["Authorization"] = `Token ${this.token}`;
-    return headers;
+    return { "Content-Type": "application/json" };
   }
 
   private async handleResponse<T>(res: Response): Promise<T> {
@@ -210,7 +196,7 @@ export class ApiClient {
 }
 
 export type LoginResponse = {
-  token: string;
+  token?: string;
   user: User;
 };
 

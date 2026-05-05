@@ -277,6 +277,7 @@ export default function AvailablePlayerItem({
             {hasFixedGoalkeepers && [
               <MenuItem
                 key="move-to-home-gk"
+                data-testid="move-to-home-gk-item"
                 onClick={() => {
                   onMoveToFixedGk?.(player.id, "home");
                   handleCloseMenu();
@@ -291,6 +292,7 @@ export default function AvailablePlayerItem({
               </MenuItem>,
               <MenuItem
                 key="move-to-away-gk"
+                data-testid="move-to-away-gk-item"
                 onClick={() => {
                   onMoveToFixedGk?.(player.id, "away");
                   handleCloseMenu();

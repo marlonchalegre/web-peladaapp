@@ -52,9 +52,7 @@ export const SecureAvatar: React.FC<SecureAvatarProps> = ({
       setLoading(true);
       try {
         const response = await fetch(cacheKey, {
-          headers: {
-            Authorization: `Token ${localStorage.getItem("authToken")}`,
-          },
+          credentials: "same-origin",
         });
 
         if (!response.ok) {

@@ -99,9 +99,7 @@ export default function UserProfilePage() {
       setAvatarFilename(result.avatar_filename);
 
       // Update AuthContext
-      if (token) {
-        signIn(token, { ...authUser, avatar_filename: result.avatar_filename });
-      }
+      signIn(token, { ...authUser, avatar_filename: result.avatar_filename });
       setSuccess(t("user.profile.success.avatar_updated"));
     } catch (err: unknown) {
       setError(
@@ -122,9 +120,7 @@ export default function UserProfilePage() {
       setAvatarFilename(null);
 
       // Update AuthContext
-      if (token) {
-        signIn(token, { ...authUser, avatar_filename: null });
-      }
+      signIn(token, { ...authUser, avatar_filename: null });
       setSuccess(t("user.profile.success.avatar_deleted"));
     } catch (err: unknown) {
       setError(
@@ -185,9 +181,7 @@ export default function UserProfilePage() {
       const updatedUser = await updateUserProfile(authUser.id, updates);
 
       // Update auth context with new user data
-      if (token) {
-        signIn(token, updatedUser);
-      }
+      signIn(token, updatedUser);
 
       setSuccess(t("user.profile.success.updated"));
       setPassword("");

@@ -23,48 +23,6 @@ describe("ApiClient", () => {
     vi.restoreAllMocks();
   });
 
-  describe("Authentication", () => {
-    it("includes Authorization header when token is set", async () => {
-      client.setToken("test-token");
-
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ data: "success" }),
-      });
-
-      await client.get("/api/test");
-
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining("/api/test"),
-        expect.objectContaining({
-          headers: expect.objectContaining({
-            Authorization: "Token test-token",
-          }),
-        }),
-      );
-    });
-
-    it("does not include Authorization header when token is null", async () => {
-      client.setToken(null);
-
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ data: "success" }),
-      });
-
-      await client.get("/auth/login");
-
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining("/auth/login"),
-        expect.objectContaining({
-          headers: expect.not.objectContaining({
-            Authorization: expect.anything(),
-          }),
-        }),
-      );
-    });
-  });
-
   describe("Error Handling", () => {
     it("throws ApiError with 401 status for unauthorized requests", async () => {
       mockFetch.mockResolvedValueOnce({
