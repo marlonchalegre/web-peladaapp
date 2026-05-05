@@ -75,8 +75,10 @@ export default function PeladaDetailHeader({
     <Box sx={{ mb: 4, pt: 1 }}>
       <Stack
         direction={{ xs: "column", lg: "row" }}
-        alignItems={{ xs: "stretch", lg: "center" }}
         spacing={2}
+        sx={{
+          alignItems: { xs: "stretch", lg: "center" },
+        }}
       >
         {pelada.status === "open" && isAdminOverride ? (
           <Paper
@@ -103,7 +105,13 @@ export default function PeladaDetailHeader({
             }}
           >
             {/* Players Per Team Stepper */}
-            <Stack direction="row" alignItems="center" spacing={1}>
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{
+                alignItems: "center",
+              }}
+            >
               <IconButton
                 size="small"
                 onClick={() => onUpdatePlayersPerTeam(playersPerTeam - 1)}
@@ -181,8 +189,10 @@ export default function PeladaDetailHeader({
             <Stack
               direction="row"
               spacing={{ xs: 1, sm: 1.5 }}
-              alignItems="center"
-              sx={{ flexShrink: 0 }}
+              sx={{
+                alignItems: "center",
+                flexShrink: 0,
+              }}
             >
               {/* Export/Copy Menu */}
               <Tooltip title={t("common.actions.export")}>
@@ -332,7 +342,6 @@ export default function PeladaDetailHeader({
                 {t("peladas.detail.button.view_matches")}
               </Button>
             )}
-
             {(votingInfo?.can_vote || pelada.is_admin) &&
               pelada.status !== "open" &&
               pelada.status !== "attendance" && (
@@ -356,7 +365,6 @@ export default function PeladaDetailHeader({
                       : t("peladas.detail.button.vote")}
                 </Button>
               )}
-
             {pelada.status === "closed" && !votingInfo?.can_vote && (
               <Button
                 component={RouterLink}
@@ -377,7 +385,6 @@ export default function PeladaDetailHeader({
           </Stack>
         )}
       </Stack>
-
       <Menu
         anchorEl={exportAnchor}
         open={Boolean(exportAnchor)}

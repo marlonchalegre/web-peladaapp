@@ -126,8 +126,11 @@ export default function AvailablePlayerItem({
         </Typography>
         <Typography
           variant="caption"
-          color="text.secondary"
-          sx={{ fontWeight: 500, fontSize: "0.7rem" }}
+          sx={{
+            color: "text.secondary",
+            fontWeight: 500,
+            fontSize: "0.7rem",
+          }}
         >
           {player.user.position
             ? t(`common.positions.${player.user.position.toLowerCase()}`)
@@ -253,9 +256,11 @@ export default function AvailablePlayerItem({
             onClose={handleCloseMenu}
             transformOrigin={{ horizontal: "left", vertical: "top" }}
             anchorOrigin={{ horizontal: "left", vertical: "bottom" }}
-            PaperProps={{
-              elevation: 3,
-              sx: { borderRadius: 2, minWidth: 180 },
+            slotProps={{
+              paper: {
+                elevation: 3,
+                sx: { borderRadius: 2, minWidth: 180 },
+              },
             }}
           >
             {teams.map((team) => (

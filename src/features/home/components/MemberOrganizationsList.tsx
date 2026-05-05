@@ -40,7 +40,6 @@ export default function MemberOrganizationsList({
           )}
         </Typography>
       </Box>
-
       {organizations.length === 0 ? (
         <Box
           sx={{
@@ -70,8 +69,10 @@ export default function MemberOrganizationsList({
           </Avatar>
           <Typography
             variant="body1"
-            color="text.secondary"
-            sx={{ maxWidth: 400 }}
+            sx={{
+              color: "text.secondary",
+              maxWidth: 400,
+            }}
           >
             {t(
               "home.sections.member_orgs.empty_desc",
@@ -151,11 +152,13 @@ export default function MemberOrganizationsList({
                         to={`/organizations/${org.id}`}
                         underline="hover"
                         variant="body2"
-                        fontWeight={600}
-                        color="text.primary"
                         onClick={(e) => e.stopPropagation()}
                         data-testid={`org-link-${org.name}`}
                         data-analytics-id="view-org-details-link"
+                        sx={{
+                          fontWeight: 600,
+                          color: "text.primary",
+                        }}
                       >
                         {org.name}
                       </Link>
@@ -163,7 +166,12 @@ export default function MemberOrganizationsList({
                   </TableCell>
                   <TableCell sx={{ py: 2.5 }}>
                     <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: "text.secondary",
+                        }}
+                      >
                         {t("common.roles.player", "Jogador")}
                       </Typography>
                     </Box>

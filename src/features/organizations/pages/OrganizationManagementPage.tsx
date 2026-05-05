@@ -167,7 +167,14 @@ export default function OrganizationManagementPage() {
           ]}
         />
 
-        <Typography variant="h4" gutterBottom fontWeight="bold" color="primary">
+        <Typography
+          variant="h4"
+          gutterBottom
+          color="primary"
+          sx={{
+            fontWeight: "bold",
+          }}
+        >
           {t("organizations.management.title", { name: org.name })}
         </Typography>
 
@@ -182,7 +189,6 @@ export default function OrganizationManagementPage() {
           </Alert>
         )}
       </Box>
-
       <Paper
         elevation={0}
         sx={{
@@ -299,7 +305,6 @@ export default function OrganizationManagementPage() {
           />
         </Tabs>
       </Paper>
-
       <Box sx={{ mt: 2 }}>
         <TabPanel value={activeTab} index="members">
           <MembersSection
@@ -371,7 +376,6 @@ export default function OrganizationManagementPage() {
           />
         </TabPanel>
       </Box>
-
       <DeleteOrganizationDialog
         open={isDeleteDialogOpen}
         orgName={org.name}
@@ -384,7 +388,6 @@ export default function OrganizationManagementPage() {
         onDelete={handleDeleteOrganization}
         actionLoading={actionLoading}
       />
-
       <AddPlayersDialog
         open={isAddPlayersOpen}
         selectedIds={selectedUserIds}
@@ -402,7 +405,6 @@ export default function OrganizationManagementPage() {
         onClose={() => setIsAddPlayersOpen(false)}
         excludeUserIds={new Set(players.map((p) => p.user_id))}
       />
-
       <InvitePlayerDialog
         open={isInviteOpen}
         onClose={() => setIsInviteOpen(false)}
@@ -414,7 +416,6 @@ export default function OrganizationManagementPage() {
         onResetPublicLink={() => setIsResetConfirmOpen(true)}
         loading={actionLoading}
       />
-
       <PrettyConfirmDialog
         open={isResetConfirmOpen}
         onClose={() => setIsResetConfirmOpen(false)}

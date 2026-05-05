@@ -275,7 +275,6 @@ export default function PeladaVotingPage() {
           ]}
         />
       </Box>
-
       <Box
         sx={{
           display: "flex",
@@ -285,7 +284,12 @@ export default function PeladaVotingPage() {
           mb: 2,
         }}
       >
-        <Typography variant="h4" fontWeight="bold">
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: "bold",
+          }}
+        >
           {t("peladas.voting.title", { id: peladaId })}
         </Typography>
         <Box sx={{ display: "flex", gap: 1 }}>
@@ -337,7 +341,6 @@ export default function PeladaVotingPage() {
           )}
         </Box>
       </Box>
-
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
@@ -348,13 +351,11 @@ export default function PeladaVotingPage() {
           {success}
         </Alert>
       )}
-
       {votingInfo?.has_voted && (
         <Alert severity="info" sx={{ mb: 2 }}>
           {t("peladas.voting.info.already_voted_view_change")}
         </Alert>
       )}
-
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 8 }}>
           <Alert severity="info" sx={{ mb: 3 }}>
@@ -385,7 +386,13 @@ export default function PeladaVotingPage() {
                   }}
                 >
                   <CardContent>
-                    <Grid container alignItems="center" spacing={2}>
+                    <Grid
+                      container
+                      spacing={2}
+                      sx={{
+                        alignItems: "center",
+                      }}
+                    >
                       <Grid size={{ xs: 12, sm: 6 }}>
                         <Box
                           sx={{
@@ -397,8 +404,9 @@ export default function PeladaVotingPage() {
                         >
                           <Typography
                             variant="h6"
-                            fontWeight="bold"
                             sx={{
+                              fontWeight: "bold",
+
                               color: pv.voting_enabled
                                 ? "text.primary"
                                 : "text.secondary",
@@ -424,10 +432,20 @@ export default function PeladaVotingPage() {
                           )}
                         </Box>
                         <Stack direction="row" spacing={2}>
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: "text.secondary",
+                            }}
+                          >
                             <strong>{t("common.goals")}:</strong> {pv.goals}
                           </Typography>
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: "text.secondary",
+                            }}
+                          >
                             <strong>{t("common.assists_short")}:</strong>{" "}
                             {pv.assists}
                           </Typography>
@@ -472,7 +490,9 @@ export default function PeladaVotingPage() {
                               <Typography
                                 variant="caption"
                                 color="primary"
-                                fontWeight="bold"
+                                sx={{
+                                  fontWeight: "bold",
+                                }}
                               >
                                 {pv.stars} {t("peladas.voting.stars")}
                               </Typography>
@@ -558,7 +578,13 @@ export default function PeladaVotingPage() {
 
         <Grid size={{ xs: 12, md: 4 }}>
           <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+            <Typography
+              variant="subtitle1"
+              gutterBottom
+              sx={{
+                fontWeight: "bold",
+              }}
+            >
               {t("peladas.voting.status.title")}
             </Typography>
             <Divider sx={{ mb: 2 }} />
@@ -566,10 +592,12 @@ export default function PeladaVotingPage() {
             <Box sx={{ mb: 3 }}>
               <Typography
                 variant="caption"
-                color="text.secondary"
-                fontWeight="bold"
-                display="block"
                 gutterBottom
+                sx={{
+                  color: "text.secondary",
+                  fontWeight: "bold",
+                  display: "block",
+                }}
               >
                 {t("peladas.voting.status.voted")} (
                 {votersByStatus.voted.length})
@@ -594,10 +622,12 @@ export default function PeladaVotingPage() {
             <Box>
               <Typography
                 variant="caption"
-                color="text.secondary"
-                fontWeight="bold"
-                display="block"
                 gutterBottom
+                sx={{
+                  color: "text.secondary",
+                  fontWeight: "bold",
+                  display: "block",
+                }}
               >
                 {t("peladas.voting.status.pending")} (
                 {votersByStatus.pending.length})
@@ -610,7 +640,9 @@ export default function PeladaVotingPage() {
                     </ListItemIcon>
                     <ListItemText
                       primary={v.name}
-                      primaryTypographyProps={{ color: "text.secondary" }}
+                      slotProps={{
+                        primary: { color: "text.secondary" },
+                      }}
                     />
                   </ListItem>
                 ))}
@@ -619,7 +651,6 @@ export default function PeladaVotingPage() {
           </Paper>
         </Grid>
       </Grid>
-
       <Snackbar
         open={!!success}
         autoHideDuration={6000}
@@ -635,7 +666,6 @@ export default function PeladaVotingPage() {
           {success}
         </Alert>
       </Snackbar>
-
       <Snackbar
         open={!!error && !!votingInfo}
         autoHideDuration={6000}
@@ -651,7 +681,6 @@ export default function PeladaVotingPage() {
           {error}
         </Alert>
       </Snackbar>
-
       <Dialog
         open={!!confirmToggle}
         onClose={() => setConfirmToggle(null)}

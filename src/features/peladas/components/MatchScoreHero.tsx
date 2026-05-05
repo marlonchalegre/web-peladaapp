@@ -81,14 +81,21 @@ export default function MatchScoreHero({
         mb: 2,
       }}
     >
-      <Stack spacing={2} alignItems="center">
+      <Stack
+        spacing={2}
+        sx={{
+          alignItems: "center",
+        }}
+      >
         {/* Score Row */}
         <Stack
           direction="row"
-          justifyContent="center"
-          alignItems="center"
           spacing={{ xs: 2, md: 4 }}
-          sx={{ width: "100%" }}
+          sx={{
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%",
+          }}
         >
           {/* Home Team Name */}
           <Typography
@@ -107,9 +114,11 @@ export default function MatchScoreHero({
 
           <Stack
             direction="row"
-            alignItems="center"
             spacing={2}
             data-testid="match-score-display"
+            sx={{
+              alignItems: "center",
+            }}
           >
             <Box sx={scoreBoxStyle(theme.palette.home.main)}>
               <Typography variant="h4" sx={{ fontWeight: "bold" }}>
@@ -119,8 +128,10 @@ export default function MatchScoreHero({
 
             <Typography
               variant="h5"
-              color="text.disabled"
-              sx={{ fontWeight: "bold" }}
+              sx={{
+                color: "text.disabled",
+                fontWeight: "bold",
+              }}
             >
               —
             </Typography>
@@ -164,11 +175,11 @@ export default function MatchScoreHero({
         {/* Controls Row */}
         <Stack
           direction="row"
-          alignItems="center"
-          justifyContent="center"
           spacing={{ xs: 1.5, sm: 3 }}
-          flexWrap="wrap"
           sx={{
+            alignItems: "center",
+            justifyContent: "center",
+            flexWrap: "wrap",
             width: "100%",
             pt: 1,
             borderTop: "1px solid",

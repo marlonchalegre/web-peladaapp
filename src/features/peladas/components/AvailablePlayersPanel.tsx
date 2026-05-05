@@ -112,13 +112,26 @@ export default function AvailablePlayersPanel({
       >
         <Stack
           direction={{ xs: "column", sm: "row" }}
-          justifyContent="space-between"
-          alignItems={{ xs: "stretch", sm: "center" }}
-          sx={{ mb: 2.5 }}
           spacing={2}
+          sx={{
+            justifyContent: "space-between",
+            alignItems: { xs: "stretch", sm: "center" },
+            mb: 2.5,
+          }}
         >
-          <Stack direction="row" spacing={1.5} alignItems="center">
-            <Typography variant="h6" fontWeight="800">
+          <Stack
+            direction="row"
+            spacing={1.5}
+            sx={{
+              alignItems: "center",
+            }}
+          >
+            <Typography
+              variant="h6"
+              sx={{
+                fontWeight: "800",
+              }}
+            >
               {t("peladas.available.title")}
             </Typography>
             <Box
@@ -232,9 +245,9 @@ export default function AvailablePlayersPanel({
             <Grid size={{ xs: 12 }}>
               <Typography
                 variant="body1"
-                color="text.disabled"
                 align="center"
                 sx={{
+                  color: "text.disabled",
                   py: 6,
                   border: "2px dashed",
                   borderColor: "divider",
@@ -250,9 +263,11 @@ export default function AvailablePlayersPanel({
             <Grid size={{ xs: 12 }}>
               <Typography
                 variant="body2"
-                color="text.disabled"
                 align="center"
-                sx={{ py: 4 }}
+                sx={{
+                  color: "text.disabled",
+                  py: 4,
+                }}
               >
                 {t("peladas.available.no_players_found")}
               </Typography>
@@ -260,7 +275,6 @@ export default function AvailablePlayersPanel({
           )}
         </Grid>
       </Paper>
-
       <AddPlayersFromOrgDialog
         open={addDialogOpen}
         onClose={() => setAddDialogOpen(false)}

@@ -38,7 +38,9 @@ export default function StartPeladaDialog({
           variant="outlined"
           value={matchesPerTeam}
           onChange={(e) => onMatchesChange(e.target.value)}
-          inputProps={{ min: 1 }}
+          slotProps={{
+            htmlInput: { min: 1 },
+          }}
         />
       </DialogContent>
       <DialogActions>

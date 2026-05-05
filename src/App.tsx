@@ -159,7 +159,12 @@ function Footer() {
         textAlign: "center",
       }}
     >
-      <Typography variant="body2" color="text.secondary">
+      <Typography
+        variant="body2"
+        sx={{
+          color: "text.secondary",
+        }}
+      >
         {t("app.version", { version })}
       </Typography>
     </Box>
@@ -295,7 +300,7 @@ function AppLayout() {
                     onClick={handleCloseUserMenu}
                     data-testid="profile-menu-item"
                   >
-                    <Typography textAlign="center">
+                    <Typography align="center">
                       {t("navigation.profile")}
                     </Typography>
                   </MenuItem>
@@ -303,9 +308,7 @@ function AppLayout() {
                     onClick={handleLogout}
                     data-testid="logout-menu-item"
                   >
-                    <Typography textAlign="center">
-                      {t("auth.logout")}
-                    </Typography>
+                    <Typography align="center">{t("auth.logout")}</Typography>
                   </MenuItem>
                 </Menu>
               </Box>
@@ -373,8 +376,7 @@ function AppLayout() {
             </Suspense>
           </PullToRefresh>
         </Box>
-        <Footer />
-        <PWAInstallPrompt />
+        <Footer /> <PWAInstallPrompt />
       </Box>
     </>
   );

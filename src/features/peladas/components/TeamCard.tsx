@@ -11,7 +11,7 @@ import {
   ListItemText,
   Tooltip,
 } from "@mui/material";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import SportsScoreIcon from "@mui/icons-material/SportsScore";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
@@ -173,11 +173,10 @@ export default function TeamCard({
               "&:hover": { color: "error.main", bgcolor: "error.lighter" },
             }}
           >
-            <DeleteOutlineIcon fontSize="small" />
+            <DeleteOutlinedIcon fontSize="small" />
           </IconButton>
         )}
       </Box>
-
       {/* Player List */}
       <Stack spacing={1} sx={{ p: 2, flexGrow: 1 }}>
         {sortedPlayers.map((p) => {
@@ -226,7 +225,13 @@ export default function TeamCard({
                 </IconButton>
               )}
               <Box sx={{ flexGrow: 1 }}>
-                <Stack direction="row" spacing={1} alignItems="center">
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  sx={{
+                    alignItems: "center",
+                  }}
+                >
                   <Typography
                     variant="body2"
                     sx={{ fontWeight: 700, color: "text.primary" }}
@@ -236,15 +241,25 @@ export default function TeamCard({
                 </Stack>
                 <Typography
                   variant="caption"
-                  color="text.secondary"
-                  sx={{ fontSize: "0.7rem", display: "block", fontWeight: 500 }}
+                  sx={{
+                    color: "text.secondary",
+                    fontSize: "0.7rem",
+                    display: "block",
+                    fontWeight: 500,
+                  }}
                 >
                   {p.user?.position
                     ? t(`common.positions.${p.user.position.toLowerCase()}`)
                     : t("common.positions.unknown")}
                 </Typography>
               </Box>
-              <Stack direction="row" spacing={0.5} alignItems="center">
+              <Stack
+                direction="row"
+                spacing={0.5}
+                sx={{
+                  alignItems: "center",
+                }}
+              >
                 {(p.member_type === "diarista" ||
                   p.member_type === "convidado") &&
                   (() => {
@@ -375,7 +390,6 @@ export default function TeamCard({
             </Box>
           ))}
       </Stack>
-
       <Menu
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}
@@ -383,9 +397,11 @@ export default function TeamCard({
         onClick={handleCloseMenu}
         transformOrigin={{ horizontal: "left", vertical: "top" }}
         anchorOrigin={{ horizontal: "left", vertical: "bottom" }}
-        PaperProps={{
-          elevation: 3,
-          sx: { borderRadius: 2, minWidth: 180 },
+        slotProps={{
+          paper: {
+            elevation: 3,
+            sx: { borderRadius: 2, minWidth: 180 },
+          },
         }}
       >
         {teams

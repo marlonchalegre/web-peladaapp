@@ -56,7 +56,7 @@ export default function LoginPage() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "100vh",
+        minHeight: "100%",
         backgroundColor: "background.default",
       }}
     >
@@ -66,12 +66,7 @@ export default function LoginPage() {
       >
         <form onSubmit={onSubmit}>
           <Stack spacing={2}>
-            <Typography
-              variant="h5"
-              component="h1"
-              textAlign="center"
-              gutterBottom
-            >
+            <Typography variant="h5" component="h1" align="center" gutterBottom>
               {t("auth.login.title")}
             </Typography>
             {error && <Alert severity="error">{error}</Alert>}
@@ -86,7 +81,9 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               fullWidth
-              inputProps={{ "data-testid": "login-email" }}
+              slotProps={{
+                htmlInput: { "data-testid": "login-email" },
+              }}
             />
             <TextField
               id="password"
@@ -97,7 +94,9 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               fullWidth
-              inputProps={{ "data-testid": "login-password" }}
+              slotProps={{
+                htmlInput: { "data-testid": "login-password" },
+              }}
             />
             <Button
               type="submit"
@@ -111,7 +110,7 @@ export default function LoginPage() {
                 ? t("auth.login.button.loading")
                 : t("auth.login.button.submit")}
             </Button>
-            <Typography variant="body2" textAlign="center">
+            <Typography variant="body2" align="center">
               {t("auth.login.link.new_user")}{" "}
               <MLink
                 href={`/register${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`}
@@ -121,7 +120,7 @@ export default function LoginPage() {
                 {t("auth.login.link.register")}
               </MLink>
             </Typography>
-            <Typography variant="body2" textAlign="center">
+            <Typography variant="body2" align="center">
               <MLink
                 href={`/forgot-password${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`}
                 underline="hover"

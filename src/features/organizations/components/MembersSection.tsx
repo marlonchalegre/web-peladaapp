@@ -8,7 +8,6 @@ import {
   List,
   ListItem,
   ListItemText,
-  ListItemSecondaryAction,
   IconButton,
   TextField,
   InputAdornment,
@@ -93,7 +92,12 @@ export default function MembersSection({
           mb: 2,
         }}
       >
-        <Typography variant="h5" fontWeight="bold">
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: "bold",
+          }}
+        >
           {t("organizations.management.sections.members")}
         </Typography>
         <Box sx={{ display: "flex", gap: 1 }}>
@@ -144,7 +148,6 @@ export default function MembersSection({
         </Box>
       </Box>
       <Divider sx={{ mb: 2 }} />
-
       <Box sx={{ mb: 2 }}>
         <TextField
           fullWidth
@@ -156,21 +159,25 @@ export default function MembersSection({
             setSearchTerm(e.target.value);
             onPageChange(0);
           }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon color="action" />
-              </InputAdornment>
-            ),
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon color="action" />
+                </InputAdornment>
+              ),
+            },
           }}
         />
       </Box>
-
       <List>
         {paginatedPlayers.length === 0 ? (
           <Typography
-            color="text.secondary"
-            sx={{ py: 2, textAlign: "center" }}
+            sx={{
+              color: "text.secondary",
+              py: 2,
+              textAlign: "center",
+            }}
           >
             {t("organizations.list.empty")}
           </Typography>
@@ -182,7 +189,7 @@ export default function MembersSection({
               : "common.positions.unknown";
 
             return (
-              <ListItem key={player.id} divider sx={{ px: 0 }}>
+              <ListItem key={player.id} divider sx={{ px: 0, pr: { xs: 1, sm: 4 }, alignItems: 'center' }}>
                 <ListItemAvatar>
                   {(user?.avatar_filename ?? player.user_avatar_filename) ? (
                     <SecureAvatar
@@ -190,14 +197,14 @@ export default function MembersSection({
                       filename={
                         user?.avatar_filename ?? player.user_avatar_filename
                       }
-                      sx={{ width: 40, height: 40 }}
+                      sx={{ width: { xs: 36, sm: 40 }, height: { xs: 36, sm: 40 } }}
                       fallbackText={(
                         (user?.name ?? player.user_name ?? "").charAt(0) || ""
                       ).toUpperCase()}
                     />
                   ) : (
                     <Avatar
-                      sx={{ width: 40, height: 40, bgcolor: "primary.dark" }}
+                      sx={{ width: { xs: 36, sm: 40 }, height: { xs: 36, sm: 40 }, bgcolor: "primary.dark" }}
                     >
                       {(
                         (user?.name ?? player.user_name ?? "").charAt(0) || ""
@@ -207,19 +214,27 @@ export default function MembersSection({
                 </ListItemAvatar>
                 <ListItemText
                   primary={
-                    <Typography fontWeight="medium">
+                    <Typography
+                      sx={{
+                        fontWeight: "medium",
+                      }}
+                      noWrap
+                    >
                       {user?.name || `User #${player.user_id}`}
                     </Typography>
                   }
-                  secondary={t(positionKey)}
+                  secondary={
+                    <Typography noWrap sx={{ color: "text.secondary" }}>
+                      {t(positionKey)}
+                    </Typography>
+                  }
+                  sx={{ flex: 1, minWidth: 0 }}
                 />
-                <ListItemSecondaryAction
-                  sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                   <FormControl
                     size="small"
                     variant="standard"
-                    sx={{ minWidth: 120 }}
+                    sx={{ minWidth: { xs: 64, sm: 120 }, width: { xs: 64, sm: 'auto' } }}
                   >
                     <Select
                       value={player.member_type || "convidado"}
@@ -233,7 +248,7 @@ export default function MembersSection({
                       }
                       disabled={actionLoading}
                       disableUnderline
-                      sx={{ fontSize: "0.875rem" }}
+                      sx={{ fontSize: "0.85rem", width: '100%' }}
                       data-testid={`member-type-select-${player.id}`}
                     >
                       <MenuItem value="convidado">
@@ -265,13 +280,12 @@ export default function MembersSection({
                   >
                     <DeleteIcon />
                   </IconButton>
-                </ListItemSecondaryAction>
+                </Box>
               </ListItem>
             );
           })
         )}
       </List>
-
       {filteredPlayers.length > 0 && (
         <TablePagination
           component="div"
@@ -282,6 +296,21 @@ export default function MembersSection({
           onRowsPerPageChange={handleChangeRowsPerPage}
           rowsPerPageOptions={[5, 10, 25]}
           labelRowsPerPage={t("common.pagination.rows_per_page")}
+          sx={{
+            width: "100%",
+            px: { xs: 1, sm: 0 },
+            '.MuiTablePagination-toolbar': {
+              px: { xs: 0, sm: 1 },
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            },
+            '.MuiTablePagination-actions': {
+              mr: 0,
+              transform: { xs: 'translateX(-6px)', sm: 'translateX(0)' },
+              pr: { xs: 0, sm: 0 },
+            },
+          }}
         />
       )}
     </Paper>

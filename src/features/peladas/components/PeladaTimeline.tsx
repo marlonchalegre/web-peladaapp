@@ -7,7 +7,7 @@ import TimelineContent from "@mui/lab/TimelineContent";
 import TimelineDot from "@mui/lab/TimelineDot";
 import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
+import ErrorOutlinedIcon from "@mui/icons-material/ErrorOutlined";
 import StarsIcon from "@mui/icons-material/Stars";
 import { useTranslation } from "react-i18next";
 import type { MatchEvent } from "../../../shared/api/endpoints";
@@ -47,7 +47,7 @@ export default function PeladaTimeline({
       case "goal":
         return <SportsSoccerIcon fontSize="small" />;
       case "own_goal":
-        return <ErrorOutlineIcon fontSize="small" color="error" />;
+        return <ErrorOutlinedIcon fontSize="small" color="error" />;
       case "assist":
         return <StarsIcon fontSize="small" color="info" />;
       default:
@@ -65,7 +65,11 @@ export default function PeladaTimeline({
   if (events.length === 0) {
     return (
       <Box sx={{ p: 4, textAlign: "center" }}>
-        <Typography color="text.secondary">
+        <Typography
+          sx={{
+            color: "text.secondary",
+          }}
+        >
           {t("peladas.timeline.no_events")}
         </Typography>
       </Box>
@@ -81,16 +85,16 @@ export default function PeladaTimeline({
         return (
           <TimelineItem key={event.id || index}>
             <TimelineOppositeContent
+              align="right"
+              variant="body2"
               sx={{
+                color: "text.secondary",
                 m: "auto 0",
                 flex: 0.2,
                 minWidth: 80,
                 textAlign: "right",
                 px: 1,
               }}
-              align="right"
-              variant="body2"
-              color="text.secondary"
             >
               <Typography
                 variant="caption"
@@ -98,7 +102,12 @@ export default function PeladaTimeline({
               >
                 {formatMs(event.session_time_ms)}
               </Typography>
-              <Typography variant="caption" color="text.disabled">
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "text.disabled",
+                }}
+              >
                 {t("peladas.timeline.match_short")}{" "}
                 {formatMs(event.match_time_ms)}
               </Typography>
@@ -115,7 +124,6 @@ export default function PeladaTimeline({
             <TimelineContent sx={{ py: "12px", px: 2 }}>
               <Typography
                 variant="body1"
-                component="span"
                 sx={{ fontWeight: isGoal ? "bold" : "normal" }}
               >
                 {event.event_type === "own_goal"

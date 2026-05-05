@@ -103,13 +103,24 @@ export default function PlayerRatingsContent({
 
   return (
     <Box>
-      <Typography variant="h5" gutterBottom fontWeight="bold">
+      <Typography
+        variant="h5"
+        gutterBottom
+        sx={{
+          fontWeight: "bold",
+        }}
+      >
         {t("organizations.ratings.title", { name: orgName })}
       </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+      <Typography
+        variant="body1"
+        sx={{
+          color: "text.secondary",
+          mb: 3,
+        }}
+      >
         {t("organizations.ratings.subtitle")}
       </Typography>
-
       <Box sx={{ mb: 3 }}>
         <TextField
           fullWidth
@@ -120,16 +131,17 @@ export default function PlayerRatingsContent({
             setSearchTerm(e.target.value);
             setPage(0);
           }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon color="action" />
-              </InputAdornment>
-            ),
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon color="action" />
+                </InputAdornment>
+              ),
+            },
           }}
         />
       </Box>
-
       <TableContainer component={Paper} variant="outlined">
         <Table>
           <TableHead>
@@ -149,7 +161,11 @@ export default function PlayerRatingsContent({
             {paginatedPlayers.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={3} align="center" sx={{ py: 4 }}>
-                  <Typography color="text.secondary">
+                  <Typography
+                    sx={{
+                      color: "text.secondary",
+                    }}
+                  >
                     {t("organizations.list.empty")}
                   </Typography>
                 </TableCell>
@@ -159,10 +175,20 @@ export default function PlayerRatingsContent({
                 <TableRow key={player.id} hover>
                   <TableCell>
                     <Box sx={{ display: "flex", flexDirection: "column" }}>
-                      <Typography variant="subtitle1" fontWeight="medium">
+                      <Typography
+                        variant="subtitle1"
+                        sx={{
+                          fontWeight: "medium",
+                        }}
+                      >
                         {player.user_name}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: "text.secondary",
+                        }}
+                      >
                         @{player.user_username}
                       </Typography>
                     </Box>
@@ -171,7 +197,6 @@ export default function PlayerRatingsContent({
                     <TextField
                       type="number"
                       size="small"
-                      inputProps={{ min: 0, max: 10, step: 0.5 }}
                       value={player.grade || 0}
                       onChange={(e) => {
                         const val = parseFloat(e.target.value);
@@ -181,14 +206,19 @@ export default function PlayerRatingsContent({
                       }}
                       data-testid={`rating-input-${player.id}`}
                       sx={{ width: 80 }}
+                      slotProps={{
+                        htmlInput: { min: 0, max: 10, step: 0.5 },
+                      }}
                     />
                   </TableCell>
                   <TableCell align="right">
                     <Typography
                       variant="body2"
-                      fontWeight="bold"
                       color="primary"
                       data-testid={`grade-${player.id}`}
+                      sx={{
+                        fontWeight: "bold",
+                      }}
                     >
                       {player.grade ? player.grade.toFixed(1) : "-"}
                     </Typography>
@@ -209,7 +239,6 @@ export default function PlayerRatingsContent({
           labelRowsPerPage={t("common.pagination.rows_per_page")}
         />
       </TableContainer>
-
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}

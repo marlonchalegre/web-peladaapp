@@ -49,7 +49,6 @@ export default function StatInput({
       >
         <RemoveIcon fontSize="small" />
       </IconButton>
-
       <Box
         sx={{
           width: 32,
@@ -68,14 +67,15 @@ export default function StatInput({
         ) : (
           <Typography
             variant="body2"
-            fontWeight="bold"
             data-testid={testIdPrefix ? `${testIdPrefix}-value` : undefined}
+            sx={{
+              fontWeight: "bold",
+            }}
           >
             {value}
           </Typography>
         )}
       </Box>
-
       <IconButton
         size="small"
         onClick={() => onChange(1)}

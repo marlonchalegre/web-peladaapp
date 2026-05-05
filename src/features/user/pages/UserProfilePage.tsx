@@ -223,9 +223,12 @@ export default function UserProfilePage() {
 
   return (
     <Box
-      maxWidth={600}
-      mx="auto"
-      sx={{ py: { xs: 2, sm: 4 }, px: { xs: 0, sm: 2 } }}
+      sx={{
+        maxWidth: 600,
+        mx: "auto",
+        py: { xs: 2, sm: 4 },
+        px: { xs: 0, sm: 2 },
+      }}
     >
       <Box sx={{ px: { xs: 1.5, sm: 0 } }}>
         <BreadcrumbNav items={[{ label: t("navigation.profile") }]} />
@@ -235,7 +238,13 @@ export default function UserProfilePage() {
           <Typography variant="h4" gutterBottom>
             {t("user.profile.title")}
           </Typography>
-          <Typography variant="body2" color="text.secondary" gutterBottom>
+          <Typography
+            variant="body2"
+            gutterBottom
+            sx={{
+              color: "text.secondary",
+            }}
+          >
             {t("user.profile.subtitle")}
           </Typography>
         </Box>
@@ -252,9 +261,12 @@ export default function UserProfilePage() {
         >
           <Typography
             variant="subtitle2"
-            color="text.secondary"
             gutterBottom
-            sx={{ alignSelf: "flex-start", mb: 2 }}
+            sx={{
+              color: "text.secondary",
+              alignSelf: "flex-start",
+              mb: 2,
+            }}
           >
             {t("user.profile.section.change_avatar")}
           </Typography>
@@ -342,7 +354,9 @@ export default function UserProfilePage() {
               required
               fullWidth
               disabled={loading}
-              inputProps={{ "data-testid": "profile-name" }}
+              slotProps={{
+                htmlInput: { "data-testid": "profile-name" },
+              }}
             />
 
             <TextField
@@ -354,7 +368,9 @@ export default function UserProfilePage() {
               required
               fullWidth
               disabled={loading}
-              inputProps={{ "data-testid": "profile-username" }}
+              slotProps={{
+                htmlInput: { "data-testid": "profile-username" },
+              }}
             />
 
             <TextField
@@ -366,7 +382,9 @@ export default function UserProfilePage() {
               onChange={(e) => setEmail(e.target.value)}
               fullWidth
               disabled={loading}
-              inputProps={{ "data-testid": "profile-email" }}
+              slotProps={{
+                htmlInput: { "data-testid": "profile-email" },
+              }}
             />
 
             <PhoneInput
@@ -420,7 +438,12 @@ export default function UserProfilePage() {
             </FormControl>
 
             <Divider sx={{ my: 2 }}>
-              <Typography variant="caption" color="text.secondary">
+              <Typography
+                variant="caption"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {t("user.profile.section.change_password")}
               </Typography>
             </Divider>
@@ -435,7 +458,9 @@ export default function UserProfilePage() {
               fullWidth
               disabled={loading}
               helperText={t("user.profile.hint.password")}
-              inputProps={{ "data-testid": "profile-new-password" }}
+              slotProps={{
+                htmlInput: { "data-testid": "profile-new-password" },
+              }}
             />
 
             <TextField
@@ -447,10 +472,18 @@ export default function UserProfilePage() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               fullWidth
               disabled={loading || !password}
-              inputProps={{ "data-testid": "profile-confirm-password" }}
+              slotProps={{
+                htmlInput: { "data-testid": "profile-confirm-password" },
+              }}
             />
 
-            <Box display="flex" gap={2} justifyContent="flex-end">
+            <Box
+              sx={{
+                display: "flex",
+                gap: 2,
+                justifyContent: "flex-end",
+              }}
+            >
               <Button
                 variant="outlined"
                 onClick={() => navigate("/home")}
@@ -493,7 +526,6 @@ export default function UserProfilePage() {
           {t("user.profile.button.delete_account")}
         </Button>
       </Paper>
-
       <Dialog
         open={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}

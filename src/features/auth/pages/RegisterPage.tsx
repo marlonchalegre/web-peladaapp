@@ -74,7 +74,7 @@ export default function RegisterPage() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "100vh",
+        minHeight: "100%",
         backgroundColor: "background.default",
       }}
     >
@@ -84,12 +84,7 @@ export default function RegisterPage() {
       >
         <form onSubmit={onSubmit}>
           <Stack spacing={2}>
-            <Typography
-              variant="h5"
-              component="h1"
-              textAlign="center"
-              gutterBottom
-            >
+            <Typography variant="h5" component="h1" align="center" gutterBottom>
               {t("auth.register.title")}
             </Typography>
             {error && <Alert severity="error">{error}</Alert>}
@@ -102,7 +97,9 @@ export default function RegisterPage() {
               required
               fullWidth
               autoFocus
-              inputProps={{ "data-testid": "register-name" }}
+              slotProps={{
+                htmlInput: { "data-testid": "register-name" },
+              }}
             />
             <TextField
               id="username"
@@ -112,7 +109,9 @@ export default function RegisterPage() {
               onChange={(e) => setUsername(e.target.value)}
               required
               fullWidth
-              inputProps={{ "data-testid": "register-username" }}
+              slotProps={{
+                htmlInput: { "data-testid": "register-username" },
+              }}
             />
             <TextField
               id="email"
@@ -124,7 +123,9 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               fullWidth
-              inputProps={{ "data-testid": "register-email" }}
+              slotProps={{
+                htmlInput: { "data-testid": "register-email" },
+              }}
             />
             <PhoneInput
               id="phone"
@@ -145,7 +146,9 @@ export default function RegisterPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               fullWidth
-              inputProps={{ "data-testid": "register-password" }}
+              slotProps={{
+                htmlInput: { "data-testid": "register-password" },
+              }}
             />
             <TextField
               id="position"
@@ -180,7 +183,7 @@ export default function RegisterPage() {
                 ? t("auth.register.button.loading")
                 : t("auth.register.button.submit")}
             </Button>
-            <Typography variant="body2" textAlign="center">
+            <Typography variant="body2" align="center">
               {t("auth.register.link.existing_user")}{" "}
               <MLink
                 href={`/login${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`}

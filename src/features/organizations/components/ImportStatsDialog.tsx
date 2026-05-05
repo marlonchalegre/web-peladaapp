@@ -24,8 +24,8 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import ErrorOutlinedIcon from "@mui/icons-material/ErrorOutlined";
+import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useTranslation } from "react-i18next";
 import { type Player } from "../../../shared/api/endpoints";
@@ -265,7 +265,13 @@ export default function ImportStatsDialog({
       <DialogTitle>{t("organizations.stats.import.title")}</DialogTitle>
       <DialogContent sx={{ minHeight: "400px" }}>
         <Box sx={{ mb: 3, mt: 1 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.secondary",
+              mb: 2,
+            }}
+          >
             {t("organizations.stats.import.description")}
           </Typography>
 
@@ -291,7 +297,9 @@ export default function ImportStatsDialog({
                   </ListItemIcon>
                   <ListItemText
                     primary={text}
-                    primaryTypographyProps={{ variant: "caption" }}
+                    slotProps={{
+                      primary: { variant: "caption" },
+                    }}
                   />
                 </ListItem>
               ))}
@@ -377,13 +385,13 @@ export default function ImportStatsDialog({
                                 "organizations.stats.import.player_not_found",
                               )}
                             >
-                              <ErrorOutlineIcon
+                              <ErrorOutlinedIcon
                                 color="error"
                                 fontSize="small"
                               />
                             </Tooltip>
                           ) : (
-                            <CheckCircleOutlineIcon
+                            <CheckCircleOutlinedIcon
                               color="success"
                               fontSize="small"
                             />
@@ -427,13 +435,17 @@ export default function ImportStatsDialog({
                                 variant="standard"
                                 error={row.notFound}
                                 placeholder={t("common.player")}
-                                inputProps={{
-                                  ...params.inputProps,
-                                  "data-testid": `player-autocomplete-input-${index}`,
-                                }}
                                 sx={{
                                   "& .MuiInput-root": {
                                     fontSize: "0.875rem",
+                                  },
+                                }}
+                                slotProps={{
+                                  ...params.slotProps,
+
+                                  htmlInput: {
+                                    ...params.slotProps.htmlInput,
+                                    "data-testid": `player-autocomplete-input-${index}`,
                                   },
                                 }}
                               />

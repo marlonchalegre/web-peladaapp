@@ -110,14 +110,18 @@ export default function MatchReportSummary({
       <Stack
         direction="row"
         spacing={1}
-        alignItems="center"
-        sx={{ minHeight: 24 }}
+        sx={{
+          alignItems: "center",
+          minHeight: 24,
+        }}
       >
         {h.goals > 0 && (
           <Stack
             direction="row"
-            alignItems="center"
-            sx={{ color: "success.main" }}
+            sx={{
+              alignItems: "center",
+              color: "success.main",
+            }}
           >
             <SportsSoccerIcon sx={{ fontSize: 18 }} />
             {h.goals > 1 && (
@@ -133,8 +137,10 @@ export default function MatchReportSummary({
         {h.assists > 0 && (
           <Stack
             direction="row"
-            alignItems="center"
-            sx={{ color: "info.main" }}
+            sx={{
+              alignItems: "center",
+              color: "info.main",
+            }}
           >
             <AssistWalkerIcon sx={{ fontSize: 18 }} />
             {h.assists > 1 && (
@@ -150,8 +156,10 @@ export default function MatchReportSummary({
         {h.ownGoals > 0 && (
           <Stack
             direction="row"
-            alignItems="center"
-            sx={{ color: "error.main" }}
+            sx={{
+              alignItems: "center",
+              color: "error.main",
+            }}
           >
             <GavelIcon sx={{ fontSize: 18 }} />
             {h.ownGoals > 1 && (
@@ -171,10 +179,12 @@ export default function MatchReportSummary({
       <Stack
         direction="row"
         spacing={1.5}
-        alignItems="center"
-        justifyContent={align === "left" ? "flex-start" : "flex-end"}
         key={h.playerId}
-        sx={{ width: "100%" }}
+        sx={{
+          alignItems: "center",
+          justifyContent: align === "left" ? "flex-start" : "flex-end",
+          width: "100%",
+        }}
       >
         {align === "right" && icons}
         <Typography
@@ -199,8 +209,10 @@ export default function MatchReportSummary({
       onClose={onClose}
       maxWidth="sm"
       fullWidth
-      PaperProps={{
-        sx: { borderRadius: 4, p: 1 },
+      slotProps={{
+        paper: {
+          sx: { borderRadius: 4, p: 1 },
+        },
       }}
     >
       <Box sx={{ position: "absolute", right: 8, top: 8 }}>
@@ -208,15 +220,23 @@ export default function MatchReportSummary({
           <CloseIcon />
         </IconButton>
       </Box>
-
       <DialogContent>
-        <Stack spacing={4} alignItems="center" sx={{ py: 2 }}>
+        <Stack
+          spacing={4}
+          sx={{
+            alignItems: "center",
+            py: 2,
+          }}
+        >
           {/* Header */}
           <Box sx={{ textAlign: "center" }}>
             <Typography
               variant="overline"
-              color="text.secondary"
-              sx={{ fontWeight: "bold", letterSpacing: 2 }}
+              sx={{
+                color: "text.secondary",
+                fontWeight: "bold",
+                letterSpacing: 2,
+              }}
             >
               {t("peladas.dashboard.summary.title", { seq: match.sequence })}
             </Typography>
@@ -276,9 +296,14 @@ export default function MatchReportSummary({
           <Box sx={{ width: "100%" }} data-testid="match-summary-highlights">
             <Typography
               variant="subtitle2"
-              color="text.secondary"
               gutterBottom
-              sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}
+              sx={{
+                color: "text.secondary",
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                mb: 2,
+              }}
             >
               <SportsSoccerIcon fontSize="small" />
               {t("peladas.dashboard.summary.highlights")}
@@ -288,7 +313,12 @@ export default function MatchReportSummary({
                 <Stack spacing={1}>
                   {homeHighlights.map((h) => renderHighlightItem(h, "left"))}
                   {homeHighlights.length === 0 && (
-                    <Typography variant="body2" color="text.disabled">
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: "text.disabled",
+                      }}
+                    >
                       -
                     </Typography>
                   )}
@@ -300,8 +330,10 @@ export default function MatchReportSummary({
                   {awayHighlights.length === 0 && (
                     <Typography
                       variant="body2"
-                      color="text.disabled"
-                      sx={{ textAlign: "right" }}
+                      sx={{
+                        color: "text.disabled",
+                        textAlign: "right",
+                      }}
                     >
                       -
                     </Typography>
@@ -327,18 +359,23 @@ export default function MatchReportSummary({
             >
               <Typography
                 variant="caption"
-                color="text.secondary"
-                display="block"
                 gutterBottom
-                sx={{ fontWeight: "bold", textTransform: "uppercase" }}
+                sx={{
+                  color: "text.secondary",
+                  display: "block",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                }}
               >
                 {t("peladas.dashboard.summary.next_up")}
               </Typography>
               <Stack
                 direction="row"
                 spacing={1}
-                alignItems="center"
-                justifyContent="center"
+                sx={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
               >
                 <Typography
                   variant="body1"
@@ -362,7 +399,12 @@ export default function MatchReportSummary({
                   />
                   {nextHomeName}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "text.secondary",
+                  }}
+                >
                   vs
                 </Typography>
                 <Typography
@@ -390,10 +432,12 @@ export default function MatchReportSummary({
               </Stack>
               <Typography
                 variant="caption"
-                color="text.secondary"
-                display="block"
-                textAlign="center"
-                sx={{ mt: 1 }}
+                align="center"
+                sx={{
+                  color: "text.secondary",
+                  display: "block",
+                  mt: 1,
+                }}
               >
                 {t("peladas.dashboard.summary.next_match_desc", {
                   seq: nextMatch.sequence,

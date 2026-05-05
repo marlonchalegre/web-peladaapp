@@ -82,7 +82,13 @@ export default function TeamsSection(props: TeamsSectionProps) {
           mb: 3,
         }}
       >
-        <Stack direction="row" spacing={1.5} alignItems="center">
+        <Stack
+          direction="row"
+          spacing={1.5}
+          sx={{
+            alignItems: "center",
+          }}
+        >
           <Box
             sx={{
               width: 32,
@@ -105,7 +111,6 @@ export default function TeamsSection(props: TeamsSectionProps) {
           </Typography>
         </Stack>
       </Box>
-
       <Box sx={{ position: "relative", mt: 2 }}>
         {creatingTeam && (
           <Box
@@ -126,7 +131,13 @@ export default function TeamsSection(props: TeamsSectionProps) {
             <CircularProgress />
           </Box>
         )}
-        <Grid container spacing={3} alignItems="stretch">
+        <Grid
+          container
+          spacing={3}
+          sx={{
+            alignItems: "stretch",
+          }}
+        >
           {teams.map((t) => {
             const players = teamPlayers[t.id] || [];
 

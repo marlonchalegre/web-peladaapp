@@ -33,10 +33,20 @@ export default function PendingInvitations({ invitations, onAccept }: Props) {
               }}
             >
               <Box>
-                <Typography variant="subtitle1" fontWeight="bold">
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: "bold",
+                  }}
+                >
                   {inv.organization_name}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: "text.secondary",
+                  }}
+                >
                   {t(
                     "home.sections.pending_invitations.invited_to_join",
                     "Você foi convidado para participar desta organização.",

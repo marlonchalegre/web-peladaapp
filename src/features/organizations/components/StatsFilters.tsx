@@ -65,11 +65,22 @@ export default function StatsFilters({
         onClick={() => setExpanded(!expanded)}
         data-testid="filters-header"
       >
-        <Typography variant="h5" fontWeight="bold">
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: "bold",
+          }}
+        >
           {t("common.filters")}
         </Typography>
 
-        <Stack direction="row" spacing={2} alignItems="center">
+        <Stack
+          direction="row"
+          spacing={2}
+          sx={{
+            alignItems: "center",
+          }}
+        >
           {!isMobile && (
             <FormControl size="small" sx={{ minWidth: 100 }}>
               <InputLabel id="year-select-label">{t("common.year")}</InputLabel>
@@ -101,7 +112,6 @@ export default function StatsFilters({
           </IconButton>
         </Stack>
       </Box>
-
       <Collapse in={expanded}>
         <Stack spacing={2}>
           {isMobile && (
@@ -128,7 +138,9 @@ export default function StatsFilters({
           <Stack
             direction={isMobile ? "column" : "row"}
             spacing={2}
-            alignItems={isMobile ? "stretch" : "center"}
+            sx={{
+              alignItems: isMobile ? "stretch" : "center",
+            }}
           >
             <TextField
               placeholder={t("common.fields.player_name")}

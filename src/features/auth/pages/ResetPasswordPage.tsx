@@ -70,7 +70,7 @@ export default function ResetPasswordPage() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          minHeight: "100vh",
+          minHeight: "100%",
           backgroundColor: "background.default",
         }}
       >
@@ -92,7 +92,7 @@ export default function ResetPasswordPage() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "100vh",
+        minHeight: "100%",
         backgroundColor: "background.default",
       }}
     >
@@ -102,18 +102,15 @@ export default function ResetPasswordPage() {
       >
         <form onSubmit={onSubmit}>
           <Stack spacing={2}>
-            <Typography
-              variant="h5"
-              component="h1"
-              textAlign="center"
-              gutterBottom
-            >
+            <Typography variant="h5" component="h1" align="center" gutterBottom>
               {t("auth.reset_password.title")}
             </Typography>
             <Typography
               variant="body2"
-              color="text.secondary"
-              textAlign="center"
+              align="center"
+              sx={{
+                color: "text.secondary",
+              }}
             >
               {t("auth.reset_password.description")}
             </Typography>
@@ -133,7 +130,9 @@ export default function ResetPasswordPage() {
               required
               fullWidth
               disabled={success}
-              inputProps={{ "data-testid": "reset-password-input" }}
+              slotProps={{
+                htmlInput: { "data-testid": "reset-password-input" },
+              }}
             />
             <TextField
               id="confirm-password"
@@ -144,7 +143,9 @@ export default function ResetPasswordPage() {
               required
               fullWidth
               disabled={success}
-              inputProps={{ "data-testid": "reset-password-confirm" }}
+              slotProps={{
+                htmlInput: { "data-testid": "reset-password-confirm" },
+              }}
             />
             <Button
               type="submit"

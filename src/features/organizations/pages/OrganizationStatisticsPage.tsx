@@ -101,7 +101,6 @@ export default function OrganizationStatisticsPage() {
           ]}
         />
       </Box>
-
       <Box
         sx={{
           display: "flex",
@@ -113,7 +112,12 @@ export default function OrganizationStatisticsPage() {
           px: { xs: 1, sm: 0 },
         }}
       >
-        <Typography variant={isMobile ? "h5" : "h4"} fontWeight="bold">
+        <Typography
+          variant={isMobile ? "h5" : "h4"}
+          sx={{
+            fontWeight: "bold",
+          }}
+        >
           {t("organizations.stats.title", { name: org.name })}
         </Typography>
 
@@ -167,9 +171,7 @@ export default function OrganizationStatisticsPage() {
           </Button>
         </Stack>
       </Box>
-
       <TopStatsCards stats={stats} />
-
       <StatsFilters
         nameFilter={nameFilter}
         onNameFilterChange={setNameFilter}
@@ -183,14 +185,12 @@ export default function OrganizationStatisticsPage() {
         onYearChange={setYear}
         years={years}
       />
-
       <StatsTable
         stats={sortedStats}
         orderBy={orderBy}
         order={order}
         onSort={handleRequestSort}
       />
-
       <ImportStatsDialog
         open={importOpen}
         onClose={() => setImportOpen(false)}
@@ -198,7 +198,6 @@ export default function OrganizationStatisticsPage() {
         players={players}
         defaultYear={year}
       />
-
       <ExportStatsDialog
         open={exportOpen}
         onClose={() => setExportOpen(false)}

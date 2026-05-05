@@ -207,13 +207,14 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
                       component="span"
                       sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
                     >
-                      <Typography component="span" sx={{ fontSize: "1.2rem" }}>
+                      <Typography sx={{ fontSize: "1.2rem" }}>
                         {country?.flag}
                       </Typography>
                       <Typography
-                        component="span"
                         variant="body2"
-                        color="text.secondary"
+                        sx={{
+                          color: "text.secondary",
+                        }}
                       >
                         {country?.prefix}
                       </Typography>
@@ -237,7 +238,12 @@ export const PhoneInput: React.FC<PhoneInputProps> = ({
                       <Typography variant="body2" sx={{ flexGrow: 1 }}>
                         {country.name}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: "text.secondary",
+                        }}
+                      >
                         {country.prefix}
                       </Typography>
                     </Box>

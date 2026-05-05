@@ -92,7 +92,16 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
   }, [handleTouchMove, handleTouchEnd]);
 
   return (
-    <Box ref={containerRef} sx={{ position: "relative", minHeight: "100%" }}>
+    <Box
+      ref={containerRef}
+      sx={{
+        position: "relative",
+        minHeight: "100%",
+        display: "flex",
+        flexDirection: "column",
+        flexGrow: 1,
+      }}
+    >
       <Box
         sx={{
           position: "absolute",
@@ -134,6 +143,9 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
         sx={{
           transform: `translateY(${isRefreshing ? pullThreshold / 2 : pullDistance / 2}px)`,
           transition: isPulling ? "none" : "transform 0.3s ease",
+          display: "flex",
+          flexDirection: "column",
+          flexGrow: 1,
         }}
       >
         {children}

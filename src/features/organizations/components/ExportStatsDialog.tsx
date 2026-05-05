@@ -81,7 +81,13 @@ export default function ExportStatsDialog({
     <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
       <DialogTitle>{t("organizations.stats.export.dialog_title")}</DialogTitle>
       <DialogContent>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        <Typography
+          variant="body2"
+          sx={{
+            color: "text.secondary",
+            mb: 2,
+          }}
+        >
           {t("organizations.stats.export.description")}
         </Typography>
         <FormGroup>

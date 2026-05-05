@@ -80,10 +80,24 @@ export const getTheme = (mode: PaletteMode) =>
     components: {
       MuiCssBaseline: {
         styleOverrides: (theme) => ({
+          html: {
+            height: "100%",
+            margin: 0,
+            padding: 0,
+          },
           body: {
+            height: "100%",
             backgroundColor: theme.palette.background.default,
             color: theme.palette.text.primary,
             transition: "background-color 0.3s ease, color 0.3s ease",
+            overflowY: "auto",
+            overflowX: "hidden",
+            WebkitOverflowScrolling: "touch",
+          },
+          "#root": {
+            minHeight: "100%",
+            display: "flex",
+            flexDirection: "column",
           },
           ".droppable": {
             border: "2px dashed transparent",

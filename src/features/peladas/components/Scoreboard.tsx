@@ -40,28 +40,55 @@ export default function Scoreboard({
         </Typography>
         <Stack
           direction="row"
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{ mt: 1, px: 4 }}
+          sx={{
+            justifyContent: "space-between",
+            alignItems: "center",
+            mt: 1,
+            px: 4,
+          }}
         >
-          <Stack alignItems="center">
+          <Stack
+            sx={{
+              alignItems: "center",
+            }}
+          >
             <Typography variant="overline" sx={{ opacity: 0.9, lineHeight: 1 }}>
               HOME
             </Typography>
-            <Typography variant="h5" fontWeight="bold">
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: "bold",
+              }}
+            >
               {homeTeamName}
             </Typography>
           </Stack>
 
-          <Typography variant="h3" fontWeight="bold" sx={{ px: 2 }}>
+          <Typography
+            variant="h3"
+            sx={{
+              fontWeight: "bold",
+              px: 2,
+            }}
+          >
             {homeScore ?? 0} x {awayScore ?? 0}
           </Typography>
 
-          <Stack alignItems="center">
+          <Stack
+            sx={{
+              alignItems: "center",
+            }}
+          >
             <Typography variant="overline" sx={{ opacity: 0.9, lineHeight: 1 }}>
               AWAY
             </Typography>
-            <Typography variant="h5" fontWeight="bold">
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: "bold",
+              }}
+            >
               {awayTeamName}
             </Typography>
           </Stack>

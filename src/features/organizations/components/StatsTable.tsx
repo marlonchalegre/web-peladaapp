@@ -102,8 +102,10 @@ const StatBar = ({
           )}
           <Typography
             variant="body2"
-            fontWeight="medium"
-            sx={{ color: "text.primary" }}
+            sx={{
+              fontWeight: "medium",
+              color: "text.primary",
+            }}
           >
             {value}
           </Typography>
@@ -127,7 +129,11 @@ export default function StatsTable({
   if (stats.length === 0) {
     return (
       <Paper sx={{ p: 4, textAlign: "center", borderRadius: 4 }}>
-        <Typography color="text.secondary">
+        <Typography
+          sx={{
+            color: "text.secondary",
+          }}
+        >
           {t("organizations.stats.empty")}
         </Typography>
       </Paper>
@@ -147,8 +153,10 @@ export default function StatsTable({
             <Stack
               direction="row"
               spacing={2}
-              alignItems="center"
-              sx={{ mb: 2 }}
+              sx={{
+                alignItems: "center",
+                mb: 2,
+              }}
             >
               <SecureAvatar
                 userId={row.user_id}
@@ -160,11 +168,21 @@ export default function StatsTable({
                 }}
               />
               <Box>
-                <Typography variant="subtitle1" fontWeight="bold">
+                <Typography
+                  variant="subtitle1"
+                  sx={{
+                    fontWeight: "bold",
+                  }}
+                >
                   {row.player_name}
                 </Typography>
                 {row.player_position && (
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "text.secondary",
+                    }}
+                  >
                     {t(
                       `common.positions.${row.player_position.toLowerCase()}`,
                       { defaultValue: row.player_position },
@@ -178,8 +196,11 @@ export default function StatsTable({
               <Box>
                 <Typography
                   variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "block", mb: 0.5 }}
+                  sx={{
+                    color: "text.secondary",
+                    display: "block",
+                    mb: 0.5,
+                  }}
                 >
                   {t("organizations.stats.table.peladas")}
                 </Typography>
@@ -189,8 +210,11 @@ export default function StatsTable({
               <Box>
                 <Typography
                   variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "block", mb: 0.5 }}
+                  sx={{
+                    color: "text.secondary",
+                    display: "block",
+                    mb: 0.5,
+                  }}
                 >
                   {t("common.goals")}
                 </Typography>
@@ -204,8 +228,11 @@ export default function StatsTable({
               <Box>
                 <Typography
                   variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "block", mb: 0.5 }}
+                  sx={{
+                    color: "text.secondary",
+                    display: "block",
+                    mb: 0.5,
+                  }}
                 >
                   {t("common.assists")}
                 </Typography>
@@ -297,7 +324,13 @@ export default function StatsTable({
           {stats.map((row) => (
             <TableRow key={row.player_id} hover>
               <TableCell>
-                <Stack direction="row" spacing={2} alignItems="center">
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  sx={{
+                    alignItems: "center",
+                  }}
+                >
                   <SecureAvatar
                     userId={row.user_id}
                     filename={row.avatar_filename}
@@ -308,7 +341,12 @@ export default function StatsTable({
                     }}
                   />
                   <Box>
-                    <Typography variant="body1" fontWeight="bold">
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        fontWeight: "bold",
+                      }}
+                    >
                       {row.player_name}
                     </Typography>
                     {row.player_position && (

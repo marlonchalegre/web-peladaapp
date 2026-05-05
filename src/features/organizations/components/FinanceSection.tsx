@@ -79,17 +79,25 @@ const SummaryCard = ({
           alignItems: "center",
         }}
       >
-        <Typography color="text.secondary" gutterBottom variant="overline">
+        <Typography
+          gutterBottom
+          variant="overline"
+          sx={{
+            color: "text.secondary",
+          }}
+        >
           {title}
         </Typography>
         {icon}
       </Box>
       <Typography
         variant="h5"
-        fontWeight="bold"
         color={color}
         data-testid={`${testId}-value`}
         data-amount={value}
+        sx={{
+          fontWeight: "bold",
+        }}
       >
         {new Intl.NumberFormat("pt-BR", {
           style: "currency",
@@ -334,10 +342,15 @@ export default function FinanceSection({
 
   return (
     <Paper variant="outlined" sx={{ p: { xs: 2, sm: 3 } }}>
-      <Typography variant="h5" fontWeight="bold" gutterBottom>
+      <Typography
+        variant="h5"
+        gutterBottom
+        sx={{
+          fontWeight: "bold",
+        }}
+      >
         {t("organizations.management.finance.title")}
       </Typography>
-
       {error && (
         <Alert
           severity="error"
@@ -348,7 +361,6 @@ export default function FinanceSection({
           {error}
         </Alert>
       )}
-
       {success && (
         <Alert
           severity="success"
@@ -359,7 +371,6 @@ export default function FinanceSection({
           {success}
         </Alert>
       )}
-
       {/* Summary Section */}
       <Grid container spacing={2} sx={{ mb: 4 }}>
         <Grid size={{ xs: 12, sm: 4 }}>
@@ -397,7 +408,6 @@ export default function FinanceSection({
           />
         </Grid>
       </Grid>
-
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
         <Tabs
           value={activeTab}
@@ -420,7 +430,6 @@ export default function FinanceSection({
           )}
         </Tabs>
       </Box>
-
       {/* Monthly Fees Tab */}
       {activeTab === 0 && (
         <Box data-testid="finance-panel-monthly">
@@ -434,10 +443,12 @@ export default function FinanceSection({
               onChange={(e) => setSelectedMonth(Number(e.target.value))}
               size="small"
               sx={{ minWidth: 120 }}
-              SelectProps={{
-                SelectDisplayProps: {
-                  "data-testid": "month-select",
-                } as React.HTMLAttributes<HTMLDivElement>,
+              slotProps={{
+                select: {
+                  SelectDisplayProps: {
+                    "data-testid": "month-select",
+                  } as React.HTMLAttributes<HTMLDivElement>,
+                },
               }}
             >
               {Array.from({ length: 12 }, (_, i) => (
@@ -459,10 +470,12 @@ export default function FinanceSection({
               onChange={(e) => setSelectedYear(Number(e.target.value))}
               size="small"
               sx={{ minWidth: 100 }}
-              SelectProps={{
-                SelectDisplayProps: {
-                  "data-testid": "year-select",
-                } as React.HTMLAttributes<HTMLDivElement>,
+              slotProps={{
+                select: {
+                  SelectDisplayProps: {
+                    "data-testid": "year-select",
+                  } as React.HTMLAttributes<HTMLDivElement>,
+                },
               }}
             >
               {[2024, 2025, 2026, 2027].map((y) => (
@@ -546,7 +559,6 @@ export default function FinanceSection({
           </TableContainer>
         </Box>
       )}
-
       {/* Transactions Tab */}
       {activeTab === 1 && (
         <Box data-testid="finance-panel-transactions">
@@ -641,7 +653,12 @@ export default function FinanceSection({
                             tx.status === "reversed" ? "line-through" : "none",
                         }}
                       >
-                        <Typography variant="body2" fontWeight="medium">
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontWeight: "medium",
+                          }}
+                        >
                           {tx.description}
                           {tx.status === "reversed" &&
                             ` (${t("organizations.management.finance.transactions.reversed")})`}
@@ -649,8 +666,10 @@ export default function FinanceSection({
                         {tx.player_name && (
                           <Typography
                             variant="caption"
-                            display="block"
-                            color="text.secondary"
+                            sx={{
+                              display: "block",
+                              color: "text.secondary",
+                            }}
                           >
                             {t(
                               "organizations.management.finance.transactions.player",
@@ -661,9 +680,11 @@ export default function FinanceSection({
                         {tx.creator_name && (
                           <Typography
                             variant="caption"
-                            display="block"
-                            color="primary.main"
-                            sx={{ fontStyle: "italic" }}
+                            sx={{
+                              display: "block",
+                              color: "primary.main",
+                              fontStyle: "italic",
+                            }}
                           >
                             {t(
                               "organizations.management.finance.transactions.recorded_by",
@@ -685,7 +706,6 @@ export default function FinanceSection({
                       </TableCell>
                       <TableCell align="right">
                         <Typography
-                          fontWeight="bold"
                           color={
                             tx.status === "reversed"
                               ? "text.disabled"
@@ -695,6 +715,8 @@ export default function FinanceSection({
                           }
                           data-testid="transaction-amount"
                           sx={{
+                            fontWeight: "bold",
+
                             textDecoration:
                               tx.status === "reversed"
                                 ? "line-through"
@@ -747,7 +769,6 @@ export default function FinanceSection({
           />
         </Box>
       )}
-
       {/* Config Tab */}
       {activeTab === 2 && finance && isAdmin && (
         <Box sx={{ maxWidth: 400 }} data-testid="finance-panel-config">
@@ -760,14 +781,17 @@ export default function FinanceSection({
                 )}
                 value={mensalistaPriceStr}
                 onChange={(e) => setMensalistaPriceStr(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      {finance.currency}
-                    </InputAdornment>
-                  ),
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        {finance.currency}
+                      </InputAdornment>
+                    ),
+                  },
+
+                  htmlInput: { "data-testid": "mensalista-price-input" },
                 }}
-                inputProps={{ "data-testid": "mensalista-price-input" }}
               />
             </Grid>
             <Grid size={12}>
@@ -778,14 +802,17 @@ export default function FinanceSection({
                 )}
                 value={diaristaPriceStr}
                 onChange={(e) => setDiaristaPriceStr(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      {finance.currency}
-                    </InputAdornment>
-                  ),
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        {finance.currency}
+                      </InputAdornment>
+                    ),
+                  },
+
+                  htmlInput: { "data-testid": "diarista-price-input" },
                 }}
-                inputProps={{ "data-testid": "diarista-price-input" }}
               />
             </Grid>
             <Grid size={12}>
@@ -797,10 +824,12 @@ export default function FinanceSection({
                 onChange={(e) =>
                   setFinance({ ...finance, currency: e.target.value })
                 }
-                SelectProps={{
-                  SelectDisplayProps: {
-                    "data-testid": "currency-select",
-                  } as React.HTMLAttributes<HTMLDivElement>,
+                slotProps={{
+                  select: {
+                    SelectDisplayProps: {
+                      "data-testid": "currency-select",
+                    } as React.HTMLAttributes<HTMLDivElement>,
+                  },
                 }}
               >
                 <MenuItem value="BRL" data-testid="currency-option-BRL">
@@ -827,7 +856,6 @@ export default function FinanceSection({
           </Grid>
         </Box>
       )}
-
       {/* Add Transaction Dialog */}
       <Dialog
         open={isTxDialogOpen}
@@ -852,10 +880,12 @@ export default function FinanceSection({
                   type: e.target.value as "income" | "expense",
                 })
               }
-              SelectProps={{
-                SelectDisplayProps: {
-                  "data-testid": "tx-type-select",
-                } as React.HTMLAttributes<HTMLDivElement>,
+              slotProps={{
+                select: {
+                  SelectDisplayProps: {
+                    "data-testid": "tx-type-select",
+                  } as React.HTMLAttributes<HTMLDivElement>,
+                },
               }}
             >
               <MenuItem value="income" data-testid="tx-type-income">
@@ -874,7 +904,9 @@ export default function FinanceSection({
               label={t("organizations.management.finance.transactions.amount")}
               value={txAmountStr}
               onChange={(e) => setTxAmountStr(e.target.value)}
-              inputProps={{ "data-testid": "tx-amount-input" }}
+              slotProps={{
+                htmlInput: { "data-testid": "tx-amount-input" },
+              }}
             />
             <TextField
               select
@@ -884,10 +916,12 @@ export default function FinanceSection({
               )}
               value={newTx.category}
               onChange={(e) => setNewTx({ ...newTx, category: e.target.value })}
-              SelectProps={{
-                SelectDisplayProps: {
-                  "data-testid": "tx-category-select",
-                } as React.HTMLAttributes<HTMLDivElement>,
+              slotProps={{
+                select: {
+                  SelectDisplayProps: {
+                    "data-testid": "tx-category-select",
+                  } as React.HTMLAttributes<HTMLDivElement>,
+                },
               }}
             >
               {(
@@ -915,7 +949,9 @@ export default function FinanceSection({
               onChange={(e) =>
                 setNewTx({ ...newTx, description: e.target.value })
               }
-              inputProps={{ "data-testid": "tx-description-input" }}
+              slotProps={{
+                htmlInput: { "data-testid": "tx-description-input" },
+              }}
             />
             <TextField
               fullWidth
@@ -925,8 +961,10 @@ export default function FinanceSection({
               onChange={(e) =>
                 setNewTx({ ...newTx, payment_date: e.target.value })
               }
-              InputLabelProps={{ shrink: true }}
-              inputProps={{ "data-testid": "tx-date-input" }}
+              slotProps={{
+                htmlInput: { "data-testid": "tx-date-input" },
+                inputLabel: { shrink: true },
+              }}
             />
           </Box>
         </DialogContent>
@@ -944,7 +982,6 @@ export default function FinanceSection({
           </Button>
         </DialogActions>
       </Dialog>
-
       <PrettyConfirmDialog
         open={confirmReverseOpen}
         onClose={() => {

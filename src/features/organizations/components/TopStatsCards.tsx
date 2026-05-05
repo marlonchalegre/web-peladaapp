@@ -70,12 +70,20 @@ const StatCard = ({
           <Box>
             <Typography
               variant="h6"
-              fontWeight="bold"
-              sx={{ mb: 0.5, color: "text.primary" }}
+              sx={{
+                fontWeight: "bold",
+                mb: 0.5,
+                color: "text.primary",
+              }}
             >
               {title}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+              }}
+            >
               {subtitle}
             </Typography>
           </Box>
@@ -84,7 +92,13 @@ const StatCard = ({
           </Box>
         </Box>
 
-        <Stack direction="row" spacing={2} alignItems="center">
+        <Stack
+          direction="row"
+          spacing={2}
+          sx={{
+            alignItems: "center",
+          }}
+        >
           <SecureAvatar
             userId={userId}
             filename={avatarFilename}
@@ -106,20 +120,29 @@ const StatCard = ({
           <Box>
             <Typography
               variant="subtitle1"
-              fontWeight="bold"
-              sx={{ color: "text.primary" }}
+              sx={{
+                fontWeight: "bold",
+                color: "text.primary",
+              }}
             >
               {playerName}
             </Typography>
             <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.5 }}>
               <Typography
                 variant="h5"
-                fontWeight="bold"
-                sx={{ color: "text.primary" }}
+                sx={{
+                  fontWeight: "bold",
+                  color: "text.primary",
+                }}
               >
                 {value}
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {unit}
               </Typography>
             </Box>

@@ -44,7 +44,6 @@ export default function PeladasList({
           {t("home.sections.peladas.title", "Minhas Peladas")}
         </Typography>
       </Box>
-
       <Paper
         elevation={0}
         sx={{
@@ -100,7 +99,11 @@ export default function PeladasList({
             {peladas.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} align="center" sx={{ py: 4 }}>
-                  <Typography color="text.secondary">
+                  <Typography
+                    sx={{
+                      color: "text.secondary",
+                    }}
+                  >
                     {t(
                       "home.sections.peladas.empty",
                       "Nenhuma pelada encontrada.",
@@ -175,13 +178,15 @@ export default function PeladasList({
                     <TableCell sx={{ py: 2.5 }}>
                       <Typography
                         variant="body2"
-                        fontWeight={500}
-                        color="text.primary"
+                        sx={{
+                          fontWeight: 500,
+                          color: "text.primary",
+                        }}
                       >
                         {pelada.organization_name || pelada.organization_id}
                       </Typography>
                     </TableCell>
-                    <TableCell sx={{ py: 2.5 }}>
+                    <TableCell sx={{ py: 2.5, width: { xs: '120px', sm: '160px' }, px: { xs: 2, sm: 3 }, textAlign: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       <Chip
                         label={t(
                           `pelada.status.${pelada.status}`,
@@ -194,17 +199,25 @@ export default function PeladasList({
                           fontWeight: 500,
                           borderRadius: 1,
                           height: "auto",
+                          maxWidth: { xs: 80, sm: 140 },
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          display: "inline-block",
+                          mx: "auto",
                           "& .MuiChip-label": {
                             display: "block",
-                            whiteSpace: "normal",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
                             textAlign: "center",
                             py: 0.5,
                             px: 1,
+                            fontSize: { xs: "0.72rem", sm: "0.875rem" },
                           },
                         }}
                       />
                     </TableCell>
-                    <TableCell sx={{ py: 2.5 }}>
+                    <TableCell sx={{ py: 2.5, width: { xs: '24px', sm: '40px' }, textAlign: 'center' }}>
                       <ChevronRightIcon sx={{ color: "grey.300" }} />
                     </TableCell>
                   </TableRow>

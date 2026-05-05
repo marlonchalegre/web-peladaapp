@@ -87,7 +87,7 @@ export default function FirstAccessPage() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "100vh",
+        minHeight: "100%",
         backgroundColor: "background.default",
       }}
     >
@@ -97,18 +97,15 @@ export default function FirstAccessPage() {
       >
         <form onSubmit={onSubmit}>
           <Stack spacing={2}>
-            <Typography
-              variant="h5"
-              component="h1"
-              textAlign="center"
-              gutterBottom
-            >
+            <Typography variant="h5" component="h1" align="center" gutterBottom>
               {t("auth.first_access.title")}
             </Typography>
             <Typography
               variant="body2"
-              color="text.secondary"
-              textAlign="center"
+              align="center"
+              sx={{
+                color: "text.secondary",
+              }}
             >
               {t("auth.first_access.description")}
             </Typography>
@@ -123,7 +120,9 @@ export default function FirstAccessPage() {
               required
               fullWidth
               disabled={!!searchParams.get("email") && email.includes("@")}
-              inputProps={{ "data-testid": "first-access-email" }}
+              slotProps={{
+                htmlInput: { "data-testid": "first-access-email" },
+              }}
             />
             <TextField
               id="username"
@@ -133,7 +132,9 @@ export default function FirstAccessPage() {
               onChange={(e) => setUsername(e.target.value)}
               required
               fullWidth
-              inputProps={{ "data-testid": "first-access-username" }}
+              slotProps={{
+                htmlInput: { "data-testid": "first-access-username" },
+              }}
             />
             <TextField
               id="name"
@@ -144,7 +145,9 @@ export default function FirstAccessPage() {
               required
               fullWidth
               autoFocus
-              inputProps={{ "data-testid": "first-access-name" }}
+              slotProps={{
+                htmlInput: { "data-testid": "first-access-name" },
+              }}
             />
             <PhoneInput
               id="phone"
@@ -165,7 +168,9 @@ export default function FirstAccessPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               fullWidth
-              inputProps={{ "data-testid": "first-access-password" }}
+              slotProps={{
+                htmlInput: { "data-testid": "first-access-password" },
+              }}
             />
             <TextField
               id="position"
@@ -200,7 +205,7 @@ export default function FirstAccessPage() {
                 ? t("auth.first_access.button.loading")
                 : t("auth.first_access.button.submit")}
             </Button>
-            <Typography variant="body2" textAlign="center">
+            <Typography variant="body2" align="center">
               <MLink
                 href={`/login${searchParams.get("redirect") ? `?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : ""}`}
                 underline="hover"

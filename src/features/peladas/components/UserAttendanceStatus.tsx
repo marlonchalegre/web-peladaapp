@@ -64,9 +64,11 @@ export default function UserAttendanceStatus({
     >
       <Stack
         direction={{ xs: "column", md: "row" }}
-        justifyContent="space-between"
-        alignItems={{ xs: "flex-start", md: "center" }}
-        gap={3}
+        sx={{
+          justifyContent: "space-between",
+          alignItems: { xs: "flex-start", md: "center" },
+          gap: 3,
+        }}
       >
         <Box>
           <Typography

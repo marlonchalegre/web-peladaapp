@@ -116,22 +116,29 @@ export default function PlayerAttendanceCard({
             <Stack
               direction="row"
               spacing={1}
-              alignItems="center"
-              sx={{ flexWrap: "wrap" }}
+              sx={{
+                alignItems: "center",
+                flexWrap: "wrap",
+              }}
             >
               {isCurrentUser && (
                 <Typography
                   variant="caption"
-                  color="primary.main"
-                  sx={{ fontWeight: "bold" }}
+                  sx={{
+                    color: "primary.main",
+                    fontWeight: "bold",
+                  }}
                 >
                   {t("common.you")}
                 </Typography>
               )}
               <Typography
                 variant="caption"
-                color="text.secondary"
-                sx={{ display: "flex", alignItems: "center" }}
+                sx={{
+                  color: "text.secondary",
+                  display: "flex",
+                  alignItems: "center",
+                }}
               >
                 {isCurrentUser && " • "}
                 {t(
@@ -143,8 +150,11 @@ export default function PlayerAttendanceCard({
               {player.member_type && (
                 <Typography
                   variant="caption"
-                  color="text.secondary"
-                  sx={{ display: "flex", alignItems: "center" }}
+                  sx={{
+                    color: "text.secondary",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
                 >
                   • {t(`common.member_types.${player.member_type}`)}
                 </Typography>
@@ -153,7 +163,13 @@ export default function PlayerAttendanceCard({
           </Box>
         </Box>
 
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack
+          direction="row"
+          spacing={1}
+          sx={{
+            alignItems: "center",
+          }}
+        >
           {needsPayment &&
             (isPaid ? (
               <Tooltip

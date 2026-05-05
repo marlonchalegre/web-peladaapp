@@ -81,10 +81,22 @@ export default function InvitePlayerDialog({
         {!invitedUser ? (
           <Stack spacing={3} sx={{ mt: 1 }}>
             <Box>
-              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+              <Typography
+                variant="subtitle1"
+                gutterBottom
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
                 {t("organizations.dialog.invite_player.personal_invite")}
               </Typography>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
+              <Typography
+                variant="body2"
+                gutterBottom
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {t("organizations.dialog.invite_player.description")}
               </Typography>
               <Stack spacing={1.5}>
@@ -97,7 +109,9 @@ export default function InvitePlayerDialog({
                   onChange={(e) => setHandle(e.target.value)}
                   disabled={loading}
                   autoFocus
-                  inputProps={{ "data-testid": "invite-email-input" }}
+                  slotProps={{
+                    htmlInput: { "data-testid": "invite-email-input" },
+                  }}
                 />
                 <Button
                   onClick={handleInvite}
@@ -114,10 +128,22 @@ export default function InvitePlayerDialog({
             <Divider />
 
             <Box>
-              <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+              <Typography
+                variant="subtitle1"
+                gutterBottom
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
                 {t("organizations.dialog.invite_player.public_link")}
               </Typography>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
+              <Typography
+                variant="body2"
+                gutterBottom
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
                 {t(
                   "organizations.dialog.invite_player.public_link_description",
                 )}
