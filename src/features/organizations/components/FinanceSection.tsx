@@ -108,6 +108,19 @@ const SummaryCard = ({
   </Card>
 );
 
+const calculateMonthlyFine = (
+  year: number,
+  month: number,
+  paymentDate: string,
+  fineAmount: number,
+  cutOffDay: number,
+): number => {
+  const [pYear, pMonth, pDay] = paymentDate.split("-").map(Number);
+  const payment = new Date(pYear, pMonth - 1, pDay, 0, 0, 0);
+  const deadline = new Date(year, month - 1, cutOffDay, 23, 59, 59);
+  return payment > deadline ? fineAmount : 0.0;
+};
+
 export default function FinanceSection({
   orgId,
   isAdmin = false,
@@ -139,6 +152,8 @@ export default function FinanceSection({
   // Local string states for inputs to allow typing decimals smoothly
   const [mensalistaPriceStr, setMensalistaPriceStr] = useState("0");
   const [diaristaPriceStr, setDiaristaPriceStr] = useState("0");
+  const [monthlyFineAmountStr, setMonthlyFineAmountStr] = useState("0");
+  const [monthlyCutOffDay, setMonthlyCutOffDay] = useState(5);
 
   // Filters for monthly payments
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
@@ -174,6 +189,8 @@ export default function FinanceSection({
         setFinance(financeRes);
         setMensalistaPriceStr(String(financeRes.mensalista_price));
         setDiaristaPriceStr(String(financeRes.diarista_price));
+        setMonthlyFineAmountStr(String(financeRes.monthly_fine_amount || 0));
+        setMonthlyCutOffDay(financeRes.monthly_cut_off_day || 5);
       }
       setTransactions(txData.data);
       setTotalTransactions(txData.total);
@@ -214,6 +231,8 @@ export default function FinanceSection({
         ...finance,
         mensalista_price: parseFloat(mensalistaPriceStr.replace(",", ".")),
         diarista_price: parseFloat(diaristaPriceStr.replace(",", ".")),
+        monthly_fine_amount: parseFloat(monthlyFineAmountStr.replace(",", ".")),
+        monthly_cut_off_day: monthlyCutOffDay,
       };
       await api.updateOrganizationFinance(orgId, payload);
       setSuccess(t("organizations.management.finance.config.success"));
@@ -266,13 +285,23 @@ export default function FinanceSection({
 
     try {
       setSuccess(null);
+      const paymentDate = new Date().toISOString().split("T")[0];
+      const baseAmount = parseFloat(mensalistaPriceStr.replace(",", "."));
+      const fine = calculateMonthlyFine(
+        selectedYear,
+        selectedMonth,
+        paymentDate,
+        parseFloat(monthlyFineAmountStr.replace(",", ".")),
+        monthlyCutOffDay,
+      );
+
       await api.markMonthlyPayment(orgId, {
         player_id: player.player_id,
         year: selectedYear,
         month: selectedMonth,
         paid: true,
-        amount: parseFloat(mensalistaPriceStr.replace(",", ".")),
-        payment_date: new Date().toISOString().split("T")[0],
+        amount: baseAmount + fine,
+        payment_date: paymentDate,
       });
       setSuccess(t("organizations.management.finance.monthly_fees.success"));
       await fetchData();
@@ -493,6 +522,12 @@ export default function FinanceSection({
                   <TableCell>
                     {t("organizations.management.finance.monthly_fees.player")}
                   </TableCell>
+                  <TableCell align="right">
+                    {t(
+                      "organizations.management.finance.monthly_fees.amount",
+                      "Valor",
+                    )}
+                  </TableCell>
                   <TableCell align="center">
                     {t("organizations.management.finance.monthly_fees.status")}
                   </TableCell>
@@ -510,6 +545,45 @@ export default function FinanceSection({
                     data-testid={`monthly-payment-row-${mp.player_id}`}
                   >
                     <TableCell>{mp.player_name}</TableCell>
+                    <TableCell align="right">
+                      {(() => {
+                        const baseAmount = parseFloat(
+                          mensalistaPriceStr.replace(",", "."),
+                        );
+                        const fine = calculateMonthlyFine(
+                          selectedYear,
+                          selectedMonth,
+                          new Date().toISOString().split("T")[0],
+                          parseFloat(monthlyFineAmountStr.replace(",", ".")),
+                          monthlyCutOffDay,
+                        );
+                        const total = baseAmount + fine;
+                        return (
+                          <Box>
+                            <Typography variant="body2">
+                              {new Intl.NumberFormat("pt-BR", {
+                                style: "currency",
+                                currency: finance?.currency || "BRL",
+                              }).format(total)}
+                            </Typography>
+                            {fine > 0 && (
+                              <Typography
+                                variant="caption"
+                                color="error"
+                                sx={{ display: "block" }}
+                              >
+                                +{" "}
+                                {new Intl.NumberFormat("pt-BR", {
+                                  style: "currency",
+                                  currency: finance?.currency || "BRL",
+                                }).format(fine)}{" "}
+                                (multa)
+                              </Typography>
+                            )}
+                          </Box>
+                        );
+                      })()}
+                    </TableCell>
                     <TableCell align="center">
                       {mp.paid ? (
                         <Chip
@@ -729,6 +803,26 @@ export default function FinanceSection({
                             currency: finance?.currency || "BRL",
                           }).format(tx.amount)}
                         </Typography>
+                        {tx.fine_amount && tx.fine_amount > 0 && (
+                          <Typography
+                            variant="caption"
+                            color="error"
+                            sx={{
+                              display: "block",
+                              textDecoration:
+                                tx.status === "reversed"
+                                  ? "line-through"
+                                  : "none",
+                            }}
+                          >
+                            (inclui{" "}
+                            {new Intl.NumberFormat("pt-BR", {
+                              style: "currency",
+                              currency: finance?.currency || "BRL",
+                            }).format(tx.fine_amount)}{" "}
+                            multa)
+                          </Typography>
+                        )}
                       </TableCell>
                       {isAdmin && (
                         <TableCell align="right">
@@ -812,6 +906,46 @@ export default function FinanceSection({
                   },
 
                   htmlInput: { "data-testid": "diarista-price-input" },
+                }}
+              />
+            </Grid>
+            <Grid size={12}>
+              <TextField
+                fullWidth
+                label={t(
+                  "organizations.management.finance.config.monthly_fine_amount",
+                  "Valor da Multa (Mensalidade)",
+                )}
+                value={monthlyFineAmountStr}
+                onChange={(e) => setMonthlyFineAmountStr(e.target.value)}
+                slotProps={{
+                  input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        {finance.currency}
+                      </InputAdornment>
+                    ),
+                  },
+                  htmlInput: { "data-testid": "monthly-fine-amount-input" },
+                }}
+              />
+            </Grid>
+            <Grid size={12}>
+              <TextField
+                fullWidth
+                type="number"
+                label={t(
+                  "organizations.management.finance.config.monthly_cut_off_day",
+                  "Dia Limite para Pagamento",
+                )}
+                value={monthlyCutOffDay}
+                onChange={(e) => setMonthlyCutOffDay(Number(e.target.value))}
+                slotProps={{
+                  htmlInput: {
+                    "data-testid": "monthly-cut-off-day-input",
+                    min: 1,
+                    max: 28,
+                  },
                 }}
               />
             </Grid>

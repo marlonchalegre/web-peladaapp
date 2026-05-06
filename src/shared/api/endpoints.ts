@@ -213,6 +213,8 @@ export interface OrganizationFinance {
   organization_id: number;
   mensalista_price: number;
   diarista_price: number;
+  monthly_fine_amount?: number;
+  monthly_cut_off_day?: number;
   currency: string;
 }
 
@@ -223,6 +225,7 @@ export interface Transaction {
   player_name?: string | null;
   pelada_id?: number | null;
   amount: number;
+  fine_amount?: number | null;
   type: "income" | "expense";
   category: string;
   description?: string | null;
