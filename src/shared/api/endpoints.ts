@@ -30,13 +30,30 @@ export interface Player {
   organization_id: number;
   grade?: number | null;
   position_id?: number | null;
-  member_type?: "mensalista" | "diarista" | "convidado";
+  member_type?:
+    | "mensalista"
+    | "diarista"
+    | "convidado"
+    | "mensalista_temporario"
+    | "diarista_temporario";
   user_name?: string;
   user_username?: string;
   user_position?: string;
   user_avatar_filename?: string | null;
   position_name?: string;
   user_email?: string;
+}
+export interface MonthlyPlayerSubstitution {
+  id: number;
+  organization_id: number;
+  permanent_player_id: number;
+  temporary_player_id: number;
+  start_date: string;
+  end_date?: string | null;
+  active: boolean;
+  permanent_player_name?: string;
+  temporary_player_name?: string;
+  created_at?: string;
 }
 export interface OrganizationAdmin {
   id: number;
@@ -346,6 +363,29 @@ export function createApi(client: ApiClient) {
       client.get<OrganizationPlayerStats[]>(
         `/api/organizations/${id}/statistics`,
         { year },
+      ),
+
+    // Monthly Player Substitutions
+    listSubstitutions: (id: number) =>
+      client.get<MonthlyPlayerSubstitution[]>(
+        `/api/organizations/${id}/substitutions`,
+      ),
+    createSubstitution: (
+      id: number,
+      payload: {
+        permanent_player_id: number;
+        temporary_player_id: number;
+        start_date: string;
+      },
+    ) =>
+      client.post<{ status: string }>(
+        `/api/organizations/${id}/substitutions`,
+        payload,
+      ),
+    endSubstitution: (id: number, subId: number, endDate?: string) =>
+      client.post<{ status: string }>(
+        `/api/organizations/${id}/substitutions/${subId}/end`,
+        { end_date: endDate },
       ),
 
     // Finance

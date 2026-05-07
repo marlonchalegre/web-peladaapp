@@ -304,9 +304,21 @@
         "invitations": "Active Invitations",
         "members": "Members",
         "finance": "Finance",
+        "substitutions": "Substitutions",
         "admins": "Administrators",
         "danger_zone": "Danger Zone",
         "waha": "WhatsApp (WAHA)"
+      },
+      "substitutions": {
+        "empty": "No substitutions recorded.",
+        "end": "End Substitution",
+        "dialog": {
+          "title": "Substitute Monthly Player"
+        },
+        "fields": {
+          "permanent_player": "Permanent Player (Mensalista)",
+          "temporary_player": "Temporary Substitute"
+        }
       },
       "finance": {
         "title": "Financial Control",
@@ -411,7 +423,9 @@
       "member_type": {
         "mensalista": "Mensalista",
         "diarista": "Diarista",
-        "convidado": "Guest"
+        "convidado": "Guest",
+        "mensalista_temporario": "Mensalista (Temp.)",
+        "diarista_temporario": "Diarista (Subst.)"
       }
     },
     "ratings": {

@@ -16,6 +16,7 @@ import StarIcon from "@mui/icons-material/Star";
 import SettingsIcon from "@mui/icons-material/Settings";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { Loading } from "../../../shared/components/Loading";
@@ -25,6 +26,7 @@ import { useOrganizationManagement } from "../hooks/useOrganizationManagement";
 import MembersSection from "../components/MembersSection";
 import FinanceSection from "../components/FinanceSection";
 import AdminsSection from "../components/AdminsSection";
+import SubstitutionsSection from "../components/SubstitutionsSection";
 import InvitationsList from "../components/InvitationsList";
 import DangerZoneSection from "../components/DangerZoneSection";
 import WahaConfigSection from "../components/WahaConfigSection";
@@ -99,6 +101,7 @@ export default function OrganizationManagementPage() {
     players,
     admins,
     invitations,
+    substitutions,
     loading,
     error,
     setError,
@@ -108,7 +111,6 @@ export default function OrganizationManagementPage() {
     isInviteOpen,
     setIsInviteOpen,
     publicInviteLink,
-    fetchInviteLink,
     invitedUser,
     setInvitedUser,
     selectedUserIds,
@@ -130,7 +132,10 @@ export default function OrganizationManagementPage() {
     handleAddPlayers,
     handleInvitePlayer,
     handleDeleteOrganization,
+    handleCreateSubstitution,
+    handleEndSubstitution,
     refreshPlayers,
+    fetchInviteLink,
     fetchData,
   } = useOrganizationManagement(orgId);
 
@@ -234,6 +239,23 @@ export default function OrganizationManagementPage() {
             data-testid="mgmt-tab-finance"
           />
           <Tab
+            icon={<SwapHorizIcon />}
+            iconPosition="start"
+            label={
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
+                {t(
+                  "organizations.management.sections.substitutions",
+                  "Substitutions",
+                )}
+              </Box>
+            }
+            value="substitutions"
+            data-testid="mgmt-tab-substitutions"
+          />
+          <Tab
             icon={<StarIcon />}
             iconPosition="start"
             label={
@@ -327,6 +349,16 @@ export default function OrganizationManagementPage() {
 
         <TabPanel value={activeTab} index="finance">
           <FinanceSection orgId={orgId} isAdmin={isAdmin} />
+        </TabPanel>
+
+        <TabPanel value={activeTab} index="substitutions">
+          <SubstitutionsSection
+            players={players}
+            substitutions={substitutions}
+            onCreateSubstitution={handleCreateSubstitution}
+            onEndSubstitution={handleEndSubstitution}
+            actionLoading={actionLoading}
+          />
         </TabPanel>
 
         <TabPanel value={activeTab} index="ratings">

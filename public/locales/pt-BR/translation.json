@@ -306,9 +306,21 @@
         "invitations": "Convites Ativos",
         "members": "Membros",
         "finance": "Financeiro",
+        "substitutions": "Substituições",
         "admins": "Administradores",
         "danger_zone": "Zona de Perigo",
         "waha": "WhatsApp (WAHA)"
+      },
+      "substitutions": {
+        "empty": "Nenhuma substituição registrada.",
+        "end": "Encerrar Substituição",
+        "dialog": {
+          "title": "Substituir Mensalista"
+        },
+        "fields": {
+          "permanent_player": "Mensalista Permanente",
+          "temporary_player": "Substituto Temporário"
+        }
       },
       "finance": {
         "title": "Controle Financeiro",
@@ -410,7 +422,9 @@
       "member_type": {
         "mensalista": "Mensalista",
         "diarista": "Diarista",
-        "convidado": "Convidado"
+        "convidado": "Convidado",
+        "mensalista_temporario": "Mensalista (Temp.)",
+        "diarista_temporario": "Diarista (Subst.)"
       }
     },
     "ratings": {

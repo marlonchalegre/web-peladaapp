@@ -9,6 +9,7 @@ import {
   type Player,
   type OrganizationAdmin,
   type OrganizationInvitation,
+  type MonthlyPlayerSubstitution,
 } from "../../../shared/api/endpoints";
 
 const endpoints = createApi(api);
@@ -21,6 +22,9 @@ export function useOrganizationManagement(orgId: number) {
   const [players, setPlayers] = useState<Player[]>([]);
   const [admins, setAdmins] = useState<OrganizationAdmin[]>([]);
   const [invitations, setInvitations] = useState<OrganizationInvitation[]>([]);
+  const [substitutions, setSubstitutions] = useState<
+    MonthlyPlayerSubstitution[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -52,12 +56,16 @@ export function useOrganizationManagement(orgId: number) {
         const { token } = await endpoints.getInviteLink(orgId);
         setPublicInviteLink(`${window.location.origin}/join/${token}`);
       } catch (err) {
-        console.error("Failed to fetch invite link", err);
+        const message =
+          err instanceof Error
+            ? err.message
+            : t("organizations.error.fetch_invite_link_failed");
+        setError(message);
       } finally {
         if (!silent) setActionLoading(false);
       }
     },
-    [orgId],
+    [orgId, t],
   );
 
   const handleResetInviteLink = useCallback(async () => {
@@ -95,6 +103,14 @@ export function useOrganizationManagement(orgId: number) {
         setPlayers(p);
         setAdmins(a);
         setInvitations(i);
+
+        try {
+          const s = await endpoints.listSubstitutions(orgId);
+          setSubstitutions(s);
+        } catch (err) {
+          console.error("Failed to fetch substitutions", err);
+        }
+
         // Also fetch the public invite link to show it in the invitations tab
         fetchInviteLink(true);
       } catch (err) {
@@ -282,6 +298,40 @@ export function useOrganizationManagement(orgId: number) {
     }
   };
 
+  const handleCreateSubstitution = async (
+    permanentPlayerId: number,
+    temporaryPlayerId: number,
+    startDate: string,
+  ) => {
+    setActionLoading(true);
+    try {
+      await endpoints.createSubstitution(orgId, {
+        permanent_player_id: permanentPlayerId,
+        temporary_player_id: temporaryPlayerId,
+        start_date: startDate,
+      });
+      await fetchData(true);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleEndSubstitution = async (subId: number, endDate?: string) => {
+    setActionLoading(true);
+    try {
+      await endpoints.endSubstitution(orgId, subId, endDate);
+      await fetchData(true);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const handleDeleteOrganization = async () => {
     if (!org || confirmOrgName !== org.name) return;
     setActionLoading(true);
@@ -355,6 +405,7 @@ export function useOrganizationManagement(orgId: number) {
     players,
     admins,
     invitations,
+    substitutions,
     loading,
     error,
     setError,
@@ -386,6 +437,8 @@ export function useOrganizationManagement(orgId: number) {
     handleAddPlayers,
     handleInvitePlayer,
     handleDeleteOrganization,
+    handleCreateSubstitution,
+    handleEndSubstitution,
     refreshPlayers,
     fetchData,
   };

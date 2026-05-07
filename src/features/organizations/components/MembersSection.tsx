@@ -193,6 +193,7 @@ export default function MembersSection({
                 key={player.id}
                 divider
                 sx={{ px: 0, pr: { xs: 1, sm: 4 }, alignItems: "center" }}
+                data-testid="player-item"
               >
                 <ListItemAvatar>
                   {(user?.avatar_filename ?? player.user_avatar_filename) ? (
@@ -257,7 +258,9 @@ export default function MembersSection({
                           member_type: e.target.value as
                             | "mensalista"
                             | "diarista"
-                            | "convidado",
+                            | "convidado"
+                            | "mensalista_temporario"
+                            | "diarista_temporario",
                         })
                       }
                       disabled={actionLoading}
@@ -281,6 +284,18 @@ export default function MembersSection({
                         {t(
                           "organizations.management.member_type.mensalista",
                           "Mensalista",
+                        )}
+                      </MenuItem>
+                      <MenuItem value="mensalista_temporario">
+                        {t(
+                          "organizations.management.member_type.mensalista_temporario",
+                          "Mensalista (Temp.)",
+                        )}
+                      </MenuItem>
+                      <MenuItem value="diarista_temporario">
+                        {t(
+                          "organizations.management.member_type.diarista_temporario",
+                          "Diarista (Subst.)",
                         )}
                       </MenuItem>
                     </Select>
