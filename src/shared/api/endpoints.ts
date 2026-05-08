@@ -262,6 +262,10 @@ export interface MonthlyPayment {
   year: number;
   month: number;
   transaction_id?: number | null;
+  fine_transaction_id?: number | null;
+  amount?: number;
+  fine_amount?: number;
+  fine_status?: "paid" | "reversed";
   paid: boolean;
 }
 

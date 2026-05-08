@@ -54,6 +54,7 @@ export default function PrettyConfirmDialog({
           color={severity === "primary" ? "primary" : severity}
           sx={{ borderRadius: 2, fontWeight: "bold", px: 3 }}
           autoFocus
+          data-testid="pretty-confirm-button"
         >
           {confirmLabel || t("common.confirm")}
         </Button>

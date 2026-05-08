@@ -27,6 +27,8 @@ import {
   Chip,
   InputAdornment,
   Tooltip,
+  Checkbox,
+  FormControlLabel,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import AddIcon from "@mui/icons-material/Add";
@@ -170,6 +172,9 @@ export default function FinanceSection({
   });
 
   const [confirmReverseOpen, setConfirmReverseOpen] = useState(false);
+  const [isMarkDialogOpen, setIsMarkDialogOpen] = useState(false);
+  const [shouldApplyFine, setShouldApplyFine] = useState(false);
+  const [playerToMark, setPlayerToMark] = useState<MonthlyPayment | null>(null);
   const [selectedPayment, setSelectedPayment] = useState<MonthlyPayment | null>(
     null,
   );
@@ -274,36 +279,30 @@ export default function FinanceSection({
     }
   };
 
-  const handleMarkPayment = async (player: MonthlyPayment, paid: boolean) => {
-    if (!isAdmin) return;
-
-    if (!paid) {
-      setSelectedPayment(player);
-      setConfirmReverseOpen(true);
-      return;
-    }
-
+  const executeMarkPayment = async (
+    player: MonthlyPayment,
+    applyFine: boolean,
+  ) => {
     try {
       setSuccess(null);
       const paymentDate = new Date().toISOString().split("T")[0];
       const baseAmount = parseFloat(mensalistaPriceStr.replace(",", "."));
-      const fine = calculateMonthlyFine(
-        selectedYear,
-        selectedMonth,
-        paymentDate,
-        parseFloat(monthlyFineAmountStr.replace(",", ".")),
-        monthlyCutOffDay,
-      );
+      const fineAmount = applyFine
+        ? parseFloat(monthlyFineAmountStr.replace(",", "."))
+        : 0;
 
       await api.markMonthlyPayment(orgId, {
         player_id: player.player_id,
         year: selectedYear,
         month: selectedMonth,
         paid: true,
-        amount: baseAmount + fine,
+        amount: baseAmount + fineAmount,
+        fine_amount: fineAmount,
         payment_date: paymentDate,
       });
       setSuccess(t("organizations.management.finance.monthly_fees.success"));
+      setIsMarkDialogOpen(false);
+      setPlayerToMark(null);
       await fetchData();
     } catch (err) {
       console.error("Failed to mark payment", err);
@@ -313,6 +312,32 @@ export default function FinanceSection({
           "Erro ao atualizar pagamento",
         ),
       );
+    }
+  };
+
+  const handleMarkPayment = async (player: MonthlyPayment, paid: boolean) => {
+    if (!isAdmin) return;
+
+    if (!paid) {
+      setSelectedPayment(player);
+      setConfirmReverseOpen(true);
+      return;
+    }
+
+    const fine = calculateMonthlyFine(
+      selectedYear,
+      selectedMonth,
+      new Date().toISOString().split("T")[0],
+      parseFloat(monthlyFineAmountStr.replace(",", ".")),
+      monthlyCutOffDay,
+    );
+
+    if (fine > 0) {
+      setPlayerToMark(player);
+      setShouldApplyFine(true);
+      setIsMarkDialogOpen(true);
+    } else {
+      executeMarkPayment(player, false);
     }
   };
 
@@ -343,17 +368,27 @@ export default function FinanceSection({
     }
   };
 
-  const handleReverseTransaction = async (txId: number) => {
+  const [txToReverse, setTxToReverse] = useState<number | null>(null);
+  const [confirmReverseTxOpen, setConfirmReverseTxOpen] = useState(false);
+
+  const handleReverseTransaction = (txId: number) => {
     if (!isAdmin) return;
+    setTxToReverse(txId);
+    setConfirmReverseTxOpen(true);
+  };
+
+  const executeReverseTransaction = async () => {
+    if (!isAdmin || !txToReverse) return;
     try {
       setSuccess(null);
-      await api.reverseTransaction(orgId, txId);
+      await api.reverseTransaction(orgId, txToReverse);
       setSuccess(
         t(
           "organizations.management.finance.transactions.reverse_success",
           "Transação estornada com sucesso!",
         ),
       );
+      setTxToReverse(null);
       await fetchData();
     } catch (err) {
       console.error("Failed to reverse transaction", err);
@@ -550,14 +585,29 @@ export default function FinanceSection({
                         const baseAmount = parseFloat(
                           mensalistaPriceStr.replace(",", "."),
                         );
-                        const fine = calculateMonthlyFine(
-                          selectedYear,
-                          selectedMonth,
-                          new Date().toISOString().split("T")[0],
-                          parseFloat(monthlyFineAmountStr.replace(",", ".")),
-                          monthlyCutOffDay,
-                        );
-                        const total = baseAmount + fine;
+                        // If already paid, use stored fine_amount.
+                        // Otherwise calculate what it would be today.
+                        const fine = mp.paid
+                          ? mp.fine_status === "reversed"
+                            ? 0
+                            : mp.fine_amount || 0
+                          : calculateMonthlyFine(
+                              selectedYear,
+                              selectedMonth,
+                              new Date().toISOString().split("T")[0],
+                              parseFloat(
+                                monthlyFineAmountStr.replace(",", "."),
+                              ),
+                              monthlyCutOffDay,
+                            );
+
+                        const total =
+                          mp.paid && mp.amount !== undefined
+                            ? mp.fine_status === "reversed"
+                              ? mp.amount
+                              : mp.amount + fine
+                            : baseAmount + fine;
+
                         return (
                           <Box>
                             <Typography variant="body2">
@@ -803,26 +853,28 @@ export default function FinanceSection({
                             currency: finance?.currency || "BRL",
                           }).format(tx.amount)}
                         </Typography>
-                        {tx.fine_amount && tx.fine_amount > 0 && (
-                          <Typography
-                            variant="caption"
-                            color="error"
-                            sx={{
-                              display: "block",
-                              textDecoration:
-                                tx.status === "reversed"
-                                  ? "line-through"
-                                  : "none",
-                            }}
-                          >
-                            (inclui{" "}
-                            {new Intl.NumberFormat("pt-BR", {
-                              style: "currency",
-                              currency: finance?.currency || "BRL",
-                            }).format(tx.fine_amount)}{" "}
-                            multa)
-                          </Typography>
-                        )}
+                        {tx.category === "monthly_fee" &&
+                          tx.fine_amount &&
+                          tx.fine_amount > 0 && (
+                            <Typography
+                              variant="caption"
+                              color="error"
+                              sx={{
+                                display: "block",
+                                textDecoration:
+                                  tx.status === "reversed"
+                                    ? "line-through"
+                                    : "none",
+                              }}
+                            >
+                              (inclui{" "}
+                              {new Intl.NumberFormat("pt-BR", {
+                                style: "currency",
+                                currency: finance?.currency || "BRL",
+                              }).format(tx.fine_amount)}{" "}
+                              multa)
+                            </Typography>
+                          )}
                       </TableCell>
                       {isAdmin && (
                         <TableCell align="right">
@@ -838,8 +890,12 @@ export default function FinanceSection({
                                 color="warning"
                                 onClick={() => handleReverseTransaction(tx.id)}
                                 data-testid={`reverse-transaction-${tx.id}`}
+                                data-testclass="reverse-transaction-button"
                               >
-                                <UndoIcon fontSize="small" />
+                                <UndoIcon
+                                  fontSize="small"
+                                  data-testid="undo-icon"
+                                />
                               </IconButton>
                             </Tooltip>
                           )}
@@ -1116,6 +1172,75 @@ export default function FinanceSection({
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Mark Payment Dialog */}
+      <Dialog
+        open={isMarkDialogOpen}
+        onClose={() => {
+          setIsMarkDialogOpen(false);
+          setPlayerToMark(null);
+        }}
+        fullWidth
+        maxWidth="xs"
+        data-testid="mark-payment-dialog"
+      >
+        <DialogTitle>
+          {t(
+            "organizations.management.finance.monthly_fees.mark_paid_title",
+            "Confirmar Pagamento",
+          )}
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ mt: 1 }}>
+            <Typography variant="body1" gutterBottom>
+              {t(
+                "organizations.management.finance.monthly_fees.mark_paid_confirm",
+                {
+                  player: playerToMark?.player_name,
+                },
+              )}
+            </Typography>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={shouldApplyFine}
+                  onChange={(e) => setShouldApplyFine(e.target.checked)}
+                  data-testid="apply-fine-checkbox"
+                />
+              }
+              label={t(
+                "organizations.management.finance.monthly_fees.apply_fine_label",
+                "Aplicar multa de {{amount}}",
+                {
+                  amount: new Intl.NumberFormat("pt-BR", {
+                    style: "currency",
+                    currency: finance?.currency || "BRL",
+                  }).format(parseFloat(monthlyFineAmountStr.replace(",", "."))),
+                },
+              )}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setIsMarkDialogOpen(false);
+              setPlayerToMark(null);
+            }}
+          >
+            {t("common.cancel")}
+          </Button>
+          <Button
+            onClick={() =>
+              playerToMark && executeMarkPayment(playerToMark, shouldApplyFine)
+            }
+            variant="contained"
+            data-testid="confirm-mark-payment-button"
+          >
+            {t("common.confirm")}
+          </Button>
+        </DialogActions>
+      </Dialog>
       <PrettyConfirmDialog
         open={confirmReverseOpen}
         onClose={() => {
@@ -1130,6 +1255,24 @@ export default function FinanceSection({
         confirmLabel={t(
           "organizations.management.finance.monthly_fees.reverse",
         )}
+        severity="warning"
+      />
+      <PrettyConfirmDialog
+        open={confirmReverseTxOpen}
+        onClose={() => {
+          setConfirmReverseTxOpen(false);
+          setTxToReverse(null);
+        }}
+        onConfirm={executeReverseTransaction}
+        title={t(
+          "organizations.management.finance.transactions.mark_as_reversed",
+          "Estornar",
+        )}
+        description={t(
+          "organizations.management.finance.transactions.reverse_confirm",
+          "Deseja realmente estornar esta transação?",
+        )}
+        confirmLabel={t("common.confirm")}
         severity="warning"
       />
     </Paper>
