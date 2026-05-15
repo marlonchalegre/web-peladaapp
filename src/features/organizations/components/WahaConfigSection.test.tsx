@@ -29,7 +29,7 @@ vi.mock("../../../shared/api/client", () => ({
 
 describe("WahaConfigSection", () => {
   const mockOrganization = {
-    id: 1,
+    id: "1",
     name: "Test Org",
     waha_enabled: true,
     waha_api_url: "http://localhost:3000",

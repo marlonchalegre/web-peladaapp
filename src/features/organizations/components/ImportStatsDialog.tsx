@@ -28,7 +28,7 @@ import ErrorOutlinedIcon from "@mui/icons-material/ErrorOutlined";
 import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { useTranslation } from "react-i18next";
-import { type Player } from "../../../shared/api/endpoints";
+import type { Player } from "../../../shared/api/endpoints";
 
 interface ImportStatsDialogProps {
   open: boolean;
@@ -39,7 +39,7 @@ interface ImportStatsDialogProps {
 }
 
 export interface ImportedStat {
-  player_id: number;
+  player_id: string;
   player_name: string;
   year: number;
   goals: number;
@@ -112,7 +112,7 @@ export default function ImportStatsDialog({
           );
 
           aggregated[key] = {
-            player_id: player?.id || 0,
+            player_id: player?.id || "",
             player_name: player?.user_name || username || "",
             username: username,
             year,
@@ -134,7 +134,7 @@ export default function ImportStatsDialog({
   const handleAddRow = () => {
     setImportedData((prev) => [
       {
-        player_id: 0,
+        player_id: "0",
         player_name: "",
         year: defaultYear,
         goals: 0,
@@ -175,7 +175,7 @@ export default function ImportStatsDialog({
     setImportedData((prev) => {
       if (!player) {
         const next = [...prev];
-        next[index] = { ...next[index], player_id: 0, notFound: true };
+        next[index] = { ...next[index], player_id: "0", notFound: true };
         return next;
       }
 
@@ -218,14 +218,16 @@ export default function ImportStatsDialog({
   };
 
   const hasValidData = useMemo(() => {
-    return importedData.some((d) => !d.notFound && d.player_id > 0);
+    return importedData.some(
+      (d) => !d.notFound && d.player_id !== "0" && d.player_id !== "",
+    );
   }, [importedData]);
 
   const handleImport = async () => {
     // Final aggregation by player_id and year just in case
     const aggregatedData: Record<string, ImportedStat> = {};
     importedData.forEach((row) => {
-      if (!row.notFound && row.player_id > 0) {
+      if (!row.notFound && row.player_id !== "0" && row.player_id !== "") {
         const key = `${row.player_id}_${row.year}`;
         if (aggregatedData[key]) {
           aggregatedData[key].goals += row.goals;

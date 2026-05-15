@@ -19,7 +19,7 @@ import {
 const endpoints = createApi(api);
 
 export function usePeladaData(
-  peladaId: number,
+  peladaId: string,
   opts?: { includeFinance?: boolean },
 ) {
   const { t } = useTranslation();
@@ -35,18 +35,18 @@ export function usePeladaData(
 
   const [teams, setTeams] = useState<Team[]>([]);
   const [pelada, setPelada] = useState<Pelada | null>(null);
-  const [teamPlayers, setTeamPlayers] = useState<Record<number, TeamPlayer[]>>(
+  const [teamPlayers, setTeamPlayers] = useState<Record<string, TeamPlayer[]>>(
     {},
   );
   const [lineupsByMatch, setLineupsByMatch] = useState<
-    Record<number, Record<number, TeamPlayer[]>>
+    Record<string, Record<string, TeamPlayer[]>>
   >({});
   const [orgPlayerIdToUserId, setOrgPlayerIdToUserId] = useState<
-    Record<number, number>
+    Record<string, string>
   >({});
-  const [userIdToName, setUserIdToName] = useState<Record<number, string>>({});
+  const [userIdToName, setUserIdToName] = useState<Record<string, string>>({});
   const [orgPlayerIdToPlayer, setOrgPlayerIdToPlayer] = useState<
-    Record<number, Player>
+    Record<string, Player>
   >({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +55,7 @@ export function usePeladaData(
     PlayerStats[] | null
   >(null);
   const [attendance, setAttendance] = useState<Attendance[]>([]);
-  const [loadedPeladaId, setLoadedPeladaId] = useState<number | null>(null);
+  const [loadedPeladaId, setLoadedPeladaId] = useState<string | null>(null);
   const [peladaTransactions, setPeladaTransactions] = useState<Transaction[]>(
     [],
   );
@@ -119,12 +119,12 @@ export function usePeladaData(
           }
         }
 
-        const nameMap: Record<number, string> = {};
+        const nameMap: Record<string, string> = {};
         for (const u of data.users) nameMap[u.id] = u.name;
         setUserIdToName(nameMap);
 
-        const relMap: Record<number, number> = {};
-        const playerMap: Record<number, Player> = {};
+        const relMap: Record<string, string> = {};
+        const playerMap: Record<string, Player> = {};
         for (const pl of data.organization_players || []) {
           relMap[pl.id] = pl.user_id;
           playerMap[pl.id] = pl;
@@ -132,11 +132,11 @@ export function usePeladaData(
         setOrgPlayerIdToUserId(relMap);
         setOrgPlayerIdToPlayer(playerMap);
 
-        const asTeamPlayers: Record<number, TeamPlayer[]> = {};
+        const asTeamPlayers: Record<string, TeamPlayer[]> = {};
         for (const [teamIdStr, arr] of Object.entries(
           data.team_players_map || {},
         )) {
-          asTeamPlayers[Number(teamIdStr)] = (arr || []).map((e) => ({
+          asTeamPlayers[teamIdStr] = (arr || []).map((e) => ({
             team_id: e.team_id,
             player_id: e.player_id,
             is_goalkeeper: e.is_goalkeeper,
@@ -144,16 +144,16 @@ export function usePeladaData(
         }
         setTeamPlayers(asTeamPlayers);
 
-        const luMap: Record<number, Record<number, TeamPlayer[]>> = {};
+        const luMap: Record<string, Record<string, TeamPlayer[]>> = {};
         for (const [midStr, teamPlayersGroup] of Object.entries(
           data.match_lineups_map || {},
         )) {
-          const mid = Number(midStr);
-          const asTeamPlayersForMatch: Record<number, TeamPlayer[]> = {};
+          const mid = midStr;
+          const asTeamPlayersForMatch: Record<string, TeamPlayer[]> = {};
           for (const [teamIdStr, arr] of Object.entries(
             teamPlayersGroup || {},
           )) {
-            asTeamPlayersForMatch[Number(teamIdStr)] = (arr || []).map((e) => ({
+            asTeamPlayersForMatch[teamIdStr] = (arr || []).map((e) => ({
               team_id: e.team_id,
               player_id: e.player_id,
               is_goalkeeper: e.is_goalkeeper,

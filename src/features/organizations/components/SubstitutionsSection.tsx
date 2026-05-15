@@ -31,8 +31,8 @@ import {
 interface SubstitutionsSectionProps {
   players: Player[];
   substitutions: MonthlyPlayerSubstitution[];
-  onCreateSubstitution: (permId: number, tempId: number, date: string) => void;
-  onEndSubstitution: (subId: number, date?: string) => void;
+  onCreateSubstitution: (permId: string, tempId: string, date: string) => void;
+  onEndSubstitution: (subId: string, date?: string) => void;
   actionLoading: boolean;
 }
 
@@ -45,8 +45,8 @@ export default function SubstitutionsSection({
 }: SubstitutionsSectionProps) {
   const { t } = useTranslation();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [permanentPlayerId, setPermanentPlayerId] = useState<number | "">("");
-  const [temporaryPlayerId, setTemporaryPlayerId] = useState<number | "">("");
+  const [permanentPlayerId, setPermanentPlayerId] = useState<string | "">("");
+  const [temporaryPlayerId, setTemporaryPlayerId] = useState<string | "">("");
   const [startDate, setStartDate] = useState(
     new Date().toISOString().split("T")[0],
   );
@@ -66,11 +66,7 @@ export default function SubstitutionsSection({
 
   const handleCreate = () => {
     if (permanentPlayerId && temporaryPlayerId && startDate) {
-      onCreateSubstitution(
-        Number(permanentPlayerId),
-        Number(temporaryPlayerId),
-        startDate,
-      );
+      onCreateSubstitution(permanentPlayerId, temporaryPlayerId, startDate);
       setIsAddDialogOpen(false);
       setPermanentPlayerId("");
       setTemporaryPlayerId("");
@@ -192,7 +188,7 @@ export default function SubstitutionsSection({
               </InputLabel>
               <Select
                 value={permanentPlayerId}
-                onChange={(e) => setPermanentPlayerId(e.target.value as number)}
+                onChange={(e) => setPermanentPlayerId(e.target.value as string)}
                 label={t(
                   "organizations.management.substitutions.fields.permanent_player",
                 )}
@@ -215,7 +211,7 @@ export default function SubstitutionsSection({
               </InputLabel>
               <Select
                 value={temporaryPlayerId}
-                onChange={(e) => setTemporaryPlayerId(e.target.value as number)}
+                onChange={(e) => setTemporaryPlayerId(e.target.value as string)}
                 label={t(
                   "organizations.management.substitutions.fields.temporary_player",
                 )}

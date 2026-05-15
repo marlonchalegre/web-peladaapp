@@ -315,7 +315,7 @@ function AppLayout() {
             </Toolbar>
           </AppBar>
         )}
-        <Box component="main" sx={{ flexGrow: 1 }}>
+        <Box component="main" sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
           <PullToRefresh>
             <Suspense fallback={<PageLoading />}>
               <Routes>

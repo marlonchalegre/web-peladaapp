@@ -24,10 +24,10 @@ import {
 interface AdminsSectionProps {
   admins: OrganizationAdmin[];
   playersNotAdmins: User[];
-  selectedAdminUserId: number | "";
-  onAdminUserChange: (value: number | "") => void;
+  selectedAdminUserId: string | "";
+  onAdminUserChange: (value: string | "") => void;
   onAddAdmin: () => void;
-  onRemoveAdmin: (userId: number) => void;
+  onRemoveAdmin: (userId: string) => void;
   actionLoading: boolean;
 }
 
@@ -60,9 +60,7 @@ export default function AdminsSection({
             size="small"
             value={selectedAdminUserId}
             onChange={(e) =>
-              onAdminUserChange(
-                e.target.value === "" ? "" : Number(e.target.value),
-              )
+              onAdminUserChange(e.target.value === "" ? "" : e.target.value)
             }
             disabled={actionLoading || playersNotAdmins.length === 0}
             data-testid="admin-select"

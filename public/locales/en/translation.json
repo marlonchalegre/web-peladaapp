@@ -538,7 +538,7 @@
         "select_user_label": "Select a user",
         "cannot_remove_last_admin_tooltip": "Cannot remove the last admin",
         "remove_admin_tooltip": "Remove admin",
-        "user_fallback": "User #{{id}}"
+        "user_fallback": "User"
       }
     },
     "table": {
@@ -550,9 +550,9 @@
     },
     "peladas": {
       "empty": "No peladas.",
-      "item_name": "Pelada #{{id}}",
+      "item_name": "Pelada",
       "aria": {
-        "delete": "Delete Pelada #{{id}}"
+        "delete": "Delete Pelada"
       }
     },
     "error": {
@@ -636,7 +636,8 @@
       "empty": {
         "confirmed": "No one confirmed yet.",
         "declined": "No one declined yet.",
-        "pending": "Everyone has responded!"
+        "pending": "Everyone has responded!",
+        "waitlist": "No players on waitlist"
       },
       "stats": {
         "total_players": "TOTAL PLAYERS",
@@ -646,7 +647,7 @@
       }
     },
     "detail": {
-      "title": "Pelada #{{id}}",
+      "title": "Pelada",
       "error": {
         "load_failed": "Error loading pelada",
         "move_to_bench_failed": "Error moving player to bench",
@@ -660,8 +661,8 @@
         "update_failed": "Error updating pelada"
       },
       "live": {
-        "moved_to_bench": "Player #{{playerId}} moved to bench",
-        "moved_to_team": "Player #{{playerId}} moved to team {{teamName}}"
+        "moved_to_bench": "Player moved to bench",
+        "moved_to_team": "Player moved to team {{teamName}}"
       },
       "button": {
         "view_matches": "View Matches",
@@ -680,6 +681,8 @@
         "subtitle": "Customize match sequence and details",
         "config": "Configuration",
         "match": "Match",
+        "match_count_one": "{{count}} Match",
+        "match_count_other": "{{count}} Matches",
         "home": "Home",
         "away": "Away",
         "button": {
@@ -729,7 +732,7 @@
       }
     },
     "matches": {
-      "title": "Pelada #{{id}}",
+      "title": "Pelada",
       "loading": "Loading matches...",
       "share_summary": "Share Summary",
       "summary_copied": "Summary copied to clipboard!",
@@ -747,7 +750,7 @@
       "history_title": "Match History Stream",
       "empty_history": "No matches",
       "match_label": "Match #{{seq}}",
-      "team_fallback": "Team {{id}}",
+      "team_fallback": "Team",
       "confirm_end_match": "Are you sure you want to end the match?",
       "confirm_close_pelada": "Are you sure you want to close this pelada? This will finish all pending matches.",
       "select_match_hint": "Select a match to view details",
@@ -765,7 +768,7 @@
       }
     },
     "voting": {
-      "title": "Voting for Pelada #{{id}}",
+      "title": "Voting for Pelada",
       "success": {
         "saved": "Votes saved successfully!"
       },

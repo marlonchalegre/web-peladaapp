@@ -45,7 +45,7 @@ import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 const endpoints = createApi(api);
 
 type PlayerVote = {
-  playerId: number;
+  playerId: string;
   playerName: string;
   position?: string;
   stars: number | null;
@@ -60,7 +60,7 @@ export default function PeladaVotingPage() {
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const peladaId = Number(id);
+  const peladaId = id!;
 
   const [votingInfo, setVotingInfo] = useState<VotingInfo | null>(null);
   const [votingStatus, setVotingStatus] = useState<VotingStatus | null>(null);
@@ -71,7 +71,7 @@ export default function PeladaVotingPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [confirmToggle, setConfirmToggle] = useState<{
-    playerId: number;
+    playerId: string;
     name: string;
   } | null>(null);
 
@@ -133,13 +133,13 @@ export default function PeladaVotingPage() {
     loadData();
   }, [peladaId, user, t]);
 
-  const handleVoteChange = (playerId: number, stars: number | null) => {
+  const handleVoteChange = (playerId: string, stars: number | null) => {
     setPlayerVotes((prev) =>
       prev.map((pv) => (pv.playerId === playerId ? { ...pv, stars } : pv)),
     );
   };
 
-  const handleToggleVoting = async (playerId: number, enabled: boolean) => {
+  const handleToggleVoting = async (playerId: string, enabled: boolean) => {
     try {
       setSubmitting(true);
       setError(null);
@@ -268,7 +268,7 @@ export default function PeladaVotingPage() {
               path: "/organizations",
             },
             {
-              label: t("peladas.detail.title", { id: peladaId }),
+              label: t("peladas.detail.title"),
               path: `/peladas/${peladaId}`,
             },
             { label: t("peladas.detail.button.vote") },

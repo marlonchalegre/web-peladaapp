@@ -1,7 +1,7 @@
 import { Box, Typography, Paper, Button, Stack, Divider } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import { useTranslation } from "react-i18next";
-import { type OrganizationInvitation } from "../../../shared/api/endpoints";
+import type { OrganizationInvitation } from "../../../shared/api/endpoints";
 
 type Props = {
   invitations: OrganizationInvitation[];

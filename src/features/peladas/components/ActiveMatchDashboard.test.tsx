@@ -12,30 +12,30 @@ import { ThemeContextProvider } from "../../../app/providers/ThemeProvider";
 
 describe("ActiveMatchDashboard", () => {
   const mockMatch: Match = {
-    id: 1,
-    pelada_id: 1,
+    id: "1",
+    pelada_id: "1",
     sequence: 1,
-    home_team_id: 10,
-    away_team_id: 20,
+    home_team_id: "10",
+    away_team_id: "20",
     home_score: 2,
     away_score: 1,
     status: "running",
   };
 
   const mockPelada: Pelada = {
-    id: 1,
-    organization_id: 1,
+    id: "1",
+    organization_id: "1",
     status: "running",
   };
 
-  const mockHomePlayers: TeamPlayer[] = [{ team_id: 10, player_id: 101 }];
-  const mockAwayPlayers: TeamPlayer[] = [{ team_id: 20, player_id: 201 }];
+  const mockHomePlayers: TeamPlayer[] = [{ team_id: "10", player_id: "101" }];
+  const mockAwayPlayers: TeamPlayer[] = [{ team_id: "20", player_id: "201" }];
 
-  const mockOrgPlayerIdToUserId = { 101: 1, 201: 2 };
-  const mockUserIdToName = { 1: "Player One", 2: "Player Two" };
+  const mockOrgPlayerIdToUserId = { "101": "1", "201": "2" };
+  const mockUserIdToName = { "1": "Player One", "2": "Player Two" };
   const mockStatsMap = {
-    101: { goals: 1, assists: 0, ownGoals: 0 },
-    201: { goals: 0, assists: 1, ownGoals: 0 },
+    "101": { goals: 1, assists: 0, ownGoals: 0 },
+    "201": { goals: 0, assists: 1, ownGoals: 0 },
   };
 
   const defaultProps = {
@@ -48,8 +48,8 @@ describe("ActiveMatchDashboard", () => {
     orgPlayerIdToUserId: mockOrgPlayerIdToUserId,
     userIdToName: mockUserIdToName,
     orgPlayerIdToPlayer: {
-      101: { id: 101, user_id: 1, organization_id: 1, position_id: 1 },
-      201: { id: 201, user_id: 2, organization_id: 1, position_id: 2 },
+      101: { id: "101", user_id: "1", organization_id: "1", position_id: "1" },
+      201: { id: "201", user_id: "2", organization_id: "1", position_id: "2" },
     },
     statsMap: mockStatsMap,
     benchPlayers: [] as Player[],
@@ -133,10 +133,10 @@ describe("ActiveMatchDashboard", () => {
 
   it("renders empty slots to balance teams even if playersPerTeam is not set", () => {
     const unbalancedHomePlayers = [
-      { team_id: 10, player_id: 101 },
-      { team_id: 10, player_id: 102 },
+      { team_id: "10", player_id: "101" },
+      { team_id: "10", player_id: "102" },
     ];
-    const unbalancedAwayPlayers = [{ team_id: 20, player_id: 201 }];
+    const unbalancedAwayPlayers = [{ team_id: "20", player_id: "201" }];
 
     render(
       <ThemeContextProvider>
@@ -159,21 +159,21 @@ describe("ActiveMatchDashboard", () => {
     const user = userEvent.setup();
     const matches: Match[] = [
       {
-        id: 1,
-        pelada_id: 1,
+        id: "1",
+        pelada_id: "1",
         sequence: 1,
-        home_team_id: 10,
-        away_team_id: 20,
+        home_team_id: "10",
+        away_team_id: "20",
         home_score: 0,
         away_score: 0,
         status: "finished",
       },
       {
-        id: 2,
-        pelada_id: 1,
+        id: "2",
+        pelada_id: "1",
         sequence: 2,
-        home_team_id: 30,
-        away_team_id: 40,
+        home_team_id: "30",
+        away_team_id: "40",
         home_score: 0,
         away_score: 0,
         status: "scheduled",

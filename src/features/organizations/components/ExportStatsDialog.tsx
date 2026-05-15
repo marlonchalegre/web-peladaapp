@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useTranslation } from "react-i18next";
-import { type OrganizationPlayerStats } from "../../../shared/api/endpoints";
+import type { OrganizationPlayerStats } from "../../../shared/api/endpoints";
 
 interface ExportStatsDialogProps {
   open: boolean;

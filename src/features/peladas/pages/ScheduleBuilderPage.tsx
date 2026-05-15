@@ -41,14 +41,14 @@ import { createApi, type Team } from "../../../shared/api/endpoints";
 const endpoints = createApi(api);
 
 interface PlannedMatch {
-  home: number;
-  away: number;
+  home: string;
+  away: string;
 }
 
 export default function ScheduleBuilderPage() {
   const { t } = useTranslation();
   const { id } = useParams();
-  const peladaId = Number(id);
+  const peladaId = id!;
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
@@ -57,7 +57,7 @@ export default function ScheduleBuilderPage() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [matches, setMatches] = useState<PlannedMatch[]>([]);
   const [matchesPerTeam, setMatchesPerTeam] = useState<number>(2);
-  const [organizationId, setOrganizationId] = useState<number | null>(null);
+  const [organizationId, setOrganizationId] = useState<string | null>(null);
 
   const fetchInitialData = useCallback(async () => {
     try {
@@ -156,7 +156,7 @@ export default function ScheduleBuilderPage() {
   const handleUpdateMatch = (
     index: number,
     field: "home" | "away",
-    teamId: number,
+    teamId: string,
   ) => {
     const newMatches = [...matches];
     newMatches[index] = { ...newMatches[index], [field]: teamId };
@@ -210,7 +210,7 @@ export default function ScheduleBuilderPage() {
               path: `/organizations/${organizationId}`,
             },
             {
-              label: t("peladas.detail.title", { id: peladaId }),
+              label: t("peladas.detail.title"),
               path: `/peladas/${peladaId}`,
             },
             { label: t("peladas.detail.button.build_schedule") },
@@ -280,7 +280,7 @@ export default function ScheduleBuilderPage() {
                 label={t("peladas.detail.schedule.matches_per_team_label")}
                 data-testid="matches-per-team-select"
                 onChange={(e) => {
-                  const val = Number(e.target.value);
+                  const val = e.target.value;
                   setMatchesPerTeam(val);
                   handleFetchOptions(val);
                 }}
@@ -288,10 +288,7 @@ export default function ScheduleBuilderPage() {
               >
                 {[1, 2, 3, 4, 5, 6].map((v) => (
                   <MuiMenuItem key={v} value={v}>
-                    {v}{" "}
-                    {v === 1
-                      ? t("peladas.detail.schedule.match")
-                      : t("peladas.detail.schedule.match") + "s"}
+                    {t("peladas.detail.schedule.match_count", { count: v })}
                   </MuiMenuItem>
                 ))}
               </Select>
@@ -407,11 +404,7 @@ export default function ScheduleBuilderPage() {
                       <Select
                         value={match.home}
                         onChange={(e) =>
-                          handleUpdateMatch(
-                            index,
-                            "home",
-                            Number(e.target.value),
-                          )
+                          handleUpdateMatch(index, "home", e.target.value)
                         }
                         sx={{ borderRadius: 2, bgcolor: "background.paper" }}
                         data-testid={`home-select-${index}`}
@@ -452,11 +445,7 @@ export default function ScheduleBuilderPage() {
                       <Select
                         value={match.away}
                         onChange={(e) =>
-                          handleUpdateMatch(
-                            index,
-                            "away",
-                            Number(e.target.value),
-                          )
+                          handleUpdateMatch(index, "away", e.target.value)
                         }
                         sx={{ borderRadius: 2, bgcolor: "background.paper" }}
                         data-testid={`away-select-${index}`}

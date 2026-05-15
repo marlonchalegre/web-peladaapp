@@ -22,8 +22,8 @@ import { useMemo } from "react";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 
 export type PlayerStatRow = {
-  playerId: number;
-  userId?: number;
+  playerId: string;
+  userId?: string;
   name: string;
   avatar_filename?: string | null;
   goals: number;

@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, type Mock } from "vitest";
 import StatsTable from "./StatsTable";
-import { type OrganizationPlayerStats } from "../../../shared/api/endpoints";
+import type { OrganizationPlayerStats } from "../../../shared/api/endpoints";
 import { ThemeProvider, createTheme } from "@mui/material";
 
 // Mock i18next
@@ -35,7 +35,7 @@ const theme = createTheme();
 
 const mockStats: OrganizationPlayerStats[] = [
   {
-    player_id: 1,
+    player_id: "1",
     player_name: "Marlon",
     player_position: "Atacante",
     goal: 10,

@@ -18,7 +18,7 @@ vi.mock("../../../shared/api/client", () => ({
 // Mock AuthContext
 vi.mock("../../../app/providers/AuthContext", () => ({
   useAuth: () => ({
-    user: { id: 1, name: "Test User", email: "test@example.com" },
+    user: { id: "1", name: "Test User", email: "test@example.com" },
     isAuthenticated: true,
   }),
 }));
@@ -31,28 +31,30 @@ describe("PeladaDetailPage", () => {
   it("renders pelada details and teams", async () => {
     const mockFullDetails = {
       pelada: {
-        id: 1,
-        organization_id: 101,
+        id: "1",
+        organization_id: "101",
         status: "open",
         players_per_team: 5,
       },
       teams: [
         {
-          id: 1,
+          id: "1",
           name: "Time 1",
-          players: [{ id: 10, user_id: 1, user: { id: 1, name: "Player 1" } }],
+          players: [
+            { id: "10", user_id: "1", user: { id: "1", name: "Player 1" } },
+          ],
         },
       ],
       available_players: [
-        { id: 11, user_id: 2, user: { id: 2, name: "Player 2" } },
+        { id: "11", user_id: "2", user: { id: "2", name: "Player 2" } },
       ],
       users_map: {
-        1: { id: 1, name: "Player 1" },
-        2: { id: 2, name: "Player 2" },
+        1: { id: "1", name: "Player 1" },
+        2: { id: "2", name: "Player 2" },
       },
       org_players_map: {
-        10: { id: 10, user_id: 1 },
-        11: { id: 11, user_id: 2 },
+        10: { id: "10", user_id: "1" },
+        11: { id: "11", user_id: "2" },
       },
       voting_info: { can_vote: false, has_voted: false, eligible_players: [] },
     };
@@ -87,7 +89,7 @@ describe("PeladaDetailPage", () => {
 
     await waitFor(() => {
       // With simple mock t(k) -> k, we lose replacement.
-      // t('peladas.detail.title', { id: 1 }) -> 'peladas.detail.title'
+      // t('peladas.detail.title', { id: "1" }) -> 'peladas.detail.title'
       expect(
         screen.getAllByText("peladas.detail.title").length,
       ).toBeGreaterThan(0);

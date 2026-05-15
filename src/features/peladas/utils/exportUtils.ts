@@ -5,7 +5,7 @@ export type PlayerWithUser = Player & { user: User; is_goalkeeper?: boolean };
 
 export function generateAvailablePlayersText(
   players: PlayerWithUser[],
-  scores: Record<number, number>,
+  scores: Record<string, number>,
 ): string {
   if (players.length === 0) return "";
 
@@ -58,8 +58,8 @@ export function generateAvailablePlayersText(
 
 export function generateExportText(
   teams: Team[],
-  teamPlayers: Record<number, PlayerWithUser[]>,
-  scores: Record<number, number>,
+  teamPlayers: Record<string, PlayerWithUser[]>,
+  scores: Record<string, number>,
 ): string {
   let text = "";
 
@@ -126,7 +126,7 @@ export function generateExportText(
 
 export function generateAnnouncementText(
   teams: Team[],
-  teamPlayers: Record<number, PlayerWithUser[]>,
+  teamPlayers: Record<string, PlayerWithUser[]>,
 ): string {
   let text = "*ESCALAÇÃO DA PELADA*\n\n";
 
@@ -174,8 +174,8 @@ export function generateAnnouncementText(
 
 export function generateExportCsv(
   teams: Team[],
-  teamPlayers: Record<number, PlayerWithUser[]>,
-  scores: Record<number, number>,
+  teamPlayers: Record<string, PlayerWithUser[]>,
+  scores: Record<string, number>,
 ): string {
   // BOM for Excel to recognize UTF-8
   let csv = "\uFEFF";

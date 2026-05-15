@@ -19,10 +19,10 @@ vi.mock("../../../shared/api/client", () => ({
 vi.mock("../../../app/providers/AuthContext", () => ({
   useAuth: () => ({
     user: {
-      id: 1,
+      id: "1",
       name: "Test User",
       email: "test@example.com",
-      admin_orgs: [1],
+      admin_orgs: ["1"],
     },
     isAuthenticated: true,
   }),
@@ -36,11 +36,11 @@ describe("OrganizationDetailPage", () => {
   });
 
   it("renders organization details and paginated peladas", async () => {
-    const mockOrg = { id: 1, name: "Test Org", owner_id: 1 };
+    const mockOrg = { id: "1", name: "Test Org", owner_id: "1" };
     const mockPeladas = {
       data: [
-        { id: 1, organization_id: 1, status: "open" },
-        { id: 2, organization_id: 1, status: "closed" },
+        { id: "1", organization_id: "1", status: "open" },
+        { id: "2", organization_id: "1", status: "closed" },
       ],
       total: 25,
       page: 1,
@@ -86,16 +86,16 @@ describe("OrganizationDetailPage", () => {
   });
 
   it("handles page change", async () => {
-    const mockOrg = { id: 1, name: "Test Org", owner_id: 1 };
+    const mockOrg = { id: "1", name: "Test Org", owner_id: "1" };
     const mockPeladasPage1 = {
-      data: [{ id: 1, organization_id: 1, status: "open" }],
+      data: [{ id: "1", organization_id: "1", status: "open" }],
       total: 25,
       page: 1,
       perPage: 10,
       totalPages: 3,
     };
     const mockPeladasPage2 = {
-      data: [{ id: 11, organization_id: 1, status: "open" }],
+      data: [{ id: "11", organization_id: "1", status: "open" }],
       total: 25,
       page: 2,
       perPage: 10,
@@ -148,7 +148,7 @@ describe("OrganizationDetailPage", () => {
   });
 
   it("creates teams and redirects after creating a pelada", async () => {
-    const mockOrg = { id: 1, name: "Test Org", owner_id: 1 };
+    const mockOrg = { id: "1", name: "Test Org", owner_id: "1" };
     const mockPeladas = {
       data: [],
       total: 0,
@@ -168,10 +168,10 @@ describe("OrganizationDetailPage", () => {
       return Promise.reject(new Error("Not found"));
     });
 
-    const createdPelada = { id: 99, organization_id: 1 };
+    const createdPelada = { id: "99", organization_id: "1" };
     (api.post as Mock).mockImplementation((path: string) => {
       if (path === "/api/peladas") return Promise.resolve(createdPelada);
-      if (path === "/api/teams") return Promise.resolve({ id: 500 });
+      if (path === "/api/teams") return Promise.resolve({ id: "500" });
       return Promise.reject(new Error("Unexpected post"));
     });
 
@@ -218,7 +218,7 @@ describe("OrganizationDetailPage", () => {
   });
 
   it("shows leave organization button for non-admin players and opens confirmation dialog", async () => {
-    const mockOrg = { id: 2, name: "Non-Admin Org" };
+    const mockOrg = { id: "2", name: "Non-Admin Org" };
     const mockPeladas = {
       data: [],
       total: 0,
@@ -281,7 +281,7 @@ describe("OrganizationDetailPage", () => {
   });
 
   it("does not show leave organization button for admins", async () => {
-    const mockOrg = { id: 1, name: "Admin Org" };
+    const mockOrg = { id: "1", name: "Admin Org" };
     const mockPeladas = {
       data: [],
       total: 0,
@@ -293,7 +293,7 @@ describe("OrganizationDetailPage", () => {
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/organizations/1") return Promise.resolve(mockOrg);
       if (path === "/api/organizations/1/admins")
-        return Promise.resolve([{ user_id: 1, organization_id: 1 }]); // User is admin
+        return Promise.resolve([{ user_id: "1", organization_id: "1" }]); // User is admin
       return Promise.reject(new Error(`Not found: ${path}`));
     });
     (api.getPaginated as Mock).mockImplementation((path: string) => {

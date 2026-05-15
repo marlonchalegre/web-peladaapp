@@ -14,7 +14,9 @@ vi.mock("react-router-dom", async () => {
 });
 
 describe("MemberOrganizationsList", () => {
-  const mockOrganizations = [{ id: 1, name: "Org 1", role: "player" as const }];
+  const mockOrganizations = [
+    { id: "1", name: "Org 1", role: "player" as const },
+  ];
 
   beforeEach(() => {
     vi.clearAllMocks();

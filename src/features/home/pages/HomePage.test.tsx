@@ -16,7 +16,7 @@ vi.mock("../../../shared/api/client", () => ({
 // Mock AuthContext
 vi.mock("../../../app/providers/AuthContext", () => ({
   useAuth: () => ({
-    user: { id: 1, name: "Test User", email: "test@example.com" },
+    user: { id: "1", name: "Test User", email: "test@example.com" },
     isAuthenticated: true,
   }),
 }));
@@ -36,8 +36,8 @@ describe("HomePage", () => {
   it("lists organizations where user is admin or player", async () => {
     // Mock user organizations
     const mockUserOrgs = [
-      { id: 101, name: "Org Admin", role: "admin" },
-      { id: 102, name: "Org Player", role: "player" },
+      { id: "101", name: "Org Admin", role: "admin" },
+      { id: "102", name: "Org Player", role: "player" },
     ];
 
     (api.get as Mock).mockImplementation((path: string) => {
@@ -79,31 +79,31 @@ describe("HomePage", () => {
         return Promise.resolve({
           data: [
             {
-              id: 1,
+              id: "1",
               status: "open",
               scheduled_at: "2023-01-01T10:00:00Z",
               organization_name: "Org 1",
             },
             {
-              id: 2,
+              id: "2",
               status: "running",
               scheduled_at: "2023-01-02T10:00:00Z",
               organization_name: "Org 1",
             },
             {
-              id: 3,
+              id: "3",
               status: "closed",
               scheduled_at: "2023-01-03T10:00:00Z",
               organization_name: "Org 1",
             },
             {
-              id: 4,
+              id: "4",
               status: "voting",
               scheduled_at: "2023-01-04T10:00:00Z",
               organization_name: "Org 1",
             },
             {
-              id: 5,
+              id: "5",
               status: "attendance",
               scheduled_at: "2023-01-05T10:00:00Z",
               organization_name: "Org 1",

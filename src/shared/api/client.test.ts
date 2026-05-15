@@ -109,7 +109,7 @@ describe("ApiClient", () => {
     it("performs GET requests correctly", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ id: 1, name: "Test" }),
+        json: async () => ({ id: "1", name: "Test" }),
       });
 
       const result = await client.get("/api/users/1");
@@ -118,13 +118,13 @@ describe("ApiClient", () => {
         expect.stringContaining("/api/users/1"),
         expect.objectContaining({ method: "GET" }),
       );
-      expect(result).toEqual({ id: 1, name: "Test" });
+      expect(result).toEqual({ id: "1", name: "Test" });
     });
 
     it("performs POST requests with body correctly", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ id: 1, name: "New User" }),
+        json: async () => ({ id: "1", name: "New User" }),
       });
 
       const body = { name: "New User", email: "new@example.com" };
@@ -137,13 +137,13 @@ describe("ApiClient", () => {
           body: JSON.stringify(body),
         }),
       );
-      expect(result).toEqual({ id: 1, name: "New User" });
+      expect(result).toEqual({ id: "1", name: "New User" });
     });
 
     it("performs PUT requests with body correctly", async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ id: 1, name: "Updated User" }),
+        json: async () => ({ id: "1", name: "Updated User" }),
       });
 
       const body = { name: "Updated User" };
@@ -156,7 +156,7 @@ describe("ApiClient", () => {
           body: JSON.stringify(body),
         }),
       );
-      expect(result).toEqual({ id: 1, name: "Updated User" });
+      expect(result).toEqual({ id: "1", name: "Updated User" });
     });
 
     it("performs DELETE requests correctly", async () => {

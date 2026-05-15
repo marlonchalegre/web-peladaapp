@@ -18,7 +18,7 @@ import {
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import HandshakeIcon from "@mui/icons-material/Handshake";
 import { useTranslation } from "react-i18next";
-import { type OrganizationPlayerStats } from "../../../shared/api/endpoints";
+import type { OrganizationPlayerStats } from "../../../shared/api/endpoints";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 
 interface StatsTableProps {

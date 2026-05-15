@@ -13,17 +13,17 @@ import { enqueueAction, type OfflineActionType } from "../utils/offlineQueue";
 const endpoints = createApi(api);
 
 export function useMatchActions(
-  peladaId: number,
+  peladaId: string,
   data: Record<string, unknown>,
 ) {
   const { t } = useTranslation();
-  const [updatingScore, setUpdatingScore] = useState<Record<number, boolean>>(
+  const [updatingScore, setUpdatingScore] = useState<Record<string, boolean>>(
     {},
   );
   const [closing, setClosing] = useState(false);
   const [selectMenu, setSelectMenu] = useState<{
-    teamId: number;
-    forPlayerId?: number;
+    teamId: string;
+    forPlayerId?: string;
     type: "replace" | "add";
   } | null>(null);
 
@@ -55,7 +55,7 @@ export function useMatchActions(
   );
 
   const adjustScore = useCallback(
-    async (matchId: number, team: "home" | "away", delta: 1 | -1 = 1) => {
+    async (matchId: string, team: "home" | "away", delta: 1 | -1 = 1) => {
       // Use latest available match data from ref
       const match = matchesRef.current.find((m: Match) => m.id === matchId);
       if (!match) return;
@@ -142,8 +142,8 @@ export function useMatchActions(
   );
 
   const deleteEventAndRefresh = async (
-    matchId: number,
-    playerId: number,
+    matchId: string,
+    playerId: string,
     type: "assist" | "goal" | "own_goal",
   ) => {
     // Optimistic
@@ -186,15 +186,15 @@ export function useMatchActions(
   };
 
   const recordEvent = async (
-    matchId: number,
-    playerId: number,
+    matchId: string,
+    playerId: string,
     type: "assist" | "goal" | "own_goal",
     sessionTimeMs?: number,
     matchTimeMs?: number,
   ) => {
     // Optimistic Update
     const newEvent = {
-      id: Date.now(), // temporary id
+      id: String(Date.now()), // temporary id
       match_id: matchId,
       player_id: playerId,
       event_type: type,
@@ -250,12 +250,12 @@ export function useMatchActions(
   };
 
   const addPlayerToTeam = async (
-    matchId: number,
-    teamId: number,
-    playerId: number,
+    matchId: string,
+    teamId: string,
+    playerId: string,
   ) => {
     // Optimistic Update
-    setLineupsByMatch((prev: Record<number, Record<number, TeamPlayer[]>>) => {
+    setLineupsByMatch((prev: Record<string, Record<string, TeamPlayer[]>>) => {
       const matchLineup = prev[matchId] || {};
       const teamLineup = matchLineup[teamId] || [];
       return {
@@ -298,13 +298,13 @@ export function useMatchActions(
   };
 
   const replacePlayerOnMatchTeam = async (
-    matchId: number,
-    teamId: number,
-    outPlayerId: number,
-    inPlayerId: number,
+    matchId: string,
+    teamId: string,
+    outPlayerId: string,
+    inPlayerId: string,
   ) => {
     // Optimistic Update
-    setLineupsByMatch((prev: Record<number, Record<number, TeamPlayer[]>>) => {
+    setLineupsByMatch((prev: Record<string, Record<string, TeamPlayer[]>>) => {
       const matchLineup = prev[matchId] || {};
       const teamLineup = matchLineup[teamId] || [];
       return {
@@ -376,7 +376,7 @@ export function useMatchActions(
     }
   };
 
-  const executeEndMatch = async (matchId: number) => {
+  const executeEndMatch = async (matchId: string) => {
     const match = matchesRef.current.find((m: Match) => m.id === matchId);
     if (!match) return;
 
@@ -490,7 +490,7 @@ export function useMatchActions(
   }, [peladaId, refreshData, setPelada, handleNetworkError]);
 
   const startMatchTimer = useCallback(
-    async (matchId: number) => {
+    async (matchId: string) => {
       setMatches((prev: Match[]) =>
         prev.map((m) =>
           m.id === matchId
@@ -515,7 +515,7 @@ export function useMatchActions(
   );
 
   const pauseMatchTimer = useCallback(
-    async (matchId: number) => {
+    async (matchId: string) => {
       setMatches((prev: Match[]) =>
         prev.map((m) =>
           m.id === matchId
@@ -540,7 +540,7 @@ export function useMatchActions(
   );
 
   const resetMatchTimer = useCallback(
-    async (matchId: number) => {
+    async (matchId: string) => {
       setMatches((prev: Match[]) =>
         prev.map((m) =>
           m.id === matchId

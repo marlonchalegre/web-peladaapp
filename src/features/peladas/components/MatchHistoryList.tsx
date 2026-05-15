@@ -9,13 +9,13 @@ import {
   Divider,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { type Match } from "../../../shared/api/endpoints";
+import type { Match } from "../../../shared/api/endpoints";
 
 interface MatchHistoryListProps {
   matches: Match[];
-  selectedMatchId: number | null;
-  onSelectMatch: (id: number) => void;
-  teamNameById: Record<number, string>;
+  selectedMatchId: string | null;
+  onSelectMatch: (id: string) => void;
+  teamNameById: Record<string, string>;
 }
 
 export default function MatchHistoryList({

@@ -30,7 +30,7 @@ const endpoints = createApi(api);
 export default function OrganizationStatisticsPage() {
   const { t } = useTranslation();
   const { id } = useParams();
-  const orgId = Number(id);
+  const orgId = id!;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const { user } = useAuth();
@@ -74,9 +74,8 @@ export default function OrganizationStatisticsPage() {
     });
   }, [orgId, user]);
 
-  const years = Array.from(
-    { length: 5 },
-    (_, i) => new Date().getFullYear() - i,
+  const years = Array.from({ length: 5 }, (_, i) =>
+    String(new Date().getFullYear() - i),
   );
 
   if (error)

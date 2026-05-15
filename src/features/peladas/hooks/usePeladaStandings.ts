@@ -7,15 +7,15 @@ import {
   type TeamPlayer,
   type Player,
 } from "../../../shared/api/endpoints";
-import { type StandingRow } from "../components/StandingsPanel";
-import { type PlayerStatRow } from "../components/PlayerStatsPanel";
+import type { StandingRow } from "../components/StandingsPanel";
+import type { PlayerStatRow } from "../components/PlayerStatsPanel";
 
 type PlayerStatCounts = { goals: number; assists: number; ownGoals: number };
 
 function aggregateStatsFromEvents(
   events: MatchEvent[],
-): Record<number, PlayerStatCounts> {
-  const counts: Record<number, PlayerStatCounts> = {};
+): Record<string, PlayerStatCounts> {
+  const counts: Record<string, PlayerStatCounts> = {};
   for (const evt of events) {
     const current = counts[evt.player_id] ?? {
       goals: 0,
@@ -32,8 +32,8 @@ function aggregateStatsFromEvents(
 
 function statsMapFromApi(
   stats: PlayerStats[] | null,
-): Record<number, PlayerStatCounts> {
-  const map: Record<number, PlayerStatCounts> = {};
+): Record<string, PlayerStatCounts> {
+  const map: Record<string, PlayerStatCounts> = {};
   if (!stats) return map;
   for (const s of stats) {
     map[s.player_id] = {
@@ -50,11 +50,11 @@ export function usePeladaStandings(
   teams: Team[],
   matchEvents: MatchEvent[],
   playerStatsFromApi: PlayerStats[] | null,
-  teamPlayers: Record<number, TeamPlayer[]>,
-  lineupsByMatch: Record<number, Record<number, TeamPlayer[]>>,
-  orgPlayerIdToUserId: Record<number, number>,
-  userIdToName: Record<number, string>,
-  orgPlayerIdToPlayer: Record<number, Player>,
+  teamPlayers: Record<string, TeamPlayer[]>,
+  lineupsByMatch: Record<string, Record<string, TeamPlayer[]>>,
+  orgPlayerIdToUserId: Record<string, string>,
+  userIdToName: Record<string, string>,
+  orgPlayerIdToPlayer: Record<string, Player>,
 ) {
   const [playerSort, setPlayerSort] = useState<{
     by: "default" | "goals" | "assists";
@@ -62,7 +62,7 @@ export function usePeladaStandings(
   }>({ by: "default", dir: "desc" });
 
   const standings = useMemo(() => {
-    const table: Record<number, StandingRow> = {};
+    const table: Record<string, StandingRow> = {};
     for (const t of teams)
       table[t.id] = {
         teamId: t.id,
@@ -124,23 +124,22 @@ export function usePeladaStandings(
   }, [playerStatsFromApi, matchEvents]);
 
   const playerStats = useMemo<PlayerStatRow[]>(() => {
-    const participatingIds = new Set<number>();
+    const participatingIds = new Set<string>();
     for (const list of Object.values(teamPlayers)) {
       for (const tp of list || []) participatingIds.add(tp.player_id);
     }
-    for (const pidStr of Object.keys(statsMap))
-      participatingIds.add(Number(pidStr));
+    for (const pidStr of Object.keys(statsMap)) participatingIds.add(pidStr);
 
-    const matchesPlayedMap: Record<number, number> = {};
-    const goalsConcededMap: Record<number, number> = {};
+    const matchesPlayedMap: Record<string, number> = {};
+    const goalsConcededMap: Record<string, number> = {};
 
     for (const m of matches) {
       if ((m.status || "").toLowerCase() !== "finished") continue;
       const lu = lineupsByMatch[m.id];
       if (!lu) continue;
-      const playersInMatch = new Set<number>();
+      const playersInMatch = new Set<string>();
       for (const [teamIdStr, list] of Object.entries(lu)) {
-        const teamId = Number(teamIdStr);
+        const teamId = teamIdStr;
         const goalsConcededInMatch =
           teamId === m.home_team_id ? m.away_score : m.home_score;
         for (const tp of list) {

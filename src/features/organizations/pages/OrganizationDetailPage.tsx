@@ -38,7 +38,7 @@ export default function OrganizationDetailPage() {
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const orgId = Number(id);
+  const orgId = id!;
   const [org, setOrg] = useState<Organization | null>(null);
   const [peladas, setPeladas] = useState<Pelada[]>([]);
   const [totalPeladas, setTotalPeladas] = useState(0);

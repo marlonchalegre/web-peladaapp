@@ -14,7 +14,7 @@ import GroupsIcon from "@mui/icons-material/Groups";
 import InfoIcon from "@mui/icons-material/Info";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { type OrganizationWithRole } from "../hooks/useHomeDashboard";
+import type { OrganizationWithRole } from "../hooks/useHomeDashboard";
 
 interface MemberOrganizationsListProps {
   organizations: OrganizationWithRole[];

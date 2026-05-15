@@ -10,7 +10,7 @@ import PeladaMatchesPage from "./PeladaMatchesPage";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { api } from "../../../shared/api/client";
 import { useAuth } from "../../../app/providers/AuthContext";
-import { type Match } from "../../../shared/api/endpoints";
+import type { Match } from "../../../shared/api/endpoints";
 import { ThemeContextProvider } from "../../../app/providers/ThemeProvider";
 
 // Mock the API client
@@ -40,13 +40,13 @@ vi.mock("../components/ActiveMatchDashboard", () => ({
   }: {
     match: Match;
     statsMap: Record<
-      number,
+      string,
       { goals: number; assists: number; ownGoals: number }
     >;
     finished: boolean;
     isAdmin: boolean;
     onEndMatch: () => void;
-    onSelectMatch: (id: number) => void;
+    onSelectMatch: (id: string) => void;
     matches: Match[];
   }) => (
     <div data-testid="active-match-dashboard">
@@ -58,10 +58,10 @@ vi.mock("../components/ActiveMatchDashboard", () => ({
       <button data-testid="end-match-btn" onClick={onEndMatch}>
         End Match
       </button>
-      <button data-testid="select-match-10" onClick={() => onSelectMatch(10)}>
+      <button data-testid="select-match-10" onClick={() => onSelectMatch("10")}>
         Select Match 10
       </button>
-      <button data-testid="select-match-11" onClick={() => onSelectMatch(11)}>
+      <button data-testid="select-match-11" onClick={() => onSelectMatch("11")}>
         Select Match 11
       </button>
       <pre data-testid="stats-map">{JSON.stringify(statsMap)}</pre>
@@ -83,54 +83,54 @@ vi.mock("../components/GlobalSessionTimer", () => ({
 describe("PeladaMatchesPage", () => {
   const mockDashboardData = {
     pelada: {
-      id: 1,
-      organization_id: 101,
+      id: "1",
+      organization_id: "101",
       organization_name: "Test Org",
       status: "running",
       players_per_team: 5,
     },
     matches: [
       {
-        id: 10,
-        pelada_id: 1,
+        id: "10",
+        pelada_id: "1",
         sequence: 1,
         status: "finished",
-        home_team_id: 1,
-        away_team_id: 2,
+        home_team_id: "1",
+        away_team_id: "2",
         home_score: 1,
         away_score: 0,
       },
       {
-        id: 11,
-        pelada_id: 1,
+        id: "11",
+        pelada_id: "1",
         sequence: 2,
         status: "scheduled",
-        home_team_id: 1,
-        away_team_id: 3,
+        home_team_id: "1",
+        away_team_id: "3",
         home_score: 0,
         away_score: 0,
       },
     ],
     teams: [
-      { id: 1, name: "Time 1" },
-      { id: 2, name: "Time 2" },
-      { id: 3, name: "Time 3" },
+      { id: "1", name: "Time 1" },
+      { id: "2", name: "Time 2" },
+      { id: "3", name: "Time 3" },
     ],
-    users: [{ id: 1, name: "Player 1" }],
-    organization_players: [{ id: 100, user_id: 1, organization_id: 101 }],
+    users: [{ id: "1", name: "Player 1" }],
+    organization_players: [{ id: "100", user_id: "1", organization_id: "101" }],
     match_events: [
       {
-        id: 1,
-        match_id: 10,
-        player_id: 100,
+        id: "1",
+        match_id: "10",
+        player_id: "100",
         event_type: "goal",
         session_time_ms: 1000,
         match_time_ms: 500,
       },
       {
-        id: 2,
-        match_id: 11,
-        player_id: 100,
+        id: "2",
+        match_id: "11",
+        player_id: "100",
         event_type: "assist",
         session_time_ms: 2000,
         match_time_ms: 1000,
@@ -147,7 +147,7 @@ describe("PeladaMatchesPage", () => {
       if (path === "/api/peladas/1/dashboard-data")
         return Promise.resolve(mockDashboardData);
       if (path === "/api/organizations/101/admins")
-        return Promise.resolve([{ user_id: 1, organization_id: 101 }]);
+        return Promise.resolve([{ user_id: "1", organization_id: "101" }]);
       if (path === "/api/organizations/101/finance")
         return Promise.resolve({
           mensalista_price: 0,
@@ -159,10 +159,10 @@ describe("PeladaMatchesPage", () => {
 
     (useAuth as Mock).mockReturnValue({
       user: {
-        id: 1,
+        id: "1",
         name: "Test User",
         email: "test@example.com",
-        admin_orgs: [101],
+        admin_orgs: ["101"],
       },
       isAuthenticated: true,
     });
@@ -221,7 +221,7 @@ describe("PeladaMatchesPage", () => {
       if (path === "/api/peladas/1/dashboard-data")
         return Promise.resolve(closedData);
       if (path === "/api/organizations/101/admins")
-        return Promise.resolve([{ user_id: 1, organization_id: 101 }]);
+        return Promise.resolve([{ user_id: "1", organization_id: "101" }]);
       return Promise.reject(new Error(`Not found: ${path}`));
     });
 
@@ -265,7 +265,7 @@ describe("PeladaMatchesPage", () => {
       if (path === "/api/peladas/1/dashboard-data")
         return Promise.resolve(votingData);
       if (path === "/api/organizations/101/admins")
-        return Promise.resolve([{ user_id: 1, organization_id: 101 }]);
+        return Promise.resolve([{ user_id: "1", organization_id: "101" }]);
       return Promise.reject(new Error(`Not found: ${path}`));
     });
 
@@ -287,7 +287,7 @@ describe("PeladaMatchesPage", () => {
       if (path === "/api/peladas/1/dashboard-data")
         return Promise.resolve(closedData);
       if (path === "/api/organizations/101/admins")
-        return Promise.resolve([{ user_id: 1, organization_id: 101 }]);
+        return Promise.resolve([{ user_id: "1", organization_id: "101" }]);
       return Promise.reject(new Error(`Not found: ${path}`));
     });
 

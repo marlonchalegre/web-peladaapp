@@ -16,14 +16,14 @@ vi.mock("react-i18next", () => ({
 }));
 
 describe("TeamCard", () => {
-  const mockTeam: Team = { id: 1, pelada_id: 1, name: "Team Alpha" };
+  const mockTeam: Team = { id: "1", pelada_id: "1", name: "Team Alpha" };
   const mockPlayers: (Player & { user: User; displayScore?: string })[] = [
     {
-      id: 101,
-      user_id: 1,
-      organization_id: 1,
+      id: "101",
+      user_id: "1",
+      organization_id: "1",
       user: {
-        id: 1,
+        id: "1",
         name: "Player 1",
         username: "player1",
         email: "p1@e.com",
@@ -32,11 +32,11 @@ describe("TeamCard", () => {
       displayScore: "8.5",
     },
     {
-      id: 102,
-      user_id: 2,
-      organization_id: 1,
+      id: "102",
+      user_id: "2",
+      organization_id: "1",
       user: {
-        id: 2,
+        id: "2",
         name: "Player 2",
         username: "player2",
         email: "p2@e.com",

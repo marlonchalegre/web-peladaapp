@@ -43,7 +43,7 @@ const endpoints = createApi(api);
 export default function PeladaVotingResultsPage() {
   const { t } = useTranslation();
   const { id } = useParams();
-  const peladaId = Number(id);
+  const peladaId = id!;
 
   const [results, setResults] = useState<VotingResults | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -89,8 +89,8 @@ export default function PeladaVotingResultsPage() {
     mvp: Array(10)
       .fill(null)
       .map((_, i) => ({
-        player_id: i,
-        user_id: 0,
+        player_id: String(i),
+        user_id: String(0),
         name: "Player Name",
         average_stars: 4.5 - i * 0.2,
         position: "Midfielder",
@@ -102,8 +102,8 @@ export default function PeladaVotingResultsPage() {
     striker: Array(3)
       .fill(null)
       .map((_, i) => ({
-        player_id: i,
-        user_id: 0,
+        player_id: String(i),
+        user_id: "0",
         name: "Striker Name",
         goals: 3 - i,
         average_stars: 4.0,
@@ -114,8 +114,8 @@ export default function PeladaVotingResultsPage() {
     garcom: Array(3)
       .fill(null)
       .map((_, i) => ({
-        player_id: i + 10,
-        user_id: 0,
+        player_id: String(i + 10),
+        user_id: "0",
         name: "Assister Name",
         assists: 3 - i,
         average_stars: 4.0,
@@ -128,11 +128,11 @@ export default function PeladaVotingResultsPage() {
     voters: Array(10)
       .fill(null)
       .map((_, i) => ({
-        player_id: i,
+        player_id: String(i),
         name: "Voter Name",
         has_voted: i < 5,
       })),
-    organization_id: 0,
+    organization_id: "0",
     organization_name: "Organization Name",
   };
 
@@ -280,7 +280,7 @@ export default function PeladaVotingResultsPage() {
                 : "/home",
             },
             {
-              label: t("peladas.detail.title", { id: peladaId }),
+              label: t("peladas.detail.title"),
               path: `/peladas/${peladaId}`,
             },
             { label: t("peladas.voting.results.title") },
@@ -439,7 +439,7 @@ export default function PeladaVotingResultsPage() {
                   {displayResults!.mvp[1] && (
                     <Box sx={{ textAlign: "center" }}>
                       <SecureAvatar
-                        userId={displayResults!.mvp[1].user_id || 0}
+                        userId={displayResults!.mvp[1].user_id || "0"}
                         filename={displayResults!.mvp[1].avatar_filename}
                         sx={{
                           bgcolor: "grey.400",
@@ -487,7 +487,7 @@ export default function PeladaVotingResultsPage() {
                         sx={{ color: "gold", fontSize: 40, mb: 1 }}
                       />
                       <SecureAvatar
-                        userId={displayResults!.mvp[0].user_id || 0}
+                        userId={displayResults!.mvp[0].user_id || "0"}
                         filename={displayResults!.mvp[0].avatar_filename}
                         sx={{
                           bgcolor: "gold",
@@ -535,7 +535,7 @@ export default function PeladaVotingResultsPage() {
                   {displayResults!.mvp[2] && (
                     <Box sx={{ textAlign: "center" }}>
                       <SecureAvatar
-                        userId={displayResults!.mvp[2].user_id || 0}
+                        userId={displayResults!.mvp[2].user_id || "0"}
                         filename={displayResults!.mvp[2].avatar_filename}
                         sx={{
                           bgcolor: "brown",

@@ -27,11 +27,11 @@ window.alert = vi.fn();
 describe("AvailablePlayersPanel", () => {
   const mockPlayers: (Player & { user: User })[] = [
     {
-      id: 101,
-      user_id: 1,
-      organization_id: 1,
+      id: "101",
+      user_id: "1",
+      organization_id: "1",
       user: {
-        id: 1,
+        id: "1",
         name: "Alice",
         username: "alice",
         email: "a@e.com",
@@ -39,11 +39,11 @@ describe("AvailablePlayersPanel", () => {
       },
     },
     {
-      id: 102,
-      user_id: 2,
-      organization_id: 1,
+      id: "102",
+      user_id: "2",
+      organization_id: "1",
       user: {
-        id: 2,
+        id: "2",
         name: "Bob",
         username: "bob",
         email: "b@e.com",
@@ -61,8 +61,8 @@ describe("AvailablePlayersPanel", () => {
           onDropToBench={() => {}}
           onDragStartPlayer={() => {}}
           onAddPlayersFromOrg={async () => {}}
-          organizationId={1}
-          allPlayerIdsInPelada={[101, 102]}
+          organizationId="1"
+          allPlayerIdsInPelada={["101", "102"]}
           isAdmin={true}
         />
       </ThemeContextProvider>,
@@ -83,8 +83,8 @@ describe("AvailablePlayersPanel", () => {
           onDropToBench={() => {}}
           onDragStartPlayer={() => {}}
           onAddPlayersFromOrg={async () => {}}
-          organizationId={1}
-          allPlayerIdsInPelada={[101, 102]}
+          organizationId="1"
+          allPlayerIdsInPelada={["101", "102"]}
           isAdmin={true}
         />
       </ThemeContextProvider>,
@@ -108,8 +108,8 @@ describe("AvailablePlayersPanel", () => {
           onDropToBench={() => {}}
           onDragStartPlayer={() => {}}
           onAddPlayersFromOrg={async () => {}}
-          organizationId={1}
-          allPlayerIdsInPelada={[101, 102]}
+          organizationId="1"
+          allPlayerIdsInPelada={["101", "102"]}
         />
       </ThemeContextProvider>,
     );
@@ -128,8 +128,8 @@ describe("AvailablePlayersPanel", () => {
           onDropToBench={() => {}}
           onDragStartPlayer={() => {}}
           onAddPlayersFromOrg={async () => {}}
-          organizationId={1}
-          allPlayerIdsInPelada={[101, 102]}
+          organizationId="1"
+          allPlayerIdsInPelada={["101", "102"]}
           isAdmin={true}
         />
       </ThemeContextProvider>,
@@ -153,7 +153,7 @@ describe("AvailablePlayersPanel", () => {
           onDropToBench={() => {}}
           onDragStartPlayer={() => {}}
           onAddPlayersFromOrg={async () => {}}
-          organizationId={1}
+          organizationId="1"
           allPlayerIdsInPelada={[]}
         />
       </ThemeContextProvider>,

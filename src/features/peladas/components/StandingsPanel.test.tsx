@@ -6,7 +6,7 @@ import { ThemeContextProvider } from "../../../app/providers/ThemeProvider";
 describe("StandingsPanel", () => {
   const mockStandings: StandingRow[] = [
     {
-      teamId: 1,
+      teamId: "1",
       name: "Champions",
       wins: 2,
       draws: 1,
@@ -16,7 +16,7 @@ describe("StandingsPanel", () => {
       goalDifference: 3,
     },
     {
-      teamId: 2,
+      teamId: "2",
       name: "Runners Up",
       wins: 1,
       draws: 1,
@@ -57,7 +57,7 @@ describe("StandingsPanel", () => {
   it("does NOT show champion highlight if no games won/drawn", () => {
     const zeroStandings: StandingRow[] = [
       {
-        teamId: 1,
+        teamId: "1",
         name: "No Games",
         wins: 0,
         draws: 0,

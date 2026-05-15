@@ -31,7 +31,7 @@ interface StatsFiltersProps {
   // Year
   year: number;
   onYearChange: (val: number) => void;
-  years: number[];
+  years: string[];
 }
 
 export default function StatsFilters({

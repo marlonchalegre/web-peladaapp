@@ -9,8 +9,8 @@ import {
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { useTranslation } from "react-i18next";
-import { type AttendanceStatus } from "../../../shared/api/endpoints";
-import { type PlayerWithUser } from "../hooks/useAttendance";
+import type { AttendanceStatus } from "../../../shared/api/endpoints";
+import type { PlayerWithUser } from "../hooks/useAttendance";
 
 interface UserAttendanceStatusProps {
   player: PlayerWithUser;

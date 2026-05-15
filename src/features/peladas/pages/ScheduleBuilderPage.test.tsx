@@ -15,24 +15,24 @@ vi.mock("../../../shared/api/client", () => ({
 // Mock AuthContext
 vi.mock("../../../app/providers/AuthContext", () => ({
   useAuth: () => ({
-    user: { id: 1, name: "Test User" },
+    user: { id: "1", name: "Test User" },
     isAuthenticated: true,
   }),
 }));
 
 describe("ScheduleBuilderPage", () => {
   const mockFullDetails = {
-    pelada: { id: 1, organization_id: 101, status: "open" },
+    pelada: { id: "1", organization_id: "101", status: "open" },
     teams: [
-      { id: 10, name: "Time A" },
-      { id: 11, name: "Time B" },
+      { id: "10", name: "Time A" },
+      { id: "11", name: "Time B" },
     ],
   };
 
   const mockPreview = {
-    matches: [{ home: 10, away: 11 }],
-    template_matches: [{ home: 10, away: 11 }],
-    random_matches: [{ home: 11, away: 10 }],
+    matches: [{ home: "10", away: "11" }],
+    template_matches: [{ home: "10", away: "11" }],
+    random_matches: [{ home: "11", away: "10" }],
     is_from_format: true,
   };
 

@@ -8,7 +8,11 @@ import {
   Stack,
   Typography,
   Alert,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { resetPassword } from "../../../shared/api/client";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -22,6 +26,8 @@ export default function ResetPasswordPage() {
   const token = searchParams.get("token");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -70,7 +76,7 @@ export default function ResetPasswordPage() {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          minHeight: "100%",
+          flex: 1,
           backgroundColor: "background.default",
         }}
       >
@@ -92,7 +98,7 @@ export default function ResetPasswordPage() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "100%",
+        flex: 1,
         backgroundColor: "background.default",
       }}
     >
@@ -124,7 +130,7 @@ export default function ResetPasswordPage() {
             <TextField
               id="password"
               label={t("common.fields.password")}
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -132,12 +138,24 @@ export default function ResetPasswordPage() {
               disabled={success}
               slotProps={{
                 htmlInput: { "data-testid": "reset-password-input" },
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
               }}
             />
             <TextField
               id="confirm-password"
               label={t("user.profile.field.confirm_password")}
-              type="password"
+              type={showConfirmPassword ? "text" : "password"}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
@@ -145,6 +163,18 @@ export default function ResetPasswordPage() {
               disabled={success}
               slotProps={{
                 htmlInput: { "data-testid": "reset-password-confirm" },
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        edge="end"
+                      >
+                        {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
               }}
             />
             <Button

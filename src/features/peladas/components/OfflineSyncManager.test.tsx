@@ -10,7 +10,7 @@ vi.mock("../../../shared/hooks/useNetwork");
 vi.mock("../utils/offlineQueue");
 
 describe("OfflineSyncManager", () => {
-  const peladaId = 123;
+  const peladaId = "123";
   const mockOnSyncComplete = vi.fn();
 
   beforeEach(() => {
@@ -143,7 +143,7 @@ describe("OfflineSyncManager", () => {
       {
         id: "1",
         type: "RECORD_EVENT",
-        payload: { matchId: 1, playerId: 2, type: "goal" },
+        payload: { matchId: 1, playerId: "2", type: "goal" },
         timestamp: Date.now(),
       },
     ]);
@@ -188,7 +188,7 @@ describe("OfflineSyncManager", () => {
       {
         id: "1",
         type: "DELETE_EVENT",
-        payload: { matchId: 1, playerId: 2, type: "goal" },
+        payload: { matchId: 1, playerId: "2", type: "goal" },
         timestamp: Date.now(),
       },
     ]);

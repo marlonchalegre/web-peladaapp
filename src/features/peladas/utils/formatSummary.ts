@@ -1,5 +1,5 @@
-import { type StandingRow } from "../components/StandingsPanel";
-import { type PlayerStatRow } from "../components/PlayerStatsPanel";
+import type { StandingRow } from "../components/StandingsPanel";
+import type { PlayerStatRow } from "../components/PlayerStatsPanel";
 
 export function formatPeladaSummary(
   date: string | null,

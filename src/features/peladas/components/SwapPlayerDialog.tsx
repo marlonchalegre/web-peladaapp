@@ -26,7 +26,7 @@ interface SwapPlayerDialogProps {
   incomingPlayer: PlayerWithUser | null;
   targetTeamName: string;
   targetTeamPlayers: PlayerWithUser[];
-  onSwap: (playerToReplaceId: number) => void;
+  onSwap: (playerToReplaceId: string) => void;
 }
 
 export default function SwapPlayerDialog({

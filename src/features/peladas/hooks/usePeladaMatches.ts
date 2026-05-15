@@ -3,7 +3,7 @@ import { usePeladaData } from "./usePeladaData";
 import { usePeladaStandings } from "./usePeladaStandings";
 import { useMatchActions } from "./useMatchActions";
 
-export function usePeladaMatches(peladaId: number) {
+export function usePeladaMatches(peladaId: string) {
   const data = usePeladaData(peladaId);
   const {
     loading,
@@ -37,19 +37,19 @@ export function usePeladaMatches(peladaId: number) {
 
   const actions = useMatchActions(peladaId, data);
 
-  const [selectedMatchId, setSelectedMatchId] = useState<number | null>(null);
-  const [justFinishedMatchId, setJustFinishedMatchId] = useState<number | null>(
+  const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
+  const [justFinishedMatchId, setJustFinishedMatchId] = useState<string | null>(
     null,
   );
 
-  const handleEndMatch = async (matchId: number) => {
+  const handleEndMatch = async (matchId: string) => {
     await actions.executeEndMatch(matchId);
     setJustFinishedMatchId(matchId);
 
     // If no more matches are scheduled or running, stop all timers
     const hasMoreMatches = matchesRef.current.some(
       (m) =>
-        m.id !== matchId &&
+        String(m.id) !== String(matchId) &&
         (m.status === "scheduled" || m.status === "running"),
     );
 
@@ -99,12 +99,12 @@ export function usePeladaMatches(peladaId: number) {
   }
 
   const selectedMatch = useMemo(
-    () => matches.find((m) => m.id === selectedMatchId),
+    () => matches.find((m) => String(m.id) === String(selectedMatchId)),
     [matches, selectedMatchId],
   );
 
   const justFinishedMatch = useMemo(
-    () => matches.find((m) => m.id === justFinishedMatchId),
+    () => matches.find((m) => String(m.id) === String(justFinishedMatchId)),
     [matches, justFinishedMatchId],
   );
 
@@ -121,7 +121,7 @@ export function usePeladaMatches(peladaId: number) {
 
     // Using simple internal calculation for current match stats UI
     const counts: Record<
-      number,
+      string,
       { goals: number; assists: number; ownGoals: number }
     > = {};
     for (const evt of filteredEvents) {
@@ -163,15 +163,15 @@ export function usePeladaMatches(peladaId: number) {
         })
         .map((a) => {
           const pid = a.player_id ?? a["player-id"] ?? a.playerId ?? a.id;
-          return pid ? Number(pid) : null;
+          return pid ? pid : null;
         })
-        .filter((id): id is number => id !== null),
+        .filter((id): id is string => id !== null),
     );
 
     // If attendance is completely missing/empty, we might want a fallback to avoid a broken UI,
     // but the user says there are confirmed players, so let's stick to the confirmed list first.
     const benchPlayers = Object.values(orgPlayerIdToPlayer).filter((p) => {
-      const pid = Number(p.id);
+      const pid = p.id;
       const isConfirmed =
         confirmedPlayerIds.size === 0 || confirmedPlayerIds.has(pid);
       const isInLineup = lineupIds.has(pid);
@@ -203,16 +203,16 @@ export function usePeladaMatches(peladaId: number) {
     lineupsByMatch,
     orgPlayerIdToUserId,
     orgPlayerIdToTeamId: useMemo(() => {
-      const m: Record<number, number> = {};
+      const m: Record<string, string> = {};
       for (const [teamId, players] of Object.entries(teamPlayers)) {
         for (const p of players) {
-          m[p.player_id] = Number(teamId);
+          m[p.player_id] = teamId;
         }
       }
       for (const [, lineups] of Object.entries(lineupsByMatch)) {
         for (const [teamId, players] of Object.entries(lineups)) {
           for (const p of players) {
-            m[p.player_id] = Number(teamId);
+            m[p.player_id] = teamId;
           }
         }
       }
@@ -228,7 +228,7 @@ export function usePeladaMatches(peladaId: number) {
     standings: standingsData.standings,
     playerStats: standingsData.playerStats,
     teamNameById: useMemo(() => {
-      const m: Record<number, string> = {};
+      const m: Record<string, string> = {};
       for (const t of teams) m[t.id] = t.name;
       return m;
     }, [teams]),

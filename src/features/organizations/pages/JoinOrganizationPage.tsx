@@ -24,7 +24,7 @@ export default function JoinOrganizationPage() {
   const { token } = useParams<{ token: string }>();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   const [invitation, setInvitation] = useState<OrganizationInvitation | null>(
     null,
@@ -35,11 +35,21 @@ export default function JoinOrganizationPage() {
 
   useEffect(() => {
     if (!token) return;
+    
+    // Auth check: ensure user is populated
+    if (isAuthenticated && !user) return;
 
     const fetchInfo = async () => {
       try {
         const info = await endpoints.getInvitationInfo(token);
         setInvitation(info);
+
+        if (isAuthenticated && user) {
+          const orgs = await endpoints.listUserOrganizations(user.id);
+          if (orgs.some((org) => org.id === info.organization_id)) {
+            navigate(`/organizations/${info.organization_id}`);
+          }
+        }
       } catch {
         setError(t("organizations.invitation.error.invalid_token"));
       } finally {
@@ -48,7 +58,7 @@ export default function JoinOrganizationPage() {
     };
 
     fetchInfo();
-  }, [token, t]);
+  }, [token, t, isAuthenticated, user, navigate]);
 
   const handleJoin = async () => {
     if (!token) return;

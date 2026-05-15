@@ -51,7 +51,7 @@ import {
 } from "../../../shared/api/endpoints";
 
 interface FinanceSectionProps {
-  orgId: number;
+  orgId: string;
   isAdmin?: boolean;
 }
 
@@ -137,7 +137,7 @@ export default function FinanceSection({
   // Data states
   const [summary, setSummary] = useState<FinanceSummary | null>(null);
   const [finance, setFinance] = useState<OrganizationFinance>({
-    id: 0,
+    id: "0",
     organization_id: orgId,
     mensalista_price: 0,
     diarista_price: 0,
@@ -368,10 +368,10 @@ export default function FinanceSection({
     }
   };
 
-  const [txToReverse, setTxToReverse] = useState<number | null>(null);
+  const [txToReverse, setTxToReverse] = useState<string | null>(null);
   const [confirmReverseTxOpen, setConfirmReverseTxOpen] = useState(false);
 
-  const handleReverseTransaction = (txId: number) => {
+  const handleReverseTransaction = (txId: string) => {
     if (!isAdmin) return;
     setTxToReverse(txId);
     setConfirmReverseTxOpen(true);

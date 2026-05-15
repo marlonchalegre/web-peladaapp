@@ -41,7 +41,11 @@ describe("SecureAvatar", () => {
 
   it("fetches the image with correct credentials and displays it", async () => {
     render(
-      <SecureAvatar userId={userId} filename={filename} fallbackText="T" />,
+      <SecureAvatar
+        userId={userId.toString()}
+        filename={filename}
+        fallbackText="T"
+      />,
     );
 
     await waitFor(() => {
@@ -59,7 +63,7 @@ describe("SecureAvatar", () => {
   });
 
   it("displays fallback text when no filename is provided", () => {
-    render(<SecureAvatar userId={userId} fallbackText="Fallback" />);
+    render(<SecureAvatar userId={userId.toString()} fallbackText="Fallback" />);
     expect(global.fetch).not.toHaveBeenCalled();
     const fallback = document.querySelector(".MuiAvatar-root");
     expect(fallback?.textContent).toBe("Fallback");
@@ -67,7 +71,7 @@ describe("SecureAvatar", () => {
 
   it("uses the cache for subsequent requests for the same image", async () => {
     const { unmount } = render(
-      <SecureAvatar userId={userId} filename={filename} />,
+      <SecureAvatar userId={userId.toString()} filename={filename} />,
     );
 
     await waitFor(() => {
@@ -75,7 +79,7 @@ describe("SecureAvatar", () => {
     });
 
     // Render another instance with the same props
-    render(<SecureAvatar userId={userId} filename={filename} />);
+    render(<SecureAvatar userId={userId.toString()} filename={filename} />);
 
     // Should NOT fetch again because of the singleton cache
     expect(global.fetch).toHaveBeenCalledTimes(1);
@@ -89,7 +93,11 @@ describe("SecureAvatar", () => {
     } as Response);
 
     render(
-      <SecureAvatar userId={userId} filename={filename} fallbackText="Err" />,
+      <SecureAvatar
+        userId={userId.toString()}
+        filename={filename}
+        fallbackText="Err"
+      />,
     );
 
     await waitFor(() => {

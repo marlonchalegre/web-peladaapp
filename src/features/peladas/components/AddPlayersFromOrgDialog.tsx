@@ -32,9 +32,9 @@ type PlayerWithUser = Player & { user: User };
 type AddPlayersFromOrgDialogProps = {
   open: boolean;
   onClose: () => void;
-  onAdd: (playerIds: number[]) => Promise<void>;
-  organizationId: number;
-  excludePlayerIds: number[];
+  onAdd: (playerIds: string[]) => Promise<void>;
+  organizationId: string;
+  excludePlayerIds: string[];
 };
 
 export default function AddPlayersFromOrgDialog({
@@ -48,7 +48,7 @@ export default function AddPlayersFromOrgDialog({
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [allPlayers, setAllPlayers] = useState<PlayerWithUser[]>([]);
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState("");
 
   const loadPlayers = useCallback(async () => {
@@ -73,7 +73,7 @@ export default function AddPlayersFromOrgDialog({
     }
   }, [open, organizationId, loadPlayers]);
 
-  const handleToggle = (id: number) => {
+  const handleToggle = (id: string) => {
     const newSelected = new Set(selectedIds);
     if (newSelected.has(id)) {
       newSelected.delete(id);

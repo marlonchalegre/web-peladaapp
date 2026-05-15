@@ -28,11 +28,11 @@ import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 
 interface MembersSectionProps {
   players: Player[];
-  usersMap: Map<number, User>;
+  usersMap: Map<string, User>;
   onAddClick: () => void;
   onInviteClick: () => void;
-  onRemovePlayer: (playerId: number) => void;
-  onUpdatePlayer: (playerId: number, payload: Partial<Player>) => void;
+  onRemovePlayer: (playerId: string) => void;
+  onUpdatePlayer: (playerId: string, payload: Partial<Player>) => void;
   actionLoading: boolean;
   page: number;
   rowsPerPage: number;

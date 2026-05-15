@@ -1,14 +1,14 @@
 import { describe, it, expect } from "vitest";
 import { formatPeladaSummary } from "./formatSummary";
-import { type StandingRow } from "../components/StandingsPanel";
-import { type PlayerStatRow } from "../components/PlayerStatsPanel";
+import type { StandingRow } from "../components/StandingsPanel";
+import type { PlayerStatRow } from "../components/PlayerStatsPanel";
 
 describe("formatPeladaSummary", () => {
   it("should format the summary correctly with full data", () => {
     const date = "2026-02-18T15:00:00Z";
     const standings: StandingRow[] = [
       {
-        teamId: 3,
+        teamId: "3",
         name: "Time 3",
         wins: 5,
         draws: 1,
@@ -18,7 +18,7 @@ describe("formatPeladaSummary", () => {
         goalDifference: 8,
       },
       {
-        teamId: 2,
+        teamId: "2",
         name: "Time 2",
         wins: 1,
         draws: 3,
@@ -28,7 +28,7 @@ describe("formatPeladaSummary", () => {
         goalDifference: -2,
       },
       {
-        teamId: 1,
+        teamId: "1",
         name: "Time 1",
         wins: 0,
         draws: 2,
@@ -40,18 +40,18 @@ describe("formatPeladaSummary", () => {
     ];
     const playerStats: PlayerStatRow[] = [
       {
-        playerId: 1,
+        playerId: "1",
         name: "Chalegre",
         goals: 4,
         assists: 0,
         ownGoals: 0,
         goalsConceded: 2,
       },
-      { playerId: 2, name: "C.Bala", goals: 3, assists: 0, ownGoals: 0 },
-      { playerId: 3, name: "Rafa Lucena", goals: 0, assists: 2, ownGoals: 0 },
-      { playerId: 4, name: "Igor", goals: 0, assists: 2, ownGoals: 0 },
+      { playerId: "2", name: "C.Bala", goals: 3, assists: 0, ownGoals: 0 },
+      { playerId: "3", name: "Rafa Lucena", goals: 0, assists: 2, ownGoals: 0 },
+      { playerId: "4", name: "Igor", goals: 0, assists: 2, ownGoals: 0 },
       {
-        playerId: 5,
+        playerId: "5",
         name: "Goalkeeper",
         goals: 0,
         assists: 0,
@@ -100,7 +100,7 @@ describe("formatPeladaSummary", () => {
     const date = "2026-02-18T15:00:00Z";
     const standings: StandingRow[] = [
       {
-        teamId: 1,
+        teamId: "1",
         name: "Time 1",
         wins: 1,
         draws: 0,
@@ -111,7 +111,7 @@ describe("formatPeladaSummary", () => {
       },
     ];
     const playerStats: PlayerStatRow[] = [
-      { playerId: 1, name: "Player 1", goals: 0, assists: 0, ownGoals: 0 },
+      { playerId: "1", name: "Player 1", goals: 0, assists: 0, ownGoals: 0 },
     ];
 
     const result = formatPeladaSummary(date, standings, playerStats);
@@ -129,7 +129,7 @@ describe("formatPeladaSummary", () => {
     const date = null;
     const standings: StandingRow[] = [
       {
-        teamId: 1,
+        teamId: "1",
         name: "Time 1",
         wins: 0,
         draws: 0,
@@ -141,7 +141,7 @@ describe("formatPeladaSummary", () => {
     ];
     const playerStats: PlayerStatRow[] = [
       {
-        playerId: 1,
+        playerId: "1",
         name: "GK",
         goals: 0,
         assists: 0,
@@ -162,7 +162,7 @@ describe("formatPeladaSummary", () => {
     const date = null;
     const standings: StandingRow[] = [
       {
-        teamId: 1,
+        teamId: "1",
         name: "Time 1",
         wins: 0,
         draws: 0,
@@ -174,7 +174,7 @@ describe("formatPeladaSummary", () => {
     ];
     const playerStats: PlayerStatRow[] = [
       {
-        playerId: 1,
+        playerId: "1",
         name: "Only Goalkeeper",
         goals: 0,
         assists: 0,
@@ -182,7 +182,7 @@ describe("formatPeladaSummary", () => {
         goalsConceded: 10,
       },
       {
-        playerId: 2,
+        playerId: "2",
         name: "Striker",
         goals: 5,
         assists: 2,

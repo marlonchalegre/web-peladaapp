@@ -15,7 +15,7 @@ vi.mock("../../../shared/api/client", () => ({
 // Mock AuthContext
 vi.mock("../../../app/providers/AuthContext", () => ({
   useAuth: () => ({
-    user: { id: 1, name: "Current User", email: "me@test.com" },
+    user: { id: "1", name: "Current User", email: "me@test.com" },
     isAuthenticated: true,
   }),
 }));
@@ -46,11 +46,11 @@ describe("PeladaVotingPage", () => {
       can_vote: true,
       has_voted: true,
       eligible_players: [
-        { player_id: 11, name: "Player 11" },
-        { player_id: 12, name: "Player 12" },
+        { player_id: "11", name: "Player 11" },
+        { player_id: "12", name: "Player 12" },
       ],
-      current_votes: [{ target_id: 11, stars: 4 }],
-      voter_player_id: 10,
+      current_votes: [{ target_id: "11", stars: 4 }],
+      voter_player_id: "10",
     };
 
     const mockVotingStatus = {
@@ -60,7 +60,7 @@ describe("PeladaVotingPage", () => {
     };
 
     const mockPeladaDetails = {
-      pelada: { id: 1, is_admin: false },
+      pelada: { id: "1", is_admin: false },
     };
 
     (api.get as Mock).mockImplementation((path: string) => {
@@ -101,8 +101,8 @@ describe("PeladaVotingPage", () => {
     const mockVotingInfo = {
       can_vote: true,
       has_voted: false,
-      eligible_players: [{ player_id: 11, name: "Target Player" }],
-      voter_player_id: 10,
+      eligible_players: [{ player_id: "11", name: "Target Player" }],
+      voter_player_id: "10",
     };
 
     const mockVotingStatus = {
@@ -112,7 +112,7 @@ describe("PeladaVotingPage", () => {
     };
 
     const mockPeladaDetails = {
-      pelada: { id: 1, is_admin: false },
+      pelada: { id: "1", is_admin: false },
     };
 
     (api.get as Mock).mockImplementation((path: string) => {
@@ -134,7 +134,7 @@ describe("PeladaVotingPage", () => {
     );
 
     await waitFor(() => {
-      // t('peladas.voting.title', { id: 1 }) -> 'peladas.voting.title' with simple mock
+      // t('peladas.voting.title', { id: "1" }) -> 'peladas.voting.title' with simple mock
       expect(
         screen.getAllByText("peladas.voting.title").length,
       ).toBeGreaterThan(0);
@@ -147,7 +147,7 @@ describe("PeladaVotingPage", () => {
       can_vote: true,
       has_voted: false,
       eligible_players: [],
-      voter_player_id: 10,
+      voter_player_id: "10",
     };
 
     const mockVotingStatus = {
@@ -157,7 +157,7 @@ describe("PeladaVotingPage", () => {
     };
 
     const mockPeladaDetails = {
-      pelada: { id: 1, is_admin: false },
+      pelada: { id: "1", is_admin: false },
     };
 
     (api.get as Mock).mockImplementation((path: string) => {

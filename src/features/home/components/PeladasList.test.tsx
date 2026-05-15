@@ -19,8 +19,8 @@ vi.mock("react-i18next", () => ({
 describe("PeladasList", () => {
   const mockPeladas = [
     {
-      id: 1,
-      organization_id: 101,
+      id: "1",
+      organization_id: "101",
       organization_name: "Test Org",
       status: "attendance" as const,
       scheduled_at: "2026-03-16T20:30:00.000Z",

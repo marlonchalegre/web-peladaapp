@@ -32,20 +32,20 @@ const mockConfirm = vi.fn();
 window.confirm = mockConfirm;
 
 describe("OrganizationManagementPage", () => {
-  const mockOrg = { id: 1, name: "Test Org" };
+  const mockOrg = { id: "1", name: "Test Org" };
   const mockPlayers = [
     {
-      id: 101,
-      user_id: 1,
-      organization_id: 1,
+      id: "101",
+      user_id: "1",
+      organization_id: "1",
       user_name: "Admin User",
       user_username: "admin",
       user_email: "admin@example.com",
     },
     {
-      id: 102,
-      user_id: 2,
-      organization_id: 1,
+      id: "102",
+      user_id: "2",
+      organization_id: "1",
       user_name: "Player User",
       user_username: "player",
       user_email: "player@example.com",
@@ -53,9 +53,9 @@ describe("OrganizationManagementPage", () => {
   ];
   const mockAdmins = [
     {
-      id: 201,
-      organization_id: 1,
-      user_id: 1,
+      id: "201",
+      organization_id: "1",
+      user_id: "1",
       user_name: "Admin User",
       user_username: "admin",
       user_email: "admin@example.com",
@@ -63,19 +63,19 @@ describe("OrganizationManagementPage", () => {
   ];
   const mockUsers = [
     {
-      id: 1,
+      id: "1",
       name: "Admin User",
       username: "admin",
       email: "admin@example.com",
     },
     {
-      id: 2,
+      id: "2",
       name: "Player User",
       username: "player",
       email: "player@example.com",
     },
     {
-      id: 3,
+      id: "3",
       name: "Search User",
       username: "search",
       email: "search@example.com",
@@ -178,7 +178,7 @@ describe("OrganizationManagementPage", () => {
     });
 
     expect(api.post).toHaveBeenCalledWith("/api/organizations/1/admins", {
-      user_id: 2,
+      user_id: "2",
     });
   });
 
@@ -217,8 +217,8 @@ describe("OrganizationManagementPage", () => {
     });
 
     expect(api.post).toHaveBeenCalledWith("/api/players", {
-      organization_id: 1,
-      user_id: 3,
+      organization_id: "1",
+      user_id: "3",
     });
   });
 });

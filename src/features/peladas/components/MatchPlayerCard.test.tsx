@@ -6,17 +6,17 @@ import { ThemeContextProvider } from "../../../app/providers/ThemeProvider";
 describe("MatchPlayerCard", () => {
   const defaultProps = {
     player: {
-      team_id: 1,
-      player_id: 101,
+      team_id: "1",
+      player_id: "101",
       side: "home" as const,
       is_goalkeeper: false,
     },
     playerName: "Marlon",
     playerData: {
-      id: 101,
-      user_id: 1,
-      organization_id: 1,
-      position_id: 4, // Striker
+      id: "101",
+      user_id: "1",
+      organization_id: "1",
+      position: "striker",
     },
     stats: { goals: 0, assists: 0, ownGoals: 0 },
     finished: false,

@@ -25,21 +25,21 @@ const theme = createTheme({
 });
 
 const mockMatch: Match = {
-  id: 1,
-  pelada_id: 1,
+  id: "1",
+  pelada_id: "1",
   sequence: 4,
-  home_team_id: 10,
-  away_team_id: 20,
+  home_team_id: "10",
+  away_team_id: "20",
   home_score: 4,
   away_score: 3,
   status: "finished",
 };
 
 const mockEvents: MatchEvent[] = [
-  { id: 1, match_id: 1, player_id: 101, event_type: "goal" },
-  { id: 2, match_id: 1, player_id: 101, event_type: "goal" },
-  { id: 3, match_id: 1, player_id: 102, event_type: "assist" },
-  { id: 4, match_id: 1, player_id: 201, event_type: "own_goal" },
+  { id: "1", match_id: "1", player_id: "101", event_type: "goal" },
+  { id: "2", match_id: "1", player_id: "101", event_type: "goal" },
+  { id: "3", match_id: "1", player_id: "102", event_type: "assist" },
+  { id: "4", match_id: "1", player_id: "201", event_type: "own_goal" },
 ];
 
 const mockUserIdToName = {
@@ -47,8 +47,8 @@ const mockUserIdToName = {
   2: "Player Two",
   3: "Opponent One",
 };
-const mockOrgPlayerIdToUserId = { 101: 1, 102: 2, 201: 3 };
-const mockOrgPlayerIdToTeamId = { 101: 10, 102: 10, 201: 20 };
+const mockOrgPlayerIdToUserId = { "101": "1", "102": "2", "201": "3" };
+const mockOrgPlayerIdToTeamId = { "101": "10", "102": "10", "201": "20" };
 const mockTeamNameById = { 10: "Time 4", 20: "Time 2" };
 
 const renderWithTheme = (ui: React.ReactElement) => {
@@ -103,10 +103,10 @@ describe("MatchReportSummary", () => {
   it("shows next match preview when provided", () => {
     const nextMatch: Match = {
       ...mockMatch,
-      id: 2,
+      id: "2",
       sequence: 5,
-      home_team_id: 20,
-      away_team_id: 30,
+      home_team_id: "20",
+      away_team_id: "30",
       home_score: 0,
       away_score: 0,
     };
@@ -138,7 +138,7 @@ describe("MatchReportSummary", () => {
   });
 
   it("calls onProceedToNext when next button is clicked", () => {
-    const nextMatch: Match = { ...mockMatch, id: 2, sequence: 5 };
+    const nextMatch: Match = { ...mockMatch, id: "2", sequence: 5 };
     const onProceed = vi.fn();
 
     renderWithTheme(

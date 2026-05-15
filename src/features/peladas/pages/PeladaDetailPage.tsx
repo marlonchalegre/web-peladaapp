@@ -28,7 +28,7 @@ import {
 export default function PeladaDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams();
-  const peladaId = Number(id);
+  const peladaId = id!;
   const { user } = useAuth();
   const [isOrgAdmin, setIsOrgAdmin] = useState(false);
   const [confirmStartWithScheduleOpen, setConfirmStartWithScheduleOpen] =
@@ -73,19 +73,19 @@ export default function PeladaDetailPage() {
 
   const [pendingSwap, setPendingSwap] = useState<{
     incomingPlayer: Player & { user: User };
-    targetTeamId: number;
-    sourceTeamId: number | null;
+    targetTeamId: string;
+    sourceTeamId: string | null;
   } | null>(null);
 
-  const handleMoveToTeam = (playerId: number, targetTeamId: number) => {
+  const handleMoveToTeam = (playerId: string, targetTeamId: string) => {
     const targetTeamPlayers = teamPlayers[targetTeamId] || [];
     const maxPlayers = pelada?.players_per_team || 5;
 
     // Find if player is in a team already
-    let sourceTeamId: number | null = null;
+    let sourceTeamId: string | null = null;
     for (const tid in teamPlayers) {
       if (teamPlayers[tid].some((p) => p.id === playerId)) {
-        sourceTeamId = Number(tid);
+        sourceTeamId = String(tid);
         break;
       }
     }
@@ -123,7 +123,7 @@ export default function PeladaDetailPage() {
 
   const handleDropToTeam = async (
     e: DragEvent<HTMLElement>,
-    targetTeamId: number,
+    targetTeamId: string,
   ) => {
     e.preventDefault();
     const dataText = e.dataTransfer.getData("application/json");
@@ -160,12 +160,12 @@ export default function PeladaDetailPage() {
     await dropToTeam(e, targetTeamId);
   };
 
-  const handleSendToBench = (playerId: number) => {
+  const handleSendToBench = (playerId: string) => {
     // Find which team the player is in
-    let sourceTeamId: number | null = null;
+    let sourceTeamId: string | null = null;
     for (const tid in teamPlayers) {
       if (teamPlayers[tid].some((p) => p.id === playerId)) {
-        sourceTeamId = Number(tid);
+        sourceTeamId = String(tid);
         break;
       }
     }
@@ -182,12 +182,12 @@ export default function PeladaDetailPage() {
     dropToBench(mockEvent);
   };
 
-  const handleMoveToFixedGk = (playerId: number, side: "home" | "away") => {
+  const handleMoveToFixedGk = (playerId: string, side: "home" | "away") => {
     // Find where player is currently (team or bench)
-    let sourceTeamId: number | null = null;
+    let sourceTeamId: string | null = null;
     for (const tid in teamPlayers) {
       if (teamPlayers[tid].some((p) => p.id === playerId)) {
-        sourceTeamId = Number(tid);
+        sourceTeamId = String(tid);
         break;
       }
     }
@@ -203,9 +203,9 @@ export default function PeladaDetailPage() {
   };
 
   const [isReverseDialogOpen, setIsReverseDialogOpen] = useState(false);
-  const [playerToReverse, setPlayerToReverse] = useState<number | null>(null);
+  const [playerToReverse, setPlayerToReverse] = useState<string | null>(null);
 
-  const handlePerformSwap = async (playerToReplaceId: number) => {
+  const handlePerformSwap = async (playerToReplaceId: string) => {
     if (!pendingSwap) return;
     const { incomingPlayer, targetTeamId, sourceTeamId } = pendingSwap;
 
@@ -226,7 +226,7 @@ export default function PeladaDetailPage() {
     setIsReverseDialogOpen(false);
   };
 
-  const onReverseClick = (playerId: number) => {
+  const onReverseClick = (playerId: string) => {
     setPlayerToReverse(playerId);
     setIsReverseDialogOpen(true);
   };
@@ -294,7 +294,7 @@ export default function PeladaDetailPage() {
               label: pelada.organization_name || t("common.organization"),
               path: `/organizations/${pelada.organization_id}`,
             },
-            { label: t("peladas.detail.title", { id: pelada.id }) },
+            { label: t("peladas.detail.title") },
           ]}
         />
       </Box>

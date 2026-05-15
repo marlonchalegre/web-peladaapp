@@ -16,9 +16,9 @@ interface SessionInsightsProps {
   isClosed?: boolean;
   // Timeline props
   events: MatchEvent[];
-  userIdToName: Record<number, string>;
-  orgPlayerIdToUserId: Record<number, number>;
-  teamNameById: Record<number, string>;
+  userIdToName: Record<string, string>;
+  orgPlayerIdToUserId: Record<string, string>;
+  teamNameById: Record<string, string>;
 }
 
 interface TabPanelProps {

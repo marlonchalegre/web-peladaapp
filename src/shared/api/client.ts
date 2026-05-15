@@ -201,12 +201,12 @@ export type LoginResponse = {
 };
 
 export type User = {
-  id: number;
+  id: string;
   name: string;
   username: string;
   email?: string;
   phone?: string;
-  admin_orgs?: number[];
+  admin_orgs?: string[];
   position?: string;
   avatar_filename?: string | null;
   token?: string; // Add token field for first-access
@@ -264,23 +264,23 @@ export async function register(
   });
 }
 
-export async function getUser(userId: number): Promise<User> {
+export async function getUser(userId: string): Promise<User> {
   return api.get<User>(`/api/user/${userId}`);
 }
 
 export async function updateUserProfile(
-  userId: number,
+  userId: string,
   updates: UserProfileUpdate,
 ): Promise<User> {
   return api.put<User>(`/api/user/${userId}/profile`, updates);
 }
 
-export async function deleteUser(userId: number): Promise<void> {
+export async function deleteUser(userId: string): Promise<void> {
   return api.delete<void>(`/api/user/${userId}`);
 }
 
 export async function uploadUserAvatar(
-  id: number,
+  id: string,
   file: File,
 ): Promise<{ avatar_filename: string }> {
   const formData = new FormData();
@@ -300,12 +300,12 @@ export async function uploadUserAvatar(
   return res.json();
 }
 
-export async function deleteUserAvatar(id: number): Promise<void> {
+export async function deleteUserAvatar(id: string): Promise<void> {
   return api.delete(`/api/user/${id}/avatar`);
 }
 
 export function getUserAvatarUrl(
-  userId: number,
+  userId: string,
   filename?: string | null,
 ): string | undefined {
   if (!filename) return undefined;

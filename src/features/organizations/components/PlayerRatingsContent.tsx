@@ -22,7 +22,7 @@ import { createApi, type Player } from "../../../shared/api/endpoints";
 const endpoints = createApi(api);
 
 interface PlayerRatingsContentProps {
-  orgId: number;
+  orgId: string;
   initialPlayers: Player[];
   orgName: string;
   onUpdateSuccess?: () => void;
@@ -52,7 +52,7 @@ export default function PlayerRatingsContent({
     setPlayers(initialPlayers);
   }, [initialPlayers]);
 
-  const handleRatingChange = async (playerId: number, newRating: number) => {
+  const handleRatingChange = async (playerId: string, newRating: number) => {
     try {
       await endpoints.updatePlayer(playerId, { grade: newRating });
       setPlayers((prev) =>
@@ -197,7 +197,7 @@ export default function PlayerRatingsContent({
                     <TextField
                       type="number"
                       size="small"
-                      value={player.grade || 0}
+                      value={player.grade || "0"}
                       onChange={(e) => {
                         const val = parseFloat(e.target.value);
                         if (!isNaN(val)) {

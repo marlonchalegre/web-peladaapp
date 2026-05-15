@@ -36,8 +36,8 @@ const mockSummary = {
 };
 
 const mockFinance = {
-  id: 1,
-  organization_id: 10,
+  id: "1",
+  organization_id: "10",
   mensalista_price: 100,
   diarista_price: 20,
   currency: "BRL",
@@ -46,8 +46,8 @@ const mockFinance = {
 const mockTransactions = {
   data: [
     {
-      id: 1,
-      organization_id: 10,
+      id: "1",
+      organization_id: "10",
       amount: 100,
       type: "income",
       category: "monthly_fee",
@@ -63,7 +63,7 @@ const mockTransactions = {
 
 const mockMonthlyPayments = [
   {
-    player_id: 101,
+    player_id: "101",
     player_name: "Alice",
     member_type: "mensalista",
     year: 2026,
@@ -71,7 +71,7 @@ const mockMonthlyPayments = [
     paid: true,
   },
   {
-    player_id: 102,
+    player_id: "102",
     player_name: "Bob",
     member_type: "mensalista",
     year: 2026,
@@ -101,7 +101,7 @@ describe("FinanceSection", () => {
   });
 
   it("renders summary cards with correct values", async () => {
-    render(<FinanceSection orgId={10} isAdmin={true} />);
+    render(<FinanceSection orgId={"10"} isAdmin={true} />);
 
     await waitFor(() => {
       expect(screen.queryByTestId("finance-loading")).toBeNull();
@@ -116,7 +116,7 @@ describe("FinanceSection", () => {
   });
 
   it("switches between tabs and shows pagination", async () => {
-    render(<FinanceSection orgId={10} isAdmin={true} />);
+    render(<FinanceSection orgId={"10"} isAdmin={true} />);
 
     await waitFor(() => {
       expect(screen.getByText("Alice")).toBeDefined();
@@ -142,7 +142,7 @@ describe("FinanceSection", () => {
   });
 
   it("marks monthly payment as paid", async () => {
-    render(<FinanceSection orgId={10} isAdmin={true} />);
+    render(<FinanceSection orgId={"10"} isAdmin={true} />);
 
     await waitFor(() => {
       expect(screen.getByText("Bob")).toBeDefined();
@@ -155,9 +155,9 @@ describe("FinanceSection", () => {
 
     await waitFor(() => {
       expect(mockApi.markMonthlyPayment).toHaveBeenCalledWith(
-        10,
+        "10",
         expect.objectContaining({
-          player_id: 102,
+          player_id: "102",
           paid: true,
         }),
       );
@@ -165,7 +165,7 @@ describe("FinanceSection", () => {
   });
 
   it("reverses monthly payment after confirmation", async () => {
-    render(<FinanceSection orgId={10} isAdmin={true} />);
+    render(<FinanceSection orgId={"10"} isAdmin={true} />);
 
     await waitFor(() => {
       expect(screen.getByText("Alice")).toBeDefined();
@@ -197,9 +197,9 @@ describe("FinanceSection", () => {
 
     await waitFor(() => {
       expect(mockApi.markMonthlyPayment).toHaveBeenCalledWith(
-        10,
+        "10",
         expect.objectContaining({
-          player_id: 101,
+          player_id: "101",
           paid: false,
         }),
       );
@@ -207,7 +207,7 @@ describe("FinanceSection", () => {
   });
 
   it("updates finance configuration with float values", async () => {
-    render(<FinanceSection orgId={10} isAdmin={true} />);
+    render(<FinanceSection orgId={"10"} isAdmin={true} />);
 
     await waitFor(() => {
       const configTab = screen.getByTestId("finance-tab-config");
@@ -224,7 +224,7 @@ describe("FinanceSection", () => {
 
     await waitFor(() => {
       expect(mockApi.updateOrganizationFinance).toHaveBeenCalledWith(
-        10,
+        "10",
         expect.objectContaining({
           mensalista_price: 150.5,
         }),

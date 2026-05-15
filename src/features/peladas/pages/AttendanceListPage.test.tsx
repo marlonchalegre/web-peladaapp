@@ -17,7 +17,7 @@ vi.mock("../../../shared/api/client", () => ({
 vi.mock("../../../app/providers/AuthContext", () => ({
   useAuth: () => ({
     user: {
-      id: 1,
+      id: "1",
       name: "Test User",
       email: "test@example.com",
       admin_orgs: [],
@@ -34,35 +34,35 @@ describe("AttendanceListPage", () => {
   it("renders attendance list and tabs", async () => {
     const mockFullDetails = {
       pelada: {
-        id: 1,
-        organization_id: 101,
+        id: "1",
+        organization_id: "101",
         organization_name: "Test Org",
         status: "attendance",
       },
       available_players: [
         {
-          id: 10,
-          user_id: 1,
+          id: "10",
+          user_id: "1",
           attendance_status: "confirmed",
-          user: { id: 1, name: "Confirmed Player", position: "Striker" },
+          user: { id: "1", name: "Confirmed Player", position: "Striker" },
         },
         {
-          id: 11,
-          user_id: 2,
+          id: "11",
+          user_id: "2",
           attendance_status: "waitlist",
-          user: { id: 2, name: "Waitlist Player", position: "Goalkeeper" },
+          user: { id: "2", name: "Waitlist Player", position: "Goalkeeper" },
         },
         {
-          id: 12,
-          user_id: 3,
+          id: "12",
+          user_id: "3",
           attendance_status: "pending",
-          user: { id: 3, name: "Pending Player", position: "Defender" },
+          user: { id: "3", name: "Pending Player", position: "Defender" },
         },
         {
-          id: 13,
-          user_id: 4,
+          id: "13",
+          user_id: "4",
           attendance_status: "declined",
-          user: { id: 4, name: "Declined Player", position: "Midfielder" },
+          user: { id: "4", name: "Declined Player", position: "Midfielder" },
         },
       ],
       teams: [],

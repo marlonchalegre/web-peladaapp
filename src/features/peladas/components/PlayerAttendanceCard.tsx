@@ -19,7 +19,7 @@ import {
   type AttendanceStatus,
   type OrganizationFinance,
 } from "../../../shared/api/endpoints";
-import { type PlayerWithUser } from "../hooks/useAttendance";
+import type { PlayerWithUser } from "../hooks/useAttendance";
 
 interface PlayerAttendanceCardProps {
   player: PlayerWithUser;

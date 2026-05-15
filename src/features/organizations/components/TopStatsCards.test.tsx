@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import TopStatsCards from "./TopStatsCards";
-import { type OrganizationPlayerStats } from "../../../shared/api/endpoints";
+import type { OrganizationPlayerStats } from "../../../shared/api/endpoints";
 import { ThemeProvider, createTheme } from "@mui/material";
 
 // Mock i18next
@@ -15,7 +15,7 @@ const theme = createTheme();
 
 const mockStats: OrganizationPlayerStats[] = [
   {
-    player_id: 1,
+    player_id: "1",
     player_name: "Marlon",
     goal: 10,
     assist: 2,
@@ -24,7 +24,7 @@ const mockStats: OrganizationPlayerStats[] = [
     avg_rating: 4.5,
   },
   {
-    player_id: 2,
+    player_id: "2",
     player_name: "Cicero",
     goal: 5,
     assist: 8,
