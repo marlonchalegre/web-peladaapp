@@ -29,6 +29,7 @@ export interface Player {
   user_id: string;
   organization_id: string;
   grade?: number | null;
+  position?: string | null;
   position_id?: string | null;
   member_type?:
     | "mensalista"

@@ -16,7 +16,7 @@ describe("MatchPlayerCard", () => {
       id: "101",
       user_id: "1",
       organization_id: "1",
-      position_id: "4", // Striker
+      position: "striker",
     },
     stats: { goals: 0, assists: 0, ownGoals: 0 },
     finished: false,

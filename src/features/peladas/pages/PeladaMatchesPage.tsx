@@ -210,11 +210,11 @@ export default function PeladaMatchesPage() {
                 "Unknown",
               username: orgPlayer.user_username || "",
               email: orgPlayer.user_email || "",
-              position: orgPlayer.position_id
-                ? ["goalkeeper", "defender", "midfielder", "striker"][
-                    Number(orgPlayer.position_id || 1) - 1
-                  ] || "unknown"
-                : "unknown",
+              position: orgPlayer.position
+                ? orgPlayer.position.toLowerCase()
+                : orgPlayer.user_position
+                  ? orgPlayer.user_position.toLowerCase()
+                  : "unknown",
             },
           } as PlayerWithUser;
         })

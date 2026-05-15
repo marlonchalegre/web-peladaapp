@@ -32,6 +32,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditIcon from "@mui/icons-material/Edit";
 import { useTranslation } from "react-i18next";
 import PlayerSelectMenu from "./PlayerSelectMenu";
+import { POSITION_ORDER } from "../utils/playerUtils";
 
 export type SelectMenuState = {
   teamId: string;
@@ -192,8 +193,16 @@ export default function ActiveMatchDashboard(props: Props) {
         const playerA = orgPlayerIdToPlayer[a.player_id];
         const playerB = orgPlayerIdToPlayer[b.player_id];
 
-        const posA = Number(playerA?.position_id || 99);
-        const posB = Number(playerB?.position_id || 99);
+        // 1. Manual goalkeeper override (highest priority)
+        if (a.is_goalkeeper && !b.is_goalkeeper) return -1;
+        if (!a.is_goalkeeper && b.is_goalkeeper) return 1;
+
+        // 2. Standard position order
+        const getPosStr = (p?: Player) =>
+          (p?.position || p?.user_position || "").toLowerCase();
+        
+        const posA = POSITION_ORDER[getPosStr(playerA)] ?? 99;
+        const posB = POSITION_ORDER[getPosStr(playerB)] ?? 99;
 
         if (posA !== posB) return posA - posB;
 

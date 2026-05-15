@@ -33,11 +33,12 @@ export default function PlayerSelectMenu({
   const [search, setSearch] = useState("");
 
   const getPositionLabel = (player: Player) => {
-    const key = player.position_id
-      ? ["goalkeeper", "defender", "midfielder", "striker"][
-          Number(player.position_id || 1) - 1
-        ]
-      : "player";
+    let key = "player";
+    if (player.position) {
+      key = player.position.toLowerCase();
+    } else if (player.user_position) {
+      key = player.user_position.toLowerCase();
+    }
     return t(`common.positions.${key}`).toUpperCase();
   };
 

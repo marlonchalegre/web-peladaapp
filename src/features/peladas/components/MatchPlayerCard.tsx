@@ -97,13 +97,23 @@ export default function MatchPlayerCard({
   const teamColor =
     player.side === "home" ? theme.palette.home.main : theme.palette.away.main;
 
-  const positionKey = player.is_goalkeeper
-    ? "goalkeeper"
-    : playerData?.position_id && !isNaN(Number(playerData.position_id))
-      ? ["goalkeeper", "defender", "midfielder", "striker"][
-          Number(playerData.position_id) - 1
-        ]
-      : "player";
+  const getPositionKey = () => {
+    if (player.is_goalkeeper) return "goalkeeper";
+
+    // Try position string first
+    if (playerData?.position) {
+      return playerData.position.toLowerCase();
+    }
+
+    // Try user_position string
+    if (playerData?.user_position) {
+      return playerData.user_position.toLowerCase();
+    }
+
+    return "player";
+  };
+
+  const positionKey = getPositionKey();
 
   const showControls = isAdmin && !finished;
 
