@@ -63,7 +63,7 @@ describe("InvitationsList", () => {
     const deleteButtons = screen.getAllByLabelText("common.revoke");
     fireEvent.click(deleteButtons[0]);
 
-    expect(defaultProps.onRevoke).toHaveBeenCalledWith(1);
+    expect(defaultProps.onRevoke).toHaveBeenCalledWith("1");
   });
 
   it("calls onInviteClick when invite button is clicked", () => {

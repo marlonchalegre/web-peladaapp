@@ -139,7 +139,7 @@ describe("AddPlayersDialog", () => {
       fireEvent.click(selectAllBtn);
     });
 
-    expect(defaultProps.onSelectAll).toHaveBeenCalledWith([1, 2]);
+    expect(defaultProps.onSelectAll).toHaveBeenCalledWith(["1", "2"]);
   });
 
   it("calls onToggle when a checkbox is clicked", async () => {
@@ -157,7 +157,7 @@ describe("AddPlayersDialog", () => {
       fireEvent.click(checkboxes[0]);
     });
 
-    expect(defaultProps.onToggle).toHaveBeenCalledWith(1, true);
+    expect(defaultProps.onToggle).toHaveBeenCalledWith("1", true);
   });
 
   it("shows 'Load More' button when hasMore is true", async () => {

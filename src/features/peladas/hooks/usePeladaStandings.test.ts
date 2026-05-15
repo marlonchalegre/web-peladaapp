@@ -49,7 +49,7 @@ describe("usePeladaStandings Tie-breaking logic", () => {
     );
 
     // Time A should be first due to GD (+1 vs -1)
-    expect(result.current.standings[0].teamId).toBe(1);
+    expect(result.current.standings[0].teamId).toBe("1");
     expect(result.current.standings[0].goalsFor).toBe(4);
     expect(result.current.standings[0].goalsAgainst).toBe(3);
     expect(result.current.standings[0].goalDifference).toBe(1);
@@ -92,7 +92,7 @@ describe("usePeladaStandings Tie-breaking logic", () => {
     );
 
     // Time B should be first due to GS (4 vs 3) since GD is both 3
-    expect(result.current.standings[0].teamId).toBe(2);
+    expect(result.current.standings[0].teamId).toBe("2");
     expect(result.current.standings[0].goalDifference).toBe(3);
     expect(result.current.standings[0].goalsFor).toBe(4);
   });

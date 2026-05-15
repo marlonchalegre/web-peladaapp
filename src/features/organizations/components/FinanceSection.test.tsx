@@ -155,7 +155,7 @@ describe("FinanceSection", () => {
 
     await waitFor(() => {
       expect(mockApi.markMonthlyPayment).toHaveBeenCalledWith(
-        10,
+        "10",
         expect.objectContaining({
           player_id: "102",
           paid: true,
@@ -197,7 +197,7 @@ describe("FinanceSection", () => {
 
     await waitFor(() => {
       expect(mockApi.markMonthlyPayment).toHaveBeenCalledWith(
-        10,
+        "10",
         expect.objectContaining({
           player_id: "101",
           paid: false,
@@ -224,7 +224,7 @@ describe("FinanceSection", () => {
 
     await waitFor(() => {
       expect(mockApi.updateOrganizationFinance).toHaveBeenCalledWith(
-        10,
+        "10",
         expect.objectContaining({
           mensalista_price: 150.5,
         }),

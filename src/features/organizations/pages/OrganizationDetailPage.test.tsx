@@ -22,7 +22,7 @@ vi.mock("../../../app/providers/AuthContext", () => ({
       id: "1",
       name: "Test User",
       email: "test@example.com",
-      admin_orgs: [1],
+      admin_orgs: ["1"],
     },
     isAuthenticated: true,
   }),

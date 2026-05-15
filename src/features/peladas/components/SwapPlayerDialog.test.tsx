@@ -67,7 +67,7 @@ describe("SwapPlayerDialog", () => {
     );
 
     fireEvent.click(screen.getByText("Defender One"));
-    expect(onSwap).toHaveBeenCalledWith(1);
+    expect(onSwap).toHaveBeenCalledWith("1");
   });
 
   it("calls onClose when cancel is clicked", () => {

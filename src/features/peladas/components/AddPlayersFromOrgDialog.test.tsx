@@ -108,7 +108,7 @@ describe("AddPlayersFromOrgDialog", () => {
     fireEvent.click(submitBtn);
 
     await waitFor(() => {
-      expect(onAdd).toHaveBeenCalledWith([1, 2]);
+      expect(onAdd).toHaveBeenCalledWith(["1", "2"]);
       expect(onClose).toHaveBeenCalled();
     });
   });

@@ -40,13 +40,13 @@ vi.mock("../components/ActiveMatchDashboard", () => ({
   }: {
     match: Match;
     statsMap: Record<
-      number,
+      string,
       { goals: number; assists: number; ownGoals: number }
     >;
     finished: boolean;
     isAdmin: boolean;
     onEndMatch: () => void;
-    onSelectMatch: (id: number) => void;
+    onSelectMatch: (id: string) => void;
     matches: Match[];
   }) => (
     <div data-testid="active-match-dashboard">
@@ -58,10 +58,10 @@ vi.mock("../components/ActiveMatchDashboard", () => ({
       <button data-testid="end-match-btn" onClick={onEndMatch}>
         End Match
       </button>
-      <button data-testid="select-match-10" onClick={() => onSelectMatch(10)}>
+      <button data-testid="select-match-10" onClick={() => onSelectMatch("10")}>
         Select Match 10
       </button>
-      <button data-testid="select-match-11" onClick={() => onSelectMatch(11)}>
+      <button data-testid="select-match-11" onClick={() => onSelectMatch("11")}>
         Select Match 11
       </button>
       <pre data-testid="stats-map">{JSON.stringify(statsMap)}</pre>
@@ -162,7 +162,7 @@ describe("PeladaMatchesPage", () => {
         id: "1",
         name: "Test User",
         email: "test@example.com",
-        admin_orgs: [101],
+        admin_orgs: ["101"],
       },
       isAuthenticated: true,
     });

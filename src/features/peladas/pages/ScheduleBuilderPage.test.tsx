@@ -30,9 +30,9 @@ describe("ScheduleBuilderPage", () => {
   };
 
   const mockPreview = {
-    matches: [{ home: 10, away: 11 }],
-    template_matches: [{ home: 10, away: 11 }],
-    random_matches: [{ home: 11, away: 10 }],
+    matches: [{ home: "10", away: "11" }],
+    template_matches: [{ home: "10", away: "11" }],
+    random_matches: [{ home: "11", away: "10" }],
     is_from_format: true,
   };
 

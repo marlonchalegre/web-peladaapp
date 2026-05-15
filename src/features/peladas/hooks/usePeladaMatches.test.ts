@@ -46,7 +46,7 @@ describe("usePeladaMatches", () => {
     expect(benchPlayers).toBeDefined();
     // Should only contain player 1
     expect(benchPlayers?.length).toBe(1);
-    expect(benchPlayers?.[0].id).toBe(1);
+    expect(benchPlayers?.[0].id).toBe("1");
   });
 
   it("should handle status case-insensitivity and ID as number/string", () => {

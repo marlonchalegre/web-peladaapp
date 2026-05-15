@@ -91,7 +91,7 @@ describe("UserProfilePage", () => {
     fireEvent.click(screen.getByText("user.profile.button.save"));
 
     await waitFor(() => {
-      expect(updateUserProfile).toHaveBeenCalledWith(1, {
+      expect(updateUserProfile).toHaveBeenCalledWith("1", {
         phone: "+55123456789",
       });
     });
@@ -127,7 +127,7 @@ describe("UserProfilePage", () => {
     fireEvent.click(screen.getByText("user.profile.button.save"));
 
     await waitFor(() => {
-      expect(updateUserProfile).toHaveBeenCalledWith(1, {
+      expect(updateUserProfile).toHaveBeenCalledWith("1", {
         name: "Updated User",
       });
     });
@@ -160,7 +160,7 @@ describe("UserProfilePage", () => {
     fireEvent.click(screen.getByText("user.profile.button.save"));
 
     await waitFor(() => {
-      expect(updateUserProfile).toHaveBeenCalledWith(1, {
+      expect(updateUserProfile).toHaveBeenCalledWith("1", {
         position: "Striker",
       });
     });
@@ -189,7 +189,7 @@ describe("UserProfilePage", () => {
     fireEvent.click(screen.getByText("user.profile.button.save"));
 
     await waitFor(() => {
-      expect(updateUserProfile).toHaveBeenCalledWith(1, {
+      expect(updateUserProfile).toHaveBeenCalledWith("1", {
         email: "",
       });
     });
