@@ -10,7 +10,11 @@ import {
   Alert,
   Link as MLink,
   MenuItem,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { register, login } from "../../../shared/api/client";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -30,6 +34,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [position, setPosition] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -74,7 +79,7 @@ export default function RegisterPage() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "100%",
+        flex: 1,
         backgroundColor: "background.default",
       }}
     >
@@ -140,7 +145,7 @@ export default function RegisterPage() {
             <TextField
               id="password"
               label={t("common.fields.password")}
-              type="password"
+              type={showPassword ? "text" : "password"}
               autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -148,6 +153,18 @@ export default function RegisterPage() {
               fullWidth
               slotProps={{
                 htmlInput: { "data-testid": "register-password" },
+                input: {
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
               }}
             />
             <TextField
