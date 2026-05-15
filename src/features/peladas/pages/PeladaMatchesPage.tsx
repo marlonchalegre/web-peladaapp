@@ -50,7 +50,7 @@ import OfflineSyncManager from "../components/OfflineSyncManager";
 export default function PeladaMatchesPage() {
   const { t } = useTranslation();
   const { id } = useParams();
-  const peladaId = Number(id);
+  const peladaId = id!;
   const { user } = useAuth();
   const [isOrgAdmin, setIsOrgAdmin] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
@@ -59,7 +59,7 @@ export default function PeladaMatchesPage() {
   } | null>(null);
 
   // Confirmation Dialog States
-  const [endMatchConfirmOpen, setEndMatchConfirmOpen] = useState<number | null>(
+  const [endMatchConfirmOpen, setEndMatchConfirmOpen] = useState<string | null>(
     null,
   );
   const [closePeladaConfirmOpen, setClosePeladaConfirmOpen] = useState(false);
@@ -191,9 +191,9 @@ export default function PeladaMatchesPage() {
   };
 
   const getFullTeamPlayers = () => {
-    const full: Record<number, PlayerWithUser[]> = {};
+    const full: Record<string, PlayerWithUser[]> = {};
     for (const [teamId, players] of Object.entries(teamPlayers)) {
-      full[Number(teamId)] = players
+      full[teamId] = players
         .map((p) => {
           const orgPlayer = orgPlayerIdToPlayer[p.player_id];
           if (!orgPlayer) return null;
@@ -212,7 +212,7 @@ export default function PeladaMatchesPage() {
               email: orgPlayer.user_email || "",
               position: orgPlayer.position_id
                 ? ["goalkeeper", "defender", "midfielder", "striker"][
-                    orgPlayer.position_id - 1
+                    Number(orgPlayer.position_id || 1) - 1
                   ] || "unknown"
                 : "unknown",
             },
@@ -275,7 +275,7 @@ export default function PeladaMatchesPage() {
                 path: `/organizations/${pelada?.organization_id}`,
               },
               {
-                label: t("peladas.detail.title", { id: peladaId }),
+                label: t("peladas.detail.title"),
                 path: `/peladas/${peladaId}`,
               },
               { label: t("peladas.detail.button.view_matches") },

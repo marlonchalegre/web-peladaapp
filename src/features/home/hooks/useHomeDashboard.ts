@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 const endpoints = createApi(api);
 
 export type OrganizationWithRole = {
-  id: number;
+  id: string;
   name: string;
   role: "admin" | "player";
 };

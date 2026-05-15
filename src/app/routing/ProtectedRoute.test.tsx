@@ -43,7 +43,7 @@ describe("ProtectedRoute", () => {
       isAuthenticated: true,
       token: "valid-token",
       user: {
-        id: 1,
+        id: "1",
         name: "Test User",
         username: "testuser",
         email: "test@example.com",
@@ -119,7 +119,7 @@ describe("ProtectedRoute", () => {
       isAuthenticated: true,
       token: "valid-token",
       user: {
-        id: 1,
+        id: "1",
         name: "Test User",
         username: "testuser",
         email: "test@example.com",

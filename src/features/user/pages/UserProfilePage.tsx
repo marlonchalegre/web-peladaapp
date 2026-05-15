@@ -267,7 +267,7 @@ export default function UserProfilePage() {
 
           <Box sx={{ position: "relative", display: "inline-block" }}>
             <SecureAvatar
-              userId={authUser?.id || 0}
+              userId={authUser?.id || "0"}
               filename={avatarFilename}
               sx={{
                 width: 100,

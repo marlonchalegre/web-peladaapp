@@ -15,8 +15,8 @@ vi.mock("react-router-dom", async () => {
 
 describe("AdminOrganizationsList", () => {
   const mockOrganizations = [
-    { id: 1, name: "Org 1", role: "admin" as const },
-    { id: 2, name: "Org 2", role: "admin" as const },
+    { id: "1", name: "Org 1", role: "admin" as const },
+    { id: "2", name: "Org 2", role: "admin" as const },
   ];
   const mockOnCreate = vi.fn();
 

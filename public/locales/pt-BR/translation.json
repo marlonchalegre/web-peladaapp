@@ -537,7 +537,7 @@
         "select_user_label": "Selecione um usuário",
         "cannot_remove_last_admin_tooltip": "Não é possível remover o último admin",
         "remove_admin_tooltip": "Remover admin",
-        "user_fallback": "Usuário #{{id}}"
+        "user_fallback": "Usuário"
       }
     },
     "table": {
@@ -549,9 +549,9 @@
     },
     "peladas": {
       "empty": "Nenhuma pelada.",
-      "item_name": "Pelada #{{id}}",
+      "item_name": "Pelada",
       "aria": {
-        "delete": "Excluir Pelada #{{id}}"
+        "delete": "Excluir Pelada"
       }
     },
     "error": {
@@ -645,7 +645,7 @@
       }
     },
     "detail": {
-      "title": "Pelada #{{id}}",
+      "title": "Pelada",
       "error": {
         "load_failed": "Erro ao carregar pelada",
         "move_to_bench_failed": "Erro ao mover jogador para o banco",
@@ -659,8 +659,8 @@
         "update_failed": "Erro ao atualizar pelada"
       },
       "live": {
-        "moved_to_bench": "Jogador #{{playerId}} movido para banco",
-        "moved_to_team": "Jogador #{{playerId}} movido para time {{teamName}}"
+        "moved_to_bench": "Jogador movido para o banco",
+        "moved_to_team": "Jogador movido para o time {{teamName}}"
       },
       "button": {
         "view_matches": "Ver Partidas",
@@ -679,6 +679,8 @@
         "subtitle": "Personalize a sequência e os detalhes das partidas",
         "config": "Configuração",
         "match": "Partida",
+        "match_count_one": "{{count}} Partida",
+        "match_count_other": "{{count}} Partidas",
         "home": "Mandante",
         "away": "Visitante",
         "button": {
@@ -728,7 +730,7 @@
       }
     },
     "matches": {
-      "title": "Pelada #{{id}}",
+      "title": "Pelada",
       "loading": "Carregando partidas...",
       "share_summary": "Compartilhar Resumo",
       "summary_copied": "Resumo copiado para a área de transferência!",
@@ -746,7 +748,7 @@
       "history_title": "Histórico de Partidas",
       "empty_history": "Nenhuma partida",
       "match_label": "Partida #{{seq}}",
-      "team_fallback": "Time {{id}}",
+      "team_fallback": "Time",
       "confirm_end_match": "Tem certeza que deseja encerrar a partida?",
       "confirm_close_pelada": "Tem certeza que deseja encerrar esta pelada? Isso finalizará todas as partidas pendentes.",
       "select_match_hint": "Selecione uma partida para ver os detalhes",
@@ -764,7 +766,7 @@
       }
     },
     "voting": {
-      "title": "Votação da Pelada #{{id}}",
+      "title": "Votação da Pelada",
       "success": {
         "saved": "Votos registrados com sucesso!"
       },

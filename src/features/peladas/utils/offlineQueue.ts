@@ -20,11 +20,11 @@ export interface OfflineAction {
   timestamp: number;
 }
 
-export function getOfflineQueueKey(peladaId: number) {
+export function getOfflineQueueKey(peladaId: string) {
   return `pelada_offline_queue_${peladaId}`;
 }
 
-export function getOfflineQueue(peladaId: number): OfflineAction[] {
+export function getOfflineQueue(peladaId: string): OfflineAction[] {
   try {
     const data = localStorage.getItem(getOfflineQueueKey(peladaId));
     return data ? JSON.parse(data) : [];
@@ -35,7 +35,7 @@ export function getOfflineQueue(peladaId: number): OfflineAction[] {
 }
 
 export function enqueueAction(
-  peladaId: number,
+  peladaId: string,
   type: OfflineActionType,
   payload: Record<string, unknown>,
 ) {
@@ -53,14 +53,14 @@ export function enqueueAction(
   window.dispatchEvent(new Event("offlineQueueChanged"));
 }
 
-export function dequeueAction(peladaId: number, actionId: string) {
+export function dequeueAction(peladaId: string, actionId: string) {
   const queue = getOfflineQueue(peladaId);
   const newQueue = queue.filter((a) => a.id !== actionId);
   localStorage.setItem(getOfflineQueueKey(peladaId), JSON.stringify(newQueue));
   window.dispatchEvent(new Event("offlineQueueChanged"));
 }
 
-export function clearOfflineQueue(peladaId: number) {
+export function clearOfflineQueue(peladaId: string) {
   localStorage.removeItem(getOfflineQueueKey(peladaId));
   window.dispatchEvent(new Event("offlineQueueChanged"));
 }

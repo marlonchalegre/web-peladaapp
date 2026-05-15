@@ -17,20 +17,20 @@ import { type TeamPlayer, type Player } from "../../../shared/api/endpoints";
 import MatchPlayerRow, { type DashboardRowItem } from "./MatchPlayerRow";
 
 export type SelectMenuState = {
-  teamId: number;
-  forPlayerId?: number;
+  teamId: string;
+  forPlayerId?: string;
   type: "replace" | "add";
 } | null;
 
 interface MatchControlTableProps {
   homePlayers: TeamPlayer[];
   awayPlayers: TeamPlayer[];
-  homeTeamId: number;
-  awayTeamId: number;
-  orgPlayerIdToUserId: Record<number, number>;
-  userIdToName: Record<number, string>;
+  homeTeamId: string;
+  awayTeamId: string;
+  orgPlayerIdToUserId: Record<string, string>;
+  userIdToName: Record<string, string>;
   statsMap: Record<
-    number,
+    string,
     { goals: number; assists: number; ownGoals: number }
   >;
   benchPlayers: Player[];
@@ -46,13 +46,13 @@ interface MatchControlTableProps {
   playersPerTeam?: number | null;
   loadingStats: Record<string, boolean>;
   onStatChange: (
-    playerId: number,
+    playerId: string,
     type: "goal" | "assist" | "own_goal",
     diff: number,
     side: "home" | "away",
   ) => void;
-  onReplacePlayer: (teamId: number, outId: number, inId: number) => void;
-  onAddPlayer: (teamId: number, playerId: number) => void;
+  onReplacePlayer: (teamId: string, outId: string, inId: string) => void;
+  onAddPlayer: (teamId: string, playerId: string) => void;
   onEndMatch: () => void;
 }
 
@@ -86,7 +86,7 @@ export default function MatchControlTable({
   const generateTeamList = (
     players: TeamPlayer[],
     side: "home" | "away",
-    teamId: number,
+    teamId: string,
   ): DashboardRowItem[] => {
     // Sort players: Goalkeepers first
     const sortedPlayers = [...players].sort((a, b) => {
@@ -111,7 +111,7 @@ export default function MatchControlTable({
       const missing = playersPerTeam - players.length;
       for (let i = 0; i < missing; i++) {
         list.push({
-          player_id: -1 * (i + 1 + (side === "home" ? 0 : 100)),
+          player_id: String(-1 * (i + 1 + (side === "home" ? 0 : 100))),
           side,
           teamId,
           isEmpty: true,
@@ -126,12 +126,12 @@ export default function MatchControlTable({
     ...generateTeamList(awayPlayers, "away", awayTeamId),
   ];
 
-  const getPlayerName = (pid: number) => {
+  const getPlayerName = (pid: string) => {
     const uid = orgPlayerIdToUserId[pid];
-    return uid && userIdToName[uid] ? userIdToName[uid] : `Player #${pid}`;
+    return uid && userIdToName[uid] ? userIdToName[uid] : t("common.player");
   };
 
-  const handleSubClick = (teamId: number, playerId: number) => {
+  const handleSubClick = (teamId: string, playerId: string) => {
     if (finished) return;
     if (
       selectMenu?.teamId === teamId &&
@@ -144,7 +144,7 @@ export default function MatchControlTable({
     }
   };
 
-  const handleAddClick = (teamId: number, placeholderId: number) => {
+  const handleAddClick = (teamId: string, placeholderId: string) => {
     if (finished) return;
     if (
       selectMenu?.teamId === teamId &&

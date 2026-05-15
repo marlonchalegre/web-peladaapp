@@ -7,11 +7,11 @@ import {
 
 const endpoints = createApi(api);
 
-const cache: Record<number, { data: OrganizationFinance; timestamp: number }> =
+const cache: Record<string, { data: OrganizationFinance; timestamp: number }> =
   {};
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-export function useOrganizationFinance(orgId: number | undefined) {
+export function useOrganizationFinance(orgId: string | undefined) {
   const [organizationFinance, setOrganizationFinance] =
     useState<OrganizationFinance | null>(null);
   const [loading, setLoading] = useState(false);

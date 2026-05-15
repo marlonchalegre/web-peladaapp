@@ -12,7 +12,7 @@ import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import HandshakeIcon from "@mui/icons-material/Handshake";
 import StarIcon from "@mui/icons-material/Star";
 import { useTranslation } from "react-i18next";
-import { type OrganizationPlayerStats } from "../../../shared/api/endpoints";
+import type { OrganizationPlayerStats } from "../../../shared/api/endpoints";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 
 interface TopStatsCardsProps {
@@ -24,7 +24,7 @@ interface StatCardProps {
   subtitle: string;
   icon: React.ReactNode;
   playerName: string;
-  userId?: number;
+  userId?: string;
   avatarFilename?: string | null;
   value: string | number;
   unit: string;
@@ -180,7 +180,7 @@ export default function TopStatsCards({ stats }: TopStatsCardsProps) {
         playerName={topScorer?.player_name || "-"}
         userId={topScorer?.user_id}
         avatarFilename={topScorer?.avatar_filename}
-        value={topScorer?.goal || 0}
+        value={topScorer?.goal || "0"}
         unit={t("common.goals")}
       />
       <StatCard
@@ -190,7 +190,7 @@ export default function TopStatsCards({ stats }: TopStatsCardsProps) {
         playerName={topAssister?.player_name || "-"}
         userId={topAssister?.user_id}
         avatarFilename={topAssister?.avatar_filename}
-        value={topAssister?.assist || 0}
+        value={topAssister?.assist || "0"}
         unit={t("common.assists")}
       />
       <StatCard

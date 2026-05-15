@@ -12,7 +12,7 @@ const endpoints = createApi(api);
 
 type Order = "asc" | "desc";
 
-export function useOrganizationStatistics(orgId: number) {
+export function useOrganizationStatistics(orgId: string) {
   const { t } = useTranslation();
   const [org, setOrg] = useState<Organization | null>(null);
   const [year, setYear] = useState<number>(new Date().getFullYear());
@@ -71,7 +71,7 @@ export function useOrganizationStatistics(orgId: number) {
   const handleImport = useCallback(
     async (
       data: {
-        player_id: number;
+        player_id: string;
         year: number;
         goals?: number;
         assists?: number;

@@ -4,7 +4,7 @@ import { api } from "../api/client";
 import { avatarCache } from "../utils/avatar-cache";
 
 interface SecureAvatarProps extends AvatarProps {
-  userId?: number;
+  userId?: string;
   filename?: string | null;
   fallbackText?: string;
 }

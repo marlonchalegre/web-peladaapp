@@ -23,9 +23,9 @@ vi.mock("react-i18next", () => ({
 
 describe("AddPlayersFromOrgDialog", () => {
   const mockPlayers = [
-    { id: 1, user_id: 1, user_name: "Alice", user_username: "alice" },
-    { id: 2, user_id: 2, user_name: "Bob", user_username: "bob" },
-    { id: 3, user_id: 3, user_name: "Charlie", user_username: "charlie" },
+    { id: "1", user_id: "1", user_name: "Alice", user_username: "alice" },
+    { id: "2", user_id: "2", user_name: "Bob", user_username: "bob" },
+    { id: "3", user_id: "3", user_name: "Charlie", user_username: "charlie" },
   ];
 
   beforeEach(() => {
@@ -40,8 +40,8 @@ describe("AddPlayersFromOrgDialog", () => {
           open={true}
           onClose={() => {}}
           onAdd={async () => {}}
-          organizationId={1}
-          excludePlayerIds={[3]} // Charlie is already in pelada
+          organizationId="1"
+          excludePlayerIds={["3"]} // Charlie is already in pelada
         />
       </ThemeContextProvider>,
     );
@@ -63,7 +63,7 @@ describe("AddPlayersFromOrgDialog", () => {
           open={true}
           onClose={() => {}}
           onAdd={async () => {}}
-          organizationId={1}
+          organizationId="1"
           excludePlayerIds={[]}
         />
       </ThemeContextProvider>,
@@ -90,7 +90,7 @@ describe("AddPlayersFromOrgDialog", () => {
           open={true}
           onClose={onClose}
           onAdd={onAdd}
-          organizationId={1}
+          organizationId="1"
           excludePlayerIds={[]}
         />
       </ThemeContextProvider>,

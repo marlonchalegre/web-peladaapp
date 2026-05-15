@@ -14,7 +14,7 @@ import {
 
 const endpoints = createApi(api);
 
-export function useOrganizationManagement(orgId: number) {
+export function useOrganizationManagement(orgId: string) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -37,10 +37,10 @@ export function useOrganizationManagement(orgId: number) {
     token?: string;
     isNew: boolean;
   } | null>(null);
-  const [selectedUserIds, setSelectedUserIds] = useState<Set<number>>(
+  const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(
     new Set(),
   );
-  const [selectedAdminUserId, setSelectedAdminUserId] = useState<number | "">(
+  const [selectedAdminUserId, setSelectedAdminUserId] = useState<string | "">(
     "",
   );
   const [actionLoading, setActionLoading] = useState(false);
@@ -140,7 +140,7 @@ export function useOrganizationManagement(orgId: number) {
     }
   }, [orgId]);
 
-  const handleRemovePlayer = async (playerId: number) => {
+  const handleRemovePlayer = async (playerId: string) => {
     if (!window.confirm(t("organizations.management.remove_member_confirm")))
       return;
 
@@ -160,7 +160,7 @@ export function useOrganizationManagement(orgId: number) {
   };
 
   const handleUpdatePlayer = async (
-    playerId: number,
+    playerId: string,
     payload: Partial<Player>,
   ) => {
     setActionLoading(true);
@@ -181,7 +181,7 @@ export function useOrganizationManagement(orgId: number) {
     }
   };
 
-  const handleRevokeInvitation = async (invitationId: number) => {
+  const handleRevokeInvitation = async (invitationId: string) => {
     if (
       !window.confirm(
         t(
@@ -215,10 +215,7 @@ export function useOrganizationManagement(orgId: number) {
 
     setActionLoading(true);
     try {
-      await endpoints.addOrganizationAdmin(
-        orgId,
-        selectedAdminUserId as number,
-      );
+      await endpoints.addOrganizationAdmin(orgId, selectedAdminUserId);
       setSelectedAdminUserId("");
       await fetchData(true);
     } catch (err) {
@@ -232,7 +229,7 @@ export function useOrganizationManagement(orgId: number) {
     }
   };
 
-  const handleRemoveAdmin = async (userId: number) => {
+  const handleRemoveAdmin = async (userId: string) => {
     if (admins.length === 1) {
       setError(t("organizations.error.remove_last_admin"));
       return;
@@ -253,7 +250,7 @@ export function useOrganizationManagement(orgId: number) {
     }
   };
 
-  const handleAddPlayers = async (ids?: number[]) => {
+  const handleAddPlayers = async (ids?: string[]) => {
     const playerIds = ids || Array.from(selectedUserIds);
     setActionLoading(true);
     try {
@@ -299,8 +296,8 @@ export function useOrganizationManagement(orgId: number) {
   };
 
   const handleCreateSubstitution = async (
-    permanentPlayerId: number,
-    temporaryPlayerId: number,
+    permanentPlayerId: string,
+    temporaryPlayerId: string,
     startDate: string,
   ) => {
     setActionLoading(true);
@@ -319,7 +316,7 @@ export function useOrganizationManagement(orgId: number) {
     }
   };
 
-  const handleEndSubstitution = async (subId: number, endDate?: string) => {
+  const handleEndSubstitution = async (subId: string, endDate?: string) => {
     setActionLoading(true);
     try {
       await endpoints.endSubstitution(orgId, subId, endDate);
@@ -348,7 +345,7 @@ export function useOrganizationManagement(orgId: number) {
   };
 
   const usersMap = useMemo(() => {
-    const map = new Map<number, User>();
+    const map = new Map<string, User>();
 
     // Add data from players
     players.forEach((p) => {
@@ -392,7 +389,7 @@ export function useOrganizationManagement(orgId: number) {
           (p) =>
             usersMap.get(p.user_id) || {
               id: p.user_id,
-              name: `User #${p.user_id}`,
+              name: p.user_name || "User",
               email: "",
             },
         )

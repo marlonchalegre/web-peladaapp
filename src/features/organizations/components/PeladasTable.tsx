@@ -21,7 +21,7 @@ import { useTranslation } from "react-i18next";
 
 export type PeladasTableProps = {
   peladas: Pelada[];
-  onDelete?: (peladaId: number) => Promise<void>;
+  onDelete?: (peladaId: string) => Promise<void>;
 };
 
 export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {

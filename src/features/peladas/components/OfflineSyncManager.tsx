@@ -20,7 +20,7 @@ import SyncIcon from "@mui/icons-material/Sync";
 const endpoints = createApi(api);
 
 interface OfflineSyncManagerProps {
-  peladaId: number;
+  peladaId: string;
   onSyncComplete: () => void;
 }
 

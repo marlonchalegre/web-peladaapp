@@ -13,11 +13,11 @@ vi.mock("react-i18next", () => ({
 
 describe("UserAttendanceStatus", () => {
   const mockPlayer = {
-    id: 1,
-    user_id: 1,
-    organization_id: 1,
+    id: "1",
+    user_id: "1",
+    organization_id: "1",
     user: {
-      id: 1,
+      id: "1",
       name: "John Doe",
     },
     attendance_status: "pending" as const,

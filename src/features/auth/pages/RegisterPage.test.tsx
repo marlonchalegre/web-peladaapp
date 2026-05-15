@@ -37,7 +37,7 @@ describe("RegisterPage", () => {
 
   it("renders registration form and submits with phone", async () => {
     (register as Mock).mockResolvedValue({});
-    (login as Mock).mockResolvedValue({ token: "token", user: { id: 1 } });
+    (login as Mock).mockResolvedValue({ token: "token", user: { id: "1" } });
 
     render(
       <MemoryRouter>
@@ -72,13 +72,13 @@ describe("RegisterPage", () => {
         undefined,
         "+55123456789",
       );
-      expect(mockSignIn).toHaveBeenCalledWith("token", { id: 1 });
+      expect(mockSignIn).toHaveBeenCalledWith("token", { id: "1" });
     });
   });
 
   it("allows registration without phone", async () => {
     (register as Mock).mockResolvedValue({});
-    (login as Mock).mockResolvedValue({ token: "token", user: { id: 1 } });
+    (login as Mock).mockResolvedValue({ token: "token", user: { id: "1" } });
 
     render(
       <MemoryRouter>

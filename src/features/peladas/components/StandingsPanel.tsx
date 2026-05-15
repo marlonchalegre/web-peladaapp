@@ -18,7 +18,7 @@ import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import { useMemo } from "react";
 
 export type StandingRow = {
-  teamId: number;
+  teamId: string;
   name: string;
   wins: number;
   draws: number;

@@ -1,9 +1,9 @@
 import { ApiClient } from "./client";
 
 export interface Organization {
-  id: number;
+  id: string;
   name: string;
-  owner_id?: number | null;
+  owner_id?: string | null;
   waha_api_url?: string | null;
   waha_instance?: string | null;
   waha_group_id?: string | null;
@@ -16,20 +16,20 @@ export interface Organization {
   waha_use_all_mention?: boolean | null;
 }
 export interface User {
-  id: number;
+  id: string;
   name: string;
   username: string;
   email?: string;
-  admin_orgs?: number[];
+  admin_orgs?: string[];
   position?: string;
   avatar_filename?: string | null;
 }
 export interface Player {
-  id: number;
-  user_id: number;
-  organization_id: number;
+  id: string;
+  user_id: string;
+  organization_id: string;
   grade?: number | null;
-  position_id?: number | null;
+  position_id?: string | null;
   member_type?:
     | "mensalista"
     | "diarista"
@@ -44,10 +44,10 @@ export interface Player {
   user_email?: string;
 }
 export interface MonthlyPlayerSubstitution {
-  id: number;
-  organization_id: number;
-  permanent_player_id: number;
-  temporary_player_id: number;
+  id: string;
+  organization_id: string;
+  permanent_player_id: string;
+  temporary_player_id: string;
   start_date: string;
   end_date?: string | null;
   active: boolean;
@@ -56,9 +56,9 @@ export interface MonthlyPlayerSubstitution {
   created_at?: string;
 }
 export interface OrganizationAdmin {
-  id: number;
-  organization_id: number;
-  user_id: number;
+  id: string;
+  organization_id: string;
+  user_id: string;
   user_name?: string;
   user_username?: string;
   user_email?: string;
@@ -71,17 +71,17 @@ export interface OrganizationAdmin {
 export type TimerStatus = "stopped" | "running" | "paused";
 
 export interface Pelada {
-  id: number;
-  organization_id: number;
+  id: string;
+  organization_id: string;
   organization_name?: string;
   scheduled_at?: string | null;
   when?: string | null;
   num_teams?: number | null;
   players_per_team?: number | null;
-  creator_id?: number | null;
+  creator_id?: string | null;
   fixed_goalkeepers?: boolean | null;
-  home_fixed_goalkeeper_id?: number | null;
-  away_fixed_goalkeeper_id?: number | null;
+  home_fixed_goalkeeper_id?: string | null;
+  away_fixed_goalkeeper_id?: string | null;
   status?: string | null;
   closed_at?: string | null;
   is_admin?: boolean;
@@ -92,22 +92,22 @@ export interface Pelada {
 }
 
 export interface Team {
-  id: number;
-  pelada_id: number;
+  id: string;
+  pelada_id: string;
   name: string;
 }
 export interface TeamPlayer {
-  team_id: number;
-  player_id: number;
+  team_id: string;
+  player_id: string;
   is_goalkeeper?: boolean;
 }
 export interface Match {
-  id: number;
-  pelada_id: number;
+  id: string;
+  pelada_id: string;
   sequence: number;
   status?: string | null;
-  home_team_id: number;
-  away_team_id: number;
+  home_team_id: string;
+  away_team_id: string;
   home_score: number;
   away_score: number;
   timer_started_at?: string | null;
@@ -116,25 +116,25 @@ export interface Match {
 }
 export type MatchEventType = "assist" | "goal" | "own_goal";
 export interface MatchEvent {
-  id: number;
-  match_id: number;
-  player_id: number;
+  id: string;
+  match_id: string;
+  player_id: string;
   event_type: MatchEventType;
   created_at?: string;
   session_time_ms?: number | null;
   match_time_ms?: number | null;
 }
 export interface PlayerStats {
-  player_id: number;
-  user_id: number;
+  player_id: string;
+  user_id: string;
   name: string;
   goals: number;
   assists: number;
   own_goals: number;
 }
 export interface OrganizationPlayerStats {
-  player_id: number;
-  user_id?: number;
+  player_id: string;
+  user_id?: string;
   player_name: string;
   player_position?: string;
   avatar_filename?: string | null;
@@ -145,8 +145,8 @@ export interface OrganizationPlayerStats {
   avg_rating: number;
 }
 export interface MatchLineupEntry {
-  team_id: number;
-  player_id: number;
+  team_id: string;
+  player_id: string;
   is_goalkeeper?: boolean;
 }
 export interface PeladaDashboardDataResponse {
@@ -158,15 +158,15 @@ export interface PeladaDashboardDataResponse {
   match_events: MatchEvent[];
   player_stats: PlayerStats[] | null;
   pelada_transactions?: Transaction[];
-  team_players_map: Record<number, TeamPlayer[]>;
-  match_lineups_map: Record<number, Record<number, MatchLineupEntry[]>>;
-  attendance?: { player_id: number; status: string; updated_at?: string }[];
+  team_players_map: Record<string, TeamPlayer[]>;
+  match_lineups_map: Record<string, Record<string, MatchLineupEntry[]>>;
+  attendance?: { player_id: string; status: string; updated_at?: string }[];
 }
 export interface VotingInfo {
   can_vote: boolean;
   has_voted: boolean;
   eligible_players: {
-    player_id: number;
+    player_id: string;
     name: string;
     position?: string;
     avatar_filename?: string | null;
@@ -175,14 +175,14 @@ export interface VotingInfo {
     assists?: number;
     own_goals?: number;
   }[];
-  current_votes?: { target_id: number; stars: number }[];
-  voter_player_id?: number | null;
+  current_votes?: { target_id: string; stars: number }[];
+  voter_player_id?: string | null;
   message?: string;
 }
 
 export interface PlayerResult {
-  player_id: number;
-  user_id?: number;
+  player_id: string;
+  user_id?: string;
   name: string;
   position?: string;
   avatar_filename?: string | null;
@@ -197,19 +197,19 @@ export interface VotingResults {
   striker: PlayerResult[];
   garcom: PlayerResult[];
   voters: {
-    player_id: number;
+    player_id: string;
     name: string;
     has_voted: boolean;
   }[];
   total_eligible: number;
   total_voted: number;
-  organization_id?: number;
+  organization_id?: string;
   organization_name?: string;
 }
 
 export interface VotingStatus {
   voters: {
-    player_id: number;
+    player_id: string;
     name: string;
     has_voted: boolean;
   }[];
@@ -218,16 +218,16 @@ export interface VotingStatus {
 }
 
 export interface BatchVotePayload {
-  voter_id: number;
-  votes: { target_id: number; stars: number }[];
+  voter_id: string;
+  votes: { target_id: string; stars: number }[];
 }
 export interface BatchVoteResponse {
   votes_cast: number;
 }
 
 export interface OrganizationFinance {
-  id: number;
-  organization_id: number;
+  id: string;
+  organization_id: string;
   mensalista_price: number;
   diarista_price: number;
   monthly_fine_amount?: number;
@@ -236,33 +236,33 @@ export interface OrganizationFinance {
 }
 
 export interface Transaction {
-  id: number;
-  organization_id: number;
-  player_id?: number | null;
+  id: string;
+  organization_id: string;
+  player_id?: string | null;
   player_name?: string | null;
-  pelada_id?: number | null;
+  pelada_id?: string | null;
   amount: number;
   fine_amount?: number | null;
   type: "income" | "expense";
   category: string;
   description?: string | null;
   payment_date: string;
-  created_by?: number | null;
+  created_by?: string | null;
   creator_name?: string | null;
   created_at?: string;
   status?: "paid" | "reversed";
 }
 
 export interface MonthlyPayment {
-  id?: number;
-  organization_id: number;
-  player_id: number;
+  id?: string;
+  organization_id: string;
+  player_id: string;
   player_name: string;
   member_type: string;
   year: number;
   month: number;
-  transaction_id?: number | null;
-  fine_transaction_id?: number | null;
+  transaction_id?: string | null;
+  fine_transaction_id?: string | null;
   amount?: number;
   fine_amount?: number;
   fine_status?: "paid" | "reversed";
@@ -281,11 +281,11 @@ export type AttendanceStatus =
   | "pending"
   | "waitlist";
 export interface Attendance {
-  id?: number;
-  pelada_id?: number;
-  player_id: number;
-  "player-id"?: number;
-  playerId?: number;
+  id?: string;
+  pelada_id?: string;
+  player_id: string;
+  "player-id"?: string;
+  playerId?: string;
   status: string;
   Status?: string;
   avatar_filename?: string | null;
@@ -295,8 +295,8 @@ export interface Attendance {
 }
 
 export interface OrganizationInvitation {
-  id: number;
-  organization_id: number;
+  id: string;
+  organization_id: string;
   organization_name?: string;
   email?: string;
   token: string;
@@ -313,11 +313,11 @@ export interface PeladaFullDetailsResponse {
     user: User;
     attendance_status?: AttendanceStatus;
   })[];
-  scores: Record<number, number>;
+  scores: Record<string, number>;
   attendance: Attendance[];
   pelada_transactions?: Transaction[];
-  users_map: Record<number, User>;
-  org_players_map: Record<number, Player>;
+  users_map: Record<string, User>;
+  org_players_map: Record<string, Player>;
   voting_info: VotingInfo | null;
 }
 
@@ -332,53 +332,53 @@ export interface PaginatedResponse<T> {
 export function createApi(client: ApiClient) {
   return {
     // Organizations
-    getOrganization: (id: number) =>
+    getOrganization: (id: string) =>
       client.get<Organization>(`/api/organizations/${id}`),
-    updateOrganization: (id: number, payload: Partial<Organization>) =>
+    updateOrganization: (id: string, payload: Partial<Organization>) =>
       client.put<Organization>(`/api/organizations/${id}`, payload),
     createOrganization: (name: string) =>
       client.post<Organization>("/api/organizations", { name }),
-    deleteOrganization: (id: number) =>
+    deleteOrganization: (id: string) =>
       client.delete(`/api/organizations/${id}`),
-    leaveOrganization: (id: number) =>
+    leaveOrganization: (id: string) =>
       client.post(`/api/organizations/${id}/leave`, {}),
-    invitePlayer: (id: number, email?: string, name?: string) =>
+    invitePlayer: (id: string, email?: string, name?: string) =>
       client.post<{
-        user_id: number;
+        user_id: string;
         email?: string;
         name?: string;
         token: string;
         is_new_user: boolean;
-        organization_id: number;
+        organization_id: string;
       }>(`/api/organizations/${id}/invite`, { email, name }),
-    testWaha: (id: number) =>
+    testWaha: (id: string) =>
       client.post<{ status: string; message: string }>(
         `/api/organizations/${id}/waha/test`,
         {},
       ),
-    getInviteLink: (id: number) =>
+    getInviteLink: (id: string) =>
       client.get<{ token: string }>(`/api/organizations/${id}/invite-link`),
-    resetInviteLink: (id: number) =>
+    resetInviteLink: (id: string) =>
       client.post<{ token: string }>(
         `/api/organizations/${id}/invite-link/reset`,
         {},
       ),
-    getOrganizationStatistics: (id: number, year: number) =>
+    getOrganizationStatistics: (id: string, year: number) =>
       client.get<OrganizationPlayerStats[]>(
         `/api/organizations/${id}/statistics`,
         { year },
       ),
 
     // Monthly Player Substitutions
-    listSubstitutions: (id: number) =>
+    listSubstitutions: (id: string) =>
       client.get<MonthlyPlayerSubstitution[]>(
         `/api/organizations/${id}/substitutions`,
       ),
     createSubstitution: (
-      id: number,
+      id: string,
       payload: {
-        permanent_player_id: number;
-        temporary_player_id: number;
+        permanent_player_id: string;
+        temporary_player_id: string;
         start_date: string;
       },
     ) =>
@@ -386,26 +386,26 @@ export function createApi(client: ApiClient) {
         `/api/organizations/${id}/substitutions`,
         payload,
       ),
-    endSubstitution: (id: number, subId: number, endDate?: string) =>
+    endSubstitution: (id: string, subId: string, endDate?: string) =>
       client.post<{ status: string }>(
         `/api/organizations/${id}/substitutions/${subId}/end`,
         { end_date: endDate },
       ),
 
     // Finance
-    getOrganizationFinance: (id: number) =>
+    getOrganizationFinance: (id: string) =>
       client.get<OrganizationFinance>(`/api/organizations/${id}/finance`),
     updateOrganizationFinance: (
-      id: number,
+      id: string,
       payload: Partial<OrganizationFinance>,
     ) =>
       client.put<{ message: string }>(
         `/api/organizations/${id}/finance`,
         payload,
       ),
-    getFinanceSummary: (id: number) =>
+    getFinanceSummary: (id: string) =>
       client.get<FinanceSummary>(`/api/organizations/${id}/finance/summary`),
-    listTransactions: (id: number, page?: number, per_page?: number) =>
+    listTransactions: (id: string, page?: number, per_page?: number) =>
       client
         .getPaginated<Transaction[]>(
           `/api/organizations/${id}/finance/transactions`,
@@ -418,39 +418,39 @@ export function createApi(client: ApiClient) {
           data: res.data,
           total: res.total,
         })),
-    addTransaction: (id: number, payload: Partial<Transaction>) =>
+    addTransaction: (id: string, payload: Partial<Transaction>) =>
       client.post<Transaction>(
         `/api/organizations/${id}/finance/transactions`,
         payload,
       ),
-    reverseTransaction: (id: number, txId: number) =>
+    reverseTransaction: (id: string, txId: string) =>
       client.post<{ message: string }>(
         `/api/organizations/${id}/finance/transactions/${txId}/reverse`,
       ),
-    getMonthlyPayments: (id: number, year: number, month: number) =>
+    getMonthlyPayments: (id: string, year: number, month: number) =>
       client.get<MonthlyPayment[]>(
         `/api/organizations/${id}/finance/monthly-payments`,
         { year, month },
       ),
     markMonthlyPayment: (
-      id: number,
+      id: string,
       payload: Partial<MonthlyPayment> & {
         amount: number;
         payment_date: string;
       },
     ) =>
-      client.post<{ message: string; transaction_id?: number }>(
+      client.post<{ message: string; transaction_id?: string }>(
         `/api/organizations/${id}/finance/monthly-payments`,
         payload,
       ),
 
     // Manual Stats
-    getManualStats: (id: number, year: number) =>
+    getManualStats: (id: string, year: number) =>
       client.get<
         {
-          id: number;
-          organization_id: number;
-          player_id: number;
+          id: string;
+          organization_id: string;
+          player_id: string;
           year: number;
           goals: number;
           assists: number;
@@ -458,9 +458,9 @@ export function createApi(client: ApiClient) {
         }[]
       >(`/api/organizations/${id}/manual-stats`, { year }),
     upsertManualStats: (
-      id: number,
+      id: string,
       stats: {
-        player_id: number;
+        player_id: string;
         year: number;
         goals?: number;
         assists?: number;
@@ -474,7 +474,7 @@ export function createApi(client: ApiClient) {
 
     // Peladas
     listPeladasByOrg: (
-      organizationId: number,
+      organizationId: string,
       page: number = 1,
       perPage: number = 20,
     ) =>
@@ -483,7 +483,7 @@ export function createApi(client: ApiClient) {
         { page, per_page: perPage },
       ),
     listPeladasByUser: (
-      userId: number,
+      userId: string,
       page: number = 1,
       perPage: number = 20,
     ) =>
@@ -491,43 +491,43 @@ export function createApi(client: ApiClient) {
         page,
         per_page: perPage,
       }),
-    getPeladaDashboardData: (id: number) =>
+    getPeladaDashboardData: (id: string) =>
       client.get<PeladaDashboardDataResponse>(
         `/api/peladas/${id}/dashboard-data`,
       ),
     createPelada: (payload: Partial<Pelada>) =>
       client.post<Pelada>("/api/peladas", payload),
-    deletePelada: (id: number) => client.delete(`/api/peladas/${id}`),
-    beginPelada: (id: number, matchesPerTeam?: number) =>
+    deletePelada: (id: string) => client.delete(`/api/peladas/${id}`),
+    beginPelada: (id: string, matchesPerTeam?: number) =>
       client.post<{ matches_created: number }>(
         `/api/peladas/${id}/begin`,
         matchesPerTeam ? { matches_per_team: matchesPerTeam } : undefined,
       ),
-    closePelada: (id: number) =>
+    closePelada: (id: string) =>
       client.post<Pelada>(`/api/peladas/${id}/close`),
-    getPeladaFullDetails: (id: number) =>
+    getPeladaFullDetails: (id: string) =>
       client.get<PeladaFullDetailsResponse>(`/api/peladas/${id}/full-details`),
     updateAttendance: (
-      id: number,
+      id: string,
       status: AttendanceStatus,
-      playerId?: number,
+      playerId?: string,
     ) =>
       client.post<number>(`/api/peladas/${id}/attendance`, {
         status,
         player_id: playerId,
       }),
     batchUpdateAttendance: (
-      id: number,
-      playerIds: number[],
+      id: string,
+      playerIds: string[],
       status: AttendanceStatus,
     ) =>
       client.post<number>(`/api/peladas/${id}/attendance/batch`, {
         player_ids: playerIds,
         status,
       }),
-    closeAttendance: (id: number) =>
+    closeAttendance: (id: string) =>
       client.post<Pelada>(`/api/peladas/${id}/close-attendance`),
-    updateVotingEnabled: (id: number, playerId: number, enabled: boolean) =>
+    updateVotingEnabled: (id: string, playerId: string, enabled: boolean) =>
       client.post<{ updated: number }>(
         `/api/peladas/${id}/attendance/voting-enabled`,
         {
@@ -536,53 +536,53 @@ export function createApi(client: ApiClient) {
         },
       ),
 
-    startPeladaTimer: (id: number) =>
+    startPeladaTimer: (id: string) =>
       client.post<Pelada>(`/api/peladas/${id}/timer/start`, {}),
-    pausePeladaTimer: (id: number) =>
+    pausePeladaTimer: (id: string) =>
       client.post<Pelada>(`/api/peladas/${id}/timer/pause`, {}),
-    resetPeladaTimer: (id: number) =>
+    resetPeladaTimer: (id: string) =>
       client.post<Pelada>(`/api/peladas/${id}/timer/reset`, {}),
 
     // Schedule
-    getSchedulePreview: (id: number, matchesPerTeam: number) =>
+    getSchedulePreview: (id: string, matchesPerTeam: number) =>
       client.get<{
-        matches: { home: number; away: number }[];
-        template_matches?: { home: number; away: number }[];
-        random_matches?: { home: number; away: number }[];
+        matches: { home: string; away: string }[];
+        template_matches?: { home: string; away: string }[];
+        random_matches?: { home: string; away: string }[];
         is_from_format: boolean;
       }>(`/api/peladas/${id}/schedule/preview`, {
         matches_per_team: matchesPerTeam,
       }),
-    saveSchedulePlan: (id: number, matches: { home: number; away: number }[]) =>
+    saveSchedulePlan: (id: string, matches: { home: string; away: string }[]) =>
       client.post<{ status: string }>(`/api/peladas/${id}/schedule`, {
         matches,
       }),
-    getSchedulePlan: (id: number) =>
-      client.get<{ home: number; away: number; sequence: number }[]>(
+    getSchedulePlan: (id: string) =>
+      client.get<{ home: string; away: string; sequence: number }[]>(
         `/api/peladas/${id}/schedule`,
       ),
 
     // Teams
-    createTeam: (payload: { pelada_id: number; name: string }) =>
+    createTeam: (payload: { pelada_id: string; name: string }) =>
       client.post<Team>("/api/teams", payload),
-    deleteTeam: (teamId: number) => client.delete(`/api/teams/${teamId}`),
+    deleteTeam: (teamId: string) => client.delete(`/api/teams/${teamId}`),
     addPlayerToTeam: (
-      teamId: number,
-      playerId: number,
+      teamId: string,
+      playerId: string,
       isGoalkeeper?: boolean,
     ) =>
       client.post(`/api/teams/${teamId}/players`, {
         player_id: playerId,
         is_goalkeeper: isGoalkeeper,
       }),
-    removePlayerFromTeam: (teamId: number, playerId: number) =>
+    removePlayerFromTeam: (teamId: string, playerId: string) =>
       client.delete<void>(`/api/teams/${teamId}/players`, {
         player_id: playerId,
       }),
 
     // Matches
     updateMatchScore: (
-      id: number,
+      id: string,
       home: number,
       away: number,
       status?: string,
@@ -592,16 +592,16 @@ export function createApi(client: ApiClient) {
         away_score: away,
         status,
       }),
-    startMatchTimer: (id: number) =>
+    startMatchTimer: (id: string) =>
       client.post<Match>(`/api/matches/${id}/timer/start`, {}),
-    pauseMatchTimer: (id: number) =>
+    pauseMatchTimer: (id: string) =>
       client.post<Match>(`/api/matches/${id}/timer/pause`, {}),
-    resetMatchTimer: (id: number) =>
+    resetMatchTimer: (id: string) =>
       client.post<Match>(`/api/matches/${id}/timer/reset`, {}),
 
     createMatchEvent: (
-      id: number,
-      playerId: number,
+      id: string,
+      playerId: string,
       eventType: MatchEventType,
       sessionTimeMs?: number,
       matchTimeMs?: number,
@@ -613,8 +613,8 @@ export function createApi(client: ApiClient) {
         match_time_ms: matchTimeMs,
       }),
     deleteMatchEvent: (
-      id: number,
-      playerId: number,
+      id: string,
+      playerId: string,
       eventType: MatchEventType,
     ) =>
       client.delete<void>(`/api/matches/${id}/events`, {
@@ -623,16 +623,16 @@ export function createApi(client: ApiClient) {
       }),
 
     // Match lineups (per-match players)
-    addMatchLineupPlayer: (matchId: number, teamId: number, playerId: number) =>
+    addMatchLineupPlayer: (matchId: string, teamId: string, playerId: string) =>
       client.post(`/api/matches/${matchId}/lineups`, {
         team_id: teamId,
         player_id: playerId,
       }),
     replaceMatchLineupPlayer: (
-      matchId: number,
-      teamId: number,
-      outPlayerId: number,
-      inPlayerId: number,
+      matchId: string,
+      teamId: string | string,
+      outPlayerId: string,
+      inPlayerId: string,
     ) =>
       client.post(`/api/matches/${matchId}/lineups/replace`, {
         team_id: teamId,
@@ -641,13 +641,13 @@ export function createApi(client: ApiClient) {
       }),
 
     // Players
-    listPlayersByOrg: (organizationId: number) =>
+    listPlayersByOrg: (organizationId: string) =>
       client.get<Player[]>(`/api/organizations/${organizationId}/players`),
     createPlayer: (payload: Partial<Player>) =>
       client.post<Player>("/api/players", payload),
-    updatePlayer: (id: number, payload: Partial<Player>) =>
+    updatePlayer: (id: string, payload: Partial<Player>) =>
       client.put<Player>(`/api/players/${id}`, payload),
-    deletePlayer: (id: number) => client.delete(`/api/players/${id}`),
+    deletePlayer: (id: string) => client.delete(`/api/players/${id}`),
 
     // Users
     listUsers: () => client.get<User[]>("/api/users"),
@@ -670,19 +670,19 @@ export function createApi(client: ApiClient) {
       client.post<{ token: string; user: User }>("/auth/first-access", payload),
 
     // Organization Admins
-    listAdminsByOrganization: (organizationId: number) =>
+    listAdminsByOrganization: (organizationId: string) =>
       client.get<OrganizationAdmin[]>(
         `/api/organizations/${organizationId}/admins`,
       ),
-    listOrganizationInvitations: (organizationId: number) =>
+    listOrganizationInvitations: (organizationId: string) =>
       client.get<OrganizationInvitation[]>(
         `/api/organizations/${organizationId}/invitations`,
       ),
-    revokeInvitation: (organizationId: number, invitationId: number) =>
+    revokeInvitation: (organizationId: string, invitationId: string) =>
       client.delete(
         `/api/organizations/${organizationId}/invitations/${invitationId}`,
       ),
-    listUserOrganizations: (userId: number) =>
+    listUserOrganizations: (userId: string) =>
       client.get<(Organization & { role: "admin" | "player" })[]>(
         `/api/users/${userId}/organizations`,
       ),
@@ -691,26 +691,26 @@ export function createApi(client: ApiClient) {
     getInvitationInfo: (token: string) =>
       client.get<OrganizationInvitation>(`/auth/invitations/${token}`),
     acceptInvitation: (token: string) =>
-      client.post<{ organization_id: number }>(
+      client.post<{ organization_id: string }>(
         `/api/invitations/${token}/accept`,
         {},
       ),
-    addOrganizationAdmin: (organizationId: number, userId: number) =>
+    addOrganizationAdmin: (organizationId: string, userId: string) =>
       client.post<OrganizationAdmin>(
         `/api/organizations/${organizationId}/admins`,
         { user_id: userId },
       ),
-    removeOrganizationAdmin: (organizationId: number, userId: number) =>
+    removeOrganizationAdmin: (organizationId: string, userId: string) =>
       client.delete(`/api/organizations/${organizationId}/admins/${userId}`),
 
     // Voting
-    getVotingInfo: (peladaId: number) =>
+    getVotingInfo: (peladaId: string) =>
       client.get<VotingInfo>(`/api/peladas/${peladaId}/voting-info`),
-    getVotingResults: (peladaId: number) =>
+    getVotingResults: (peladaId: string) =>
       client.get<VotingResults>(`/api/peladas/${peladaId}/voting-results`),
-    getVotingStatus: (peladaId: number) =>
+    getVotingStatus: (peladaId: string) =>
       client.get<VotingStatus>(`/api/peladas/${peladaId}/voting-status`),
-    batchCastVotes: (peladaId: number, payload: BatchVotePayload) =>
+    batchCastVotes: (peladaId: string, payload: BatchVotePayload) =>
       client.post<BatchVoteResponse>(
         `/api/peladas/${peladaId}/votes/batch`,
         payload,

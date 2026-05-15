@@ -23,13 +23,13 @@ const endpoints = createApi(api);
 
 type Props = {
   open: boolean;
-  selectedIds: Set<number>;
-  onSelectAll: (ids: number[]) => void;
+  selectedIds: Set<string>;
+  onSelectAll: (ids: string[]) => void;
   onClear: () => void;
-  onToggle: (userId: number, checked: boolean) => void;
+  onToggle: (userId: string, checked: boolean) => void;
   onAddSelected: () => Promise<void>;
   onClose: () => void;
-  excludeUserIds?: Set<number>;
+  excludeUserIds?: Set<string>;
 };
 
 export default function AddPlayersDialog({

@@ -99,9 +99,9 @@ export default function MatchPlayerCard({
 
   const positionKey = player.is_goalkeeper
     ? "goalkeeper"
-    : playerData?.position_id
+    : playerData?.position_id && !isNaN(Number(playerData.position_id))
       ? ["goalkeeper", "defender", "midfielder", "striker"][
-          playerData.position_id - 1
+          Number(playerData.position_id) - 1
         ]
       : "player";
 

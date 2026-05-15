@@ -43,18 +43,18 @@ type TeamCardProps = {
   maxPlayers?: number;
   onDelete: () => void;
   onDrop: (e: DragEvent<HTMLElement>) => void;
-  onDragStartPlayer: (e: DragEvent<HTMLElement>, playerId: number) => void;
-  onMoveToTeam?: (playerId: number, teamId: number) => void;
-  onSendToBench?: (playerId: number) => void;
-  onMoveToFixedGk?: (playerId: number, side: "home" | "away") => void;
+  onDragStartPlayer: (e: DragEvent<HTMLElement>, playerId: string) => void;
+  onMoveToTeam?: (playerId: string, teamId: string) => void;
+  onSendToBench?: (playerId: string) => void;
+  onMoveToFixedGk?: (playerId: string, side: "home" | "away") => void;
   teams?: Team[];
   locked?: boolean;
   isAdminOverride?: boolean;
   hasFixedGoalkeepers?: boolean;
   peladaTransactions?: Transaction[];
-  teamOrganizationId?: number; // Add teamOrganizationId since we removed organizationFinance from prop
-  onMarkPaid?: (playerId: number, amount: number) => void;
-  onReversePayment?: (playerId: number) => void;
+  teamOrganizationId?: string; // Add teamOrganizationId since we removed organizationFinance from prop
+  onMarkPaid?: (playerId: string, amount: number) => void;
+  onReversePayment?: (playerId: string) => void;
 };
 
 import { useOrganizationFinance } from "../../../shared/hooks/useOrganizationFinance";
@@ -81,11 +81,11 @@ export default function TeamCard({
 }: TeamCardProps) {
   const { t } = useTranslation();
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
-  const [selectedPlayerId, setSelectedPlayerId] = useState<null | number>(null);
+  const [selectedPlayerId, setSelectedPlayerId] = useState<null | string>(null);
 
   const { organizationFinance } = useOrganizationFinance(teamOrganizationId);
 
-  const handleOpenMenu = (event: MouseEvent<HTMLElement>, playerId: number) => {
+  const handleOpenMenu = (event: MouseEvent<HTMLElement>, playerId: string) => {
     setMenuAnchor(event.currentTarget);
     setSelectedPlayerId(playerId);
   };

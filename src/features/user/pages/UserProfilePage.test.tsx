@@ -27,7 +27,7 @@ describe("UserProfilePage", () => {
   const mockSignIn = vi.fn();
   const mockSignOut = vi.fn();
   const defaultUser = {
-    id: 1,
+    id: "1",
     name: "Test User",
     username: "testuser",
     email: "test@example.com",

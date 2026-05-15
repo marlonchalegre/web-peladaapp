@@ -11,14 +11,14 @@ import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import PanToolIcon from "@mui/icons-material/PanTool";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { useTranslation } from "react-i18next";
-import { type Player } from "../../../shared/api/endpoints";
+import type { Player } from "../../../shared/api/endpoints";
 import StatInput from "./StatInput";
 
 export type DashboardRowItem = {
-  player_id: number;
-  team_id?: number;
+  player_id: string;
+  team_id?: string;
   side: "home" | "away";
-  teamId: number;
+  teamId: string;
   isEmpty: boolean;
   is_goalkeeper?: boolean;
 };
@@ -38,9 +38,9 @@ interface MatchPlayerRowProps {
   onSubClick: () => void;
   onAddClick: () => void;
   onCloseMenu: () => void;
-  onReplace: (inId: number) => void;
-  onAdd: (inId: number) => void;
-  getPlayerName: (id: number) => string;
+  onReplace: (inId: string) => void;
+  onAdd: (inId: string) => void;
+  getPlayerName: (id: string) => string;
 }
 
 export default function MatchPlayerRow({

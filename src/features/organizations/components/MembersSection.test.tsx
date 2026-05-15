@@ -11,21 +11,21 @@ vi.mock("react-i18next", () => ({
 
 const mockUsers: User[] = [
   {
-    id: 1,
+    id: "1",
     name: "Alice",
     username: "alice",
     email: "alice@example.com",
     position: "STRIKER",
   },
   {
-    id: 2,
+    id: "2",
     name: "Bob",
     username: "bob",
     email: "bob@example.com",
     position: "GOALKEEPER",
   },
   {
-    id: 3,
+    id: "3",
     name: "Charlie",
     username: "charlie",
     email: "charlie@example.com",
@@ -34,12 +34,12 @@ const mockUsers: User[] = [
 ];
 
 const mockPlayers: Player[] = [
-  { id: 101, user_id: 1, organization_id: 10, grade: 5 },
-  { id: 102, user_id: 2, organization_id: 10, grade: 5 },
-  { id: 103, user_id: 3, organization_id: 10, grade: 5 },
+  { id: "101", user_id: "1", organization_id: "10", grade: 5 },
+  { id: "102", user_id: "2", organization_id: "10", grade: 5 },
+  { id: "103", user_id: "3", organization_id: "10", grade: 5 },
 ];
 
-const usersMap = new Map<number, User>(mockUsers.map((u) => [u.id, u]));
+const usersMap = new Map<string, User>(mockUsers.map((u) => [u.id, u]));
 
 describe("MembersSection", () => {
   const defaultProps = {
@@ -94,26 +94,26 @@ describe("MembersSection", () => {
 
     expect(screen.queryByText("Bob")).toBeNull();
   });
-
   it("calls onPageChange when pagination is used", () => {
     // Create many players for pagination
     const manyPlayers = Array.from({ length: 15 }, (_, i) => ({
-      id: i + 200,
-      user_id: i + 200,
-      organization_id: 10,
+      id: String(i + 1),
+      user_id: String(i + 1),
+      organization_id: "10",
     }));
-    const manyUsers = new Map<number, User>(
+
+    const manyUsersMap = new Map<string, User>(
       manyPlayers.map((p) => [
         p.user_id,
-        { id: p.user_id, name: `User ${p.id}`, username: `u${p.id}` },
+        { id: p.user_id, name: `User ${p.id}`, username: `u${p.id}` } as User,
       ]),
     );
 
     render(
       <MembersSection
         {...defaultProps}
-        players={manyPlayers}
-        usersMap={manyUsers}
+        players={manyPlayers as Player[]}
+        usersMap={manyUsersMap}
       />,
     );
 

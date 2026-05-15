@@ -5,7 +5,7 @@ import { ThemeContextProvider } from "../../../app/providers/ThemeProvider";
 import type { Player, User } from "../../../shared/api/endpoints";
 
 const mockUser = (id: number, name: string, position: string): User => ({
-  id,
+  id: String(id),
   name,
   username: name.toLowerCase(),
   email: `${name.toLowerCase()}@example.com`,
@@ -13,9 +13,9 @@ const mockUser = (id: number, name: string, position: string): User => ({
 });
 
 const mockPlayer = (id: number, user: User): Player & { user: User } => ({
-  id,
-  user_id: user.id,
-  organization_id: 1,
+  id: String(id),
+  user_id: String(user.id),
+  organization_id: "1",
   member_type: "mensalista",
   grade: 8,
   user,

@@ -15,8 +15,8 @@ vi.mock("react-i18next", () => ({
 
 describe("Admin Actions Visibility", () => {
   const mockPelada: Pelada = {
-    id: 1,
-    organization_id: 1,
+    id: "1",
+    organization_id: "1",
     status: "open",
   };
 

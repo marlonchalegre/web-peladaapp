@@ -24,8 +24,7 @@ const endpoints = createApi(api);
 export type TeamWithPlayers = Team & {
   players: (Player & { user: User; is_goalkeeper?: boolean })[];
 };
-
-export function usePeladaDetail(peladaId: number) {
+export function usePeladaDetail(peladaId: string) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -34,7 +33,7 @@ export function usePeladaDetail(peladaId: number) {
   const [pelada, setPelada] = useState<Pelada | null>(null);
   const [teams, setTeams] = useState<TeamWithPlayers[]>([]);
   const [teamPlayers, setTeamPlayers] = useState<
-    Record<number, (Player & { user: User; is_goalkeeper?: boolean })[]>
+    Record<string, (Player & { user: User; is_goalkeeper?: boolean })[]>
   >({});
   const [availablePlayers, setAvailablePlayers] = useState<
     (Player & { user: User })[]
@@ -44,7 +43,7 @@ export function usePeladaDetail(peladaId: number) {
   const [changingStatus, setChangingStatus] = useState(false);
   const [live, setLive] = useState("");
   const [votingInfo, setVotingInfo] = useState<VotingInfo | null>(null);
-  const [scores, setScores] = useState<Record<number, number>>({});
+  const [scores, setScores] = useState<Record<string, number>>({});
   const [peladaTransactions, setPeladaTransactions] = useState<Transaction[]>(
     [],
   );
@@ -88,7 +87,7 @@ export function usePeladaDetail(peladaId: number) {
       if (data.scores) setScores(data.scores);
 
       const playersByTeam: Record<
-        number,
+        string,
         (Player & { user: User; is_goalkeeper?: boolean })[]
       > = {};
       for (const t of data.teams) {
@@ -123,7 +122,7 @@ export function usePeladaDetail(peladaId: number) {
       [
         pelada?.home_fixed_goalkeeper_id,
         pelada?.away_fixed_goalkeeper_id,
-      ].filter(Boolean) as number[],
+      ].filter(Boolean) as string[],
     );
   }, [pelada]);
 
@@ -153,8 +152,8 @@ export function usePeladaDetail(peladaId: number) {
 
   function onDragStartPlayer(
     e: DragEvent<HTMLElement>,
-    playerId: number,
-    sourceTeamId: number | null,
+    playerId: string,
+    sourceTeamId: string | null,
   ) {
     if (processing) {
       e.preventDefault();
@@ -169,15 +168,15 @@ export function usePeladaDetail(peladaId: number) {
 
   function parseDrag(
     e: DragEvent<HTMLElement>,
-  ): { playerId: number; sourceTeamId: number | null } | null {
+  ): { playerId: string; sourceTeamId: string | null } | null {
     try {
       const data = e.dataTransfer.getData("application/json");
       if (!data) return null;
       const obj = JSON.parse(data);
       return {
-        playerId: Number(obj.playerId),
+        playerId: String(obj.playerId),
         sourceTeamId:
-          obj.sourceTeamId == null ? null : Number(obj.sourceTeamId),
+          obj.sourceTeamId == null ? null : String(obj.sourceTeamId),
       };
     } catch {
       return null;
@@ -222,7 +221,7 @@ export function usePeladaDetail(peladaId: number) {
 
   const dropToTeam = async (
     e: DragEvent<HTMLElement>,
-    targetTeamId: number,
+    targetTeamId: string,
   ) => {
     e.preventDefault();
     if (processing) return;
@@ -321,7 +320,7 @@ export function usePeladaDetail(peladaId: number) {
     }
   };
 
-  const handleSetGoalkeeper = async (teamId: number, playerId: number) => {
+  const handleSetGoalkeeper = async (teamId: string, playerId: string) => {
     if (processing) return;
     setProcessing(true);
     try {
@@ -339,7 +338,7 @@ export function usePeladaDetail(peladaId: number) {
     }
   };
 
-  const handleRemovePlayer = async (teamId: number, playerId: number) => {
+  const handleRemovePlayer = async (teamId: string, playerId: string) => {
     if (processing) return;
     setProcessing(true);
     try {
@@ -439,7 +438,7 @@ export function usePeladaDetail(peladaId: number) {
     }
   };
 
-  const handleDeleteTeam = async (teamId: number) => {
+  const handleDeleteTeam = async (teamId: string) => {
     setProcessing(true);
     try {
       await endpoints.deleteTeam(teamId);
@@ -481,7 +480,7 @@ export function usePeladaDetail(peladaId: number) {
     }
   };
 
-  const handleAddPlayersFromOrg = async (playerIds: number[]) => {
+  const handleAddPlayersFromOrg = async (playerIds: string[]) => {
     if (processing) return;
     setProcessing(true);
     try {
@@ -498,7 +497,7 @@ export function usePeladaDetail(peladaId: number) {
     }
   };
 
-  const handleMarkPaid = async (playerId: number, amount: number) => {
+  const handleMarkPaid = async (playerId: string, amount: number) => {
     if (!pelada) return;
     try {
       setProcessing(true);
@@ -524,7 +523,7 @@ export function usePeladaDetail(peladaId: number) {
     }
   };
 
-  const handleReversePayment = async (playerId: number) => {
+  const handleReversePayment = async (playerId: string) => {
     if (!pelada) return;
     try {
       setProcessing(true);
@@ -558,10 +557,10 @@ export function usePeladaDetail(peladaId: number) {
   };
 
   const handlePerformSwap = async (
-    incomingPlayerId: number,
-    targetTeamId: number,
-    sourceTeamId: number | null,
-    playerToReplaceId: number,
+    incomingPlayerId: string,
+    targetTeamId: string,
+    sourceTeamId: string | null,
+    playerToReplaceId: string,
   ) => {
     setProcessing(true);
     try {
@@ -602,7 +601,7 @@ export function usePeladaDetail(peladaId: number) {
   };
 
   const allPlayerIdsInPelada = useMemo(() => {
-    const ids = new Set<number>();
+    const ids = new Set<string>();
     Object.values(teamPlayers)
       .flat()
       .forEach((p) => ids.add(p.id));

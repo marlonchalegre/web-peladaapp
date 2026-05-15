@@ -6,16 +6,16 @@ import type { OrganizationInvitation } from "../../../shared/api/endpoints";
 describe("InvitationsList", () => {
   const mockInvitations: OrganizationInvitation[] = [
     {
-      id: 1,
-      organization_id: 1,
+      id: "1",
+      organization_id: "1",
       email: "invitee@test.com",
       token: "token-1",
       status: "pending",
       created_at: new Date().toISOString(),
     },
     {
-      id: 2,
-      organization_id: 1,
+      id: "2",
+      organization_id: "1",
       token: "token-2",
       status: "pending",
       created_at: new Date().toISOString(),

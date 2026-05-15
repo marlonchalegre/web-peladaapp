@@ -7,12 +7,12 @@ import dayjs from "dayjs";
 import type { Dayjs } from "dayjs";
 
 export type CreatePeladaPayload = {
-  organization_id: number;
+  organization_id: string;
   when: string;
 };
 
 type Props = {
-  organizationId: number;
+  organizationId: string;
   onCreate: (payload: CreatePeladaPayload) => Promise<void>;
 };
 

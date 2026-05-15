@@ -32,8 +32,8 @@ interface AvailablePlayerItemProps {
   onMarkPaid?: () => void;
   onReversePayment?: () => void;
   teams?: Team[];
-  onMoveToTeam?: (playerId: number, teamId: number) => void;
-  onMoveToFixedGk?: (playerId: number, side: "home" | "away") => void;
+  onMoveToTeam?: (playerId: string, teamId: string) => void;
+  onMoveToFixedGk?: (playerId: string, side: "home" | "away") => void;
   hasFixedGoalkeepers?: boolean;
 }
 
@@ -66,7 +66,7 @@ export default function AvailablePlayerItem({
     setAnchorEl(null);
   };
 
-  const handleMove = (teamId: number) => {
+  const handleMove = (teamId: string) => {
     onMoveToTeam?.(player.id, teamId);
     handleCloseMenu();
   };

@@ -59,7 +59,7 @@ function CustomTabPanel(props: TabPanelProps) {
 export default function AttendanceListPage() {
   const { t } = useTranslation();
   const { id } = useParams();
-  const peladaId = Number(id);
+  const peladaId = id!;
   const { user } = useAuth();
   const [isOrgAdmin, setIsOrgAdmin] = useState(false);
   const [tabValue, setTabValue] = useState(0);
@@ -86,7 +86,7 @@ export default function AttendanceListPage() {
   } = useAttendance(peladaId);
 
   const [isReverseDialogOpen, setIsReverseDialogOpen] = useState(false);
-  const [playerToReverse, setPlayerToReverse] = useState<number | null>(null);
+  const [playerToReverse, setPlayerToReverse] = useState<string | null>(null);
 
   // Derived admin status
   const isAnyAdmin = useMemo(() => {
@@ -109,7 +109,7 @@ export default function AttendanceListPage() {
     setIsReverseDialogOpen(false);
   };
 
-  const onReverseClick = (playerId: number) => {
+  const onReverseClick = (playerId: string) => {
     setPlayerToReverse(playerId);
     setIsReverseDialogOpen(true);
   };
@@ -165,7 +165,7 @@ export default function AttendanceListPage() {
               path: `/organizations/${pelada.organization_id}`,
             },
             {
-              label: t("peladas.detail.title", { id: pelada.id }),
+              label: t("peladas.detail.title"),
               path: `/peladas/${pelada.id}`,
             },
             { label: t("peladas.attendance.title") },

@@ -11,8 +11,13 @@ describe("sortPlayersByPosition", () => {
   ) => ({
     id,
     user_id: id,
-    organization_id: 1,
-    user: { id, name, username: name.toLowerCase(), position } as User,
+    organization_id: "1",
+    user: {
+      id: String(id),
+      name,
+      username: name.toLowerCase(),
+      position,
+    } as User,
     is_goalkeeper: isGk,
   });
 

@@ -61,7 +61,7 @@ export default function OrganizationManagementPage() {
   const { t } = useTranslation();
   const { id } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
-  const orgId = Number(id);
+  const orgId = id!;
 
   const activeTab = searchParams.get("tab") || "members";
   const page = parseInt(searchParams.get("page") || "0", 10);

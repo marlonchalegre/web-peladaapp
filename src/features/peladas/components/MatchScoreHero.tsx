@@ -23,8 +23,8 @@ interface MatchScoreHeroProps {
   homeTeamName: string;
   awayTeamName: string;
   isAdmin: boolean;
-  onStartMatch: (id: number) => Promise<void>;
-  onPauseMatch: (id: number) => Promise<void>;
+  onStartMatch: (id: string) => Promise<void>;
+  onPauseMatch: (id: string) => Promise<void>;
   onOpenResetConfirm: (type: "session" | "match") => void;
   onEndMatch: () => void;
   updating: boolean;
@@ -273,7 +273,6 @@ export default function MatchScoreHero({
                   )
                 }
                 onClick={onEndMatch}
-                disabled={updating}
                 data-testid="end-match-button"
                 sx={{
                   textTransform: "none",

@@ -34,8 +34,8 @@ import { useTranslation } from "react-i18next";
 import PlayerSelectMenu from "./PlayerSelectMenu";
 
 export type SelectMenuState = {
-  teamId: number;
-  forPlayerId?: number;
+  teamId: string;
+  forPlayerId?: string;
   type: "replace" | "add";
 } | null;
 
@@ -46,11 +46,11 @@ type Props = {
   awayTeamName: string;
   homePlayers: TeamPlayer[];
   awayPlayers: TeamPlayer[];
-  orgPlayerIdToUserId: Record<number, number>;
-  userIdToName: Record<number, string>;
-  orgPlayerIdToPlayer: Record<number, Player>;
+  orgPlayerIdToUserId: Record<string, string>;
+  userIdToName: Record<string, string>;
+  orgPlayerIdToPlayer: Record<string, Player>;
   statsMap: Record<
-    number,
+    string,
     { goals: number; assists: number; ownGoals: number }
   >;
   benchPlayers: Player[];
@@ -61,39 +61,39 @@ type Props = {
   setSelectMenu: Dispatch<SetStateAction<SelectMenuState>>;
   playersPerTeam?: number | null;
   // Timer Actions
-  onStartMatch: (id: number) => Promise<void>;
-  onPauseMatch: (id: number) => Promise<void>;
-  onResetMatch: (id: number) => Promise<void>;
+  onStartMatch: (id: string) => Promise<void>;
+  onPauseMatch: (id: string) => Promise<void>;
+  onResetMatch: (id: string) => Promise<void>;
   onOpenResetConfirm: (type: "session" | "match") => void;
   // Data Actions
   recordEvent: (
-    matchId: number,
-    playerId: number,
+    matchId: string,
+    playerId: string,
     type: "assist" | "goal" | "own_goal",
     sessionTimeMs?: number,
     matchTimeMs?: number,
   ) => Promise<void>;
   deleteEventAndRefresh: (
-    matchId: number,
-    playerId: number,
+    matchId: string,
+    playerId: string,
     type: "assist" | "goal" | "own_goal",
   ) => Promise<void>;
   adjustScore: (
-    matchId: number,
+    matchId: string,
     team: "home" | "away",
     delta: 1 | -1,
   ) => Promise<void>;
   replacePlayerOnTeam: (
-    teamId: number,
-    outPlayerId: number,
-    inPlayerId: number,
+    teamId: string,
+    outPlayerId: string,
+    inPlayerId: string,
   ) => Promise<void>;
-  addPlayerToTeam: (teamId: number, playerId: number) => Promise<void>;
+  addPlayerToTeam: (teamId: string, playerId: string) => Promise<void>;
   onEndMatch: () => void;
   // History Drawer
   matches: Match[];
-  onSelectMatch: (id: number) => void;
-  teamNameById: Record<number, string>;
+  onSelectMatch: (id: string) => void;
+  teamNameById: Record<string, string>;
 };
 
 export default function ActiveMatchDashboard(props: Props) {
@@ -137,7 +137,7 @@ export default function ActiveMatchDashboard(props: Props) {
   const effectiveFinished = finished && !isEditing;
 
   const getPlayerName = useCallback(
-    (pid: number) => {
+    (pid: string) => {
       const uid = orgPlayerIdToUserId[pid];
       return uid && userIdToName[uid] ? userIdToName[uid] : `Player #${pid}`;
     },
@@ -150,7 +150,7 @@ export default function ActiveMatchDashboard(props: Props) {
   }, [matches]);
 
   const handleStatChange = (
-    playerId: number,
+    playerId: string,
     type: "goal" | "assist" | "own_goal",
     diff: number,
     side: "home" | "away",
@@ -186,14 +186,14 @@ export default function ActiveMatchDashboard(props: Props) {
   }, [playersPerTeam, homePlayers.length, awayPlayers.length]);
 
   const generateTeamList = useCallback(
-    (players: TeamPlayer[], side: "home" | "away", teamId: number) => {
+    (players: TeamPlayer[], side: "home" | "away", teamId: string) => {
       // Sort by position then name
       const sortedPlayers = [...players].sort((a, b) => {
         const playerA = orgPlayerIdToPlayer[a.player_id];
         const playerB = orgPlayerIdToPlayer[b.player_id];
 
-        const posA = playerA?.position_id || 99;
-        const posB = playerB?.position_id || 99;
+        const posA = Number(playerA?.position_id || 99);
+        const posB = Number(playerB?.position_id || 99);
 
         if (posA !== posB) return posA - posB;
 
@@ -212,7 +212,7 @@ export default function ActiveMatchDashboard(props: Props) {
         const missing = targetCount - players.length;
         for (let i = 0; i < missing; i++) {
           list.push({
-            player_id: -1 * (i + 1 + (side === "home" ? 0 : 100)),
+            player_id: String(-1 * (i + 1 + (side === "home" ? 0 : 100))),
             team_id: teamId,
             is_goalkeeper: false,
             side,

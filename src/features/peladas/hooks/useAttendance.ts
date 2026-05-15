@@ -64,7 +64,7 @@ export type PlayerWithUser = Player & {
   attendance_updated_at?: string;
 };
 
-export function useAttendance(peladaId: number) {
+export function useAttendance(peladaId: string) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -75,7 +75,7 @@ export function useAttendance(peladaId: number) {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [updatingPlayers, setUpdatingPlayers] = useState<Set<number>>(
+  const [updatingPlayers, setUpdatingPlayers] = useState<Set<string>>(
     new Set(),
   );
   const [peladaTransactions, setPeladaTransactions] = useState<Transaction[]>(
@@ -134,7 +134,7 @@ export function useAttendance(peladaId: number) {
 
   const handleUpdateAttendance = async (
     status: AttendanceStatus,
-    targetPlayerId?: number,
+    targetPlayerId?: string,
   ) => {
     // Determine the ID to track for loading state
     const currentPlayerAsPlayer = players.find(
@@ -179,7 +179,7 @@ export function useAttendance(peladaId: number) {
     }
   };
 
-  const handleAddPlayersFromOrg = async (playerIds: number[]) => {
+  const handleAddPlayersFromOrg = async (playerIds: string[]) => {
     try {
       setLoading(true);
       await Promise.all(
@@ -199,7 +199,7 @@ export function useAttendance(peladaId: number) {
     }
   };
 
-  const handleMarkPaid = async (playerId: number, amount?: number) => {
+  const handleMarkPaid = async (playerId: string, amount?: number) => {
     if (!pelada) return;
     try {
       setUpdatingPlayers((prev) => new Set(prev).add(playerId));
@@ -232,7 +232,7 @@ export function useAttendance(peladaId: number) {
     }
   };
 
-  const handleReversePayment = async (playerId: number) => {
+  const handleReversePayment = async (playerId: string) => {
     if (!pelada) return;
     try {
       setUpdatingPlayers((prev) => new Set(prev).add(playerId));

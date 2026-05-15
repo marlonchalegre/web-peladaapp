@@ -60,7 +60,7 @@ describe("FinanceSection - Calculation Scenarios", () => {
       total_expense: 0,
     });
 
-    render(<FinanceSection orgId={10} isAdmin={true} />);
+    render(<FinanceSection orgId={"10"} isAdmin={true} />);
 
     await waitFor(() => {
       expect(screen.queryByTestId("finance-loading")).toBeNull();
@@ -79,7 +79,7 @@ describe("FinanceSection - Calculation Scenarios", () => {
     mockApi.listTransactions.mockResolvedValue({
       data: [
         {
-          id: 1,
+          id: "1",
           amount: 10,
           type: "income",
           status: "paid",
@@ -125,7 +125,7 @@ describe("FinanceSection - Calculation Scenarios", () => {
     mockApi.listTransactions.mockResolvedValue({
       data: [
         {
-          id: 1,
+          id: "1",
           amount: 10,
           type: "income",
           status: "reversed",
@@ -161,7 +161,7 @@ describe("FinanceSection - Calculation Scenarios", () => {
       total_expense: 0,
     });
 
-    render(<FinanceSection orgId={10} isAdmin={true} />);
+    render(<FinanceSection orgId={"10"} isAdmin={true} />);
 
     await waitFor(() => {
       expect(screen.queryByTestId("finance-loading")).toBeNull();
@@ -176,7 +176,7 @@ describe("FinanceSection - Calculation Scenarios", () => {
     mockApi.listTransactions.mockResolvedValue({
       data: [
         {
-          id: 2,
+          id: "2",
           amount: 100,
           type: "expense",
           status: "paid",
@@ -218,7 +218,7 @@ describe("FinanceSection - Calculation Scenarios", () => {
     mockApi.listTransactions.mockResolvedValue({
       data: [
         {
-          id: 2,
+          id: "2",
           amount: 100,
           type: "expense",
           status: "reversed",

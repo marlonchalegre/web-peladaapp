@@ -32,12 +32,12 @@ describe("AddPlayersDialog", () => {
     mockSearchUsers.mockResolvedValue({
       data: [
         {
-          id: 1,
+          id: "1",
           name: "Alice Smith",
           username: "alice",
           email: "alice@test.com",
         },
-        { id: 2, name: "Bob Jones", username: "bob", email: "bob@test.com" },
+        { id: "2", name: "Bob Jones", username: "bob", email: "bob@test.com" },
       ],
       total: 2,
       page: 1,
@@ -48,13 +48,13 @@ describe("AddPlayersDialog", () => {
 
   const defaultProps = {
     open: true,
-    selectedIds: new Set<number>(),
+    selectedIds: new Set<string>(),
     onSelectAll: vi.fn(),
     onClear: vi.fn(),
     onToggle: vi.fn(),
     onAddSelected: vi.fn().mockResolvedValue(undefined),
     onClose: vi.fn(),
-    excludeUserIds: new Set<number>([10]),
+    excludeUserIds: new Set<string>(["10"]),
   };
 
   const sleep = (ms: number) =>
@@ -102,8 +102,8 @@ describe("AddPlayersDialog", () => {
   it("excludes users present in excludeUserIds", async () => {
     mockSearchUsers.mockResolvedValue({
       data: [
-        { id: 1, name: "Alice", username: "alice", email: "" },
-        { id: 10, name: "Excluded", username: "excluded", email: "" },
+        { id: "1", name: "Alice", username: "alice", email: "" },
+        { id: "10", name: "Excluded", username: "excluded", email: "" },
       ],
       total: 2,
       page: 1,
@@ -162,7 +162,7 @@ describe("AddPlayersDialog", () => {
 
   it("shows 'Load More' button when hasMore is true", async () => {
     mockSearchUsers.mockResolvedValue({
-      data: [{ id: 1, name: "Alice", username: "alice", email: "" }],
+      data: [{ id: "1", name: "Alice", username: "alice", email: "" }],
       total: 2,
       page: 1,
       perPage: 1,

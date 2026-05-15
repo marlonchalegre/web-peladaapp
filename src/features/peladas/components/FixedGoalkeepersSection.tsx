@@ -27,8 +27,8 @@ interface FixedGoalkeepersSectionProps {
   isAdminOverride?: boolean;
   onDragStartPlayer: (
     e: DragEvent<HTMLElement>,
-    playerId: number,
-    sourceTeamId: number | null,
+    playerId: string,
+    sourceTeamId: string | null,
   ) => void;
 }
 

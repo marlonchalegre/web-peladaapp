@@ -11,11 +11,11 @@ import { AuthContext, type AuthContextValue } from "./AuthContext";
 import type { Organization } from "../../shared/api/endpoints";
 
 type TokenPayload = {
-  id: number;
+  id: string;
   email: string;
   phone?: string;
   avatar_filename?: string | null;
-  admin_orgs?: number[];
+  admin_orgs?: string[];
   exp?: number;
 };
 

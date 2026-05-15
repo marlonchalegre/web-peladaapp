@@ -8,7 +8,7 @@ import {
 import Grid from "@mui/material/Grid";
 import AddIcon from "@mui/icons-material/Add";
 import GroupsIcon from "@mui/icons-material/Groups";
-import { type DragEvent } from "react";
+import type { DragEvent } from "react";
 import type {
   Player,
   Team,
@@ -22,31 +22,31 @@ type PlayerWithUser = Player & { user: User; is_goalkeeper?: boolean };
 
 export type TeamsSectionProps = {
   teams: Team[];
-  teamPlayers: Record<number, PlayerWithUser[]>;
+  teamPlayers: Record<string, PlayerWithUser[]>;
   playersPerTeam?: number | null;
   creatingTeam: boolean;
   locked?: boolean;
   onCreateTeam: (name: string) => Promise<void>;
-  onDeleteTeam: (teamId: number) => Promise<void>;
+  onDeleteTeam: (teamId: string) => Promise<void>;
   onDragStartPlayer: (
     e: DragEvent<HTMLElement>,
-    playerId: number,
-    sourceTeamId: number | null,
+    playerId: string,
+    sourceTeamId: string | null,
   ) => void;
   dropToTeam: (
     e: DragEvent<HTMLElement>,
-    targetTeamId: number,
+    targetTeamId: string,
   ) => Promise<void>;
-  onMoveToTeam?: (playerId: number, teamId: number) => void;
-  onSendToBench?: (playerId: number) => void;
-  onMoveToFixedGk?: (playerId: number, side: "home" | "away") => void;
-  scores: Record<number, number>;
+  onMoveToTeam?: (playerId: string, teamId: string) => void;
+  onSendToBench?: (playerId: string) => void;
+  onMoveToFixedGk?: (playerId: string, side: "home" | "away") => void;
+  scores: Record<string, number>;
   isAdminOverride?: boolean;
   hasFixedGoalkeepers?: boolean;
   peladaTransactions?: Transaction[];
-  organizationId?: number; // Add organizationId
-  onMarkPaid?: (playerId: number, amount: number) => void;
-  onReversePayment?: (playerId: number) => void;
+  organizationId?: string; // Add organizationId
+  onMarkPaid?: (playerId: string, amount: number) => void;
+  onReversePayment?: (playerId: string) => void;
 };
 export default function TeamsSection(props: TeamsSectionProps) {
   const { t } = useTranslation();

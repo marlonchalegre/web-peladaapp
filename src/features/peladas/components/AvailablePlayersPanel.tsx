@@ -31,20 +31,20 @@ type PlayerWithUser = Player & { user: User };
 
 type AvailablePlayersPanelProps = {
   players: PlayerWithUser[];
-  scores: Record<number, number>;
+  scores: Record<string, number>;
   onDropToBench: (e: DragEvent<HTMLElement>) => void;
-  onDragStartPlayer: (e: DragEvent<HTMLElement>, playerId: number) => void;
-  onAddPlayersFromOrg: (playerIds: number[]) => Promise<void>;
-  organizationId: number;
-  allPlayerIdsInPelada: number[];
+  onDragStartPlayer: (e: DragEvent<HTMLElement>, playerId: string) => void;
+  onAddPlayersFromOrg: (playerIds: string[]) => Promise<void>;
+  organizationId: string;
+  allPlayerIdsInPelada: string[];
   locked?: boolean;
   isAdmin?: boolean;
   peladaTransactions?: Transaction[];
-  onMarkPaid?: (playerId: number, amount: number) => void;
-  onReversePayment?: (playerId: number) => void;
+  onMarkPaid?: (playerId: string, amount: number) => void;
+  onReversePayment?: (playerId: string) => void;
   teams?: Team[];
-  onMoveToTeam?: (playerId: number, teamId: number) => void;
-  onMoveToFixedGk?: (playerId: number, side: "home" | "away") => void;
+  onMoveToTeam?: (playerId: string, teamId: string) => void;
+  onMoveToFixedGk?: (playerId: string, side: "home" | "away") => void;
   hasFixedGoalkeepers?: boolean;
 };
 

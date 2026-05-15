@@ -24,7 +24,7 @@ import type { OrganizationInvitation } from "../../../shared/api/endpoints";
 interface InvitationsListProps {
   invitations: OrganizationInvitation[];
   publicInviteLink: string | null;
-  onRevoke: (invitationId: number) => void;
+  onRevoke: (invitationId: string) => void;
   onResetLink: () => void;
   onInviteClick: () => void;
   actionLoading: boolean;

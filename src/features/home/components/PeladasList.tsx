@@ -15,7 +15,7 @@ import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { type Pelada } from "../../../shared/api/endpoints";
+import type { Pelada } from "../../../shared/api/endpoints";
 
 interface PeladasListProps {
   peladas: Pelada[];

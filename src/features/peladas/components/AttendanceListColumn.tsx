@@ -1,6 +1,6 @@
 import { Box, Typography, Stack } from "@mui/material";
-import { type ReactNode } from "react";
-import { type PlayerWithUser } from "../hooks/useAttendance";
+import type { ReactNode } from "react";
+import type { PlayerWithUser } from "../hooks/useAttendance";
 import {
   type AttendanceStatus,
   type Transaction,
@@ -15,13 +15,13 @@ interface AttendanceListColumnProps {
   players: PlayerWithUser[];
   emptyMessage: string;
   isAdmin: boolean;
-  currentUserId?: number;
-  onUpdate: (status: AttendanceStatus, playerId: number) => void;
-  updatingPlayers: Set<number>;
+  currentUserId?: string;
+  onUpdate: (status: AttendanceStatus, playerId: string) => void;
+  updatingPlayers: Set<string>;
   hideHeader?: boolean;
   peladaTransactions?: Transaction[];
-  onMarkPaid?: (playerId: number, amount: number) => void;
-  onReversePayment?: (playerId: number) => void;
+  onMarkPaid?: (playerId: string, amount: number) => void;
+  onReversePayment?: (playerId: string) => void;
   organizationFinance?: OrganizationFinance | null;
 }
 

@@ -14,8 +14,8 @@ vi.mock("react-i18next", () => ({
 
 describe("PeladaDetailHeader", () => {
   const mockPelada: Pelada = {
-    id: 1,
-    organization_id: 1,
+    id: "1",
+    organization_id: "1",
     status: "open",
     has_schedule_plan: false,
   };

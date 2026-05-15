@@ -25,10 +25,10 @@ interface MatchReportSummaryProps {
   homeTeamName: string;
   awayTeamName: string;
   events: MatchEvent[];
-  userIdToName: Record<number, string>;
-  orgPlayerIdToUserId: Record<number, number>;
-  orgPlayerIdToTeamId: Record<number, number>;
-  teamNameById: Record<number, string>;
+  userIdToName: Record<string, string>;
+  orgPlayerIdToUserId: Record<string, string>;
+  orgPlayerIdToTeamId: Record<string, string>;
+  teamNameById: Record<string, string>;
   nextMatch?: Match | null;
   onProceedToNext?: () => void;
 }
@@ -37,7 +37,7 @@ import AssistWalkerIcon from "@mui/icons-material/DirectionsRun";
 import GavelIcon from "@mui/icons-material/Gavel";
 
 interface GroupedEvent {
-  playerId: number;
+  playerId: string;
   playerName: string;
   goals: number;
   assists: number;
@@ -60,16 +60,16 @@ export default function MatchReportSummary({
 }: MatchReportSummaryProps) {
   const { t } = useTranslation();
 
-  const getPlayerName = (orgPlayerId: number) => {
+  const getPlayerName = (orgPlayerId: string) => {
     const userId = orgPlayerIdToUserId[orgPlayerId];
     return userIdToName[userId] || t("common.unknown_player");
   };
 
-  const groupEventsByTeam = (teamId: number) => {
+  const groupEventsByTeam = (teamId: string) => {
     const teamEvents = events.filter(
       (e) => orgPlayerIdToTeamId[e.player_id] === teamId,
     );
-    const grouped: Record<number, GroupedEvent> = {};
+    const grouped: Record<string, GroupedEvent> = {};
 
     teamEvents.forEach((e) => {
       if (!grouped[e.player_id]) {
@@ -240,7 +240,11 @@ export default function MatchReportSummary({
             >
               {t("peladas.dashboard.summary.title", { seq: match.sequence })}
             </Typography>
-            <Typography variant="h4" sx={{ fontWeight: 900, mt: 1 }}>
+            <Typography
+              variant="h4"
+              sx={{ fontWeight: 900, mt: 1 }}
+              data-testid="match-finished-title"
+            >
               {t("peladas.dashboard.summary.match_finished")}
             </Typography>
           </Box>
@@ -454,6 +458,7 @@ export default function MatchReportSummary({
               color="inherit"
               onClick={onClose}
               sx={{ borderRadius: 2, py: 1.5 }}
+              data-testid="summary-close-button"
             >
               {t("common.close")}
             </Button>
@@ -465,6 +470,7 @@ export default function MatchReportSummary({
                 onClick={onProceedToNext}
                 endIcon={<ArrowForwardIcon />}
                 sx={{ borderRadius: 2, py: 1.5, fontWeight: "bold" }}
+                data-testid="summary-next-match-button"
               >
                 {t("peladas.dashboard.summary.go_to_next")}
               </Button>

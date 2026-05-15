@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import PlayerRatingsContent from "./PlayerRatingsContent";
-import { type Player } from "../../../shared/api/endpoints";
+import type { Player } from "../../../shared/api/endpoints";
 
 // Mock endpoints
 vi.mock("../../../shared/api/endpoints", async () => {
@@ -22,25 +22,25 @@ vi.mock("react-i18next", () => ({
 
 const mockPlayers: Player[] = [
   {
-    id: 1,
-    user_id: 101,
-    organization_id: 10,
+    id: "1",
+    user_id: "101",
+    organization_id: "10",
     user_name: "Alice",
     user_username: "alice",
     grade: 5,
   },
   {
-    id: 2,
-    user_id: 102,
-    organization_id: 10,
+    id: "2",
+    user_id: "102",
+    organization_id: "10",
     user_name: "Bob",
     user_username: "bob",
     grade: 7,
   },
   {
-    id: 3,
-    user_id: 103,
-    organization_id: 10,
+    id: "3",
+    user_id: "103",
+    organization_id: "10",
     user_name: "Charlie",
     user_username: "charlie",
     grade: null,
@@ -49,7 +49,7 @@ const mockPlayers: Player[] = [
 
 describe("PlayerRatingsContent", () => {
   const defaultProps = {
-    orgId: 10,
+    orgId: "10",
     initialPlayers: mockPlayers,
     orgName: "Test Org",
     onUpdateSuccess: vi.fn(),
@@ -90,16 +90,19 @@ describe("PlayerRatingsContent", () => {
 
   it("paginates players", () => {
     const manyPlayers = Array.from({ length: 15 }, (_, i) => ({
-      id: i + 200,
-      user_id: i + 200,
-      organization_id: 10,
+      id: String(i + 200),
+      user_id: String(i + 200),
+      organization_id: "10",
       user_name: `User ${i + 200}`,
       user_username: `u${i + 200}`,
       grade: 5,
     }));
 
     render(
-      <PlayerRatingsContent {...defaultProps} initialPlayers={manyPlayers} />,
+      <PlayerRatingsContent
+        {...defaultProps}
+        initialPlayers={manyPlayers as Player[]}
+      />,
     );
 
     // Default rows per page is 10

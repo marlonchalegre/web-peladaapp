@@ -28,7 +28,7 @@ vi.mock("react-router-dom", () => ({
 // Mock jwt-decode to avoid parsing errors with dummy tokens
 vi.mock("jwt-decode", () => ({
   jwtDecode: vi.fn(() => ({
-    id: 1,
+    id: "1",
     email: "test@example.com",
     admin_orgs: [],
   })),
@@ -48,7 +48,7 @@ function TestComponent() {
       <button
         onClick={() =>
           signIn("test-token", {
-            id: 1,
+            id: "1",
             name: "Test User",
             username: "testuser",
             email: "test@example.com",
@@ -71,7 +71,7 @@ describe("AuthProvider", () => {
     vi.resetAllMocks();
     // Restore default implementation
     vi.mocked(jwtDecode).mockImplementation(() => ({
-      id: 1,
+      id: "1",
       email: "test@example.com",
       admin_orgs: [],
     }));
@@ -95,7 +95,7 @@ describe("AuthProvider", () => {
 
   it("initializes with authentication when localStorage has user", () => {
     const mockUser = {
-      id: 1,
+      id: "1",
       name: "Stored User",
       username: "storeduser",
       email: "stored@example.com",
@@ -149,7 +149,7 @@ describe("AuthProvider", () => {
     localStorage.setItem(
       "authUser",
       JSON.stringify({
-        id: 1,
+        id: "1",
         name: "User",
         username: "user1",
         email: "user@example.com",
@@ -182,7 +182,7 @@ describe("AuthProvider", () => {
     localStorage.setItem(
       "authUser",
       JSON.stringify({
-        id: 1,
+        id: "1",
         name: "User",
         username: "user1",
         email: "user@example.com",

@@ -14,9 +14,9 @@ import type { MatchEvent } from "../../../shared/api/endpoints";
 
 interface PeladaTimelineProps {
   events: MatchEvent[];
-  userIdToName: Record<number, string>;
-  orgPlayerIdToUserId: Record<number, number>;
-  teamNameById: Record<number, string>;
+  userIdToName: Record<string, string>;
+  orgPlayerIdToUserId: Record<string, string>;
+  teamNameById: Record<string, string>;
 }
 
 export default function PeladaTimeline({
@@ -37,7 +37,7 @@ export default function PeladaTimeline({
     return `${pad(minutes)}:${pad(seconds)}`;
   };
 
-  const getPlayerName = (playerId: number) => {
+  const getPlayerName = (playerId: string) => {
     const userId = orgPlayerIdToUserId[playerId];
     return userIdToName[userId] || `Player ${playerId}`;
   };
@@ -59,7 +59,10 @@ export default function PeladaTimeline({
     if (a.session_time_ms && b.session_time_ms) {
       return a.session_time_ms - b.session_time_ms;
     }
-    return (a.id || 0) - (b.id || 0);
+    if (a.id && b.id) {
+      return String(a.id).localeCompare(String(b.id));
+    }
+    return 0;
   });
 
   if (events.length === 0) {

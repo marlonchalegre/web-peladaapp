@@ -8,42 +8,42 @@ import { type Team, type User } from "../../../shared/api/endpoints";
 
 describe("exportUtils", () => {
   const mockTeams: Team[] = [
-    { id: 1, pelada_id: 1, name: "Time 1" },
-    { id: 2, pelada_id: 1, name: "Time 2" },
+    { id: "1", pelada_id: "1", name: "Time 1" },
+    { id: "2", pelada_id: "1", name: "Time 2" },
   ];
 
   const mockUser1: User = {
-    id: 101,
+    id: "101",
     name: "Marlon",
     username: "marlon",
     position: "striker",
   };
   const mockUser2: User = {
-    id: 102,
+    id: "102",
     name: "Chalegre",
     username: "chalegre",
     position: "defender",
   };
 
-  const mockPlayers: Record<number, PlayerWithUser[]> = {
+  const mockPlayers: Record<string, PlayerWithUser[]> = {
     1: [
       {
-        id: 1,
-        user_id: 101,
+        id: "1",
+        user_id: "101",
         user: mockUser1,
         grade: 8.5,
-        organization_id: 1,
+        organization_id: "1",
         is_goalkeeper: false,
       },
     ],
     2: [
       {
-        id: 2,
-        user_id: 102,
+        id: "2",
+        user_id: "102",
         user: mockUser2,
         grade: 7.0,
         is_goalkeeper: true,
-        organization_id: 1,
+        organization_id: "1",
       },
     ],
   };
@@ -71,25 +71,25 @@ describe("exportUtils", () => {
 
     it("should fallback to '?' for unknown positions", () => {
       const unknownUser: User = {
-        id: 103,
+        id: "103",
         name: "Stranger",
         username: "stranger",
         position: "unknown",
       };
-      const unknownPlayers: Record<number, PlayerWithUser[]> = {
+      const unknownPlayers: Record<string, PlayerWithUser[]> = {
         1: [
           {
-            id: 3,
-            user_id: 103,
+            id: "3",
+            user_id: "103",
             user: unknownUser,
             grade: 5.0,
-            organization_id: 1,
+            organization_id: "1",
             is_goalkeeper: false,
           },
         ],
       };
       const result = generateExportText(
-        [{ id: 1, pelada_id: 1, name: "Time X" }],
+        [{ id: "1", pelada_id: "1", name: "Time X" }],
         unknownPlayers,
         {},
       );
