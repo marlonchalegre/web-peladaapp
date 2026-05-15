@@ -636,7 +636,8 @@
       "empty": {
         "confirmed": "No one confirmed yet.",
         "declined": "No one declined yet.",
-        "pending": "Everyone has responded!"
+        "pending": "Everyone has responded!",
+        "waitlist": "No players on waitlist"
       },
       "stats": {
         "total_players": "TOTAL PLAYERS",
