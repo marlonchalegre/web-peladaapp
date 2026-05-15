@@ -35,19 +35,29 @@ export default function JoinOrganizationPage() {
 
   useEffect(() => {
     if (!token) return;
+    
+    // Auth check: ensure user is populated
+    if (isAuthenticated && !user) return;
 
     const fetchInfo = async () => {
       try {
         const info = await endpoints.getInvitationInfo(token);
         setInvitation(info);
 
+        console.warn('Auth state:', { isAuthenticated, user: user?.id });
         if (isAuthenticated && user) {
+          console.warn('Membership check - user:', user.id, 'org:', info.organization_id);
           const orgs = await endpoints.listUserOrganizations(user.id);
+          console.warn('User orgs fetched:', orgs);
           if (orgs.some((org) => org.id === info.organization_id)) {
+            console.warn('Redirection triggered!');
             navigate(`/organizations/${info.organization_id}`);
           }
+        } else {
+          console.warn('Not authenticated or no user');
         }
-      } catch {
+      } catch (err) {
+        console.error('Error fetching invitation:', err);
         setError(t("organizations.invitation.error.invalid_token"));
       } finally {
         setLoading(false);
