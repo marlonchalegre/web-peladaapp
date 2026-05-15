@@ -56,7 +56,7 @@ export default function ForgotPasswordPage() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "100%",
+        flex: 1,
         backgroundColor: "background.default",
       }}
     >
