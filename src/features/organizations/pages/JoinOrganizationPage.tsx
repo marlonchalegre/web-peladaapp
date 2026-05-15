@@ -50,7 +50,7 @@ export default function JoinOrganizationPage() {
             navigate(`/organizations/${info.organization_id}`);
           }
         }
-      } catch (err) {
+      } catch {
         setError(t("organizations.invitation.error.invalid_token"));
       } finally {
         setLoading(false);
