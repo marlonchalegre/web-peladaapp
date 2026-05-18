@@ -102,6 +102,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,json}"],
+        globIgnores: ["**/version.json"],
         navigateFallback: "index.html",
         skipWaiting: false,
         clientsClaim: false,

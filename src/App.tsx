@@ -34,6 +34,7 @@ import { SecureAvatar } from "./shared/components/SecureAvatar";
 import { initGA, logPageView, logClickEvent } from "./lib/analytics";
 import { PWAInstallPrompt } from "./shared/components/PWAInstallPrompt";
 import { PullToRefresh } from "./shared/components/PullToRefresh";
+import { PWAProvider, usePWA } from "./app/providers/PWAContext";
 
 // Lazy load pages to reduce initial bundle size
 const LoginPage = lazy(() => import("./features/auth/pages/LoginPage"));
@@ -176,6 +177,7 @@ function AppLayout() {
   const navigate = useNavigate();
   const { mode, toggleTheme } = useAppTheme();
   const { t } = useTranslation();
+  const { isInstallable, installApp } = usePWA();
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -190,6 +192,11 @@ function AppLayout() {
     handleCloseUserMenu();
     signOut();
     navigate("/");
+  };
+
+  const handleInstallApp = () => {
+    handleCloseUserMenu();
+    installApp();
   };
 
   return (
@@ -304,6 +311,16 @@ function AppLayout() {
                       {t("navigation.profile")}
                     </Typography>
                   </MenuItem>
+
+                  {isInstallable && (
+                    <MenuItem
+                      onClick={handleInstallApp}
+                      data-testid="install-app-menu-item"
+                    >
+                      <Typography align="center">{t("common.install")}</Typography>
+                    </MenuItem>
+                  )}
+
                   <MenuItem
                     onClick={handleLogout}
                     data-testid="logout-menu-item"
@@ -386,14 +403,16 @@ export default function App() {
   const { i18n } = useTranslation();
   return (
     <AuthProvider>
-      <LocalizationProvider
-        dateAdapter={AdapterDayjs}
-        adapterLocale={i18n.language === "pt-BR" ? "pt-br" : "en"}
-      >
-        <BrowserRouter>
-          <AppLayout />
-        </BrowserRouter>
-      </LocalizationProvider>
+      <PWAProvider>
+        <LocalizationProvider
+          dateAdapter={AdapterDayjs}
+          adapterLocale={i18n.language === "pt-BR" ? "pt-br" : "en"}
+        >
+          <BrowserRouter>
+            <AppLayout />
+          </BrowserRouter>
+        </LocalizationProvider>
+      </PWAProvider>
     </AuthProvider>
   );
 }

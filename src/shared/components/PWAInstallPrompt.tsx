@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useRegisterSW } from "virtual:pwa-register/react";
 import {
   Snackbar,
@@ -11,81 +11,65 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import DownloadIcon from "@mui/icons-material/Download";
 import { useTranslation } from "react-i18next";
-
-interface BeforeInstallPromptEvent extends Event {
-  readonly platforms: string[];
-  readonly userChoice: Promise<{
-    outcome: "accepted" | "dismissed";
-    platform: string;
-  }>;
-  prompt(): Promise<void>;
-}
+import { usePWA } from "../../app/providers/PWAContext";
 
 export function PWAInstallPrompt() {
   const { t } = useTranslation();
-  const [deferredPrompt, setDeferredPrompt] =
-    useState<BeforeInstallPromptEvent | null>(null);
-  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
-
-  // Detect if device is iOS and not already in standalone mode
-  const isIOS =
-    /iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window);
-  const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
-
-  // Use state but initialize it based on the detection to avoid extra render cycle or effect warning
-  const [showIOSPrompt, setShowIOSPrompt] = useState(isIOS && !isStandalone);
+  const { showIOSInstructions, setShowIOSInstructions } = usePWA();
 
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
   } = useRegisterSW({
-    onRegistered(r) {
-      console.log("SW Registered:", r);
+    onRegisteredSW(_swUrl, r) {
+      if (r) {
+        // Check for updates every hour
+        setInterval(() => {
+          r.update();
+        }, 60 * 60 * 1000);
+      }
     },
     onRegisterError(error) {
       console.error("SW registration error", error);
     },
   });
 
+  // Manual version check to ensure we're not running a stale version
   useEffect(() => {
-    const handleBeforeInstallPrompt = (e: Event) => {
-      // Prevent Chrome 67 and earlier from automatically showing the prompt
-      e.preventDefault();
-      // Stash the event so it can be triggered later.
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
-      // Update UI notify the user they can add to home screen
-      setShowInstallPrompt(true);
+    const checkVersion = async () => {
+      try {
+        const response = await fetch("/version.json?t=" + Date.now(), {
+          cache: "no-store",
+        });
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const currentVersion = import.meta.env.VITE_APP_VERSION;
+
+        if (
+          currentVersion &&
+          currentVersion !== "dev" &&
+          data.version !== currentVersion
+        ) {
+          console.log("New version detected via version.json:", data.version);
+          const registration = await navigator.serviceWorker.getRegistration();
+          if (registration) {
+            await registration.update();
+          }
+        }
+      } catch (err) {
+        console.warn("Failed to check version.json", err);
+      }
     };
 
-    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-
-    return () => {
-      window.removeEventListener(
-        "beforeinstallprompt",
-        handleBeforeInstallPrompt,
-      );
-    };
+    checkVersion();
+    const interval = setInterval(checkVersion, 30 * 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
 
-  const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
-
-    // Show the prompt
-    deferredPrompt.prompt();
-
-    // Wait for the user to respond to the prompt
-    const { outcome } = await deferredPrompt.userChoice;
-    console.log(`User response to the install prompt: ${outcome}`);
-
-    // We've used the prompt, and can't use it again, throw it away
-    setDeferredPrompt(null);
-    setShowInstallPrompt(false);
-  };
-
   const handleClose = () => {
-    setShowInstallPrompt(false);
-    setShowIOSPrompt(false);
     setNeedRefresh(false);
+    setShowIOSInstructions(false);
   };
 
   return (
@@ -122,38 +106,11 @@ export function PWAInstallPrompt() {
         </Alert>
       </Snackbar>
 
-      {/* Prompt for install (Android/Desktop) */}
+      {/* Prompt for manual install (iOS) - Only shown when user clicks "Install" in menu */}
       <Snackbar
-        open={showInstallPrompt}
+        open={showIOSInstructions}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
-          severity="success"
-          icon={<DownloadIcon />}
-          action={
-            <Box sx={{ display: "flex", gap: 1 }}>
-              <Button color="inherit" size="small" onClick={handleInstallClick}>
-                {t("common.install")}
-              </Button>
-              <IconButton
-                size="small"
-                aria-label="close"
-                color="inherit"
-                onClick={handleClose}
-              >
-                <CloseIcon fontSize="small" />
-              </IconButton>
-            </Box>
-          }
-        >
-          <Typography variant="body2">{t("app.install_prompt")}</Typography>
-        </Alert>
-      </Snackbar>
-
-      {/* Prompt for manual install (iOS) */}
-      <Snackbar
-        open={showIOSPrompt}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        onClose={handleClose}
       >
         <Alert
           severity="info"
