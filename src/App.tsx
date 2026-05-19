@@ -145,7 +145,28 @@ function AnalyticsTracker() {
 
 function Footer() {
   const { t } = useTranslation();
-  const version = import.meta.env.VITE_APP_VERSION || t("app.development");
+  const [version, setVersion] = useState(
+    import.meta.env.VITE_APP_VERSION || "dev",
+  );
+
+  useEffect(() => {
+    // If it's a dev build, try to get more info from version.json
+    const fetchVersion = async () => {
+      try {
+        const response = await fetch("/version.json");
+        if (response.ok) {
+          const data = await response.json();
+          // Use the generated version if env is 'dev' or missing
+          if (import.meta.env.VITE_APP_VERSION === "dev" || !import.meta.env.VITE_APP_VERSION) {
+             setVersion(data.version);
+          }
+        }
+      } catch (e) {
+        console.warn("Could not fetch version.json", e);
+      }
+    };
+    fetchVersion();
+  }, []);
 
   return (
     <Box
