@@ -153,7 +153,9 @@ function Footer() {
     // If it's a dev build, try to get more info from version.json
     const fetchVersion = async () => {
       try {
-        const response = await fetch("/version.json");
+        const response = await fetch("/version.json?t=" + Date.now(), {
+          cache: "no-store",
+        });
         if (response.ok) {
           const data = await response.json();
           // Use the generated version if env is 'dev' or missing
