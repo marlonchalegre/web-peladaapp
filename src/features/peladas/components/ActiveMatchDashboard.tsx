@@ -200,7 +200,7 @@ export default function ActiveMatchDashboard(props: Props) {
         // 2. Standard position order
         const getPosStr = (p?: Player) =>
           (p?.position || p?.user_position || "").toLowerCase();
-        
+
         const posA = POSITION_ORDER[getPosStr(playerA)] ?? 99;
         const posB = POSITION_ORDER[getPosStr(playerB)] ?? 99;
 

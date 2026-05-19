@@ -159,8 +159,11 @@ function Footer() {
         if (response.ok) {
           const data = await response.json();
           // Use the generated version if env is 'dev' or missing
-          if (import.meta.env.VITE_APP_VERSION === "dev" || !import.meta.env.VITE_APP_VERSION) {
-             setVersion(data.version);
+          if (
+            import.meta.env.VITE_APP_VERSION === "dev" ||
+            !import.meta.env.VITE_APP_VERSION
+          ) {
+            setVersion(data.version);
           }
         }
       } catch (e) {
@@ -340,7 +343,9 @@ function AppLayout() {
                       onClick={handleInstallApp}
                       data-testid="install-app-menu-item"
                     >
-                      <Typography align="center">{t("common.install")}</Typography>
+                      <Typography align="center">
+                        {t("common.install")}
+                      </Typography>
                     </MenuItem>
                   )}
 
@@ -355,7 +360,10 @@ function AppLayout() {
             </Toolbar>
           </AppBar>
         )}
-        <Box component="main" sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
+        <Box
+          component="main"
+          sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
+        >
           <PullToRefresh>
             <Suspense fallback={<PageLoading />}>
               <Routes>

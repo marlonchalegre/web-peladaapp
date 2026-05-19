@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -20,11 +26,15 @@ interface PWAContextType {
 
 const PWAContext = createContext<PWAContextType | undefined>(undefined);
 
-export const PWAProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+export const PWAProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);
 
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window);
+  const isIOS =
+    /iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window);
   const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
 
   useEffect(() => {
@@ -36,7 +46,10 @@ export const PWAProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
     return () => {
-      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt,
+      );
     };
   }, []);
 
@@ -62,7 +75,7 @@ export const PWAProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     isStandalone,
     installApp,
     showIOSInstructions,
-    setShowIOSInstructions
+    setShowIOSInstructions,
   };
 
   return <PWAContext.Provider value={value}>{children}</PWAContext.Provider>;

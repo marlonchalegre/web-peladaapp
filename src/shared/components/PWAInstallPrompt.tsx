@@ -24,9 +24,12 @@ export function PWAInstallPrompt() {
     onRegisteredSW(_swUrl, r) {
       if (r) {
         // Check for updates every hour
-        setInterval(() => {
-          r.update();
-        }, 60 * 60 * 1000);
+        setInterval(
+          () => {
+            r.update();
+          },
+          60 * 60 * 1000,
+        );
       }
     },
     onRegisterError(error) {

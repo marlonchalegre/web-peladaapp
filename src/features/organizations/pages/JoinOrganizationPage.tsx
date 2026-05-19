@@ -35,7 +35,7 @@ export default function JoinOrganizationPage() {
 
   useEffect(() => {
     if (!token) return;
-    
+
     // Auth check: ensure user is populated
     if (isAuthenticated && !user) return;
 
