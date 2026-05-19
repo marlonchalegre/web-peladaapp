@@ -11,7 +11,6 @@ import {
   ListItemText,
   FormControlLabel,
   Switch,
-  Tooltip,
 } from "@mui/material";
 import HistoryIcon from "@mui/icons-material/History";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -25,6 +24,7 @@ import Divider from "@mui/material/Divider";
 
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import AssessmentIcon from "@mui/icons-material/Assessment";
+import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
 import { Link as RouterLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
@@ -62,6 +62,7 @@ export default function PeladaDetailHeader({
 }: PeladaDetailHeaderProps) {
   const { t } = useTranslation();
   const [exportAnchor, setExportAnchor] = useState<null | HTMLElement>(null);
+  const [randomizeDialogOpen, setRandomizeDialogOpen] = useState(false);
 
   const handleOpenExport = (event: MouseEvent<HTMLElement>) => {
     setExportAnchor(event.currentTarget);
@@ -99,7 +100,6 @@ export default function PeladaDetailHeader({
               boxShadow: "0 2px 12px rgba(0,0,0,0.04)",
               width: "100%",
               overflowX: "auto",
-              // Hide scrollbar but allow scrolling if needed
               "&::-webkit-scrollbar": { display: "none" },
               scrollbarWidth: "none",
             }}
@@ -110,6 +110,7 @@ export default function PeladaDetailHeader({
               spacing={1}
               sx={{
                 alignItems: "center",
+                flexShrink: 0,
               }}
             >
               <IconButton
@@ -151,7 +152,7 @@ export default function PeladaDetailHeader({
               </IconButton>
             </Stack>
 
-            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+            <Divider orientation="vertical" flexItem />
 
             {/* Fixed Keepers Toggle */}
             <FormControlLabel
@@ -181,80 +182,117 @@ export default function PeladaDetailHeader({
                   {t("organizations.form.pelada.fixed_goalkeepers")}
                 </Typography>
               }
-              sx={{ mr: 0, ml: 0.5 }}
+              sx={{ mr: 0, ml: 0, flexShrink: 0 }}
             />
 
-            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+            <Divider orientation="vertical" flexItem />
 
-            <Stack
-              direction="row"
-              spacing={{ xs: 1, sm: 1.5 }}
+            {/* Export/Copy Menu */}
+            <Button
+              variant="outlined"
+              onClick={handleOpenExport}
               sx={{
-                alignItems: "center",
+                borderRadius: 10,
+                textTransform: "none",
+                fontWeight: 900,
+                fontSize: "0.85rem",
+                px: { xs: 1.5, sm: 2, md: 3 },
+                minWidth: { xs: "44px", md: "auto" },
                 flexShrink: 0,
+                borderColor: "divider",
+                color: "text.primary",
+                "&:hover": {
+                  borderColor: "primary.main",
+                  bgcolor: "primary.lighter",
+                },
               }}
             >
-              {/* Export/Copy Menu */}
-              <Tooltip title={t("common.actions.export")}>
-                <IconButton
-                  size="small"
-                  onClick={handleOpenExport}
-                  sx={{
-                    border: "1px solid",
-                    borderColor: "divider",
-                    bgcolor: "background.default",
-                    p: 1,
-                  }}
-                >
-                  <ContentCopyIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
+              <ContentCopyIcon
+                sx={{ mr: { xs: 0, md: 1 }, fontSize: "1.2rem" }}
+              />
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", md: "inline" } }}
+              >
+                {t("common.actions.export")}
+              </Box>
+            </Button>
 
-              {/* Randomize Button */}
+            <Divider orientation="vertical" flexItem />
+
+            {/* Randomize Button */}
+            <Button
+              variant="outlined"
+              onClick={() => setRandomizeDialogOpen(true)}
+              disabled={processing}
+              data-testid="randomize-teams-button"
+              sx={{
+                borderRadius: 10,
+                textTransform: "none",
+                fontWeight: 900,
+                fontSize: "0.85rem",
+                px: { xs: 1.5, sm: 2, md: 3 },
+                minWidth: { xs: "44px", md: "auto" },
+                flexShrink: 0,
+                borderColor: "divider",
+                color: "text.primary",
+                "&:hover": {
+                  borderColor: "primary.main",
+                  bgcolor: "primary.lighter",
+                },
+              }}
+            >
+              <ShuffleIcon sx={{ mr: { xs: 0, md: 1 } }} />
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", md: "inline" } }}
+              >
+                {t("peladas.detail.button.randomize")}
+              </Box>
+            </Button>
+
+            {/* Main Session Action (Build Schedule / Start) */}
+            {!pelada.has_schedule_plan ? (
               <Button
-                variant="outlined"
-                onClick={onRandomizeTeams}
-                disabled={processing}
-                data-testid="randomize-teams-button"
+                component={RouterLink}
+                to={`/peladas/${pelada.id}/build-schedule`}
+                variant="contained"
+                data-testid="build-schedule-button"
                 sx={{
                   borderRadius: 10,
                   textTransform: "none",
                   fontWeight: 900,
                   fontSize: "0.85rem",
-                  px: { xs: 1.5, sm: 2, md: 3 },
+                  px: { xs: 2, sm: 3, md: 4 },
                   minWidth: { xs: "44px", md: "auto" },
-                  borderColor: "divider",
-                  color: "text.primary",
-                  "&:hover": {
-                    borderColor: "primary.main",
-                    bgcolor: "primary.lighter",
-                  },
+                  flexShrink: 0,
+                  boxShadow: "0 4px 14px rgba(25, 118, 210, 0.3)",
                 }}
               >
-                <ShuffleIcon sx={{ mr: { xs: 0, md: 1 } }} />
+                <CalendarTodayIcon sx={{ mr: { xs: 0, md: 1 } }} />
                 <Box
                   component="span"
                   sx={{ display: { xs: "none", md: "inline" } }}
                 >
-                  {t("peladas.detail.button.randomize")}
+                  {t("peladas.detail.button.build_schedule")}
                 </Box>
               </Button>
-
-              {/* Main Session Action (Build Schedule / Start) */}
-              {!pelada.has_schedule_plan ? (
+            ) : (
+              <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
                 <Button
                   component={RouterLink}
                   to={`/peladas/${pelada.id}/build-schedule`}
-                  variant="contained"
-                  data-testid="build-schedule-button"
+                  variant="outlined"
+                  data-testid="build-schedule-button-edit"
                   sx={{
                     borderRadius: 10,
                     textTransform: "none",
                     fontWeight: 900,
                     fontSize: "0.85rem",
-                    px: { xs: 2, sm: 3, md: 4 },
+                    px: { xs: 1.5, sm: 2, md: 3 },
                     minWidth: { xs: "44px", md: "auto" },
-                    boxShadow: "0 4px 14px rgba(25, 118, 210, 0.3)",
+                    borderColor: "divider",
+                    color: "text.primary",
                   }}
                 >
                   <CalendarTodayIcon sx={{ mr: { xs: 0, md: 1 } }} />
@@ -265,58 +303,31 @@ export default function PeladaDetailHeader({
                     {t("peladas.detail.button.build_schedule")}
                   </Box>
                 </Button>
-              ) : (
-                <Stack direction="row" spacing={1}>
-                  <Button
-                    component={RouterLink}
-                    to={`/peladas/${pelada.id}/build-schedule`}
-                    variant="outlined"
-                    data-testid="build-schedule-button-edit"
-                    sx={{
-                      borderRadius: 10,
-                      textTransform: "none",
-                      fontWeight: 900,
-                      fontSize: "0.85rem",
-                      px: { xs: 1.5, sm: 2, md: 3 },
-                      minWidth: { xs: "44px", md: "auto" },
-                      borderColor: "divider",
-                      color: "text.primary",
-                    }}
+                <Button
+                  variant="contained"
+                  onClick={onStartClick}
+                  disabled={changingStatus || processing}
+                  data-testid="start-pelada-button"
+                  sx={{
+                    borderRadius: 10,
+                    textTransform: "none",
+                    fontWeight: 900,
+                    fontSize: "0.85rem",
+                    px: { xs: 2, sm: 3, md: 4 },
+                    minWidth: { xs: "44px", md: "auto" },
+                    boxShadow: "0 4px 14px rgba(25, 118, 210, 0.3)",
+                  }}
+                >
+                  <PlayArrowIcon sx={{ mr: { xs: 0, md: 1 } }} />
+                  <Box
+                    component="span"
+                    sx={{ display: { xs: "none", md: "inline" } }}
                   >
-                    <CalendarTodayIcon sx={{ mr: { xs: 0, md: 1 } }} />
-                    <Box
-                      component="span"
-                      sx={{ display: { xs: "none", md: "inline" } }}
-                    >
-                      {t("peladas.detail.button.build_schedule")}
-                    </Box>
-                  </Button>
-                  <Button
-                    variant="contained"
-                    onClick={onStartClick}
-                    disabled={changingStatus || processing}
-                    data-testid="start-pelada-button"
-                    sx={{
-                      borderRadius: 10,
-                      textTransform: "none",
-                      fontWeight: 900,
-                      fontSize: "0.85rem",
-                      px: { xs: 2, sm: 3, md: 4 },
-                      minWidth: { xs: "44px", md: "auto" },
-                      boxShadow: "0 4px 14px rgba(25, 118, 210, 0.3)",
-                    }}
-                  >
-                    <PlayArrowIcon sx={{ mr: { xs: 0, md: 1 } }} />
-                    <Box
-                      component="span"
-                      sx={{ display: { xs: "none", md: "inline" } }}
-                    >
-                      {t("peladas.detail.button.start_pelada")}
-                    </Box>
-                  </Button>
-                </Stack>
-              )}
-            </Stack>
+                    {t("peladas.detail.button.start_pelada")}
+                  </Box>
+                </Button>
+              </Stack>
+            )}
           </Paper>
         ) : (
           /* Non-admin or non-open status view */
@@ -418,6 +429,17 @@ export default function PeladaDetailHeader({
           </ListItemText>
         </MenuItem>
       </Menu>
+
+      <PrettyConfirmDialog
+        open={randomizeDialogOpen}
+        onClose={() => setRandomizeDialogOpen(false)}
+        onConfirm={onRandomizeTeams}
+        title={t("peladas.detail.randomize_dialog.title")}
+        description={t("peladas.detail.randomize_dialog.description")}
+        confirmLabel={t("peladas.detail.randomize_dialog.confirm")}
+        cancelLabel={t("peladas.detail.randomize_dialog.cancel")}
+        severity="primary"
+      />
     </Box>
   );
 }

@@ -242,7 +242,7 @@ describe("PeladaDetailHeader", () => {
     fireEvent.click(screen.getByTestId("players-per-team-decrement"));
     expect(onUpdate).toHaveBeenCalledWith(4);
   });
-  it("calls onRandomizeTeams when randomize button is clicked", () => {
+  it("calls onRandomizeTeams when randomize button is clicked and confirmed", () => {
     const onRandomize = vi.fn();
     render(
       <MemoryRouter>
@@ -266,6 +266,11 @@ describe("PeladaDetailHeader", () => {
     );
 
     fireEvent.click(screen.getByTestId("randomize-teams-button"));
+    // Dialog should be open, but onRandomize not called yet
+    expect(onRandomize).not.toHaveBeenCalled();
+
+    // Click confirm in the dialog
+    fireEvent.click(screen.getByTestId("pretty-confirm-button"));
     expect(onRandomize).toHaveBeenCalled();
   });
 });

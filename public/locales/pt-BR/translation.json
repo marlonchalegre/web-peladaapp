@@ -675,6 +675,12 @@
         "copy_announcement": "Escalação (Sem Notas)",
         "randomize": "RANDOMIZAR"
       },
+      "randomize_dialog": {
+        "title": "Randomizar Times",
+        "description": "Esta ação irá redistribuir os jogadores confirmados em novos times, mantendo o equilíbrio de posições e nível técnico. Deseja continuar?",
+        "confirm": "Randomizar",
+        "cancel": "Cancelar"
+      },
       "per_team": "POR TIME",
       "schedule": {
         "subtitle": "Personalize a sequência e os detalhes das partidas",

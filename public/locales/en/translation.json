@@ -676,6 +676,12 @@
         "copy_announcement": "Lineup (No Grades)",
         "randomize": "RANDOMIZE"
       },
+      "randomize_dialog": {
+        "title": "Randomize Teams",
+        "description": "This action will redistribute confirmed players into new teams, maintaining position balance and technical level. Do you want to continue?",
+        "confirm": "Randomize",
+        "cancel": "Cancel"
+      },
       "per_team": "PER TEAM",
       "schedule": {
         "subtitle": "Customize match sequence and details",
