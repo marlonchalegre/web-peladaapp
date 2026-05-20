@@ -215,4 +215,50 @@ describe("ScheduleBuilderPage", () => {
       expect(screen.getByText("Pelada Detail Page")).toBeInTheDocument();
     });
   });
+
+  it("loads and displays an existing saved schedule plan if has_schedule_plan is true", async () => {
+    const mockFullDetailsWithPlan = {
+      pelada: {
+        id: "1",
+        organization_id: "101",
+        status: "open",
+        has_schedule_plan: true,
+      },
+      teams: [
+        { id: "10", name: "Time A" },
+        { id: "11", name: "Time B" },
+      ],
+    };
+
+    const mockSavedPlan = [
+      { home: "11", away: "10", sequence: 1 },
+      { home: "10", away: "11", sequence: 2 },
+    ];
+
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/peladas/1/full-details")
+        return Promise.resolve(mockFullDetailsWithPlan);
+      if (path === "/api/peladas/1/schedule")
+        return Promise.resolve(mockSavedPlan);
+      return Promise.reject(new Error(`Not found: ${path}`));
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/peladas/1/build-schedule"]}>
+        <Routes>
+          <Route
+            path="/peladas/:id/build-schedule"
+            element={<ScheduleBuilderPage />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(api.get).toHaveBeenCalledWith("/api/peladas/1/schedule");
+      // MUI Select has hidden inputs containing the selected value
+      expect(screen.getAllByDisplayValue("11").length).toBe(2);
+      expect(screen.getAllByDisplayValue("10").length).toBe(2);
+    });
+  });
 });

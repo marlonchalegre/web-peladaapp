@@ -34,7 +34,8 @@ import { SecureAvatar } from "./shared/components/SecureAvatar";
 import { initGA, logPageView, logClickEvent } from "./lib/analytics";
 import { PWAInstallPrompt } from "./shared/components/PWAInstallPrompt";
 import { PullToRefresh } from "./shared/components/PullToRefresh";
-import { PWAProvider, usePWA } from "./app/providers/PWAContext";
+import { usePWA } from "./app/providers/PWAContext";
+import { PWAProvider } from "./app/providers/PWAProvider";
 
 // Lazy load pages to reduce initial bundle size
 const LoginPage = lazy(() => import("./features/auth/pages/LoginPage"));

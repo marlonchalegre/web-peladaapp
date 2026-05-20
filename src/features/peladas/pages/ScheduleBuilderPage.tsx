@@ -70,12 +70,21 @@ export default function ScheduleBuilderPage() {
       setMatchesPerTeam(currentMatchesPerTeam);
 
       if (data.teams.length >= 2) {
-        // Always fetch algorithmic default
-        const preview = await endpoints.getSchedulePreview(
-          peladaId,
-          currentMatchesPerTeam,
-        );
-        setMatches(preview.matches);
+        if (data.pelada.has_schedule_plan) {
+          const plan = await endpoints.getSchedulePlan(peladaId);
+          setMatches(plan);
+          const calculated = Math.round((plan.length * 2) / data.teams.length);
+          if (Number.isFinite(calculated) && calculated >= 1) {
+            setMatchesPerTeam(calculated);
+          }
+        } else {
+          // Fetch algorithmic default
+          const preview = await endpoints.getSchedulePreview(
+            peladaId,
+            currentMatchesPerTeam,
+          );
+          setMatches(preview.matches);
+        }
       }
     } catch (err: unknown) {
       const message =
