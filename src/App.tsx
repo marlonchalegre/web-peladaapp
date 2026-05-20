@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -36,54 +36,69 @@ import { PWAInstallPrompt } from "./shared/components/PWAInstallPrompt";
 import { PullToRefresh } from "./shared/components/PullToRefresh";
 import { usePWA } from "./app/providers/PWAContext";
 import { PWAProvider } from "./app/providers/PWAProvider";
+import { lazyRetry } from "./shared/utils/lazyRetry";
 
 // Lazy load pages to reduce initial bundle size
-const LoginPage = lazy(() => import("./features/auth/pages/LoginPage"));
-const RegisterPage = lazy(() => import("./features/auth/pages/RegisterPage"));
-const FirstAccessPage = lazy(
+const LoginPage = lazyRetry(() => import("./features/auth/pages/LoginPage"), "LoginPage");
+const RegisterPage = lazyRetry(() => import("./features/auth/pages/RegisterPage"), "RegisterPage");
+const FirstAccessPage = lazyRetry(
   () => import("./features/auth/pages/FirstAccessPage"),
+  "FirstAccessPage"
 );
-const ForgotPasswordPage = lazy(
+const ForgotPasswordPage = lazyRetry(
   () => import("./features/auth/pages/ForgotPasswordPage"),
+  "ForgotPasswordPage"
 );
-const ResetPasswordPage = lazy(
+const ResetPasswordPage = lazyRetry(
   () => import("./features/auth/pages/ResetPasswordPage"),
+  "ResetPasswordPage"
 );
-const HomePage = lazy(() => import("./features/home/pages/HomePage"));
-const OrganizationDetailPage = lazy(
+const HomePage = lazyRetry(() => import("./features/home/pages/HomePage"), "HomePage");
+const OrganizationDetailPage = lazyRetry(
   () => import("./features/organizations/pages/OrganizationDetailPage"),
+  "OrganizationDetailPage"
 );
-const JoinOrganizationPage = lazy(
+const JoinOrganizationPage = lazyRetry(
   () => import("./features/organizations/pages/JoinOrganizationPage"),
+  "JoinOrganizationPage"
 );
-const OrganizationStatisticsPage = lazy(
+const OrganizationStatisticsPage = lazyRetry(
   () => import("./features/organizations/pages/OrganizationStatisticsPage"),
+  "OrganizationStatisticsPage"
 );
-const OrganizationManagementPage = lazy(
+const OrganizationManagementPage = lazyRetry(
   () => import("./features/organizations/pages/OrganizationManagementPage"),
+  "OrganizationManagementPage"
 );
-const PeladaDetailPage = lazy(
+const PeladaDetailPage = lazyRetry(
   () => import("./features/peladas/pages/PeladaDetailPage"),
+  "PeladaDetailPage"
 );
-const ScheduleBuilderPage = lazy(
+const ScheduleBuilderPage = lazyRetry(
   () => import("./features/peladas/pages/ScheduleBuilderPage"),
+  "ScheduleBuilderPage"
 );
-const AttendanceListPage = lazy(
+const AttendanceListPage = lazyRetry(
   () => import("./features/peladas/pages/AttendanceListPage"),
+  "AttendanceListPage"
 );
-const PeladaMatchesPage = lazy(
+const PeladaMatchesPage = lazyRetry(
   () => import("./features/peladas/pages/PeladaMatchesPage"),
+  "PeladaMatchesPage"
 );
-const PeladaVotingPage = lazy(
+const PeladaVotingPage = lazyRetry(
   () => import("./features/peladas/pages/PeladaVotingPage"),
+  "PeladaVotingPage"
 );
-const PeladaVotingResultsPage = lazy(
+const PeladaVotingResultsPage = lazyRetry(
   () => import("./features/peladas/pages/PeladaVotingResultsPage"),
+  "PeladaVotingResultsPage"
 );
-const UserProfilePage = lazy(
+const UserProfilePage = lazyRetry(
   () => import("./features/user/pages/UserProfilePage"),
+  "UserProfilePage"
 );
-const WelcomePage = lazy(() => import("./features/auth/pages/WelcomePage"));
+const WelcomePage = lazyRetry(() => import("./features/auth/pages/WelcomePage"), "WelcomePage");
 
 function PageLoading() {
   return (
