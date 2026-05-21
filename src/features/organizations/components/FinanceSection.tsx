@@ -237,15 +237,15 @@ export default function FinanceSection({
       setSuccess(null);
       const payload = {
         ...finance,
-        mensalista_price: parseFloat(mensalistaPriceStr.replace(",", ".")),
-        diarista_price: parseFloat(diaristaPriceStr.replace(",", ".")),
-        monthly_fine_amount: parseFloat(monthlyFineAmountStr.replace(",", ".")),
-        monthly_cut_off_day: monthlyCutOffDay,
+        mensalista_price: Number(String(mensalistaPriceStr).replace(",", ".")),
+        diarista_price: Number(String(diaristaPriceStr).replace(",", ".")),
+        monthly_fine_amount: Number(String(monthlyFineAmountStr).replace(",", ".")),
+        monthly_cut_off_day: Number(monthlyCutOffDay),
       };
       await api.updateOrganizationFinance(orgId, payload);
       clearFinanceCache(orgId);
-      setSuccess(t("organizations.management.finance.config.success"));
       await fetchData();
+      setSuccess(t("organizations.management.finance.config.success"));
     } catch (err) {
       console.error("Failed to update finance config", err);
       setError(
@@ -261,7 +261,7 @@ export default function FinanceSection({
     if (!isAdmin) return;
     try {
       setSuccess(null);
-      const amount = parseFloat(txAmountStr.replace(",", "."));
+      const amount = Number(String(txAmountStr).replace(",", "."));
       await api.addTransaction(orgId, { ...newTx, amount });
       setIsTxDialogOpen(false);
       setTxAmountStr("0");
@@ -290,9 +290,9 @@ export default function FinanceSection({
     try {
       setSuccess(null);
       const paymentDate = new Date().toISOString().split("T")[0];
-      const baseAmount = parseFloat(mensalistaPriceStr.replace(",", "."));
+      const baseAmount = Number(String(mensalistaPriceStr).replace(",", "."));
       const fineAmount = applyFine
-        ? parseFloat(monthlyFineAmountStr.replace(",", "."))
+        ? Number(String(monthlyFineAmountStr).replace(",", "."))
         : 0;
 
       await api.markMonthlyPayment(orgId, {
@@ -300,14 +300,14 @@ export default function FinanceSection({
         year: selectedYear,
         month: selectedMonth,
         paid: true,
-        amount: baseAmount + fineAmount,
-        fine_amount: fineAmount,
+        amount: Number(baseAmount) + Number(fineAmount),
+        fine_amount: Number(fineAmount),
         payment_date: paymentDate,
       });
+      await fetchData();
       setSuccess(t("organizations.management.finance.monthly_fees.success"));
       setIsMarkDialogOpen(false);
       setPlayerToMark(null);
-      await fetchData();
     } catch (err) {
       console.error("Failed to mark payment", err);
       setError(
@@ -332,11 +332,11 @@ export default function FinanceSection({
       selectedYear,
       selectedMonth,
       new Date().toISOString().split("T")[0],
-      parseFloat(monthlyFineAmountStr.replace(",", ".")),
-      monthlyCutOffDay,
+      Number(String(monthlyFineAmountStr).replace(",", ".")),
+      Number(monthlyCutOffDay),
     );
 
-    if (fine > 0) {
+    if (Number(fine) > 0) {
       setPlayerToMark(player);
       setShouldApplyFine(true);
       setIsMarkDialogOpen(true);
@@ -355,12 +355,12 @@ export default function FinanceSection({
         year: selectedYear,
         month: selectedMonth,
         paid: false,
-        amount: parseFloat(mensalistaPriceStr.replace(",", ".")),
+        amount: Number(String(mensalistaPriceStr).replace(",", ".")),
         payment_date: new Date().toISOString().split("T")[0],
       });
+      await fetchData();
       setSuccess(t("organizations.management.finance.monthly_fees.success"));
       setSelectedPayment(null);
-      await fetchData();
     } catch (err) {
       console.error("Failed to reverse payment", err);
       setError(
@@ -386,6 +386,7 @@ export default function FinanceSection({
     try {
       setSuccess(null);
       await api.reverseTransaction(orgId, txToReverse);
+      await fetchData();
       setSuccess(
         t(
           "organizations.management.finance.transactions.reverse_success",
@@ -393,7 +394,6 @@ export default function FinanceSection({
         ),
       );
       setTxToReverse(null);
-      await fetchData();
     } catch (err) {
       console.error("Failed to reverse transaction", err);
       setError(
@@ -591,31 +591,27 @@ export default function FinanceSection({
                     <TableCell>{mp.player_name}</TableCell>
                     <TableCell align="right">
                       {(() => {
-                        const baseAmount = parseFloat(
-                          mensalistaPriceStr.replace(",", "."),
-                        );
+                        const baseAmount = Number(finance?.mensalista_price || 0);
                         // If already paid, use stored fine_amount.
                         // Otherwise calculate what it would be today.
                         const fine = mp.paid
                           ? mp.fine_status === "reversed"
                             ? 0
-                            : mp.fine_amount || 0
+                            : Number(mp.fine_amount || 0)
                           : calculateMonthlyFine(
                               selectedYear,
                               selectedMonth,
                               new Date().toISOString().split("T")[0],
-                              parseFloat(
-                                monthlyFineAmountStr.replace(",", "."),
-                              ),
-                              monthlyCutOffDay,
+                              Number(finance?.monthly_fine_amount || 0),
+                              Number(finance?.monthly_cut_off_day || 5),
                             );
 
                         const total =
                           mp.paid && mp.amount !== undefined
                             ? mp.fine_status === "reversed"
-                              ? mp.amount
-                              : mp.amount + fine
-                            : baseAmount + fine;
+                              ? Number(mp.amount)
+                              : Number(mp.amount) + Number(fine)
+                            : Number(baseAmount) + Number(fine);
 
                         return (
                           <Box>
@@ -625,7 +621,7 @@ export default function FinanceSection({
                                 currency: finance?.currency || "BRL",
                               }).format(total)}
                             </Typography>
-                            {fine > 0 && (
+                            {Number(fine) > 0 && (
                               <Typography
                                 variant="caption"
                                 color="error"
