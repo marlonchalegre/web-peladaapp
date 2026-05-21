@@ -206,13 +206,17 @@ export function useAttendance(peladaId: string) {
 
       // Payment: add new transaction
       const finalAmount = amount ?? organizationFinance?.diarista_price ?? 0;
+      const peladaDate = pelada.scheduled_at
+        ? new Date(pelada.scheduled_at).toLocaleDateString(t("common.locale", "pt-BR"))
+        : peladaId;
+
       await endpoints.addTransaction(pelada.organization_id, {
         player_id: playerId,
         pelada_id: peladaId,
         amount: finalAmount,
         type: "income",
         category: "diarista_fee",
-        description: `Pagamento Pelada ${peladaId}`,
+        description: `Pagamento Pelada ${peladaDate}`,
         payment_date: new Date().toISOString().split("T")[0],
       });
       await fetchData(true);

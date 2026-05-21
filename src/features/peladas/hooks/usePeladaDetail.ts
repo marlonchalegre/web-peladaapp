@@ -501,13 +501,17 @@ export function usePeladaDetail(peladaId: string) {
     if (!pelada) return;
     try {
       setProcessing(true);
+      const peladaDate = pelada.scheduled_at
+        ? new Date(pelada.scheduled_at).toLocaleDateString(i18n.language)
+        : peladaId;
+
       await endpoints.addTransaction(pelada.organization_id, {
         player_id: playerId,
         pelada_id: peladaId,
         amount,
         type: "income",
         category: "diarista_fee",
-        description: `Pagamento Pelada ${peladaId}`,
+        description: `Pagamento Pelada ${peladaDate}`,
         payment_date: new Date().toISOString().split("T")[0],
       });
       await fetchPeladaData();

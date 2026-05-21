@@ -63,6 +63,7 @@ interface SummaryCardProps {
   icon: React.ReactNode;
   testId: string;
   currency?: string;
+  language?: string;
 }
 
 const SummaryCard = ({
@@ -72,6 +73,7 @@ const SummaryCard = ({
   icon,
   testId,
   currency = "BRL",
+  language = "pt-BR",
 }: SummaryCardProps) => (
   <Card variant="outlined" sx={{ height: "100%" }} data-testid={testId}>
     <CardContent>
@@ -102,7 +104,7 @@ const SummaryCard = ({
           fontWeight: "bold",
         }}
       >
-        {new Intl.NumberFormat("pt-BR", {
+        {new Intl.NumberFormat(language, {
           style: "currency",
           currency: currency,
         }).format(value)}
@@ -128,7 +130,7 @@ export default function FinanceSection({
   orgId,
   isAdmin = false,
 }: FinanceSectionProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const api = useMemo(() => createApi(apiClient), []);
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -451,6 +453,7 @@ export default function FinanceSection({
             icon={<AccountBalanceWalletIcon color="primary" />}
             testId="summary-balance"
             currency={finance?.currency}
+            language={i18n.language}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
@@ -461,6 +464,7 @@ export default function FinanceSection({
             icon={<TrendingUpIcon color="success" />}
             testId="summary-income"
             currency={finance?.currency}
+            language={i18n.language}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
@@ -471,6 +475,7 @@ export default function FinanceSection({
             icon={<TrendingDownIcon color="error" />}
             testId="summary-expense"
             currency={finance?.currency}
+            language={i18n.language}
           />
         </Grid>
       </Grid>
@@ -523,7 +528,7 @@ export default function FinanceSection({
                   value={i + 1}
                   data-testid={`month-option-${i + 1}`}
                 >
-                  {new Date(0, i).toLocaleString("pt-BR", { month: "long" })}
+                  {new Date(0, i).toLocaleString(i18n.language, { month: "long" })}
                 </MenuItem>
               ))}
             </TextField>
@@ -613,7 +618,7 @@ export default function FinanceSection({
                         return (
                           <Box>
                             <Typography variant="body2">
-                              {new Intl.NumberFormat("pt-BR", {
+                              {new Intl.NumberFormat(i18n.language, {
                                 style: "currency",
                                 currency: finance?.currency || "BRL",
                               }).format(total)}
@@ -625,7 +630,7 @@ export default function FinanceSection({
                                 sx={{ display: "block" }}
                               >
                                 +{" "}
-                                {new Intl.NumberFormat("pt-BR", {
+                                {new Intl.NumberFormat(i18n.language, {
                                   style: "currency",
                                   currency: finance?.currency || "BRL",
                                 }).format(fine)}{" "}
@@ -769,7 +774,7 @@ export default function FinanceSection({
                                 Number(year),
                                 Number(month) - 1,
                                 Number(day),
-                              ).toLocaleDateString("pt-BR");
+                              ).toLocaleDateString(i18n.language);
                             })()
                           : "-"}
                       </TableCell>
@@ -785,7 +790,23 @@ export default function FinanceSection({
                             fontWeight: "medium",
                           }}
                         >
-                          {tx.description}
+                          {(() => {
+                            if (
+                              tx.description &&
+                              tx.pelada_id &&
+                              tx.description.includes(tx.pelada_id) &&
+                              tx.pelada_date
+                            ) {
+                              const dateStr = new Date(
+                                tx.pelada_date,
+                              ).toLocaleDateString(i18n.language);
+                              return tx.description.replace(
+                                tx.pelada_id,
+                                dateStr,
+                              );
+                            }
+                            return tx.description;
+                          })()}
                           {tx.status === "reversed" &&
                             ` (${t("organizations.management.finance.transactions.reversed")})`}
                         </Typography>
@@ -850,7 +871,7 @@ export default function FinanceSection({
                           }}
                         >
                           {tx.type === "income" ? "+" : "-"}
-                          {new Intl.NumberFormat("pt-BR", {
+                          {new Intl.NumberFormat(i18n.language, {
                             style: "currency",
                             currency: finance?.currency || "BRL",
                           }).format(tx.amount)}
@@ -870,7 +891,7 @@ export default function FinanceSection({
                               }}
                             >
                               (inclui{" "}
-                              {new Intl.NumberFormat("pt-BR", {
+                              {new Intl.NumberFormat(i18n.language, {
                                 style: "currency",
                                 currency: finance?.currency || "BRL",
                               }).format(tx.fine_amount)}{" "}
@@ -1214,7 +1235,7 @@ export default function FinanceSection({
                 "organizations.management.finance.monthly_fees.apply_fine_label",
                 "Aplicar multa de {{amount}}",
                 {
-                  amount: new Intl.NumberFormat("pt-BR", {
+                  amount: new Intl.NumberFormat(i18n.language, {
                     style: "currency",
                     currency: finance?.currency || "BRL",
                   }).format(parseFloat(monthlyFineAmountStr.replace(",", "."))),

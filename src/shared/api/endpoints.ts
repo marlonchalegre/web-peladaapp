@@ -248,6 +248,7 @@ export interface Transaction {
   category: string;
   description?: string | null;
   payment_date: string;
+  pelada_date?: string | null;
   created_by?: string | null;
   creator_name?: string | null;
   created_at?: string;
