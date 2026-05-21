@@ -12,10 +12,19 @@ import { enqueueAction, type OfflineActionType } from "../utils/offlineQueue";
 
 const endpoints = createApi(api);
 
-export function useMatchActions(
-  peladaId: string,
-  data: Record<string, unknown>,
-) {
+export interface MatchStateDelegates {
+  matchesRef: React.MutableRefObject<Match[]>;
+  setMatches: React.Dispatch<React.SetStateAction<Match[]>>;
+  refreshData: () => Promise<void>;
+  setError: React.Dispatch<React.SetStateAction<string | null>>;
+  setMatchEvents: React.Dispatch<React.SetStateAction<MatchEvent[]>>;
+  setLineupsByMatch: React.Dispatch<
+    React.SetStateAction<Record<string, Record<string, TeamPlayer[]>>>
+  >;
+  setPelada: React.Dispatch<React.SetStateAction<Pelada | null>>;
+}
+
+export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
   const { t } = useTranslation();
   const [updatingScore, setUpdatingScore] = useState<Record<string, boolean>>(
     {},
@@ -35,8 +44,7 @@ export function useMatchActions(
     setMatchEvents,
     setLineupsByMatch,
     setPelada,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } = data as any;
+  } = data;
 
   const handleNetworkError = useCallback(
     (error: unknown, actionType: string, payload: Record<string, unknown>) => {

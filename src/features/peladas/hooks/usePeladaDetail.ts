@@ -502,7 +502,9 @@ export function usePeladaDetail(peladaId: string) {
     try {
       setProcessing(true);
       const peladaDate = pelada.scheduled_at
-        ? new Date(pelada.scheduled_at).toLocaleDateString(i18n?.language || "pt-BR")
+        ? new Date(pelada.scheduled_at).toLocaleDateString(
+            i18n?.language || "pt-BR",
+          )
         : peladaId;
 
       await endpoints.addTransaction(pelada.organization_id, {

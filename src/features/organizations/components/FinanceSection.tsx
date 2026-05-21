@@ -3,42 +3,11 @@ import {
   Paper,
   Box,
   Typography,
-  Card,
-  CardContent,
   Tabs,
   Tab,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
-  IconButton,
-  TextField,
-  MenuItem,
   CircularProgress,
   Alert,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Chip,
-  InputAdornment,
-  Tooltip,
-  Checkbox,
-  FormControlLabel,
 } from "@mui/material";
-import Grid from "@mui/material/Grid";
-import AddIcon from "@mui/icons-material/Add";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import ErrorIcon from "@mui/icons-material/Error";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-import TrendingDownIcon from "@mui/icons-material/TrendingDown";
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import SaveIcon from "@mui/icons-material/Save";
-import UndoIcon from "@mui/icons-material/Undo";
 import { useTranslation } from "react-i18next";
 import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
 import { api as apiClient } from "../../../shared/api/client";
@@ -51,86 +20,24 @@ import {
   type FinanceSummary,
 } from "../../../shared/api/endpoints";
 
+import SummaryCards from "./finance/SummaryCards";
+import MonthlyPaymentsTable from "./finance/MonthlyPaymentsTable";
+import TransactionsTable from "./finance/TransactionsTable";
+import FinanceConfigForm from "./finance/FinanceConfigForm";
+import AddTransactionDialog from "./finance/AddTransactionDialog";
+import MarkPaymentDialog from "./finance/MarkPaymentDialog";
+import { calculateMonthlyFine } from "./finance/utils";
+
 interface FinanceSectionProps {
   orgId: string;
   isAdmin?: boolean;
 }
 
-interface SummaryCardProps {
-  title: string;
-  value: number;
-  color: string;
-  icon: React.ReactNode;
-  testId: string;
-  currency?: string;
-  language?: string;
-}
-
-const SummaryCard = ({
-  title,
-  value,
-  color,
-  icon,
-  testId,
-  currency = "BRL",
-  language = "pt-BR",
-}: SummaryCardProps) => (
-  <Card variant="outlined" sx={{ height: "100%" }} data-testid={testId}>
-    <CardContent>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Typography
-          gutterBottom
-          variant="overline"
-          sx={{
-            color: "text.secondary",
-          }}
-        >
-          {title}
-        </Typography>
-        {icon}
-      </Box>
-      <Typography
-        variant="h5"
-        color={color}
-        data-testid={`${testId}-value`}
-        data-amount={value}
-        sx={{
-          fontWeight: "bold",
-        }}
-      >
-        {new Intl.NumberFormat(language, {
-          style: "currency",
-          currency: currency,
-        }).format(value)}
-      </Typography>
-    </CardContent>
-  </Card>
-);
-
-const calculateMonthlyFine = (
-  year: number,
-  month: number,
-  paymentDate: string,
-  fineAmount: number,
-  cutOffDay: number,
-): number => {
-  const [pYear, pMonth, pDay] = paymentDate.split("-").map(Number);
-  const payment = new Date(pYear, pMonth - 1, pDay, 0, 0, 0);
-  const deadline = new Date(year, month - 1, cutOffDay, 23, 59, 59);
-  return payment > deadline ? fineAmount : 0.0;
-};
-
 export default function FinanceSection({
   orgId,
   isAdmin = false,
 }: FinanceSectionProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const api = useMemo(() => createApi(apiClient), []);
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -164,19 +71,10 @@ export default function FinanceSection({
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
 
-  // Transaction Dialog state
+  // Dialog / Dialog triggers states
   const [isTxDialogOpen, setIsTxDialogOpen] = useState(false);
-  const [txAmountStr, setTxAmountStr] = useState("0");
-  const [newTx, setNewTx] = useState<Partial<Transaction>>({
-    type: "income",
-    amount: 0,
-    category: "other",
-    payment_date: new Date().toISOString().split("T")[0],
-  });
-
   const [confirmReverseOpen, setConfirmReverseOpen] = useState(false);
   const [isMarkDialogOpen, setIsMarkDialogOpen] = useState(false);
-  const [shouldApplyFine, setShouldApplyFine] = useState(false);
   const [playerToMark, setPlayerToMark] = useState<MonthlyPayment | null>(null);
   const [selectedPayment, setSelectedPayment] = useState<MonthlyPayment | null>(
     null,
@@ -239,7 +137,9 @@ export default function FinanceSection({
         ...finance,
         mensalista_price: Number(String(mensalistaPriceStr).replace(",", ".")),
         diarista_price: Number(String(diaristaPriceStr).replace(",", ".")),
-        monthly_fine_amount: Number(String(monthlyFineAmountStr).replace(",", ".")),
+        monthly_fine_amount: Number(
+          String(monthlyFineAmountStr).replace(",", "."),
+        ),
         monthly_cut_off_day: Number(monthlyCutOffDay),
       };
       await api.updateOrganizationFinance(orgId, payload);
@@ -257,20 +157,18 @@ export default function FinanceSection({
     }
   };
 
-  const handleAddTransaction = async () => {
+  const handleAddTransaction = async (txData: {
+    type: "income" | "expense";
+    amount: number;
+    category: string;
+    description: string;
+    payment_date: string;
+  }) => {
     if (!isAdmin) return;
     try {
       setSuccess(null);
-      const amount = Number(String(txAmountStr).replace(",", "."));
-      await api.addTransaction(orgId, { ...newTx, amount });
+      await api.addTransaction(orgId, txData);
       setIsTxDialogOpen(false);
-      setTxAmountStr("0");
-      setNewTx({
-        type: "income",
-        amount: 0,
-        category: "other",
-        payment_date: new Date().toISOString().split("T")[0],
-      });
       await fetchData();
     } catch (err) {
       console.error("Failed to add transaction", err);
@@ -338,7 +236,6 @@ export default function FinanceSection({
 
     if (Number(fine) > 0) {
       setPlayerToMark(player);
-      setShouldApplyFine(true);
       setIsMarkDialogOpen(true);
     } else {
       executeMarkPayment(player, false);
@@ -405,6 +302,10 @@ export default function FinanceSection({
     }
   };
 
+  const setCurrency = (val: string) => {
+    setFinance((prev) => ({ ...prev, currency: val }));
+  };
+
   if (loading && !summary && transactions.length === 0)
     return <CircularProgress data-testid="finance-loading" />;
 
@@ -439,46 +340,15 @@ export default function FinanceSection({
           {success}
         </Alert>
       )}
+
       {/* Summary Section */}
-      <Grid container spacing={2} sx={{ mb: 4 }}>
-        <Grid size={{ xs: 12, sm: 4 }}>
-          <SummaryCard
-            title={t("organizations.management.finance.summary.balance")}
-            value={summary?.total_balance || 0}
-            color={
-              summary?.total_balance && summary.total_balance < 0
-                ? "error.main"
-                : "success.main"
-            }
-            icon={<AccountBalanceWalletIcon color="primary" />}
-            testId="summary-balance"
-            currency={finance?.currency}
-            language={i18n?.language || "pt-BR"}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 4 }}>
-          <SummaryCard
-            title={t("organizations.management.finance.summary.income")}
-            value={summary?.total_income || 0}
-            color="success.main"
-            icon={<TrendingUpIcon color="success" />}
-            testId="summary-income"
-            currency={finance?.currency}
-            language={i18n?.language || "pt-BR"}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 4 }}>
-          <SummaryCard
-            title={t("organizations.management.finance.summary.expense")}
-            value={summary?.total_expense || 0}
-            color="error.main"
-            icon={<TrendingDownIcon color="error" />}
-            testId="summary-expense"
-            currency={finance?.currency}
-            language={i18n?.language || "pt-BR"}
-          />
-        </Grid>
-      </Grid>
+      <SummaryCards
+        totalBalance={summary?.total_balance || 0}
+        totalIncome={summary?.total_income || 0}
+        totalExpense={summary?.total_expense || 0}
+        currency={finance?.currency}
+      />
+
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
         <Tabs
           value={activeTab}
@@ -501,767 +371,77 @@ export default function FinanceSection({
           )}
         </Tabs>
       </Box>
+
       {/* Monthly Fees Tab */}
       {activeTab === 0 && (
-        <Box data-testid="finance-panel-monthly">
-          <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
-            <TextField
-              select
-              label={t(
-                "organizations.management.finance.monthly_fees.month_select",
-              )}
-              value={selectedMonth}
-              onChange={(e) => setSelectedMonth(Number(e.target.value))}
-              size="small"
-              sx={{ minWidth: 120 }}
-              slotProps={{
-                select: {
-                  SelectDisplayProps: {
-                    "data-testid": "month-select",
-                  } as React.HTMLAttributes<HTMLDivElement>,
-                },
-              }}
-            >
-              {Array.from({ length: 12 }, (_, i) => (
-                <MenuItem
-                  key={i + 1}
-                  value={i + 1}
-                  data-testid={`month-option-${i + 1}`}
-                >
-                  {new Date(0, i).toLocaleString((i18n?.language || "pt-BR"), {
-                    month: "long",
-                  })}
-                </MenuItem>
-              ))}
-            </TextField>
-            <TextField
-              select
-              label={t(
-                "organizations.management.finance.monthly_fees.year_select",
-              )}
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(Number(e.target.value))}
-              size="small"
-              sx={{ minWidth: 100 }}
-              slotProps={{
-                select: {
-                  SelectDisplayProps: {
-                    "data-testid": "year-select",
-                  } as React.HTMLAttributes<HTMLDivElement>,
-                },
-              }}
-            >
-              {[2024, 2025, 2026, 2027].map((y) => (
-                <MenuItem key={y} value={y} data-testid={`year-option-${y}`}>
-                  {y}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Box>
-
-          <TableContainer>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>
-                    {t("organizations.management.finance.monthly_fees.player")}
-                  </TableCell>
-                  <TableCell align="right">
-                    {t(
-                      "organizations.management.finance.monthly_fees.amount",
-                      "Valor",
-                    )}
-                  </TableCell>
-                  <TableCell align="center">
-                    {t("organizations.management.finance.monthly_fees.status")}
-                  </TableCell>
-                  {isAdmin && (
-                    <TableCell align="right">
-                      {t("common.actions.title", "Ações")}
-                    </TableCell>
-                  )}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {monthlyPayments.map((mp) => (
-                  <TableRow
-                    key={mp.player_id}
-                    data-testid={`monthly-payment-row-${mp.player_id}`}
-                  >
-                    <TableCell>{mp.player_name}</TableCell>
-                    <TableCell align="right">
-                      {(() => {
-                        const baseAmount = Number(finance?.mensalista_price || 0);
-                        // If already paid, use stored fine_amount.
-                        // Otherwise calculate what it would be today.
-                        const fine = mp.paid
-                          ? mp.fine_status === "reversed"
-                            ? 0
-                            : Number(mp.fine_amount || 0)
-                          : calculateMonthlyFine(
-                              selectedYear,
-                              selectedMonth,
-                              new Date().toISOString().split("T")[0],
-                              Number(finance?.monthly_fine_amount || 0),
-                              Number(finance?.monthly_cut_off_day || 5),
-                            );
-
-                        const total =
-                          mp.paid && mp.amount !== undefined
-                            ? mp.fine_status === "reversed"
-                              ? Number(mp.amount)
-                              : Number(mp.amount) + Number(fine)
-                            : Number(baseAmount) + Number(fine);
-
-                        return (
-                          <Box>
-                            <Typography variant="body2">
-                              {new Intl.NumberFormat((i18n?.language || "pt-BR"), {
-                                style: "currency",
-                                currency: finance?.currency || "BRL",
-                              }).format(total)}
-                            </Typography>
-                            {Number(fine) > 0 && (
-                              <Typography
-                                variant="caption"
-                                color="error"
-                                sx={{ display: "block" }}
-                              >
-                                +{" "}
-                                {new Intl.NumberFormat((i18n?.language || "pt-BR"), {
-                                  style: "currency",
-                                  currency: finance?.currency || "BRL",
-                                }).format(fine)}{" "}
-                                (multa)
-                              </Typography>
-                            )}
-                          </Box>
-                        );
-                      })()}
-                    </TableCell>
-                    <TableCell align="center">
-                      {mp.paid ? (
-                        <Chip
-                          icon={<CheckCircleIcon />}
-                          label={t(
-                            "organizations.management.finance.monthly_fees.paid",
-                          )}
-                          color="success"
-                          size="small"
-                          data-testid="status-paid"
-                        />
-                      ) : (
-                        <Chip
-                          icon={<ErrorIcon />}
-                          label={t(
-                            "organizations.management.finance.monthly_fees.pending",
-                          )}
-                          color="warning"
-                          size="small"
-                          data-testid="status-pending"
-                        />
-                      )}
-                    </TableCell>
-                    {isAdmin && (
-                      <TableCell align="right">
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          color={mp.paid ? "error" : "success"}
-                          onClick={() => handleMarkPayment(mp, !mp.paid)}
-                          data-testid="mark-payment-button"
-                        >
-                          {mp.paid
-                            ? t(
-                                "organizations.management.finance.monthly_fees.reverse",
-                              )
-                            : t(
-                                "organizations.management.finance.monthly_fees.mark_as_paid",
-                              )}
-                        </Button>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Box>
+        <MonthlyPaymentsTable
+          monthlyPayments={monthlyPayments}
+          selectedMonth={selectedMonth}
+          setSelectedMonth={setSelectedMonth}
+          selectedYear={selectedYear}
+          setSelectedYear={setSelectedYear}
+          isAdmin={isAdmin}
+          mensalistaPrice={finance.mensalista_price}
+          monthlyFineAmount={finance.monthly_fine_amount || 0}
+          monthlyCutOffDay={monthlyCutOffDay}
+          currency={finance.currency}
+          onMarkPayment={handleMarkPayment}
+        />
       )}
+
       {/* Transactions Tab */}
       {activeTab === 1 && (
-        <Box data-testid="finance-panel-transactions">
-          {isAdmin && (
-            <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-              <Button
-                startIcon={<AddIcon />}
-                variant="contained"
-                onClick={() => setIsTxDialogOpen(true)}
-                data-testid="add-transaction-button"
-              >
-                {t("organizations.management.finance.transactions.add_button")}
-              </Button>
-            </Box>
-          )}
-          <TableContainer>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>
-                    {t("organizations.management.finance.transactions.date")}
-                  </TableCell>
-                  <TableCell>
-                    {t(
-                      "organizations.management.finance.transactions.description",
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {t(
-                      "organizations.management.finance.transactions.category",
-                    )}
-                  </TableCell>
-                  <TableCell align="right">
-                    {t("organizations.management.finance.transactions.amount")}
-                  </TableCell>
-                  {isAdmin && (
-                    <TableCell align="right">
-                      {t("common.actions.title", "Ações")}
-                    </TableCell>
-                  )}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {transactions.length === 0 ? (
-                  <TableRow key="empty-transactions">
-                    <TableCell colSpan={5} align="center">
-                      <Typography
-                        variant="body2"
-                        sx={{ py: 2, color: "text.secondary" }}
-                      >
-                        {t(
-                          "organizations.management.finance.transactions.empty",
-                        )}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  transactions.map((tx) => (
-                    <TableRow
-                      key={
-                        tx.id ||
-                        `tx-${tx.payment_date}-${tx.amount}-${tx.description}`
-                      }
-                      data-testid={`transaction-row-${tx.id}`}
-                      sx={{
-                        opacity: tx.status === "reversed" ? 0.5 : 1,
-                        bgcolor:
-                          tx.status === "reversed" ? "action.hover" : "inherit",
-                      }}
-                    >
-                      <TableCell
-                        sx={{
-                          textDecoration:
-                            tx.status === "reversed" ? "line-through" : "none",
-                        }}
-                      >
-                        {tx.payment_date
-                          ? (() => {
-                              const [year, month, day] =
-                                tx.payment_date.split("-");
-                              return new Date(
-                                Number(year),
-                                Number(month) - 1,
-                                Number(day),
-                              ).toLocaleDateString((i18n?.language || "pt-BR"));
-                            })()
-                          : "-"}
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          textDecoration:
-                            tx.status === "reversed" ? "line-through" : "none",
-                        }}
-                      >
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontWeight: "medium",
-                          }}
-                        >
-                          {(() => {
-                            if (
-                              tx.description &&
-                              tx.pelada_id &&
-                              tx.description.includes(tx.pelada_id) &&
-                              tx.pelada_date
-                            ) {
-                              const dateStr = new Date(
-                                tx.pelada_date,
-                              ).toLocaleDateString((i18n?.language || "pt-BR"));
-                              return tx.description.replace(
-                                tx.pelada_id,
-                                dateStr,
-                              );
-                            }
-                            return tx.description;
-                          })()}
-                          {tx.status === "reversed" &&
-                            ` (${t("organizations.management.finance.transactions.reversed")})`}
-                        </Typography>
-                        {tx.player_name && (
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              display: "block",
-                              color: "text.secondary",
-                            }}
-                          >
-                            {t(
-                              "organizations.management.finance.transactions.player",
-                            )}
-                            : {tx.player_name}
-                          </Typography>
-                        )}
-                        {tx.creator_name && (
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              display: "block",
-                              color: "primary.main",
-                              fontStyle: "italic",
-                            }}
-                          >
-                            {t(
-                              "organizations.management.finance.transactions.recorded_by",
-                            )}
-                            : {tx.creator_name}
-                          </Typography>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={t(
-                            `organizations.management.finance.categories.${tx.category}`,
-                            tx.category,
-                          )}
-                          size="small"
-                          variant="outlined"
-                          disabled={tx.status === "reversed"}
-                        />
-                      </TableCell>
-                      <TableCell align="right">
-                        <Typography
-                          color={
-                            tx.status === "reversed"
-                              ? "text.disabled"
-                              : tx.type === "income"
-                                ? "success.main"
-                                : "error.main"
-                          }
-                          data-testid="transaction-amount"
-                          sx={{
-                            fontWeight: "bold",
-
-                            textDecoration:
-                              tx.status === "reversed"
-                                ? "line-through"
-                                : "none",
-                          }}
-                        >
-                          {tx.type === "income" ? "+" : "-"}
-                          {new Intl.NumberFormat((i18n?.language || "pt-BR"), {
-                            style: "currency",
-                            currency: finance?.currency || "BRL",
-                          }).format(tx.amount)}
-                        </Typography>
-                        {tx.category === "monthly_fee" &&
-                          tx.fine_amount &&
-                          tx.fine_amount > 0 && (
-                            <Typography
-                              variant="caption"
-                              color="error"
-                              sx={{
-                                display: "block",
-                                textDecoration:
-                                  tx.status === "reversed"
-                                    ? "line-through"
-                                    : "none",
-                              }}
-                            >
-                              (inclui{" "}
-                              {new Intl.NumberFormat((i18n?.language || "pt-BR"), {
-                                style: "currency",
-                                currency: finance?.currency || "BRL",
-                              }).format(tx.fine_amount)}{" "}
-                              multa)
-                            </Typography>
-                          )}
-                      </TableCell>
-                      {isAdmin && (
-                        <TableCell align="right">
-                          {tx.status === "paid" && (
-                            <Tooltip
-                              title={t(
-                                "organizations.management.finance.transactions.mark_as_reversed",
-                                "Estornar",
-                              )}
-                            >
-                              <IconButton
-                                size="small"
-                                color="warning"
-                                onClick={() => handleReverseTransaction(tx.id)}
-                                data-testid={`reverse-transaction-${tx.id}`}
-                                data-testclass="reverse-transaction-button"
-                              >
-                                <UndoIcon
-                                  fontSize="small"
-                                  data-testid="undo-icon"
-                                />
-                              </IconButton>
-                            </Tooltip>
-                          )}
-                        </TableCell>
-                      )}
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={totalTransactions}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            labelRowsPerPage={t("common.pagination.rows_per_page")}
-          />
-        </Box>
+        <TransactionsTable
+          transactions={transactions}
+          totalTransactions={totalTransactions}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          isAdmin={isAdmin}
+          currency={finance.currency}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          onAddTransactionClick={() => setIsTxDialogOpen(true)}
+          onReverseTransactionClick={handleReverseTransaction}
+        />
       )}
+
       {/* Config Tab */}
       {activeTab === 2 && finance && isAdmin && (
-        <Box sx={{ maxWidth: 400 }} data-testid="finance-panel-config">
-          <Grid container spacing={3}>
-            <Grid size={12}>
-              <TextField
-                fullWidth
-                label={t(
-                  "organizations.management.finance.config.mensalista_price",
-                )}
-                value={mensalistaPriceStr}
-                onChange={(e) => setMensalistaPriceStr(e.target.value)}
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        {finance.currency}
-                      </InputAdornment>
-                    ),
-                  },
-
-                  htmlInput: { "data-testid": "mensalista-price-input" },
-                }}
-              />
-            </Grid>
-            <Grid size={12}>
-              <TextField
-                fullWidth
-                label={t(
-                  "organizations.management.finance.config.diarista_price",
-                )}
-                value={diaristaPriceStr}
-                onChange={(e) => setDiaristaPriceStr(e.target.value)}
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        {finance.currency}
-                      </InputAdornment>
-                    ),
-                  },
-
-                  htmlInput: { "data-testid": "diarista-price-input" },
-                }}
-              />
-            </Grid>
-            <Grid size={12}>
-              <TextField
-                fullWidth
-                label={t(
-                  "organizations.management.finance.config.monthly_fine_amount",
-                  "Valor da Multa (Mensalidade)",
-                )}
-                value={monthlyFineAmountStr}
-                onChange={(e) => setMonthlyFineAmountStr(e.target.value)}
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        {finance.currency}
-                      </InputAdornment>
-                    ),
-                  },
-                  htmlInput: { "data-testid": "monthly-fine-amount-input" },
-                }}
-              />
-            </Grid>
-            <Grid size={12}>
-              <TextField
-                fullWidth
-                type="number"
-                label={t(
-                  "organizations.management.finance.config.monthly_cut_off_day",
-                  "Dia Limite para Pagamento",
-                )}
-                value={monthlyCutOffDay}
-                onChange={(e) => setMonthlyCutOffDay(Number(e.target.value))}
-                slotProps={{
-                  htmlInput: {
-                    "data-testid": "monthly-cut-off-day-input",
-                    min: 1,
-                    max: 28,
-                  },
-                }}
-              />
-            </Grid>
-            <Grid size={12}>
-              <TextField
-                fullWidth
-                select
-                label={t("organizations.management.finance.config.currency")}
-                value={finance.currency}
-                onChange={(e) =>
-                  setFinance({ ...finance, currency: e.target.value })
-                }
-                slotProps={{
-                  select: {
-                    SelectDisplayProps: {
-                      "data-testid": "currency-select",
-                    } as React.HTMLAttributes<HTMLDivElement>,
-                  },
-                }}
-              >
-                <MenuItem value="BRL" data-testid="currency-option-BRL">
-                  Real (BRL)
-                </MenuItem>
-                <MenuItem value="USD" data-testid="currency-option-USD">
-                  Dollar (USD)
-                </MenuItem>
-                <MenuItem value="EUR" data-testid="currency-option-EUR">
-                  Euro (EUR)
-                </MenuItem>
-              </TextField>
-            </Grid>
-            <Grid size={12}>
-              <Button
-                variant="contained"
-                startIcon={<SaveIcon />}
-                onClick={handleUpdateFinance}
-                data-testid="save-finance-config-button"
-              >
-                {t("organizations.management.finance.config.save_button")}
-              </Button>
-            </Grid>
-          </Grid>
-        </Box>
+        <FinanceConfigForm
+          mensalistaPriceStr={mensalistaPriceStr}
+          setMensalistaPriceStr={setMensalistaPriceStr}
+          diaristaPriceStr={diaristaPriceStr}
+          setDiaristaPriceStr={setDiaristaPriceStr}
+          monthlyFineAmountStr={monthlyFineAmountStr}
+          setMonthlyFineAmountStr={setMonthlyFineAmountStr}
+          monthlyCutOffDay={monthlyCutOffDay}
+          setMonthlyCutOffDay={setMonthlyCutOffDay}
+          currency={finance.currency}
+          setCurrency={setCurrency}
+          onUpdateFinance={handleUpdateFinance}
+        />
       )}
+
       {/* Add Transaction Dialog */}
-      <Dialog
+      <AddTransactionDialog
         open={isTxDialogOpen}
         onClose={() => setIsTxDialogOpen(false)}
-        fullWidth
-        maxWidth="xs"
-        data-testid="add-transaction-dialog"
-      >
-        <DialogTitle>
-          {t("organizations.management.finance.transactions.add_dialog.title")}
-        </DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
-            <TextField
-              select
-              fullWidth
-              label={t("organizations.management.finance.transactions.type")}
-              value={newTx.type}
-              onChange={(e) =>
-                setNewTx({
-                  ...newTx,
-                  type: e.target.value as "income" | "expense",
-                })
-              }
-              slotProps={{
-                select: {
-                  SelectDisplayProps: {
-                    "data-testid": "tx-type-select",
-                  } as React.HTMLAttributes<HTMLDivElement>,
-                },
-              }}
-            >
-              <MenuItem value="income" data-testid="tx-type-income">
-                {t(
-                  "organizations.management.finance.transactions.add_dialog.income",
-                )}
-              </MenuItem>
-              <MenuItem value="expense" data-testid="tx-type-expense">
-                {t(
-                  "organizations.management.finance.transactions.add_dialog.expense",
-                )}
-              </MenuItem>
-            </TextField>
-            <TextField
-              fullWidth
-              label={t("organizations.management.finance.transactions.amount")}
-              value={txAmountStr}
-              onChange={(e) => setTxAmountStr(e.target.value)}
-              slotProps={{
-                htmlInput: { "data-testid": "tx-amount-input" },
-              }}
-            />
-            <TextField
-              select
-              fullWidth
-              label={t(
-                "organizations.management.finance.transactions.category",
-              )}
-              value={newTx.category}
-              onChange={(e) => setNewTx({ ...newTx, category: e.target.value })}
-              slotProps={{
-                select: {
-                  SelectDisplayProps: {
-                    "data-testid": "tx-category-select",
-                  } as React.HTMLAttributes<HTMLDivElement>,
-                },
-              }}
-            >
-              {(
-                Object.keys(
-                  t("organizations.management.finance.categories", {
-                    returnObjects: true,
-                  }),
-                ) as string[]
-              ).map((cat) => (
-                <MenuItem
-                  key={cat}
-                  value={cat}
-                  data-testid={`tx-category-option-${cat}`}
-                >
-                  {t(`organizations.management.finance.categories.${cat}`)}
-                </MenuItem>
-              ))}
-            </TextField>
-            <TextField
-              fullWidth
-              label={t(
-                "organizations.management.finance.transactions.description",
-              )}
-              value={newTx.description || ""}
-              onChange={(e) =>
-                setNewTx({ ...newTx, description: e.target.value })
-              }
-              slotProps={{
-                htmlInput: { "data-testid": "tx-description-input" },
-              }}
-            />
-            <TextField
-              fullWidth
-              label={t("organizations.management.finance.transactions.date")}
-              type="date"
-              value={newTx.payment_date}
-              onChange={(e) =>
-                setNewTx({ ...newTx, payment_date: e.target.value })
-              }
-              slotProps={{
-                htmlInput: { "data-testid": "tx-date-input" },
-                inputLabel: { shrink: true },
-              }}
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsTxDialogOpen(false)}>
-            {t("common.cancel")}
-          </Button>
-          <Button
-            onClick={handleAddTransaction}
-            variant="contained"
-            disabled={!txAmountStr}
-            data-testid="confirm-add-transaction-button"
-          >
-            {t("common.add")}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onAddTransaction={handleAddTransaction}
+      />
 
       {/* Mark Payment Dialog */}
-      <Dialog
+      <MarkPaymentDialog
         open={isMarkDialogOpen}
         onClose={() => {
           setIsMarkDialogOpen(false);
           setPlayerToMark(null);
         }}
-        fullWidth
-        maxWidth="xs"
-        data-testid="mark-payment-dialog"
-      >
-        <DialogTitle>
-          {t(
-            "organizations.management.finance.monthly_fees.mark_paid_title",
-            "Confirmar Pagamento",
-          )}
-        </DialogTitle>
-        <DialogContent>
-          <Box sx={{ mt: 1 }}>
-            <Typography variant="body1" gutterBottom>
-              {t(
-                "organizations.management.finance.monthly_fees.mark_paid_confirm",
-                {
-                  player: playerToMark?.player_name,
-                },
-              )}
-            </Typography>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={shouldApplyFine}
-                  onChange={(e) => setShouldApplyFine(e.target.checked)}
-                  data-testid="apply-fine-checkbox"
-                />
-              }
-              label={t(
-                "organizations.management.finance.monthly_fees.apply_fine_label",
-                "Aplicar multa de {{amount}}",
-                {
-                  amount: new Intl.NumberFormat((i18n?.language || "pt-BR"), {
-                    style: "currency",
-                    currency: finance?.currency || "BRL",
-                  }).format(parseFloat(monthlyFineAmountStr.replace(",", "."))),
-                },
-              )}
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={() => {
-              setIsMarkDialogOpen(false);
-              setPlayerToMark(null);
-            }}
-          >
-            {t("common.cancel")}
-          </Button>
-          <Button
-            onClick={() =>
-              playerToMark && executeMarkPayment(playerToMark, shouldApplyFine)
-            }
-            variant="contained"
-            data-testid="confirm-mark-payment-button"
-          >
-            {t("common.confirm")}
-          </Button>
-        </DialogActions>
-      </Dialog>
+        playerToMark={playerToMark}
+        fineAmountStr={monthlyFineAmountStr}
+        currency={finance.currency}
+        onConfirm={executeMarkPayment}
+      />
+
       <PrettyConfirmDialog
         open={confirmReverseOpen}
         onClose={() => {
@@ -1278,6 +458,7 @@ export default function FinanceSection({
         )}
         severity="warning"
       />
+
       <PrettyConfirmDialog
         open={confirmReverseTxOpen}
         onClose={() => {
