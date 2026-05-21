@@ -42,6 +42,7 @@ import UndoIcon from "@mui/icons-material/Undo";
 import { useTranslation } from "react-i18next";
 import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
 import { api as apiClient } from "../../../shared/api/client";
+import { clearFinanceCache } from "../../../shared/hooks/useOrganizationFinance";
 import {
   createApi,
   type Transaction,
@@ -240,6 +241,7 @@ export default function FinanceSection({
         monthly_cut_off_day: monthlyCutOffDay,
       };
       await api.updateOrganizationFinance(orgId, payload);
+      clearFinanceCache(orgId);
       setSuccess(t("organizations.management.finance.config.success"));
       await fetchData();
     } catch (err) {
