@@ -39,66 +39,78 @@ import { PWAProvider } from "./app/providers/PWAProvider";
 import { lazyRetry } from "./shared/utils/lazyRetry";
 
 // Lazy load pages to reduce initial bundle size
-const LoginPage = lazyRetry(() => import("./features/auth/pages/LoginPage"), "LoginPage");
-const RegisterPage = lazyRetry(() => import("./features/auth/pages/RegisterPage"), "RegisterPage");
+const LoginPage = lazyRetry(
+  () => import("./features/auth/pages/LoginPage"),
+  "LoginPage",
+);
+const RegisterPage = lazyRetry(
+  () => import("./features/auth/pages/RegisterPage"),
+  "RegisterPage",
+);
 const FirstAccessPage = lazyRetry(
   () => import("./features/auth/pages/FirstAccessPage"),
-  "FirstAccessPage"
+  "FirstAccessPage",
 );
 const ForgotPasswordPage = lazyRetry(
   () => import("./features/auth/pages/ForgotPasswordPage"),
-  "ForgotPasswordPage"
+  "ForgotPasswordPage",
 );
 const ResetPasswordPage = lazyRetry(
   () => import("./features/auth/pages/ResetPasswordPage"),
-  "ResetPasswordPage"
+  "ResetPasswordPage",
 );
-const HomePage = lazyRetry(() => import("./features/home/pages/HomePage"), "HomePage");
+const HomePage = lazyRetry(
+  () => import("./features/home/pages/HomePage"),
+  "HomePage",
+);
 const OrganizationDetailPage = lazyRetry(
   () => import("./features/organizations/pages/OrganizationDetailPage"),
-  "OrganizationDetailPage"
+  "OrganizationDetailPage",
 );
 const JoinOrganizationPage = lazyRetry(
   () => import("./features/organizations/pages/JoinOrganizationPage"),
-  "JoinOrganizationPage"
+  "JoinOrganizationPage",
 );
 const OrganizationStatisticsPage = lazyRetry(
   () => import("./features/organizations/pages/OrganizationStatisticsPage"),
-  "OrganizationStatisticsPage"
+  "OrganizationStatisticsPage",
 );
 const OrganizationManagementPage = lazyRetry(
   () => import("./features/organizations/pages/OrganizationManagementPage"),
-  "OrganizationManagementPage"
+  "OrganizationManagementPage",
 );
 const PeladaDetailPage = lazyRetry(
   () => import("./features/peladas/pages/PeladaDetailPage"),
-  "PeladaDetailPage"
+  "PeladaDetailPage",
 );
 const ScheduleBuilderPage = lazyRetry(
   () => import("./features/peladas/pages/ScheduleBuilderPage"),
-  "ScheduleBuilderPage"
+  "ScheduleBuilderPage",
 );
 const AttendanceListPage = lazyRetry(
   () => import("./features/peladas/pages/AttendanceListPage"),
-  "AttendanceListPage"
+  "AttendanceListPage",
 );
 const PeladaMatchesPage = lazyRetry(
   () => import("./features/peladas/pages/PeladaMatchesPage"),
-  "PeladaMatchesPage"
+  "PeladaMatchesPage",
 );
 const PeladaVotingPage = lazyRetry(
   () => import("./features/peladas/pages/PeladaVotingPage"),
-  "PeladaVotingPage"
+  "PeladaVotingPage",
 );
 const PeladaVotingResultsPage = lazyRetry(
   () => import("./features/peladas/pages/PeladaVotingResultsPage"),
-  "PeladaVotingResultsPage"
+  "PeladaVotingResultsPage",
 );
 const UserProfilePage = lazyRetry(
   () => import("./features/user/pages/UserProfilePage"),
-  "UserProfilePage"
+  "UserProfilePage",
 );
-const WelcomePage = lazyRetry(() => import("./features/auth/pages/WelcomePage"), "WelcomePage");
+const WelcomePage = lazyRetry(
+  () => import("./features/auth/pages/WelcomePage"),
+  "WelcomePage",
+);
 
 function PageLoading() {
   return (

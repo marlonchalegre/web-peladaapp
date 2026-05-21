@@ -453,7 +453,7 @@ export default function FinanceSection({
             icon={<AccountBalanceWalletIcon color="primary" />}
             testId="summary-balance"
             currency={finance?.currency}
-            language={i18n.language}
+            language={i18n?.language || "pt-BR"}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
@@ -464,7 +464,7 @@ export default function FinanceSection({
             icon={<TrendingUpIcon color="success" />}
             testId="summary-income"
             currency={finance?.currency}
-            language={i18n.language}
+            language={i18n?.language || "pt-BR"}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 4 }}>
@@ -475,7 +475,7 @@ export default function FinanceSection({
             icon={<TrendingDownIcon color="error" />}
             testId="summary-expense"
             currency={finance?.currency}
-            language={i18n.language}
+            language={i18n?.language || "pt-BR"}
           />
         </Grid>
       </Grid>
@@ -528,7 +528,9 @@ export default function FinanceSection({
                   value={i + 1}
                   data-testid={`month-option-${i + 1}`}
                 >
-                  {new Date(0, i).toLocaleString(i18n.language, { month: "long" })}
+                  {new Date(0, i).toLocaleString((i18n?.language || "pt-BR"), {
+                    month: "long",
+                  })}
                 </MenuItem>
               ))}
             </TextField>
@@ -618,7 +620,7 @@ export default function FinanceSection({
                         return (
                           <Box>
                             <Typography variant="body2">
-                              {new Intl.NumberFormat(i18n.language, {
+                              {new Intl.NumberFormat((i18n?.language || "pt-BR"), {
                                 style: "currency",
                                 currency: finance?.currency || "BRL",
                               }).format(total)}
@@ -630,7 +632,7 @@ export default function FinanceSection({
                                 sx={{ display: "block" }}
                               >
                                 +{" "}
-                                {new Intl.NumberFormat(i18n.language, {
+                                {new Intl.NumberFormat((i18n?.language || "pt-BR"), {
                                   style: "currency",
                                   currency: finance?.currency || "BRL",
                                 }).format(fine)}{" "}
@@ -774,7 +776,7 @@ export default function FinanceSection({
                                 Number(year),
                                 Number(month) - 1,
                                 Number(day),
-                              ).toLocaleDateString(i18n.language);
+                              ).toLocaleDateString((i18n?.language || "pt-BR"));
                             })()
                           : "-"}
                       </TableCell>
@@ -799,7 +801,7 @@ export default function FinanceSection({
                             ) {
                               const dateStr = new Date(
                                 tx.pelada_date,
-                              ).toLocaleDateString(i18n.language);
+                              ).toLocaleDateString((i18n?.language || "pt-BR"));
                               return tx.description.replace(
                                 tx.pelada_id,
                                 dateStr,
@@ -871,7 +873,7 @@ export default function FinanceSection({
                           }}
                         >
                           {tx.type === "income" ? "+" : "-"}
-                          {new Intl.NumberFormat(i18n.language, {
+                          {new Intl.NumberFormat((i18n?.language || "pt-BR"), {
                             style: "currency",
                             currency: finance?.currency || "BRL",
                           }).format(tx.amount)}
@@ -891,7 +893,7 @@ export default function FinanceSection({
                               }}
                             >
                               (inclui{" "}
-                              {new Intl.NumberFormat(i18n.language, {
+                              {new Intl.NumberFormat((i18n?.language || "pt-BR"), {
                                 style: "currency",
                                 currency: finance?.currency || "BRL",
                               }).format(tx.fine_amount)}{" "}
@@ -1235,7 +1237,7 @@ export default function FinanceSection({
                 "organizations.management.finance.monthly_fees.apply_fine_label",
                 "Aplicar multa de {{amount}}",
                 {
-                  amount: new Intl.NumberFormat(i18n.language, {
+                  amount: new Intl.NumberFormat((i18n?.language || "pt-BR"), {
                     style: "currency",
                     currency: finance?.currency || "BRL",
                   }).format(parseFloat(monthlyFineAmountStr.replace(",", "."))),

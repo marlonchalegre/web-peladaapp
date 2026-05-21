@@ -9,7 +9,7 @@ import { lazy, type ComponentType } from "react";
 export function lazyRetry<T extends ComponentType<any>>(
   componentImport: () => Promise<{ default: T }>,
   name: string,
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): ComponentType<any> {
   return lazy(async () => {
     const pageHasBeenForceRefreshed = JSON.parse(
@@ -23,14 +23,20 @@ export function lazyRetry<T extends ComponentType<any>>(
     } catch (error) {
       if (!pageHasBeenForceRefreshed) {
         // Logging the error to help with debugging
-        console.warn(`Failed to load chunk for ${name}. Force refreshing...`, error);
+        console.warn(
+          `Failed to load chunk for ${name}. Force refreshing...`,
+          error,
+        );
         window.localStorage.setItem(`lazy-retry-${name}-refreshed`, "true");
         window.location.reload();
         return { default: (() => null) as unknown as T };
       }
 
       // If we already refreshed and it still fails, throw the error
-      console.error(`Failed to load chunk for ${name} even after refresh.`, error);
+      console.error(
+        `Failed to load chunk for ${name} even after refresh.`,
+        error,
+      );
       throw error;
     }
   });
