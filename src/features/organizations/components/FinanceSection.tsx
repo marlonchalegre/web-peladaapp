@@ -40,7 +40,8 @@ export default function FinanceSection({
   const { t } = useTranslation();
   const api = useMemo(() => createApi(apiClient), []);
   const [activeTab, setActiveTab] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [configLoading, setConfigLoading] = useState(true);
+  const [dynamicLoading, setDynamicLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -80,17 +81,10 @@ export default function FinanceSection({
     null,
   );
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const fetchConfig = useCallback(async () => {
+    setConfigLoading(true);
     try {
-      const [summaryRes, financeRes, txData, mpRes] = await Promise.all([
-        api.getFinanceSummary(orgId),
-        api.getOrganizationFinance(orgId),
-        api.listTransactions(orgId, page + 1, rowsPerPage),
-        api.getMonthlyPayments(orgId, selectedYear, selectedMonth),
-      ]);
-      setSummary(summaryRes);
+      const financeRes = await api.getOrganizationFinance(orgId);
       if (financeRes) {
         setFinance(financeRes);
         setMensalistaPriceStr(String(financeRes.mensalista_price));
@@ -98,11 +92,28 @@ export default function FinanceSection({
         setMonthlyFineAmountStr(String(financeRes.monthly_fine_amount || 0));
         setMonthlyCutOffDay(financeRes.monthly_cut_off_day || 5);
       }
+    } catch (err) {
+      console.error("Failed to fetch finance config", err);
+    } finally {
+      setConfigLoading(false);
+    }
+  }, [api, orgId]);
+
+  const fetchDynamicData = useCallback(async () => {
+    setDynamicLoading(true);
+    setError(null);
+    try {
+      const [summaryRes, txData, mpRes] = await Promise.all([
+        api.getFinanceSummary(orgId),
+        api.listTransactions(orgId, page + 1, rowsPerPage),
+        api.getMonthlyPayments(orgId, selectedYear, selectedMonth),
+      ]);
+      setSummary(summaryRes);
       setTransactions(txData.data);
       setTotalTransactions(txData.total);
       setMonthlyPayments(mpRes);
     } catch (err) {
-      console.error("Failed to fetch finance data", err);
+      console.error("Failed to fetch finance dynamic data", err);
       setError(
         t(
           "organizations.management.finance.error.load_failed",
@@ -110,13 +121,17 @@ export default function FinanceSection({
         ),
       );
     } finally {
-      setLoading(false);
+      setDynamicLoading(false);
     }
   }, [api, orgId, page, rowsPerPage, selectedYear, selectedMonth, t]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    fetchConfig();
+  }, [fetchConfig]);
+
+  useEffect(() => {
+    fetchDynamicData();
+  }, [fetchDynamicData]);
 
   const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
@@ -144,7 +159,7 @@ export default function FinanceSection({
       };
       await api.updateOrganizationFinance(orgId, payload);
       clearFinanceCache(orgId);
-      await fetchData();
+      await Promise.all([fetchConfig(), fetchDynamicData()]);
       setSuccess(t("organizations.management.finance.config.success"));
     } catch (err) {
       console.error("Failed to update finance config", err);
@@ -169,7 +184,7 @@ export default function FinanceSection({
       setSuccess(null);
       await api.addTransaction(orgId, txData);
       setIsTxDialogOpen(false);
-      await fetchData();
+      await fetchDynamicData();
     } catch (err) {
       console.error("Failed to add transaction", err);
       setError(
@@ -188,7 +203,7 @@ export default function FinanceSection({
     try {
       setSuccess(null);
       const paymentDate = new Date().toISOString().split("T")[0];
-      const baseAmount = Number(String(mensalistaPriceStr).replace(",", "."));
+      const baseAmount = finance.mensalista_price;
       const fineAmount = applyFine
         ? Number(String(monthlyFineAmountStr).replace(",", "."))
         : 0;
@@ -202,7 +217,7 @@ export default function FinanceSection({
         fine_amount: Number(fineAmount),
         payment_date: paymentDate,
       });
-      await fetchData();
+      await fetchDynamicData();
       setSuccess(t("organizations.management.finance.monthly_fees.success"));
       setIsMarkDialogOpen(false);
       setPlayerToMark(null);
@@ -252,10 +267,10 @@ export default function FinanceSection({
         year: selectedYear,
         month: selectedMonth,
         paid: false,
-        amount: Number(String(mensalistaPriceStr).replace(",", ".")),
+        amount: finance.mensalista_price,
         payment_date: new Date().toISOString().split("T")[0],
       });
-      await fetchData();
+      await fetchDynamicData();
       setSuccess(t("organizations.management.finance.monthly_fees.success"));
       setSelectedPayment(null);
     } catch (err) {
@@ -283,7 +298,7 @@ export default function FinanceSection({
     try {
       setSuccess(null);
       await api.reverseTransaction(orgId, txToReverse);
-      await fetchData();
+      await fetchDynamicData();
       setSuccess(
         t(
           "organizations.management.finance.transactions.reverse_success",
@@ -306,7 +321,11 @@ export default function FinanceSection({
     setFinance((prev) => ({ ...prev, currency: val }));
   };
 
-  if (loading && !summary && transactions.length === 0)
+  if (
+    (configLoading || dynamicLoading) &&
+    !summary &&
+    transactions.length === 0
+  )
     return <CircularProgress data-testid="finance-loading" />;
 
   return (

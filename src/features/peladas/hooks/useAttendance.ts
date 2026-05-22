@@ -82,7 +82,7 @@ export function useAttendance(peladaId: string) {
     [],
   );
 
-  const { organizationFinance } = useOrganizationFinance(
+  const { organizationFinance, loadingFinance } = useOrganizationFinance(
     pelada?.organization_id,
   );
 
@@ -314,6 +314,7 @@ export function useAttendance(peladaId: string) {
     isUpdatingSelf,
     peladaTransactions,
     organizationFinance,
+    loadingFinance,
     handleUpdateAttendance,
     handleCloseAttendance,
     handleAddPlayersFromOrg,

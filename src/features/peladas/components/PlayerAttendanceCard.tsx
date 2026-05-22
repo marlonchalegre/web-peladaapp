@@ -31,6 +31,7 @@ interface PlayerAttendanceCardProps {
   onMarkPaid?: (amount: number) => void;
   onReversePayment?: () => void;
   organizationFinance?: OrganizationFinance | null;
+  loadingFinance?: boolean;
   "data-testid"?: string;
 }
 
@@ -44,6 +45,7 @@ export default function PlayerAttendanceCard({
   onMarkPaid,
   onReversePayment,
   organizationFinance,
+  loadingFinance,
   "data-testid": testId,
 }: PlayerAttendanceCardProps) {
   const { t } = useTranslation();
@@ -218,30 +220,40 @@ export default function PlayerAttendanceCard({
                 </Box>
               </Tooltip>
             ) : isAdmin && onMarkPaid ? (
-              <Tooltip
-                title={t(
-                  "organizations.management.finance.monthly_fees.mark_as_paid",
-                  "Marcar como Pago",
+              <>
+                {loadingFinance ? (
+                  <Box sx={{ p: 0.5 }}>
+                    <CircularProgress size={20} />
+                  </Box>
+                ) : (
+                  <Tooltip
+                    title={t(
+                      "organizations.management.finance.monthly_fees.mark_as_paid",
+                      "Marcar como Pago",
+                    )}
+                  >
+                    <IconButton
+                      size="small"
+                      onClick={() =>
+                        onMarkPaid?.(organizationFinance?.diarista_price || 0)
+                      }
+                      disabled={
+                        isUpdating || !organizationFinance?.diarista_price
+                      }
+                      data-testid="mark-as-paid-button"
+                      sx={{
+                        color: "warning.main",
+                        "&:hover": {
+                          color: "success.main",
+                          bgcolor: "success.light",
+                        },
+                      }}
+                    >
+                      <AttachMoneyIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
                 )}
-              >
-                <IconButton
-                  size="small"
-                  onClick={() =>
-                    onMarkPaid?.(organizationFinance?.diarista_price || 0)
-                  }
-                  disabled={isUpdating || !organizationFinance?.diarista_price}
-                  data-testid="mark-as-paid-button"
-                  sx={{
-                    color: "warning.main",
-                    "&:hover": {
-                      color: "success.main",
-                      bgcolor: "success.light",
-                    },
-                  }}
-                >
-                  <AttachMoneyIcon fontSize="small" />
-                </IconButton>
-              </Tooltip>
+              </>
             ) : (
               <Tooltip
                 title={t(

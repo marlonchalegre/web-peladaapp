@@ -23,6 +23,7 @@ interface AttendanceListColumnProps {
   onMarkPaid?: (playerId: string, amount: number) => void;
   onReversePayment?: (playerId: string) => void;
   organizationFinance?: OrganizationFinance | null;
+  loadingFinance?: boolean;
 }
 
 export default function AttendanceListColumn({
@@ -40,6 +41,7 @@ export default function AttendanceListColumn({
   onMarkPaid,
   onReversePayment,
   organizationFinance,
+  loadingFinance,
 }: AttendanceListColumnProps) {
   return (
     <Box sx={{ width: "100%" }}>
@@ -83,6 +85,7 @@ export default function AttendanceListColumn({
                 onReversePayment ? () => onReversePayment(p.id) : undefined
               }
               organizationFinance={organizationFinance}
+              loadingFinance={loadingFinance}
               data-testid={`attendance-card-${p.user.username || p.user_id}`}
             />
           );

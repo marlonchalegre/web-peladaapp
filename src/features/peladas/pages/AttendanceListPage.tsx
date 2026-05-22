@@ -79,6 +79,7 @@ export default function AttendanceListPage() {
     isUpdatingSelf,
     peladaTransactions,
     organizationFinance,
+    loadingFinance,
     handleUpdateAttendance,
     handleCloseAttendance,
     handleMarkPaid,
@@ -375,6 +376,7 @@ export default function AttendanceListPage() {
               onMarkPaid={handleMarkPaid}
               onReversePayment={onReverseClick}
               organizationFinance={organizationFinance}
+              loadingFinance={loadingFinance}
             />
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={1}>
@@ -395,6 +397,7 @@ export default function AttendanceListPage() {
               onMarkPaid={handleMarkPaid}
               onReversePayment={onReverseClick}
               organizationFinance={organizationFinance}
+              loadingFinance={loadingFinance}
             />
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={2}>
@@ -412,6 +415,7 @@ export default function AttendanceListPage() {
               onMarkPaid={handleMarkPaid}
               onReversePayment={onReverseClick}
               organizationFinance={organizationFinance}
+              loadingFinance={loadingFinance}
             />
           </CustomTabPanel>
           <CustomTabPanel value={tabValue} index={3}>
@@ -429,6 +433,7 @@ export default function AttendanceListPage() {
               onMarkPaid={handleMarkPaid}
               onReversePayment={onReverseClick}
               organizationFinance={organizationFinance}
+              loadingFinance={loadingFinance}
             />
           </CustomTabPanel>
         </Box>
