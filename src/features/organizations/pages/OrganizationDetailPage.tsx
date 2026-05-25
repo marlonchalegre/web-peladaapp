@@ -261,8 +261,17 @@ export default function OrganizationDetailPage() {
         </Stack>
       </Box>
       <Stack spacing={4}>
+        {org.is_blocked && (
+          <Alert severity="warning" data-testid="org-blocked-banner">
+            {t(
+              "organizations.detail.blocked_warning",
+              "Esta organização está bloqueada pelo administrador do sistema e não pode realizar novas peladas.",
+            )}
+          </Alert>
+        )}
+
         {/* Create Pelada Section */}
-        {isAdmin && (
+        {isAdmin && !org.is_blocked && (
           <Paper variant="outlined" sx={{ p: 3 }}>
             <Typography variant="h5" gutterBottom>
               {t("organizations.detail.section.new_pelada")}

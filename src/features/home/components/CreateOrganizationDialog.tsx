@@ -6,12 +6,14 @@ interface CreateOrganizationDialogProps {
   open: boolean;
   onClose: () => void;
   onCreate: (name: string) => Promise<void>;
+  allowOrgCreation: boolean;
 }
 
 export default function CreateOrganizationDialog({
   open,
   onClose,
   onCreate,
+  allowOrgCreation,
 }: CreateOrganizationDialogProps) {
   const { t } = useTranslation();
 
@@ -21,6 +23,7 @@ export default function CreateOrganizationDialog({
       <DialogContent>
         <Box sx={{ pt: 1 }}>
           <CreateOrganizationForm
+            allowOrgCreation={allowOrgCreation}
             onCreate={async (name) => {
               await onCreate(name);
               onClose();

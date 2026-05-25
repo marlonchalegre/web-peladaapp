@@ -14,6 +14,7 @@ export interface Organization {
   waha_vote_reminder_enabled?: boolean | null;
   waha_vote_ended_msg_enabled?: boolean | null;
   waha_use_all_mention?: boolean | null;
+  is_blocked?: boolean;
 }
 export interface User {
   id: string;
@@ -23,6 +24,9 @@ export interface User {
   admin_orgs?: string[];
   position?: string;
   avatar_filename?: string | null;
+  is_super_admin?: boolean;
+  is_blocked?: boolean;
+  allow_org_creation?: boolean;
 }
 export interface Player {
   id: string;
@@ -716,6 +720,38 @@ export function createApi(client: ApiClient) {
       client.post<BatchVoteResponse>(
         `/api/peladas/${peladaId}/votes/batch`,
         payload,
+      ),
+
+    // Super Admin Actions
+    listOrganizationsAdmin: (
+      query: string = "",
+      page: number = 1,
+      perPage: number = 20,
+    ) =>
+      client.getPaginated<Organization[]>("/api/admin/organizations", {
+        q: query,
+        page,
+        per_page: perPage,
+      }),
+    toggleBlockOrganization: (id: string) =>
+      client.post<{ id: string; is_blocked: boolean }>(
+        `/api/admin/organizations/${id}/toggle-block`,
+        {},
+      ),
+    toggleBlockUser: (id: string) =>
+      client.post<{ id: string; is_blocked: boolean }>(
+        `/api/admin/users/${id}/toggle-block`,
+        {},
+      ),
+    toggleOrgCreation: (id: string) =>
+      client.post<{ id: string; allow_org_creation: boolean }>(
+        `/api/admin/users/${id}/toggle-org-creation`,
+        {},
+      ),
+    toggleSuperAdmin: (id: string) =>
+      client.post<{ id: string; is_super_admin: boolean }>(
+        `/api/admin/users/${id}/toggle-super-admin`,
+        {},
       ),
   };
 }

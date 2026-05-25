@@ -111,6 +111,10 @@ const WelcomePage = lazyRetry(
   () => import("./features/auth/pages/WelcomePage"),
   "WelcomePage",
 );
+const AdminPanelPage = lazyRetry(
+  () => import("./features/admin/pages/AdminPanelPage"),
+  "AdminPanelPage",
+);
 
 function PageLoading() {
   return (
@@ -366,6 +370,19 @@ function AppLayout() {
                     </Typography>
                   </MenuItem>
 
+                  {user?.is_super_admin && (
+                    <MenuItem
+                      component={RouterLink}
+                      to="/admin"
+                      onClick={handleCloseUserMenu}
+                      data-testid="admin-menu-item"
+                    >
+                      <Typography align="center">
+                        {t("navigation.adminPanel") || "Admin Panel"}
+                      </Typography>
+                    </MenuItem>
+                  )}
+
                   {isInstallable && (
                     <MenuItem
                       onClick={handleInstallApp}
@@ -447,6 +464,7 @@ function AppLayout() {
                     element={<PeladaVotingResultsPage />}
                   />
                   <Route path="/profile" element={<UserProfilePage />} />
+                  <Route path="/admin" element={<AdminPanelPage />} />
                 </Route>
               </Routes>
             </Suspense>

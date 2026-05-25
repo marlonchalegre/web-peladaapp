@@ -143,4 +143,93 @@ describe("ProtectedRoute", () => {
 
     expect(screen.getByText("Organizations")).toBeInTheDocument();
   });
+
+  it("redirects blocked user to /home when trying to access other pages", () => {
+    const authValue = mockAuthContext({
+      isAuthenticated: true,
+      token: "valid-token",
+      user: {
+        id: "1",
+        name: "Test User",
+        username: "testuser",
+        email: "test@example.com",
+        is_blocked: true,
+      },
+    });
+
+    render(
+      <AuthContext.Provider value={authValue}>
+        <MemoryRouter initialEntries={["/organizations"]}>
+          <Routes>
+            <Route path="/home" element={<div>Home Page (Banner Shown)</div>} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/organizations" element={<div>Organizations</div>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </AuthContext.Provider>,
+    );
+
+    expect(screen.getByText("Home Page (Banner Shown)")).toBeInTheDocument();
+    expect(screen.queryByText("Organizations")).not.toBeInTheDocument();
+  });
+
+  it("allows blocked user to access /home", () => {
+    const authValue = mockAuthContext({
+      isAuthenticated: true,
+      token: "valid-token",
+      user: {
+        id: "1",
+        name: "Test User",
+        username: "testuser",
+        email: "test@example.com",
+        is_blocked: true,
+      },
+    });
+
+    render(
+      <AuthContext.Provider value={authValue}>
+        <MemoryRouter initialEntries={["/home"]}>
+          <Routes>
+            <Route element={<ProtectedRoute />}>
+              <Route
+                path="/home"
+                element={<div>Home Page (Banner Shown)</div>}
+              />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </AuthContext.Provider>,
+    );
+
+    expect(screen.getByText("Home Page (Banner Shown)")).toBeInTheDocument();
+  });
+
+  it("allows blocked user to access /profile", () => {
+    const authValue = mockAuthContext({
+      isAuthenticated: true,
+      token: "valid-token",
+      user: {
+        id: "1",
+        name: "Test User",
+        username: "testuser",
+        email: "test@example.com",
+        is_blocked: true,
+      },
+    });
+
+    render(
+      <AuthContext.Provider value={authValue}>
+        <MemoryRouter initialEntries={["/profile"]}>
+          <Routes>
+            <Route element={<ProtectedRoute />}>
+              <Route path="/profile" element={<div>Profile Page</div>} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </AuthContext.Provider>,
+    );
+
+    expect(screen.getByText("Profile Page")).toBeInTheDocument();
+  });
 });

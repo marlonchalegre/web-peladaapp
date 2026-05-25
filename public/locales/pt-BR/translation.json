@@ -11,7 +11,8 @@
     "home": "Início",
     "organizations": "Organizações",
     "users": "Usuários",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "adminPanel": "Painel de Admin"
   },
   "auth": {
     "login": {
@@ -210,6 +211,8 @@
     }
   },
   "home": {
+    "blocked_message": "Sua conta está bloqueada. Você não pode participar de peladas ou ver estatísticas, mas pode acessar seu perfil.",
+    "org_creation_disabled": "Criação de organização não permitida para sua conta.",
     "error": {
       "load_failed": "Erro ao carregar organizações",
       "invalid_format_org_list": "Formato de lista de organizações inválido"

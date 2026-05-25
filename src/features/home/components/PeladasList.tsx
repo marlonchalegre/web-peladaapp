@@ -34,7 +34,7 @@ export default function PeladasList({
   const navigate = useNavigate();
 
   return (
-    <Box sx={{ mb: 5 }}>
+    <Box sx={{ mb: 5 }} data-testid="peladas-list">
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <SportsSoccerIcon sx={{ mr: 1.5, color: "primary.main" }} />
         <Typography

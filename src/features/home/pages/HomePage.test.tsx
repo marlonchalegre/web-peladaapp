@@ -13,17 +13,31 @@ vi.mock("../../../shared/api/client", () => ({
   },
 }));
 
+const mockUser = {
+  id: "1",
+  name: "Test User",
+  email: "test@example.com",
+  is_blocked: false,
+  allow_org_creation: true,
+};
+
 // Mock AuthContext
 vi.mock("../../../app/providers/AuthContext", () => ({
   useAuth: () => ({
-    user: { id: "1", name: "Test User", email: "test@example.com" },
+    user: mockUser,
     isAuthenticated: true,
+    refreshUser: vi.fn(),
   }),
 }));
 
 describe("HomePage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUser.id = "1";
+    mockUser.name = "Test User";
+    mockUser.email = "test@example.com";
+    mockUser.is_blocked = false;
+    mockUser.allow_org_creation = true;
     (api.getPaginated as Mock).mockResolvedValue({
       data: [],
       total: 0,
@@ -172,5 +186,26 @@ describe("HomePage", () => {
         screen.getByText("home.sections.member_orgs.empty_desc"),
       ).toBeInTheDocument();
     });
+  });
+
+  it("renders blocked warning banner and hides lists when user is blocked", async () => {
+    mockUser.is_blocked = true;
+
+    render(
+      <MemoryRouter>
+        <HomePage />
+      </MemoryRouter>,
+    );
+
+    // Block banner should be visible
+    expect(screen.getByText("home.blocked_message")).toBeInTheDocument();
+
+    // Lists/dashboard shouldn't be loaded or rendered
+    expect(
+      screen.queryByText("home.sections.admin_orgs.title"),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("home.sections.member_orgs.title"),
+    ).not.toBeInTheDocument();
   });
 });
