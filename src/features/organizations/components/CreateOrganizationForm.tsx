@@ -1,13 +1,28 @@
-import { Stack, TextField, Button } from "@mui/material";
+import { Stack, TextField, Button, Alert } from "@mui/material";
 import type { FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 
 type Props = {
   onCreate: (name: string) => Promise<void>;
+  allowOrgCreation: boolean;
 };
 
-export default function CreateOrganizationForm({ onCreate }: Props) {
+export default function CreateOrganizationForm({
+  onCreate,
+  allowOrgCreation,
+}: Props) {
   const { t } = useTranslation();
+
+  if (!allowOrgCreation) {
+    return (
+      <Alert severity="warning" sx={{ mt: 1 }}>
+        {t(
+          "organizations.create.permission_denied",
+          "Você não tem permissão para criar organizações. Entre em contato com o administrador do sistema para criar uma nova organização.",
+        )}
+      </Alert>
+    );
+  }
 
   return (
     <form

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Container, Box, Typography, Alert } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../../app/providers/AuthContext";
@@ -11,9 +11,14 @@ import CreateOrganizationDialog from "../components/CreateOrganizationDialog";
 import PendingInvitations from "../components/PendingInvitations";
 
 export default function HomePage() {
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const { t } = useTranslation();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+
+  useEffect(() => {
+    refreshUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const {
     loading,
@@ -78,7 +83,16 @@ export default function HomePage() {
         </Box>
       </Box>
 
-      {error && (
+      {user.is_blocked && (
+        <Alert severity="warning" sx={{ mb: 3 }}>
+          {t(
+            "home.blocked_message",
+            "Sua conta está bloqueada. Você não pode participar de peladas ou ver estatísticas, mas pode acessar seu perfil.",
+          )}
+        </Alert>
+      )}
+
+      {error && !user.is_blocked && (
         <Alert severity="error" sx={{ mb: 3 }}>
           {error}
         </Alert>
@@ -86,7 +100,7 @@ export default function HomePage() {
 
       {loading ? (
         <Loading message={t("common.loading")} />
-      ) : (
+      ) : user.is_blocked ? null : (
         <>
           <PendingInvitations
             invitations={pendingInvitations}
@@ -113,6 +127,7 @@ export default function HomePage() {
         open={createDialogOpen}
         onClose={() => setCreateDialogOpen(false)}
         onCreate={createOrganization}
+        allowOrgCreation={user.allow_org_creation === true}
       />
     </Container>
   );

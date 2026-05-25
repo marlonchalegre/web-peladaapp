@@ -91,10 +91,19 @@ export function useHomeDashboard() {
   }, [user, t]);
 
   useEffect(() => {
+    if (user?.is_blocked) {
+      setLoading(false);
+      return;
+    }
     fetchOrganizations();
     fetchPeladas(1);
     fetchPendingInvitations();
-  }, [fetchOrganizations, fetchPeladas, fetchPendingInvitations]);
+  }, [
+    user?.is_blocked,
+    fetchOrganizations,
+    fetchPeladas,
+    fetchPendingInvitations,
+  ]);
 
   const handlePeladaPageChange = (
     _event: React.ChangeEvent<unknown>,

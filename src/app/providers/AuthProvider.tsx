@@ -81,13 +81,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshUser: async () => {
         try {
           const freshUser = await api.get<User>("/api/users/me");
-          // Fetch orgs to get fresh admin_orgs since token might be stale
-          const userOrgs = await api.get<
-            (Organization & { role: "admin" | "player" })[]
-          >(`/api/users/${freshUser.id}/organizations`);
-          const adminOrgsList = userOrgs
-            .filter((org) => org.role === "admin")
-            .map((org) => org.id);
+
+          let adminOrgsList: string[] = [];
+          if (!freshUser.is_blocked) {
+            // Fetch orgs to get fresh admin_orgs since token might be stale
+            const userOrgs = await api.get<
+              (Organization & { role: "admin" | "player" })[]
+            >(`/api/users/${freshUser.id}/organizations`);
+
+            adminOrgsList = userOrgs
+              .filter((org) => org.role === "admin")
+              .map((org) => org.id);
+          }
 
           setUser({
             ...freshUser,

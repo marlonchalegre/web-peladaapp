@@ -11,7 +11,8 @@
     "home": "Home",
     "organizations": "Organizations",
     "users": "Users",
-    "profile": "Profile"
+    "profile": "Profile",
+    "adminPanel": "Admin Panel"
   },
   "auth": {
     "login": {
@@ -210,6 +211,8 @@
     }
   },
   "home": {
+    "blocked_message": "Your account is blocked. You cannot participate in peladas or see statistics, but you can access your profile.",
+    "org_creation_disabled": "Organization creation is not allowed for your account.",
     "error": {
       "load_failed": "Error loading organizations",
       "invalid_format_org_list": "Invalid organization list format"

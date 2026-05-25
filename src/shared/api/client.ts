@@ -210,6 +210,9 @@ export type User = {
   position?: string;
   avatar_filename?: string | null;
   token?: string; // Add token field for first-access
+  is_super_admin?: boolean;
+  is_blocked?: boolean;
+  allow_org_creation?: boolean;
 };
 
 export type UserProfileUpdate = {
