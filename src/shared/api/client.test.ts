@@ -7,7 +7,7 @@ import {
   afterEach,
   type Mock,
 } from "vitest";
-import { ApiClient, ApiError } from "./client";
+import { ApiClient, ApiError, login, logout, register, getUser, updateUserProfile } from "./client";
 
 describe("ApiClient", () => {
   let client: ApiClient;
@@ -208,5 +208,53 @@ describe("ApiClient", () => {
       const error = new ApiError(500, { error: "Server error" });
       expect(error.message).toBe("API Error: 500");
     });
+  });
+});
+
+describe("Auth & User Functions", () => {
+  let mockFetch: Mock;
+
+  beforeEach(() => {
+    mockFetch = vi.fn();
+    global.fetch = mockFetch as unknown as typeof fetch;
+  });
+
+  const mockResponse = (data: any, ok = true, status = 200) => {
+    mockFetch.mockResolvedValueOnce({
+      ok,
+      status,
+      json: async () => data,
+      headers: new Headers(),
+    });
+  };
+
+  it("login calls correct endpoint", async () => {
+    mockResponse({ token: "tk123", user: { id: "u1" } });
+    await login("test@test.com", "pass");
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/auth/login"), expect.objectContaining({ method: "POST" }));
+  });
+
+  it("logout calls correct endpoint", async () => {
+    mockResponse({});
+    await logout();
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/auth/logout"), expect.objectContaining({ method: "POST" }));
+  });
+
+  it("register calls correct endpoint", async () => {
+    mockResponse({});
+    await register("Name", "user", "test@test.com", "pass");
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/auth/register"), expect.objectContaining({ method: "POST" }));
+  });
+
+  it("getUser calls correct endpoint", async () => {
+    mockResponse({ id: "u1" });
+    await getUser("u1");
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/api/user/u1"), expect.objectContaining({ method: "GET" }));
+  });
+
+  it("updateUserProfile calls correct endpoint", async () => {
+    mockResponse({ id: "u1" });
+    await updateUserProfile("u1", { name: "New Name" });
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/api/user/u1/profile"), expect.objectContaining({ method: "PUT" }));
   });
 });
