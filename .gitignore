@@ -48,3 +48,4 @@ Thumbs.db
 *.sln
 *.sw?
 public/version.json
+coverage-results.json
