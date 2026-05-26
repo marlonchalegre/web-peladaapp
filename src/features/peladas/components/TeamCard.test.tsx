@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import type { DragEvent } from "react";
 import TeamCard from "./TeamCard";
 import type {
   Player,
@@ -83,25 +84,19 @@ describe("TeamCard", () => {
     },
   ];
 
-  let onDelete: ReturnType<typeof vi.fn>;
-  let onDrop: ReturnType<typeof vi.fn>;
-  let onDragStartPlayer: ReturnType<typeof vi.fn>;
-  let onMoveToTeam: ReturnType<typeof vi.fn>;
-  let onSendToBench: ReturnType<typeof vi.fn>;
-  let onMoveToFixedGk: ReturnType<typeof vi.fn>;
-  let onMarkPaid: ReturnType<typeof vi.fn>;
-  let onReversePayment: ReturnType<typeof vi.fn>;
+  const onDelete = vi.fn<() => void>();
+  const onDrop = vi.fn<(e: DragEvent<HTMLElement>) => void>();
+  const onDragStartPlayer =
+    vi.fn<(e: DragEvent<HTMLElement>, playerId: string) => void>();
+  const onMoveToTeam = vi.fn<(playerId: string, teamId: string) => void>();
+  const onSendToBench = vi.fn<(playerId: string) => void>();
+  const onMoveToFixedGk =
+    vi.fn<(playerId: string, side: "home" | "away") => void>();
+  const onMarkPaid = vi.fn<(playerId: string, amount: number) => void>();
+  const onReversePayment = vi.fn<(playerId: string) => void>();
 
   beforeEach(() => {
     vi.clearAllMocks();
-    onDelete = vi.fn();
-    onDrop = vi.fn();
-    onDragStartPlayer = vi.fn();
-    onMoveToTeam = vi.fn();
-    onSendToBench = vi.fn();
-    onMoveToFixedGk = vi.fn();
-    onMarkPaid = vi.fn();
-    onReversePayment = vi.fn();
   });
 
   const renderComponent = (props = {}) => {

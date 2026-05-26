@@ -18,7 +18,7 @@ import type {
 import TeamCard from "./TeamCard";
 import { useTranslation } from "react-i18next";
 
-type PlayerWithUser = Player & { user: User; is_goalkeeper?: boolean };
+export type PlayerWithUser = Player & { user: User; is_goalkeeper?: boolean };
 
 export type TeamsSectionProps = {
   teams: Team[];

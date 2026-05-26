@@ -1,7 +1,10 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import TeamsSection, { type TeamsSectionProps } from "./TeamsSection";
-import type { Player, Team } from "../../../shared/api/endpoints";
+import TeamsSection, {
+  type TeamsSectionProps,
+  type PlayerWithUser,
+} from "./TeamsSection";
+import type { Team } from "../../../shared/api/endpoints";
 
 // Mock i18next
 vi.mock("react-i18next", () => ({
@@ -33,16 +36,22 @@ vi.mock("./TeamCard", () => ({
         >
           Dropzone
         </div>
-        {players.map((p: { id: string; displayScore?: string; user?: { name?: string } }) => (
-          <div
-            key={p.id}
-            data-testid={`player-${p.id}`}
-            draggable
-            onDragStart={(e) => onDragStartPlayer(e, p.id)}
-          >
-            {p.user?.name} ({p.displayScore})
-          </div>
-        ))}
+        {players.map(
+          (p: {
+            id: string;
+            displayScore?: string;
+            user?: { name?: string };
+          }) => (
+            <div
+              key={p.id}
+              data-testid={`player-${p.id}`}
+              draggable
+              onDragStart={(e) => onDragStartPlayer(e, p.id)}
+            >
+              {p.user?.name} ({p.displayScore})
+            </div>
+          ),
+        )}
       </div>
     ),
   ),
@@ -62,8 +71,10 @@ describe("TeamsSection", () => {
         t1: [
           { id: "p1", grade: 8.5, user: { name: "Player 1" } },
           { id: "p2", grade: 9.0, user: { name: "Player 2" } },
-        ] as Player[],
-        t2: [{ id: "p3", grade: 7.0, user: { name: "Player 3" } }] as Player[],
+        ] as PlayerWithUser[],
+        t2: [
+          { id: "p3", grade: 7.0, user: { name: "Player 3" } },
+        ] as PlayerWithUser[],
       },
       playersPerTeam: 5,
       creatingTeam: false,
@@ -106,7 +117,9 @@ describe("TeamsSection", () => {
       ...defaultProps,
       teamPlayers: {
         t1: [],
-        t2: [{ id: "p3", grade: undefined, user: { name: "Player 3" } }] as Player[],
+        t2: [
+          { id: "p3", grade: undefined, user: { name: "Player 3" } },
+        ] as PlayerWithUser[],
       },
     };
     render(<TeamsSection {...props} />);

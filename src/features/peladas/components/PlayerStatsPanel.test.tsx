@@ -19,11 +19,10 @@ vi.mock("../../../shared/components/SecureAvatar", () => ({
 
 describe("PlayerStatsPanel", () => {
   let mockStats: PlayerStatRow[];
-  let onToggleSort: ReturnType<typeof vi.fn>;
+  const onToggleSort = vi.fn<(by: "goals" | "assists") => void>();
 
   beforeEach(() => {
     vi.clearAllMocks();
-    onToggleSort = vi.fn();
     mockStats = [
       {
         playerId: "p1",
