@@ -271,22 +271,28 @@ describe("useOrganizationManagement", () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     await act(async () => {
-      await result.current.handleUpdatePlayer("p1", { user_name: "Updated Name" });
+      await result.current.handleUpdatePlayer("p1", {
+        user_name: "Updated Name",
       });
-      expect(mockApi.updatePlayer).toHaveBeenCalledWith("p1", {
+    });
+    expect(mockApi.updatePlayer).toHaveBeenCalledWith("p1", {
       user_name: "Updated Name",
-      });
+    });
     // Update error Error object
     mockApi.updatePlayer.mockRejectedValue(new Error("Update Fail"));
     await act(async () => {
-      await result.current.handleUpdatePlayer("p1", { user_name: "Updated Name" });
+      await result.current.handleUpdatePlayer("p1", {
+        user_name: "Updated Name",
+      });
     });
     expect(result.current.error).toBe("Update Fail");
 
     // Update error non-Error
     mockApi.updatePlayer.mockRejectedValue("String Update Fail");
     await act(async () => {
-      await result.current.handleUpdatePlayer("p1", { user_name: "Updated Name" });
+      await result.current.handleUpdatePlayer("p1", {
+        user_name: "Updated Name",
+      });
     });
     expect(result.current.error).toBe(
       "organizations.error.update_player_failed",

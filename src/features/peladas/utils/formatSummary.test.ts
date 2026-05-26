@@ -114,7 +114,11 @@ describe("formatPeladaSummary", () => {
         goalDifference: 1,
       },
     ];
-    const result = formatPeladaSummary("2024-05-25", standings as StandingRow[], []);
+    const result = formatPeladaSummary(
+      "2024-05-25",
+      standings as StandingRow[],
+      [],
+    );
     expect(result).toContain("A very long team name");
   });
 });

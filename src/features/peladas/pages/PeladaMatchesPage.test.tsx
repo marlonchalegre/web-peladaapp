@@ -56,7 +56,11 @@ vi.mock("../components/ActiveMatchDashboard", () => ({
     onStartMatch: (id: string) => void;
     onPauseMatch: (id: string) => void;
     recordEvent: (matchId: string, playerId: string, type: string) => void;
-    deleteEventAndRefresh: (matchId: string, playerId: string, type: string) => void;
+    deleteEventAndRefresh: (
+      matchId: string,
+      playerId: string,
+      type: string,
+    ) => void;
     adjustScore: (matchId: string, side: string, amount: number) => void;
     replacePlayerOnTeam: (teamId: string, outId: string, inId: string) => void;
     addPlayerToTeam: (teamId: string, playerId: string) => void;
@@ -136,7 +140,15 @@ vi.mock("../components/ActiveMatchDashboard", () => ({
 }));
 
 vi.mock("../components/MatchReportSummary", () => ({
-  default: ({ open, match, onClose }: { open: boolean; match?: { sequence?: number }; onClose: () => void }) =>
+  default: ({
+    open,
+    match,
+    onClose,
+  }: {
+    open: boolean;
+    match?: { sequence?: number };
+    onClose: () => void;
+  }) =>
     open ? (
       <div data-testid="match-summary">
         Summary for Match {match?.sequence}

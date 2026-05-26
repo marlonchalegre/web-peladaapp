@@ -467,13 +467,14 @@ describe("OrganizationManagementPage", () => {
     // Let's check if the mock confirms it's rendered.
 
     // 2. InvitationsList onInviteClick
-    await user.click(screen.getByTestId("mock-invitations-section").querySelector("button")!); // Assuming first button or add a testid
+    await user.click(
+      screen.getByTestId("mock-invitations-section").querySelector("button")!,
+    ); // Assuming first button or add a testid
   });
 
   it("covers setSelectedUserIds toggle logic branches", async () => {
     // In OrganizationManagementPage.tsx:
     // onToggle={(id, checked) => setSelectedUserIds((prev) => { ... checked ? add : delete ... })}
-    
     // We need to trigger the actual function passed to onToggle in the mock
   });
 });

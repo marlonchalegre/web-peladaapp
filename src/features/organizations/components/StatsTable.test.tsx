@@ -168,10 +168,11 @@ describe("StatsTable", () => {
   });
 
   it("renders correctly without player position", () => {
-    const statsNoPos = [{ ...mockStats[0], player_position: undefined }] as (Omit<
-      (typeof mockStats)[0],
-      "player_position"
-    > & { player_position?: string })[];
+    const statsNoPos = [
+      { ...mockStats[0], player_position: undefined },
+    ] as (Omit<(typeof mockStats)[0], "player_position"> & {
+      player_position?: string;
+    })[];
     render(
       <ThemeProvider theme={theme}>
         <StatsTable
