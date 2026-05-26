@@ -34,6 +34,12 @@ COPY . .
 # Ensure build args are passed to the build command if needed by vite
 RUN VITE_APP_VERSION=$VITE_APP_VERSION VITE_GOOGLE_ANALYTICS_ID=$VITE_GOOGLE_ANALYTICS_ID npm run build
 
+# Create fallback config for latest assets
+RUN LATEST_JS=$(basename $(ls dist/assets/index-*.js | head -n 1)) && \
+    LATEST_CSS=$(basename $(ls dist/assets/index-*.css | head -n 1)) && \
+    echo "set \$latest_index_js $LATEST_JS;" > dist/assets/latest.conf && \
+    echo "set \$latest_index_css $LATEST_CSS;" >> dist/assets/latest.conf
+
 FROM nginx:alpine AS prod
 WORKDIR /usr/share/nginx/html
 COPY --from=build /app/dist/ ./
