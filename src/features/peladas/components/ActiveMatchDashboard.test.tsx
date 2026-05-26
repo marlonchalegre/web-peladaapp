@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect } from "vitest";
 import ActiveMatchDashboard from "./ActiveMatchDashboard";
@@ -198,6 +199,303 @@ describe("ActiveMatchDashboard", () => {
     // Actually we changed it to "ATUAL" for English "Current"
     expect(
       screen.getByText(/peladas\.matches\.status\.next/i),
+    ).toBeInTheDocument();
+  });
+
+  it("shows next match pill when a scheduled match exists after current", () => {
+    const matches: Match[] = [
+      mockMatch,
+      {
+        id: "2",
+        pelada_id: "1",
+        sequence: 2,
+        home_team_id: "30",
+        away_team_id: "40",
+        home_score: 0,
+        away_score: 0,
+        status: "scheduled",
+      },
+    ];
+
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          match={matches[0]}
+          matches={matches}
+        />
+      </ThemeContextProvider>,
+    );
+
+    expect(
+      screen.getByText(/peladas\.dashboard\.summary\.next_up/i),
+    ).toBeInTheDocument();
+  });
+
+  it("handles stat change: goal +1", async () => {
+    const recordEvent = vi.fn();
+    const adjustScore = vi.fn();
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          isAdmin={true}
+          recordEvent={recordEvent}
+          adjustScore={adjustScore}
+        />
+      </ThemeContextProvider>,
+    );
+
+    const goalIncrement = screen.getAllByTestId("stat-goals-increment")[0];
+    await userEvent.click(goalIncrement);
+
+    expect(recordEvent).toHaveBeenCalledWith(
+      "1",
+      "101",
+      "goal",
+      undefined,
+      undefined,
+    );
+    expect(adjustScore).toHaveBeenCalledWith("1", "home", 1);
+  });
+
+  it("handles stat change: goal -1", async () => {
+    const deleteEventAndRefresh = vi.fn();
+    const adjustScore = vi.fn();
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          isAdmin={true}
+          statsMap={{ 101: { goals: 1, assists: 0, ownGoals: 0 } }}
+          deleteEventAndRefresh={deleteEventAndRefresh}
+          adjustScore={adjustScore}
+        />
+      </ThemeContextProvider>,
+    );
+
+    const goalDecrement = screen.getAllByTestId("stat-goals-decrement")[0];
+    await userEvent.click(goalDecrement);
+
+    expect(deleteEventAndRefresh).toHaveBeenCalledWith("1", "101", "goal");
+    expect(adjustScore).toHaveBeenCalledWith("1", "home", -1);
+  });
+
+  it("handles stat change: own_goal +1 (flips side)", async () => {
+    const recordEvent = vi.fn();
+    const adjustScore = vi.fn();
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          isAdmin={true}
+          recordEvent={recordEvent}
+          adjustScore={adjustScore}
+        />
+      </ThemeContextProvider>,
+    );
+
+    const ownGoalIncrement = screen.getAllByTestId(
+      "stat-own-goals-increment",
+    )[0];
+    await userEvent.click(ownGoalIncrement);
+
+    expect(recordEvent).toHaveBeenCalledWith(
+      "1",
+      "101",
+      "own_goal",
+      undefined,
+      undefined,
+    );
+    expect(adjustScore).toHaveBeenCalledWith("1", "away", 1);
+  });
+
+  it("handles stat change: assist +1 (no score adjust)", async () => {
+    const recordEvent = vi.fn();
+    const adjustScore = vi.fn();
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          isAdmin={true}
+          recordEvent={recordEvent}
+          adjustScore={adjustScore}
+        />
+      </ThemeContextProvider>,
+    );
+
+    const assistIncrement = screen.getAllByTestId("stat-assists-increment")[0];
+    await userEvent.click(assistIncrement);
+
+    expect(recordEvent).toHaveBeenCalledWith(
+      "1",
+      "101",
+      "assist",
+      undefined,
+      undefined,
+    );
+    expect(adjustScore).not.toHaveBeenCalled();
+  });
+
+  it("opens sub menu on player click and handles replacement", async () => {
+    const setSelectMenu = vi.fn();
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          isAdmin={true}
+          setSelectMenu={setSelectMenu}
+        />
+      </ThemeContextProvider>,
+    );
+
+    const subBtn = screen.getAllByTestId("sub-button")[0];
+    await userEvent.click(subBtn);
+
+    expect(setSelectMenu).toHaveBeenCalledWith({
+      teamId: "10",
+      forPlayerId: "101",
+      type: "replace",
+    });
+  });
+
+  it("opens sub menu on empty slot and handles adding", async () => {
+    const user = userEvent.setup();
+    const setSelectMenu = vi.fn();
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          isAdmin={true}
+          playersPerTeam={2}
+          setSelectMenu={setSelectMenu}
+        />
+      </ThemeContextProvider>,
+    );
+
+    // Find the add button in the empty slot
+    const emptySlot = screen.getAllByTestId("player-row-empty")[0];
+    const addBtn = within(emptySlot).getByRole("button");
+    await user.click(addBtn);
+
+    expect(setSelectMenu).toHaveBeenCalledWith({
+      teamId: "10",
+      forPlayerId: expect.any(String),
+      type: "add",
+    });
+  });
+
+  it("renders PlayerSelectMenu and calls addPlayerToTeam", async () => {
+    const user = userEvent.setup();
+    const addPlayerToTeam = vi.fn();
+    const benchPlayers = [
+      { id: "b1", user_id: "u3", organization_id: "1", position_id: "1" },
+    ];
+    const setSelectMenu = vi.fn();
+
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          selectMenu={{ teamId: "10", type: "add" }}
+          benchPlayers={benchPlayers as any}
+          addPlayerToTeam={addPlayerToTeam}
+          setSelectMenu={setSelectMenu}
+          orgPlayerIdToUserId={{ ...mockOrgPlayerIdToUserId, b1: "u3" }}
+          userIdToName={{ ...mockUserIdToName, u3: "Bench Player" }}
+        />
+      </ThemeContextProvider>,
+    );
+
+    expect(screen.getByText("Bench Player")).toBeInTheDocument();
+    await user.click(screen.getByText("Bench Player"));
+
+    expect(addPlayerToTeam).toHaveBeenCalledWith("10", "b1");
+  });
+
+  it("renders PlayerSelectMenu and calls replacePlayerOnTeam", async () => {
+    const user = userEvent.setup();
+    const replacePlayerOnTeam = vi.fn();
+    const benchPlayers = [
+      { id: "b1", user_id: "u3", organization_id: "1", position_id: "1" },
+    ];
+
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          selectMenu={{ teamId: "10", forPlayerId: "101", type: "replace" }}
+          benchPlayers={benchPlayers as any}
+          replacePlayerOnTeam={replacePlayerOnTeam}
+          orgPlayerIdToUserId={{ ...mockOrgPlayerIdToUserId, b1: "u3" }}
+          userIdToName={{ ...mockUserIdToName, u3: "Bench Player" }}
+        />
+      </ThemeContextProvider>,
+    );
+
+    await user.click(screen.getByText("Bench Player"));
+    expect(replacePlayerOnTeam).toHaveBeenCalledWith("10", "101", "b1");
+  });
+
+  it("handles stat change: own_goal -1 (flips side)", async () => {
+    const deleteEventAndRefresh = vi.fn();
+    const adjustScore = vi.fn();
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          isAdmin={true}
+          statsMap={{ 101: { goals: 0, assists: 0, ownGoals: 1 } }}
+          deleteEventAndRefresh={deleteEventAndRefresh}
+          adjustScore={adjustScore}
+        />
+      </ThemeContextProvider>,
+    );
+
+    const ownGoalDecrement = screen.getAllByTestId(
+      "stat-own-goals-decrement",
+    )[0];
+    await userEvent.click(ownGoalDecrement);
+
+    expect(deleteEventAndRefresh).toHaveBeenCalledWith("1", "101", "own_goal");
+    expect(adjustScore).toHaveBeenCalledWith("1", "away", -1);
+  });
+
+  it("handles clicking a match in the history drawer", async () => {
+    const onSelectMatch = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          onSelectMatch={onSelectMatch}
+        />
+      </ThemeContextProvider>,
+    );
+
+    await user.click(screen.getByTestId("toggle-history-drawer"));
+    const historyItem = screen.getByTestId("match-history-item-1");
+    await user.click(historyItem);
+
+    expect(onSelectMatch).toHaveBeenCalledWith("1");
+  });
+
+  it("shows running status in history drawer", async () => {
+    const user = userEvent.setup();
+    const matches: Match[] = [{ ...mockMatch, status: "running" }];
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          match={matches[0]}
+          matches={matches}
+        />
+      </ThemeContextProvider>,
+    );
+
+    await user.click(screen.getByTestId("toggle-history-drawer"));
+    expect(
+      screen.getByText(/peladas\.matches\.status\.running/i),
     ).toBeInTheDocument();
   });
 });
