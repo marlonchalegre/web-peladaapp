@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from "@testing-library/react";
 import OrganizationDetailPage from "./OrganizationDetailPage";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -67,6 +73,7 @@ describe("OrganizationDetailPage", () => {
               path="/organizations/:id"
               element={<OrganizationDetailPage />}
             />
+            <Route path="/home" element={<div>Home Page</div>} />
           </Routes>
         </MemoryRouter>
       </LocalizationProvider>,
@@ -125,6 +132,7 @@ describe("OrganizationDetailPage", () => {
               path="/organizations/:id"
               element={<OrganizationDetailPage />}
             />
+            <Route path="/home" element={<div>Home Page</div>} />
           </Routes>
         </MemoryRouter>
       </LocalizationProvider>,
@@ -246,6 +254,7 @@ describe("OrganizationDetailPage", () => {
               path="/organizations/:id"
               element={<OrganizationDetailPage />}
             />
+            <Route path="/home" element={<div>Home Page</div>} />
           </Routes>
         </MemoryRouter>
       </LocalizationProvider>,
@@ -310,6 +319,7 @@ describe("OrganizationDetailPage", () => {
               path="/organizations/:id"
               element={<OrganizationDetailPage />}
             />
+            <Route path="/home" element={<div>Home Page</div>} />
           </Routes>
         </MemoryRouter>
       </LocalizationProvider>,
@@ -352,6 +362,7 @@ describe("OrganizationDetailPage", () => {
               path="/organizations/:id"
               element={<OrganizationDetailPage />}
             />
+            <Route path="/home" element={<div>Home Page</div>} />
           </Routes>
         </MemoryRouter>
       </LocalizationProvider>,
@@ -365,7 +376,9 @@ describe("OrganizationDetailPage", () => {
     fireEvent.click(leaveButton);
 
     await waitFor(() => {
-      expect(screen.getByText("organizations.detail.leave_dialog.title")).toBeInTheDocument();
+      expect(
+        screen.getByText("organizations.detail.leave_dialog.title"),
+      ).toBeInTheDocument();
     });
 
     // Mock leave API call to reject with Error
@@ -408,6 +421,7 @@ describe("OrganizationDetailPage", () => {
               path="/organizations/:id"
               element={<OrganizationDetailPage />}
             />
+            <Route path="/home" element={<div>Home Page</div>} />
           </Routes>
         </MemoryRouter>
       </LocalizationProvider>,
@@ -427,7 +441,9 @@ describe("OrganizationDetailPage", () => {
     fireEvent.click(confirmButton);
 
     await waitFor(() => {
-      expect(screen.getByText("organizations.detail.error.leave_failed")).toBeInTheDocument();
+      expect(
+        screen.getByText("organizations.detail.error.leave_failed"),
+      ).toBeInTheDocument();
     });
   });
 
@@ -460,6 +476,7 @@ describe("OrganizationDetailPage", () => {
               path="/organizations/:id"
               element={<OrganizationDetailPage />}
             />
+            <Route path="/home" element={<div>Home Page</div>} />
           </Routes>
         </MemoryRouter>
       </LocalizationProvider>,
@@ -473,7 +490,9 @@ describe("OrganizationDetailPage", () => {
     fireEvent.click(leaveButton);
 
     await waitFor(() => {
-      expect(screen.getByText("organizations.detail.leave_dialog.title")).toBeInTheDocument();
+      expect(
+        screen.getByText("organizations.detail.leave_dialog.title"),
+      ).toBeInTheDocument();
     });
 
     // Click Cancel button
@@ -481,7 +500,9 @@ describe("OrganizationDetailPage", () => {
     fireEvent.click(cancelButton);
 
     await waitFor(() => {
-      expect(screen.queryByText("organizations.detail.leave_dialog.title")).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("organizations.detail.leave_dialog.title"),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -507,7 +528,9 @@ describe("OrganizationDetailPage", () => {
     });
 
     // Mock createPelada to fail with Error
-    (api.post as Mock).mockRejectedValueOnce(new Error("Failed to create pelada"));
+    (api.post as Mock).mockRejectedValueOnce(
+      new Error("Failed to create pelada"),
+    );
 
     render(
       <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -517,13 +540,16 @@ describe("OrganizationDetailPage", () => {
               path="/organizations/:id"
               element={<OrganizationDetailPage />}
             />
+            <Route path="/home" element={<div>Home Page</div>} />
           </Routes>
         </MemoryRouter>
       </LocalizationProvider>,
     );
 
     await waitFor(() => {
-      expect(screen.getByText("organizations.detail.section.new_pelada")).toBeInTheDocument();
+      expect(
+        screen.getByText("organizations.detail.section.new_pelada"),
+      ).toBeInTheDocument();
     });
 
     const createButton = screen.getByText("organizations.form.pelada.submit");
@@ -537,9 +563,7 @@ describe("OrganizationDetailPage", () => {
   it("handles deletePelada successfully and refetches peladas list", async () => {
     const mockOrg = { id: "1", name: "Test Org", owner_id: "1" };
     const mockPeladas = {
-      data: [
-        { id: "10", organization_id: "1", status: "open" },
-      ],
+      data: [{ id: "10", organization_id: "1", status: "open" }],
       total: 1,
       page: 1,
       perPage: 10,
@@ -548,7 +572,8 @@ describe("OrganizationDetailPage", () => {
 
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/organizations/1") return Promise.resolve(mockOrg);
-      if (path === "/api/organizations/1/admins") return Promise.resolve([{ user_id: "1" }]);
+      if (path === "/api/organizations/1/admins")
+        return Promise.resolve([{ user_id: "1" }]);
       return Promise.reject(new Error(`Not found: ${path}`));
     });
     (api.getPaginated as Mock).mockImplementation((path: string) => {
@@ -567,6 +592,7 @@ describe("OrganizationDetailPage", () => {
               path="/organizations/:id"
               element={<OrganizationDetailPage />}
             />
+            <Route path="/home" element={<div>Home Page</div>} />
           </Routes>
         </MemoryRouter>
       </LocalizationProvider>,
@@ -576,7 +602,9 @@ describe("OrganizationDetailPage", () => {
       expect(screen.getAllByText("Test Org").length).toBeGreaterThan(0);
     });
 
-    const deleteBtn = screen.getByLabelText("organizations.peladas.aria.delete");
+    const deleteBtn = screen.getByLabelText(
+      "organizations.peladas.aria.delete",
+    );
     fireEvent.click(deleteBtn);
 
     await waitFor(() => {
@@ -588,9 +616,7 @@ describe("OrganizationDetailPage", () => {
   it("handles deletePelada failure and displays error banner", async () => {
     const mockOrg = { id: "1", name: "Test Org", owner_id: "1" };
     const mockPeladas = {
-      data: [
-        { id: "10", organization_id: "1", status: "open" },
-      ],
+      data: [{ id: "10", organization_id: "1", status: "open" }],
       total: 1,
       page: 1,
       perPage: 10,
@@ -599,7 +625,8 @@ describe("OrganizationDetailPage", () => {
 
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/organizations/1") return Promise.resolve(mockOrg);
-      if (path === "/api/organizations/1/admins") return Promise.resolve([{ user_id: "1" }]);
+      if (path === "/api/organizations/1/admins")
+        return Promise.resolve([{ user_id: "1" }]);
       return Promise.reject(new Error(`Not found: ${path}`));
     });
     (api.getPaginated as Mock).mockImplementation((path: string) => {
@@ -608,7 +635,9 @@ describe("OrganizationDetailPage", () => {
       return Promise.reject(new Error("Not found"));
     });
 
-    (api.delete as Mock).mockRejectedValueOnce(new Error("Failed to delete pelada"));
+    (api.delete as Mock).mockRejectedValueOnce(
+      new Error("Failed to delete pelada"),
+    );
 
     render(
       <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -618,6 +647,7 @@ describe("OrganizationDetailPage", () => {
               path="/organizations/:id"
               element={<OrganizationDetailPage />}
             />
+            <Route path="/home" element={<div>Home Page</div>} />
           </Routes>
         </MemoryRouter>
       </LocalizationProvider>,
@@ -627,7 +657,9 @@ describe("OrganizationDetailPage", () => {
       expect(screen.getAllByText("Test Org").length).toBeGreaterThan(0);
     });
 
-    const deleteBtn = screen.getByLabelText("organizations.peladas.aria.delete");
+    const deleteBtn = screen.getByLabelText(
+      "organizations.peladas.aria.delete",
+    );
     fireEvent.click(deleteBtn);
 
     await waitFor(() => {
@@ -643,7 +675,9 @@ describe("OrganizationDetailPage", () => {
       if (path === "/api/organizations/1/admins") return Promise.resolve([]);
       return Promise.reject(new Error("Not found"));
     });
-    (api.getPaginated as Mock).mockRejectedValueOnce(new Error("Peladas fetch failed"));
+    (api.getPaginated as Mock).mockRejectedValueOnce(
+      new Error("Peladas fetch failed"),
+    );
 
     render(
       <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -653,6 +687,7 @@ describe("OrganizationDetailPage", () => {
               path="/organizations/:id"
               element={<OrganizationDetailPage />}
             />
+            <Route path="/home" element={<div>Home Page</div>} />
           </Routes>
         </MemoryRouter>
       </LocalizationProvider>,
@@ -680,19 +715,28 @@ describe("OrganizationDetailPage", () => {
               path="/organizations/:id"
               element={<OrganizationDetailPage />}
             />
+            <Route path="/home" element={<div>Home Page</div>} />
           </Routes>
         </MemoryRouter>
       </LocalizationProvider>,
     );
 
     await waitFor(() => {
-      expect(screen.getByText("organizations.detail.error.load_peladas_failed")).toBeInTheDocument();
+      expect(
+        screen.getByText("organizations.detail.error.load_peladas_failed"),
+      ).toBeInTheDocument();
     });
   });
 
   it("does not close leave dialog when isLeaving is true", async () => {
     const mockOrg = { id: "2", name: "Non-Admin Org" };
-    const mockPeladas = { data: [], total: 0, page: 1, perPage: 10, totalPages: 0 };
+    const mockPeladas = {
+      data: [],
+      total: 0,
+      page: 1,
+      perPage: 10,
+      totalPages: 0,
+    };
 
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/organizations/2") return Promise.resolve(mockOrg);
@@ -702,12 +746,11 @@ describe("OrganizationDetailPage", () => {
     (api.getPaginated as Mock).mockResolvedValue(mockPeladas);
 
     // Mock leave API to return a pending promise that never resolves
-    let resolveLeavePromise: any;
+    let resolveLeavePromise: (value: unknown) => void;
     const leavePromise = new Promise((resolve) => {
       resolveLeavePromise = resolve;
     });
     (api.post as Mock).mockReturnValueOnce(leavePromise);
-
     render(
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <MemoryRouter initialEntries={["/organizations/2"]}>
@@ -716,6 +759,7 @@ describe("OrganizationDetailPage", () => {
               path="/organizations/:id"
               element={<OrganizationDetailPage />}
             />
+            <Route path="/home" element={<div>Home Page</div>} />
           </Routes>
         </MemoryRouter>
       </LocalizationProvider>,
@@ -728,7 +772,9 @@ describe("OrganizationDetailPage", () => {
     // Open leave dialog
     fireEvent.click(screen.getByTestId("leave-org-button"));
     await waitFor(() => {
-      expect(screen.getByText("organizations.detail.leave_dialog.title")).toBeInTheDocument();
+      expect(
+        screen.getByText("organizations.detail.leave_dialog.title"),
+      ).toBeInTheDocument();
     });
 
     // Confirm to trigger leave (which is pending)
@@ -739,7 +785,9 @@ describe("OrganizationDetailPage", () => {
     fireEvent.keyDown(dialog, { key: "Escape" });
 
     // Dialog should still be open
-    expect(screen.getByText("organizations.detail.leave_dialog.title")).toBeInTheDocument();
+    expect(
+      screen.getByText("organizations.detail.leave_dialog.title"),
+    ).toBeInTheDocument();
 
     // Now resolve the promise so the test doesn't leak/hang
     await act(async () => {
@@ -772,17 +820,22 @@ describe("OrganizationDetailPage", () => {
               path="/organizations/:id"
               element={<OrganizationDetailPage />}
             />
+            <Route path="/home" element={<div>Home Page</div>} />
           </Routes>
         </MemoryRouter>
       </LocalizationProvider>,
     );
 
     await waitFor(() => {
-      expect(screen.getAllByText("organizations.peladas.item_name").length).toBeGreaterThan(0);
+      expect(
+        screen.getAllByText("organizations.peladas.item_name").length,
+      ).toBeGreaterThan(0);
     });
 
     // Find and change rows per page
-    const select = screen.getByRole("combobox", { name: "common.pagination.rows_per_page" });
+    const select = screen.getByRole("combobox", {
+      name: "common.pagination.rows_per_page",
+    });
     fireEvent.mouseDown(select);
     const option = screen.getByRole("option", { name: "25" });
     fireEvent.click(option);

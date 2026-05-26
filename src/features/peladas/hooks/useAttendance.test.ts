@@ -173,7 +173,11 @@ describe("useAttendance", () => {
     await act(async () => {
       await result.current.handleUpdateAttendance("confirmed");
     });
-    expect(mockEndpoints.updateAttendance).toHaveBeenCalledWith("1", "confirmed", undefined);
+    expect(mockEndpoints.updateAttendance).toHaveBeenCalledWith(
+      "1",
+      "confirmed",
+      undefined,
+    );
   });
 
   it("should handle handleAddPlayersFromOrg error with non-Error", async () => {
@@ -218,10 +222,13 @@ describe("useAttendance", () => {
     await act(async () => {
       await result.current.handleMarkPaid("pl1");
     });
-    expect(mockEndpoints.addTransaction).toHaveBeenCalledWith("org1", expect.objectContaining({
-      amount: 25,
-      description: "Pagamento Pelada 1",
-    }));
+    expect(mockEndpoints.addTransaction).toHaveBeenCalledWith(
+      "org1",
+      expect.objectContaining({
+        amount: 25,
+        description: "Pagamento Pelada 1",
+      }),
+    );
 
     // Non-Error exception handler
     mockEndpoints.addTransaction.mockRejectedValue("String Payment Error");
@@ -229,7 +236,9 @@ describe("useAttendance", () => {
     await act(async () => {
       await result.current.handleMarkPaid("pl1");
     });
-    expect(result.current.error).toBe("organizations.management.finance.transactions.error.add_failed");
+    expect(result.current.error).toBe(
+      "organizations.management.finance.transactions.error.add_failed",
+    );
     expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();
   });
@@ -251,7 +260,12 @@ describe("useAttendance", () => {
 
     // 2. tx not found path
     const mockData = {
-      pelada: { id: "1", organization_id: "org1", status: "attendance", scheduled_at: "2024-05-25T16:00:00Z" },
+      pelada: {
+        id: "1",
+        organization_id: "org1",
+        status: "attendance",
+        scheduled_at: "2024-05-25T16:00:00Z",
+      },
       available_players: [{ id: "pl1", user_id: "u1" }],
       pelada_transactions: [], // empty transactions
     };
@@ -270,7 +284,12 @@ describe("useAttendance", () => {
 
   it("should set error when handleReversePayment api call fails", async () => {
     const mockDataWithTx = {
-      pelada: { id: "1", organization_id: "org1", status: "attendance", scheduled_at: "2024-05-25T16:00:00Z" },
+      pelada: {
+        id: "1",
+        organization_id: "org1",
+        status: "attendance",
+        scheduled_at: "2024-05-25T16:00:00Z",
+      },
       available_players: [{ id: "pl1", user_id: "u1" }],
       pelada_transactions: [
         {
@@ -294,7 +313,9 @@ describe("useAttendance", () => {
     await act(async () => {
       await result.current.handleReversePayment("pl1");
     });
-    expect(result.current.error).toBe("organizations.management.finance.transactions.error.reverse_failed");
+    expect(result.current.error).toBe(
+      "organizations.management.finance.transactions.error.reverse_failed",
+    );
     expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();
   });
@@ -335,10 +356,30 @@ describe("useAttendance", () => {
     const mockData = {
       pelada: { id: "1", organization_id: "org1", status: "attendance" },
       available_players: [
-        { id: "1", attendance_status: "confirmed", member_type: "convidado", user: { name: "Player Z" } },
-        { id: "2", attendance_status: "confirmed", member_type: "convidado", user: { name: "Player A" } },
-        { id: "3", attendance_status: "confirmed", member_type: "mensalista", user: { name: "Mensalista B" } },
-        { id: "4", attendance_status: "confirmed", member_type: "mensalista", user: { name: "Mensalista A" } },
+        {
+          id: "1",
+          attendance_status: "confirmed",
+          member_type: "convidado",
+          user: { name: "Player Z" },
+        },
+        {
+          id: "2",
+          attendance_status: "confirmed",
+          member_type: "convidado",
+          user: { name: "Player A" },
+        },
+        {
+          id: "3",
+          attendance_status: "confirmed",
+          member_type: "mensalista",
+          user: { name: "Mensalista B" },
+        },
+        {
+          id: "4",
+          attendance_status: "confirmed",
+          member_type: "mensalista",
+          user: { name: "Mensalista A" },
+        },
       ],
     };
     mockGetPeladaFullDetails.mockResolvedValue(mockData);
@@ -421,8 +462,12 @@ describe("useAttendance", () => {
       await result.current.handleAddPlayersFromOrg(["u1", "u2"]);
     });
 
-    expect(api.post).toHaveBeenCalledWith("/api/peladas/1/players", { player_id: "u1" });
-    expect(api.post).toHaveBeenCalledWith("/api/peladas/1/players", { player_id: "u2" });
+    expect(api.post).toHaveBeenCalledWith("/api/peladas/1/players", {
+      player_id: "u1",
+    });
+    expect(api.post).toHaveBeenCalledWith("/api/peladas/1/players", {
+      player_id: "u2",
+    });
     expect(mockGetPeladaFullDetails).toHaveBeenCalledTimes(2); // Initial load + refresh
   });
 
@@ -450,7 +495,10 @@ describe("useAttendance", () => {
       await result.current.handleReversePayment("pl1");
     });
 
-    expect(mockEndpoints.reverseTransaction).toHaveBeenCalledWith("org1", "tx123");
+    expect(mockEndpoints.reverseTransaction).toHaveBeenCalledWith(
+      "org1",
+      "tx123",
+    );
     expect(mockGetPeladaFullDetails).toHaveBeenCalledTimes(2); // Initial load + refresh
   });
 });

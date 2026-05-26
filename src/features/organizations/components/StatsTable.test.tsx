@@ -168,11 +168,14 @@ describe("StatsTable", () => {
   });
 
   it("renders correctly without player position", () => {
-    const statsNoPos = [{ ...mockStats[0], player_position: undefined }];
+    const statsNoPos = [{ ...mockStats[0], player_position: undefined }] as (Omit<
+      (typeof mockStats)[0],
+      "player_position"
+    > & { player_position?: string })[];
     render(
       <ThemeProvider theme={theme}>
         <StatsTable
-          stats={statsNoPos as any}
+          stats={statsNoPos as OrganizationPlayerStats[]}
           orderBy="player_name"
           order="asc"
           onSort={() => {}}

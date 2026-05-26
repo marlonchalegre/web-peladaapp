@@ -11,7 +11,6 @@ import PeladaMatchesPage from "./PeladaMatchesPage";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { api } from "../../../shared/api/client";
 import { useAuth } from "../../../app/providers/AuthContext";
-import type { Match } from "../../../shared/api/endpoints";
 import { ThemeContextProvider } from "../../../app/providers/ThemeProvider";
 
 // Mock the API client
@@ -38,7 +37,6 @@ vi.mock("../components/ActiveMatchDashboard", () => ({
     isAdmin,
     onEndMatch,
     onSelectMatch,
-    onResetMatch,
     onOpenResetConfirm,
     onStartMatch,
     onPauseMatch,
@@ -47,7 +45,22 @@ vi.mock("../components/ActiveMatchDashboard", () => ({
     adjustScore,
     replacePlayerOnTeam,
     addPlayerToTeam,
-  }: any) => (
+  }: {
+    match: { id: string; sequence?: number };
+    statsMap: Record<string, unknown>;
+    finished: boolean;
+    isAdmin: boolean;
+    onEndMatch: () => void;
+    onSelectMatch: (id: string) => void;
+    onOpenResetConfirm: (type: string) => void;
+    onStartMatch: (id: string) => void;
+    onPauseMatch: (id: string) => void;
+    recordEvent: (matchId: string, playerId: string, type: string) => void;
+    deleteEventAndRefresh: (matchId: string, playerId: string, type: string) => void;
+    adjustScore: (matchId: string, side: string, amount: number) => void;
+    replacePlayerOnTeam: (teamId: string, outId: string, inId: string) => void;
+    addPlayerToTeam: (teamId: string, playerId: string) => void;
+  }) => (
     <div data-testid="active-match-dashboard">
       <span data-testid="current-match-id">{match.id}</span>
       <span data-testid="finished-status">
@@ -57,10 +70,16 @@ vi.mock("../components/ActiveMatchDashboard", () => ({
       <button data-testid="end-match-btn" onClick={onEndMatch}>
         End Match
       </button>
-      <button data-testid="reset-match-btn" onClick={() => onOpenResetConfirm("match")}>
+      <button
+        data-testid="reset-match-btn"
+        onClick={() => onOpenResetConfirm("match")}
+      >
         Reset Match
       </button>
-      <button data-testid="reset-session-btn" onClick={() => onOpenResetConfirm("session")}>
+      <button
+        data-testid="reset-session-btn"
+        onClick={() => onOpenResetConfirm("session")}
+      >
         Reset Session
       </button>
       <button data-testid="select-match-10" onClick={() => onSelectMatch("10")}>
@@ -69,25 +88,46 @@ vi.mock("../components/ActiveMatchDashboard", () => ({
       <button data-testid="select-match-11" onClick={() => onSelectMatch("11")}>
         Select Match 11
       </button>
-      <button data-testid="start-match-btn" onClick={() => onStartMatch(match.id)}>
+      <button
+        data-testid="start-match-btn"
+        onClick={() => onStartMatch(match.id)}
+      >
         Start Match
       </button>
-      <button data-testid="pause-match-btn" onClick={() => onPauseMatch(match.id)}>
+      <button
+        data-testid="pause-match-btn"
+        onClick={() => onPauseMatch(match.id)}
+      >
         Pause Match
       </button>
-      <button data-testid="record-event-btn" onClick={() => recordEvent(match.id, "100", "goal")}>
+      <button
+        data-testid="record-event-btn"
+        onClick={() => recordEvent(match.id, "100", "goal")}
+      >
         Record Event
       </button>
-      <button data-testid="delete-event-btn" onClick={() => deleteEventAndRefresh(match.id, "100", "goal")}>
+      <button
+        data-testid="delete-event-btn"
+        onClick={() => deleteEventAndRefresh(match.id, "100", "goal")}
+      >
         Delete Event
       </button>
-      <button data-testid="adjust-score-btn" onClick={() => adjustScore(match.id, "home", 1)}>
+      <button
+        data-testid="adjust-score-btn"
+        onClick={() => adjustScore(match.id, "home", 1)}
+      >
         Adjust Score
       </button>
-      <button data-testid="replace-player-btn" onClick={() => replacePlayerOnTeam("1", "100", "101")}>
+      <button
+        data-testid="replace-player-btn"
+        onClick={() => replacePlayerOnTeam("1", "100", "101")}
+      >
         Replace Player
       </button>
-      <button data-testid="add-player-btn" onClick={() => addPlayerToTeam("1", "101")}>
+      <button
+        data-testid="add-player-btn"
+        onClick={() => addPlayerToTeam("1", "101")}
+      >
         Add Player
       </button>
       <pre data-testid="stats-map">{JSON.stringify(statsMap)}</pre>
@@ -96,11 +136,13 @@ vi.mock("../components/ActiveMatchDashboard", () => ({
 }));
 
 vi.mock("../components/MatchReportSummary", () => ({
-  default: ({ open, match, onClose }: any) =>
+  default: ({ open, match, onClose }: { open: boolean; match?: { sequence?: number }; onClose: () => void }) =>
     open ? (
       <div data-testid="match-summary">
         Summary for Match {match?.sequence}
-        <button data-testid="close-summary-btn" onClick={onClose}>Close Summary</button>
+        <button data-testid="close-summary-btn" onClick={onClose}>
+          Close Summary
+        </button>
       </div>
     ) : null,
 }));
@@ -420,12 +462,16 @@ describe("PeladaMatchesPage", () => {
     fireEvent.click(screen.getByText("peladas.matches.share_summary"));
     await waitFor(() => {
       expect(mockClipboard.writeText).toHaveBeenCalled();
-      expect(window.alert).toHaveBeenCalledWith("peladas.matches.summary_copied");
+      expect(window.alert).toHaveBeenCalledWith(
+        "peladas.matches.summary_copied",
+      );
     });
 
     // Re-open for Announcement
     fireEvent.click(screen.getByTestId("share-dropdown-button"));
-    fireEvent.click(screen.getByText("peladas.detail.button.copy_announcement"));
+    fireEvent.click(
+      screen.getByText("peladas.detail.button.copy_announcement"),
+    );
     await waitFor(() => expect(mockClipboard.writeText).toHaveBeenCalled());
 
     // Re-open for Teams
@@ -440,11 +486,17 @@ describe("PeladaMatchesPage", () => {
 
     // Standings
     fireEvent.click(screen.getByText("peladas.panel.standings.title"));
-    expect(screen.getByText("peladas.matches.button.close_pelada")).toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.matches.button.close_pelada"),
+    ).toBeInTheDocument();
 
     // Stats
-    fireEvent.click(screen.getByRole("tab", { name: "peladas.panel.stats.title" }));
-    expect(screen.getAllByText("peladas.panel.stats.title").length).toBeGreaterThan(0);
+    fireEvent.click(
+      screen.getByRole("tab", { name: "peladas.panel.stats.title" }),
+    );
+    expect(
+      screen.getAllByText("peladas.panel.stats.title").length,
+    ).toBeGreaterThan(0);
 
     // Timeline
     fireEvent.click(screen.getByText("peladas.timeline.title"));
@@ -462,12 +514,19 @@ describe("PeladaMatchesPage", () => {
 
     // Reset Match
     fireEvent.click(screen.getByTestId("reset-match-btn"));
-    
+
     const dialog = await screen.findByRole("dialog");
-    const confirmBtn = within(dialog).getByRole("button", { name: "common.confirm" });
+    const confirmBtn = within(dialog).getByRole("button", {
+      name: "common.confirm",
+    });
     fireEvent.click(confirmBtn);
-    
-    await waitFor(() => expect(api.post).toHaveBeenCalledWith(expect.stringContaining("/timer/reset"), {}));
+
+    await waitFor(() =>
+      expect(api.post).toHaveBeenCalledWith(
+        expect.stringContaining("/timer/reset"),
+        {},
+      ),
+    );
   });
 
   it("handles data loading error", async () => {
@@ -484,57 +543,87 @@ describe("PeladaMatchesPage", () => {
     (api.delete as Mock).mockResolvedValue({});
 
     renderPage();
-    await waitFor(() => expect(screen.getByTestId("active-match-dashboard")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByTestId("active-match-dashboard")).toBeInTheDocument(),
+    );
 
     // 1. Start Match (triggers startPeladaTimer and startMatchTimer)
     fireEvent.click(screen.getByTestId("start-match-btn"));
     await waitFor(() => {
-      expect(api.post).toHaveBeenCalledWith(expect.stringContaining("/timer/start"), {});
+      expect(api.post).toHaveBeenCalledWith(
+        expect.stringContaining("/timer/start"),
+        {},
+      );
     });
 
     // 2. Pause Match
     fireEvent.click(screen.getByTestId("pause-match-btn"));
     await waitFor(() => {
-      expect(api.post).toHaveBeenCalledWith(expect.stringContaining("/timer/pause"), {});
+      expect(api.post).toHaveBeenCalledWith(
+        expect.stringContaining("/timer/pause"),
+        {},
+      );
     });
 
     // 3. Record Event
     fireEvent.click(screen.getByTestId("record-event-btn"));
     await waitFor(() => {
-      expect(api.post).toHaveBeenCalledWith(expect.stringContaining("/events"), expect.any(Object));
+      expect(api.post).toHaveBeenCalledWith(
+        expect.stringContaining("/events"),
+        expect.any(Object),
+      );
     });
 
     // 4. Delete Event
     fireEvent.click(screen.getByTestId("delete-event-btn"));
     await waitFor(() => {
-      expect(api.delete).toHaveBeenCalledWith(expect.stringContaining("/events"), expect.any(Object));
+      expect(api.delete).toHaveBeenCalledWith(
+        expect.stringContaining("/events"),
+        expect.any(Object),
+      );
     });
 
     // 5. Adjust Score
     fireEvent.click(screen.getByTestId("adjust-score-btn"));
     await waitFor(() => {
-      expect(api.put).toHaveBeenCalledWith(expect.stringContaining("/score"), expect.any(Object));
+      expect(api.put).toHaveBeenCalledWith(
+        expect.stringContaining("/score"),
+        expect.any(Object),
+      );
     });
 
     // 6. Replace Player
     fireEvent.click(screen.getByTestId("replace-player-btn"));
     await waitFor(() => {
-      expect(api.post).toHaveBeenCalledWith(expect.stringContaining("/lineups/replace"), expect.any(Object));
+      expect(api.post).toHaveBeenCalledWith(
+        expect.stringContaining("/lineups/replace"),
+        expect.any(Object),
+      );
     });
 
     // 7. Add Player
     fireEvent.click(screen.getByTestId("add-player-btn"));
     await waitFor(() => {
-      expect(api.post).toHaveBeenCalledWith(expect.stringContaining("/lineups"), expect.any(Object));
+      expect(api.post).toHaveBeenCalledWith(
+        expect.stringContaining("/lineups"),
+        expect.any(Object),
+      );
     });
 
     // 8. Open reset session confirm dialog and confirm it
     fireEvent.click(screen.getByTestId("reset-session-btn"));
-    await waitFor(() => expect(screen.getAllByText("common.confirm")[0]).toBeInTheDocument());
-    const confirmBtn = screen.getAllByRole("button", { name: "common.confirm" })[0];
+    await waitFor(() =>
+      expect(screen.getAllByText("common.confirm")[0]).toBeInTheDocument(),
+    );
+    const confirmBtn = screen.getAllByRole("button", {
+      name: "common.confirm",
+    })[0];
     fireEvent.click(confirmBtn);
     await waitFor(() => {
-      expect(api.post).toHaveBeenCalledWith(expect.stringContaining("/timer/reset"), {});
+      expect(api.post).toHaveBeenCalledWith(
+        expect.stringContaining("/timer/reset"),
+        {},
+      );
     });
 
     // 9. Close MatchReportSummary
@@ -545,13 +634,19 @@ describe("PeladaMatchesPage", () => {
     });
     fireEvent.click(screen.getByTestId("select-match-11"));
     fireEvent.click(screen.getByTestId("end-match-btn"));
-    const endConfirmBtn = screen.getAllByRole("button", { name: "common.confirm" })[0];
+    const endConfirmBtn = screen.getAllByRole("button", {
+      name: "common.confirm",
+    })[0];
     await act(async () => {
       fireEvent.click(endConfirmBtn);
     });
 
-    await waitFor(() => expect(screen.getByTestId("match-summary")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByTestId("match-summary")).toBeInTheDocument(),
+    );
     fireEvent.click(screen.getByTestId("close-summary-btn"));
-    await waitFor(() => expect(screen.queryByTestId("match-summary")).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.queryByTestId("match-summary")).not.toBeInTheDocument(),
+    );
   });
 });

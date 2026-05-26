@@ -12,12 +12,12 @@ vi.mock("react-i18next", () => ({
 
 describe("PeladaTimeline", () => {
   const userIdToName = {
-    "u1": "User One",
-    "u2": "User Two",
+    u1: "User One",
+    u2: "User Two",
   };
   const orgPlayerIdToUserId = {
-    "p1": "u1",
-    "p2": "u2",
+    p1: "u1",
+    p2: "u2",
   };
   const teamNameById = {};
 
@@ -78,7 +78,9 @@ describe("PeladaTimeline", () => {
     expect(screen.getByText(/common.goal: User One/)).toBeInTheDocument();
     expect(screen.getByText(/common.own_goal: User Two/)).toBeInTheDocument();
     expect(screen.getByText(/common.assist: Player p3/)).toBeInTheDocument();
-    expect(screen.getByText(/common.some_other_type: User One/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/common.some_other_type: User One/),
+    ).toBeInTheDocument();
 
     // Check time values
     expect(screen.getByText("03:04")).toBeInTheDocument();

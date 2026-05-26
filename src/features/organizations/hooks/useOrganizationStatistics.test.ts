@@ -41,6 +41,7 @@ describe("useOrganizationStatistics", () => {
     await waitFor(() => expect(result.current.org?.name).toBe("Org 1"), {
       timeout: 2000,
     });
+    await waitFor(() => expect(result.current.stats).toBeDefined());
     expect(mockApi.getOrganization).toHaveBeenCalledWith(orgId);
   });
 
@@ -67,8 +68,9 @@ describe("useOrganizationStatistics", () => {
 
     const { result } = renderHook(() => useOrganizationStatistics(orgId));
     await waitFor(() => expect(result.current.stats).toHaveLength(2));
+    await waitFor(() => expect(result.current.org).not.toBeNull());
 
-    act(() => {
+    await act(async () => {
       result.current.setNameFilter("Ali");
     });
     expect(result.current.sortedStats).toHaveLength(1);
@@ -84,11 +86,12 @@ describe("useOrganizationStatistics", () => {
 
     const { result } = renderHook(() => useOrganizationStatistics(orgId));
     await waitFor(() => expect(result.current.stats).toHaveLength(2));
+    await waitFor(() => expect(result.current.org).not.toBeNull());
 
     // Default is goal desc
     expect(result.current.sortedStats[0].player_name).toBe("Bob");
 
-    act(() => {
+    await act(async () => {
       result.current.handleRequestSort("goal");
     }); // toggle to asc
     expect(result.current.sortedStats[0].player_name).toBe("Alice");
@@ -147,8 +150,9 @@ describe("useOrganizationStatistics", () => {
     mockApi.getOrganizationStatistics.mockResolvedValue(mockStats);
     const { result } = renderHook(() => useOrganizationStatistics(orgId));
     await waitFor(() => expect(result.current.stats).toHaveLength(2));
+    await waitFor(() => expect(result.current.org).not.toBeNull());
 
-    act(() => {
+    await act(async () => {
       result.current.setMinPeladas("3");
     });
     expect(result.current.sortedStats).toHaveLength(1);
@@ -160,6 +164,7 @@ describe("useOrganizationStatistics", () => {
     mockApi.listPlayersByOrg.mockRejectedValue(new Error("Players Load Error"));
     renderHook(() => useOrganizationStatistics(orgId));
     await waitFor(() => expect(consoleSpy).toHaveBeenCalled());
+    consoleSpy.mockRestore();
   });
 
   it("should sort stats by string values", async () => {
@@ -171,15 +176,16 @@ describe("useOrganizationStatistics", () => {
 
     const { result } = renderHook(() => useOrganizationStatistics(orgId));
     await waitFor(() => expect(result.current.stats).toHaveLength(2));
+    await waitFor(() => expect(result.current.org).not.toBeNull());
 
     // Sort by name ascending (first click is ascending)
-    act(() => {
+    await act(async () => {
       result.current.handleRequestSort("player_name");
     });
     expect(result.current.sortedStats[0].player_name).toBe("Alice");
 
     // Sort by name descending (second click is descending)
-    act(() => {
+    await act(async () => {
       result.current.handleRequestSort("player_name");
     });
     expect(result.current.sortedStats[0].player_name).toBe("Bob");
@@ -194,8 +200,9 @@ describe("useOrganizationStatistics", () => {
 
     const { result } = renderHook(() => useOrganizationStatistics(orgId));
     await waitFor(() => expect(result.current.stats).toHaveLength(2));
+    await waitFor(() => expect(result.current.org).not.toBeNull());
 
-    act(() => {
+    await act(async () => {
       result.current.handleRequestSort("goal");
     });
     // With equal values, sort preserves original array/tie-breaker order (Alice first)
@@ -204,23 +211,38 @@ describe("useOrganizationStatistics", () => {
 
   it("should filter stats by goals, assists, and own_goals", async () => {
     const mockStats = [
-      { player_id: "p1", player_name: "Alice", goal: 10, peladas_played: 5, assist: 5, own_goal: 0 },
-      { player_id: "p2", player_name: "Bob", goal: 5, peladas_played: 5, assist: 0, own_goal: 2 },
+      {
+        player_id: "p1",
+        player_name: "Alice",
+        goal: 10,
+        peladas_played: 5,
+        assist: 5,
+        own_goal: 0,
+      },
+      {
+        player_id: "p2",
+        player_name: "Bob",
+        goal: 5,
+        peladas_played: 5,
+        assist: 0,
+        own_goal: 2,
+      },
     ] as any;
     mockApi.getOrganizationStatistics.mockResolvedValue(mockStats);
 
     const { result } = renderHook(() => useOrganizationStatistics(orgId));
     await waitFor(() => expect(result.current.stats).toHaveLength(2));
+    await waitFor(() => expect(result.current.org).not.toBeNull());
 
     // Filter by minGoals
-    act(() => {
+    await act(async () => {
       result.current.setMinGoals("8");
     });
     expect(result.current.sortedStats).toHaveLength(1);
     expect(result.current.sortedStats[0].player_name).toBe("Alice");
 
     // Reset minGoals, Filter by minAssists
-    act(() => {
+    await act(async () => {
       result.current.setMinGoals("");
       result.current.setMinAssists("3");
     });
@@ -228,7 +250,7 @@ describe("useOrganizationStatistics", () => {
     expect(result.current.sortedStats[0].player_name).toBe("Alice");
 
     // Reset minAssists, Filter by minOwnGoals
-    act(() => {
+    await act(async () => {
       result.current.setMinAssists("");
       result.current.setMinOwnGoals("1");
     });
@@ -239,12 +261,20 @@ describe("useOrganizationStatistics", () => {
   it("should handle organization load errors with non-Error objects", async () => {
     mockApi.getOrganization.mockRejectedValue("String Org Error");
     const { result } = renderHook(() => useOrganizationStatistics(orgId));
-    await waitFor(() => expect(result.current.error).toBe("organizations.stats.error.load_org_failed"));
+    await waitFor(() =>
+      expect(result.current.error).toBe(
+        "organizations.stats.error.load_org_failed",
+      ),
+    );
   });
 
   it("should handle statistics load errors with non-Error objects", async () => {
     mockApi.getOrganizationStatistics.mockRejectedValue("String Stats Error");
     const { result } = renderHook(() => useOrganizationStatistics(orgId));
-    await waitFor(() => expect(result.current.error).toBe("organizations.stats.error.load_stats_failed"));
+    await waitFor(() =>
+      expect(result.current.error).toBe(
+        "organizations.stats.error.load_stats_failed",
+      ),
+    );
   });
 });

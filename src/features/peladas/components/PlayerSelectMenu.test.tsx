@@ -11,7 +11,9 @@ vi.mock("react-i18next", () => ({
 }));
 
 vi.mock("../../../shared/components/SecureAvatar", () => ({
-  SecureAvatar: ({ userId }: any) => <div data-testid={`mock-avatar-${userId}`}>Avatar</div>,
+  SecureAvatar: ({ userId }: any) => (
+    <div data-testid={`mock-avatar-${userId}`}>Avatar</div>
+  ),
 }));
 
 describe("PlayerSelectMenu", () => {
@@ -84,7 +86,13 @@ describe("PlayerSelectMenu", () => {
   it("calls onSelect and onClose when a player is selected", () => {
     const onSelect = vi.fn();
     const onClose = vi.fn();
-    render(<PlayerSelectMenu {...defaultProps} onSelect={onSelect} onClose={onClose} />);
+    render(
+      <PlayerSelectMenu
+        {...defaultProps}
+        onSelect={onSelect}
+        onClose={onClose}
+      />,
+    );
 
     fireEvent.click(screen.getByTestId("bench-player-item-p2"));
     expect(onSelect).toHaveBeenCalledWith("p2");

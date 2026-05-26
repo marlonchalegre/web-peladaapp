@@ -590,7 +590,9 @@ describe("endpoints", () => {
         payment_date: "2024-05-01",
       } as any);
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining("/api/organizations/1/finance/monthly-payments"),
+        expect.stringContaining(
+          "/api/organizations/1/finance/monthly-payments",
+        ),
         expect.objectContaining({ method: "POST" }),
       );
     });

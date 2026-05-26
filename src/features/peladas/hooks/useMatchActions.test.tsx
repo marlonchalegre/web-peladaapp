@@ -443,45 +443,75 @@ describe("useMatchActions", () => {
       await act(async () => {
         await result.current.startPeladaTimer();
       });
-      expect(mockEnqueueAction).toHaveBeenCalledWith(peladaId, "START_PELADA_TIMER", { peladaId });
+      expect(mockEnqueueAction).toHaveBeenCalledWith(
+        peladaId,
+        "START_PELADA_TIMER",
+        { peladaId },
+      );
 
       await act(async () => {
         await result.current.pausePeladaTimer();
       });
-      expect(mockEnqueueAction).toHaveBeenCalledWith(peladaId, "PAUSE_PELADA_TIMER", { peladaId });
+      expect(mockEnqueueAction).toHaveBeenCalledWith(
+        peladaId,
+        "PAUSE_PELADA_TIMER",
+        { peladaId },
+      );
 
       await act(async () => {
         await result.current.resetPeladaTimer();
       });
-      expect(mockEnqueueAction).toHaveBeenCalledWith(peladaId, "RESET_PELADA_TIMER", { peladaId });
+      expect(mockEnqueueAction).toHaveBeenCalledWith(
+        peladaId,
+        "RESET_PELADA_TIMER",
+        { peladaId },
+      );
 
       // 2. Match Timers offline
       await act(async () => {
         await result.current.startMatchTimer("m1");
       });
-      expect(mockEnqueueAction).toHaveBeenCalledWith(peladaId, "START_MATCH_TIMER", { matchId: "m1" });
+      expect(mockEnqueueAction).toHaveBeenCalledWith(
+        peladaId,
+        "START_MATCH_TIMER",
+        { matchId: "m1" },
+      );
 
       await act(async () => {
         await result.current.pauseMatchTimer("m1");
       });
-      expect(mockEnqueueAction).toHaveBeenCalledWith(peladaId, "PAUSE_MATCH_TIMER", { matchId: "m1" });
+      expect(mockEnqueueAction).toHaveBeenCalledWith(
+        peladaId,
+        "PAUSE_MATCH_TIMER",
+        { matchId: "m1" },
+      );
 
       await act(async () => {
         await result.current.resetMatchTimer("m1");
       });
-      expect(mockEnqueueAction).toHaveBeenCalledWith(peladaId, "RESET_MATCH_TIMER", { matchId: "m1" });
+      expect(mockEnqueueAction).toHaveBeenCalledWith(
+        peladaId,
+        "RESET_MATCH_TIMER",
+        { matchId: "m1" },
+      );
 
       // 3. executeClosePelada offline
       await act(async () => {
         await result.current.executeClosePelada();
       });
-      expect(mockEnqueueAction).toHaveBeenCalledWith(peladaId, "CLOSE_PELADA", { peladaId });
+      expect(mockEnqueueAction).toHaveBeenCalledWith(peladaId, "CLOSE_PELADA", {
+        peladaId,
+      });
 
       // 4. executeEndMatch offline
       await act(async () => {
         await result.current.executeEndMatch("m1");
       });
-      expect(mockEnqueueAction).toHaveBeenCalledWith(peladaId, "END_MATCH", { matchId: "m1", homeScore: 0, awayScore: 0 });
+      expect(mockEnqueueAction).toHaveBeenCalledWith(peladaId, "END_MATCH", {
+        matchId: "m1",
+        homeScore: 0,
+        awayScore: 0,
+      });
 
       // Online network errors
       Object.defineProperty(navigator, "onLine", { value: true });
@@ -491,37 +521,61 @@ describe("useMatchActions", () => {
       await act(async () => {
         await result.current.startPeladaTimer();
       });
-      expect(mockEnqueueAction).toHaveBeenCalledWith(peladaId, "START_PELADA_TIMER", { peladaId });
+      expect(mockEnqueueAction).toHaveBeenCalledWith(
+        peladaId,
+        "START_PELADA_TIMER",
+        { peladaId },
+      );
 
       mockApi.pausePeladaTimer.mockRejectedValue(new Error("Network Error"));
       await act(async () => {
         await result.current.pausePeladaTimer();
       });
-      expect(mockEnqueueAction).toHaveBeenCalledWith(peladaId, "PAUSE_PELADA_TIMER", { peladaId });
+      expect(mockEnqueueAction).toHaveBeenCalledWith(
+        peladaId,
+        "PAUSE_PELADA_TIMER",
+        { peladaId },
+      );
 
       mockApi.resetPeladaTimer.mockRejectedValue(new Error("Network timeout"));
       await act(async () => {
         await result.current.resetPeladaTimer();
       });
-      expect(mockEnqueueAction).toHaveBeenCalledWith(peladaId, "RESET_PELADA_TIMER", { peladaId });
+      expect(mockEnqueueAction).toHaveBeenCalledWith(
+        peladaId,
+        "RESET_PELADA_TIMER",
+        { peladaId },
+      );
 
       mockApi.startMatchTimer.mockRejectedValue(new Error("Failed to fetch"));
       await act(async () => {
         await result.current.startMatchTimer("m1");
       });
-      expect(mockEnqueueAction).toHaveBeenCalledWith(peladaId, "START_MATCH_TIMER", { matchId: "m1" });
+      expect(mockEnqueueAction).toHaveBeenCalledWith(
+        peladaId,
+        "START_MATCH_TIMER",
+        { matchId: "m1" },
+      );
 
       mockApi.pauseMatchTimer.mockRejectedValue(new Error("Network Error"));
       await act(async () => {
         await result.current.pauseMatchTimer("m1");
       });
-      expect(mockEnqueueAction).toHaveBeenCalledWith(peladaId, "PAUSE_MATCH_TIMER", { matchId: "m1" });
+      expect(mockEnqueueAction).toHaveBeenCalledWith(
+        peladaId,
+        "PAUSE_MATCH_TIMER",
+        { matchId: "m1" },
+      );
 
       mockApi.resetMatchTimer.mockRejectedValue(new Error("Network timeout"));
       await act(async () => {
         await result.current.resetMatchTimer("m1");
       });
-      expect(mockEnqueueAction).toHaveBeenCalledWith(peladaId, "RESET_MATCH_TIMER", { matchId: "m1" });
+      expect(mockEnqueueAction).toHaveBeenCalledWith(
+        peladaId,
+        "RESET_MATCH_TIMER",
+        { matchId: "m1" },
+      );
 
       // 6. Test handleNetworkError returning false (standard error)
       // non-Error reject
@@ -532,23 +586,36 @@ describe("useMatchActions", () => {
       // Should not throw or crash, just not queue (handled silently or logged inside component if not caught)
 
       // Other actions standard errors (non-Error and Error instances)
-      mockApi.addMatchLineupPlayer.mockRejectedValue(new Error("Standard Error"));
+      mockApi.addMatchLineupPlayer.mockRejectedValue(
+        new Error("Standard Error"),
+      );
       await act(async () => {
         await result.current.addPlayerToTeam("m1", "t1", "pl1");
       });
       expect(mockDelegates.setError).toHaveBeenCalledWith("Standard Error");
 
-      mockApi.replaceMatchLineupPlayer.mockRejectedValue("String Replace Error");
+      mockApi.replaceMatchLineupPlayer.mockRejectedValue(
+        "String Replace Error",
+      );
       await act(async () => {
-        await result.current.replacePlayerOnMatchTeam("m1", "t1", "p_out", "p_in");
+        await result.current.replacePlayerOnMatchTeam(
+          "m1",
+          "t1",
+          "p_out",
+          "p_in",
+        );
       });
-      expect(mockDelegates.setError).toHaveBeenCalledWith("peladas.matches.error.replace_player_failed");
+      expect(mockDelegates.setError).toHaveBeenCalledWith(
+        "peladas.matches.error.replace_player_failed",
+      );
 
       mockApi.closePelada.mockRejectedValue("String Close Error");
       await act(async () => {
         await result.current.executeClosePelada();
       });
-      expect(mockDelegates.setError).toHaveBeenCalledWith("peladas.matches.error.close_failed");
+      expect(mockDelegates.setError).toHaveBeenCalledWith(
+        "peladas.matches.error.close_failed",
+      );
 
       mockApi.updateMatchScore.mockRejectedValue(new Error("End Match Error"));
       await act(async () => {
@@ -560,7 +627,9 @@ describe("useMatchActions", () => {
 
   describe("network errors and edge cases for all actions", () => {
     it("should queue adjustScore when online but updateMatchScore fails with a network error", async () => {
-      mockApi.updateMatchScore.mockRejectedValueOnce(new Error("Failed to fetch"));
+      mockApi.updateMatchScore.mockRejectedValueOnce(
+        new Error("Failed to fetch"),
+      );
       const { result } = renderHook(() =>
         useMatchActions(peladaId, mockDelegates),
       );
@@ -576,7 +645,9 @@ describe("useMatchActions", () => {
     });
 
     it("should queue deleteEventAndRefresh when online but deleteMatchEvent fails with a network error", async () => {
-      mockApi.deleteMatchEvent.mockRejectedValueOnce(new Error("Network Error"));
+      mockApi.deleteMatchEvent.mockRejectedValueOnce(
+        new Error("Network Error"),
+      );
       const { result } = renderHook(() =>
         useMatchActions(peladaId, mockDelegates),
       );
@@ -591,7 +662,9 @@ describe("useMatchActions", () => {
     });
 
     it("should queue recordEvent when online but createMatchEvent fails with a network error", async () => {
-      mockApi.createMatchEvent.mockRejectedValueOnce(new Error("Network timeout"));
+      mockApi.createMatchEvent.mockRejectedValueOnce(
+        new Error("Network timeout"),
+      );
       const { result } = renderHook(() =>
         useMatchActions(peladaId, mockDelegates),
       );
@@ -608,34 +681,51 @@ describe("useMatchActions", () => {
     });
 
     it("should queue addPlayerToTeam when online but addMatchLineupPlayer fails with a network error", async () => {
-      mockApi.addMatchLineupPlayer.mockRejectedValueOnce(new Error("Failed to fetch"));
+      mockApi.addMatchLineupPlayer.mockRejectedValueOnce(
+        new Error("Failed to fetch"),
+      );
       const { result } = renderHook(() =>
         useMatchActions(peladaId, mockDelegates),
       );
       await act(async () => {
         await result.current.addPlayerToTeam("m1", "t1", "pl1");
       });
-      expect(mockEnqueueAction).toHaveBeenCalledWith(peladaId, "ADD_PLAYER_TO_TEAM", {
-        matchId: "m1",
-        teamId: "t1",
-        playerId: "pl1",
-      });
+      expect(mockEnqueueAction).toHaveBeenCalledWith(
+        peladaId,
+        "ADD_PLAYER_TO_TEAM",
+        {
+          matchId: "m1",
+          teamId: "t1",
+          playerId: "pl1",
+        },
+      );
     });
 
     it("should queue replacePlayerOnMatchTeam when online but replaceMatchLineupPlayer fails with a network error", async () => {
-      mockApi.replaceMatchLineupPlayer.mockRejectedValueOnce(new Error("Network Error"));
+      mockApi.replaceMatchLineupPlayer.mockRejectedValueOnce(
+        new Error("Network Error"),
+      );
       const { result } = renderHook(() =>
         useMatchActions(peladaId, mockDelegates),
       );
       await act(async () => {
-        await result.current.replacePlayerOnMatchTeam("m1", "t1", "p_out", "p_in");
+        await result.current.replacePlayerOnMatchTeam(
+          "m1",
+          "t1",
+          "p_out",
+          "p_in",
+        );
       });
-      expect(mockEnqueueAction).toHaveBeenCalledWith(peladaId, "REPLACE_PLAYER", {
-        matchId: "m1",
-        teamId: "t1",
-        outPlayerId: "p_out",
-        inPlayerId: "p_in",
-      });
+      expect(mockEnqueueAction).toHaveBeenCalledWith(
+        peladaId,
+        "REPLACE_PLAYER",
+        {
+          matchId: "m1",
+          teamId: "t1",
+          outPlayerId: "p_out",
+          inPlayerId: "p_in",
+        },
+      );
     });
 
     it("should queue executeClosePelada when online but closePelada fails with a network error", async () => {
@@ -646,11 +736,15 @@ describe("useMatchActions", () => {
       await act(async () => {
         await result.current.executeClosePelada();
       });
-      expect(mockEnqueueAction).toHaveBeenCalledWith(peladaId, "CLOSE_PELADA", { peladaId });
+      expect(mockEnqueueAction).toHaveBeenCalledWith(peladaId, "CLOSE_PELADA", {
+        peladaId,
+      });
     });
 
     it("should queue executeEndMatch when online but updateMatchScore fails with a network error", async () => {
-      mockApi.updateMatchScore.mockRejectedValueOnce(new Error("Failed to fetch"));
+      mockApi.updateMatchScore.mockRejectedValueOnce(
+        new Error("Failed to fetch"),
+      );
       const { result } = renderHook(() =>
         useMatchActions(peladaId, mockDelegates),
       );
@@ -665,9 +759,7 @@ describe("useMatchActions", () => {
     });
 
     it("should return early in executeClosePelada if peladaId is falsy", async () => {
-      const { result } = renderHook(() =>
-        useMatchActions("", mockDelegates),
-      );
+      const { result } = renderHook(() => useMatchActions("", mockDelegates));
       await act(async () => {
         await result.current.executeClosePelada();
       });

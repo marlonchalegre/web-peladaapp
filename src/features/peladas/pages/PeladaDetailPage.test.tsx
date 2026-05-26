@@ -1,12 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
-import {
-  render,
-  screen,
-  waitFor,
-  fireEvent,
-  act,
-} from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import type { UserEvent } from "@testing-library/user-event";
 import PeladaDetailPage from "./PeladaDetailPage";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -49,11 +45,24 @@ vi.mock("../components/PeladaDetailHeader", () => ({
     onCopyAnnouncement,
   }: any) => (
     <div data-testid="mock-detail-header">
-      <button data-testid="start-pelada-button" onClick={onStartClick}>Start</button>
-      {!pelada.has_schedule_plan && <button data-testid="build-schedule-button">Build</button>}
-      <button data-testid="export-menu-button" onClick={onCopyClipboard}>Export</button>
-      <button data-testid="copy-clipboard-button" onClick={onCopyClipboard}>Copy Clip</button>
-      <button data-testid="copy-announcement-button" onClick={onCopyAnnouncement}>Copy Ann</button>
+      <button data-testid="start-pelada-button" onClick={onStartClick}>
+        Start
+      </button>
+      {!pelada.has_schedule_plan && (
+        <button data-testid="build-schedule-button">Build</button>
+      )}
+      <button data-testid="export-menu-button" onClick={onCopyClipboard}>
+        Export
+      </button>
+      <button data-testid="copy-clipboard-button" onClick={onCopyClipboard}>
+        Copy Clip
+      </button>
+      <button
+        data-testid="copy-announcement-button"
+        onClick={onCopyAnnouncement}
+      >
+        Copy Ann
+      </button>
     </div>
   ),
 }));
@@ -69,8 +78,6 @@ vi.mock("../components/TeamsSection", () => ({
     onSendToBench,
     onMoveToFixedGk,
     onDeleteTeam,
-    onUpdatePlayersPerTeam,
-    onToggleFixedGoalkeepers,
   }: any) => (
     <div data-testid="mock-teams-section">
       <button
@@ -82,7 +89,6 @@ vi.mock("../components/TeamsSection", () => ({
       <button
         data-testid="trigger-delete-team"
         onClick={() => {
-          console.log("onDeleteTeam call with 1");
           onDeleteTeam?.("1");
         }}
       >
@@ -112,7 +118,11 @@ vi.mock("../components/TeamsSection", () => ({
           const e = {
             preventDefault: vi.fn(),
             dataTransfer: {
-              getData: vi.fn().mockReturnValue(JSON.stringify({ playerId: "11", sourceTeamId: null })),
+              getData: vi
+                .fn()
+                .mockReturnValue(
+                  JSON.stringify({ playerId: "11", sourceTeamId: null }),
+                ),
             },
           } as any;
           dropToTeam?.(e, "1");
@@ -126,7 +136,11 @@ vi.mock("../components/TeamsSection", () => ({
           const e = {
             preventDefault: vi.fn(),
             dataTransfer: {
-              getData: vi.fn().mockReturnValue(JSON.stringify({ playerId: "10", sourceTeamId: "1" })),
+              getData: vi
+                .fn()
+                .mockReturnValue(
+                  JSON.stringify({ playerId: "10", sourceTeamId: "1" }),
+                ),
             },
           } as any;
           dropToTeam?.(e, "1");
@@ -209,7 +223,11 @@ vi.mock("../components/AvailablePlayersPanel", () => ({
           const e = {
             preventDefault: vi.fn(),
             dataTransfer: {
-              getData: vi.fn().mockReturnValue(JSON.stringify({ playerId: "10", sourceTeamId: "1" })),
+              getData: vi
+                .fn()
+                .mockReturnValue(
+                  JSON.stringify({ playerId: "10", sourceTeamId: "1" }),
+                ),
             },
           } as any;
           onDropToBench?.(e);
@@ -278,6 +296,8 @@ vi.mock("../components/FixedGoalkeepersSection", () => ({
 }));
 
 describe("PeladaDetailPage", () => {
+  let user: UserEvent;
+
   const mockFullDetails = {
     pelada: {
       id: "1",
@@ -321,6 +341,7 @@ describe("PeladaDetailPage", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    user = userEvent.setup();
     (useAuth as Mock).mockReturnValue({
       user: { id: "1", name: "Test User", admin_orgs: ["101"] },
       isAuthenticated: true,
@@ -345,6 +366,22 @@ describe("PeladaDetailPage", () => {
         <MemoryRouter initialEntries={["/peladas/1"]}>
           <Routes>
             <Route path="/peladas/:id" element={<PeladaDetailPage />} />
+            <Route
+              path="/peladas/:id/matches"
+              element={<div>Matches Page</div>}
+            />
+            <Route
+              path="/peladas/:id/attendance"
+              element={<div>Attendance Page</div>}
+            />
+            <Route
+              path="/peladas/:id/voting"
+              element={<div>Voting Page</div>}
+            />
+            <Route
+              path="/peladas/:id/results"
+              element={<div>Results Page</div>}
+            />
           </Routes>
         </MemoryRouter>
       </LocalizationProvider>,
@@ -363,16 +400,14 @@ describe("PeladaDetailPage", () => {
     await waitFor(() =>
       expect(screen.getByTestId("start-pelada-button")).toBeInTheDocument(),
     );
-    fireEvent.click(screen.getByTestId("start-pelada-button"));
+    await user.click(screen.getByTestId("start-pelada-button"));
 
     // Should show start dialog (confirm start with schedule plan)
     await waitFor(() =>
       expect(screen.getByTestId("pretty-confirm-button")).toBeInTheDocument(),
     );
     const confirmBtn = screen.getByTestId("pretty-confirm-button");
-    await act(async () => {
-      fireEvent.click(confirmBtn);
-    });
+    await user.click(confirmBtn);
     expect(api.post).toHaveBeenCalledWith(
       expect.stringContaining("/begin"),
       expect.anything(),
@@ -384,7 +419,7 @@ describe("PeladaDetailPage", () => {
     await waitFor(() =>
       expect(screen.getByTestId("trigger-create-team")).toBeInTheDocument(),
     );
-    fireEvent.click(screen.getByTestId("trigger-create-team"));
+    await user.click(screen.getByTestId("trigger-create-team"));
     expect(api.post).toHaveBeenCalledWith(
       "/api/teams",
       expect.objectContaining({ pelada_id: "1" }),
@@ -399,8 +434,7 @@ describe("PeladaDetailPage", () => {
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/peladas/1/full-details")
         return Promise.resolve(mockFullDetails);
-      if (path === "/api/organizations/101/admins")
-        return Promise.resolve([]);
+      if (path === "/api/organizations/101/admins") return Promise.resolve([]);
       if (path === "/api/organizations/101/finance")
         return Promise.resolve({ base_price: 10 });
       return Promise.resolve({});
@@ -409,8 +443,12 @@ describe("PeladaDetailPage", () => {
     renderPage();
 
     await waitFor(() => {
-      expect(screen.queryByTestId("start-pelada-button")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("admin-bench-indicator")).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId("start-pelada-button"),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId("admin-bench-indicator"),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -445,16 +483,14 @@ describe("PeladaDetailPage", () => {
       expect(screen.getByTestId("trigger-move-player")).toBeInTheDocument(),
     );
     // Trigger moving Player 2 (id "11") to Team 1 (id "1") which is full (max 1 player, already has Player 1)
-    fireEvent.click(screen.getByTestId("trigger-move-player"));
+    await user.click(screen.getByTestId("trigger-move-player"));
 
     // Verify SwapPlayerDialog is opened
-    await waitFor(() =>
-      expect(screen.getByRole("dialog")).toBeInTheDocument(),
-    );
+    await waitFor(() => expect(screen.getByRole("dialog")).toBeInTheDocument());
     expect(screen.getByText("Player 1")).toBeInTheDocument();
 
     // Select Player 1 to be replaced
-    fireEvent.click(screen.getByText("Player 1"));
+    await user.click(screen.getByText("Player 1"));
 
     // Confirm that api endpoints were called:
     // 1. remove player 1 ("10") from team 1 ("1")
@@ -476,16 +512,18 @@ describe("PeladaDetailPage", () => {
     await waitFor(() =>
       expect(screen.getByTestId("trigger-reverse-payment")).toBeInTheDocument(),
     );
-    fireEvent.click(screen.getByTestId("trigger-reverse-payment"));
+    await user.click(screen.getByTestId("trigger-reverse-payment"));
 
     // Wait for confirm button to appear and click it
     const confirmBtn = await screen.findByTestId("pretty-confirm-button");
-    fireEvent.click(confirmBtn);
+    await user.click(confirmBtn);
 
     // Check endpoints reverseTransaction was called
     await waitFor(() => {
       expect(api.post).toHaveBeenCalledWith(
-        expect.stringContaining("/api/organizations/101/finance/transactions/tx-1/reverse"),
+        expect.stringContaining(
+          "/api/organizations/101/finance/transactions/tx-1/reverse",
+        ),
       );
     });
   });
@@ -507,21 +545,23 @@ describe("PeladaDetailPage", () => {
     );
 
     // Open export menu
-    fireEvent.click(screen.getByTestId("export-menu-button"));
+    await user.click(screen.getByTestId("export-menu-button"));
 
     // Wait for menu items and Export text
     await waitFor(() =>
       expect(screen.getByTestId("copy-clipboard-button")).toBeInTheDocument(),
     );
-    fireEvent.click(screen.getByTestId("copy-clipboard-button"));
+    await user.click(screen.getByTestId("copy-clipboard-button"));
     expect(mockClipboard.writeText).toHaveBeenCalled();
 
     // Re-open menu for Announcement text (it closes after click)
-    fireEvent.click(screen.getByTestId("export-menu-button"));
+    await user.click(screen.getByTestId("export-menu-button"));
     await waitFor(() =>
-      expect(screen.getByTestId("copy-announcement-button")).toBeInTheDocument(),
+      expect(
+        screen.getByTestId("copy-announcement-button"),
+      ).toBeInTheDocument(),
     );
-    fireEvent.click(screen.getByTestId("copy-announcement-button"));
+    await user.click(screen.getByTestId("copy-announcement-button"));
     expect(mockClipboard.writeText).toHaveBeenCalled();
   });
 
@@ -599,7 +639,7 @@ describe("PeladaDetailPage", () => {
     );
 
     // 1. Move player (NOT swapping because team is not full)
-    fireEvent.click(screen.getByTestId("trigger-move-player"));
+    await user.click(screen.getByTestId("trigger-move-player"));
     await waitFor(() =>
       expect(api.post).toHaveBeenCalledWith(
         expect.stringContaining("/api/teams/1/players"),
@@ -609,13 +649,13 @@ describe("PeladaDetailPage", () => {
     vi.clearAllMocks();
 
     // Move player to SAME team (should call dropToTeam immediately, but dropToTeam returns early if sourceTeamId === targetTeamId)
-    fireEvent.click(screen.getByTestId("trigger-drop-to-team-same"));
+    await user.click(screen.getByTestId("trigger-drop-to-team-same"));
     // Since it returns early, api.post should NOT be called
     expect(api.post).not.toHaveBeenCalled();
     vi.clearAllMocks();
 
     // 2. Mark paid trigger from mock
-    fireEvent.click(screen.getByTestId("trigger-mark-paid"));
+    await user.click(screen.getByTestId("trigger-mark-paid"));
     await waitFor(() =>
       expect(api.post).toHaveBeenCalledWith(
         expect.stringContaining("/finance/transactions"),
@@ -625,7 +665,7 @@ describe("PeladaDetailPage", () => {
     vi.clearAllMocks();
 
     // 3. dropToTeam triggers
-    fireEvent.click(screen.getByTestId("trigger-drop-to-team"));
+    await user.click(screen.getByTestId("trigger-drop-to-team"));
     await waitFor(() =>
       expect(api.post).toHaveBeenCalledWith(
         expect.stringContaining("/api/teams/1/players"),
@@ -633,14 +673,14 @@ describe("PeladaDetailPage", () => {
       ),
     );
 
-    fireEvent.click(screen.getByTestId("trigger-drop-to-team-same"));
-    fireEvent.click(screen.getByTestId("trigger-drop-to-team-invalid-json"));
+    await user.click(screen.getByTestId("trigger-drop-to-team-same"));
+    await user.click(screen.getByTestId("trigger-drop-to-team-invalid-json"));
     await waitFor(() => expect(consoleSpy).toHaveBeenCalled());
 
-    fireEvent.click(screen.getByTestId("trigger-drop-to-team-empty-data"));
+    await user.click(screen.getByTestId("trigger-drop-to-team-empty-data"));
 
     // 4. Send to bench
-    fireEvent.click(screen.getByTestId("trigger-send-to-bench"));
+    await user.click(screen.getByTestId("trigger-send-to-bench"));
     await waitFor(() =>
       expect(api.delete).toHaveBeenCalledWith(
         expect.stringContaining("/api/teams/1/players"),
@@ -648,10 +688,10 @@ describe("PeladaDetailPage", () => {
       ),
     );
 
-    fireEvent.click(screen.getByTestId("trigger-send-to-bench-not-found"));
+    await user.click(screen.getByTestId("trigger-send-to-bench-not-found"));
 
     // 5. Move to fixed GK
-    fireEvent.click(screen.getByTestId("trigger-move-to-fixed-gk"));
+    await user.click(screen.getByTestId("trigger-move-to-fixed-gk"));
     await waitFor(() =>
       expect(api.put).toHaveBeenCalledWith(
         expect.stringContaining("/api/peladas/1"),
@@ -684,30 +724,47 @@ describe("PeladaDetailPage", () => {
 
     renderPage();
     await waitFor(() =>
-      expect(screen.queryByTestId("mock-fixed-gk-section")).not.toBeInTheDocument(),
+      expect(
+        screen.queryByTestId("mock-fixed-gk-section"),
+      ).not.toBeInTheDocument(),
     );
   });
 
   it("handles delete team successfully", async () => {
     (api.delete as Mock).mockResolvedValue({});
     renderPage();
-    await waitFor(() => expect(screen.getByTestId("mock-teams-section")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByTestId("mock-teams-section")).toBeInTheDocument(),
+    );
 
-    fireEvent.click(screen.getByTestId("trigger-delete-team"));
-    await waitFor(() => expect(api.delete).toHaveBeenCalledWith(expect.stringContaining("/api/teams/1")));
+    await user.click(screen.getByTestId("trigger-delete-team"));
+    await waitFor(() =>
+      expect(api.delete).toHaveBeenCalledWith(
+        expect.stringContaining("/api/teams/1"),
+      ),
+    );
   });
 
   it("handles start dialog confirm with schedule open", async () => {
     (api.post as Mock).mockResolvedValue({});
     renderPage();
-    await waitFor(() => expect(screen.getByTestId("start-pelada-button")).toBeInTheDocument());
-    
-    fireEvent.click(screen.getByTestId("start-pelada-button"));
+    await waitFor(() =>
+      expect(screen.getByTestId("start-pelada-button")).toBeInTheDocument(),
+    );
+
+    await user.click(screen.getByTestId("start-pelada-button"));
     // PrettyConfirmDialog for schedule open uses common.confirm title
-    await waitFor(() => expect(screen.getByText("common.confirm")).toBeInTheDocument());
-    
-    fireEvent.click(screen.getByTestId("pretty-confirm-button"));
-    await waitFor(() => expect(api.post).toHaveBeenCalledWith(expect.stringContaining("/begin"), expect.anything()));
+    await waitFor(() =>
+      expect(screen.getByText("common.confirm")).toBeInTheDocument(),
+    );
+
+    await user.click(screen.getByTestId("pretty-confirm-button"));
+    await waitFor(() =>
+      expect(api.post).toHaveBeenCalledWith(
+        expect.stringContaining("/begin"),
+        expect.anything(),
+      ),
+    );
   });
 
   it("handles closed pelada alerts when voting info can_vote is false", async () => {
@@ -771,17 +828,26 @@ describe("PeladaDetailPage", () => {
     });
 
     renderPage();
-    await waitFor(() => expect(screen.getByTestId("start-pelada-button")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByTestId("start-pelada-button")).toBeInTheDocument(),
+    );
 
     // 1. Open StartPeladaDialog
-    fireEvent.click(screen.getByTestId("start-pelada-button"));
+    await user.click(screen.getByTestId("start-pelada-button"));
 
     // Verify it is open
-    await waitFor(() => expect(screen.getByLabelText("peladas.dialog.start.matches_per_team")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(
+        screen.getByLabelText("peladas.dialog.start.matches_per_team"),
+      ).toBeInTheDocument(),
+    );
 
     // 2. Change matches per team
-    const matchesInput = screen.getByLabelText("peladas.dialog.start.matches_per_team");
-    fireEvent.change(matchesInput, { target: { value: "3" } });
+    const matchesInput = screen.getByLabelText(
+      "peladas.dialog.start.matches_per_team",
+    );
+    await user.clear(matchesInput);
+    await user.type(matchesInput, "3");
 
     // 3. Confirm failure path
     const axiosError = {
@@ -793,10 +859,12 @@ describe("PeladaDetailPage", () => {
     };
     (api.post as Mock).mockRejectedValueOnce(axiosError);
 
-    fireEvent.click(screen.getByTestId("confirm-start-pelada-button"));
+    await user.click(screen.getByTestId("confirm-start-pelada-button"));
 
     await waitFor(() => {
-      expect(api.post).toHaveBeenCalledWith(expect.stringContaining("/begin"), { matches_per_team: 3 });
+      expect(api.post).toHaveBeenCalledWith(expect.stringContaining("/begin"), {
+        matches_per_team: 3,
+      });
     });
   });
 
@@ -820,14 +888,12 @@ describe("PeladaDetailPage", () => {
     );
 
     // Trigger moving player to open SwapPlayerDialog
-    fireEvent.click(screen.getByTestId("trigger-move-player"));
-    await waitFor(() =>
-      expect(screen.getByRole("dialog")).toBeInTheDocument(),
-    );
+    await user.click(screen.getByTestId("trigger-move-player"));
+    await waitFor(() => expect(screen.getByRole("dialog")).toBeInTheDocument());
 
     // Click Cancel in SwapPlayerDialog
     const cancelBtn = screen.getByRole("button", { name: "common.cancel" });
-    fireEvent.click(cancelBtn);
+    await user.click(cancelBtn);
 
     await waitFor(() =>
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
@@ -841,17 +907,19 @@ describe("PeladaDetailPage", () => {
     );
 
     // Open reverse payment dialog
-    fireEvent.click(screen.getByTestId("trigger-reverse-payment"));
+    await user.click(screen.getByTestId("trigger-reverse-payment"));
     await waitFor(() => {
       expect(screen.getByText("finance.reversal.title")).toBeInTheDocument();
     });
 
     // Click Cancel in dialog
     const cancelBtn = screen.getByRole("button", { name: "common.cancel" });
-    fireEvent.click(cancelBtn);
+    await user.click(cancelBtn);
 
     await waitFor(() =>
-      expect(screen.queryByText("finance.reversal.title")).not.toBeInTheDocument(),
+      expect(
+        screen.queryByText("finance.reversal.title"),
+      ).not.toBeInTheDocument(),
     );
   });
 
@@ -866,7 +934,7 @@ describe("PeladaDetailPage", () => {
     );
 
     // 1. Drop to Bench (valid JSON)
-    fireEvent.click(screen.getByTestId("trigger-drop-to-bench"));
+    await user.click(screen.getByTestId("trigger-drop-to-bench"));
     await waitFor(() => {
       expect(api.delete).toHaveBeenCalledWith(
         expect.stringContaining("/api/teams/1/players"),
@@ -875,16 +943,16 @@ describe("PeladaDetailPage", () => {
     });
 
     // 2. Drop to Bench (invalid JSON)
-    fireEvent.click(screen.getByTestId("trigger-drop-to-bench-invalid"));
+    await user.click(screen.getByTestId("trigger-drop-to-bench-invalid"));
     // should not crash or call API
     expect(api.delete).toHaveBeenCalledTimes(1);
 
     // 3. Drag Start
-    fireEvent.click(screen.getByTestId("trigger-drag-start-player"));
+    await user.click(screen.getByTestId("trigger-drag-start-player"));
     // should execute drag start logic without crashing
 
     // 4. Bench Mark Paid
-    fireEvent.click(screen.getByTestId("trigger-bench-mark-paid"));
+    await user.click(screen.getByTestId("trigger-bench-mark-paid"));
     await waitFor(() => {
       expect(api.post).toHaveBeenCalledWith(
         expect.stringContaining("/api/organizations/101/finance/transactions"),
@@ -893,21 +961,25 @@ describe("PeladaDetailPage", () => {
     });
 
     // 5. Bench Reverse Payment
-    fireEvent.click(screen.getByTestId("trigger-bench-reverse-payment"));
+    await user.click(screen.getByTestId("trigger-bench-reverse-payment"));
     await waitFor(() => {
       expect(screen.getByText("finance.reversal.title")).toBeInTheDocument();
     });
     // Click confirm to cover handleConfirmReverse
-    const confirmBtn = screen.getAllByRole("button", { name: "common.confirm" })[0];
-    fireEvent.click(confirmBtn);
+    const confirmBtn = screen.getAllByRole("button", {
+      name: "common.confirm",
+    })[0];
+    await user.click(confirmBtn);
     await waitFor(() => {
       expect(api.post).toHaveBeenCalledWith(
-        expect.stringContaining("/api/organizations/101/finance/transactions/tx-1/reverse"),
+        expect.stringContaining(
+          "/api/organizations/101/finance/transactions/tx-1/reverse",
+        ),
       );
     });
 
     // 6. Bench Move to Team
-    fireEvent.click(screen.getByTestId("trigger-bench-move-to-team"));
+    await user.click(screen.getByTestId("trigger-bench-move-to-team"));
     await waitFor(() => {
       expect(api.post).toHaveBeenCalledWith(
         expect.stringContaining("/api/teams/1/players"),
@@ -916,7 +988,7 @@ describe("PeladaDetailPage", () => {
     });
 
     // 7. Bench Move to Fixed GK
-    fireEvent.click(screen.getByTestId("trigger-bench-move-to-fixed-gk"));
+    await user.click(screen.getByTestId("trigger-bench-move-to-fixed-gk"));
     await waitFor(() => {
       expect(api.put).toHaveBeenCalledWith(
         expect.stringContaining("/api/peladas/1"),

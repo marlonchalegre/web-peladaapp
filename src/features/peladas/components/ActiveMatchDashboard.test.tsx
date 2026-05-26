@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { render, screen, within, act } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect } from "vitest";
 import ActiveMatchDashboard from "./ActiveMatchDashboard";
@@ -472,10 +472,7 @@ describe("ActiveMatchDashboard", () => {
     const user = userEvent.setup();
     render(
       <ThemeContextProvider>
-        <ActiveMatchDashboard
-          {...defaultProps}
-          onSelectMatch={onSelectMatch}
-        />
+        <ActiveMatchDashboard {...defaultProps} onSelectMatch={onSelectMatch} />
       </ThemeContextProvider>,
     );
 

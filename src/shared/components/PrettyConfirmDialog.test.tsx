@@ -1,10 +1,20 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import PrettyConfirmDialog from "./PrettyConfirmDialog";
 import { ThemeProvider, createTheme } from "@mui/material";
 
 describe("PrettyConfirmDialog", () => {
-  const theme = createTheme();
+  const theme = createTheme({
+    components: {
+      MuiButtonBase: {
+        defaultProps: {
+          disableRipple: true,
+          disableTouchRipple: true,
+        },
+      },
+    },
+  });
   const defaultProps = {
     open: true,
     onClose: vi.fn(),
@@ -23,23 +33,25 @@ describe("PrettyConfirmDialog", () => {
     expect(screen.getByText("Are you sure?")).toBeDefined();
   });
 
-  it("calls onClose when cancel is clicked", () => {
+  it("calls onClose when cancel is clicked", async () => {
+    const user = userEvent.setup();
     render(
       <ThemeProvider theme={theme}>
         <PrettyConfirmDialog {...defaultProps} />
       </ThemeProvider>,
     );
-    fireEvent.click(screen.getByText("common.cancel"));
+    await user.click(screen.getByText("common.cancel"));
     expect(defaultProps.onClose).toHaveBeenCalled();
   });
 
-  it("calls onConfirm when confirm is clicked", () => {
+  it("calls onConfirm when confirm is clicked", async () => {
+    const user = userEvent.setup();
     render(
       <ThemeProvider theme={theme}>
         <PrettyConfirmDialog {...defaultProps} />
       </ThemeProvider>,
     );
-    fireEvent.click(screen.getByText("common.confirm"));
+    await user.click(screen.getByText("common.confirm"));
     expect(defaultProps.onConfirm).toHaveBeenCalled();
   });
 

@@ -128,7 +128,9 @@ describe("PeladaVotingResultsPage Restricted Access", () => {
     renderWithProviders();
 
     await waitFor(() => {
-      expect(screen.getByText("peladas.voting.results.hero_title")).toBeInTheDocument();
+      expect(
+        screen.getByText("peladas.voting.results.hero_title"),
+      ).toBeInTheDocument();
     });
 
     expect(screen.getByText("common.organization")).toBeInTheDocument();
@@ -140,7 +142,9 @@ describe("PeladaVotingResultsPage Restricted Access", () => {
     expect(screen.getAllByText("Player B").length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText("Player C").length).toBeGreaterThanOrEqual(1);
 
-    const noAwardsMessages = screen.getAllByText("peladas.voting.results.no_awards");
+    const noAwardsMessages = screen.getAllByText(
+      "peladas.voting.results.no_awards",
+    );
     expect(noAwardsMessages.length).toBe(2);
 
     expect(screen.getByText("common.positions.unknown")).toBeInTheDocument();

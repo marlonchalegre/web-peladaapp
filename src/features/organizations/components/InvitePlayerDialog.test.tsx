@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import InvitePlayerDialog from "./InvitePlayerDialog";
 import { LocalizationProvider } from "@mui/x-date-pickers";
@@ -41,6 +42,7 @@ describe("InvitePlayerDialog", () => {
   });
 
   it("calls onInvite when send button is clicked", async () => {
+    const user = userEvent.setup();
     render(
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <InvitePlayerDialog {...defaultProps} />
@@ -48,17 +50,18 @@ describe("InvitePlayerDialog", () => {
     );
 
     const handleInput = screen.getByLabelText("common.fields.username");
-    fireEvent.change(handleInput, { target: { value: "testuser" } });
+    await user.type(handleInput, "testuser");
 
     const sendButton = screen.getByText(
       "organizations.dialog.invite_player.send_invite",
     );
-    fireEvent.click(sendButton);
+    await user.click(sendButton);
 
     expect(defaultProps.onInvite).toHaveBeenCalledWith("testuser");
   });
 
-  it("calls onFetchPublicLink when generate link button is clicked", () => {
+  it("calls onFetchPublicLink when generate link button is clicked", async () => {
+    const user = userEvent.setup();
     render(
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <InvitePlayerDialog {...defaultProps} />
@@ -68,12 +71,13 @@ describe("InvitePlayerDialog", () => {
     const generateButton = screen.getByText(
       "organizations.dialog.invite_player.generate_link",
     );
-    fireEvent.click(generateButton);
+    await user.click(generateButton);
 
     expect(defaultProps.onFetchPublicLink).toHaveBeenCalled();
   });
 
-  it("calls onResetPublicLink when reset button is clicked", () => {
+  it("calls onResetPublicLink when reset button is clicked", async () => {
+    const user = userEvent.setup();
     render(
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <InvitePlayerDialog
@@ -84,7 +88,7 @@ describe("InvitePlayerDialog", () => {
     );
 
     const resetButton = screen.getByTestId("reset-public-link-button");
-    fireEvent.click(resetButton);
+    await user.click(resetButton);
 
     expect(defaultProps.onResetPublicLink).toHaveBeenCalled();
   });
@@ -120,7 +124,8 @@ describe("InvitePlayerDialog", () => {
     ).toBeInTheDocument();
   });
 
-  it("copies public link to clipboard when copy button is clicked", () => {
+  it("copies public link to clipboard when copy button is clicked", async () => {
+    const user = userEvent.setup();
     const writeTextMock = vi.fn();
     vi.stubGlobal("navigator", {
       clipboard: {
@@ -138,13 +143,14 @@ describe("InvitePlayerDialog", () => {
     );
 
     const copyButton = screen.getByTestId("copy-public-link-button");
-    fireEvent.click(copyButton);
+    await user.click(copyButton);
 
     expect(writeTextMock).toHaveBeenCalledWith("http://example.com/join/123");
     vi.unstubAllGlobals();
   });
 
-  it("copies invitation link to clipboard when copy invitation link button is clicked", () => {
+  it("copies invitation link to clipboard when copy invitation link button is clicked", async () => {
+    const user = userEvent.setup();
     const writeTextMock = vi.fn();
     vi.stubGlobal("navigator", {
       clipboard: {
@@ -156,21 +162,26 @@ describe("InvitePlayerDialog", () => {
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <InvitePlayerDialog
           {...defaultProps}
-          invitedUser={{ email: "new@user.com", isNew: true, token: "testtoken" }}
+          invitedUser={{
+            email: "new@user.com",
+            isNew: true,
+            token: "testtoken",
+          }}
         />
       </LocalizationProvider>,
     );
 
     const copyButton = screen.getByTestId("copy-invitation-link-button");
-    fireEvent.click(copyButton);
+    await user.click(copyButton);
 
     expect(writeTextMock).toHaveBeenCalledWith(
-      `${window.location.origin}/first-access?token=testtoken&email=new%40user.com`
+      `${window.location.origin}/first-access?token=testtoken&email=new%40user.com`,
     );
     vi.unstubAllGlobals();
   });
 
   it("handles console.error output when onInvite throws an error", async () => {
+    const user = userEvent.setup();
     const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const onInviteError = vi.fn().mockRejectedValue(new Error("Invite failed"));
 
@@ -181,14 +192,14 @@ describe("InvitePlayerDialog", () => {
     );
 
     const handleInput = screen.getByLabelText("common.fields.username");
-    fireEvent.change(handleInput, { target: { value: "testuser" } });
+    await user.type(handleInput, "testuser");
 
     const sendButton = screen.getByText(
       "organizations.dialog.invite_player.send_invite",
     );
-    fireEvent.click(sendButton);
+    await user.click(sendButton);
 
-    await vi.waitFor(() => {
+    await waitFor(() => {
       expect(onInviteError).toHaveBeenCalledWith("testuser");
     });
     expect(consoleSpy).toHaveBeenCalled();
@@ -205,9 +216,9 @@ describe("InvitePlayerDialog", () => {
       </LocalizationProvider>,
     );
 
-    expect(
-      screen.getByTestId("invite-name-success-alert"),
-    ).toHaveTextContent("common.welcome - John Doe added!");
+    expect(screen.getByTestId("invite-name-success-alert")).toHaveTextContent(
+      "common.welcome - John Doe added!",
+    );
   });
 
   it("displays success message when existing user is invited", () => {
@@ -225,7 +236,8 @@ describe("InvitePlayerDialog", () => {
     ).toBeInTheDocument();
   });
 
-  it("verifies close button and onClose / onClearInvited functionality", () => {
+  it("verifies close button and onClose / onClearInvited functionality", async () => {
+    const user = userEvent.setup();
     const onCloseMock = vi.fn();
     const onClearInvitedMock = vi.fn();
 
@@ -243,7 +255,7 @@ describe("InvitePlayerDialog", () => {
 
     const closeButton = screen.getByTestId("invite-dialog-close-button");
     expect(closeButton).toHaveTextContent("common.close");
-    fireEvent.click(closeButton);
+    await user.click(closeButton);
     expect(onCloseMock).toHaveBeenCalled();
     expect(onClearInvitedMock).toHaveBeenCalled();
 
@@ -263,12 +275,13 @@ describe("InvitePlayerDialog", () => {
 
     const cancelButton = screen.getByTestId("invite-dialog-close-button");
     expect(cancelButton).toHaveTextContent("common.cancel");
-    fireEvent.click(cancelButton);
+    await user.click(cancelButton);
     expect(onCloseMock).toHaveBeenCalled();
     expect(onClearInvitedMock).toHaveBeenCalled();
   });
 
-  it("calls onClose and onClearInvited when Dialog onClose is triggered", () => {
+  it("calls onClose and onClearInvited when Dialog onClose is triggered", async () => {
+    const user = userEvent.setup();
     const onCloseMock = vi.fn();
     const onClearInvitedMock = vi.fn();
 
@@ -285,9 +298,9 @@ describe("InvitePlayerDialog", () => {
     // Trigger Dialog onClose directly or by clicking backdrop
     const backdrop = document.querySelector(".MuiBackdrop-root");
     if (backdrop) {
-      fireEvent.click(backdrop);
+      await user.click(backdrop as HTMLElement);
     } else {
-      fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape", code: "Escape", keyCode: 27 });
+      await user.keyboard("{Escape}");
     }
     expect(onCloseMock).toHaveBeenCalled();
     expect(onClearInvitedMock).toHaveBeenCalled();

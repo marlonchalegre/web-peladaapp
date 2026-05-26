@@ -175,7 +175,9 @@ describe("useOrganizationManagement", () => {
     await act(async () => {
       await result.current.fetchInviteLink(false);
     });
-    expect(result.current.error).toBe("organizations.error.fetch_invite_link_failed");
+    expect(result.current.error).toBe(
+      "organizations.error.fetch_invite_link_failed",
+    );
   });
 
   it("should handle handleResetInviteLink success and error scenarios", async () => {
@@ -185,7 +187,9 @@ describe("useOrganizationManagement", () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     mockApi.resetInviteLink.mockResolvedValue({ token: "reset-token" });
-    mockApi.listOrganizationInvitations.mockResolvedValue([{ id: "inv1", email: "invited@test.com" }]);
+    mockApi.listOrganizationInvitations.mockResolvedValue([
+      { id: "inv1", email: "invited@test.com" },
+    ]);
     await act(async () => {
       await result.current.handleResetInviteLink();
     });
@@ -213,7 +217,9 @@ describe("useOrganizationManagement", () => {
     });
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    mockApi.listPlayersByOrg.mockResolvedValue([{ id: "p2", name: "Player 2" }]);
+    mockApi.listPlayersByOrg.mockResolvedValue([
+      { id: "p2", name: "Player 2" },
+    ]);
     await act(async () => {
       await result.current.refreshPlayers();
     });
@@ -265,23 +271,26 @@ describe("useOrganizationManagement", () => {
     await waitFor(() => expect(result.current.loading).toBe(false));
 
     await act(async () => {
-      await result.current.handleUpdatePlayer("p1", { name: "Updated Name" });
-    });
-    expect(mockApi.updatePlayer).toHaveBeenCalledWith("p1", { name: "Updated Name" });
-
+      await result.current.handleUpdatePlayer("p1", { user_name: "Updated Name" });
+      });
+      expect(mockApi.updatePlayer).toHaveBeenCalledWith("p1", {
+      user_name: "Updated Name",
+      });
     // Update error Error object
     mockApi.updatePlayer.mockRejectedValue(new Error("Update Fail"));
     await act(async () => {
-      await result.current.handleUpdatePlayer("p1", { name: "Updated Name" });
+      await result.current.handleUpdatePlayer("p1", { user_name: "Updated Name" });
     });
     expect(result.current.error).toBe("Update Fail");
 
     // Update error non-Error
     mockApi.updatePlayer.mockRejectedValue("String Update Fail");
     await act(async () => {
-      await result.current.handleUpdatePlayer("p1", { name: "Updated Name" });
+      await result.current.handleUpdatePlayer("p1", { user_name: "Updated Name" });
     });
-    expect(result.current.error).toBe("organizations.error.update_player_failed");
+    expect(result.current.error).toBe(
+      "organizations.error.update_player_failed",
+    );
   });
 
   it("should handle handleRevokeInvitation success, cancel and error paths", async () => {
@@ -395,18 +404,24 @@ describe("useOrganizationManagement", () => {
     await act(async () => {
       await result.current.fetchData(true);
     });
-    mockApi.removeOrganizationAdmin.mockRejectedValue(new Error("Remove Admin Fail"));
+    mockApi.removeOrganizationAdmin.mockRejectedValue(
+      new Error("Remove Admin Fail"),
+    );
     await act(async () => {
       await result.current.handleRemoveAdmin("u2");
     });
     expect(result.current.error).toBe("Remove Admin Fail");
 
     // non-Error fail
-    mockApi.removeOrganizationAdmin.mockRejectedValue("String Remove Admin Fail");
+    mockApi.removeOrganizationAdmin.mockRejectedValue(
+      "String Remove Admin Fail",
+    );
     await act(async () => {
       await result.current.handleRemoveAdmin("u2");
     });
-    expect(result.current.error).toBe("organizations.error.remove_admin_failed");
+    expect(result.current.error).toBe(
+      "organizations.error.remove_admin_failed",
+    );
   });
 
   it("should handle handleAddPlayers with explicit ids, selectedUserIds, success and error paths", async () => {
@@ -419,8 +434,14 @@ describe("useOrganizationManagement", () => {
     await act(async () => {
       await result.current.handleAddPlayers(["u10", "u11"]);
     });
-    expect(mockApi.createPlayer).toHaveBeenCalledWith({ organization_id: orgId, user_id: "u10" });
-    expect(mockApi.createPlayer).toHaveBeenCalledWith({ organization_id: orgId, user_id: "u11" });
+    expect(mockApi.createPlayer).toHaveBeenCalledWith({
+      organization_id: orgId,
+      user_id: "u10",
+    });
+    expect(mockApi.createPlayer).toHaveBeenCalledWith({
+      organization_id: orgId,
+      user_id: "u11",
+    });
 
     // Fallback to selectedUserIds
     await act(async () => {
@@ -429,7 +450,10 @@ describe("useOrganizationManagement", () => {
     await act(async () => {
       await result.current.handleAddPlayers();
     });
-    expect(mockApi.createPlayer).toHaveBeenCalledWith({ organization_id: orgId, user_id: "u20" });
+    expect(mockApi.createPlayer).toHaveBeenCalledWith({
+      organization_id: orgId,
+      user_id: "u20",
+    });
     expect(result.current.isAddPlayersOpen).toBe(false);
     expect(result.current.selectedUserIds.size).toBe(0);
 
@@ -481,7 +505,11 @@ describe("useOrganizationManagement", () => {
     await act(async () => {
       await result.current.handleEndSubstitution("sub1", "2024-01-02");
     });
-    expect(mockApi.endSubstitution).toHaveBeenCalledWith(orgId, "sub1", "2024-01-02");
+    expect(mockApi.endSubstitution).toHaveBeenCalledWith(
+      orgId,
+      "sub1",
+      "2024-01-02",
+    );
 
     // Error with Error
     mockApi.endSubstitution.mockRejectedValue(new Error("End Sub Fail"));
@@ -533,12 +561,23 @@ describe("useOrganizationManagement", () => {
   it("should handle edge cases in usersMap and playersNotAdmins memoization", async () => {
     // Player with missing user information
     mockApi.listPlayersByOrg.mockResolvedValue([
-      { id: "p1", name: "Player 1", user_id: "u1", user_name: "User 1", user_username: "user1" },
-      { id: "p2", name: "Player 2" } // missing user_id/user_name/user_username
+      {
+        id: "p1",
+        name: "Player 1",
+        user_id: "u1",
+        user_name: "User 1",
+        user_username: "user1",
+      },
+      { id: "p2", name: "Player 2" }, // missing user_id/user_name/user_username
     ]);
     mockApi.listAdminsByOrganization.mockResolvedValue([
-      { user_id: "u1", name: "Admin 1", user_name: "Admin 1", user_username: "admin1" },
-      { user_id: "u3", name: "Admin 3" } // missing user_name/user_username
+      {
+        user_id: "u1",
+        name: "Admin 1",
+        user_name: "Admin 1",
+        user_username: "admin1",
+      },
+      { user_id: "u3", name: "Admin 3" }, // missing user_name/user_username
     ]);
 
     const { result } = renderHook(() => useOrganizationManagement(orgId), {
@@ -553,7 +592,8 @@ describe("useOrganizationManagement", () => {
     // Since player 2 has no user_id, playersNotAdmins should contain a default user object for player 2
     const pNotAdmins = result.current.playersNotAdmins;
     expect(pNotAdmins).toHaveLength(1);
-    expect(pNotAdmins.find(u => u.name === "Player 2" || u.name === "User")).toBeTruthy();
+    expect(
+      pNotAdmins.find((u) => u.name === "Player 2" || u.name === "User"),
+    ).toBeTruthy();
   });
 });
-

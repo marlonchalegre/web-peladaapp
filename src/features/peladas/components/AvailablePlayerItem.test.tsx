@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { render, screen, act } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import AvailablePlayerItem from "./AvailablePlayerItem";
@@ -120,7 +120,9 @@ describe("AvailablePlayerItem", () => {
     );
 
     await user.click(screen.getByRole("button"));
-    expect(screen.getByText(/peladas\.teams\.menu\.move_to/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/peladas\.teams\.menu\.move_to/i),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByText(/peladas\.teams\.menu\.move_to/i));
     expect(onMoveToTeam).toHaveBeenCalledWith("p1", "t1");

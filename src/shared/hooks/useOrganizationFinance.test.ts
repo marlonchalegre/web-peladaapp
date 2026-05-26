@@ -121,21 +121,23 @@ describe("useOrganizationFinance", () => {
   });
 
   it("should not update state if unmounted", async () => {
-    let resolveApi: (value: any) => void;
+    let resolveApi: (value: { diarista_price: number }) => void;
     const apiPromise = new Promise((resolve) => {
       resolveApi = resolve;
     });
     vi.mocked(api.get).mockReturnValue(apiPromise);
 
-    const { result, unmount } = renderHook(() => useOrganizationFinance("org1"));
-    
+    const { result, unmount } = renderHook(() =>
+      useOrganizationFinance("org1"),
+    );
+
     // Unmount before resolving
     unmount();
-    
-    // @ts-ignore
+
+    // @ts-expect-error - resolveApi is always assigned before this line
     resolveApi({ diarista_price: 50 });
-    
-    // State should not be updated (difficult to check directly without internals, 
+
+    // State should not be updated (difficult to check directly without internals,
     // but we check coverage)
     expect(result.current.organizationFinance).toBeNull();
   });
@@ -144,7 +146,7 @@ describe("useOrganizationFinance", () => {
     const dateSpy = vi.spyOn(Date, "now");
     const initialTime = 1000000;
     dateSpy.mockReturnValue(initialTime);
-    
+
     const mockFinance = { diarista_price: 20 };
     vi.mocked(api.get).mockResolvedValue(mockFinance);
 
@@ -153,7 +155,9 @@ describe("useOrganizationFinance", () => {
       { initialProps: { orgId: "org-expired" } },
     );
 
-    await waitFor(() => expect(result.current.organizationFinance).toEqual(mockFinance));
+    await waitFor(() =>
+      expect(result.current.organizationFinance).toEqual(mockFinance),
+    );
     expect(api.get).toHaveBeenCalledTimes(1);
 
     // Fast-forward time in mock
@@ -165,7 +169,7 @@ describe("useOrganizationFinance", () => {
 
     // Change back to org-expired
     rerender({ orgId: "org-expired" });
-    
+
     // Should fetch again because cache expired
     await waitFor(() => expect(api.get).toHaveBeenCalledTimes(3));
     dateSpy.mockRestore();

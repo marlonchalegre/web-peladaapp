@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
-import { render, screen, waitFor, fireEvent, act } from "@testing-library/react";
+import {
+  render,
+  screen,
+  waitFor,
+  fireEvent,
+  act,
+} from "@testing-library/react";
 import UserProfilePage from "./UserProfilePage";
 import { MemoryRouter } from "react-router-dom";
 
@@ -11,7 +17,13 @@ vi.mock("react-router-dom", async (importOriginal) => {
     useNavigate: () => mockNavigate,
   };
 });
-import { getUser, updateUserProfile, deleteUser, uploadUserAvatar, deleteUserAvatar } from "../../../shared/api/client";
+import {
+  getUser,
+  updateUserProfile,
+  deleteUser,
+  uploadUserAvatar,
+  deleteUserAvatar,
+} from "../../../shared/api/client";
 import { useAuth } from "../../../app/providers/AuthContext";
 
 // Mock API
@@ -58,9 +70,12 @@ describe("UserProfilePage", () => {
 
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
-      blob: () => Promise.resolve(new Blob(["mock-image"], { type: "image/png" })),
+      blob: () =>
+        Promise.resolve(new Blob(["mock-image"], { type: "image/png" })),
     });
-    global.URL.createObjectURL = vi.fn().mockReturnValue("blob:http://test-avatar-url");
+    global.URL.createObjectURL = vi
+      .fn()
+      .mockReturnValue("blob:http://test-avatar-url");
     global.URL.revokeObjectURL = vi.fn();
   });
 
@@ -268,48 +283,65 @@ describe("UserProfilePage", () => {
         <UserProfilePage />
       </MemoryRouter>,
     );
-    await waitFor(() => expect(screen.getByDisplayValue("Test User")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument(),
+    );
 
-    const file = new File(["a".repeat(3 * 1024 * 1024)], "avatar.png", { type: "image/png" });
+    const file = new File(["a".repeat(3 * 1024 * 1024)], "avatar.png", {
+      type: "image/png",
+    });
     const label = screen.getByLabelText("upload picture");
     const input = label.querySelector("input")!;
     Object.defineProperty(input, "files", {
       value: [file],
       configurable: true,
     });
-    
+
     await act(async () => {
       fireEvent.change(input);
     });
 
-    expect(screen.getByText("user.profile.error.file_too_large")).toBeInTheDocument();
+    expect(
+      screen.getByText("user.profile.error.file_too_large"),
+    ).toBeInTheDocument();
   });
 
   it("handles avatar upload successfully", async () => {
     (getUser as Mock).mockResolvedValue(defaultUser);
-    (uploadUserAvatar as Mock).mockResolvedValue({ avatar_filename: "new-avatar.png" });
+    (uploadUserAvatar as Mock).mockResolvedValue({
+      avatar_filename: "new-avatar.png",
+    });
     render(
       <MemoryRouter>
         <UserProfilePage />
       </MemoryRouter>,
     );
-    await waitFor(() => expect(screen.getByDisplayValue("Test User")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument(),
+    );
 
-    const file = new File(["avatar-content"], "avatar.png", { type: "image/png" });
+    const file = new File(["avatar-content"], "avatar.png", {
+      type: "image/png",
+    });
     const label = screen.getByLabelText("upload picture");
     const input = label.querySelector("input")!;
     Object.defineProperty(input, "files", {
       value: [file],
       configurable: true,
     });
-    
+
     await act(async () => {
       fireEvent.change(input);
     });
 
     expect(uploadUserAvatar).toHaveBeenCalledWith("1", file);
-    expect(mockSignIn).toHaveBeenCalledWith("fake-token", expect.objectContaining({ avatar_filename: "new-avatar.png" }));
-    expect(screen.getByText("user.profile.success.avatar_updated")).toBeInTheDocument();
+    expect(mockSignIn).toHaveBeenCalledWith(
+      "fake-token",
+      expect.objectContaining({ avatar_filename: "new-avatar.png" }),
+    );
+    expect(
+      screen.getByText("user.profile.success.avatar_updated"),
+    ).toBeInTheDocument();
   });
 
   it("handles avatar upload error gracefully", async () => {
@@ -320,21 +352,27 @@ describe("UserProfilePage", () => {
         <UserProfilePage />
       </MemoryRouter>,
     );
-    await waitFor(() => expect(screen.getByDisplayValue("Test User")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument(),
+    );
 
-    const file = new File(["avatar-content"], "avatar.png", { type: "image/png" });
+    const file = new File(["avatar-content"], "avatar.png", {
+      type: "image/png",
+    });
     const label = screen.getByLabelText("upload picture");
     const input = label.querySelector("input")!;
     Object.defineProperty(input, "files", {
       value: [file],
       configurable: true,
     });
-    
+
     await act(async () => {
       fireEvent.change(input);
     });
 
-    expect(screen.getByText("user.profile.error.upload_failed")).toBeInTheDocument();
+    expect(
+      screen.getByText("user.profile.error.upload_failed"),
+    ).toBeInTheDocument();
   });
 
   it("handles avatar deletion successfully", async () => {
@@ -353,7 +391,9 @@ describe("UserProfilePage", () => {
         <UserProfilePage />
       </MemoryRouter>,
     );
-    await waitFor(() => expect(screen.getByDisplayValue("Test User")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument(),
+    );
 
     const deleteButton = screen.getByLabelText("delete picture");
     await act(async () => {
@@ -361,8 +401,13 @@ describe("UserProfilePage", () => {
     });
 
     expect(deleteUserAvatar).toHaveBeenCalledWith("1");
-    expect(mockSignIn).toHaveBeenCalledWith("fake-token", expect.objectContaining({ avatar_filename: null }));
-    expect(screen.getByText("user.profile.success.avatar_deleted")).toBeInTheDocument();
+    expect(mockSignIn).toHaveBeenCalledWith(
+      "fake-token",
+      expect.objectContaining({ avatar_filename: null }),
+    );
+    expect(
+      screen.getByText("user.profile.success.avatar_deleted"),
+    ).toBeInTheDocument();
   });
 
   it("handles avatar deletion error gracefully", async () => {
@@ -381,14 +426,18 @@ describe("UserProfilePage", () => {
         <UserProfilePage />
       </MemoryRouter>,
     );
-    await waitFor(() => expect(screen.getByDisplayValue("Test User")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument(),
+    );
 
     const deleteButton = screen.getByLabelText("delete picture");
     await act(async () => {
       fireEvent.click(deleteButton);
     });
 
-    expect(screen.getByText("user.profile.error.delete_failed")).toBeInTheDocument();
+    expect(
+      screen.getByText("user.profile.error.delete_failed"),
+    ).toBeInTheDocument();
   });
 
   it("shows error if passwords do not match", async () => {
@@ -398,13 +447,22 @@ describe("UserProfilePage", () => {
         <UserProfilePage />
       </MemoryRouter>,
     );
-    await waitFor(() => expect(screen.getByDisplayValue("Test User")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument(),
+    );
 
-    fireEvent.change(screen.getByLabelText("user.profile.field.new_password"), { target: { value: "pass1" } });
-    fireEvent.change(screen.getByLabelText("user.profile.field.confirm_password"), { target: { value: "pass2" } });
+    fireEvent.change(screen.getByLabelText("user.profile.field.new_password"), {
+      target: { value: "pass1" },
+    });
+    fireEvent.change(
+      screen.getByLabelText("user.profile.field.confirm_password"),
+      { target: { value: "pass2" } },
+    );
     fireEvent.click(screen.getByText("user.profile.button.save"));
 
-    expect(screen.getByText("user.profile.error.password_mismatch")).toBeInTheDocument();
+    expect(
+      screen.getByText("user.profile.error.password_mismatch"),
+    ).toBeInTheDocument();
   });
 
   it("shows error if name is empty on save", async () => {
@@ -414,12 +472,18 @@ describe("UserProfilePage", () => {
         <UserProfilePage />
       </MemoryRouter>,
     );
-    await waitFor(() => expect(screen.getByDisplayValue("Test User")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument(),
+    );
 
-    fireEvent.change(screen.getByLabelText(/common.fields.name/i), { target: { value: "  " } });
+    fireEvent.change(screen.getByLabelText(/common.fields.name/i), {
+      target: { value: "  " },
+    });
     fireEvent.click(screen.getByText("user.profile.button.save"));
 
-    expect(screen.getByText("user.profile.error.name_required")).toBeInTheDocument();
+    expect(
+      screen.getByText("user.profile.error.name_required"),
+    ).toBeInTheDocument();
   });
 
   it("shows error if no changes are submitted", async () => {
@@ -429,11 +493,15 @@ describe("UserProfilePage", () => {
         <UserProfilePage />
       </MemoryRouter>,
     );
-    await waitFor(() => expect(screen.getByDisplayValue("Test User")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument(),
+    );
 
     fireEvent.click(screen.getByText("user.profile.button.save"));
 
-    expect(screen.getByText("user.profile.error.no_changes")).toBeInTheDocument();
+    expect(
+      screen.getByText("user.profile.error.no_changes"),
+    ).toBeInTheDocument();
   });
 
   it("handles delete account dialog interactions and successful deletion", async () => {
@@ -444,16 +512,24 @@ describe("UserProfilePage", () => {
         <UserProfilePage />
       </MemoryRouter>,
     );
-    await waitFor(() => expect(screen.getByDisplayValue("Test User")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument(),
+    );
 
     // Open Dialog
     fireEvent.click(screen.getByText("user.profile.button.delete_account"));
-    expect(screen.getByText("user.profile.dialog.delete_title")).toBeInTheDocument();
+    expect(
+      screen.getByText("user.profile.dialog.delete_title"),
+    ).toBeInTheDocument();
 
     // Cancel Dialog
     const cancelButtons = screen.getAllByText("common.cancel");
     fireEvent.click(cancelButtons[1]); // dialog cancel button
-    await waitFor(() => expect(screen.queryByText("user.profile.dialog.delete_title")).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(
+        screen.queryByText("user.profile.dialog.delete_title"),
+      ).not.toBeInTheDocument(),
+    );
 
     // Open again and confirm
     fireEvent.click(screen.getByText("user.profile.button.delete_account"));
@@ -474,13 +550,17 @@ describe("UserProfilePage", () => {
         <UserProfilePage />
       </MemoryRouter>,
     );
-    await waitFor(() => expect(screen.getByDisplayValue("Test User")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument(),
+    );
 
     fireEvent.click(screen.getByText("user.profile.button.delete_account"));
     fireEvent.click(screen.getByText("user.profile.dialog.delete_button"));
 
     await waitFor(() => {
-      expect(screen.getByText("user.profile.error.delete_failed")).toBeInTheDocument();
+      expect(
+        screen.getByText("user.profile.error.delete_failed"),
+      ).toBeInTheDocument();
     });
   });
 
@@ -495,7 +575,9 @@ describe("UserProfilePage", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("user.profile.error.load_failed")).toBeInTheDocument();
+      expect(
+        screen.getByText("user.profile.error.load_failed"),
+      ).toBeInTheDocument();
     });
     expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();
@@ -508,7 +590,9 @@ describe("UserProfilePage", () => {
         <UserProfilePage />
       </MemoryRouter>,
     );
-    await waitFor(() => expect(screen.getByDisplayValue("testuser")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByDisplayValue("testuser")).toBeInTheDocument(),
+    );
 
     const usernameInput = screen.getByLabelText(/common.fields.username/i);
     fireEvent.change(usernameInput, { target: { value: "newusername" } });
@@ -526,7 +610,9 @@ describe("UserProfilePage", () => {
         <UserProfilePage />
       </MemoryRouter>,
     );
-    await waitFor(() => expect(screen.getByDisplayValue("Test User")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument(),
+    );
 
     // Open dialog
     fireEvent.click(screen.getByText("user.profile.button.delete_account"));
@@ -538,9 +624,17 @@ describe("UserProfilePage", () => {
     if (backdrop) {
       fireEvent.click(backdrop);
     } else {
-      fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape", code: "Escape", keyCode: 27 });
+      fireEvent.keyDown(screen.getByRole("dialog"), {
+        key: "Escape",
+        code: "Escape",
+        keyCode: 27,
+      });
     }
-    await waitFor(() => expect(screen.queryByText("user.profile.dialog.delete_title")).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(
+        screen.queryByText("user.profile.dialog.delete_title"),
+      ).not.toBeInTheDocument(),
+    );
   });
 
   it("updates username and password on save", async () => {
@@ -563,8 +657,13 @@ describe("UserProfilePage", () => {
     const usernameInput = screen.getByLabelText(/common.fields.username/i);
     fireEvent.change(usernameInput, { target: { value: "newusername" } });
 
-    fireEvent.change(screen.getByLabelText("user.profile.field.new_password"), { target: { value: "matchingpass" } });
-    fireEvent.change(screen.getByLabelText("user.profile.field.confirm_password"), { target: { value: "matchingpass" } });
+    fireEvent.change(screen.getByLabelText("user.profile.field.new_password"), {
+      target: { value: "matchingpass" },
+    });
+    fireEvent.change(
+      screen.getByLabelText("user.profile.field.confirm_password"),
+      { target: { value: "matchingpass" } },
+    );
 
     fireEvent.click(screen.getByText("user.profile.button.save"));
 

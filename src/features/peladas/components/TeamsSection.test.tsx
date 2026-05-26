@@ -1,11 +1,12 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import TeamsSection, { type TeamsSectionProps } from "./TeamsSection";
+import type { Player, Team } from "../../../shared/api/endpoints";
 
 // Mock i18next
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
-    t: (key: string, options?: any) => {
+    t: (key: string, options?: { number?: number }) => {
       if (key === "peladas.teams.default_name") {
         return `Team ${options?.number}`;
       }
@@ -16,29 +17,35 @@ vi.mock("react-i18next", () => ({
 
 // Mock TeamCard to avoid mounting its complex inner elements
 vi.mock("./TeamCard", () => ({
-  default: vi.fn(({ team, players, averageScore, onDelete, onDrop, onDragStartPlayer }) => (
-    <div data-testid={`team-card-${team.id}`}>
-      <span>Team: {team.name}</span>
-      <span>Average: {averageScore ?? "N/A"}</span>
-      <span>Players Count: {players.length}</span>
-      <button data-testid={`delete-team-${team.id}`} onClick={onDelete}>Delete Team</button>
-      <div
-        data-testid={`dropzone-${team.id}`}
-        onDrop={(e) => onDrop(e)}
-        onDragOver={(e) => e.preventDefault()}
-      >Dropzone</div>
-      {players.map((p: any) => (
+  default: vi.fn(
+    ({ team, players, averageScore, onDelete, onDrop, onDragStartPlayer }) => (
+      <div data-testid={`team-card-${team.id}`}>
+        <span>Team: {team.name}</span>
+        <span>Average: {averageScore ?? "N/A"}</span>
+        <span>Players Count: {players.length}</span>
+        <button data-testid={`delete-team-${team.id}`} onClick={onDelete}>
+          Delete Team
+        </button>
         <div
-          key={p.id}
-          data-testid={`player-${p.id}`}
-          draggable
-          onDragStart={(e) => onDragStartPlayer(e, p.id)}
+          data-testid={`dropzone-${team.id}`}
+          onDrop={(e) => onDrop(e)}
+          onDragOver={(e) => e.preventDefault()}
         >
-          {p.user?.name} ({p.displayScore})
+          Dropzone
         </div>
-      ))}
-    </div>
-  )),
+        {players.map((p: { id: string; displayScore?: string; user?: { name?: string } }) => (
+          <div
+            key={p.id}
+            data-testid={`player-${p.id}`}
+            draggable
+            onDragStart={(e) => onDragStartPlayer(e, p.id)}
+          >
+            {p.user?.name} ({p.displayScore})
+          </div>
+        ))}
+      </div>
+    ),
+  ),
 }));
 
 describe("TeamsSection", () => {
@@ -50,15 +57,13 @@ describe("TeamsSection", () => {
       teams: [
         { id: "t1", name: "Team A" },
         { id: "t2", name: "Team B" },
-      ] as any,
+      ] as Team[],
       teamPlayers: {
         t1: [
           { id: "p1", grade: 8.5, user: { name: "Player 1" } },
           { id: "p2", grade: 9.0, user: { name: "Player 2" } },
-        ] as any,
-        t2: [
-          { id: "p3", grade: 7.0, user: { name: "Player 3" } },
-        ] as any,
+        ] as Player[],
+        t2: [{ id: "p3", grade: 7.0, user: { name: "Player 3" } }] as Player[],
       },
       playersPerTeam: 5,
       creatingTeam: false,
@@ -101,7 +106,7 @@ describe("TeamsSection", () => {
       ...defaultProps,
       teamPlayers: {
         t1: [],
-        t2: [{ id: "p3", grade: undefined, user: { name: "Player 3" } }] as any,
+        t2: [{ id: "p3", grade: undefined, user: { name: "Player 3" } }] as Player[],
       },
     };
     render(<TeamsSection {...props} />);
@@ -116,7 +121,9 @@ describe("TeamsSection", () => {
     const { container } = render(<TeamsSection {...props} />);
 
     // CircularProgress should be present
-    expect(container.querySelector(".MuiCircularProgress-root")).toBeInTheDocument();
+    expect(
+      container.querySelector(".MuiCircularProgress-root"),
+    ).toBeInTheDocument();
   });
 
   it("calls onDeleteTeam when a team's delete button is clicked", () => {
@@ -138,7 +145,9 @@ describe("TeamsSection", () => {
   });
 
   it("does not show add team button when locked is true or isAdminOverride is false", () => {
-    const { rerender } = render(<TeamsSection {...defaultProps} locked={true} />);
+    const { rerender } = render(
+      <TeamsSection {...defaultProps} locked={true} />,
+    );
     expect(screen.queryByTestId("add-team-button")).not.toBeInTheDocument();
 
     rerender(<TeamsSection {...defaultProps} isAdminOverride={false} />);

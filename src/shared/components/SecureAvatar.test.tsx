@@ -89,6 +89,7 @@ describe("SecureAvatar", () => {
   });
 
   it("handles fetch errors gracefully by showing fallback", async () => {
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     vi.mocked(global.fetch).mockResolvedValueOnce({
       ok: false,
     } as Response);
@@ -107,6 +108,7 @@ describe("SecureAvatar", () => {
 
     const fallback = document.querySelector(".MuiAvatar-root");
     expect(fallback?.textContent).toBe("Err");
+    consoleSpy.mockRestore();
   });
 
   it("should clear the timeout if unmounted quickly", async () => {
@@ -134,7 +136,9 @@ describe("SecureAvatar", () => {
       vi.advanceTimersByTime(5000);
     });
 
-    expect(global.URL.revokeObjectURL).toHaveBeenCalledWith("blob:http://test-url");
+    expect(global.URL.revokeObjectURL).toHaveBeenCalledWith(
+      "blob:http://test-url",
+    );
     vi.useRealTimers();
   });
 
@@ -155,7 +159,8 @@ describe("SecureAvatar", () => {
     await act(async () => {
       resolveFetch({
         ok: true,
-        blob: () => Promise.resolve(new Blob(["content"], { type: "image/png" })),
+        blob: () =>
+          Promise.resolve(new Blob(["content"], { type: "image/png" })),
       });
     });
 

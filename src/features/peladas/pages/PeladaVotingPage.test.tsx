@@ -26,7 +26,11 @@ vi.mock("@mui/material", async (importOriginal) => {
   const actual = (await importOriginal()) as Record<string, unknown>;
   return {
     ...actual,
-    Rating: (props: { value: number | null; "data-testid"?: string; onChange?: (e: any, v: number) => void }) => (
+    Rating: (props: {
+      value: number | null;
+      "data-testid"?: string;
+      onChange?: (e: React.ChangeEvent<HTMLInputElement>, v: number) => void;
+    }) => (
       <input
         type="number"
         data-testid={props["data-testid"]}
@@ -41,7 +45,9 @@ describe("PeladaVotingPage", () => {
   const mockVotingInfo = {
     can_vote: true,
     has_voted: false,
-    eligible_players: [{ player_id: "11", name: "Target Player", voting_enabled: true }],
+    eligible_players: [
+      { player_id: "11", name: "Target Player", voting_enabled: true },
+    ],
     voter_player_id: "10",
   };
 
@@ -63,11 +69,17 @@ describe("PeladaVotingPage", () => {
     });
   });
 
-  const setupMocks = (info = mockVotingInfo, status = mockVotingStatus, details = mockPeladaDetails) => {
+  const setupMocks = (
+    info = mockVotingInfo,
+    status = mockVotingStatus,
+    details = mockPeladaDetails,
+  ) => {
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/peladas/1/voting-info") return Promise.resolve(info);
-      if (path === "/api/peladas/1/voting-status") return Promise.resolve(status);
-      if (path === "/api/peladas/1/full-details") return Promise.resolve(details);
+      if (path === "/api/peladas/1/voting-status")
+        return Promise.resolve(status);
+      if (path === "/api/peladas/1/full-details")
+        return Promise.resolve(details);
       return Promise.reject(new Error(`Not found: ${path}`));
     });
   };
@@ -77,8 +89,8 @@ describe("PeladaVotingPage", () => {
       ...mockVotingInfo,
       has_voted: true,
       eligible_players: [
-        { player_id: "11", name: "Player 11" },
-        { player_id: "12", name: "Player 12" },
+        { player_id: "11", name: "Player 11", voting_enabled: true },
+        { player_id: "12", name: "Player 12", voting_enabled: true },
       ],
       current_votes: [{ target_id: "11", stars: 4 }],
     };
@@ -95,7 +107,9 @@ describe("PeladaVotingPage", () => {
     await waitFor(() => {
       const rating11 = screen.getByTestId("rating-11") as HTMLInputElement;
       expect(rating11.value).toBe("4");
-      expect(screen.getByText("peladas.voting.info.already_voted_view_change")).toBeInTheDocument();
+      expect(
+        screen.getByText("peladas.voting.info.already_voted_view_change"),
+      ).toBeInTheDocument();
     });
   });
 
@@ -111,7 +125,9 @@ describe("PeladaVotingPage", () => {
       </MemoryRouter>,
     );
 
-    await waitFor(() => expect(screen.getByText("Target Player")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Target Player")).toBeInTheDocument(),
+    );
 
     const rating = screen.getByTestId("rating-11");
     fireEvent.change(rating, { target: { value: "5" } });
@@ -127,7 +143,9 @@ describe("PeladaVotingPage", () => {
           votes: [{ target_id: "11", stars: 5 }],
         }),
       );
-      expect(screen.getAllByText("peladas.voting.success.saved")[0]).toBeInTheDocument();
+      expect(
+        screen.getAllByText("peladas.voting.success.saved")[0],
+      ).toBeInTheDocument();
     });
   });
 
@@ -143,8 +161,12 @@ describe("PeladaVotingPage", () => {
       </MemoryRouter>,
     );
 
-    await waitFor(() => expect(screen.getByTestId("save-votes-button")).toBeInTheDocument());
-    fireEvent.change(screen.getByTestId("rating-11"), { target: { value: "5" } });
+    await waitFor(() =>
+      expect(screen.getByTestId("save-votes-button")).toBeInTheDocument(),
+    );
+    fireEvent.change(screen.getByTestId("rating-11"), {
+      target: { value: "5" },
+    });
     fireEvent.click(screen.getByTestId("save-votes-button"));
 
     await waitFor(() => {
@@ -165,7 +187,9 @@ describe("PeladaVotingPage", () => {
       </MemoryRouter>,
     );
 
-    await waitFor(() => expect(screen.getByText("common.actions.disable")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("common.actions.disable")).toBeInTheDocument(),
+    );
 
     // Disable
     fireEvent.click(screen.getByText("common.actions.disable"));
@@ -202,12 +226,18 @@ describe("PeladaVotingPage", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("peladas.voting.error.unauthenticated")).toBeInTheDocument();
+      expect(
+        screen.getByText("peladas.voting.error.unauthenticated"),
+      ).toBeInTheDocument();
     });
   });
 
   it("handles cannot vote state for non-admins", async () => {
-    const cannotVoteInfo = { ...mockVotingInfo, can_vote: false, message: "Custom message" };
+    const cannotVoteInfo = {
+      ...mockVotingInfo,
+      can_vote: false,
+      message: "Custom message",
+    };
     setupMocks(cannotVoteInfo);
 
     render(
@@ -245,8 +275,12 @@ describe("PeladaVotingPage", () => {
     await waitFor(() => {
       expect(screen.getByText("Voter 11")).toBeInTheDocument();
       expect(screen.getByText("Voter 12")).toBeInTheDocument();
-      expect(screen.getByText("peladas.voting.status.voted (1)")).toBeInTheDocument();
-      expect(screen.getByText("peladas.voting.status.pending (1)")).toBeInTheDocument();
+      expect(
+        screen.getByText("peladas.voting.status.voted (1)"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("peladas.voting.status.pending (1)"),
+      ).toBeInTheDocument();
     });
   });
 
@@ -279,7 +313,9 @@ describe("PeladaVotingPage", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("peladas.voting.warning.no_eligible_players")).toBeInTheDocument();
+      expect(
+        screen.getByText("peladas.voting.warning.no_eligible_players"),
+      ).toBeInTheDocument();
     });
   });
 });

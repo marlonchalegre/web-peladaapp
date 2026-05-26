@@ -1,12 +1,30 @@
 import { describe, it, expect } from "vitest";
 import { formatPeladaSummary } from "./formatSummary";
+import type { StandingRow } from "../components/StandingsPanel";
+import type { PlayerStatRow } from "../components/PlayerStatsPanel";
 
 describe("formatPeladaSummary", () => {
   it("formats summary correctly with all data", () => {
     const date = "2024-05-25T12:00:00Z";
     const standings = [
-      { name: "Team A", wins: 2, draws: 1, losses: 0, goalsFor: 5, goalsAgainst: 2, goalDifference: 3 },
-      { name: "Team B", wins: 0, draws: 1, losses: 2, goalsFor: 2, goalsAgainst: 5, goalDifference: -3 },
+      {
+        name: "Team A",
+        wins: 2,
+        draws: 1,
+        losses: 0,
+        goalsFor: 5,
+        goalsAgainst: 2,
+        goalDifference: 3,
+      },
+      {
+        name: "Team B",
+        wins: 0,
+        draws: 1,
+        losses: 2,
+        goalsFor: 2,
+        goalsAgainst: 5,
+        goalDifference: -3,
+      },
     ];
     const playerStats = [
       { name: "Player 1", goals: 3, assists: 1, goalsConceded: undefined },
@@ -15,8 +33,12 @@ describe("formatPeladaSummary", () => {
       { name: "GK B", goals: 0, assists: 0, goalsConceded: 3 },
     ];
 
-    const result = formatPeladaSummary(date, standings as any, playerStats as any);
-    
+    const result = formatPeladaSummary(
+      date,
+      standings as StandingRow[],
+      playerStats as PlayerStatRow[],
+    );
+
     expect(result).toContain("Resumo da rodada 25/05");
     expect(result).toContain("Team A");
     expect(result).toContain("7 pts (2V 1E 0D) GP:5 SG:+3");
@@ -46,14 +68,34 @@ describe("formatPeladaSummary", () => {
 
   it("handles tie-breaking and zero goal difference", () => {
     const standings = [
-      { name: "Team B", wins: 1, draws: 0, losses: 1, goalsFor: 1, goalsAgainst: 1, goalDifference: 0 },
-      { name: "Team A", wins: 1, draws: 0, losses: 1, goalsFor: 2, goalsAgainst: 2, goalDifference: 0 },
+      {
+        name: "Team B",
+        wins: 1,
+        draws: 0,
+        losses: 1,
+        goalsFor: 1,
+        goalsAgainst: 1,
+        goalDifference: 0,
+      },
+      {
+        name: "Team A",
+        wins: 1,
+        draws: 0,
+        losses: 1,
+        goalsFor: 2,
+        goalsAgainst: 2,
+        goalDifference: 0,
+      },
     ];
     const playerStats = [
       { name: "Player B", goals: 1, assists: 1 },
       { name: "Player A", goals: 1, assists: 1 },
     ];
-    const result = formatPeladaSummary("2024-05-25T12:00:00Z", standings as any, playerStats as any);
+    const result = formatPeladaSummary(
+      "2024-05-25T12:00:00Z",
+      standings as StandingRow[],
+      playerStats as PlayerStatRow[],
+    );
     expect(result).toContain("Team A");
     expect(result).toContain("Team B");
     expect(result).toContain("Player A");
@@ -61,8 +103,18 @@ describe("formatPeladaSummary", () => {
   });
 
   it("handles long names for alignment", () => {
-    const standings = [{ name: "A very long team name that should be truncated or padded", wins: 1, draws: 0, losses: 0, goalsFor: 1, goalsAgainst: 0, goalDifference: 1 }];
-    const result = formatPeladaSummary("2024-05-25", standings as any, []);
+    const standings = [
+      {
+        name: "A very long team name that should be truncated or padded",
+        wins: 1,
+        draws: 0,
+        losses: 0,
+        goalsFor: 1,
+        goalsAgainst: 0,
+        goalDifference: 1,
+      },
+    ];
+    const result = formatPeladaSummary("2024-05-25", standings as StandingRow[], []);
     expect(result).toContain("A very long team name");
   });
 });

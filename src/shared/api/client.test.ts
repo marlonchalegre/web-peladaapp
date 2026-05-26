@@ -1,18 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  type Mock,
-} from "vitest";
+import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
 import {
   ApiClient,
   ApiError,
-  login,
-  logout,
-  getUser,
   forgotPassword,
   resetPassword,
   register,
@@ -133,21 +123,30 @@ describe("ApiClient", () => {
     await client.post("/post", { data: 1 });
     expect(mockFetch).toHaveBeenCalledWith(
       expect.anything(),
-      expect.objectContaining({ method: "POST", body: JSON.stringify({ data: 1 }) }),
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ data: 1 }),
+      }),
     );
 
     mockResponse({ success: true });
     await client.put("/put", { data: 2 });
     expect(mockFetch).toHaveBeenCalledWith(
       expect.anything(),
-      expect.objectContaining({ method: "PUT", body: JSON.stringify({ data: 2 }) }),
+      expect.objectContaining({
+        method: "PUT",
+        body: JSON.stringify({ data: 2 }),
+      }),
     );
 
     mockResponse({ success: true });
     await client.delete("/delete", { data: 3 });
     expect(mockFetch).toHaveBeenCalledWith(
       expect.anything(),
-      expect.objectContaining({ method: "DELETE", body: JSON.stringify({ data: 3 }) }),
+      expect.objectContaining({
+        method: "DELETE",
+        body: JSON.stringify({ data: 3 }),
+      }),
     );
   });
 });

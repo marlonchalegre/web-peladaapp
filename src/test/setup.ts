@@ -1,6 +1,11 @@
+import React from "react";
 import { afterEach, vi } from "vitest";
 import { cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom";
+
+// Fix act warnings for React 18/19
+// @ts-expect-error - IS_REACT_ACT_ENVIRONMENT is used by React internals
+globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
 // Mock react-i18next
 const tSpy = (key: string) => {
@@ -44,6 +49,53 @@ const localStorageMock = (function () {
 Object.defineProperty(window, "localStorage", {
   value: localStorageMock,
 });
+
+// Mock window.scrollTo
+window.scrollTo = vi.fn();
+
+// Systemically disable MUI ripples to avoid act warnings from animations
+// We use a named export mock for MUI components to ensure they all use the same mocked base
+vi.mock("@mui/material/ButtonBase", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("@mui/material/ButtonBase")>();
+  return {
+    ...actual,
+    default: React.forwardRef((props: unknown, ref: React.Ref<unknown>) => {
+      const { children, style, ...rest } = props as {
+        children: React.ReactNode;
+        style?: React.CSSProperties;
+      };
+      return React.createElement(
+        "button",
+        {
+          ...rest,
+          ref,
+          type: "button",
+          style: {
+            border: "none",
+            background: "none",
+            padding: 0,
+            cursor: "pointer",
+            ...style,
+          },
+        },
+        children,
+      );
+    }),
+  };
+});
+
+// Mock TouchRipple directly as well
+vi.mock("@mui/material/ButtonBase/TouchRipple", () => ({
+  default: React.forwardRef((_props: unknown, ref: React.Ref<unknown>) => {
+    React.useImperativeHandle(ref, () => ({
+      pulsate: () => {},
+      start: () => {},
+      stop: () => {},
+    }));
+    return null;
+  }),
+}));
 
 // Cleanup after each test
 afterEach(() => {

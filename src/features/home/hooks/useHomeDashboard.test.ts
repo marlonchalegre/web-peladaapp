@@ -92,7 +92,7 @@ describe("useHomeDashboard", () => {
     const { result } = renderHook(() => useHomeDashboard());
     await waitFor(() => expect(result.current.loading).toBe(false));
 
-    act(() => {
+    await act(async () => {
       result.current.handlePeladaPageChange({} as any, 2);
     });
 

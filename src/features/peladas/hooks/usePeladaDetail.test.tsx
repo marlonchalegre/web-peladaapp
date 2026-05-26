@@ -284,11 +284,15 @@ describe("usePeladaDetail", () => {
     await waitFor(() => expect(result.current.pelada).not.toBe(null), {
       timeout: 2000,
     });
-    mockApi.reverseTransaction.mockRejectedValueOnce(new Error("Reversal Error"));
+    mockApi.reverseTransaction.mockRejectedValueOnce(
+      new Error("Reversal Error"),
+    );
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     await act(async () => {
       await result.current.handleReversePayment("pl1");
     });
     expect(result.current.error).toBe("Reversal Error");
+    consoleSpy.mockRestore();
   });
 
   it("should execute handlePerformSwap when incoming player comes from another team", async () => {
@@ -299,12 +303,31 @@ describe("usePeladaDetail", () => {
       timeout: 2000,
     });
     await act(async () => {
-      await result.current.handlePerformSwap("incomingPlayer", "targetTeam", "sourceTeam", "playerToReplace");
+      await result.current.handlePerformSwap(
+        "incomingPlayer",
+        "targetTeam",
+        "sourceTeam",
+        "playerToReplace",
+      );
     });
-    expect(mockApi.removePlayerFromTeam).toHaveBeenCalledWith("targetTeam", "playerToReplace");
-    expect(mockApi.removePlayerFromTeam).toHaveBeenCalledWith("sourceTeam", "incomingPlayer");
-    expect(mockApi.addPlayerToTeam).toHaveBeenCalledWith("targetTeam", "incomingPlayer", false);
-    expect(mockApi.addPlayerToTeam).toHaveBeenCalledWith("sourceTeam", "playerToReplace", false);
+    expect(mockApi.removePlayerFromTeam).toHaveBeenCalledWith(
+      "targetTeam",
+      "playerToReplace",
+    );
+    expect(mockApi.removePlayerFromTeam).toHaveBeenCalledWith(
+      "sourceTeam",
+      "incomingPlayer",
+    );
+    expect(mockApi.addPlayerToTeam).toHaveBeenCalledWith(
+      "targetTeam",
+      "incomingPlayer",
+      false,
+    );
+    expect(mockApi.addPlayerToTeam).toHaveBeenCalledWith(
+      "sourceTeam",
+      "playerToReplace",
+      false,
+    );
   });
 
   it("should execute handlePerformSwap when incoming player is fixed goalkeeper on bench", async () => {
@@ -328,18 +351,35 @@ describe("usePeladaDetail", () => {
       timeout: 2000,
     });
     await act(async () => {
-      await result.current.handlePerformSwap("incomingPlayer", "targetTeam", null, "playerToReplace");
+      await result.current.handlePerformSwap(
+        "incomingPlayer",
+        "targetTeam",
+        null,
+        "playerToReplace",
+      );
     });
-    expect(mockApi.removePlayerFromTeam).toHaveBeenCalledWith("targetTeam", "playerToReplace");
+    expect(mockApi.removePlayerFromTeam).toHaveBeenCalledWith(
+      "targetTeam",
+      "playerToReplace",
+    );
     expect(mockApiClient.put).toHaveBeenCalledWith(
       expect.stringContaining(peladaId),
       expect.objectContaining({ home_fixed_goalkeeper_id: null }),
     );
-    expect(mockApi.addPlayerToTeam).toHaveBeenCalledWith("targetTeam", "incomingPlayer", false);
+    expect(mockApi.addPlayerToTeam).toHaveBeenCalledWith(
+      "targetTeam",
+      "incomingPlayer",
+      false,
+    );
 
     // Swap away fixed GK
     await act(async () => {
-      await result.current.handlePerformSwap("incomingPlayerAway", "targetTeam", null, "playerToReplace");
+      await result.current.handlePerformSwap(
+        "incomingPlayerAway",
+        "targetTeam",
+        null,
+        "playerToReplace",
+      );
     });
     expect(mockApiClient.put).toHaveBeenCalledWith(
       expect.stringContaining(peladaId),
@@ -349,7 +389,12 @@ describe("usePeladaDetail", () => {
     // Swap fail path with non-Error
     mockApi.removePlayerFromTeam.mockRejectedValueOnce("String Swap Error");
     await act(async () => {
-      await result.current.handlePerformSwap("incomingPlayer", "targetTeam", null, "playerToReplace");
+      await result.current.handlePerformSwap(
+        "incomingPlayer",
+        "targetTeam",
+        null,
+        "playerToReplace",
+      );
     });
     expect(result.current.error).toBe("Swap failed");
   });
@@ -392,7 +437,11 @@ describe("usePeladaDetail", () => {
     const homeGkEvent = {
       preventDefault: vi.fn(),
       dataTransfer: {
-        getData: vi.fn().mockReturnValue(JSON.stringify({ playerId: "gkHome", sourceTeamId: null })),
+        getData: vi
+          .fn()
+          .mockReturnValue(
+            JSON.stringify({ playerId: "gkHome", sourceTeamId: null }),
+          ),
       },
     } as any;
     await act(async () => {
@@ -407,7 +456,11 @@ describe("usePeladaDetail", () => {
     const awayGkEvent = {
       preventDefault: vi.fn(),
       dataTransfer: {
-        getData: vi.fn().mockReturnValue(JSON.stringify({ playerId: "gkAway", sourceTeamId: null })),
+        getData: vi
+          .fn()
+          .mockReturnValue(
+            JSON.stringify({ playerId: "gkAway", sourceTeamId: null }),
+          ),
       },
     } as any;
     await act(async () => {
@@ -423,7 +476,9 @@ describe("usePeladaDetail", () => {
     await act(async () => {
       await result.current.dropToBench(homeGkEvent);
     });
-    expect(result.current.error).toBe("peladas.detail.error.move_to_bench_failed");
+    expect(result.current.error).toBe(
+      "peladas.detail.error.move_to_bench_failed",
+    );
   });
 
   it("should cover dropToTeam branches: same team, unsetting global GKs, and errors", async () => {
@@ -450,7 +505,11 @@ describe("usePeladaDetail", () => {
     const sameTeamEvent = {
       preventDefault: vi.fn(),
       dataTransfer: {
-        getData: vi.fn().mockReturnValue(JSON.stringify({ playerId: "pl1", sourceTeamId: "team1" })),
+        getData: vi
+          .fn()
+          .mockReturnValue(
+            JSON.stringify({ playerId: "pl1", sourceTeamId: "team1" }),
+          ),
       },
     } as any;
     await act(async () => {
@@ -462,7 +521,11 @@ describe("usePeladaDetail", () => {
     const homeGkEvent = {
       preventDefault: vi.fn(),
       dataTransfer: {
-        getData: vi.fn().mockReturnValue(JSON.stringify({ playerId: "gkHome", sourceTeamId: null })),
+        getData: vi
+          .fn()
+          .mockReturnValue(
+            JSON.stringify({ playerId: "gkHome", sourceTeamId: null }),
+          ),
       },
     } as any;
     await act(async () => {
@@ -472,13 +535,21 @@ describe("usePeladaDetail", () => {
       expect.stringContaining(peladaId),
       expect.objectContaining({ home_fixed_goalkeeper_id: null }),
     );
-    expect(mockApi.addPlayerToTeam).toHaveBeenCalledWith("team2", "gkHome", false);
+    expect(mockApi.addPlayerToTeam).toHaveBeenCalledWith(
+      "team2",
+      "gkHome",
+      false,
+    );
 
     // Move away GK to team2
     const awayGkEvent = {
       preventDefault: vi.fn(),
       dataTransfer: {
-        getData: vi.fn().mockReturnValue(JSON.stringify({ playerId: "gkAway", sourceTeamId: null })),
+        getData: vi
+          .fn()
+          .mockReturnValue(
+            JSON.stringify({ playerId: "gkAway", sourceTeamId: null }),
+          ),
       },
     } as any;
     await act(async () => {
@@ -494,7 +565,9 @@ describe("usePeladaDetail", () => {
     await act(async () => {
       await result.current.dropToTeam(homeGkEvent, "team2");
     });
-    expect(result.current.error).toBe("peladas.detail.error.move_player_failed");
+    expect(result.current.error).toBe(
+      "peladas.detail.error.move_player_failed",
+    );
   });
 
   it("should cover dropToFixedGk and removeFixedGk branches and errors", async () => {
@@ -507,7 +580,11 @@ describe("usePeladaDetail", () => {
     const mockEvent = {
       preventDefault: vi.fn(),
       dataTransfer: {
-        getData: vi.fn().mockReturnValue(JSON.stringify({ playerId: "pl1", sourceTeamId: "team1" })),
+        getData: vi
+          .fn()
+          .mockReturnValue(
+            JSON.stringify({ playerId: "pl1", sourceTeamId: "team1" }),
+          ),
       },
     } as any;
     await act(async () => {
@@ -523,7 +600,9 @@ describe("usePeladaDetail", () => {
     await act(async () => {
       await result.current.dropToFixedGk(mockEvent, "home");
     });
-    expect(result.current.error).toBe("peladas.detail.error.set_goalkeeper_failed");
+    expect(result.current.error).toBe(
+      "peladas.detail.error.set_goalkeeper_failed",
+    );
 
     // removeFixedGk away side
     await act(async () => {
@@ -539,7 +618,9 @@ describe("usePeladaDetail", () => {
     await act(async () => {
       await result.current.removeFixedGk("home");
     });
-    expect(result.current.error).toBe("peladas.detail.error.remove_player_failed");
+    expect(result.current.error).toBe(
+      "peladas.detail.error.remove_player_failed",
+    );
   });
 
   it("should cover handleSetGoalkeeper, handleRemovePlayer, and handleUpdatePlayersPerTeam error branches", async () => {
@@ -553,14 +634,18 @@ describe("usePeladaDetail", () => {
     await act(async () => {
       await result.current.handleSetGoalkeeper("team1", "pl1");
     });
-    expect(result.current.error).toBe("peladas.detail.error.set_goalkeeper_failed");
+    expect(result.current.error).toBe(
+      "peladas.detail.error.set_goalkeeper_failed",
+    );
 
     // handleRemovePlayer error
     mockApi.removePlayerFromTeam.mockRejectedValueOnce("Remove Error");
     await act(async () => {
       await result.current.handleRemovePlayer("team1", "pl1");
     });
-    expect(result.current.error).toBe("peladas.detail.error.remove_player_failed");
+    expect(result.current.error).toBe(
+      "peladas.detail.error.remove_player_failed",
+    );
 
     // handleUpdatePlayersPerTeam error
     mockApiClient.put.mockRejectedValueOnce("Count Update Error");
@@ -597,14 +682,18 @@ describe("usePeladaDetail", () => {
     await act(async () => {
       await result.current.handleCreateTeam("Team New");
     });
-    expect(result.current.error).toBe("peladas.detail.error.create_team_failed");
+    expect(result.current.error).toBe(
+      "peladas.detail.error.create_team_failed",
+    );
 
     // handleDeleteTeam error
     mockApi.deleteTeam.mockRejectedValueOnce("Delete Team Error");
     await act(async () => {
       await result.current.handleDeleteTeam("team1");
     });
-    expect(result.current.error).toBe("peladas.detail.error.delete_team_failed");
+    expect(result.current.error).toBe(
+      "peladas.detail.error.delete_team_failed",
+    );
   });
 
   it("should cover handleToggleFixedGoalkeepers, handleAddPlayersFromOrg, and payment guards/failures", async () => {
@@ -646,10 +735,11 @@ describe("usePeladaDetail", () => {
     await act(async () => {
       await result.current.handleMarkPaid("pl1", 10);
     });
-    expect(result.current.error).toBe("organizations.management.finance.transactions.error.add_failed");
+    expect(result.current.error).toBe(
+      "organizations.management.finance.transactions.error.add_failed",
+    );
     expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();
-
   });
 
   it("should guard handleMarkPaid and handleReversePayment when pelada is null", async () => {
@@ -676,5 +766,3 @@ describe("usePeladaDetail", () => {
     expect(mockApi.reverseTransaction).not.toHaveBeenCalled();
   });
 });
-
-

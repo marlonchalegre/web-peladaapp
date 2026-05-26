@@ -232,25 +232,27 @@ export default function PlayerAttendanceCard({
                       "Marcar como Pago",
                     )}
                   >
-                    <IconButton
-                      size="small"
-                      onClick={() =>
-                        onMarkPaid?.(organizationFinance?.diarista_price || 0)
-                      }
-                      disabled={
-                        isUpdating || !organizationFinance?.diarista_price
-                      }
-                      data-testid="mark-as-paid-button"
-                      sx={{
-                        color: "warning.main",
-                        "&:hover": {
-                          color: "success.main",
-                          bgcolor: "success.light",
-                        },
-                      }}
-                    >
-                      <AttachMoneyIcon fontSize="small" />
-                    </IconButton>
+                    <span>
+                      <IconButton
+                        size="small"
+                        onClick={() =>
+                          onMarkPaid?.(organizationFinance?.diarista_price || 0)
+                        }
+                        disabled={
+                          isUpdating || !organizationFinance?.diarista_price
+                        }
+                        data-testid="mark-as-paid-button"
+                        sx={{
+                          color: "warning.main",
+                          "&:hover": {
+                            color: "success.main",
+                            bgcolor: "success.light",
+                          },
+                        }}
+                      >
+                        <AttachMoneyIcon fontSize="small" />
+                      </IconButton>
+                    </span>
                   </Tooltip>
                 )}
               </>

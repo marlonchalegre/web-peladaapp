@@ -1,7 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import TeamCard from "./TeamCard";
-import type { Player, Team, User, Transaction } from "../../../shared/api/endpoints";
+import type {
+  Player,
+  Team,
+  User,
+  Transaction,
+} from "../../../shared/api/endpoints";
 import { ThemeContextProvider } from "../../../app/providers/ThemeProvider";
 
 // Mock i18next
@@ -9,7 +14,8 @@ vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string, params?: { score?: string | number; name?: string }) => {
       if (key === "peladas.team_card.average") return `AVG: ${params?.score}`;
-      if (key === "peladas.teams.menu.move_to") return `Move to ${params?.name}`;
+      if (key === "peladas.teams.menu.move_to")
+        return `Move to ${params?.name}`;
       if (key.startsWith("common.positions.")) return key.split(".").pop();
       return key;
     },
@@ -28,7 +34,11 @@ describe("TeamCard", () => {
   const mockTeam: Team = { id: "t1", pelada_id: "p1", name: "Team Alpha" };
   const otherTeam: Team = { id: "t2", pelada_id: "p1", name: "Team Beta" };
 
-  const mockPlayers: (Player & { user: User; displayScore?: string; member_type?: string })[] = [
+  const mockPlayers: (Player & {
+    user: User;
+    displayScore?: string;
+    member_type?: string;
+  })[] = [
     {
       id: "pl1",
       user_id: "u1",
@@ -73,14 +83,14 @@ describe("TeamCard", () => {
     },
   ];
 
-  let onDelete: any;
-  let onDrop: any;
-  let onDragStartPlayer: any;
-  let onMoveToTeam: any;
-  let onSendToBench: any;
-  let onMoveToFixedGk: any;
-  let onMarkPaid: any;
-  let onReversePayment: any;
+  let onDelete: ReturnType<typeof vi.fn>;
+  let onDrop: ReturnType<typeof vi.fn>;
+  let onDragStartPlayer: ReturnType<typeof vi.fn>;
+  let onMoveToTeam: ReturnType<typeof vi.fn>;
+  let onSendToBench: ReturnType<typeof vi.fn>;
+  let onMoveToFixedGk: ReturnType<typeof vi.fn>;
+  let onMarkPaid: ReturnType<typeof vi.fn>;
+  let onReversePayment: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -124,7 +134,9 @@ describe("TeamCard", () => {
 
   it("renders team name and average score chip", () => {
     renderComponent();
-    expect(screen.getByTestId("team-card-name")).toHaveTextContent("Team Alpha");
+    expect(screen.getByTestId("team-card-name")).toHaveTextContent(
+      "Team Alpha",
+    );
     expect(screen.getByText("AVG: 7.3")).toBeInTheDocument();
   });
 
@@ -159,9 +171,15 @@ describe("TeamCard", () => {
 
     // Check menu items
     expect(screen.getByText("Move to Team Beta")).toBeInTheDocument();
-    expect(screen.getByText("peladas.teams.menu.send_to_bench")).toBeInTheDocument();
-    expect(screen.getByText("peladas.teams.menu.move_to_home_gk")).toBeInTheDocument();
-    expect(screen.getByText("peladas.teams.menu.move_to_away_gk")).toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.teams.menu.send_to_bench"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.teams.menu.move_to_home_gk"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.teams.menu.move_to_away_gk"),
+    ).toBeInTheDocument();
 
     // Move to beta
     fireEvent.click(screen.getByText("Move to Team Beta"));
@@ -198,12 +216,13 @@ describe("TeamCard", () => {
     const transactions: Transaction[] = [
       {
         id: "tx1",
+        organization_id: "org1",
         player_id: "pl1",
         type: "income",
         category: "diarista_fee",
         status: "paid",
-        amount: 30,
-        payment_date: "2024-05-25",
+        amount: 25,
+        payment_date: "2024-05-25T10:00:00Z",
         description: "",
       },
     ];
@@ -215,28 +234,36 @@ describe("TeamCard", () => {
     fireEvent.click(reverseBtn);
 
     expect(onReversePayment).toHaveBeenCalledWith("pl1");
-    expect(screen.queryByTestId("mark-as-paid-button")).toHaveLength; // Player 3 (convidado) still has pay button
+    expect(screen.getAllByTestId("mark-as-paid-button")).toHaveLength(1); // Player 3 (convidado) still has pay button
   });
 
   it("renders non-admin view correctly with no action buttons", () => {
     const transactions: Transaction[] = [
       {
         id: "tx1",
+        organization_id: "org1",
         player_id: "pl1",
         type: "income",
         category: "diarista_fee",
         status: "paid",
-        amount: 30,
-        payment_date: "2024-05-25",
+        amount: 25,
+        payment_date: "2024-05-25T10:00:00Z",
         description: "",
       },
     ];
 
-    renderComponent({ isAdminOverride: false, peladaTransactions: transactions });
+    renderComponent({
+      isAdminOverride: false,
+      peladaTransactions: transactions,
+    });
 
-    expect(screen.queryByLabelText("peladas.team_card.delete")).not.toBeInTheDocument();
+    expect(
+      screen.queryByLabelText("peladas.team_card.delete"),
+    ).not.toBeInTheDocument();
     expect(screen.queryByTestId("SwapHorizIcon")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("reverse-payment-button")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("reverse-payment-button"),
+    ).not.toBeInTheDocument();
     expect(screen.queryByTestId("mark-as-paid-button")).not.toBeInTheDocument();
 
     // Should show static paid icon (PaidIcon)

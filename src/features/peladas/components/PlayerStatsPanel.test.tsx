@@ -12,12 +12,14 @@ vi.mock("react-i18next", () => ({
 
 // Mock SecureAvatar to avoid network requests or complex image renderings
 vi.mock("../../../shared/components/SecureAvatar", () => ({
-  SecureAvatar: ({ fallbackText }: any) => <div data-testid="avatar">{fallbackText}</div>,
+  SecureAvatar: ({ fallbackText }: { fallbackText?: string }) => (
+    <div data-testid="avatar">{fallbackText}</div>
+  ),
 }));
 
 describe("PlayerStatsPanel", () => {
   let mockStats: PlayerStatRow[];
-  let onToggleSort: any;
+  let onToggleSort: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -62,7 +64,7 @@ describe("PlayerStatsPanel", () => {
           showHighlights={true}
           {...props}
         />
-      </ThemeContextProvider>
+      </ThemeContextProvider>,
     );
   };
 
@@ -82,10 +84,11 @@ describe("PlayerStatsPanel", () => {
   it("renders highlight cards for top scorers and assists when there are non-zero stats", () => {
     renderComponent({ showHighlights: true });
 
-    expect(screen.getByText("peladas.dashboard.summary.highlights")).toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.dashboard.summary.highlights"),
+    ).toBeInTheDocument();
 
     // Top scorer should have Alice and Bob (both have 3 goals)
-    const scorersHighlight = screen.getAllByText("3");
     // Bob should also be highlighted as top assists (5 assists)
     expect(screen.getAllByText("5").length).toBeGreaterThan(0);
   });
@@ -96,7 +99,9 @@ describe("PlayerStatsPanel", () => {
     ];
     renderComponent({ playerStats: zeroStats, showHighlights: true });
 
-    expect(screen.queryByText("peladas.dashboard.summary.highlights")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("peladas.dashboard.summary.highlights"),
+    ).not.toBeInTheDocument();
   });
 
   it("triggers onToggleSort when goals or assists headers are clicked", () => {

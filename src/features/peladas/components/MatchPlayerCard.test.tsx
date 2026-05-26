@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { render, screen, act } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import MatchPlayerCard from "./MatchPlayerCard";
@@ -94,7 +94,9 @@ describe("MatchPlayerCard", () => {
     );
 
     expect(screen.getByTestId("player-row-empty")).toBeInTheDocument();
-    expect(screen.getByText(/peladas\.dashboard\.empty_slot/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/peladas\.dashboard\.empty_slot/i),
+    ).toBeInTheDocument();
     expect(screen.getByRole("button")).toBeInTheDocument(); // Sub button in empty slot
   });
 
@@ -144,11 +146,19 @@ describe("MatchPlayerCard", () => {
       <ThemeContextProvider>
         <MatchPlayerCard
           {...defaultProps}
-          playerData={{ ...defaultProps.playerData, position: undefined, user_position: "Defender" } as any}
+          playerData={
+            {
+              ...defaultProps.playerData,
+              position: undefined,
+              user_position: "Defender",
+            } as any
+          }
         />
       </ThemeContextProvider>,
     );
-    expect(screen.getByText(/common\.positions\.defender/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/common\.positions\.defender/i),
+    ).toBeInTheDocument();
   });
 
   it("falls back to 'player' position when both are missing", () => {
@@ -156,7 +166,13 @@ describe("MatchPlayerCard", () => {
       <ThemeContextProvider>
         <MatchPlayerCard
           {...defaultProps}
-          playerData={{ ...defaultProps.playerData, position: undefined, user_position: undefined } as any}
+          playerData={
+            {
+              ...defaultProps.playerData,
+              position: undefined,
+              user_position: undefined,
+            } as any
+          }
         />
       </ThemeContextProvider>,
     );
@@ -171,7 +187,9 @@ describe("MatchPlayerCard", () => {
     );
 
     expect(screen.queryByTestId("sub-button")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("stat-goals-increment")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("stat-goals-increment"),
+    ).not.toBeInTheDocument();
   });
 
   it("hides controls when finished", () => {
@@ -182,7 +200,9 @@ describe("MatchPlayerCard", () => {
     );
 
     expect(screen.queryByTestId("sub-button")).not.toBeInTheDocument();
-    expect(screen.queryByTestId("stat-goals-increment")).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("stat-goals-increment"),
+    ).not.toBeInTheDocument();
   });
 
   it("triggers onStatChange for goals", async () => {
@@ -190,7 +210,11 @@ describe("MatchPlayerCard", () => {
     const onStatChange = vi.fn();
     render(
       <ThemeContextProvider>
-        <MatchPlayerCard {...defaultProps} onStatChange={onStatChange} stats={{ goals: 1, assists: 0, ownGoals: 0 }} />
+        <MatchPlayerCard
+          {...defaultProps}
+          onStatChange={onStatChange}
+          stats={{ goals: 1, assists: 0, ownGoals: 0 }}
+        />
       </ThemeContextProvider>,
     );
 
@@ -206,7 +230,11 @@ describe("MatchPlayerCard", () => {
     const onStatChange = vi.fn();
     render(
       <ThemeContextProvider>
-        <MatchPlayerCard {...defaultProps} onStatChange={onStatChange} stats={{ goals: 0, assists: 1, ownGoals: 0 }} />
+        <MatchPlayerCard
+          {...defaultProps}
+          onStatChange={onStatChange}
+          stats={{ goals: 0, assists: 1, ownGoals: 0 }}
+        />
       </ThemeContextProvider>,
     );
 
@@ -222,7 +250,11 @@ describe("MatchPlayerCard", () => {
     const onStatChange = vi.fn();
     render(
       <ThemeContextProvider>
-        <MatchPlayerCard {...defaultProps} onStatChange={onStatChange} stats={{ goals: 0, assists: 0, ownGoals: 1 }} />
+        <MatchPlayerCard
+          {...defaultProps}
+          onStatChange={onStatChange}
+          stats={{ goals: 0, assists: 0, ownGoals: 1 }}
+        />
       </ThemeContextProvider>,
     );
 
@@ -236,7 +268,10 @@ describe("MatchPlayerCard", () => {
   it("disables decrement buttons when stats are zero", () => {
     render(
       <ThemeContextProvider>
-        <MatchPlayerCard {...defaultProps} stats={{ goals: 0, assists: 0, ownGoals: 0 }} />
+        <MatchPlayerCard
+          {...defaultProps}
+          stats={{ goals: 0, assists: 0, ownGoals: 0 }}
+        />
       </ThemeContextProvider>,
     );
 

@@ -1,12 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-} from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor, act } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { AuthProvider } from "./AuthProvider";
 import { useAuth } from "./AuthContext";
 import { api } from "../../shared/api/client";
@@ -33,8 +28,7 @@ vi.mock("jwt-decode", () => ({
 
 // Helper component
 function TestComponent() {
-  const { isAuthenticated, user, signIn, signOut, refreshUser } =
-    useAuth();
+  const { isAuthenticated, user, signIn, signOut, refreshUser } = useAuth();
   return (
     <div>
       <div data-testid="authenticated">
@@ -48,8 +42,8 @@ function TestComponent() {
       >
         Sign In
       </button>
-      <button onClick={signOut}>Sign Out</button>
-      <button onClick={refreshUser}>Refresh</button>
+      <button onClick={async () => await signOut()}>Sign Out</button>
+      <button onClick={async () => await refreshUser()}>Refresh</button>
     </div>
   );
 }
@@ -75,29 +69,31 @@ describe("AuthProvider", () => {
   });
 
   it("updates state when signIn is called", async () => {
+    const user = userEvent.setup();
     render(
       <AuthProvider>
         <TestComponent />
       </AuthProvider>,
     );
-    screen.getByText("Sign In").click();
+    await user.click(screen.getByText("Sign In"));
     await waitFor(() =>
       expect(screen.getByTestId("authenticated")).toHaveTextContent("true"),
     );
   });
 
   it("extracts admin_orgs from token in signIn", async () => {
+    const user = userEvent.setup();
     vi.mocked(jwtDecode).mockReturnValue({
       id: "1",
       email: "t@e.com",
       admin_orgs: ["org1"],
-    });
+    } as any);
     render(
       <AuthProvider>
         <TestComponent />
       </AuthProvider>,
     );
-    screen.getByText("Sign In").click();
+    await user.click(screen.getByText("Sign In"));
     await waitFor(() => {
       const stored = JSON.parse(localStorage.getItem("authUser") || "{}");
       expect(stored.admin_orgs).toEqual(["org1"]);
@@ -105,6 +101,7 @@ describe("AuthProvider", () => {
   });
 
   it("refreshes user data successfully", async () => {
+    const user = userEvent.setup();
     localStorage.setItem("authUser", JSON.stringify({ id: "1", name: "Old" }));
     vi.mocked(api.get).mockImplementation((url: string) => {
       if (url === "/api/users/me")
@@ -118,7 +115,7 @@ describe("AuthProvider", () => {
         <TestComponent />
       </AuthProvider>,
     );
-    screen.getByText("Refresh").click();
+    await user.click(screen.getByText("Refresh"));
     await waitFor(() =>
       expect(screen.getByTestId("user")).toHaveTextContent("New"),
     );
@@ -127,6 +124,7 @@ describe("AuthProvider", () => {
   });
 
   it("clears authentication state when signOut is called", async () => {
+    const user = userEvent.setup();
     localStorage.setItem("authUser", JSON.stringify({ id: "1", name: "User" }));
     render(
       <AuthProvider>
@@ -134,7 +132,7 @@ describe("AuthProvider", () => {
       </AuthProvider>,
     );
     expect(screen.getByTestId("authenticated")).toHaveTextContent("true");
-    screen.getByText("Sign Out").click();
+    await user.click(screen.getByText("Sign Out"));
     await waitFor(() => {
       expect(screen.getByTestId("authenticated")).toHaveTextContent("false");
       expect(screen.getByTestId("user")).toHaveTextContent("null");
@@ -150,8 +148,9 @@ describe("AuthProvider", () => {
       </AuthProvider>,
     );
     expect(api.setAuthErrorHandler).toHaveBeenCalled();
-    const authErrorHandler = vi.mocked(api.setAuthErrorHandler).mock.calls[0][0];
-    act(() => {
+    const authErrorHandler = vi.mocked(api.setAuthErrorHandler).mock
+      .calls[0][0];
+    await act(async () => {
       authErrorHandler();
     });
     await waitFor(() => {
@@ -161,4 +160,3 @@ describe("AuthProvider", () => {
     expect(localStorage.getItem("authUser")).toBeNull();
   });
 });
-
