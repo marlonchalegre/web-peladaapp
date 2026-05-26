@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import MatchPlayerCard from "./MatchPlayerCard";
 import { ThemeContextProvider } from "../../../app/providers/ThemeProvider";
@@ -184,7 +185,8 @@ describe("MatchPlayerCard", () => {
     expect(screen.queryByTestId("stat-goals-increment")).not.toBeInTheDocument();
   });
 
-  it("triggers onStatChange for goals", () => {
+  it("triggers onStatChange for goals", async () => {
+    const user = userEvent.setup();
     const onStatChange = vi.fn();
     render(
       <ThemeContextProvider>
@@ -192,14 +194,15 @@ describe("MatchPlayerCard", () => {
       </ThemeContextProvider>,
     );
 
-    fireEvent.click(screen.getByTestId("stat-goals-increment"));
+    await user.click(screen.getByTestId("stat-goals-increment"));
     expect(onStatChange).toHaveBeenCalledWith("goal", 1, "home");
 
-    fireEvent.click(screen.getByTestId("stat-goals-decrement"));
+    await user.click(screen.getByTestId("stat-goals-decrement"));
     expect(onStatChange).toHaveBeenCalledWith("goal", -1, "home");
   });
 
-  it("triggers onStatChange for assists", () => {
+  it("triggers onStatChange for assists", async () => {
+    const user = userEvent.setup();
     const onStatChange = vi.fn();
     render(
       <ThemeContextProvider>
@@ -207,14 +210,15 @@ describe("MatchPlayerCard", () => {
       </ThemeContextProvider>,
     );
 
-    fireEvent.click(screen.getByTestId("stat-assists-increment"));
+    await user.click(screen.getByTestId("stat-assists-increment"));
     expect(onStatChange).toHaveBeenCalledWith("assist", 1, "home");
 
-    fireEvent.click(screen.getByTestId("stat-assists-decrement"));
+    await user.click(screen.getByTestId("stat-assists-decrement"));
     expect(onStatChange).toHaveBeenCalledWith("assist", -1, "home");
   });
 
-  it("triggers onStatChange for own goals", () => {
+  it("triggers onStatChange for own goals", async () => {
+    const user = userEvent.setup();
     const onStatChange = vi.fn();
     render(
       <ThemeContextProvider>
@@ -222,10 +226,10 @@ describe("MatchPlayerCard", () => {
       </ThemeContextProvider>,
     );
 
-    fireEvent.click(screen.getByTestId("stat-own-goals-increment"));
+    await user.click(screen.getByTestId("stat-own-goals-increment"));
     expect(onStatChange).toHaveBeenCalledWith("own_goal", 1, "home");
 
-    fireEvent.click(screen.getByTestId("stat-own-goals-decrement"));
+    await user.click(screen.getByTestId("stat-own-goals-decrement"));
     expect(onStatChange).toHaveBeenCalledWith("own_goal", -1, "home");
   });
 
@@ -241,7 +245,8 @@ describe("MatchPlayerCard", () => {
     expect(screen.getByTestId("stat-own-goals-decrement")).toBeDisabled();
   });
 
-  it("triggers onSubClick when sub button is clicked", () => {
+  it("triggers onSubClick when sub button is clicked", async () => {
+    const user = userEvent.setup();
     const onSubClick = vi.fn();
     render(
       <ThemeContextProvider>
@@ -249,7 +254,7 @@ describe("MatchPlayerCard", () => {
       </ThemeContextProvider>,
     );
 
-    fireEvent.click(screen.getByTestId("sub-button"));
+    await user.click(screen.getByTestId("sub-button"));
     expect(onSubClick).toHaveBeenCalled();
   });
 
@@ -269,8 +274,5 @@ describe("MatchPlayerCard", () => {
     expect(screen.getByTestId("stat-goals-value")).toBeInTheDocument();
     expect(screen.getByTestId("stat-assists-value")).toBeInTheDocument();
     expect(screen.getByTestId("stat-own-goals-value")).toBeInTheDocument();
-    
-    // The background logic is inside MUI sx, harder to test directly without deep implementation knowledge,
-    // but the branch will be marked as covered.
   });
 });

@@ -401,11 +401,13 @@ export default function OrganizationManagementPage() {
         </TabPanel>
 
         <TabPanel value={activeTab} index="settings">
-          <DangerZoneSection
-            orgName={org.name}
-            onDeleteClick={() => setIsDeleteDialogOpen(true)}
-            actionLoading={actionLoading}
-          />
+          {isAdmin && (
+            <DangerZoneSection
+              orgName={org.name}
+              onDeleteClick={() => setIsDeleteDialogOpen(true)}
+              actionLoading={actionLoading}
+            />
+          )}
         </TabPanel>
       </Box>
       <DeleteOrganizationDialog

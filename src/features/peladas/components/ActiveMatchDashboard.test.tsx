@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, within, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect } from "vitest";
 import ActiveMatchDashboard from "./ActiveMatchDashboard";
@@ -233,6 +233,7 @@ describe("ActiveMatchDashboard", () => {
   });
 
   it("handles stat change: goal +1", async () => {
+    const user = userEvent.setup();
     const recordEvent = vi.fn();
     const adjustScore = vi.fn();
     render(
@@ -247,7 +248,7 @@ describe("ActiveMatchDashboard", () => {
     );
 
     const goalIncrement = screen.getAllByTestId("stat-goals-increment")[0];
-    await userEvent.click(goalIncrement);
+    await user.click(goalIncrement);
 
     expect(recordEvent).toHaveBeenCalledWith(
       "1",
@@ -260,6 +261,7 @@ describe("ActiveMatchDashboard", () => {
   });
 
   it("handles stat change: goal -1", async () => {
+    const user = userEvent.setup();
     const deleteEventAndRefresh = vi.fn();
     const adjustScore = vi.fn();
     render(
@@ -275,13 +277,14 @@ describe("ActiveMatchDashboard", () => {
     );
 
     const goalDecrement = screen.getAllByTestId("stat-goals-decrement")[0];
-    await userEvent.click(goalDecrement);
+    await user.click(goalDecrement);
 
     expect(deleteEventAndRefresh).toHaveBeenCalledWith("1", "101", "goal");
     expect(adjustScore).toHaveBeenCalledWith("1", "home", -1);
   });
 
   it("handles stat change: own_goal +1 (flips side)", async () => {
+    const user = userEvent.setup();
     const recordEvent = vi.fn();
     const adjustScore = vi.fn();
     render(
@@ -298,7 +301,7 @@ describe("ActiveMatchDashboard", () => {
     const ownGoalIncrement = screen.getAllByTestId(
       "stat-own-goals-increment",
     )[0];
-    await userEvent.click(ownGoalIncrement);
+    await user.click(ownGoalIncrement);
 
     expect(recordEvent).toHaveBeenCalledWith(
       "1",
@@ -311,6 +314,7 @@ describe("ActiveMatchDashboard", () => {
   });
 
   it("handles stat change: assist +1 (no score adjust)", async () => {
+    const user = userEvent.setup();
     const recordEvent = vi.fn();
     const adjustScore = vi.fn();
     render(
@@ -325,7 +329,7 @@ describe("ActiveMatchDashboard", () => {
     );
 
     const assistIncrement = screen.getAllByTestId("stat-assists-increment")[0];
-    await userEvent.click(assistIncrement);
+    await user.click(assistIncrement);
 
     expect(recordEvent).toHaveBeenCalledWith(
       "1",
@@ -338,6 +342,7 @@ describe("ActiveMatchDashboard", () => {
   });
 
   it("opens sub menu on player click and handles replacement", async () => {
+    const user = userEvent.setup();
     const setSelectMenu = vi.fn();
     render(
       <ThemeContextProvider>
@@ -350,7 +355,7 @@ describe("ActiveMatchDashboard", () => {
     );
 
     const subBtn = screen.getAllByTestId("sub-button")[0];
-    await userEvent.click(subBtn);
+    await user.click(subBtn);
 
     expect(setSelectMenu).toHaveBeenCalledWith({
       teamId: "10",
@@ -438,6 +443,7 @@ describe("ActiveMatchDashboard", () => {
   });
 
   it("handles stat change: own_goal -1 (flips side)", async () => {
+    const user = userEvent.setup();
     const deleteEventAndRefresh = vi.fn();
     const adjustScore = vi.fn();
     render(
@@ -455,7 +461,7 @@ describe("ActiveMatchDashboard", () => {
     const ownGoalDecrement = screen.getAllByTestId(
       "stat-own-goals-decrement",
     )[0];
-    await userEvent.click(ownGoalDecrement);
+    await user.click(ownGoalDecrement);
 
     expect(deleteEventAndRefresh).toHaveBeenCalledWith("1", "101", "own_goal");
     expect(adjustScore).toHaveBeenCalledWith("1", "away", -1);

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import AvailablePlayerItem from "./AvailablePlayerItem";
 import { ThemeContextProvider } from "../../../app/providers/ThemeProvider";
@@ -103,7 +104,8 @@ describe("AvailablePlayerItem", () => {
     expect(screen.queryByTestId("SwapHorizIcon")).not.toBeInTheDocument();
   });
 
-  it("opens menu and calls onMoveToTeam", () => {
+  it("opens menu and calls onMoveToTeam", async () => {
+    const user = userEvent.setup();
     const onMoveToTeam = vi.fn();
     const teams = [{ id: "t1", name: "Team A", organization_id: "o1" }];
     render(
@@ -117,14 +119,15 @@ describe("AvailablePlayerItem", () => {
       </ThemeContextProvider>,
     );
 
-    fireEvent.click(screen.getByRole("button"));
+    await user.click(screen.getByRole("button"));
     expect(screen.getByText(/peladas\.teams\.menu\.move_to/i)).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText(/peladas\.teams\.menu\.move_to/i));
+    await user.click(screen.getByText(/peladas\.teams\.menu\.move_to/i));
     expect(onMoveToTeam).toHaveBeenCalledWith("p1", "t1");
   });
 
-  it("shows fixed GK menu items and calls onMoveToFixedGk", () => {
+  it("shows fixed GK menu items and calls onMoveToFixedGk", async () => {
+    const user = userEvent.setup();
     const onMoveToFixedGk = vi.fn();
     render(
       <ThemeContextProvider>
@@ -137,19 +140,20 @@ describe("AvailablePlayerItem", () => {
       </ThemeContextProvider>,
     );
 
-    fireEvent.click(screen.getByRole("button"));
+    await user.click(screen.getByRole("button"));
 
     const homeGk = screen.getByTestId("move-to-home-gk-item");
-    fireEvent.click(homeGk);
+    await user.click(homeGk);
     expect(onMoveToFixedGk).toHaveBeenCalledWith("p1", "home");
 
-    fireEvent.click(screen.getByRole("button"));
+    await user.click(screen.getByRole("button"));
     const awayGk = screen.getByTestId("move-to-away-gk-item");
-    fireEvent.click(awayGk);
+    await user.click(awayGk);
     expect(onMoveToFixedGk).toHaveBeenCalledWith("p1", "away");
   });
 
-  it("renders payment badge for diarista/convidado - Paid (Admin with onReversePayment)", () => {
+  it("renders payment badge for diarista/convidado - Paid (Admin with onReversePayment)", async () => {
+    const user = userEvent.setup();
     const onReversePayment = vi.fn();
     const player = { ...defaultPlayer, member_type: "diarista" };
     render(
@@ -165,7 +169,7 @@ describe("AvailablePlayerItem", () => {
     );
 
     const reverseBtn = screen.getByTestId("reverse-payment-button");
-    fireEvent.click(reverseBtn);
+    await user.click(reverseBtn);
     expect(onReversePayment).toHaveBeenCalled();
   });
 
@@ -188,7 +192,8 @@ describe("AvailablePlayerItem", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("renders mark-as-paid button for unpaid diarista (Admin with onMarkPaid)", () => {
+  it("renders mark-as-paid button for unpaid diarista (Admin with onMarkPaid)", async () => {
+    const user = userEvent.setup();
     const onMarkPaid = vi.fn();
     const player = { ...defaultPlayer, member_type: "diarista" };
     render(
@@ -204,7 +209,7 @@ describe("AvailablePlayerItem", () => {
     );
 
     const markPaidBtn = screen.getByTestId("mark-as-paid-button");
-    fireEvent.click(markPaidBtn);
+    await user.click(markPaidBtn);
     expect(onMarkPaid).toHaveBeenCalled();
   });
 
