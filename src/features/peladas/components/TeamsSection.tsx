@@ -194,6 +194,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
             <Grid size={{ xs: 12, md: 6, lg: 4 }}>
               <Button
                 fullWidth
+                data-testid="add-team-button"
                 onClick={async () => {
                   await onCreateTeam(
                     t("peladas.teams.default_name", {

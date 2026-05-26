@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { lazyRetry } from "./lazyRetry";
-import * as React from "react";
 
 // Mock React.lazy
 vi.mock("react", async (importOriginal) => {
@@ -28,23 +28,33 @@ describe("lazyRetry", () => {
   it("should load component successfully on first try", async () => {
     const mockComponent = { default: () => null };
     const componentImport = vi.fn().mockResolvedValue(mockComponent);
-    
-    const factory = lazyRetry(componentImport, "TestComponent") as unknown as () => Promise<any>;
+
+    const factory = lazyRetry(
+      componentImport,
+      "TestComponent",
+    ) as unknown as () => Promise<any>;
     const result = await factory();
-    
+
     expect(result).toBe(mockComponent);
-    expect(window.localStorage.getItem("lazy-retry-TestComponent-refreshed")).toBe("false");
+    expect(
+      window.localStorage.getItem("lazy-retry-TestComponent-refreshed"),
+    ).toBe("false");
   });
 
   it("should force refresh on first failure", async () => {
     const error = new Error("ChunkLoadError");
     const componentImport = vi.fn().mockRejectedValue(error);
-    
-    const factory = lazyRetry(componentImport, "TestComponent") as unknown as () => Promise<any>;
+
+    const factory = lazyRetry(
+      componentImport,
+      "TestComponent",
+    ) as unknown as () => Promise<any>;
     const result = await factory();
-    
+
     expect(window.location.reload).toHaveBeenCalled();
-    expect(window.localStorage.getItem("lazy-retry-TestComponent-refreshed")).toBe("true");
+    expect(
+      window.localStorage.getItem("lazy-retry-TestComponent-refreshed"),
+    ).toBe("true");
     expect(console.warn).toHaveBeenCalledWith(
       "Failed to load chunk for TestComponent. Force refreshing...",
       error,
@@ -57,9 +67,12 @@ describe("lazyRetry", () => {
     window.localStorage.setItem("lazy-retry-TestComponent-refreshed", "true");
     const error = new Error("Persistent Error");
     const componentImport = vi.fn().mockRejectedValue(error);
-    
-    const factory = lazyRetry(componentImport, "TestComponent") as unknown as () => Promise<any>;
-    
+
+    const factory = lazyRetry(
+      componentImport,
+      "TestComponent",
+    ) as unknown as () => Promise<any>;
+
     await expect(factory()).rejects.toThrow("Persistent Error");
     expect(window.location.reload).not.toHaveBeenCalled();
     expect(console.error).toHaveBeenCalledWith(

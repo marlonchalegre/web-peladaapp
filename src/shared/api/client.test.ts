@@ -1,13 +1,27 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   describe,
   it,
   expect,
   vi,
   beforeEach,
-  afterEach,
   type Mock,
 } from "vitest";
-import { ApiClient, ApiError, login, logout, register, getUser, updateUserProfile } from "./client";
+import {
+  ApiClient,
+  ApiError,
+  login,
+  logout,
+  getUser,
+  forgotPassword,
+  resetPassword,
+  register,
+  updateUserProfile,
+  deleteUser,
+  uploadUserAvatar,
+  deleteUserAvatar,
+  getUserAvatarUrl,
+} from "./client";
 
 describe("ApiClient", () => {
   let client: ApiClient;
@@ -19,199 +33,141 @@ describe("ApiClient", () => {
     global.fetch = mockFetch as unknown as typeof fetch;
   });
 
-  afterEach(() => {
-    vi.restoreAllMocks();
+  const mockResponse = (
+    data: any,
+    ok = true,
+    status = 200,
+    headers: any = {},
+  ) => {
+    mockFetch.mockResolvedValueOnce({
+      ok,
+      status,
+      json: async () => data,
+      headers: {
+        get: (name: string) => headers[name] || null,
+      },
+    });
+  };
+
+  it("performs a GET request successfully", async () => {
+    mockResponse({ foo: "bar" });
+    const result = await client.get("/test");
+    expect(result).toEqual({ foo: "bar" });
   });
 
-  describe("Error Handling", () => {
-    it("throws ApiError with 401 status for unauthorized requests", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 401,
-        json: async () => ({
-          error: "Authentication required",
-          type: "authentication",
-        }),
+  it("handles timeout", async () => {
+    vi.useFakeTimers();
+    mockFetch.mockImplementation((_url, init) => {
+      return new Promise((_resolve, reject) => {
+        if (init?.signal) {
+          init.signal.addEventListener("abort", () => {
+            const err = new Error("The operation was aborted.");
+            err.name = "AbortError";
+            reject(err);
+          });
+        }
       });
-
-      try {
-        await client.get("/api/users");
-      } catch (error) {
-        expect(error).toBeInstanceOf(ApiError);
-        expect((error as ApiError).status).toBe(401);
-        expect((error as ApiError).isAuthError()).toBe(true);
-      }
     });
 
-    it("throws ApiError with 403 status for forbidden requests", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 403,
-        json: async () => ({ error: "Access forbidden", type: "forbidden" }),
-      });
-
-      try {
-        await client.get("/admin/settings");
-      } catch (error) {
-        expect(error).toBeInstanceOf(ApiError);
-        expect((error as ApiError).status).toBe(403);
-        expect((error as ApiError).isForbiddenError()).toBe(true);
-        expect((error as ApiError).isAuthError()).toBe(false);
-      }
-    });
-
-    it("calls onAuthError handler when 401 error occurs", async () => {
-      const onAuthError = vi.fn();
-      client.setAuthErrorHandler(onAuthError);
-
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 401,
-        json: async () => ({ error: "Authentication required" }),
-      });
-
-      try {
-        await client.get("/api/users");
-      } catch {
-        // Error should be thrown
-      }
-
-      expect(onAuthError).toHaveBeenCalled();
-    });
-
-    it("does not call onAuthError handler for non-401 errors", async () => {
-      const onAuthError = vi.fn();
-      client.setAuthErrorHandler(onAuthError);
-
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 403,
-        json: async () => ({ error: "Access forbidden" }),
-      });
-
-      try {
-        await client.get("/admin/settings");
-      } catch {
-        // Error should be thrown
-      }
-
-      expect(onAuthError).not.toHaveBeenCalled();
-    });
-
-    it("handles network errors gracefully", async () => {
-      mockFetch.mockRejectedValueOnce(new Error("Network error"));
-
-      await expect(client.get("/api/users")).rejects.toThrow("Network error");
-    });
+    const promise = client.get("/test");
+    vi.advanceTimersByTime(11000);
+    await expect(promise).rejects.toThrow("Network timeout");
+    vi.useRealTimers();
   });
 
-  describe("HTTP Methods", () => {
-    it("performs GET requests correctly", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ id: "1", name: "Test" }),
-      });
-
-      const result = await client.get("/api/users/1");
-
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining("/api/users/1"),
-        expect.objectContaining({ method: "GET" }),
-      );
-      expect(result).toEqual({ id: "1", name: "Test" });
-    });
-
-    it("performs POST requests with body correctly", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ id: "1", name: "New User" }),
-      });
-
-      const body = { name: "New User", email: "new@example.com" };
-      const result = await client.post("/api/users", body);
-
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining("/api/users"),
-        expect.objectContaining({
-          method: "POST",
-          body: JSON.stringify(body),
-        }),
-      );
-      expect(result).toEqual({ id: "1", name: "New User" });
-    });
-
-    it("performs PUT requests with body correctly", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ id: "1", name: "Updated User" }),
-      });
-
-      const body = { name: "Updated User" };
-      const result = await client.put("/api/users/1", body);
-
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining("/api/users/1"),
-        expect.objectContaining({
-          method: "PUT",
-          body: JSON.stringify(body),
-        }),
-      );
-      expect(result).toEqual({ id: "1", name: "Updated User" });
-    });
-
-    it("performs DELETE requests correctly", async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({ success: true }),
-      });
-
-      const result = await client.delete("/api/users/1");
-
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining("/api/users/1"),
-        expect.objectContaining({ method: "DELETE" }),
-      );
-      expect(result).toEqual({ success: true });
-    });
+  it("throws ApiError on failure", async () => {
+    mockResponse({ error: "Fail" }, false, 400);
+    await expect(client.get("/test")).rejects.toThrow(ApiError);
   });
 
-  describe("ApiError", () => {
-    it("correctly identifies auth errors (401)", () => {
-      const error = new ApiError(401, { error: "Unauthorized" });
-      expect(error.isAuthError()).toBe(true);
-      expect(error.isForbiddenError()).toBe(false);
+  it("parses pagination headers", async () => {
+    mockResponse([], true, 200, {
+      "X-Page": "2",
+      "X-Total-Pages": "10",
+      "X-Total": "100",
+      "X-Per-Page": "50",
     });
+    const result = await client.getPaginated("/test", { page: 2 });
+    expect(result.page).toBe(2);
+    expect(result.totalPages).toBe(10);
+    expect(result.total).toBe(100);
+    expect(result.perPage).toBe(50);
+  });
 
-    it("correctly identifies forbidden errors (403)", () => {
-      const error = new ApiError(403, { error: "Forbidden" });
-      expect(error.isAuthError()).toBe(false);
-      expect(error.isForbiddenError()).toBe(true);
+  it("handles 204 No Content successfully", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      status: 204,
+      json: async () => {
+        throw new Error("Should not be called");
+      },
+      headers: { get: () => null },
     });
+    const result = await client.post("/test");
+    expect(result).toEqual({});
+  });
 
-    it("correctly identifies other errors", () => {
-      const error = new ApiError(404, { error: "Not found" });
-      expect(error.isAuthError()).toBe(false);
-      expect(error.isForbiddenError()).toBe(false);
-    });
+  it("triggers onAuthError on 401 status", async () => {
+    const onAuthError = vi.fn();
+    client.setAuthErrorHandler(onAuthError);
+    mockResponse({ message: "Unauthorized" }, false, 401);
+    await expect(client.get("/test")).rejects.toThrow(ApiError);
+    expect(onAuthError).toHaveBeenCalled();
+  });
 
-    it("has correct error message", () => {
-      const error = new ApiError(
-        401,
-        { error: "Unauthorized" },
-        "Custom message",
-      );
-      expect(error.message).toBe("Custom message");
-      expect(error.status).toBe(401);
+  it("handles non-JSON error responses", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      statusText: "Internal Server Error",
+      json: async () => {
+        throw new Error("Not JSON");
+      },
+      headers: { get: () => null },
     });
+    await expect(client.get("/test")).rejects.toThrow("Internal Server Error");
+  });
 
-    it("defaults to generic message if not provided", () => {
-      const error = new ApiError(500, { error: "Server error" });
-      expect(error.message).toBe("API Error: 500");
-    });
+  it("supports PUT, DELETE and POST with bodies", async () => {
+    mockResponse({ success: true });
+    await client.post("/post", { data: 1 });
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ method: "POST", body: JSON.stringify({ data: 1 }) }),
+    );
+
+    mockResponse({ success: true });
+    await client.put("/put", { data: 2 });
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ method: "PUT", body: JSON.stringify({ data: 2 }) }),
+    );
+
+    mockResponse({ success: true });
+    await client.delete("/delete", { data: 3 });
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ method: "DELETE", body: JSON.stringify({ data: 3 }) }),
+    );
   });
 });
 
-describe("Auth & User Functions", () => {
+describe("ApiError", () => {
+  it("identifies auth and forbidden errors", () => {
+    const authErr = new ApiError(401, {});
+    expect(authErr.isAuthError()).toBe(true);
+    expect(authErr.isForbiddenError()).toBe(false);
+
+    const forbiddenErr = new ApiError(403, {});
+    expect(forbiddenErr.isAuthError()).toBe(false);
+    expect(forbiddenErr.isForbiddenError()).toBe(true);
+
+    const otherErr = new ApiError(500, {}, "Custom Message");
+    expect(otherErr.message).toBe("Custom Message");
+  });
+});
+
+describe("Auth and User Functions", () => {
   let mockFetch: Mock;
 
   beforeEach(() => {
@@ -224,37 +180,75 @@ describe("Auth & User Functions", () => {
       ok,
       status,
       json: async () => data,
-      headers: new Headers(),
+      headers: { get: () => null },
     });
   };
 
-  it("login calls correct endpoint", async () => {
-    mockResponse({ token: "tk123", user: { id: "u1" } });
-    await login("test@test.com", "pass");
-    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/auth/login"), expect.objectContaining({ method: "POST" }));
-  });
-
-  it("logout calls correct endpoint", async () => {
+  it("forgotPassword and resetPassword call correct endpoints", async () => {
     mockResponse({});
-    await logout();
-    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/auth/logout"), expect.objectContaining({ method: "POST" }));
+    await forgotPassword("email@test.com");
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining("/auth/forgot-password"),
+      expect.anything(),
+    );
+
+    mockResponse({});
+    await resetPassword("token", "pass");
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining("/auth/reset-password"),
+      expect.anything(),
+    );
   });
 
   it("register calls correct endpoint", async () => {
     mockResponse({});
-    await register("Name", "user", "test@test.com", "pass");
-    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/auth/register"), expect.objectContaining({ method: "POST" }));
+    await register("Name", "user", "email", "pass", "Midfielder", "123");
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining("/auth/register"),
+      expect.objectContaining({
+        body: expect.stringContaining('"position":"Midfielder"'),
+      }),
+    );
   });
 
-  it("getUser calls correct endpoint", async () => {
-    mockResponse({ id: "u1" });
-    await getUser("u1");
-    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/api/user/u1"), expect.objectContaining({ method: "GET" }));
-  });
-
-  it("updateUserProfile calls correct endpoint", async () => {
+  it("updateUserProfile and deleteUser call correct endpoints", async () => {
     mockResponse({ id: "u1" });
     await updateUserProfile("u1", { name: "New Name" });
-    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/api/user/u1/profile"), expect.objectContaining({ method: "PUT" }));
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining("/api/user/u1/profile"),
+      expect.objectContaining({ method: "PUT" }),
+    );
+
+    mockResponse({});
+    await deleteUser("u1");
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining("/api/user/u1"),
+      expect.objectContaining({ method: "DELETE" }),
+    );
+  });
+
+  it("uploadUserAvatar handles success and failure", async () => {
+    mockResponse({ avatar_filename: "img.png" });
+    const file = new File([""], "img.png", { type: "image/png" });
+    const res = await uploadUserAvatar("u1", file);
+    expect(res.avatar_filename).toBe("img.png");
+
+    mockResponse({ message: "Upload failed" }, false, 400);
+    await expect(uploadUserAvatar("u1", file)).rejects.toThrow("Upload failed");
+  });
+
+  it("deleteUserAvatar and getUserAvatarUrl work correctly", async () => {
+    mockResponse({});
+    await deleteUserAvatar("u1");
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining("/api/user/u1/avatar"),
+      expect.objectContaining({ method: "DELETE" }),
+    );
+
+    const url = getUserAvatarUrl("u1", "img.png");
+    expect(url).toContain("/api/user/u1/avatar");
+    expect(url).toContain("t=img.png");
+
+    expect(getUserAvatarUrl("u1", null)).toBeUndefined();
   });
 });

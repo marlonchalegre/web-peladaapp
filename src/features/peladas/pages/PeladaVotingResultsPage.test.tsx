@@ -78,4 +78,93 @@ describe("PeladaVotingResultsPage Restricted Access", () => {
       expect(screen.getByText(errorMessage)).toBeInTheDocument();
     });
   });
+
+  it("renders voting results successfully with standard and fallback scenarios", async () => {
+    const mockSuccessResults = {
+      mvp: [
+        {
+          player_id: "p1",
+          user_id: null,
+          name: "Player A",
+          average_stars: 4.8,
+          position: null,
+          goals: 2,
+          assists: 1,
+        },
+        {
+          player_id: "p2",
+          user_id: "u2",
+          name: "Player B",
+          average_stars: 4.5,
+          position: "Striker",
+          goals: 1,
+          assists: 2,
+        },
+        {
+          player_id: "p3",
+          user_id: "u3",
+          name: "Player C",
+          average_stars: 4.2,
+          position: "Goalkeeper",
+          goals: 0,
+          assists: 0,
+        },
+      ],
+      striker: [],
+      garcom: [],
+      total_voted: 3,
+      total_eligible: 10,
+      voters: [
+        { player_id: "p1", name: "Player A", has_voted: true },
+        { player_id: "p2", name: "Player B", has_voted: true },
+        { player_id: "p3", name: "Player C", has_voted: true },
+      ],
+      organization_id: null,
+      organization_name: null,
+    };
+
+    vi.mocked(api.get).mockResolvedValueOnce(mockSuccessResults);
+
+    renderWithProviders();
+
+    await waitFor(() => {
+      expect(screen.getByText("peladas.voting.results.hero_title")).toBeInTheDocument();
+    });
+
+    expect(screen.getByText("common.organization")).toBeInTheDocument();
+
+    const orgLink = screen.getByText("common.organization").closest("a");
+    expect(orgLink).toHaveAttribute("href", "/home");
+
+    expect(screen.getAllByText("Player A").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Player B").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Player C").length).toBeGreaterThanOrEqual(1);
+
+    const noAwardsMessages = screen.getAllByText("peladas.voting.results.no_awards");
+    expect(noAwardsMessages.length).toBe(2);
+
+    expect(screen.getByText("common.positions.unknown")).toBeInTheDocument();
+    expect(screen.getByText("common.positions.striker")).toBeInTheDocument();
+    expect(screen.getByText("common.positions.goalkeeper")).toBeInTheDocument();
+  });
+
+  it("shows still voting message when receiving a 400 error", async () => {
+    const axiosError = {
+      isAxiosError: true,
+      response: {
+        status: 400,
+        data: { message: "Voting is still open" },
+      },
+    };
+
+    vi.mocked(api.get).mockRejectedValueOnce(axiosError);
+
+    renderWithProviders();
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("peladas.voting.results.error.still_voting"),
+      ).toBeInTheDocument();
+    });
+  });
 });

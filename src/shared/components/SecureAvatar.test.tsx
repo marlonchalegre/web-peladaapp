@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, waitFor, cleanup } from "@testing-library/react";
+import { render, waitFor, cleanup, act } from "@testing-library/react";
 import { SecureAvatar } from "./SecureAvatar";
 import { clearAvatarCache } from "../utils/avatar-cache";
 
@@ -106,5 +107,59 @@ describe("SecureAvatar", () => {
 
     const fallback = document.querySelector(".MuiAvatar-root");
     expect(fallback?.textContent).toBe("Err");
+  });
+
+  it("should clear the timeout if unmounted quickly", async () => {
+    const { unmount } = render(
+      <SecureAvatar userId={userId.toString()} filename={filename} />,
+    );
+    unmount();
+  });
+
+  it("should revoke object URL and delete from cache after 5 seconds of being unused", async () => {
+    vi.useFakeTimers();
+    const { unmount } = render(
+      <SecureAvatar userId={userId.toString()} filename={filename} />,
+    );
+
+    // Wait for mount and fetch resolution
+    await act(async () => {
+      vi.advanceTimersByTime(0);
+    });
+
+    unmount();
+
+    // The cleanup timer is set to 5000ms
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+
+    expect(global.URL.revokeObjectURL).toHaveBeenCalledWith("blob:http://test-url");
+    vi.useRealTimers();
+  });
+
+  it("should reuse cached object URL on concurrent fetches when the first fetch resolves", async () => {
+    let resolveFetch: (value: any) => void = () => {};
+    const fetchPromise = new Promise((resolve) => {
+      resolveFetch = resolve;
+    });
+
+    vi.mocked(global.fetch).mockReturnValue(fetchPromise as any);
+
+    render(<SecureAvatar userId={userId.toString()} filename={filename} />);
+    render(<SecureAvatar userId={userId.toString()} filename={filename} />);
+
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+
+    // Resolve the fetches
+    await act(async () => {
+      resolveFetch({
+        ok: true,
+        blob: () => Promise.resolve(new Blob(["content"], { type: "image/png" })),
+      });
+    });
+
+    // The second component should reuse the cache from the first component's resolution
+    expect(global.URL.createObjectURL).toHaveBeenCalledTimes(1);
   });
 });

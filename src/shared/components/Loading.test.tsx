@@ -10,7 +10,7 @@ describe("Loading", () => {
     render(
       <ThemeProvider theme={theme}>
         <Loading />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     expect(screen.getAllByRole("progressbar")).toHaveLength(2);
     // Check that it's NOT displaying any text (message)
@@ -22,7 +22,7 @@ describe("Loading", () => {
     render(
       <ThemeProvider theme={theme}>
         <Loading message="Fetching data..." />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     expect(screen.getByText("Fetching data...")).toBeDefined();
   });
@@ -31,7 +31,7 @@ describe("Loading", () => {
     const { container } = render(
       <ThemeProvider theme={theme}>
         <Loading fullScreen />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     const box = container.firstChild as HTMLElement;
     // In jsdom with MUI, sometimes style object doesn't reflect sx props directly

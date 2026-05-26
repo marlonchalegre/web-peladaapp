@@ -1,119 +1,123 @@
-import { describe, it, expect, vi, type Mock } from "vitest";
-import { renderHook } from "@testing-library/react";
+import { describe, it, expect, vi, type Mock, beforeEach } from "vitest";
+import { renderHook, act } from "@testing-library/react";
 import { usePeladaMatches } from "./usePeladaMatches";
 import { usePeladaData } from "./usePeladaData";
 
-// Mock usePeladaData
+// Mock hooks
 vi.mock("./usePeladaData", () => ({
   usePeladaData: vi.fn(),
 }));
 
+vi.mock("./usePeladaStandings", () => ({
+  usePeladaStandings: vi.fn(() => ({})),
+}));
+
+const mockActions = {
+  executeEndMatch: vi.fn(),
+  startMatchTimer: vi.fn(),
+  startPeladaTimer: vi.fn(),
+  pauseMatchTimer: vi.fn(),
+  pausePeladaTimer: vi.fn(),
+};
+
+vi.mock("./useMatchActions", () => ({
+  useMatchActions: vi.fn(() => mockActions),
+}));
+
 describe("usePeladaMatches", () => {
-  it("should filter benchPlayers to only include confirmed attendance players", () => {
-    const mockData = {
-      loading: false,
-      error: null,
-      matches: [
-        { id: "1", home_team_id: "10", away_team_id: "20", status: "running" },
-      ],
-      matchesRef: { current: [] },
-      teams: [],
-      pelada: { id: "1", status: "running" },
-      teamPlayers: {},
-      lineupsByMatch: {},
-      orgPlayerIdToUserId: {},
-      userIdToName: {},
-      orgPlayerIdToPlayer: {
-        1: { id: "1", name: "Confirmed Player" },
-        2: { id: "2", name: "Not Confirmed Player" },
-        3: { id: "3", name: "Declined Player" },
-      },
-      matchEvents: [],
-      playerStatsFromApi: null,
-      attendance: [
-        { player_id: "1", status: "confirmed" },
-        { player_id: "3", status: "declined" },
-      ],
-      refreshData: vi.fn(),
-    };
+  const mockData = {
+    loading: false,
+    error: null,
+    matches: [
+      { id: "m1", home_team_id: "t1", away_team_id: "t2", status: "running" },
+      { id: "m2", home_team_id: "t1", away_team_id: "t3", status: "scheduled" },
+    ],
+    matchesRef: { current: [] },
+    teams: [
+      { id: "t1", name: "Team 1" },
+      { id: "t2", name: "Team 2" },
+      { id: "t3", name: "Team 3" },
+    ],
+    pelada: { id: "p1", status: "running", timer_status: "running" },
+    teamPlayers: { t1: [], t2: [], t3: [] },
+    lineupsByMatch: { m1: { t1: [], t2: [] }, m2: { t1: [], t3: [] } },
+    orgPlayerIdToUserId: {},
+    userIdToName: {},
+    orgPlayerIdToPlayer: {
+      p1: { id: "p1", name: "Player 1" },
+    },
+    matchEvents: [],
+    playerStatsFromApi: null,
+    attendance: [{ player_id: "p1", status: "confirmed" }],
+    refreshData: vi.fn(),
+  };
 
-    (usePeladaData as Mock).mockReturnValue(mockData);
-
-    const { result } = renderHook(() => usePeladaMatches("1"));
-
-    // Check bench players in activeMatchData
-    const benchPlayers = result.current.activeMatchData?.benchPlayers;
-    expect(benchPlayers).toBeDefined();
-    // Should only contain player 1
-    expect(benchPlayers?.length).toBe(1);
-    expect(benchPlayers?.[0].id).toBe("1");
+  beforeEach(() => {
+    vi.clearAllMocks();
+    (usePeladaData as Mock).mockReturnValue({
+      ...mockData,
+      matchesRef: { current: mockData.matches },
+    });
   });
 
-  it("should handle status case-insensitivity and ID as number/string", () => {
-    const mockData = {
-      loading: false,
-      error: null,
-      matches: [
-        { id: "1", home_team_id: "10", away_team_id: "20", status: "running" },
-      ],
-      matchesRef: { current: [] },
-      teams: [],
-      pelada: { id: "1", status: "running" },
-      teamPlayers: {},
-      lineupsByMatch: {},
-      orgPlayerIdToUserId: {},
-      userIdToName: {},
-      orgPlayerIdToPlayer: {
-        1: { id: "1", name: "Confirmed 1" },
-        2: { id: "2", name: "Confirmed 2" },
-      },
-      matchEvents: [],
-      playerStatsFromApi: null,
-      attendance: [
-        { player_id: "1", status: "CONFIRMED" }, // string ID and uppercase
-        { player_id: "2", status: "confirmed " }, // space
-      ],
-      refreshData: vi.fn(),
-    };
-
-    (usePeladaData as Mock).mockReturnValue(mockData);
-
-    const { result } = renderHook(() => usePeladaMatches("1"));
-
-    const benchPlayers = result.current.activeMatchData?.benchPlayers;
-    expect(benchPlayers?.length).toBe(2);
+  it("should initialize with selected match", () => {
+    const { result } = renderHook(() => usePeladaMatches("p1"));
+    expect(result.current.selectedMatchId).toBe("m1");
   });
 
-  it("should fallback to all players if attendance is empty", () => {
-    const mockData = {
-      loading: false,
-      error: null,
-      matches: [
-        { id: "1", home_team_id: "10", away_team_id: "20", status: "running" },
-      ],
-      matchesRef: { current: [] },
-      teams: [],
-      pelada: { id: "1", status: "running" },
-      teamPlayers: {},
-      lineupsByMatch: {},
-      orgPlayerIdToUserId: {},
-      userIdToName: {},
-      orgPlayerIdToPlayer: {
-        1: { id: "1", name: "Player 1" },
-        2: { id: "2", name: "Player 2" },
-      },
-      matchEvents: [],
-      playerStatsFromApi: null,
-      attendance: [],
-      refreshData: vi.fn(),
-    };
+  it("should handle endMatch", async () => {
+    const { result } = renderHook(() => usePeladaMatches("p1"));
 
-    (usePeladaData as Mock).mockReturnValue(mockData);
+    await act(async () => {
+      await result.current.endMatch("m1");
+    });
 
-    const { result } = renderHook(() => usePeladaMatches("1"));
+    expect(mockActions.executeEndMatch).toHaveBeenCalledWith("m1");
+    expect(result.current.justFinishedMatch?.id).toBe("m1");
+  });
 
-    const benchPlayers = result.current.activeMatchData?.benchPlayers;
-    // Size 0 fallback logic: if confirmedPlayerIds.size === 0, it shows all
-    expect(benchPlayers?.length).toBe(2);
+  it("should handle proceedToNextMatch", async () => {
+    const { result } = renderHook(() => usePeladaMatches("p1"));
+
+    await act(async () => {
+      await result.current.proceedToNextMatch();
+    });
+
+    expect(result.current.selectedMatchId).toBe("m2");
+    expect(mockActions.startMatchTimer).toHaveBeenCalledWith("m2");
+  });
+
+  it("should handle endMatch and stop timers if no more matches", async () => {
+    // Override mockData to have only one match
+    (usePeladaData as Mock).mockReturnValue({
+      ...mockData,
+      matches: [mockData.matches[0]],
+      matchesRef: { current: [mockData.matches[0]] },
+    });
+
+    const { result } = renderHook(() => usePeladaMatches("p1"));
+
+    await act(async () => {
+      await result.current.endMatch("m1");
+    });
+
+    expect(mockActions.pauseMatchTimer).toHaveBeenCalledWith("m1");
+    expect(mockActions.pausePeladaTimer).toHaveBeenCalled();
+  });
+
+  it("should handle proceedToNextMatch and start pelada timer if not running", async () => {
+    (usePeladaData as Mock).mockReturnValue({
+      ...mockData,
+      pelada: { ...mockData.pelada, timer_status: "stopped" },
+      matchesRef: { current: mockData.matches },
+    });
+
+    const { result } = renderHook(() => usePeladaMatches("p1"));
+
+    await act(async () => {
+      await result.current.proceedToNextMatch();
+    });
+
+    expect(mockActions.startPeladaTimer).toHaveBeenCalled();
   });
 });

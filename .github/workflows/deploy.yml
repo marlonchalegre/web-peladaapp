@@ -41,10 +41,10 @@ jobs:
         id: summary
         run: |
           SUMMARY="### 📊 Test & Lint Summary (Web)
-          
+
           | Category | Status | Details |
           | :--- | :--- | :--- |"
-          
+
           # Lint Summary
           LINT_STATUS="❓ Unknown"
           LINT_DETAILS="N/A"
@@ -62,7 +62,7 @@ jobs:
           fi
           SUMMARY="$SUMMARY
           | 🔍 Linting | $LINT_STATUS | $LINT_DETAILS |"
-          
+
           # Test Summary
           TEST_STATUS="❓ Unknown"
           TEST_DETAILS="N/A"
@@ -99,9 +99,9 @@ jobs:
           fi
           SUMMARY="$SUMMARY
           | 📈 Coverage | $COVERAGE_STATUS | $COVERAGE_DETAILS |"
-          
+
           echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
-          
+
           # Export for PR comment
           echo "content<<EOF" >> $GITHUB_OUTPUT
           echo "$SUMMARY" >> $GITHUB_OUTPUT
@@ -191,7 +191,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "| Resource | Status | Namespace |" >> $GITHUB_STEP_SUMMARY
           echo "| :--- | :--- | :--- |" >> $GITHUB_STEP_SUMMARY
-          
+
           if [ "${{ steps.deploy.outcome }}" == "success" ]; then
             echo "| 🚢 deployment/frontend | ✅ Rolled out | peladaapp |" >> $GITHUB_STEP_SUMMARY
           else

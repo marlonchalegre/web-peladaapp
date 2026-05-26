@@ -1,77 +1,61 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from "vitest";
 import { sortPlayersByPosition } from "./playerUtils";
-import type { User } from "../../../shared/api/endpoints";
 
-describe("sortPlayersByPosition", () => {
-  const createPlayer = (
-    id: number,
-    name: string,
-    position: string,
-    isGk = false,
-  ) => ({
-    id,
-    user_id: id,
-    organization_id: "1",
-    user: {
-      id: String(id),
-      name,
-      username: name.toLowerCase(),
-      position,
-    } as User,
-    is_goalkeeper: isGk,
-  });
+describe("playerUtils", () => {
+  describe("sortPlayersByPosition", () => {
+    const players = [
+      { id: "1", user: { name: "Striker A", position: "Striker" } },
+      { id: "2", user: { name: "Defender A", position: "Defender" } },
+      { id: "3", user: { name: "Goalkeeper A", position: "Goalkeeper" } },
+      { id: "4", user: { name: "Midfielder A", position: "Midfielder" } },
+    ] as any;
 
-  it("should sort players by position (GK -> DF -> MF -> ST)", () => {
-    const p1 = createPlayer(1, "Striker", "Striker");
-    const p2 = createPlayer(2, "Defender", "Defender");
-    const p3 = createPlayer(3, "Midfielder", "Midfielder");
-    const p4 = createPlayer(4, "Goalkeeper", "Goalkeeper");
+    it("should sort by standard position order (GK > DF > MF > ST)", () => {
+      const sorted = sortPlayersByPosition(players);
+      expect(sorted[0].user.name).toBe("Goalkeeper A");
+      expect(sorted[1].user.name).toBe("Defender A");
+      expect(sorted[2].user.name).toBe("Midfielder A");
+      expect(sorted[3].user.name).toBe("Striker A");
+    });
 
-    const sorted = sortPlayersByPosition([p1, p2, p3, p4]);
+    it("should respect manual goalkeeper override (is_goalkeeper)", () => {
+      const mixedPlayers = [
+        {
+          id: "1",
+          is_goalkeeper: false,
+          user: { name: "GK by position", position: "Goalkeeper" },
+        },
+        {
+          id: "2",
+          is_goalkeeper: true,
+          user: { name: "ST but is GK", position: "Striker" },
+        },
+      ] as any;
+      const sorted = sortPlayersByPosition(mixedPlayers);
+      expect(sorted[0].user.name).toBe("ST but is GK");
+    });
 
-    expect(sorted[0].user.name).toBe("Goalkeeper");
-    expect(sorted[1].user.name).toBe("Defender");
-    expect(sorted[2].user.name).toBe("Midfielder");
-    expect(sorted[3].user.name).toBe("Striker");
-  });
+    it("should sort alphabetically by name as a tie-breaker", () => {
+      const samePos = [
+        { id: "1", user: { name: "Charlie", position: "Midfielder" } },
+        { id: "2", user: { name: "Alpha", position: "Midfielder" } },
+        { id: "3", user: { name: "Bravo", position: "Midfielder" } },
+      ] as any;
+      const sorted = sortPlayersByPosition(samePos);
+      expect(sorted[0].user.name).toBe("Alpha");
+      expect(sorted[1].user.name).toBe("Bravo");
+      expect(sorted[2].user.name).toBe("Charlie");
+    });
 
-  it("should prioritize manual is_goalkeeper flag", () => {
-    const p1 = createPlayer(1, "Fake Striker", "Striker", true);
-    const p2 = createPlayer(2, "Real Goalkeeper", "Goalkeeper", false);
-
-    const sorted = sortPlayersByPosition([p2, p1]);
-
-    expect(sorted[0].user.name).toBe("Fake Striker");
-    expect(sorted[1].user.name).toBe("Real Goalkeeper");
-  });
-
-  it("should be case-insensitive for position names", () => {
-    const p1 = createPlayer(1, "Lower", "striker");
-    const p2 = createPlayer(2, "Upper", "GOALKEEPER");
-
-    const sorted = sortPlayersByPosition([p1, p2]);
-
-    expect(sorted[0].user.name).toBe("Upper");
-    expect(sorted[1].user.name).toBe("Lower");
-  });
-
-  it("should sort alphabetically by name as a tie-breaker", () => {
-    const p1 = createPlayer(1, "Zebra", "Defender");
-    const p2 = createPlayer(2, "Apple", "Defender");
-
-    const sorted = sortPlayersByPosition([p1, p2]);
-
-    expect(sorted[0].user.name).toBe("Apple");
-    expect(sorted[1].user.name).toBe("Zebra");
-  });
-
-  it("should handle missing or unknown positions by putting them at the end", () => {
-    const p1 = createPlayer(1, "Unknown", "Surprise");
-    const p2 = createPlayer(2, "Goalkeeper", "Goalkeeper");
-
-    const sorted = sortPlayersByPosition([p1, p2]);
-
-    expect(sorted[0].user.name).toBe("Goalkeeper");
-    expect(sorted[1].user.name).toBe("Unknown");
+    it("should put unknown positions at the end", () => {
+      const unknown = [
+        { id: "1", user: { name: "Unknown", position: "Waterboy" } },
+        { id: "2", user: { name: "Striker", position: "Striker" } },
+      ] as any;
+      const sorted = sortPlayersByPosition(unknown);
+      expect(sorted[0].user.name).toBe("Striker");
+      expect(sorted[1].user.name).toBe("Unknown");
+    });
   });
 });

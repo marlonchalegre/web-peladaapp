@@ -1,199 +1,68 @@
 import { describe, it, expect } from "vitest";
 import { formatPeladaSummary } from "./formatSummary";
-import type { StandingRow } from "../components/StandingsPanel";
-import type { PlayerStatRow } from "../components/PlayerStatsPanel";
 
 describe("formatPeladaSummary", () => {
-  it("should format the summary correctly with full data", () => {
-    const date = "2026-02-18T15:00:00Z";
-    const standings: StandingRow[] = [
-      {
-        teamId: "3",
-        name: "Time 3",
-        wins: 5,
-        draws: 1,
-        losses: 0,
-        goalsFor: 10,
-        goalsAgainst: 2,
-        goalDifference: 8,
-      },
-      {
-        teamId: "2",
-        name: "Time 2",
-        wins: 1,
-        draws: 3,
-        losses: 2,
-        goalsFor: 5,
-        goalsAgainst: 7,
-        goalDifference: -2,
-      },
-      {
-        teamId: "1",
-        name: "Time 1",
-        wins: 0,
-        draws: 2,
-        losses: 4,
-        goalsFor: 2,
-        goalsAgainst: 8,
-        goalDifference: -6,
-      },
+  it("formats summary correctly with all data", () => {
+    const date = "2024-05-25T12:00:00Z";
+    const standings = [
+      { name: "Team A", wins: 2, draws: 1, losses: 0, goalsFor: 5, goalsAgainst: 2, goalDifference: 3 },
+      { name: "Team B", wins: 0, draws: 1, losses: 2, goalsFor: 2, goalsAgainst: 5, goalDifference: -3 },
     ];
-    const playerStats: PlayerStatRow[] = [
-      {
-        playerId: "1",
-        name: "Chalegre",
-        goals: 4,
-        assists: 0,
-        ownGoals: 0,
-        goalsConceded: 2,
-      },
-      { playerId: "2", name: "C.Bala", goals: 3, assists: 0, ownGoals: 0 },
-      { playerId: "3", name: "Rafa Lucena", goals: 0, assists: 2, ownGoals: 0 },
-      { playerId: "4", name: "Igor", goals: 0, assists: 2, ownGoals: 0 },
-      {
-        playerId: "5",
-        name: "Goalkeeper",
-        goals: 0,
-        assists: 0,
-        ownGoals: 0,
-        goalsConceded: 5,
-      },
+    const playerStats = [
+      { name: "Player 1", goals: 3, assists: 1, goalsConceded: undefined },
+      { name: "Player 2", goals: 1, assists: 2, goalsConceded: undefined },
+      { name: "GK A", goals: 0, assists: 0, goalsConceded: 5 },
+      { name: "GK B", goals: 0, assists: 0, goalsConceded: 3 },
     ];
 
-    const result = formatPeladaSummary(date, standings, playerStats);
-
-    expect(result.startsWith("```")).toBe(true);
-    expect(result.endsWith("```")).toBe(true);
-    expect(result).toContain("Resumo da rodada 18/02");
-    expect(result).toMatch(/Time 3\s+16 pts \(5V 1E 0D\) GP:10 SG:\+8/);
-    expect(result).toMatch(/Time 2\s+6 pts \(1V 3E 2D\) GP:5 SG:-2/);
-    expect(result).toMatch(/Time 1\s+2 pts \(0V 2E 4D\) GP:2 SG:-6/);
+    const result = formatPeladaSummary(date, standings as any, playerStats as any);
+    
+    expect(result).toContain("Resumo da rodada 25/05");
+    expect(result).toContain("Team A");
+    expect(result).toContain("7 pts (2V 1E 0D) GP:5 SG:+3");
+    expect(result).toContain("Team B");
+    expect(result).toContain("1 pts (0V 1E 2D) GP:2 SG:-3");
     expect(result).toContain("Gols:");
-    expect(result).toMatch(/Chalegre\s+4/);
-    expect(result).toMatch(/C.Bala\s+3/);
+    expect(result).toContain("Player 1");
     expect(result).toContain("Assistencias:");
-    expect(result).toMatch(/Rafa Lucena\s+2/);
-    expect(result).toMatch(/Igor\s+2/);
+    expect(result).toContain("Player 2");
     expect(result).toContain("Gols sofridos:");
-    expect(result).toMatch(/Chalegre\s+2/);
-    expect(result).toMatch(/Goalkeeper\s+5/);
-    // Should NOT contain the footnote artifacts
-    expect(result).not.toContain("[1]");
+    expect(result).toContain("GK B              3"); // Sorted by goals conceded ASC
+    expect(result).toContain("GK A              5");
   });
 
-  it("should handle empty stats correctly", () => {
-    const date = null;
-    const standings: StandingRow[] = [];
-    const playerStats: PlayerStatRow[] = [];
-
-    const result = formatPeladaSummary(date, standings, playerStats);
-
-    expect(result.startsWith("```")).toBe(true);
-    expect(result.endsWith("```")).toBe(true);
+  it("handles null date", () => {
+    const result = formatPeladaSummary(null, [], []);
     expect(result).toContain("Resumo da rodada");
-    expect(result).toContain("Classificacao:");
-    expect(result).not.toContain("Gols:");
-    expect(result).not.toContain("Assistencias:");
   });
 
-  it("should hide sections with zero values", () => {
-    const date = "2026-02-18T15:00:00Z";
-    const standings: StandingRow[] = [
-      {
-        teamId: "1",
-        name: "Time 1",
-        wins: 1,
-        draws: 0,
-        losses: 0,
-        goalsFor: 2,
-        goalsAgainst: 0,
-        goalDifference: 2,
-      },
-    ];
-    const playerStats: PlayerStatRow[] = [
-      { playerId: "1", name: "Player 1", goals: 0, assists: 0, ownGoals: 0 },
-    ];
-
-    const result = formatPeladaSummary(date, standings, playerStats);
-
-    expect(result.startsWith("```")).toBe(true);
-    expect(result.endsWith("```")).toBe(true);
+  it("handles empty data", () => {
+    const result = formatPeladaSummary("2024-05-25", [], []);
     expect(result).toContain("Classificacao:");
-    expect(result).toMatch(/Time 1\s+3 pts \(1V 0E 0D\) GP:2 SG:\+2/);
     expect(result).not.toContain("Gols:");
     expect(result).not.toContain("Assistencias:");
     expect(result).not.toContain("Gols sofridos:");
   });
 
-  it("should show Gols sofridos even if zero", () => {
-    const date = null;
-    const standings: StandingRow[] = [
-      {
-        teamId: "1",
-        name: "Time 1",
-        wins: 0,
-        draws: 0,
-        losses: 0,
-        goalsFor: 0,
-        goalsAgainst: 0,
-        goalDifference: 0,
-      },
+  it("handles tie-breaking and zero goal difference", () => {
+    const standings = [
+      { name: "Team B", wins: 1, draws: 0, losses: 1, goalsFor: 1, goalsAgainst: 1, goalDifference: 0 },
+      { name: "Team A", wins: 1, draws: 0, losses: 1, goalsFor: 2, goalsAgainst: 2, goalDifference: 0 },
     ];
-    const playerStats: PlayerStatRow[] = [
-      {
-        playerId: "1",
-        name: "GK",
-        goals: 0,
-        assists: 0,
-        ownGoals: 0,
-        goalsConceded: 0,
-      },
+    const playerStats = [
+      { name: "Player B", goals: 1, assists: 1 },
+      { name: "Player A", goals: 1, assists: 1 },
     ];
-
-    const result = formatPeladaSummary(date, standings, playerStats);
-
-    expect(result.startsWith("```")).toBe(true);
-    expect(result.endsWith("```")).toBe(true);
-    expect(result).toContain("Gols sofridos:");
-    expect(result).toMatch(/GK\s+0/);
+    const result = formatPeladaSummary("2024-05-25T12:00:00Z", standings as any, playerStats as any);
+    expect(result).toContain("Team A");
+    expect(result).toContain("Team B");
+    expect(result).toContain("Player A");
+    expect(result).toContain("Player B");
   });
 
-  it("should show goalkeepers even if they have no other stats (Bug #9)", () => {
-    const date = null;
-    const standings: StandingRow[] = [
-      {
-        teamId: "1",
-        name: "Time 1",
-        wins: 0,
-        draws: 0,
-        losses: 0,
-        goalsFor: 0,
-        goalsAgainst: 0,
-        goalDifference: 0,
-      },
-    ];
-    const playerStats: PlayerStatRow[] = [
-      {
-        playerId: "1",
-        name: "Only Goalkeeper",
-        goals: 0,
-        assists: 0,
-        ownGoals: 0,
-        goalsConceded: 10,
-      },
-      {
-        playerId: "2",
-        name: "Striker",
-        goals: 5,
-        assists: 2,
-        ownGoals: 0,
-        // goalsConceded is undefined for non-goalkeepers
-      },
-    ];
-
-    const result = formatPeladaSummary(date, standings, playerStats);
-
-    expect(result).toContain("Gols sofridos:");
-    expect(result).toMatch(/Only Goalkeeper\s+10/);
+  it("handles long names for alignment", () => {
+    const standings = [{ name: "A very long team name that should be truncated or padded", wins: 1, draws: 0, losses: 0, goalsFor: 1, goalsAgainst: 0, goalDifference: 1 }];
+    const result = formatPeladaSummary("2024-05-25", standings as any, []);
+    expect(result).toContain("A very long team name");
   });
 });

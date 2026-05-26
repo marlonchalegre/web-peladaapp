@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi, type Mock } from "vitest";
 import StatsTable from "./StatsTable";
 import type { OrganizationPlayerStats } from "../../../shared/api/endpoints";
@@ -118,5 +118,69 @@ describe("StatsTable", () => {
     );
 
     expect(screen.getByText("organizations.stats.empty")).toBeDefined();
+  });
+
+  it("handles sorting label clicks", () => {
+    // Force desktop view
+    (window.matchMedia as Mock).mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }));
+
+    const onSort = vi.fn();
+    render(
+      <ThemeProvider theme={theme}>
+        <StatsTable
+          stats={mockStats}
+          orderBy="player_name"
+          order="asc"
+          onSort={onSort}
+        />
+      </ThemeProvider>,
+    );
+
+    // Click the second sort label (peladas_played)
+    const sortButtons = screen.getAllByRole("button");
+    fireEvent.click(sortButtons[1]);
+    expect(onSort).toHaveBeenCalledWith("peladas_played");
+  });
+
+  it("renders correctly in dark mode", () => {
+    const darkTheme = createTheme({ palette: { mode: "dark" } });
+    render(
+      <ThemeProvider theme={darkTheme}>
+        <StatsTable
+          stats={mockStats}
+          orderBy="player_name"
+          order="asc"
+          onSort={() => {}}
+        />
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByText("Marlon")).toBeDefined();
+  });
+
+  it("renders correctly without player position", () => {
+    const statsNoPos = [{ ...mockStats[0], player_position: undefined }];
+    render(
+      <ThemeProvider theme={theme}>
+        <StatsTable
+          stats={statsNoPos as any}
+          orderBy="player_name"
+          order="asc"
+          onSort={() => {}}
+        />
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByText("Marlon")).toBeDefined();
+    expect(screen.queryByText("Atacante")).toBeNull();
   });
 });

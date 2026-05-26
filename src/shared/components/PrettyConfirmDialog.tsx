@@ -17,6 +17,7 @@ interface PrettyConfirmDialogProps {
   onConfirm: () => void;
   onClose: () => void;
   severity?: "primary" | "error" | "warning";
+  loading?: boolean;
 }
 
 export default function PrettyConfirmDialog({
@@ -28,6 +29,7 @@ export default function PrettyConfirmDialog({
   onConfirm,
   onClose,
   severity = "primary",
+  loading = false,
 }: PrettyConfirmDialogProps) {
   const { t } = useTranslation();
 
@@ -42,19 +44,21 @@ export default function PrettyConfirmDialog({
           onClick={onClose}
           variant="text"
           sx={{ color: "text.secondary" }}
+          disabled={loading}
         >
           {cancelLabel || t("common.cancel")}
         </Button>
         <Button
           onClick={() => {
             onConfirm();
-            onClose();
+            if (!loading) onClose();
           }}
           variant="contained"
           color={severity === "primary" ? "primary" : severity}
           sx={{ borderRadius: 2, fontWeight: "bold", px: 3 }}
           autoFocus
           data-testid="pretty-confirm-button"
+          disabled={loading}
         >
           {confirmLabel || t("common.confirm")}
         </Button>

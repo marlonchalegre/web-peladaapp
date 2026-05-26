@@ -1,111 +1,55 @@
-import { describe, it, expect } from "vitest";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { describe, it, expect, vi } from "vitest";
 import {
+  generateAvailablePlayersText,
   generateExportText,
   generateAnnouncementText,
-  type PlayerWithUser,
+  generateExportCsv,
+  copyToClipboard,
 } from "./exportUtils";
-import { type Team, type User } from "../../../shared/api/endpoints";
 
 describe("exportUtils", () => {
-  const mockTeams: Team[] = [
-    { id: "1", pelada_id: "1", name: "Time 1" },
-    { id: "2", pelada_id: "1", name: "Time 2" },
-  ];
+  const mockPlayers = [
+    { id: "1", user: { name: "Player 1", position: "Striker" }, grade: 8.5 },
+    { id: "2", user: { name: "Player 2", position: "Goalkeeper" }, grade: 9.0 },
+  ] as any;
+  const mockTeams = [{ id: "t1", name: "Team 1" }] as any;
+  const mockTeamPlayers = { t1: mockPlayers };
+  const mockScores = { "1": 8.7 };
 
-  const mockUser1: User = {
-    id: "101",
-    name: "Marlon",
-    username: "marlon",
-    position: "striker",
-  };
-  const mockUser2: User = {
-    id: "102",
-    name: "Chalegre",
-    username: "chalegre",
-    position: "defender",
-  };
-
-  const mockPlayers: Record<string, PlayerWithUser[]> = {
-    1: [
-      {
-        id: "1",
-        user_id: "101",
-        user: mockUser1,
-        grade: 8.5,
-        organization_id: "1",
-        is_goalkeeper: false,
-      },
-    ],
-    2: [
-      {
-        id: "2",
-        user_id: "102",
-        user: mockUser2,
-        grade: 7.0,
-        is_goalkeeper: true,
-        organization_id: "1",
-      },
-    ],
-  };
-
-  describe("generateExportText", () => {
-    it("should format lineup with grades correctly", () => {
-      const scores = { 1: 9.0 }; // Specific match score
-      const result = generateExportText(mockTeams, mockPlayers, scores);
-
-      expect(result).toContain("TIME 1");
-      expect(result).toContain("Marlon");
-      expect(result).toContain("A"); // striker -> A
-      expect(result).toContain("9,00"); // from scores
-
-      expect(result).toContain("TIME 2");
-      expect(result).toContain("Chalegre");
-      expect(result).toContain("G"); // is_goalkeeper -> G
-      expect(result).toContain("7,00"); // from p.grade fallback
-    });
-    it("should handle score of 0 correctly", () => {
-      const scores = { 1: 0 };
-      const result = generateExportText(mockTeams, mockPlayers, scores);
-      expect(result).toContain("0,00");
-    });
-
-    it("should fallback to '?' for unknown positions", () => {
-      const unknownUser: User = {
-        id: "103",
-        name: "Stranger",
-        username: "stranger",
-        position: "unknown",
-      };
-      const unknownPlayers: Record<string, PlayerWithUser[]> = {
-        1: [
-          {
-            id: "3",
-            user_id: "103",
-            user: unknownUser,
-            grade: 5.0,
-            organization_id: "1",
-            is_goalkeeper: false,
-          },
-        ],
-      };
-      const result = generateExportText(
-        [{ id: "1", pelada_id: "1", name: "Time X" }],
-        unknownPlayers,
-        {},
-      );
-      expect(result).toContain("?");
-    });
+  it("generateAvailablePlayersText returns formatted text", () => {
+    const text = generateAvailablePlayersText(mockPlayers, mockScores);
+    expect(text).toContain("Striker");
+    expect(text).toContain("Player 1");
+    expect(text).toContain("8,7");
   });
 
-  describe("generateAnnouncementText", () => {
-    it("should format announcement without grades", () => {
-      const result = generateAnnouncementText(mockTeams, mockPlayers);
+  it("generateExportText returns formatted text", () => {
+    const text = generateExportText(mockTeams, mockTeamPlayers, mockScores);
+    expect(text).toContain("TEAM 1");
+    expect(text).toContain("Player 1");
+    expect(text).toContain("8,70");
+    expect(text).toContain("MÉDIA");
+  });
 
-      expect(result).toContain("TIME 1");
-      expect(result).toContain("Marlon");
-      expect(result).toContain("A");
-      expect(result).not.toContain("8.5");
-      expect(result).not.toContain("7.0");
+  it("generateAnnouncementText returns formatted text", () => {
+    const text = generateAnnouncementText(mockTeams, mockTeamPlayers);
+    expect(text).toContain("ESCALAÇÃO DA PELADA");
+    expect(text).toContain("TEAM 1");
+  });
+
+  it("generateExportCsv returns csv string", () => {
+    const csv = generateExportCsv(mockTeams, mockTeamPlayers, mockScores);
+    expect(csv).toContain("Time;Nome;Posição;Nota");
+    expect(csv).toContain("Team 1;Player 1;A;8,70");
+  });
+
+  it("copyToClipboard works", async () => {
+    Object.assign(navigator, {
+      clipboard: { writeText: vi.fn().mockResolvedValue(true) },
     });
+    const success = await copyToClipboard("test");
+    expect(success).toBe(true);
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith("test");
   });
 });

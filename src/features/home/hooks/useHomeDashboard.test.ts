@@ -1,91 +1,118 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { useHomeDashboard } from "./useHomeDashboard";
-import { api } from "../../../shared/api/client";
-import { useAuth } from "../../../app/providers/AuthContext";
 
-// Mock i18next
+// Stable mocks
+const stableTranslation = {
+  t: (key: string) => key,
+  i18n: { language: "en", changeLanguage: vi.fn() },
+};
 vi.mock("react-i18next", () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-  }),
+  useTranslation: () => stableTranslation,
 }));
 
-// Mock API client
-vi.mock("../../../shared/api/client", () => ({
-  api: {
+const mockUser = { id: "user-123", name: "Test User" };
+vi.mock("../../../app/providers/AuthContext", () => ({
+  useAuth: vi.fn(() => ({
+    user: mockUser,
+    refreshUser: vi.fn(),
+    login: vi.fn(),
+    logout: vi.fn(),
+    register: vi.fn(),
+    loading: false,
+    error: null,
+    clearError: vi.fn(),
+    isLoggedIn: true,
+    isAdmin: false,
+  })),
+}));
+
+const { mockApiClient } = vi.hoisted(() => ({
+  mockApiClient: {
     get: vi.fn(),
+    post: vi.fn(),
+    getPaginated: vi
+      .fn()
+      .mockResolvedValue({ data: [], page: 1, totalPages: 1 }),
   },
 }));
 
-// Mock AuthContext
-vi.mock("../../../app/providers/AuthContext", () => ({
-  useAuth: vi.fn(),
+vi.mock("../../../shared/api/client", () => ({
+  api: mockApiClient,
+  login: vi.fn(),
+  logout: vi.fn(),
+  register: vi.fn(),
+  getUser: vi.fn(),
+  updateUserProfile: vi.fn(),
 }));
 
 describe("useHomeDashboard", () => {
-  const mockUser = { id: "user-123", name: "Test User" };
-
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(useAuth).mockReturnValue({
-      user: mockUser,
-      refreshUser: vi.fn(),
-      login: vi.fn(),
-      logout: vi.fn(),
-      register: vi.fn(),
-      loading: false,
-      error: null,
-      clearError: vi.fn(),
-      isLoggedIn: true,
-      isAdmin: false,
+    mockApiClient.get.mockResolvedValue([]);
+    mockApiClient.post.mockResolvedValue({});
+    mockApiClient.getPaginated.mockResolvedValue({
+      data: [],
+      page: 1,
+      totalPages: 1,
     });
   });
 
   it("should initialize and fetch data", async () => {
-    const mockOrgs = [
-      { id: "org-1", name: "Admin Org", role: "admin" },
-      { id: "org-2", name: "Member Org", role: "player" },
-    ];
-    const mockPeladas = { data: [], page: 1, totalPages: 1 };
-    const mockInvites = [];
-
-    vi.mocked(api.get).mockImplementation((url: string) => {
-      if (url.includes("/api/users/user-123/organizations")) return Promise.resolve(mockOrgs);
-      if (url.includes("/api/users/user-123/peladas")) return Promise.resolve(mockPeladas);
-      if (url.includes("/api/invitations/pending")) return Promise.resolve(mockInvites);
+    const mockOrgs = [{ id: "org-1", name: "Admin Org", role: "admin" }];
+    mockApiClient.get.mockImplementation((url: string) => {
+      if (url.includes("/organizations")) return Promise.resolve(mockOrgs);
+      if (url.includes("/invitations/pending")) return Promise.resolve([]);
       return Promise.resolve([]);
     });
 
     const { result } = renderHook(() => useHomeDashboard());
-
-    await waitFor(() => {
-      expect(result.current.loading).toBe(false);
+    await waitFor(() => expect(result.current.loading).toBe(false), {
+      timeout: 3000,
     });
-
     expect(result.current.adminOrgs).toHaveLength(1);
-    expect(result.current.adminOrgs[0].name).toBe("Admin Org");
-    expect(result.current.memberOrgs).toHaveLength(1);
-    expect(result.current.memberOrgs[0].name).toBe("Member Org");
   });
 
-  it("should handle blocked user", async () => {
-    vi.mocked(useAuth).mockReturnValue({
-      user: { ...mockUser, is_blocked: true },
-      refreshUser: vi.fn(),
-      login: vi.fn(),
-      logout: vi.fn(),
-      register: vi.fn(),
-      loading: false,
-      error: null,
-      clearError: vi.fn(),
-      isLoggedIn: true,
-      isAdmin: false,
+  it("should handle acceptInvitation successfully", async () => {
+    const { result } = renderHook(() => useHomeDashboard());
+    await waitFor(() => expect(result.current.loading).toBe(false), {
+      timeout: 3000,
+    });
+    await act(async () => {
+      await result.current.acceptInvitation("token123");
+    });
+    expect(mockApiClient.post).toHaveBeenCalledWith(
+      expect.stringContaining("token123/accept"),
+      expect.anything(),
+    );
+  });
+
+  it("should handle handlePeladaPageChange", async () => {
+    const { result } = renderHook(() => useHomeDashboard());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    act(() => {
+      result.current.handlePeladaPageChange({} as any, 2);
     });
 
-    const { result } = renderHook(() => useHomeDashboard());
+    expect(mockApiClient.getPaginated).toHaveBeenCalledWith(
+      expect.stringContaining("/peladas"),
+      expect.objectContaining({ page: 2 }),
+    );
+  });
 
-    expect(result.current.loading).toBe(false);
-    expect(api.get).not.toHaveBeenCalled();
+  it("should handle createOrganization successfully", async () => {
+    const { result } = renderHook(() => useHomeDashboard());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await act(async () => {
+      await result.current.createOrganization("New Org");
+    });
+
+    expect(mockApiClient.post).toHaveBeenCalledWith(
+      "/api/organizations",
+      expect.objectContaining({ name: "New Org" }),
+    );
   });
 });

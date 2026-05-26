@@ -12,6 +12,14 @@ import {
 } from "../../../shared/api/endpoints";
 import { useAuth } from "../../../app/providers/AuthContext";
 
+const MEMBER_TYPE_PRIORITY: Record<string, number> = {
+  mensalista: 0,
+  mensalista_temporario: 0,
+  diarista: 1,
+  diarista_temporario: 1,
+  convidado: 2,
+};
+
 /**
  * Sorts players by their member type priority (mensalista > diarista > convidado)
  * and then by their attendance update time (FIFO - First In First Out).
@@ -20,34 +28,23 @@ import { useAuth } from "../../../app/providers/AuthContext";
 function sortPlayersByAttendanceTime(
   players: PlayerWithUser[],
 ): PlayerWithUser[] {
-  const priority: Record<string, number> = {
-    mensalista: 1,
-    diarista: 2,
-    convidado: 3,
-  };
-
   return [...players].sort((a, b) => {
-    // 1. Sort by member type priority
-    const priorityA = priority[a.member_type || "convidado"] || 3;
-    const priorityB = priority[b.member_type || "convidado"] || 3;
+    // 1. Member type priority
+    const priorityA = MEMBER_TYPE_PRIORITY[a.member_type || ""] ?? 3;
+    const priorityB = MEMBER_TYPE_PRIORITY[b.member_type || ""] ?? 3;
 
     if (priorityA !== priorityB) {
       return priorityA - priorityB;
     }
 
-    // 2. Sort by attendance time (FIFO)
-    const timeA = a.attendance_updated_at
-      ? new Date(a.attendance_updated_at).getTime()
-      : Infinity;
-    const timeB = b.attendance_updated_at
-      ? new Date(b.attendance_updated_at).getTime()
-      : Infinity;
-
-    if (timeA !== timeB) {
-      return timeA - timeB;
+    // 2. FIFO (attendance_updated_at)
+    if (a.attendance_updated_at && b.attendance_updated_at) {
+      return a.attendance_updated_at.localeCompare(b.attendance_updated_at);
     }
+    if (a.attendance_updated_at) return -1;
+    if (b.attendance_updated_at) return 1;
 
-    // 3. Alphabetical name sort (final tie-breaker)
+    // 3. Alphabetical
     const nameA = a.user?.name || "";
     const nameB = b.user?.name || "";
     return nameA.localeCompare(nameB);

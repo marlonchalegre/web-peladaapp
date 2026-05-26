@@ -191,6 +191,7 @@ export default function PeladaDetailHeader({
             <Button
               variant="outlined"
               onClick={handleOpenExport}
+              data-testid="export-menu-button"
               sx={{
                 borderRadius: 10,
                 textTransform: "none",
@@ -406,6 +407,7 @@ export default function PeladaDetailHeader({
             onCopyAnnouncement();
             handleCloseExport();
           }}
+          data-testid="copy-announcement-button"
         >
           <ListItemIcon>
             <WhatsAppIcon fontSize="small" color="success" />
@@ -420,6 +422,7 @@ export default function PeladaDetailHeader({
             onCopyClipboard();
             handleCloseExport();
           }}
+          data-testid="copy-clipboard-button"
         >
           <ListItemIcon>
             <RateReviewIcon fontSize="small" />
