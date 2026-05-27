@@ -60,57 +60,52 @@ export default function StatsFilters({
           justifyContent: "space-between",
           alignItems: "center",
           mb: 2,
-          cursor: "pointer",
         }}
-        onClick={() => setExpanded(!expanded)}
-        data-testid="filters-header"
       >
-        <Typography
-          variant="h5"
-          sx={{
-            fontWeight: "bold",
-          }}
-        >
-          {t("common.filters")}
-        </Typography>
-
         <Stack
           direction="row"
-          spacing={2}
+          spacing={1}
           sx={{
             alignItems: "center",
+            cursor: "pointer",
           }}
+          onClick={() => setExpanded(!expanded)}
+          data-testid="filters-header"
         >
-          {!isMobile && (
-            <FormControl size="small" sx={{ minWidth: 100 }}>
-              <InputLabel id="year-select-label">{t("common.year")}</InputLabel>
-              <Select
-                labelId="year-select-label"
-                value={year}
-                label={t("common.year")}
-                onChange={(e) => onYearChange(Number(e.target.value))}
-                sx={{
-                  borderRadius: 2,
-                  height: "40px",
-                }}
-              >
-                {years.map((y) => (
-                  <MenuItem key={y} value={y}>
-                    {y}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
-
-          <IconButton
-            size="small"
-            onClick={() => setExpanded(!expanded)}
-            sx={{ ml: 1 }}
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: "bold",
+            }}
           >
+            {t("common.filters")}
+          </Typography>
+          <IconButton size="small">
             {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </IconButton>
         </Stack>
+
+        {!isMobile && (
+          <FormControl size="small" sx={{ minWidth: 100 }}>
+            <InputLabel id="year-select-label">{t("common.year")}</InputLabel>
+            <Select
+              labelId="year-select-label"
+              value={year}
+              label={t("common.year")}
+              onChange={(e) => onYearChange(Number(e.target.value))}
+              sx={{
+                borderRadius: 2,
+                height: "40px",
+              }}
+            >
+              {years.map((y) => (
+                <MenuItem key={y} value={y}>
+                  {y}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
       </Box>
       <Collapse in={expanded}>
         <Stack spacing={2}>
