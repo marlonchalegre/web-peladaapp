@@ -753,5 +753,11 @@ export function createApi(client: ApiClient) {
         `/api/admin/users/${id}/toggle-super-admin`,
         {},
       ),
+    deleteUser: (id: string) => client.delete<void>(`/api/user/${id}`),
+    resetUserPassword: (id: string, password: string) =>
+      client.post<{ id: string; message: string }>(
+        `/api/user/${id}/reset-password`,
+        { password },
+      ),
   };
 }

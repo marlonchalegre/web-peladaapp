@@ -32,7 +32,7 @@ export default function AdminOrganizationsList({
   const navigate = useNavigate();
 
   return (
-    <Box sx={{ mb: 5 }}>
+    <Box sx={{ mb: 5 }} data-testid="admin-orgs-list">
       <Box
         sx={{
           display: "flex",
