@@ -93,6 +93,16 @@
   },
   "common": {
     "locale_code": "en-US",
+    "characteristics": {
+      "title": "Player Characteristics",
+      "passing": "Passing",
+      "ball_control": "Ball Control",
+      "carrying": "Carrying",
+      "shooting": "Shooting",
+      "dribbling": "Dribbling",
+      "defending": "Defending",
+      "save_success": "Characteristics updated successfully!"
+    },
     "of": "of",
     "welcome": "Welcome to Pelada App",
     "hello": "Hello",

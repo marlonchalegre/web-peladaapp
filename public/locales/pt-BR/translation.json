@@ -93,6 +93,16 @@
   },
   "common": {
     "locale_code": "pt-BR",
+    "characteristics": {
+      "title": "Características do Jogador",
+      "passing": "Passe",
+      "ball_control": "Domínio",
+      "carrying": "Condução",
+      "shooting": "Chute",
+      "dribbling": "Drible",
+      "defending": "Marcação",
+      "save_success": "Características atualizadas com sucesso!"
+    },
     "of": "de",
     "welcome": "Bem-vindo ao Pelada App",
     "hello": "Olá",

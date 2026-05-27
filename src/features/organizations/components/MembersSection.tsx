@@ -25,6 +25,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useTranslation } from "react-i18next";
 import { type User, type Player } from "../../../shared/api/endpoints";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
+import PlayerRadarDialog from "./PlayerRadarDialog";
 
 interface MembersSectionProps {
   players: Player[];
@@ -55,6 +56,13 @@ export default function MembersSection({
 }: MembersSectionProps) {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [isRadarOpen, setIsRadarOpen] = useState(false);
+
+  const handlePlayerClick = (player: Player) => {
+    setSelectedPlayer(player);
+    setIsRadarOpen(true);
+  };
 
   const filteredPlayers = useMemo(() => {
     return players.filter((player) => {
@@ -195,53 +203,72 @@ export default function MembersSection({
                 sx={{ px: 0, pr: { xs: 1, sm: 4 }, alignItems: "center" }}
                 data-testid="player-item"
               >
-                <ListItemAvatar>
-                  {(user?.avatar_filename ?? player.user_avatar_filename) ? (
-                    <SecureAvatar
-                      userId={user?.id ?? player.user_id}
-                      filename={
-                        user?.avatar_filename ?? player.user_avatar_filename
-                      }
-                      sx={{
-                        width: { xs: 36, sm: 40 },
-                        height: { xs: 36, sm: 40 },
-                      }}
-                      fallbackText={(
-                        (user?.name ?? player.user_name ?? "").charAt(0) || ""
-                      ).toUpperCase()}
-                    />
-                  ) : (
-                    <Avatar
-                      sx={{
-                        width: { xs: 36, sm: 40 },
-                        height: { xs: 36, sm: 40 },
-                        bgcolor: "primary.dark",
-                      }}
-                    >
-                      {(
-                        (user?.name ?? player.user_name ?? "").charAt(0) || ""
-                      ).toUpperCase()}
-                    </Avatar>
-                  )}
-                </ListItemAvatar>
-                <ListItemText
-                  primary={
-                    <Typography
-                      sx={{
-                        fontWeight: "medium",
-                      }}
-                      noWrap
-                    >
-                      {user?.name || `User #${player.user_id}`}
-                    </Typography>
-                  }
-                  secondary={
-                    <Typography noWrap sx={{ color: "text.secondary" }}>
-                      {t(positionKey)}
-                    </Typography>
-                  }
-                  sx={{ flex: 1, minWidth: 0 }}
-                />
+                <Box
+                  onClick={() => handlePlayerClick(player)}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    flex: 1,
+                    cursor: "pointer",
+                    borderRadius: 1,
+                    mr: 2,
+                    p: 0.5,
+                    minWidth: 0,
+                    transition: "background-color 0.2s",
+                    "&:hover": {
+                      bgcolor: "action.hover",
+                    },
+                  }}
+                  data-testid={`player-click-zone-${player.id}`}
+                >
+                  <ListItemAvatar>
+                    {(user?.avatar_filename ?? player.user_avatar_filename) ? (
+                      <SecureAvatar
+                        userId={user?.id ?? player.user_id}
+                        filename={
+                          user?.avatar_filename ?? player.user_avatar_filename
+                        }
+                        sx={{
+                          width: { xs: 36, sm: 40 },
+                          height: { xs: 36, sm: 40 },
+                        }}
+                        fallbackText={(
+                          (user?.name ?? player.user_name ?? "").charAt(0) || ""
+                        ).toUpperCase()}
+                      />
+                    ) : (
+                      <Avatar
+                        sx={{
+                          width: { xs: 36, sm: 40 },
+                          height: { xs: 36, sm: 40 },
+                          bgcolor: "primary.dark",
+                        }}
+                      >
+                        {(
+                          (user?.name ?? player.user_name ?? "").charAt(0) || ""
+                        ).toUpperCase()}
+                      </Avatar>
+                    )}
+                  </ListItemAvatar>
+                  <ListItemText
+                    primary={
+                      <Typography
+                        sx={{
+                          fontWeight: "medium",
+                        }}
+                        noWrap
+                      >
+                        {user?.name || `User #${player.user_id}`}
+                      </Typography>
+                    }
+                    secondary={
+                      <Typography noWrap sx={{ color: "text.secondary" }}>
+                        {t(positionKey)}
+                      </Typography>
+                    }
+                    sx={{ flex: 1, minWidth: 0 }}
+                  />
+                </Box>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                   {(() => {
                     const isTemporary =
@@ -353,6 +380,23 @@ export default function MembersSection({
           }}
         />
       )}
+
+      {/* Radar Chart Dialog */}
+      <PlayerRadarDialog
+        open={isRadarOpen}
+        onClose={() => {
+          setIsRadarOpen(false);
+          setSelectedPlayer(null);
+        }}
+        player={selectedPlayer}
+        userName={
+          selectedPlayer
+            ? usersMap.get(selectedPlayer.user_id)?.name || selectedPlayer.user_name || ""
+            : ""
+        }
+        onUpdatePlayer={onUpdatePlayer}
+        actionLoading={actionLoading}
+      />
     </Paper>
   );
 }

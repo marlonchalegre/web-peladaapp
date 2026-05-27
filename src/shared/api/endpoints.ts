@@ -46,6 +46,12 @@ export interface Player {
   user_position?: string;
   user_avatar_filename?: string | null;
   position_name?: string;
+  passing?: number;
+  ball_control?: number;
+  carrying?: number;
+  shooting?: number;
+  dribbling?: number;
+  defending?: number;
   user_email?: string;
 }
 export interface MonthlyPlayerSubstitution {
