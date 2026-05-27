@@ -86,7 +86,10 @@ export function OrganizationsTab({
           gap: 2,
         }}
       >
-        <Typography variant="h5" sx={{ fontWeight: 700, color: "text.primary" }}>
+        <Typography
+          variant="h5"
+          sx={{ fontWeight: 700, color: "text.primary" }}
+        >
           {t("admin.sections.orgs.title", "Organizações no Sistema")}
         </Typography>
         <IconButton
@@ -211,7 +214,10 @@ export function OrganizationsTab({
                     <IconButton
                       color="primary"
                       onClick={() => onOpenManageAdmins(org)}
-                      title={t("admin.actions.manage_admins", "Gerenciar Admins")}
+                      title={t(
+                        "admin.actions.manage_admins",
+                        "Gerenciar Admins",
+                      )}
                       data-testid={`manage-admins-btn-${org.id}`}
                     >
                       <SettingsIcon />

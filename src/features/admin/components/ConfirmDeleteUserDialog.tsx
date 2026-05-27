@@ -53,7 +53,11 @@ export function ConfirmDeleteUserDialog({
           disabled={loading}
           data-testid="confirm-delete-user-btn"
         >
-          {loading ? <CircularProgress size={24} /> : t("common.delete", "Excluir")}
+          {loading ? (
+            <CircularProgress size={24} />
+          ) : (
+            t("common.delete", "Excluir")
+          )}
         </Button>
       </DialogActions>
     </Dialog>

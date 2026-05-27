@@ -243,63 +243,74 @@ export default function MembersSection({
                   sx={{ flex: 1, minWidth: 0 }}
                 />
                 <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                  <FormControl
-                    size="small"
-                    variant="standard"
-                    sx={{
-                      minWidth: { xs: 64, sm: 120 },
-                      width: { xs: 64, sm: "auto" },
-                    }}
-                  >
-                    <Select
-                      value={player.member_type || "convidado"}
-                      onChange={(e) =>
-                        onUpdatePlayer(player.id, {
-                          member_type: e.target.value as
-                            | "mensalista"
-                            | "diarista"
-                            | "convidado"
-                            | "mensalista_temporario"
-                            | "diarista_temporario",
-                        })
-                      }
-                      disabled={actionLoading}
-                      disableUnderline
-                      sx={{ fontSize: "0.85rem", width: "100%" }}
-                      data-testid={`member-type-select-${player.id}`}
-                    >
-                      <MenuItem value="convidado">
-                        {t(
-                          "organizations.management.member_type.convidado",
-                          "Convidado",
-                        )}
-                      </MenuItem>
-                      <MenuItem value="diarista">
-                        {t(
-                          "organizations.management.member_type.diarista",
-                          "Diarista",
-                        )}
-                      </MenuItem>
-                      <MenuItem value="mensalista">
-                        {t(
-                          "organizations.management.member_type.mensalista",
-                          "Mensalista",
-                        )}
-                      </MenuItem>
-                      <MenuItem value="mensalista_temporario">
-                        {t(
-                          "organizations.management.member_type.mensalista_temporario",
-                          "Mensalista (Temp.)",
-                        )}
-                      </MenuItem>
-                      <MenuItem value="diarista_temporario">
-                        {t(
-                          "organizations.management.member_type.diarista_temporario",
-                          "Diarista (Subst.)",
-                        )}
-                      </MenuItem>
-                    </Select>
-                  </FormControl>
+                  {(() => {
+                    const isTemporary =
+                      player.member_type === "mensalista_temporario" ||
+                      player.member_type === "diarista_temporario";
+                    return (
+                      <FormControl
+                        size="small"
+                        variant="standard"
+                        sx={{
+                          minWidth: { xs: 64, sm: 120 },
+                          width: { xs: 64, sm: "auto" },
+                        }}
+                      >
+                        <Select
+                          value={player.member_type || "convidado"}
+                          onChange={(e) =>
+                            onUpdatePlayer(player.id, {
+                              member_type: e.target.value as
+                                | "mensalista"
+                                | "diarista"
+                                | "convidado"
+                                | "mensalista_temporario"
+                                | "diarista_temporario",
+                            })
+                          }
+                          disabled={actionLoading || isTemporary}
+                          disableUnderline
+                          sx={{ fontSize: "0.85rem", width: "100%" }}
+                          data-testid={`member-type-select-${player.id}`}
+                        >
+                          <MenuItem value="convidado">
+                            {t(
+                              "organizations.management.member_type.convidado",
+                              "Convidado",
+                            )}
+                          </MenuItem>
+                          <MenuItem value="diarista">
+                            {t(
+                              "organizations.management.member_type.diarista",
+                              "Diarista",
+                            )}
+                          </MenuItem>
+                          <MenuItem value="mensalista">
+                            {t(
+                              "organizations.management.member_type.mensalista",
+                              "Mensalista",
+                            )}
+                          </MenuItem>
+                          {player.member_type === "mensalista_temporario" && (
+                            <MenuItem value="mensalista_temporario" disabled>
+                              {t(
+                                "organizations.management.member_type.mensalista_temporario",
+                                "Mensalista (Temp.)",
+                              )}
+                            </MenuItem>
+                          )}
+                          {player.member_type === "diarista_temporario" && (
+                            <MenuItem value="diarista_temporario" disabled>
+                              {t(
+                                "organizations.management.member_type.diarista_temporario",
+                                "Diarista (Subst.)",
+                              )}
+                            </MenuItem>
+                          )}
+                        </Select>
+                      </FormControl>
+                    );
+                  })()}
                   <IconButton
                     edge="end"
                     color="error"

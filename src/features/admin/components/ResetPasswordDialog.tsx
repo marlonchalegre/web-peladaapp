@@ -74,7 +74,11 @@ export function ResetPasswordDialog({
           disabled={loading}
           data-testid="confirm-reset-password-btn"
         >
-          {loading ? <CircularProgress size={24} /> : t("common.confirm", "Confirmar")}
+          {loading ? (
+            <CircularProgress size={24} />
+          ) : (
+            t("common.confirm", "Confirmar")
+          )}
         </Button>
       </DialogActions>
     </Dialog>

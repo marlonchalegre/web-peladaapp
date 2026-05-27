@@ -187,13 +187,19 @@ export function useAdminUsers({ showToast, currentUser }: UseAdminUsersProps) {
     if (!resetPasswordUser) return;
     if (resetPasswordValue.length < 4) {
       setResetPasswordError(
-        t("admin.errors.password_too_short", "A senha deve ter pelo menos 4 caracteres."),
+        t(
+          "admin.errors.password_too_short",
+          "A senha deve ter pelo menos 4 caracteres.",
+        ),
       );
       return;
     }
     setResetPasswordLoading(true);
     try {
-      await endpoints.resetUserPassword(resetPasswordUser.id, resetPasswordValue);
+      await endpoints.resetUserPassword(
+        resetPasswordUser.id,
+        resetPasswordValue,
+      );
       showToast(
         t("admin.success.reset_password", "Senha redefinida com sucesso."),
         "success",

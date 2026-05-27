@@ -9,7 +9,9 @@ export interface UseAdminOrganizationsProps {
   showToast: (message: string, severity?: "success" | "error" | "info") => void;
 }
 
-export function useAdminOrganizations({ showToast }: UseAdminOrganizationsProps) {
+export function useAdminOrganizations({
+  showToast,
+}: UseAdminOrganizationsProps) {
   const { t } = useTranslation();
 
   // Search & Pagination States - Organizations
@@ -21,7 +23,9 @@ export function useAdminOrganizations({ showToast }: UseAdminOrganizationsProps)
 
   // Actions / UI states
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
-  const [manageAdminsOrg, setManageAdminsOrg] = useState<Organization | null>(null);
+  const [manageAdminsOrg, setManageAdminsOrg] = useState<Organization | null>(
+    null,
+  );
 
   // Fetch Organizations
   const fetchOrganizations = useCallback(

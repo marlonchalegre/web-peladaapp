@@ -22,7 +22,9 @@ vi.mock("../../../app/providers/AuthContext", () => ({
 
 // Mock react-i18next
 const mockT = (key: string, arg2?: unknown, arg3?: unknown) => {
-  const options = (typeof arg2 === "object" ? arg2 : arg3) as Record<string, string> | undefined;
+  const options = (typeof arg2 === "object" ? arg2 : arg3) as
+    | Record<string, string>
+    | undefined;
   if (key === "admin.dialogs.reset_password.description") {
     return `Digite a nova senha para o usuário ${options?.name} (@${options?.username}).`;
   }
@@ -49,7 +51,7 @@ const {
   mockResetUserPassword,
   mockListAdminsByOrganization,
   mockAddOrganizationAdmin,
-  mockRemoveOrganizationAdmin
+  mockRemoveOrganizationAdmin,
 } = vi.hoisted(() => ({
   mockSearchUsers: vi.fn(),
   mockListOrganizationsAdmin: vi.fn(),
@@ -57,12 +59,13 @@ const {
   mockResetUserPassword: vi.fn(),
   mockListAdminsByOrganization: vi.fn(),
   mockAddOrganizationAdmin: vi.fn(),
-  mockRemoveOrganizationAdmin: vi.fn()
+  mockRemoveOrganizationAdmin: vi.fn(),
 }));
 
 // Mock endpoints module
 vi.mock("../../../shared/api/endpoints", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("../../../shared/api/endpoints")>();
+  const actual =
+    await importOriginal<typeof import("../../../shared/api/endpoints")>();
   return {
     ...actual,
     createApi: vi.fn(() => ({
@@ -132,7 +135,7 @@ describe("AdminPanelPage", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.spyOn(console, 'error').mockImplementation((...args) => {
+    vi.spyOn(console, "error").mockImplementation((...args) => {
       console.log("CONSOLE ERROR:", ...args);
     });
     (useAuth as Mock).mockReturnValue({ user: mockCurrentUser });
@@ -145,7 +148,7 @@ describe("AdminPanelPage", () => {
       render(
         <MemoryRouter>
           <AdminPanelPage />
-        </MemoryRouter>
+        </MemoryRouter>,
       );
     });
 
@@ -168,7 +171,7 @@ describe("AdminPanelPage", () => {
       render(
         <MemoryRouter>
           <AdminPanelPage />
-        </MemoryRouter>
+        </MemoryRouter>,
       );
     });
 
@@ -180,7 +183,11 @@ describe("AdminPanelPage", () => {
     await user.click(resetBtn);
 
     // Dialog should be open
-    expect(screen.getByText("Digite a nova senha para o usuário John Doe (@johndoe).")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Digite a nova senha para o usuário John Doe (@johndoe).",
+      ),
+    ).toBeInTheDocument();
 
     const input = screen.getByTestId("new-password-input");
     await user.type(input, "newsecurepassword");
@@ -191,7 +198,10 @@ describe("AdminPanelPage", () => {
     await user.click(confirmBtn);
 
     await waitFor(() => {
-      expect(mockResetUserPassword).toHaveBeenCalledWith("user-1", "newsecurepassword");
+      expect(mockResetUserPassword).toHaveBeenCalledWith(
+        "user-1",
+        "newsecurepassword",
+      );
     });
   });
 
@@ -201,7 +211,7 @@ describe("AdminPanelPage", () => {
       render(
         <MemoryRouter>
           <AdminPanelPage />
-        </MemoryRouter>
+        </MemoryRouter>,
       );
     });
 
@@ -213,7 +223,11 @@ describe("AdminPanelPage", () => {
     await user.click(deleteBtn);
 
     // Dialog should be open
-    expect(screen.getByText("Tem certeza de que deseja remover permanentemente o usuário John Doe (@johndoe)? Esta ação não pode ser desfeita e todas as informações associadas serão excluídas.")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Tem certeza de que deseja remover permanentemente o usuário John Doe (@johndoe)? Esta ação não pode ser desfeita e todas as informações associadas serão excluídas.",
+      ),
+    ).toBeInTheDocument();
 
     mockDeleteUser.mockResolvedValueOnce(undefined);
 
@@ -227,7 +241,7 @@ describe("AdminPanelPage", () => {
 
   it("manages organization admins (lists, searches, adds, and removes admins)", async () => {
     const user = userEvent.setup();
-    
+
     // Mock the sequence of fetching administrators
     mockListAdminsByOrganization
       .mockResolvedValueOnce([
@@ -269,7 +283,7 @@ describe("AdminPanelPage", () => {
       render(
         <MemoryRouter>
           <AdminPanelPage />
-        </MemoryRouter>
+        </MemoryRouter>,
       );
     });
 
@@ -324,7 +338,10 @@ describe("AdminPanelPage", () => {
     await user.click(addBtn);
 
     await waitFor(() => {
-      expect(mockAddOrganizationAdmin).toHaveBeenCalledWith("org-1", "bob-user-id");
+      expect(mockAddOrganizationAdmin).toHaveBeenCalledWith(
+        "org-1",
+        "bob-user-id",
+      );
     });
 
     // Verify Bob is now in list
@@ -339,7 +356,10 @@ describe("AdminPanelPage", () => {
     await user.click(removeBtn);
 
     await waitFor(() => {
-      expect(mockRemoveOrganizationAdmin).toHaveBeenCalledWith("org-1", "admin-user-id");
+      expect(mockRemoveOrganizationAdmin).toHaveBeenCalledWith(
+        "org-1",
+        "admin-user-id",
+      );
     });
   });
 });

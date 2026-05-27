@@ -51,14 +51,14 @@ export default function AdminPanelPage() {
     "success" | "error" | "info"
   >("success");
 
-  const showToast = useCallback((
-    message: string,
-    severity: "success" | "error" | "info" = "success",
-  ) => {
-    setToastMessage(message);
-    setToastSeverity(severity);
-    setToastOpen(true);
-  }, []);
+  const showToast = useCallback(
+    (message: string, severity: "success" | "error" | "info" = "success") => {
+      setToastMessage(message);
+      setToastSeverity(severity);
+      setToastOpen(true);
+    },
+    [],
+  );
 
   const adminUsers = useAdminUsers({ showToast, currentUser });
   const adminOrgs = useAdminOrganizations({ showToast });
@@ -71,7 +71,13 @@ export default function AdminPanelPage() {
       adminOrgs.fetchOrganizations(adminOrgs.orgQuery, adminOrgs.orgPage);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tabValue, adminUsers.userPage, adminOrgs.orgPage, adminUsers.fetchUsers, adminOrgs.fetchOrganizations]);
+  }, [
+    tabValue,
+    adminUsers.userPage,
+    adminOrgs.orgPage,
+    adminUsers.fetchUsers,
+    adminOrgs.fetchOrganizations,
+  ]);
 
   if (!currentUser || !currentUser.is_super_admin) {
     return (
@@ -155,7 +161,9 @@ export default function AdminPanelPage() {
             adminUsers.fetchUsers(adminUsers.userQuery, p);
           }}
           onSearchSubmit={adminUsers.handleUserSearch}
-          onRefresh={() => adminUsers.fetchUsers(adminUsers.userQuery, adminUsers.userPage)}
+          onRefresh={() =>
+            adminUsers.fetchUsers(adminUsers.userQuery, adminUsers.userPage)
+          }
           onToggleBlock={adminUsers.handleToggleUserBlock}
           onToggleOrgCreation={adminUsers.handleToggleUserOrgCreation}
           onToggleSuperAdmin={adminUsers.handleToggleUserSuperAdmin}
@@ -180,7 +188,9 @@ export default function AdminPanelPage() {
             adminOrgs.fetchOrganizations(adminOrgs.orgQuery, p);
           }}
           onSearchSubmit={adminOrgs.handleOrgSearch}
-          onRefresh={() => adminOrgs.fetchOrganizations(adminOrgs.orgQuery, adminOrgs.orgPage)}
+          onRefresh={() =>
+            adminOrgs.fetchOrganizations(adminOrgs.orgQuery, adminOrgs.orgPage)
+          }
           onToggleBlock={adminOrgs.handleToggleOrgBlock}
           onOpenManageAdmins={adminOrgs.handleOpenManageAdmins}
           actionInProgress={adminOrgs.actionInProgress}

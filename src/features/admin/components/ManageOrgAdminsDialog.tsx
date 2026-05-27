@@ -67,7 +67,10 @@ export function ManageOrgAdminsDialog({
 
         {/* Current Admins List */}
         <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-          {t("admin.dialogs.manage_admins.current_admins", "Administradores Atuais")}
+          {t(
+            "admin.dialogs.manage_admins.current_admins",
+            "Administradores Atuais",
+          )}
         </Typography>
         {loading ? (
           <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
@@ -75,7 +78,10 @@ export function ManageOrgAdminsDialog({
           </Box>
         ) : admins.length === 0 ? (
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            {t("admin.dialogs.manage_admins.no_admins", "Nenhum administrador encontrado.")}
+            {t(
+              "admin.dialogs.manage_admins.no_admins",
+              "Nenhum administrador encontrado.",
+            )}
           </Typography>
         ) : (
           <List
@@ -92,7 +98,9 @@ export function ManageOrgAdminsDialog({
               <ListItem key={admin.id}>
                 <ListItemText
                   primary={admin.user_name || ""}
-                  secondary={admin.user_username ? `@${admin.user_username}` : ""}
+                  secondary={
+                    admin.user_username ? `@${admin.user_username}` : ""
+                  }
                 />
                 <ListItemSecondaryAction>
                   <IconButton
@@ -100,7 +108,10 @@ export function ManageOrgAdminsDialog({
                     color="error"
                     onClick={() => removeAdmin(admin.user_id)}
                     disabled={actionLoading || admins.length <= 1}
-                    title={t("admin.actions.remove_admin", "Remover Administrador")}
+                    title={t(
+                      "admin.actions.remove_admin",
+                      "Remover Administrador",
+                    )}
                     data-testid={`remove-admin-btn-${admin.user_id}`}
                   >
                     <DeleteIcon />
@@ -113,7 +124,10 @@ export function ManageOrgAdminsDialog({
 
         {/* Add New Admin Section */}
         <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 600 }}>
-          {t("admin.dialogs.manage_admins.add_admin", "Adicionar Novo Administrador")}
+          {t(
+            "admin.dialogs.manage_admins.add_admin",
+            "Adicionar Novo Administrador",
+          )}
         </Typography>
         <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
           <TextField
@@ -136,7 +150,11 @@ export function ManageOrgAdminsDialog({
             disabled={searchLoading || !searchQuery.trim()}
             data-testid="search-admin-users-btn"
           >
-            {searchLoading ? <CircularProgress size={20} /> : t("common.search", "Buscar")}
+            {searchLoading ? (
+              <CircularProgress size={20} />
+            ) : (
+              t("common.search", "Buscar")
+            )}
           </Button>
         </Box>
 
@@ -163,7 +181,10 @@ export function ManageOrgAdminsDialog({
               );
               return (
                 <ListItem key={user.id}>
-                  <ListItemText primary={user.name} secondary={`@${user.username}`} />
+                  <ListItemText
+                    primary={user.name}
+                    secondary={`@${user.username}`}
+                  />
                   <ListItemSecondaryAction>
                     <Button
                       size="small"
@@ -173,7 +194,10 @@ export function ManageOrgAdminsDialog({
                       data-testid={`add-admin-btn-${user.id}`}
                     >
                       {isAlreadyAdmin
-                        ? t("admin.dialogs.manage_admins.already_admin", "Já é Admin")
+                        ? t(
+                            "admin.dialogs.manage_admins.already_admin",
+                            "Já é Admin",
+                          )
                         : t("common.add", "Adicionar")}
                     </Button>
                   </ListItemSecondaryAction>

@@ -97,7 +97,10 @@ export function UsersTab({
           gap: 2,
         }}
       >
-        <Typography variant="h5" sx={{ fontWeight: 700, color: "text.primary" }}>
+        <Typography
+          variant="h5"
+          sx={{ fontWeight: 700, color: "text.primary" }}
+        >
           {t("admin.sections.users.title", "Usuários Cadastrados")}
         </Typography>
         <IconButton
@@ -181,7 +184,10 @@ export function UsersTab({
               <TableRow>
                 <TableCell colSpan={6} align="center" sx={{ py: 6 }}>
                   <Typography color="text.secondary">
-                    {t("admin.table.no_users_found", "Nenhum usuário encontrado.")}
+                    {t(
+                      "admin.table.no_users_found",
+                      "Nenhum usuário encontrado.",
+                    )}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -280,7 +286,10 @@ export function UsersTab({
                     <IconButton
                       color="primary"
                       onClick={() => onOpenResetPassword(user)}
-                      title={t("admin.actions.reset_password", "Redefinir Senha")}
+                      title={t(
+                        "admin.actions.reset_password",
+                        "Redefinir Senha",
+                      )}
                       data-testid={`reset-password-btn-${user.id}`}
                     >
                       <KeyIcon />

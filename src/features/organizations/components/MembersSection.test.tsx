@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import MembersSection from "./MembersSection";
 import { type User, type Player } from "../../../shared/api/endpoints";
@@ -132,5 +132,82 @@ describe("MembersSection", () => {
 
     fireEvent.click(deleteButtons[0]);
     expect(defaultProps.onRemovePlayer).toHaveBeenCalledWith(mockPlayers[0].id);
+  });
+
+  it("does not show temporary member type options for regular players", () => {
+    render(<MembersSection {...defaultProps} />);
+    const selectContainer = screen.getByTestId("member-type-select-101");
+    const selectButton = selectContainer.querySelector("[role='combobox']");
+    expect(selectButton).not.toBeNull();
+    fireEvent.mouseDown(selectButton!);
+
+    const listbox = screen.getByRole("listbox");
+    expect(
+      within(listbox).queryByText(
+        "organizations.management.member_type.convidado",
+      ),
+    ).not.toBeNull();
+    expect(
+      within(listbox).queryByText(
+        "organizations.management.member_type.diarista",
+      ),
+    ).not.toBeNull();
+    expect(
+      within(listbox).queryByText(
+        "organizations.management.member_type.mensalista",
+      ),
+    ).not.toBeNull();
+
+    expect(
+      within(listbox).queryByText(
+        "organizations.management.member_type.mensalista_temporario",
+      ),
+    ).toBeNull();
+    expect(
+      within(listbox).queryByText(
+        "organizations.management.member_type.diarista_temporario",
+      ),
+    ).toBeNull();
+  });
+
+  it("disables the dropdown when player has a temporary member type", () => {
+    const tempPlayers: Player[] = [
+      {
+        id: "101",
+        user_id: "1",
+        organization_id: "10",
+        grade: 5,
+        member_type: "mensalista_temporario",
+      },
+      {
+        id: "102",
+        user_id: "2",
+        organization_id: "10",
+        grade: 5,
+        member_type: "diarista_temporario",
+      },
+    ];
+    render(<MembersSection {...defaultProps} players={tempPlayers} />);
+
+    const select101 = screen
+      .getByTestId("member-type-select-101")
+      .querySelector("input");
+    expect(select101).toBeDisabled();
+
+    const select102 = screen
+      .getByTestId("member-type-select-102")
+      .querySelector("input");
+    expect(select102).toBeDisabled();
+
+    expect(
+      screen.getByText(
+        "organizations.management.member_type.mensalista_temporario",
+      ),
+    ).toBeDefined();
+    expect(
+      screen.getByText(
+        "organizations.management.member_type.diarista_temporario",
+      ),
+    ).toBeDefined();
   });
 });
