@@ -70,6 +70,7 @@ export default function MarkPaymentDialog({
           <Typography variant="body1" gutterBottom>
             {t(
               "organizations.management.finance.monthly_fees.mark_paid_confirm",
+              "Confirmar o pagamento da mensalidade do jogador {{player}}?",
               {
                 player: playerToMark?.player_name,
               },

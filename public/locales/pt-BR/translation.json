@@ -358,7 +358,14 @@
           "reverse": "Estornar",
           "reverse_confirm": "Tem certeza que deseja estornar este pagamento? A transação financeira associada será marcada como estornada.",
           "success": "Status de pagamento atualizado!",
-          "confirm_payment": "Confirmar recebimento de {{amount}} de {{name}}?"
+          "confirm_payment": "Confirmar recebimento de {{amount}} de {{name}}?",
+          "mark_paid_title": "Confirmar Pagamento",
+          "mark_paid_confirm": "Confirmar o pagamento da mensalidade do jogador {{player}}?",
+          "apply_fine_label": "Aplicar multa de {{amount}}",
+          "amount": "Valor",
+          "amount_paid": "Valor Pago",
+          "amount_expected": "Valor Esperado",
+          "fine_label": "multa"
         },
         "transactions": {
           "title": "Transações",

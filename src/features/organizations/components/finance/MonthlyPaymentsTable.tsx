@@ -159,11 +159,26 @@ export default function MonthlyPaymentsTable({
 
                     return (
                       <Box>
-                        <Typography variant="body2">
+                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
                           {new Intl.NumberFormat(language, {
                             style: "currency",
                             currency: currency || "BRL",
                           }).format(total)}
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ display: "block" }}
+                        >
+                          {mp.paid
+                            ? t(
+                                "organizations.management.finance.monthly_fees.amount_paid",
+                                "Valor Pago",
+                              )
+                            : t(
+                                "organizations.management.finance.monthly_fees.amount_expected",
+                                "Valor Esperado",
+                              )}
                         </Typography>
                         {Number(fine) > 0 && (
                           <Typography
@@ -176,7 +191,12 @@ export default function MonthlyPaymentsTable({
                               style: "currency",
                               currency: currency || "BRL",
                             }).format(fine)}{" "}
-                            (multa)
+                            (
+                            {t(
+                              "organizations.management.finance.monthly_fees.fine_label",
+                              "multa",
+                            )}
+                            )
                           </Typography>
                         )}
                       </Box>

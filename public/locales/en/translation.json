@@ -356,7 +356,14 @@
           "reverse": "Reverse",
           "reverse_confirm": "Are you sure you want to reverse this payment? The associated financial transaction will be marked as reversed.",
           "success": "Payment status updated!",
-          "confirm_payment": "Confirm receipt of {{amount}} from {{name}}?"
+          "confirm_payment": "Confirm receipt of {{amount}} from {{name}}?",
+          "mark_paid_title": "Confirm Payment",
+          "mark_paid_confirm": "Confirm payment of monthly fee for player {{player}}?",
+          "apply_fine_label": "Apply fine of {{amount}}",
+          "amount": "Amount",
+          "amount_paid": "Value Paid",
+          "amount_expected": "Expected Value",
+          "fine_label": "fine"
         },
         "transactions": {
           "title": "Transactions",
