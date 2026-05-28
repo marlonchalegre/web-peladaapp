@@ -171,6 +171,7 @@
     "goal": "Gol",
     "assists": "Assistências",
     "assist": "Assistência",
+    "without_assistance": "Sem assistência",
     "own_goals": "Gols Contra",
     "own_goal": "Gol Contra",
     "back": "Voltar",
@@ -593,7 +594,9 @@
       "session_timer": "TEMPO TOTAL DA SESSÃO",
       "match_timer": "TEMPO DA PARTIDA #{{seq}}",
       "no_events": "Nenhum gol ou assistência registrado ainda.",
-      "match_short": "Part."
+      "match_short": "Part.",
+      "edit_goal": "Editar Gol & Assistência",
+      "edit_own_goal": "Editar Gol Contra"
     },
     "available": {
       "title": "Jogadores",
@@ -751,6 +754,9 @@
     },
     "matches": {
       "title": "Pelada",
+      "who_assisted": "Quem deu a assistência?",
+      "match_uppercase": "PARTIDA",
+      "duration": "DURAÇÃO",
       "loading": "Carregando partidas...",
       "share_summary": "Compartilhar Resumo",
       "summary_copied": "Resumo copiado para a área de transferência!",

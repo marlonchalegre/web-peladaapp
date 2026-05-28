@@ -75,10 +75,24 @@ export default function OfflineSyncManager({
               p.type,
               p.sessionTimeMs,
               p.matchTimeMs,
+              p.assistantId,
             );
             break;
           case "DELETE_EVENT":
-            await endpoints.deleteMatchEvent(p.matchId, p.playerId, p.type);
+            await endpoints.deleteMatchEvent(
+              p.matchId,
+              p.playerId,
+              p.type,
+              p.eventId,
+            );
+            break;
+          case "UPDATE_EVENT":
+            await endpoints.updateMatchEvent(
+              p.matchId,
+              p.eventId,
+              p.playerId,
+              p.assistantId,
+            );
             break;
           case "ADD_PLAYER_TO_TEAM":
             await endpoints.addMatchLineupPlayer(

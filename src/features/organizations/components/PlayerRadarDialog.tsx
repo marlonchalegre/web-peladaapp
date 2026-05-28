@@ -19,7 +19,10 @@ interface PlayerRadarDialogProps {
   onClose: () => void;
   player: Player | null;
   userName: string;
-  onUpdatePlayer: (playerId: string, payload: Partial<Player>) => Promise<void> | void;
+  onUpdatePlayer: (
+    playerId: string,
+    payload: Partial<Player>,
+  ) => Promise<void> | void;
   actionLoading: boolean;
 }
 
@@ -377,9 +380,7 @@ export default function PlayerRadarDialog({
           variant="contained"
           color="primary"
           startIcon={
-            isLoading ? (
-              <CircularProgress size={16} color="inherit" />
-            ) : null
+            isLoading ? <CircularProgress size={16} color="inherit" /> : null
           }
           data-testid="radar-dialog-save-button"
         >

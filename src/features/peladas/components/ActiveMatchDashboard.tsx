@@ -11,6 +11,10 @@ import {
   Chip,
   Avatar,
   useTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  ListItemText,
 } from "@mui/material";
 import {
   type Dispatch,
@@ -30,9 +34,11 @@ import MatchPlayerCard from "./MatchPlayerCard";
 import HistoryIcon from "@mui/icons-material/History";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditIcon from "@mui/icons-material/Edit";
+import BlockIcon from "@mui/icons-material/Block";
 import { useTranslation } from "react-i18next";
 import PlayerSelectMenu from "./PlayerSelectMenu";
 import { POSITION_ORDER } from "../utils/playerUtils";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 
 export type SelectMenuState = {
   teamId: string;
@@ -66,13 +72,13 @@ type Props = {
   onPauseMatch: (id: string) => Promise<void>;
   onResetMatch: (id: string) => Promise<void>;
   onOpenResetConfirm: (type: "session" | "match") => void;
-  // Data Actions
   recordEvent: (
     matchId: string,
     playerId: string,
     type: "assist" | "goal" | "own_goal",
     sessionTimeMs?: number,
     matchTimeMs?: number,
+    assistantId?: string,
   ) => Promise<void>;
   deleteEventAndRefresh: (
     matchId: string,
@@ -135,6 +141,39 @@ export default function ActiveMatchDashboard(props: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
 
+  const [assistDialogOpen, setAssistDialogOpen] = useState(false);
+  const [goalScorerInfo, setGoalScorerInfo] = useState<{
+    playerId: string;
+    side: "home" | "away";
+  } | null>(null);
+
+  const assistantOptions = useMemo(() => {
+    if (!goalScorerInfo) return [];
+    const teamPlayers =
+      goalScorerInfo.side === "home" ? homePlayers : awayPlayers;
+    return teamPlayers.filter((p) => p.player_id !== goalScorerInfo.playerId);
+  }, [goalScorerInfo, homePlayers, awayPlayers]);
+
+  const handleSelectAssistant = (assistantId?: string) => {
+    if (!goalScorerInfo) return;
+    recordEvent(
+      match.id,
+      goalScorerInfo.playerId,
+      "goal",
+      undefined,
+      undefined,
+      assistantId,
+    );
+    adjustScore(match.id, goalScorerInfo.side, 1);
+    setAssistDialogOpen(false);
+    setGoalScorerInfo(null);
+  };
+
+  const handleCloseAssistDialog = () => {
+    setAssistDialogOpen(false);
+    setGoalScorerInfo(null);
+  };
+
   const effectiveFinished = finished && !isEditing;
 
   const getPlayerName = useCallback(
@@ -161,11 +200,14 @@ export default function ActiveMatchDashboard(props: Props) {
     const absDiff = Math.abs(diff);
     for (let i = 0; i < absDiff; i++) {
       if (diff > 0) {
-        recordEvent(match.id, playerId, type, undefined, undefined);
         if (type === "goal") {
-          adjustScore(match.id, side, 1);
-        } else if (type === "own_goal") {
-          adjustScore(match.id, side === "home" ? "away" : "home", 1);
+          setGoalScorerInfo({ playerId, side });
+          setAssistDialogOpen(true);
+        } else {
+          recordEvent(match.id, playerId, type, undefined, undefined);
+          if (type === "own_goal") {
+            adjustScore(match.id, side === "home" ? "away" : "home", 1);
+          }
         }
       } else {
         deleteEventAndRefresh(match.id, playerId, type);
@@ -526,6 +568,79 @@ export default function ActiveMatchDashboard(props: Props) {
           getPlayerName={getPlayerName}
         />
       )}
+      {/* Who Assisted Dialog */}
+      <Dialog
+        open={assistDialogOpen}
+        onClose={handleCloseAssistDialog}
+        fullWidth
+        maxWidth="xs"
+        data-testid="assist-select-dialog"
+      >
+        <DialogTitle sx={{ fontWeight: "bold" }}>
+          {t("peladas.matches.who_assisted", "Who assisted?")}
+        </DialogTitle>
+        <DialogContent sx={{ p: 0 }}>
+          <List sx={{ pt: 0, maxHeight: 400, overflow: "auto" }}>
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={() => handleSelectAssistant(undefined)}
+                data-testid="without-assistance-option"
+              >
+                <Avatar
+                  sx={{
+                    bgcolor: "text.disabled",
+                    width: 40,
+                    height: 40,
+                    mr: 2,
+                  }}
+                >
+                  <BlockIcon />
+                </Avatar>
+                <ListItemText
+                  primary={t("common.without_assistance")}
+                  slotProps={{
+                    primary: {
+                      sx: { fontWeight: "bold", color: "text.secondary" },
+                    },
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+
+            {assistantOptions.map((player) => {
+              const name = getPlayerName(player.player_id);
+              const playerData = orgPlayerIdToPlayer[player.player_id];
+              return (
+                <ListItem key={player.player_id} disablePadding>
+                  <ListItemButton
+                    onClick={() => handleSelectAssistant(player.player_id)}
+                    data-testid={`assistant-player-item-${player.player_id}`}
+                  >
+                    <SecureAvatar
+                      userId={playerData?.user_id}
+                      filename={playerData?.user_avatar_filename}
+                      sx={{
+                        width: 40,
+                        height: 40,
+                        fontSize: "0.9rem",
+                        fontWeight: "bold",
+                        mr: 2,
+                      }}
+                      fallbackText={name.substring(0, 2).toUpperCase()}
+                    />
+                    <ListItemText
+                      primary={name}
+                      slotProps={{
+                        primary: { sx: { fontWeight: "bold" } },
+                      }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              );
+            })}
+          </List>
+        </DialogContent>
+      </Dialog>
       {/* History Drawer */}
       <Drawer
         anchor="left"

@@ -153,33 +153,78 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
     matchId: string,
     playerId: string,
     type: "assist" | "goal" | "own_goal",
+    eventId?: string,
   ) => {
-    // Optimistic
-    setMatchEvents((prev: MatchEvent[]) =>
-      prev.filter(
-        (e) =>
-          !(
-            e.match_id === matchId &&
-            e.player_id === playerId &&
-            e.event_type === type
-          ),
-      ),
-    );
+    // Optimistic Update
+    setMatchEvents((prev: MatchEvent[]) => {
+      if (eventId) {
+        const eventToDelete = prev.find((e) => e.id === eventId);
+        if (eventToDelete && eventToDelete.event_type === "goal") {
+          const matchingAssist = prev.find(
+            (e) =>
+              e.match_id === matchId &&
+              e.event_type === "assist" &&
+              e.session_time_ms === eventToDelete.session_time_ms &&
+              e.match_time_ms === eventToDelete.match_time_ms,
+          );
+          return prev.filter(
+            (e) =>
+              e.id !== eventId &&
+              (!matchingAssist || e.id !== matchingAssist.id),
+          );
+        }
+        return prev.filter((e) => e.id !== eventId);
+      } else {
+        const goalToDelete = [...prev]
+          .reverse()
+          .find(
+            (e) =>
+              e.match_id === matchId &&
+              e.player_id === playerId &&
+              e.event_type === type,
+          );
+        if (goalToDelete) {
+          const matchingAssist = prev.find(
+            (e) =>
+              e.match_id === matchId &&
+              e.event_type === "assist" &&
+              e.session_time_ms === goalToDelete.session_time_ms &&
+              e.match_time_ms === goalToDelete.match_time_ms,
+          );
+          return prev.filter(
+            (e) =>
+              e.id !== goalToDelete.id &&
+              (!matchingAssist || e.id !== matchingAssist.id),
+          );
+        }
+      }
+      return prev;
+    });
 
     setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
 
     if (!navigator.onLine) {
-      enqueueAction(peladaId, "DELETE_EVENT", { matchId, playerId, type });
+      enqueueAction(peladaId, "DELETE_EVENT", {
+        matchId,
+        playerId,
+        type,
+        eventId,
+      });
       setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
       return;
     }
 
     try {
-      await endpoints.deleteMatchEvent(matchId, playerId, type);
+      await endpoints.deleteMatchEvent(matchId, playerId, type, eventId);
       await refreshData();
     } catch (error: unknown) {
       if (
-        !handleNetworkError(error, "DELETE_EVENT", { matchId, playerId, type })
+        !handleNetworkError(error, "DELETE_EVENT", {
+          matchId,
+          playerId,
+          type,
+          eventId,
+        })
       ) {
         setError(
           (error instanceof Error
@@ -199,6 +244,7 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
     type: "assist" | "goal" | "own_goal",
     sessionTimeMs?: number,
     matchTimeMs?: number,
+    assistantId?: string,
   ) => {
     // Optimistic Update
     const newEvent = {
@@ -210,7 +256,19 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
       match_time_ms: matchTimeMs,
       created_at: new Date().toISOString(),
     } as MatchEvent;
-    setMatchEvents((prev: MatchEvent[]) => [...prev, newEvent]);
+    const optimisticEvents = [newEvent];
+    if (type === "goal" && assistantId) {
+      optimisticEvents.push({
+        id: String(Date.now() + 1), // temporary id
+        match_id: matchId,
+        player_id: assistantId,
+        event_type: "assist",
+        session_time_ms: sessionTimeMs,
+        match_time_ms: matchTimeMs,
+        created_at: new Date().toISOString(),
+      } as MatchEvent);
+    }
+    setMatchEvents((prev: MatchEvent[]) => [...prev, ...optimisticEvents]);
 
     setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
 
@@ -221,6 +279,7 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
         type,
         sessionTimeMs,
         matchTimeMs,
+        assistantId,
       });
       setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
       return;
@@ -233,6 +292,7 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
         type,
         sessionTimeMs,
         matchTimeMs,
+        assistantId,
       );
       await refreshData();
     } catch (error: unknown) {
@@ -243,6 +303,7 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
           type,
           sessionTimeMs,
           matchTimeMs,
+          assistantId,
         })
       ) {
         setError(
@@ -256,6 +317,57 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
       setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
     }
   };
+
+  const updateEvent = useCallback(
+    async (
+      matchId: string,
+      eventId: string,
+      playerId: string,
+      assistantId?: string | null,
+    ) => {
+      setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
+
+      if (!navigator.onLine) {
+        enqueueAction(peladaId, "UPDATE_EVENT", {
+          matchId,
+          eventId,
+          playerId,
+          assistantId,
+        });
+        setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
+        return;
+      }
+
+      try {
+        await endpoints.updateMatchEvent(
+          matchId,
+          eventId,
+          playerId,
+          assistantId,
+        );
+        await refreshData();
+      } catch (error: unknown) {
+        if (
+          !handleNetworkError(error, "UPDATE_EVENT", {
+            matchId,
+            eventId,
+            playerId,
+            assistantId,
+          })
+        ) {
+          setError(
+            (error instanceof Error
+              ? error.message
+              : t("peladas.matches.error.record_event_failed")) as string,
+          );
+          throw error;
+        }
+      } finally {
+        setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
+      }
+    },
+    [peladaId, t, setError, handleNetworkError, refreshData],
+  );
 
   const addPlayerToTeam = async (
     matchId: string,
@@ -584,6 +696,7 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
     adjustScore,
     deleteEventAndRefresh,
     recordEvent,
+    updateEvent,
     addPlayerToTeam,
     replacePlayerOnMatchTeam,
     executeClosePelada,

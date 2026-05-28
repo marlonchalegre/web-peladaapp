@@ -250,10 +250,16 @@ describe("ActiveMatchDashboard", () => {
     const goalIncrement = screen.getAllByTestId("stat-goals-increment")[0];
     await user.click(goalIncrement);
 
+    const withoutAssistanceOption = screen.getByTestId(
+      "without-assistance-option",
+    );
+    await user.click(withoutAssistanceOption);
+
     expect(recordEvent).toHaveBeenCalledWith(
       "1",
       "101",
       "goal",
+      undefined,
       undefined,
       undefined,
     );
@@ -311,34 +317,6 @@ describe("ActiveMatchDashboard", () => {
       undefined,
     );
     expect(adjustScore).toHaveBeenCalledWith("1", "away", 1);
-  });
-
-  it("handles stat change: assist +1 (no score adjust)", async () => {
-    const user = userEvent.setup();
-    const recordEvent = vi.fn();
-    const adjustScore = vi.fn();
-    render(
-      <ThemeContextProvider>
-        <ActiveMatchDashboard
-          {...defaultProps}
-          isAdmin={true}
-          recordEvent={recordEvent}
-          adjustScore={adjustScore}
-        />
-      </ThemeContextProvider>,
-    );
-
-    const assistIncrement = screen.getAllByTestId("stat-assists-increment")[0];
-    await user.click(assistIncrement);
-
-    expect(recordEvent).toHaveBeenCalledWith(
-      "1",
-      "101",
-      "assist",
-      undefined,
-      undefined,
-    );
-    expect(adjustScore).not.toHaveBeenCalled();
   });
 
   it("opens sub menu on player click and handles replacement", async () => {

@@ -205,6 +205,7 @@ describe("useMatchActions", () => {
         "goal",
         100,
         200,
+        undefined,
       );
       expect(mockDelegates.refreshData).toHaveBeenCalled();
     });
@@ -237,6 +238,7 @@ describe("useMatchActions", () => {
         "m1",
         "pl1",
         "goal",
+        undefined,
       );
       expect(mockDelegates.refreshData).toHaveBeenCalled();
     });

@@ -225,26 +225,6 @@ describe("MatchPlayerCard", () => {
     expect(onStatChange).toHaveBeenCalledWith("goal", -1, "home");
   });
 
-  it("triggers onStatChange for assists", async () => {
-    const user = userEvent.setup();
-    const onStatChange = vi.fn();
-    render(
-      <ThemeContextProvider>
-        <MatchPlayerCard
-          {...defaultProps}
-          onStatChange={onStatChange}
-          stats={{ goals: 0, assists: 1, ownGoals: 0 }}
-        />
-      </ThemeContextProvider>,
-    );
-
-    await user.click(screen.getByTestId("stat-assists-increment"));
-    expect(onStatChange).toHaveBeenCalledWith("assist", 1, "home");
-
-    await user.click(screen.getByTestId("stat-assists-decrement"));
-    expect(onStatChange).toHaveBeenCalledWith("assist", -1, "home");
-  });
-
   it("triggers onStatChange for own goals", async () => {
     const user = userEvent.setup();
     const onStatChange = vi.fn();
@@ -276,7 +256,6 @@ describe("MatchPlayerCard", () => {
     );
 
     expect(screen.getByTestId("stat-goals-decrement")).toBeDisabled();
-    expect(screen.getByTestId("stat-assists-decrement")).toBeDisabled();
     expect(screen.getByTestId("stat-own-goals-decrement")).toBeDisabled();
   });
 

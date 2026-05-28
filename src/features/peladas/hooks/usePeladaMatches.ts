@@ -250,6 +250,7 @@ export function usePeladaMatches(peladaId: string) {
     adjustScore: actions.adjustScore,
     recordEvent: actions.recordEvent,
     deleteEventAndRefresh: actions.deleteEventAndRefresh,
+    updateEvent: actions.updateEvent,
     addPlayerToTeam: actions.addPlayerToTeam,
     endMatch: handleEndMatch,
     setJustFinishedMatchId,

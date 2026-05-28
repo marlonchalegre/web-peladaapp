@@ -317,33 +317,21 @@ export default function MatchPlayerCard({
                 justifyContent: "center",
                 border: "2px solid",
                 borderColor: "info.light",
-                borderRadius: showControls ? 1.5 : "50%",
-                width: showControls ? "auto" : { xs: 26, sm: 28, md: 32 },
-                height: showControls ? "auto" : { xs: 26, sm: 28, md: 32 },
+                borderRadius: "50%",
+                width: { xs: 26, sm: 28, md: 32 },
+                height: { xs: 26, sm: 28, md: 32 },
                 overflow: "hidden",
 
                 bgcolor:
-                  stats.assists > 0 && !showControls
+                  stats.assists > 0
                     ? alpha(theme.palette.primary.main, 0.05)
                     : "background.paper",
 
                 transition: "all 0.2s",
               }}
             >
-              {showControls && (
-                <IconButton
-                  size="small"
-                  onClick={() => onStatChange("assist", -1, player.side)}
-                  disabled={stats.assists <= 0}
-                  sx={{ p: { xs: 0.4, sm: 0.6, md: 0.8 }, borderRadius: 0 }}
-                  data-testid="stat-assists-decrement"
-                >
-                  <RemoveIcon sx={{ fontSize: { xs: 14, sm: 16, md: 18 } }} />
-                </IconButton>
-              )}
               <Box
                 sx={{
-                  minWidth: showControls ? { xs: 20, sm: 24, md: 28 } : "auto",
                   textAlign: "center",
                   fontWeight: "bold",
                   fontSize: { xs: "0.8rem", sm: "0.85rem", md: "1rem" },
@@ -353,20 +341,6 @@ export default function MatchPlayerCard({
               >
                 {stats.assists}
               </Box>
-              {showControls && (
-                <IconButton
-                  size="small"
-                  onClick={() => onStatChange("assist", 1, player.side)}
-                  sx={{
-                    p: { xs: 0.4, sm: 0.6, md: 0.8 },
-                    borderRadius: 0,
-                    color: "info.main",
-                  }}
-                  data-testid="stat-assists-increment"
-                >
-                  <AddIcon sx={{ fontSize: { xs: 14, sm: 16, md: 18 } }} />
-                </IconButton>
-              )}
             </Stack>
           </Box>
 

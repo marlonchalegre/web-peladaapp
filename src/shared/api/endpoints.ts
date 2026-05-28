@@ -617,21 +617,35 @@ export function createApi(client: ApiClient) {
       eventType: MatchEventType,
       sessionTimeMs?: number,
       matchTimeMs?: number,
+      assistantId?: string,
     ) =>
       client.post(`/api/matches/${id}/events`, {
         player_id: playerId,
         event_type: eventType,
         session_time_ms: sessionTimeMs,
         match_time_ms: matchTimeMs,
+        assistant_id: assistantId,
       }),
     deleteMatchEvent: (
       id: string,
       playerId: string,
       eventType: MatchEventType,
+      eventId?: string,
     ) =>
       client.delete<void>(`/api/matches/${id}/events`, {
         player_id: playerId,
         event_type: eventType,
+        id: eventId,
+      }),
+    updateMatchEvent: (
+      id: string,
+      eventId: string,
+      playerId: string,
+      assistantId?: string | null,
+    ) =>
+      client.put(`/api/matches/${id}/events/${eventId}`, {
+        player_id: playerId,
+        assistant_id: assistantId,
       }),
 
     // Match lineups (per-match players)

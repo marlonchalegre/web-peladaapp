@@ -171,6 +171,7 @@
     "goal": "Goal",
     "assists": "Assists",
     "assist": "Assist",
+    "without_assistance": "Without assistance",
     "own_goals": "Own Goals",
     "own_goal": "Own Goal",
     "back": "Back",
@@ -594,7 +595,9 @@
       "session_timer": "TOTAL SESSION TIME",
       "match_timer": "MATCH #{{seq}} TIME",
       "no_events": "No goals or assists recorded yet.",
-      "match_short": "Match"
+      "match_short": "Match",
+      "edit_goal": "Edit Goal & Assist",
+      "edit_own_goal": "Edit Own Goal"
     },
     "available": {
       "title": "Players",
@@ -752,6 +755,9 @@
     },
     "matches": {
       "title": "Pelada",
+      "who_assisted": "Who assisted?",
+      "match_uppercase": "MATCH",
+      "duration": "DURATION",
       "loading": "Loading matches...",
       "share_summary": "Share Summary",
       "summary_copied": "Summary copied to clipboard!",

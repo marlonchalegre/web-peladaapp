@@ -14,6 +14,13 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  FormControl,
+  InputLabel,
+  Select,
 } from "@mui/material";
 import ActiveMatchDashboard from "../components/ActiveMatchDashboard";
 import MatchReportSummary from "../components/MatchReportSummary";
@@ -25,7 +32,7 @@ import PlayerStatsPanel from "../components/PlayerStatsPanel";
 import PeladaTimeline from "../components/PeladaTimeline";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { api } from "../../../shared/api/client";
-import { createApi } from "../../../shared/api/endpoints";
+import { createApi, type MatchEvent } from "../../../shared/api/endpoints";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import RateReviewIcon from "@mui/icons-material/RateReview";
@@ -93,6 +100,7 @@ export default function PeladaMatchesPage() {
     setSelectMenu,
     recordEvent,
     deleteEventAndRefresh,
+    updateEvent,
     adjustScore,
     replacePlayerOnMatchTeam,
     addPlayerToTeam,
@@ -123,7 +131,6 @@ export default function PeladaMatchesPage() {
     refreshStats,
   } = usePeladaMatches(peladaId);
 
-  // Derived admin status
   const isAdmin = useMemo(() => {
     return !!(
       pelada?.is_admin ||
@@ -134,6 +141,105 @@ export default function PeladaMatchesPage() {
           user.admin_orgs?.includes(pelada.organization_id)))
     );
   }, [pelada, isOrgAdmin, user]);
+
+  const [deleteEventConfirmOpen, setDeleteEventConfirmOpen] =
+    useState<MatchEvent | null>(null);
+  const [editEventDialogOpen, setEditEventDialogOpen] =
+    useState<MatchEvent | null>(null);
+  const [selectedScorerId, setSelectedScorerId] = useState<string>("");
+  const [selectedAssistantId, setSelectedAssistantId] = useState<string>("");
+
+  const getPlayerName = (playerId: string) => {
+    const userId = orgPlayerIdToUserId[playerId];
+    return userId && userIdToName[userId]
+      ? userIdToName[userId]
+      : `Player #${playerId}`;
+  };
+
+  const currentAssistEvent = useMemo(() => {
+    if (!editEventDialogOpen || editEventDialogOpen.event_type !== "goal")
+      return null;
+    return matchEvents.find(
+      (e) =>
+        e.match_id === editEventDialogOpen.match_id &&
+        e.event_type === "assist" &&
+        e.session_time_ms === editEventDialogOpen.session_time_ms &&
+        e.match_time_ms === editEventDialogOpen.match_time_ms,
+    );
+  }, [editEventDialogOpen, matchEvents]);
+
+  useEffect(() => {
+    if (editEventDialogOpen) {
+      setSelectedScorerId(editEventDialogOpen.player_id);
+      setSelectedAssistantId(
+        currentAssistEvent ? currentAssistEvent.player_id : "none",
+      );
+    } else {
+      setSelectedScorerId("");
+      setSelectedAssistantId("");
+    }
+  }, [editEventDialogOpen, currentAssistEvent]);
+
+  const editEventMatch = useMemo(() => {
+    if (!editEventDialogOpen) return null;
+    return matches.find((m) => m.id === editEventDialogOpen.match_id) || null;
+  }, [editEventDialogOpen, matches]);
+
+  const editScorerOptions = useMemo(() => {
+    if (!editEventMatch) return [];
+    const homeTeamPlayers = teamPlayers[editEventMatch.home_team_id] || [];
+    const awayTeamPlayers = teamPlayers[editEventMatch.away_team_id] || [];
+    return [...homeTeamPlayers, ...awayTeamPlayers];
+  }, [editEventMatch, teamPlayers]);
+
+  const editAssistantOptions = useMemo(() => {
+    if (!editEventMatch || !selectedScorerId) return [];
+    const scorerTeamId = orgPlayerIdToTeamId[selectedScorerId];
+    if (!scorerTeamId) return [];
+    const teamPlayersList = teamPlayers[scorerTeamId] || [];
+    return teamPlayersList.filter((p) => p.player_id !== selectedScorerId);
+  }, [editEventMatch, selectedScorerId, teamPlayers, orgPlayerIdToTeamId]);
+
+  const handleScorerChange = (newScorerId: string) => {
+    setSelectedScorerId(newScorerId);
+    const oldTeamId = selectedScorerId
+      ? orgPlayerIdToTeamId[selectedScorerId]
+      : null;
+    const newTeamId = newScorerId ? orgPlayerIdToTeamId[newScorerId] : null;
+    if (newScorerId === selectedAssistantId || oldTeamId !== newTeamId) {
+      setSelectedAssistantId("none");
+    }
+  };
+
+  const handleSaveEditEvent = async () => {
+    if (!editEventDialogOpen) return;
+    try {
+      await updateEvent(
+        editEventDialogOpen.match_id,
+        editEventDialogOpen.id!,
+        selectedScorerId,
+        selectedAssistantId === "none" ? null : selectedAssistantId,
+      );
+      setEditEventDialogOpen(null);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleConfirmDeleteEvent = async () => {
+    if (!deleteEventConfirmOpen) return;
+    try {
+      await deleteEventAndRefresh(
+        deleteEventConfirmOpen.match_id,
+        deleteEventConfirmOpen.player_id,
+        deleteEventConfirmOpen.event_type as "goal" | "assist" | "own_goal",
+        deleteEventConfirmOpen.id,
+      );
+      setDeleteEventConfirmOpen(null);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   useEffect(() => {
     if (pelada?.organization_id && user && !isAdmin) {
@@ -465,13 +571,14 @@ export default function PeladaMatchesPage() {
                 onPauseMatch={pauseMatchTimer}
                 onResetMatch={resetMatchTimer}
                 onOpenResetConfirm={handleResetClick}
-                recordEvent={(mid, pid, type, st, mt) =>
+                recordEvent={(mid, pid, type, st, mt, assistantId) =>
                   recordEvent(
                     mid,
                     pid,
                     type,
                     st ?? peladaTimer.elapsedMs,
                     mt ?? matchTimer.elapsedMs,
+                    assistantId,
                   )
                 }
                 deleteEventAndRefresh={(mid, pid, type) =>
@@ -559,14 +666,19 @@ export default function PeladaMatchesPage() {
             </Paper>
           )}
           {activeTab === 3 && (
-            <Paper sx={{ p: 2, borderRadius: 4 }}>
+            <Box sx={{ p: 2 }}>
               <PeladaTimeline
                 events={matchEvents}
                 userIdToName={userIdToName}
                 orgPlayerIdToUserId={orgPlayerIdToUserId}
                 teamNameById={teamNameById}
+                matches={matches}
+                orgPlayerIdToTeamId={orgPlayerIdToTeamId}
+                isAdmin={isAdmin}
+                onEditClick={(event) => setEditEventDialogOpen(event)}
+                onDeleteClick={(event) => setDeleteEventConfirmOpen(event)}
               />
-            </Paper>
+            </Box>
           )}{" "}
         </Box>
 
@@ -618,6 +730,117 @@ export default function PeladaMatchesPage() {
         onClose={() => setClosePeladaConfirmOpen(false)}
         severity="error"
       />
+      {/* Delete Event Dialog */}
+      <PrettyConfirmDialog
+        open={Boolean(deleteEventConfirmOpen)}
+        title={t("common.confirm")}
+        description="Tem certeza que deseja deletar este evento? Se for um gol, a assistência associada também será deletada."
+        onConfirm={handleConfirmDeleteEvent}
+        onClose={() => setDeleteEventConfirmOpen(null)}
+        severity="error"
+      />
+      {/* Edit Event Dialog */}
+      <Dialog
+        open={Boolean(editEventDialogOpen)}
+        onClose={() => setEditEventDialogOpen(null)}
+        fullWidth
+        maxWidth="xs"
+        data-testid="edit-event-dialog"
+      >
+        <DialogTitle sx={{ fontWeight: "bold" }}>
+          {editEventDialogOpen?.event_type === "own_goal"
+            ? t("peladas.timeline.edit_own_goal", "Edit Own Goal")
+            : t("peladas.timeline.edit_goal", "Edit Goal & Assist")}
+        </DialogTitle>
+        <DialogContent
+          sx={{ pt: 2, display: "flex", flexDirection: "column", gap: 3 }}
+        >
+          {/* Scorer Select */}
+          <FormControl fullWidth size="small" sx={{ mt: 1 }}>
+            <InputLabel id="edit-scorer-label">
+              {editEventDialogOpen?.event_type === "own_goal"
+                ? t("common.player")
+                : t("common.goal")}
+            </InputLabel>
+            <Select
+              labelId="edit-scorer-label"
+              value={selectedScorerId}
+              label={
+                editEventDialogOpen?.event_type === "own_goal"
+                  ? t("common.player")
+                  : t("common.goal")
+              }
+              onChange={(e) => handleScorerChange(e.target.value as string)}
+              data-testid="edit-scorer-select"
+            >
+              {editScorerOptions.map((player) => {
+                const name =
+                  orgPlayerIdToPlayer[player.player_id]?.user_name ||
+                  getPlayerName(player.player_id);
+                const sideLabel = editEventMatch
+                  ? player.team_id === editEventMatch.home_team_id
+                    ? `(${teamNameById[editEventMatch.home_team_id] || "Home"})`
+                    : `(${teamNameById[editEventMatch.away_team_id] || "Away"})`
+                  : "";
+                return (
+                  <MenuItem key={player.player_id} value={player.player_id}>
+                    {name} {sideLabel}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+
+          {/* Assistant Select (Only for Goal events) */}
+          {editEventDialogOpen?.event_type === "goal" && (
+            <FormControl fullWidth size="small">
+              <InputLabel id="edit-assistant-label">
+                {t("common.assist")}
+              </InputLabel>
+              <Select
+                labelId="edit-assistant-label"
+                value={selectedAssistantId}
+                label={t("common.assist")}
+                onChange={(e) =>
+                  setSelectedAssistantId(e.target.value as string)
+                }
+                data-testid="edit-assistant-select"
+              >
+                <MenuItem value="none">
+                  <em>{t("common.without_assistance")}</em>
+                </MenuItem>
+                {editAssistantOptions.map((player) => {
+                  const name =
+                    orgPlayerIdToPlayer[player.player_id]?.user_name ||
+                    getPlayerName(player.player_id);
+                  return (
+                    <MenuItem key={player.player_id} value={player.player_id}>
+                      {name}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 3 }}>
+          <Button
+            onClick={() => setEditEventDialogOpen(null)}
+            variant="outlined"
+            color="inherit"
+          >
+            {t("common.actions.cancel")}
+          </Button>
+          <Button
+            onClick={handleSaveEditEvent}
+            variant="contained"
+            color="primary"
+            disabled={!selectedScorerId}
+          >
+            {t("common.actions.save")}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

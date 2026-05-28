@@ -2,6 +2,7 @@ export type OfflineActionType =
   | "ADJUST_SCORE"
   | "RECORD_EVENT"
   | "DELETE_EVENT"
+  | "UPDATE_EVENT"
   | "ADD_PLAYER_TO_TEAM"
   | "REPLACE_PLAYER"
   | "CLOSE_PELADA"

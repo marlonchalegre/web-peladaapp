@@ -391,7 +391,9 @@ export default function MembersSection({
         player={selectedPlayer}
         userName={
           selectedPlayer
-            ? usersMap.get(selectedPlayer.user_id)?.name || selectedPlayer.user_name || ""
+            ? usersMap.get(selectedPlayer.user_id)?.name ||
+              selectedPlayer.user_name ||
+              ""
             : ""
         }
         onUpdatePlayer={onUpdatePlayer}
