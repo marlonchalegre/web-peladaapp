@@ -27,6 +27,7 @@ import { OrganizationsTab } from "../components/OrganizationsTab";
 import { ResetPasswordDialog } from "../components/ResetPasswordDialog";
 import { ConfirmDeleteUserDialog } from "../components/ConfirmDeleteUserDialog";
 import { ManageOrgAdminsDialog } from "../components/ManageOrgAdminsDialog";
+import { ConfirmDeleteOrgDialog } from "../components/ConfirmDeleteOrgDialog";
 
 export default function AdminPanelPage() {
   const { t } = useTranslation();
@@ -193,6 +194,7 @@ export default function AdminPanelPage() {
           }
           onToggleBlock={adminOrgs.handleToggleOrgBlock}
           onOpenManageAdmins={adminOrgs.handleOpenManageAdmins}
+          onOpenDeleteOrg={adminOrgs.handleOpenDeleteOrg}
           actionInProgress={adminOrgs.actionInProgress}
         />
       )}
@@ -224,6 +226,15 @@ export default function AdminPanelPage() {
         onClose={() => adminOrgs.setManageAdminsOrg(null)}
         organization={adminOrgs.manageAdminsOrg}
         showToast={showToast}
+      />
+
+      {/* Confirm Delete Org Dialog */}
+      <ConfirmDeleteOrgDialog
+        open={Boolean(adminOrgs.deleteOrgTarget)}
+        onClose={() => adminOrgs.setDeleteOrgTarget(null)}
+        organization={adminOrgs.deleteOrgTarget}
+        loading={adminOrgs.deleteOrgLoading}
+        onConfirm={adminOrgs.handleConfirmDeleteOrg}
       />
 
       {/* Snackbar notification */}

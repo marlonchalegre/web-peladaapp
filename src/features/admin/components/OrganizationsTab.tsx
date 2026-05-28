@@ -22,6 +22,7 @@ import {
   Search as SearchIcon,
   Refresh as RefreshIcon,
   Settings as SettingsIcon,
+  Delete as DeleteIcon,
 } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { type Organization } from "../../../shared/api/endpoints";
@@ -38,6 +39,7 @@ export interface OrganizationsTabProps {
   onRefresh: () => void;
   onToggleBlock: (org: Organization) => void;
   onOpenManageAdmins: (org: Organization) => void;
+  onOpenDeleteOrg: (org: Organization) => void;
   actionInProgress: string | null;
 }
 
@@ -53,6 +55,7 @@ export function OrganizationsTab({
   onRefresh,
   onToggleBlock,
   onOpenManageAdmins,
+  onOpenDeleteOrg,
   actionInProgress,
 }: OrganizationsTabProps) {
   const { t } = useTranslation();
@@ -221,6 +224,17 @@ export function OrganizationsTab({
                       data-testid={`manage-admins-btn-${org.id}`}
                     >
                       <SettingsIcon />
+                    </IconButton>
+                    <IconButton
+                      color="error"
+                      onClick={() => onOpenDeleteOrg(org)}
+                      title={t(
+                        "admin.actions.delete_org",
+                        "Remover Organização",
+                      )}
+                      data-testid={`delete-org-btn-${org.id}`}
+                    >
+                      <DeleteIcon />
                     </IconButton>
                   </TableCell>
                 </TableRow>

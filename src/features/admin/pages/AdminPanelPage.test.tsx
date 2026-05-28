@@ -34,6 +34,9 @@ const mockT = (key: string, arg2?: unknown, arg3?: unknown) => {
   if (key === "admin.dialogs.manage_admins.description") {
     return `Gerencie os administradores da organização ${options?.name}.`;
   }
+  if (key === "admin.dialogs.delete_org.description") {
+    return `Tem certeza de que deseja remover permanentemente a organização ${options?.name}? Esta ação não pode ser desfeita e todas as informações associadas serão excluídas.`;
+  }
   return key;
 };
 
@@ -52,6 +55,7 @@ const {
   mockListAdminsByOrganization,
   mockAddOrganizationAdmin,
   mockRemoveOrganizationAdmin,
+  mockDeleteOrganization,
 } = vi.hoisted(() => ({
   mockSearchUsers: vi.fn(),
   mockListOrganizationsAdmin: vi.fn(),
@@ -60,6 +64,7 @@ const {
   mockListAdminsByOrganization: vi.fn(),
   mockAddOrganizationAdmin: vi.fn(),
   mockRemoveOrganizationAdmin: vi.fn(),
+  mockDeleteOrganization: vi.fn(),
 }));
 
 // Mock endpoints module
@@ -76,6 +81,7 @@ vi.mock("../../../shared/api/endpoints", async (importOriginal) => {
       listAdminsByOrganization: mockListAdminsByOrganization,
       addOrganizationAdmin: mockAddOrganizationAdmin,
       removeOrganizationAdmin: mockRemoveOrganizationAdmin,
+      deleteOrganization: mockDeleteOrganization,
       toggleBlockUser: vi.fn(),
       toggleOrgCreation: vi.fn(),
       toggleSuperAdmin: vi.fn(),
@@ -360,6 +366,44 @@ describe("AdminPanelPage", () => {
         "org-1",
         "admin-user-id",
       );
+    });
+  });
+
+  it("opens delete organization dialog and deletes organization successfully", async () => {
+    const user = userEvent.setup();
+    await act(async () => {
+      render(
+        <MemoryRouter>
+          <AdminPanelPage />
+        </MemoryRouter>,
+      );
+    });
+
+    // Switch to Organizations Tab
+    const orgsTab = screen.getByText("admin.tabs.organizations");
+    await user.click(orgsTab);
+
+    await waitFor(() => {
+      expect(screen.getByText("Cool Organization")).toBeInTheDocument();
+    });
+
+    const deleteBtn = screen.getByTestId("delete-org-btn-org-1");
+    await user.click(deleteBtn);
+
+    // Dialog should be open
+    expect(
+      screen.getByText(
+        "Tem certeza de que deseja remover permanentemente a organização Cool Organization? Esta ação não pode ser desfeita e todas as informações associadas serão excluídas.",
+      ),
+    ).toBeInTheDocument();
+
+    mockDeleteOrganization.mockResolvedValueOnce(undefined);
+
+    const confirmBtn = screen.getByTestId("confirm-delete-org-btn");
+    await user.click(confirmBtn);
+
+    await waitFor(() => {
+      expect(mockDeleteOrganization).toHaveBeenCalledWith("org-1");
     });
   });
 });

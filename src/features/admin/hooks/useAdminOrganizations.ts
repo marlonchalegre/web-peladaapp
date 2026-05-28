@@ -26,6 +26,10 @@ export function useAdminOrganizations({
   const [manageAdminsOrg, setManageAdminsOrg] = useState<Organization | null>(
     null,
   );
+  const [deleteOrgTarget, setDeleteOrgTarget] = useState<Organization | null>(
+    null,
+  );
+  const [deleteOrgLoading, setDeleteOrgLoading] = useState(false);
 
   // Fetch Organizations
   const fetchOrganizations = useCallback(
@@ -97,6 +101,32 @@ export function useAdminOrganizations({
     setManageAdminsOrg(org);
   };
 
+  const handleOpenDeleteOrg = (org: Organization) => {
+    setDeleteOrgTarget(org);
+  };
+
+  const handleConfirmDeleteOrg = async () => {
+    if (!deleteOrgTarget) return;
+    setDeleteOrgLoading(true);
+    try {
+      await endpoints.deleteOrganization(deleteOrgTarget.id);
+      showToast(
+        t("admin.success.org_deleted", "Organização excluída com sucesso."),
+        "success",
+      );
+      setDeleteOrgTarget(null);
+      fetchOrganizations(orgQuery, orgPage);
+    } catch (err) {
+      console.error("Failed to delete organization:", err);
+      showToast(
+        t("admin.errors.delete_org", "Falha ao excluir a organização."),
+        "error",
+      );
+    } finally {
+      setDeleteOrgLoading(false);
+    }
+  };
+
   return {
     orgQuery,
     setOrgQuery,
@@ -108,9 +138,14 @@ export function useAdminOrganizations({
     actionInProgress,
     manageAdminsOrg,
     setManageAdminsOrg,
+    deleteOrgTarget,
+    setDeleteOrgTarget,
+    deleteOrgLoading,
     fetchOrganizations,
     handleOrgSearch,
     handleToggleOrgBlock,
     handleOpenManageAdmins,
+    handleOpenDeleteOrg,
+    handleConfirmDeleteOrg,
   };
 }
