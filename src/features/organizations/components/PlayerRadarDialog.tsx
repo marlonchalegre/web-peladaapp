@@ -33,7 +33,7 @@ const TOTAL_SIDES = 6;
 const ATTRIBUTES = [
   { key: "passing", label: "common.characteristics.passing" },
   { key: "ball_control", label: "common.characteristics.ball_control" },
-  { key: "carrying", label: "common.characteristics.carrying" },
+  { key: "velocity", label: "common.characteristics.velocity" },
   { key: "shooting", label: "common.characteristics.shooting" },
   { key: "dribbling", label: "common.characteristics.dribbling" },
   { key: "defending", label: "common.characteristics.defending" },
@@ -58,7 +58,7 @@ export default function PlayerRadarDialog({
   const [draftValues, setDraftValues] = useState({
     passing: 0,
     ball_control: 0,
-    carrying: 0,
+    velocity: 0,
     shooting: 0,
     dribbling: 0,
     defending: 0,
@@ -69,7 +69,7 @@ export default function PlayerRadarDialog({
       setDraftValues({
         passing: player.passing ?? 0,
         ball_control: player.ball_control ?? 0,
-        carrying: player.carrying ?? 0,
+        velocity: player.velocity ?? 0,
         shooting: player.shooting ?? 0,
         dribbling: player.dribbling ?? 0,
         defending: player.defending ?? 0,

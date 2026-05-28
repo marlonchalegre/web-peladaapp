@@ -230,7 +230,7 @@ describe("MembersSection", () => {
     expect(defaultProps.onUpdatePlayer).toHaveBeenCalledWith("101", {
       passing: 0,
       ball_control: 0,
-      carrying: 0,
+      velocity: 0,
       shooting: 0,
       dribbling: 0,
       defending: 0,

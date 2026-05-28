@@ -48,7 +48,7 @@ export interface Player {
   position_name?: string;
   passing?: number;
   ball_control?: number;
-  carrying?: number;
+  velocity?: number;
   shooting?: number;
   dribbling?: number;
   defending?: number;
