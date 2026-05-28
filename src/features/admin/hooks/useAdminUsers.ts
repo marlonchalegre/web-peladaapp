@@ -130,21 +130,21 @@ export function useAdminUsers({ showToast, currentUser }: UseAdminUsersProps) {
     }
   };
 
-  const handleToggleUserSuperAdmin = async (user: User) => {
+  const handleToggleUserGlobalAdmin = async (user: User) => {
     if (user.id === currentUser?.id) {
       showToast(
         t(
           "admin.warnings.cannot_demote_self",
-          "Você não pode remover seu próprio privilégio de Super Admin.",
+          "Você não pode remover seu próprio privilégio de Global Admin.",
         ),
         "info",
       );
       return;
     }
-    const actionKey = `super-admin-${user.id}`;
+    const actionKey = `global-admin-${user.id}`;
     setActionInProgress(actionKey);
     try {
-      const res = await endpoints.toggleSuperAdmin(user.id);
+      const res = await endpoints.toggleGlobalAdmin(user.id);
       setUsers((prev) =>
         prev.map((u) =>
           u.id === user.id ? { ...u, is_super_admin: res.is_super_admin } : u,
@@ -153,21 +153,21 @@ export function useAdminUsers({ showToast, currentUser }: UseAdminUsersProps) {
       showToast(
         res.is_super_admin
           ? t(
-              "admin.success.super_admin_granted",
-              "Privilégios de Super Admin concedidos.",
+              "admin.success.global_admin_granted",
+              "Privilégios de Global Admin concedidos.",
             )
           : t(
-              "admin.success.super_admin_revoked",
-              "Privilégios de Super Admin revogados.",
+              "admin.success.global_admin_revoked",
+              "Privilégios de Global Admin revogados.",
             ),
         "success",
       );
     } catch (err) {
-      console.error("Failed to toggle user super admin status:", err);
+      console.error("Failed to toggle user global admin status:", err);
       showToast(
         t(
-          "admin.errors.toggle_super_admin",
-          "Falha ao alterar status de Super Admin.",
+          "admin.errors.toggle_global_admin",
+          "Falha ao alterar status de Global Admin.",
         ),
         "error",
       );
@@ -266,7 +266,7 @@ export function useAdminUsers({ showToast, currentUser }: UseAdminUsersProps) {
     handleUserSearch,
     handleToggleUserBlock,
     handleToggleUserOrgCreation,
-    handleToggleUserSuperAdmin,
+    handleToggleUserGlobalAdmin,
     handleOpenResetPassword,
     handleConfirmResetPassword,
     handleOpenDeleteUser,

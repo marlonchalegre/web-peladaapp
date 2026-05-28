@@ -742,7 +742,7 @@ export function createApi(client: ApiClient) {
         payload,
       ),
 
-    // Super Admin Actions
+    // Global Admin Actions
     listOrganizationsAdmin: (
       query: string = "",
       page: number = 1,
@@ -768,9 +768,9 @@ export function createApi(client: ApiClient) {
         `/api/admin/users/${id}/toggle-org-creation`,
         {},
       ),
-    toggleSuperAdmin: (id: string) =>
+    toggleGlobalAdmin: (id: string) =>
       client.post<{ id: string; is_super_admin: boolean }>(
-        `/api/admin/users/${id}/toggle-super-admin`,
+        `/api/admin/users/${id}/toggle-global-admin`,
         {},
       ),
     deleteUser: (id: string) => client.delete<void>(`/api/user/${id}`),

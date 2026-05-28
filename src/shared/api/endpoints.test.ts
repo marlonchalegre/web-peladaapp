@@ -681,7 +681,7 @@ describe("endpoints", () => {
     });
   });
 
-  describe("Super Admin", () => {
+  describe("Global Admin", () => {
     it("listOrganizationsAdmin calls correct endpoint with defaults", async () => {
       mockResponse([], true, 200, { "X-Page": "1", "X-Total": "0" });
       await api.listOrganizationsAdmin();
@@ -727,9 +727,9 @@ describe("endpoints", () => {
       );
 
       mockResponse({ is_super_admin: true });
-      await api.toggleSuperAdmin("u1");
+      await api.toggleGlobalAdmin("u1");
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining("/api/admin/users/u1/toggle-super-admin"),
+        expect.stringContaining("/api/admin/users/u1/toggle-global-admin"),
         expect.objectContaining({ method: "POST" }),
       );
     });

@@ -35,7 +35,7 @@ export default function AdminPanelPage() {
   const { user: currentUser } = useAuth();
   const theme = useTheme();
 
-  // Redirect if not super admin
+  // Redirect if not global admin
   useEffect(() => {
     if (currentUser && !currentUser.is_super_admin) {
       navigate("/home");
@@ -110,7 +110,7 @@ export default function AdminPanelPage() {
           component="h1"
           sx={{ fontWeight: 800, mb: 1, letterSpacing: "-0.02em" }}
         >
-          {t("admin.title", "Painel do Super Admin")}
+          {t("admin.title", "Painel do Global Admin")}
         </Typography>
         <Typography variant="subtitle1" sx={{ opacity: 0.9 }}>
           {t(
@@ -167,7 +167,7 @@ export default function AdminPanelPage() {
           }
           onToggleBlock={adminUsers.handleToggleUserBlock}
           onToggleOrgCreation={adminUsers.handleToggleUserOrgCreation}
-          onToggleSuperAdmin={adminUsers.handleToggleUserSuperAdmin}
+          onToggleGlobalAdmin={adminUsers.handleToggleUserGlobalAdmin}
           onOpenResetPassword={adminUsers.handleOpenResetPassword}
           onOpenDeleteUser={adminUsers.handleOpenDeleteUser}
           actionInProgress={adminUsers.actionInProgress}

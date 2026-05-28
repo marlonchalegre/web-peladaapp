@@ -41,7 +41,7 @@ export interface UsersTabProps {
   onRefresh: () => void;
   onToggleBlock: (user: User) => void;
   onToggleOrgCreation: (user: User) => void;
-  onToggleSuperAdmin: (user: User) => void;
+  onToggleGlobalAdmin: (user: User) => void;
   onOpenResetPassword: (user: User) => void;
   onOpenDeleteUser: (user: User) => void;
   actionInProgress: string | null;
@@ -60,7 +60,7 @@ export function UsersTab({
   onRefresh,
   onToggleBlock,
   onToggleOrgCreation,
-  onToggleSuperAdmin,
+  onToggleGlobalAdmin,
   onOpenResetPassword,
   onOpenDeleteUser,
   actionInProgress,
@@ -166,7 +166,7 @@ export function UsersTab({
                 {t("admin.table.allow_org_creation", "Criar Orgs")}
               </TableCell>
               <TableCell sx={{ fontWeight: 600, minWidth: 120 }} align="center">
-                {t("admin.table.super_admin", "Super Admin")}
+                {t("admin.table.global_admin", "Global Admin")}
               </TableCell>
               <TableCell sx={{ fontWeight: 600, minWidth: 120 }} align="center">
                 {t("admin.table.actions", "Ações")}
@@ -274,9 +274,9 @@ export function UsersTab({
                   <TableCell align="center" sx={{ minWidth: 120 }}>
                     <Switch
                       checked={!!user.is_super_admin}
-                      onChange={() => onToggleSuperAdmin(user)}
+                      onChange={() => onToggleGlobalAdmin(user)}
                       disabled={
-                        actionInProgress === `super-admin-${user.id}` ||
+                        actionInProgress === `global-admin-${user.id}` ||
                         user.id === currentUser?.id
                       }
                       color="primary"

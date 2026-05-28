@@ -84,7 +84,7 @@ vi.mock("../../../shared/api/endpoints", async (importOriginal) => {
       deleteOrganization: mockDeleteOrganization,
       toggleBlockUser: vi.fn(),
       toggleOrgCreation: vi.fn(),
-      toggleSuperAdmin: vi.fn(),
+      toggleGlobalAdmin: vi.fn(),
       toggleBlockOrganization: vi.fn(),
     })),
   };
@@ -93,7 +93,7 @@ vi.mock("../../../shared/api/endpoints", async (importOriginal) => {
 describe("AdminPanelPage", () => {
   const mockCurrentUser = {
     id: "super-admin-id",
-    name: "Super Admin",
+    name: "Global Admin",
     username: "superadmin",
     is_super_admin: true,
   };
@@ -111,7 +111,7 @@ describe("AdminPanelPage", () => {
       },
       {
         id: "super-admin-id",
-        name: "Super Admin",
+        name: "Global Admin",
         username: "superadmin",
         email: "super@example.com",
         is_super_admin: true,
