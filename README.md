@@ -86,7 +86,7 @@ The project follows a feature-based architecture:
 
 ### Authentication & Authorization
 
-- Secure JWT storage in `localStorage`.
+- Secure JWT storage in `authToken` cookie (with local user state cached in `localStorage`).
 - Protected routes based on authentication state.
 - Permission-based UI elements (Admin vs. Player).
 

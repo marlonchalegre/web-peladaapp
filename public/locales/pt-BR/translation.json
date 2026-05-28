@@ -1,10 +1,10 @@
 {
   "app": {
-    "title": "Pelada App",
+    "title": "Minha Pelada",
     "version": "Versão: {{version}}",
     "development": "versão de desenvolvimento",
     "new_version_available": "Uma nova versão está disponível!",
-    "install_prompt": "Instale o Pelada App para uma melhor experiência!",
+    "install_prompt": "Instale o Minha Pelada para uma melhor experiência!",
     "ios_install_prompt": "Para instalar no iPhone/iPad: Toque em 'Compartilhar' e depois em 'Adicionar à Tela de Início'"
   },
   "navigation": {
@@ -104,7 +104,7 @@
       "save_success": "Características atualizadas com sucesso!"
     },
     "of": "de",
-    "welcome": "Bem-vindo ao Pelada App",
+    "welcome": "Bem-vindo ao Minha Pelada",
     "hello": "Olá",
     "loading": "Carregando...",
     "import": "Importar",
@@ -991,31 +991,65 @@
   },
   "welcome": {
     "title": "Organize seu futebol de forma profissional",
-    "subtitle": "Gestão de peladas, sorteio de times equilibrados, estatísticas automáticas e votação de MVP. Tudo em um só lugar.",
+    "subtitle": "Confirme presenças automaticamente, sorteie times equilibrados de verdade, organize as partidas, vote no craque do jogo e envie tudo direto no WhatsApp do grupo!",
     "cta": {
       "login": "Entrar",
       "register": "Criar Conta Grátis"
     },
     "features": {
-      "management": {
-        "title": "Gestão Completa",
-        "description": "Controle presenças, mensalidades e convites de forma simples e rápida."
+      "roster": {
+        "title": "Lista de Presença Prática",
+        "description": "Confirme quem vai jogar com um único toque. A lista é organizada automaticamente por posições táticas para você saber exatamente quem vai ao jogo."
       },
-      "teams": {
-        "title": "Times Equilibrados",
-        "description": "Algoritmo inteligente que sorteia os times baseado no nível técnico dos jogadores."
+      "skills": {
+        "title": "Ficha de Habilidades",
+        "description": "Avalie os jogadores de 0 a 5 em fundamentos essenciais (passe, chute, marcação) e visualize tudo em um gráfico interativo de radar."
       },
-      "stats": {
-        "title": "Estatísticas & MVP",
-        "description": "Acompanhe gols, assistências e vote nos melhores da partida após o jogo."
+      "bucket_shuffle": {
+        "title": "Sorteio de Times Justo",
+        "description": "Chega de panelinhas! Sorteie times equilibrados de verdade com base nas posições e notas dos jogadores, mantendo os goleiros fixados."
+      },
+      "ils_scheduling": {
+        "title": "Gerador de Partidas",
+        "description": "Monte a tabela de jogos e o rodízio na hora para manter a bola rolando de forma justa e diminuir o tempo de espera no banco de reservas."
+      },
+      "z_score_voting": {
+        "title": "Vote no Craque da Rodada",
+        "description": "Deixe os jogadores avaliarem os outros após a partida para eleger o melhor jogador (MVP) com um cálculo justo que elimina notas parciais."
+      },
+      "waha_whatsapp": {
+        "title": "Integração com WhatsApp",
+        "description": "Mantenha o grupo atualizado! Envie listas de presença, convocações, times sorteados e placares finais direto na conversa do seu futebol."
+      },
+      "finances": {
+        "title": "Mensalidades sem Complicação",
+        "description": "Controle o pagamento das mensalidades dos mensalistas e a taxa de jogos dos diaristas em um clique, mantendo o caixa do grupo em dia."
+      }
+    },
+    "sections": {
+      "features": {
+        "badge": "FUNCIONALIDADES DO SISTEMA",
+        "title": "Tudo que seu futebol precisa",
+        "subtitle": "Sorteador inteligente, tabelas automáticas e avisos no WhatsApp feitos para facilitar a vida de quem organiza."
       }
     },
     "mock": {
-      "match_day": "Dia de Jogo",
-      "confirmed": "Confirmados",
-      "team_a": "Time A",
-      "team_b": "Time B",
-      "mvp_vote": "Vote no MVP"
+      "match_day": "Lista de Presença",
+      "teams": "Times Equilibrados",
+      "mvp_vote": "Craque do Jogo (MVP)",
+      "attendance_phase": "Fase de Presença",
+      "no_fifo_bias": "Sem viés de confirmação (FIFO): Ordenado por Posição (GK > DF > MF > ST) e Nome.",
+      "confirmed": "Confirmado",
+      "waitlist": "Lista de Espera",
+      "gk_locked": "GK (Fixo)",
+      "goalkeepers_fixed": "Goleiros fixos nos times. Outras posições embaralhadas e balanceadas por nível.",
+      "team_a": "TIME A",
+      "team_b": "TIME B",
+      "avg": "Média",
+      "ratings_normalized": "Notas normalizadas (1 a 10) para neutralizar o viés de avaliadores exigentes/generosos.",
+      "mvp": "MVP",
+      "raw_stars": "Original: {{val}} ⭐",
+      "normalized_score": "Normalizada: {{val}}/10"
     }
   }
 }

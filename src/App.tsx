@@ -294,7 +294,7 @@ function AppLayout() {
                 <Box
                   component="img"
                   src="/logo.png"
-                  alt="Pelada App Logo"
+                  alt="Minha Pelada Logo"
                   sx={{ height: 32, mr: 1.5 }}
                 />
                 <Typography
@@ -306,7 +306,7 @@ function AppLayout() {
                     fontSize: "1.125rem",
                   }}
                 >
-                  PeladaApp
+                  Minha Pelada
                 </Typography>
               </Box>
 
