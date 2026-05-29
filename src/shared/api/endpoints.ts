@@ -16,6 +16,17 @@ export interface Organization {
   waha_use_all_mention?: boolean | null;
   is_blocked?: boolean;
 }
+export interface OrganizationFeatureFlags {
+  organization_id: string;
+  finance_control: boolean;
+  waha_communications: boolean;
+  player_characteristics: boolean;
+  monthly_substitutions: boolean;
+  org_statistics: boolean;
+  peer_voting: boolean;
+  unlimited_members: boolean;
+  unlimited_peladas: boolean;
+}
 export interface User {
   id: string;
   name: string;
@@ -741,6 +752,10 @@ export function createApi(client: ApiClient) {
         `/api/peladas/${peladaId}/votes/batch`,
         payload,
       ),
+    getOrgFeatureFlags: (id: string) =>
+      client.get<OrganizationFeatureFlags>(
+        `/api/organizations/${id}/feature-flags`,
+      ),
 
     // Global Admin Actions
     listOrganizationsAdmin: (
@@ -757,6 +772,18 @@ export function createApi(client: ApiClient) {
       client.post<{ id: string; is_blocked: boolean }>(
         `/api/admin/organizations/${id}/toggle-block`,
         {},
+      ),
+    getOrganizationFeatureFlagsAdmin: (id: string) =>
+      client.get<OrganizationFeatureFlags>(
+        `/api/admin/organizations/${id}/feature-flags`,
+      ),
+    updateOrganizationFeatureFlagsAdmin: (
+      id: string,
+      flags: Partial<OrganizationFeatureFlags>,
+    ) =>
+      client.put<OrganizationFeatureFlags>(
+        `/api/admin/organizations/${id}/feature-flags`,
+        flags,
       ),
     toggleBlockUser: (id: string) =>
       client.post<{ id: string; is_blocked: boolean }>(

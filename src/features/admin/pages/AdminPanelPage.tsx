@@ -28,6 +28,8 @@ import { ResetPasswordDialog } from "../components/ResetPasswordDialog";
 import { ConfirmDeleteUserDialog } from "../components/ConfirmDeleteUserDialog";
 import { ManageOrgAdminsDialog } from "../components/ManageOrgAdminsDialog";
 import { ConfirmDeleteOrgDialog } from "../components/ConfirmDeleteOrgDialog";
+import { ManageFeatureFlagsDialog } from "../components/ManageFeatureFlagsDialog";
+import { type Organization } from "../../../shared/api/endpoints";
 
 export default function AdminPanelPage() {
   const { t } = useTranslation();
@@ -63,6 +65,9 @@ export default function AdminPanelPage() {
 
   const adminUsers = useAdminUsers({ showToast, currentUser });
   const adminOrgs = useAdminOrganizations({ showToast });
+  const [featureFlagsOrg, setFeatureFlagsOrg] = useState<Organization | null>(
+    null,
+  );
 
   // Load Initial Data & on Tab Switch
   useEffect(() => {
@@ -194,6 +199,7 @@ export default function AdminPanelPage() {
           }
           onToggleBlock={adminOrgs.handleToggleOrgBlock}
           onOpenManageAdmins={adminOrgs.handleOpenManageAdmins}
+          onOpenFeatureFlags={setFeatureFlagsOrg}
           onOpenDeleteOrg={adminOrgs.handleOpenDeleteOrg}
           actionInProgress={adminOrgs.actionInProgress}
         />
@@ -225,6 +231,14 @@ export default function AdminPanelPage() {
         open={Boolean(adminOrgs.manageAdminsOrg)}
         onClose={() => adminOrgs.setManageAdminsOrg(null)}
         organization={adminOrgs.manageAdminsOrg}
+        showToast={showToast}
+      />
+
+      {/* Manage Org Feature Flags Dialog */}
+      <ManageFeatureFlagsDialog
+        open={Boolean(featureFlagsOrg)}
+        onClose={() => setFeatureFlagsOrg(null)}
+        organization={featureFlagsOrg}
         showToast={showToast}
       />
 

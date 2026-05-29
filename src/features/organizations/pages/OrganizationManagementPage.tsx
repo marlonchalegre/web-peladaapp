@@ -34,6 +34,7 @@ import DeleteOrganizationDialog from "../components/DeleteOrganizationDialog";
 import PlayerRatingsContent from "../components/PlayerRatingsContent";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
+import { PremiumFeatureLock } from "../../../shared/components/PremiumFeatureLock";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -137,6 +138,7 @@ export default function OrganizationManagementPage() {
     refreshPlayers,
     fetchInviteLink,
     fetchData,
+    featureFlags,
   } = useOrganizationManagement(orgId);
 
   const { user } = useAuth();
@@ -348,26 +350,107 @@ export default function OrganizationManagementPage() {
         </TabPanel>
 
         <TabPanel value={activeTab} index="finance">
-          <FinanceSection orgId={orgId} isAdmin={isAdmin} />
+          {featureFlags?.finance_control !== false ? (
+            <FinanceSection orgId={orgId} isAdmin={isAdmin} />
+          ) : (
+            <PremiumFeatureLock
+              title={t(
+                "common.premium.finance_title",
+                "Controle Financeiro Premium",
+              )}
+              description={t(
+                "common.premium.finance_description",
+                "Monitore o fluxo de caixa, pagamentos de mensalistas e diaristas, e controle a saúde financeira do seu grupo.",
+              )}
+              benefits={[
+                t(
+                  "common.premium.finance_benefit1",
+                  "Fluxo de caixa completo de receitas e despesas",
+                ),
+                t(
+                  "common.premium.finance_benefit2",
+                  "Acompanhamento detalhado de pagamentos por jogador",
+                ),
+                t(
+                  "common.premium.finance_benefit3",
+                  "Histórico completo de transações da organização",
+                ),
+              ]}
+            />
+          )}
         </TabPanel>
 
         <TabPanel value={activeTab} index="substitutions">
-          <SubstitutionsSection
-            players={players}
-            substitutions={substitutions}
-            onCreateSubstitution={handleCreateSubstitution}
-            onEndSubstitution={handleEndSubstitution}
-            actionLoading={actionLoading}
-          />
+          {featureFlags?.monthly_substitutions !== false ? (
+            <SubstitutionsSection
+              players={players}
+              substitutions={substitutions}
+              onCreateSubstitution={handleCreateSubstitution}
+              onEndSubstitution={handleEndSubstitution}
+              actionLoading={actionLoading}
+            />
+          ) : (
+            <PremiumFeatureLock
+              title={t(
+                "common.premium.substitutions_title",
+                "Substituições de Mensalistas",
+              )}
+              description={t(
+                "common.premium.substitutions_description",
+                "Gerencie o afastamento temporário ou definitivo de mensalistas e a substituição por diaristas de forma automática.",
+              )}
+              benefits={[
+                t(
+                  "common.premium.substitutions_benefit1",
+                  "Substituições temporárias com data de término",
+                ),
+                t(
+                  "common.premium.substitutions_benefit2",
+                  "Substituições permanentes de membros",
+                ),
+                t(
+                  "common.premium.substitutions_benefit3",
+                  "Histórico de substituições realizadas",
+                ),
+              ]}
+            />
+          )}
         </TabPanel>
 
         <TabPanel value={activeTab} index="ratings">
-          <PlayerRatingsContent
-            orgId={orgId}
-            initialPlayers={players}
-            orgName={org.name}
-            onUpdateSuccess={refreshPlayers}
-          />
+          {featureFlags?.player_characteristics !== false ? (
+            <PlayerRatingsContent
+              orgId={orgId}
+              initialPlayers={players}
+              orgName={org.name}
+              onUpdateSuccess={refreshPlayers}
+            />
+          ) : (
+            <PremiumFeatureLock
+              title={t(
+                "common.premium.characteristics_title",
+                "Avaliações e Características de Jogadores",
+              )}
+              description={t(
+                "common.premium.characteristics_description",
+                "Defina os atributos técnicos e físicos de seus atletas para gerar gráficos de radar personalizados.",
+              )}
+              benefits={[
+                t(
+                  "common.premium.characteristics_benefit1",
+                  "Gráficos de radar de habilidades de 6 eixos",
+                ),
+                t(
+                  "common.premium.characteristics_benefit2",
+                  "Atributos personalizados (Chute, Velocidade, Passe, etc.)",
+                ),
+                t(
+                  "common.premium.characteristics_benefit3",
+                  "Melhor balanceamento de times baseado em dados reais",
+                ),
+              ]}
+            />
+          )}
         </TabPanel>
 
         <TabPanel value={activeTab} index="admins">
@@ -394,10 +477,37 @@ export default function OrganizationManagementPage() {
         </TabPanel>
 
         <TabPanel value={activeTab} index="waha">
-          <WahaConfigSection
-            organization={org}
-            onUpdateSuccess={() => fetchData(true)}
-          />
+          {featureFlags?.waha_communications !== false ? (
+            <WahaConfigSection
+              organization={org}
+              onUpdateSuccess={() => fetchData(true)}
+            />
+          ) : (
+            <PremiumFeatureLock
+              title={t(
+                "common.premium.waha_title",
+                "Comunicações Automatizadas via WhatsApp",
+              )}
+              description={t(
+                "common.premium.waha_description",
+                "Integre sua organização com o WhatsApp para automatizar notificações de peladas, presenças e listas de espera.",
+              )}
+              benefits={[
+                t(
+                  "common.premium.waha_benefit1",
+                  "Notificações automáticas de novos eventos",
+                ),
+                t(
+                  "common.premium.waha_benefit2",
+                  "Alertas de confirmação de presença",
+                ),
+                t(
+                  "common.premium.waha_benefit3",
+                  "Integração direta com o serviço WAHA API",
+                ),
+              ]}
+            />
+          )}
         </TabPanel>
 
         <TabPanel value={activeTab} index="settings">

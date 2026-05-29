@@ -23,6 +23,7 @@ import {
   Refresh as RefreshIcon,
   Settings as SettingsIcon,
   Delete as DeleteIcon,
+  Flag as FlagIcon,
 } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { type Organization } from "../../../shared/api/endpoints";
@@ -40,6 +41,7 @@ export interface OrganizationsTabProps {
   onToggleBlock: (org: Organization) => void;
   onOpenManageAdmins: (org: Organization) => void;
   onOpenDeleteOrg: (org: Organization) => void;
+  onOpenFeatureFlags: (org: Organization) => void;
   actionInProgress: string | null;
 }
 
@@ -56,6 +58,7 @@ export function OrganizationsTab({
   onToggleBlock,
   onOpenManageAdmins,
   onOpenDeleteOrg,
+  onOpenFeatureFlags,
   actionInProgress,
 }: OrganizationsTabProps) {
   const { t } = useTranslation();
@@ -224,6 +227,17 @@ export function OrganizationsTab({
                       data-testid={`manage-admins-btn-${org.id}`}
                     >
                       <SettingsIcon />
+                    </IconButton>
+                    <IconButton
+                      color="secondary"
+                      onClick={() => onOpenFeatureFlags(org)}
+                      title={t(
+                        "admin.actions.manage_feature_flags",
+                        "Gerenciar Premium Flags",
+                      )}
+                      data-testid={`manage-feature-flags-btn-${org.id}`}
+                    >
+                      <FlagIcon />
                     </IconButton>
                     <IconButton
                       color="error"

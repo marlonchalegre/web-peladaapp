@@ -477,4 +477,88 @@ describe("OrganizationManagementPage", () => {
     // onToggle={(id, checked) => setSelectedUserIds((prev) => { ... checked ? add : delete ... })}
     // We need to trigger the actual function passed to onToggle in the mock
   });
+
+  describe("Premium Feature Locks", () => {
+    it("renders PremiumFeatureLock when finance is disabled", () => {
+      mockHook.featureFlags = { finance_control: false };
+      renderPage("finance");
+      expect(
+        screen.queryByTestId("mock-finance-section"),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByText("common.premium.activation_notice"),
+      ).toBeInTheDocument();
+    });
+
+    it("renders actual component when finance is enabled", () => {
+      mockHook.featureFlags = { finance_control: true };
+      renderPage("finance");
+      expect(screen.getByTestId("mock-finance-section")).toBeInTheDocument();
+      expect(
+        screen.queryByText("common.premium.activation_notice"),
+      ).not.toBeInTheDocument();
+    });
+
+    it("renders PremiumFeatureLock when substitutions is disabled", () => {
+      mockHook.featureFlags = { monthly_substitutions: false };
+      renderPage("substitutions");
+      expect(
+        screen.queryByTestId("mock-substitutions-section"),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByText("common.premium.activation_notice"),
+      ).toBeInTheDocument();
+    });
+
+    it("renders actual component when substitutions is enabled", () => {
+      mockHook.featureFlags = { monthly_substitutions: true };
+      renderPage("substitutions");
+      expect(
+        screen.getByTestId("mock-substitutions-section"),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByText("common.premium.activation_notice"),
+      ).not.toBeInTheDocument();
+    });
+
+    it("renders PremiumFeatureLock when ratings is disabled", () => {
+      mockHook.featureFlags = { player_characteristics: false };
+      renderPage("ratings");
+      expect(
+        screen.queryByTestId("mock-player-ratings-section"),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByText("common.premium.activation_notice"),
+      ).toBeInTheDocument();
+    });
+
+    it("renders actual component when ratings is enabled", () => {
+      mockHook.featureFlags = { player_characteristics: true };
+      renderPage("ratings");
+      expect(
+        screen.getByTestId("mock-player-ratings-section"),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByText("common.premium.activation_notice"),
+      ).not.toBeInTheDocument();
+    });
+
+    it("renders PremiumFeatureLock when waha is disabled", () => {
+      mockHook.featureFlags = { waha_communications: false };
+      renderPage("waha");
+      expect(screen.queryByTestId("mock-waha-section")).not.toBeInTheDocument();
+      expect(
+        screen.getByText("common.premium.activation_notice"),
+      ).toBeInTheDocument();
+    });
+
+    it("renders actual component when waha is enabled", () => {
+      mockHook.featureFlags = { waha_communications: true };
+      renderPage("waha");
+      expect(screen.getByTestId("mock-waha-section")).toBeInTheDocument();
+      expect(
+        screen.queryByText("common.premium.activation_notice"),
+      ).not.toBeInTheDocument();
+    });
+  });
 });

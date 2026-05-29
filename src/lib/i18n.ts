@@ -16,11 +16,16 @@ i18n
   // init i18next
   // for all options read: https://www.i18next.com/overview/configuration-options
   .init({
-    fallbackLng: "en",
+    fallbackLng: "pt-BR",
     debug: import.meta.env.DEV,
 
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
+    },
+
+    detection: {
+      order: ["querystring", "localStorage"],
+      caches: ["localStorage"],
     },
 
     // supported languages

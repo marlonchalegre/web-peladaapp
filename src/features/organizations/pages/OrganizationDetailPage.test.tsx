@@ -847,4 +847,88 @@ describe("OrganizationDetailPage", () => {
       );
     });
   });
+
+  it("disables statistics button when org_statistics feature flag is false", async () => {
+    const mockOrg = { id: "1", name: "Test Org", owner_id: "1" };
+    const mockPeladas = {
+      data: [],
+      total: 0,
+      page: 1,
+      perPage: 10,
+      totalPages: 1,
+    };
+
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/organizations/1") return Promise.resolve(mockOrg);
+      if (path === "/api/organizations/1/admins") return Promise.resolve([]);
+      if (path === "/api/organizations/1/feature-flags")
+        return Promise.resolve({ org_statistics: false });
+      return Promise.reject(new Error(`Not found: ${path}`));
+    });
+    (api.getPaginated as Mock).mockImplementation((path: string) => {
+      if (path === "/api/organizations/1/peladas")
+        return Promise.resolve(mockPeladas);
+      return Promise.reject(new Error("Not found"));
+    });
+
+    render(
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <MemoryRouter initialEntries={["/organizations/1"]}>
+          <Routes>
+            <Route
+              path="/organizations/:id"
+              element={<OrganizationDetailPage />}
+            />
+          </Routes>
+        </MemoryRouter>
+      </LocalizationProvider>,
+    );
+
+    await waitFor(() => {
+      const statsBtn = screen.getByTestId("org-statistics-button");
+      expect(statsBtn).toBeDisabled();
+    });
+  });
+
+  it("enables statistics button when org_statistics feature flag is true", async () => {
+    const mockOrg = { id: "1", name: "Test Org", owner_id: "1" };
+    const mockPeladas = {
+      data: [],
+      total: 0,
+      page: 1,
+      perPage: 10,
+      totalPages: 1,
+    };
+
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/organizations/1") return Promise.resolve(mockOrg);
+      if (path === "/api/organizations/1/admins") return Promise.resolve([]);
+      if (path === "/api/organizations/1/feature-flags")
+        return Promise.resolve({ org_statistics: true });
+      return Promise.reject(new Error(`Not found: ${path}`));
+    });
+    (api.getPaginated as Mock).mockImplementation((path: string) => {
+      if (path === "/api/organizations/1/peladas")
+        return Promise.resolve(mockPeladas);
+      return Promise.reject(new Error("Not found"));
+    });
+
+    render(
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <MemoryRouter initialEntries={["/organizations/1"]}>
+          <Routes>
+            <Route
+              path="/organizations/:id"
+              element={<OrganizationDetailPage />}
+            />
+          </Routes>
+        </MemoryRouter>
+      </LocalizationProvider>,
+    );
+
+    await waitFor(() => {
+      const statsBtn = screen.getByTestId("org-statistics-button");
+      expect(statsBtn).toBeEnabled();
+    });
+  });
 });

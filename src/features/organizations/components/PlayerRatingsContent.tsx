@@ -13,11 +13,15 @@ import {
   InputAdornment,
   Snackbar,
   TablePagination,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+import StarIcon from "@mui/icons-material/Star";
 import { useTranslation } from "react-i18next";
 import { api } from "../../../shared/api/client";
 import { createApi, type Player } from "../../../shared/api/endpoints";
+import PlayerRadarDialog from "./PlayerRadarDialog";
 
 const endpoints = createApi(api);
 
@@ -47,6 +51,39 @@ export default function PlayerRatingsContent({
     message: "",
     severity: "success",
   });
+
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [isRadarOpen, setIsRadarOpen] = useState(false);
+
+  const handlePlayerClick = (player: Player) => {
+    setSelectedPlayer(player);
+    setIsRadarOpen(true);
+  };
+
+  const handleUpdatePlayer = async (
+    playerId: string,
+    payload: Partial<Player>,
+  ) => {
+    try {
+      await endpoints.updatePlayer(playerId, payload);
+      setPlayers((prev) =>
+        prev.map((p) => (p.id === playerId ? { ...p, ...payload } : p)),
+      );
+      setSnackbar({
+        open: true,
+        message: t("organizations.ratings.save_success"),
+        severity: "success",
+      });
+      onUpdateSuccess?.();
+    } catch (err) {
+      console.error("Failed to update player characteristics", err);
+      setSnackbar({
+        open: true,
+        message: t("organizations.ratings.error.update_rating_failed"),
+        severity: "error",
+      });
+    }
+  };
 
   useEffect(() => {
     setPlayers(initialPlayers);
@@ -173,7 +210,17 @@ export default function PlayerRatingsContent({
             ) : (
               paginatedPlayers.map((player) => (
                 <TableRow key={player.id} hover>
-                  <TableCell>
+                  <TableCell
+                    onClick={() => handlePlayerClick(player)}
+                    sx={{
+                      cursor: "pointer",
+                      transition: "background-color 0.2s",
+                      "&:hover": {
+                        bgcolor: "action.hover",
+                      },
+                    }}
+                    data-testid={`player-click-zone-${player.id}`}
+                  >
                     <Box sx={{ display: "flex", flexDirection: "column" }}>
                       <Typography
                         variant="subtitle1"
@@ -212,16 +259,40 @@ export default function PlayerRatingsContent({
                     />
                   </TableCell>
                   <TableCell align="right">
-                    <Typography
-                      variant="body2"
-                      color="primary"
-                      data-testid={`grade-${player.id}`}
+                    <Box
                       sx={{
-                        fontWeight: "bold",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "flex-end",
+                        gap: 1,
                       }}
                     >
-                      {player.grade ? player.grade.toFixed(1) : "-"}
-                    </Typography>
+                      <Typography
+                        variant="body2"
+                        color="primary"
+                        data-testid={`grade-${player.id}`}
+                        sx={{
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {player.grade ? player.grade.toFixed(1) : "-"}
+                      </Typography>
+                      <Tooltip
+                        title={t(
+                          "common.characteristics.title",
+                          "Características do Jogador",
+                        )}
+                      >
+                        <IconButton
+                          color="primary"
+                          onClick={() => handlePlayerClick(player)}
+                          data-testid={`edit-characteristics-btn-${player.id}`}
+                          size="small"
+                        >
+                          <StarIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ))
@@ -244,6 +315,17 @@ export default function PlayerRatingsContent({
         autoHideDuration={4000}
         onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
         message={snackbar.message}
+      />
+      <PlayerRadarDialog
+        open={isRadarOpen}
+        onClose={() => {
+          setIsRadarOpen(false);
+          setSelectedPlayer(null);
+        }}
+        player={selectedPlayer}
+        userName={selectedPlayer?.user_name || ""}
+        onUpdatePlayer={handleUpdatePlayer}
+        actionLoading={false}
       />
     </Box>
   );

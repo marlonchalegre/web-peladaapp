@@ -23,6 +23,7 @@ import {
   createApi,
   type Pelada,
   type Organization,
+  type OrganizationFeatureFlags,
 } from "../../../shared/api/endpoints";
 import { useAuth } from "../../../app/providers/AuthContext";
 import CreatePeladaForm from "../components/CreatePeladaForm";
@@ -48,6 +49,8 @@ export default function OrganizationDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
+  const [featureFlags, setFeatureFlags] =
+    useState<OrganizationFeatureFlags | null>(null);
 
   useEffect(() => {
     if (!orgId || !user) return;
@@ -82,6 +85,16 @@ export default function OrganizationDetailPage() {
             ? error.message
             : t("organizations.detail.error.load_failed");
         setError(message);
+      });
+
+    // Load feature flags
+    endpoints
+      .getOrgFeatureFlags(orgId)
+      .then((ff) => {
+        setFeatureFlags(ff);
+      })
+      .catch((err: unknown) => {
+        console.error("Failed to load feature flags", err);
       });
   }, [orgId, user, t, peladas.length]); // Added peladas.length as a hint to refresh when data changes
 
@@ -185,8 +198,12 @@ export default function OrganizationDetailPage() {
         </Typography>
         <Stack direction="row" spacing={1}>
           <Button
-            component={RouterLink}
-            to={`/organizations/${orgId}/statistics`}
+            {...(featureFlags?.org_statistics !== false
+              ? {
+                  component: RouterLink,
+                  to: `/organizations/${orgId}/statistics`,
+                }
+              : { disabled: true })}
             variant="outlined"
             data-testid="org-statistics-button"
             data-analytics-id="view-org-statistics-btn"

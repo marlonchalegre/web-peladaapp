@@ -10,6 +10,7 @@ import {
   type OrganizationAdmin,
   type OrganizationInvitation,
   type MonthlyPlayerSubstitution,
+  type OrganizationFeatureFlags,
 } from "../../../shared/api/endpoints";
 
 const endpoints = createApi(api);
@@ -27,6 +28,8 @@ export function useOrganizationManagement(orgId: string) {
   >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [featureFlags, setFeatureFlags] =
+    useState<OrganizationFeatureFlags | null>(null);
 
   const [isAddPlayersOpen, setIsAddPlayersOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
@@ -109,6 +112,13 @@ export function useOrganizationManagement(orgId: string) {
           setSubstitutions(s);
         } catch (err) {
           console.error("Failed to fetch substitutions", err);
+        }
+
+        try {
+          const ff = await endpoints.getOrgFeatureFlags(orgId);
+          setFeatureFlags(ff);
+        } catch (err) {
+          console.error("Failed to fetch feature flags", err);
         }
 
         // Also fetch the public invite link to show it in the invitations tab
@@ -438,5 +448,6 @@ export function useOrganizationManagement(orgId: string) {
     handleEndSubstitution,
     refreshPlayers,
     fetchData,
+    featureFlags,
   };
 }
