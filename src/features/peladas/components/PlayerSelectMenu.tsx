@@ -6,7 +6,7 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
-  ListItemIcon,
+  ListItemAvatar,
   TextField,
   Box,
 } from "@mui/material";
@@ -94,7 +94,7 @@ export default function PlayerSelectMenu({
                     }}
                     data-testid={`bench-player-item-${player.id}`}
                   >
-                    <ListItemIcon>
+                    <ListItemAvatar>
                       <SecureAvatar
                         userId={player.user_id}
                         filename={player.user_avatar_filename}
@@ -106,7 +106,7 @@ export default function PlayerSelectMenu({
                         }}
                         fallbackText={name.substring(0, 2).toUpperCase()}
                       />
-                    </ListItemIcon>
+                    </ListItemAvatar>
                     <ListItemText
                       primary={name}
                       secondary={getPositionLabel(player)}
