@@ -111,6 +111,7 @@ export interface Pelada {
   timer_started_at?: string | null;
   timer_accumulated_ms?: number | null;
   timer_status?: TimerStatus | null;
+  user_attendance_status?: string | null;
 }
 
 export interface Team {
