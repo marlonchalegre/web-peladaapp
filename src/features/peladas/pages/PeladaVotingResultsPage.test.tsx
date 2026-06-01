@@ -3,14 +3,28 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import PeladaVotingResultsPage from "./PeladaVotingResultsPage";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material";
-import { api } from "../../../shared/api/client";
+import { api, ApiError } from "../../../shared/api/client";
 
 // Mock the API client
-vi.mock("../../../shared/api/client", () => ({
-  api: {
-    get: vi.fn(),
-  },
-}));
+vi.mock("../../../shared/api/client", () => {
+  class MockApiError extends Error {
+    constructor(
+      public status: number,
+      public data: unknown,
+      message?: string,
+    ) {
+      super(message || `API Error: ${status}`);
+      this.name = "ApiError";
+    }
+  }
+
+  return {
+    api: {
+      get: vi.fn(),
+    },
+    ApiError: MockApiError,
+  };
+});
 
 const theme = createTheme();
 
@@ -35,23 +49,28 @@ describe("PeladaVotingResultsPage Restricted Access", () => {
   });
 
   it("shows the restricted view when receiving a 403 error (user didn't vote)", async () => {
-    // Create a mock Axios error for 403 Forbidden
-    const axiosError = {
-      isAxiosError: true,
-      response: {
-        status: 403,
-        data: { message: "Você precisa votar para ter acesso aos resultados" },
-      },
-    };
+    const error = new ApiError(403, {
+      message: "Você precisa votar para ter acesso aos resultados",
+    });
 
-    vi.mocked(api.get).mockRejectedValueOnce(axiosError);
+    vi.mocked(api.get)
+      .mockRejectedValueOnce(error)
+      .mockResolvedValueOnce({
+        pelada: {
+          id: "1",
+          organization_id: "org1",
+          organization_name: "Test Org",
+        },
+      });
 
     renderWithProviders();
 
     // Should show the restriction dialog
     // The t mock in setup.ts returns the key as the text
     await waitFor(() => {
-      expect(screen.getByText(/common\.actions\.view/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/peladas\.voting\.results\.restricted_title/i),
+      ).toBeInTheDocument();
     });
 
     expect(
@@ -152,16 +171,90 @@ describe("PeladaVotingResultsPage Restricted Access", () => {
     expect(screen.getByText("common.positions.goalkeeper")).toBeInTheDocument();
   });
 
-  it("shows still voting message when receiving a 400 error", async () => {
-    const axiosError = {
-      isAxiosError: true,
-      response: {
-        status: 400,
-        data: { message: "Voting is still open" },
-      },
-    };
+  it("handles restricted view navigation links when organization details load successfully", async () => {
+    const error = new ApiError(403, {
+      message: "Você precisa votar para ter acesso aos resultados",
+    });
 
-    vi.mocked(api.get).mockRejectedValueOnce(axiosError);
+    vi.mocked(api.get)
+      .mockRejectedValueOnce(error) // first call (getVotingResults)
+      .mockResolvedValueOnce({
+        pelada: {
+          id: "1",
+          organization_id: "org_real_123",
+          organization_name: "Real Organization Name",
+        },
+      }); // second call (getPeladaFullDetails)
+
+    renderWithProviders();
+
+    // Check Dialog Title and Content are rendered
+    await waitFor(() => {
+      expect(
+        screen.getByText(/peladas\.voting\.results\.restricted_title/i),
+      ).toBeInTheDocument();
+    });
+
+    // Voltar button should link to the real organization detail page
+    const backButton = screen.getByText("common.back_to_org");
+    expect(backButton).toBeInTheDocument();
+    expect(backButton.closest("a")).toHaveAttribute(
+      "href",
+      "/organizations/org_real_123",
+    );
+
+    // Breadcrumb for organization name should be updated
+    await waitFor(() => {
+      expect(screen.getByText("Real Organization Name")).toBeInTheDocument();
+    });
+    expect(
+      screen.getByText("Real Organization Name").closest("a"),
+    ).toHaveAttribute("href", "/organizations/org_real_123");
+
+    // Breadcrumb for pelada detail should be disabled (path undefined, which falls back to '#' and resolves to the current URL)
+    const peladaDetailBreadcrumb = screen
+      .getByText("peladas.detail.title")
+      .closest("a");
+    expect(peladaDetailBreadcrumb).toHaveAttribute(
+      "href",
+      "/peladas/1/results",
+    );
+  });
+
+  it("handles restricted view navigation links when organization details fail to load", async () => {
+    const error = new ApiError(403, {
+      message: "Você precisa votar para ter acesso aos resultados",
+    });
+
+    vi.mocked(api.get)
+      .mockRejectedValueOnce(error) // first call (getVotingResults)
+      .mockRejectedValueOnce(new Error("Failed to load details")); // second call fails
+
+    renderWithProviders();
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/peladas\.voting\.results\.restricted_title/i),
+      ).toBeInTheDocument();
+    });
+
+    // Voltar button should link to home as a fallback
+    const backButton = screen.getByText("common.back_to_home");
+    expect(backButton).toBeInTheDocument();
+    expect(backButton.closest("a")).toHaveAttribute("href", "/home");
+
+    // Organization Breadcrumb should default to Organization Name linking to /home (since organization_id is dummy "0")
+    expect(screen.getByText("Organization Name")).toBeInTheDocument();
+    expect(screen.getByText("Organization Name").closest("a")).toHaveAttribute(
+      "href",
+      "/home",
+    );
+  });
+
+  it("shows still voting message when receiving a 400 error", async () => {
+    const error = new ApiError(400, { message: "Voting is still open" });
+
+    vi.mocked(api.get).mockRejectedValueOnce(error);
 
     renderWithProviders();
 

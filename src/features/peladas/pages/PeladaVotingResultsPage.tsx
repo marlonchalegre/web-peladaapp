@@ -17,8 +17,7 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import LockIcon from "@mui/icons-material/Lock";
-import axios from "axios";
-import { api } from "../../../shared/api/client";
+import { api, ApiError } from "../../../shared/api/client";
 import { type VotingResults, createApi } from "../../../shared/api/endpoints";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
@@ -40,6 +39,8 @@ export default function PeladaVotingResultsPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [isRestricted, setIsRestricted] = useState(false);
+  const [realOrgId, setRealOrgId] = useState<string | null>(null);
+  const [realOrgName, setRealOrgName] = useState<string | null>(null);
 
   useEffect(() => {
     if (!peladaId) return;
@@ -52,15 +53,25 @@ export default function PeladaVotingResultsPage() {
         setIsRestricted(false);
       } catch (error: unknown) {
         let message = t("peladas.voting.results.error.load_failed");
-        if (axios.isAxiosError(error) && error.response?.status === 400) {
+        if (error instanceof ApiError && error.status === 400) {
           message = t("peladas.voting.results.error.still_voting");
           setError(message);
-        } else if (
-          axios.isAxiosError(error) &&
-          error.response?.status === 403
-        ) {
+        } else if (error instanceof ApiError && error.status === 403) {
           setIsRestricted(true);
           setError(null);
+          // Fetch basic pelada details to populate the real organization info
+          try {
+            const details = await endpoints.getPeladaFullDetails(peladaId);
+            if (details.pelada) {
+              setRealOrgId(details.pelada.organization_id);
+              setRealOrgName(details.pelada.organization_name || null);
+            }
+          } catch (e) {
+            console.error(
+              "Failed to load basic pelada details for restricted user:",
+              e,
+            );
+          }
         } else {
           if (error instanceof Error) {
             message = error.message;
@@ -127,7 +138,13 @@ export default function PeladaVotingResultsPage() {
     organization_name: "Organization Name",
   };
 
-  const displayResults = isRestricted ? dummyResults : results;
+  const displayResults = isRestricted
+    ? {
+        ...dummyResults,
+        organization_id: realOrgId || dummyResults.organization_id,
+        organization_name: realOrgName || dummyResults.organization_name,
+      }
+    : results;
 
   if (loading) {
     return <Loading message={t("common.loading")} />;
@@ -206,13 +223,26 @@ export default function PeladaVotingResultsPage() {
           open={true}
           aria-labelledby="restricted-results-title"
           slotProps={{
+            backdrop: {
+              sx: {
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+              },
+            },
             paper: {
-              sx: { borderRadius: 4, p: 2, maxWidth: "400px" },
+              sx: {
+                borderRadius: 4,
+                p: 3,
+                maxWidth: "400px",
+                backgroundColor: "rgba(255, 255, 255, 0.85)",
+                backdropFilter: "blur(12px)",
+                border: "1px solid rgba(255, 255, 255, 0.3)",
+                boxShadow: "0 8px 32px 0 rgba(0, 0, 0, 0.1)",
+              },
             },
           }}
         >
           <DialogTitle id="restricted-results-title" align="center">
-            <LockIcon color="warning" sx={{ fontSize: 60, mb: 2 }} />
+            <LockIcon color="warning" sx={{ fontSize: 60, mb: 1 }} />
             <Typography
               variant="h5"
               component="div"
@@ -220,11 +250,18 @@ export default function PeladaVotingResultsPage() {
                 fontWeight: "bold",
               }}
             >
-              {t("common.actions.view", "Resultados Restritos")}
+              {t(
+                "peladas.voting.results.restricted_title",
+                "Resultados Restritos",
+              )}
             </Typography>
           </DialogTitle>
           <DialogContent>
-            <Typography variant="body1" align="center" sx={{ mb: 2 }}>
+            <Typography
+              variant="body1"
+              align="center"
+              sx={{ mb: 1, color: "text.primary" }}
+            >
               {t(
                 "peladas.voting.results.error.not_voted",
                 "Você participou desta pelada mas não votou. Por isso, você não tem acesso aos resultados.",
@@ -234,7 +271,7 @@ export default function PeladaVotingResultsPage() {
           <DialogActions
             sx={{
               flexDirection: "column",
-              gap: 1,
+              gap: 2,
               px: 3,
               pb: 3,
             }}
@@ -243,10 +280,27 @@ export default function PeladaVotingResultsPage() {
               variant="contained"
               fullWidth
               component={RouterLink}
-              to={`/peladas/${peladaId}`}
-              sx={{ borderRadius: 2, py: 1.5 }}
+              to={`/peladas/${peladaId}/matches`}
+              sx={{ borderRadius: 2, py: 1.5, textTransform: "none" }}
             >
-              {t("common.back", "Voltar")}
+              {t("peladas.detail.button.view_matches", "Ver Partidas")}
+            </Button>
+            <Button
+              variant="outlined"
+              fullWidth
+              component={RouterLink}
+              to={
+                displayResults!.organization_id &&
+                displayResults!.organization_id !== "0"
+                  ? `/organizations/${displayResults!.organization_id}`
+                  : "/home"
+              }
+              sx={{ borderRadius: 2, py: 1.5, textTransform: "none" }}
+            >
+              {displayResults!.organization_id &&
+              displayResults!.organization_id !== "0"
+                ? t("common.back_to_org", "Voltar para Organização")
+                : t("common.back_to_home", "Voltar para Início")}
             </Button>
           </DialogActions>
         </Dialog>
@@ -267,13 +321,15 @@ export default function PeladaVotingResultsPage() {
             {
               label:
                 displayResults!.organization_name || t("common.organization"),
-              path: displayResults!.organization_id
-                ? `/organizations/${displayResults!.organization_id}`
-                : "/home",
+              path:
+                displayResults!.organization_id &&
+                displayResults!.organization_id !== "0"
+                  ? `/organizations/${displayResults!.organization_id}`
+                  : "/home",
             },
             {
               label: t("peladas.detail.title"),
-              path: `/peladas/${peladaId}`,
+              path: isRestricted ? undefined : `/peladas/${peladaId}`,
             },
             { label: t("peladas.voting.results.title") },
           ]}
