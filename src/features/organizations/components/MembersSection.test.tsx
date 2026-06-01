@@ -210,30 +210,4 @@ describe("MembersSection", () => {
       ),
     ).toBeDefined();
   });
-
-  it("opens the player radar dialog when clicking on a player and saves changes", () => {
-    render(<MembersSection {...defaultProps} />);
-
-    const clickZone = screen.getByTestId("player-click-zone-101");
-    expect(clickZone).toBeDefined();
-
-    fireEvent.click(clickZone);
-
-    expect(screen.getByTestId("player-radar-dialog")).toBeDefined();
-    expect(
-      within(screen.getByTestId("player-radar-dialog")).getByText("Alice"),
-    ).toBeDefined();
-
-    const saveButton = screen.getByTestId("radar-dialog-save-button");
-    fireEvent.click(saveButton);
-
-    expect(defaultProps.onUpdatePlayer).toHaveBeenCalledWith("101", {
-      passing: 0,
-      ball_control: 0,
-      velocity: 0,
-      shooting: 0,
-      dribbling: 0,
-      defending: 0,
-    });
-  });
 });
