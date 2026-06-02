@@ -31,6 +31,7 @@ export function useHomeDashboard() {
   const [peladas, setPeladas] = useState<Pelada[]>([]);
   const [peladasPage, setPeladasPage] = useState(1);
   const [peladasTotalPages, setPeladasTotalPages] = useState(1);
+  const [peladasTotal, setPeladasTotal] = useState(0);
   const PELADAS_PER_PAGE = 5;
 
   const fetchPeladas = useCallback(
@@ -45,6 +46,7 @@ export function useHomeDashboard() {
         setPeladas(response.data);
         setPeladasPage(response.page);
         setPeladasTotalPages(response.totalPages);
+        setPeladasTotal(response.total);
       } catch (err) {
         console.error("Failed to fetch peladas", err);
       }
@@ -83,7 +85,7 @@ export function useHomeDashboard() {
       // If admin_orgs needs to stay in sync, it should be updated via AuthContext/refreshUser.
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : t("home.error.load_failed");
+          err instanceof Error ? err.message : t("home.error.load_failed");
       setError(message);
     } finally {
       setLoading(false);
@@ -143,6 +145,7 @@ export function useHomeDashboard() {
     peladas,
     peladasPage,
     peladasTotalPages,
+    peladasTotal,
     fetchOrganizations,
     handlePeladaPageChange,
     acceptInvitation,

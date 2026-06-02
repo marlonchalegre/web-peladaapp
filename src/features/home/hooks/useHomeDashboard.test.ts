@@ -115,4 +115,19 @@ describe("useHomeDashboard", () => {
       expect.objectContaining({ name: "New Org" }),
     );
   });
+
+  it("should correctly set peladasTotal from the paginated API response", async () => {
+    mockApiClient.getPaginated.mockResolvedValue({
+      data: [{ id: "pelada-1" }, { id: "pelada-2" }],
+      page: 1,
+      totalPages: 3,
+      total: 15,
+    });
+
+    const { result } = renderHook(() => useHomeDashboard());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.peladasTotal).toBe(15);
+    expect(result.current.peladas).toHaveLength(2);
+  });
 });

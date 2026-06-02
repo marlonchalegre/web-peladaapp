@@ -37,6 +37,7 @@ export default function HomePage() {
     peladas,
     peladasPage,
     peladasTotalPages,
+    peladasTotal,
     handlePeladaPageChange,
     acceptInvitation,
     createOrganization,
@@ -125,7 +126,7 @@ export default function HomePage() {
                     ⚽ {t("home.stats.peladas_total", "Peladas Registradas")}
                   </Typography>
                   <Typography variant="h5" sx={{ fontWeight: 800 }}>
-                    {peladas.length}
+                    {peladasTotal}
                   </Typography>
                 </Paper>
               </Grid>

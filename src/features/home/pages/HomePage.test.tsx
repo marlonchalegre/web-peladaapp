@@ -208,4 +208,47 @@ describe("HomePage", () => {
       screen.queryByText("home.sections.member_orgs.title"),
     ).not.toBeInTheDocument();
   });
+
+  it("renders the total number of peladas in the dashboard stats widget, not just the page length", async () => {
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/users/1/organizations") return Promise.resolve([]);
+      if (path === "/api/invitations/pending") return Promise.resolve([]);
+      return Promise.resolve([]);
+    });
+
+    (api.getPaginated as Mock).mockImplementation((path: string) => {
+      if (path === "/api/users/1/peladas") {
+        return Promise.resolve({
+          data: [
+            { id: "1", status: "open", scheduled_at: "2023-01-01T10:00:00Z" },
+            { id: "2", status: "open", scheduled_at: "2023-01-02T10:00:00Z" },
+          ],
+          total: 10,
+          page: 1,
+          perPage: 2,
+          totalPages: 5,
+        });
+      }
+      return Promise.resolve({
+        data: [],
+        total: 0,
+        page: 1,
+        perPage: 10,
+        totalPages: 0,
+      });
+    });
+
+    render(
+      <MemoryRouter>
+        <HomePage />
+      </MemoryRouter>,
+    );
+
+    // Wait for the total count to be displayed
+    await waitFor(() => {
+      // The widget should show the total count (10), not the page items count (2)
+      expect(screen.getByText("10")).toBeInTheDocument();
+      expect(screen.queryByText("2")).not.toBeInTheDocument();
+    });
+  });
 });
