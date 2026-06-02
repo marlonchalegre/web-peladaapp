@@ -29,7 +29,7 @@ export default function CreatePeladaForm({ organizationId, onCreate }: Props) {
       .hour(time.hour())
       .minute(time.minute())
       .second(0)
-      .format("YYYY-MM-DDTHH:mm:ss");
+      .toISOString();
 
     await onCreate({
       organization_id: organizationId,

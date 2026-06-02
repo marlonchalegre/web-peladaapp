@@ -61,10 +61,13 @@ export default function UserProfilePage() {
       return;
     }
 
+    let active = true;
+
     // Load current user data
     const loadUserProfile = async () => {
       try {
         const userData = await getUser(authUser.id);
+        if (!active) return;
         setName(userData.name);
         setUsername(userData.username);
         setEmail(userData.email || "");
@@ -72,14 +75,21 @@ export default function UserProfilePage() {
         setPosition(userData.position || "");
         setAvatarFilename(userData.avatar_filename || null);
       } catch (error) {
+        if (!active) return;
         console.error("Failed to load user profile:", error);
         setError(t("user.profile.error.load_failed"));
       } finally {
-        setLoadingProfile(false);
+        if (active) {
+          setLoadingProfile(false);
+        }
       }
     };
 
     loadUserProfile();
+
+    return () => {
+      active = false;
+    };
   }, [authUser, navigate, t]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
