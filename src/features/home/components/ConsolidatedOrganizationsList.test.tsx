@@ -61,7 +61,7 @@ describe("ConsolidatedOrganizationsList", () => {
 
     // Should find management button for org 101 (Admin)
     expect(screen.getByTestId("manage-org-101")).toBeInTheDocument();
-    
+
     // Should NOT find management button for org 102 (Player)
     expect(screen.queryByTestId("manage-org-102")).not.toBeInTheDocument();
   });
@@ -101,10 +101,7 @@ describe("ConsolidatedOrganizationsList", () => {
   it("renders empty state messages when user has no organizations", () => {
     render(
       <BrowserRouter>
-        <ConsolidatedOrganizationsList
-          adminOrgs={[]}
-          memberOrgs={[]}
-        />
+        <ConsolidatedOrganizationsList adminOrgs={[]} memberOrgs={[]} />
       </BrowserRouter>,
     );
 

@@ -146,6 +146,7 @@ export interface MatchEvent {
   created_at?: string;
   session_time_ms?: number | null;
   match_time_ms?: number | null;
+  parent_event_id?: string | null;
 }
 export interface PlayerStats {
   player_id: string;

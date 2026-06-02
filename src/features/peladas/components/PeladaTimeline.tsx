@@ -341,8 +341,10 @@ export default function PeladaTimeline({
           const matchingAssist = assists.find(
             (a) =>
               !pairedAssistIds.has(a.id!) &&
-              a.session_time_ms === goal.session_time_ms &&
-              a.match_time_ms === goal.match_time_ms,
+              ((a.parent_event_id && a.parent_event_id === goal.id) ||
+                (!a.parent_event_id &&
+                  a.session_time_ms === goal.session_time_ms &&
+                  a.match_time_ms === goal.match_time_ms)),
           );
 
           if (matchingAssist) {
@@ -411,8 +413,8 @@ export default function PeladaTimeline({
               >
                 <Box
                   sx={{
-                    width: 28,
-                    height: 28,
+                    width: 32,
+                    height: 32,
                     borderRadius: "50%",
                     bgcolor: "background.paper",
                     display: "flex",
@@ -433,20 +435,6 @@ export default function PeladaTimeline({
                     {match.sequence}
                   </Typography>
                 </Box>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontWeight: "bold",
-                    color: "text.secondary",
-                    fontSize: "0.75rem",
-                    letterSpacing: "0.05em",
-                  }}
-                >
-                  {t(
-                    "peladas.matches.match_uppercase",
-                    "PARTIDA",
-                  ).toUpperCase()}
-                </Typography>
               </Stack>
 
               {/* Center: Teams Name & Large Score */}

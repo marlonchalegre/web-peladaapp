@@ -73,7 +73,9 @@ describe("ActiveMatchesCarousel", () => {
     // Check with only closed matches
     const { container: closedContainer } = render(
       <BrowserRouter>
-        <ActiveMatchesCarousel peladas={[{ id: "5", status: "closed" }] as any} />
+        <ActiveMatchesCarousel
+          peladas={[{ id: "5", status: "closed" }] as any}
+        />
       </BrowserRouter>,
     );
     expect(closedContainer.firstChild).toBeNull();
@@ -87,7 +89,9 @@ describe("ActiveMatchesCarousel", () => {
     );
 
     expect(screen.getByText("Org A")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Confirmar Presença/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Confirmar Presença/ }),
+    ).toBeInTheDocument();
     expect(screen.getByText("1 de 4 partidas")).toBeInTheDocument();
   });
 
@@ -100,11 +104,17 @@ describe("ActiveMatchesCarousel", () => {
 
     // Initial state: Org A (attendance)
     expect(screen.getByText("Org A")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Confirmar Presença/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Confirmar Presença/ }),
+    ).toBeInTheDocument();
 
     const nextButtons = screen.getAllByRole("button");
-    const nextBtn = nextButtons.find(b => b.querySelector("[data-testid='ChevronRightIcon']"));
-    const prevBtn = nextButtons.find(b => b.querySelector("[data-testid='ChevronLeftIcon']"));
+    const nextBtn = nextButtons.find((b) =>
+      b.querySelector("[data-testid='ChevronRightIcon']"),
+    );
+    const prevBtn = nextButtons.find((b) =>
+      b.querySelector("[data-testid='ChevronLeftIcon']"),
+    );
 
     expect(nextBtn).toBeDefined();
     expect(prevBtn).toBeDefined();
@@ -112,18 +122,24 @@ describe("ActiveMatchesCarousel", () => {
     // Go to Next: Org B (voting)
     fireEvent.click(nextBtn!);
     expect(screen.getByText("Org B")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Votar no MVP/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Votar no MVP/ }),
+    ).toBeInTheDocument();
     expect(screen.getByText("2 de 4 partidas")).toBeInTheDocument();
 
     // Go to Next: Org C (running)
     fireEvent.click(nextBtn!);
     expect(screen.getByText("Org C")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Acompanhar Partida/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Acompanhar Partida/ }),
+    ).toBeInTheDocument();
 
     // Go to Next: Org D (open)
     fireEvent.click(nextBtn!);
     expect(screen.getByText("Org D")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Ver Detalhes/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Ver Detalhes/ }),
+    ).toBeInTheDocument();
 
     // Go back using Prev: Org C
     fireEvent.click(prevBtn!);
@@ -145,9 +161,11 @@ describe("ActiveMatchesCarousel", () => {
     // Clear mocks, navigate to Org B (voting) -> Link /peladas/2/voting
     vi.clearAllMocks();
     const nextButtons = screen.getAllByRole("button");
-    const nextBtn = nextButtons.find(b => b.querySelector("[data-testid='ChevronRightIcon']"));
+    const nextBtn = nextButtons.find((b) =>
+      b.querySelector("[data-testid='ChevronRightIcon']"),
+    );
     fireEvent.click(nextBtn!);
-    
+
     const voteBtn = screen.getByRole("button", { name: /Votar no MVP/ });
     fireEvent.click(voteBtn);
     expect(mockNavigate).toHaveBeenCalledWith("/peladas/2/voting");
@@ -170,6 +188,8 @@ describe("ActiveMatchesCarousel", () => {
       </BrowserRouter>,
     );
 
-    expect(screen.getByRole("button", { name: /Ver Lista de Presença/ })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /Ver Lista de Presença/ }),
+    ).toBeInTheDocument();
   });
 });

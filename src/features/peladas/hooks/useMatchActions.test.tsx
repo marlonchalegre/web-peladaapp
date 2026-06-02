@@ -243,6 +243,140 @@ describe("useMatchActions", () => {
       expect(mockDelegates.refreshData).toHaveBeenCalled();
     });
 
+    it("should optimistically delete goal and its associated assist via parent_event_id", async () => {
+      let updatedEvents: any[] = [];
+      mockDelegates.setMatchEvents = vi.fn((updater) => {
+        const prevEvents = [
+          {
+            id: "goal-1",
+            match_id: "m1",
+            player_id: "pl1",
+            event_type: "goal",
+            session_time_ms: 100,
+            match_time_ms: 200,
+          },
+          {
+            id: "assist-1",
+            match_id: "m1",
+            player_id: "pl2",
+            event_type: "assist",
+            session_time_ms: 100,
+            match_time_ms: 200,
+            parent_event_id: "goal-1",
+          },
+          {
+            id: "goal-2",
+            match_id: "m1",
+            player_id: "pl3",
+            event_type: "goal",
+            session_time_ms: 300,
+            match_time_ms: 400,
+          },
+        ];
+        updatedEvents = updater(prevEvents);
+      });
+
+      const { result } = renderHook(() =>
+        useMatchActions(peladaId, mockDelegates),
+      );
+
+      await act(async () => {
+        await result.current.deleteEventAndRefresh(
+          "m1",
+          "pl1",
+          "goal",
+          "goal-1",
+        );
+      });
+
+      expect(updatedEvents).toEqual([
+        {
+          id: "goal-2",
+          match_id: "m1",
+          player_id: "pl3",
+          event_type: "goal",
+          session_time_ms: 300,
+          match_time_ms: 400,
+        },
+      ]);
+    });
+
+    it("should optimistically delete last goal and its associated assist via parent_event_id when no eventId is provided", async () => {
+      let updatedEvents: any[] = [];
+      mockDelegates.setMatchEvents = vi.fn((updater) => {
+        const prevEvents = [
+          {
+            id: "goal-1",
+            match_id: "m1",
+            player_id: "pl1",
+            event_type: "goal",
+            session_time_ms: 100,
+            match_time_ms: 200,
+          },
+          {
+            id: "assist-1",
+            match_id: "m1",
+            player_id: "pl2",
+            event_type: "assist",
+            session_time_ms: 100,
+            match_time_ms: 200,
+            parent_event_id: "goal-1",
+          },
+        ];
+        updatedEvents = updater(prevEvents);
+      });
+
+      const { result } = renderHook(() =>
+        useMatchActions(peladaId, mockDelegates),
+      );
+
+      await act(async () => {
+        await result.current.deleteEventAndRefresh("m1", "pl1", "goal");
+      });
+
+      expect(updatedEvents).toEqual([]);
+    });
+
+    it("should optimistically delete goal and its associated assist via matching session/match times as fallback", async () => {
+      let updatedEvents: any[] = [];
+      mockDelegates.setMatchEvents = vi.fn((updater) => {
+        const prevEvents = [
+          {
+            id: "goal-1",
+            match_id: "m1",
+            player_id: "pl1",
+            event_type: "goal",
+            session_time_ms: 100,
+            match_time_ms: 200,
+          },
+          {
+            id: "assist-1",
+            match_id: "m1",
+            player_id: "pl2",
+            event_type: "assist",
+            session_time_ms: 100,
+            match_time_ms: 200,
+          },
+        ];
+        updatedEvents = updater(prevEvents);
+      });
+
+      const { result } = renderHook(() =>
+        useMatchActions(peladaId, mockDelegates),
+      );
+
+      await act(async () => {
+        await result.current.deleteEventAndRefresh(
+          "m1",
+          "pl1",
+          "goal",
+          "goal-1",
+        );
+      });
+
+      expect(updatedEvents).toEqual([]);
+    });
+
     it("should queue deleteEvent if offline", async () => {
       Object.defineProperty(navigator, "onLine", { value: false });
       const { result } = renderHook(() =>

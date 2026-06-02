@@ -37,7 +37,7 @@ export default function ActiveMatchesCarousel({
       pelada.status === "attendance" ||
       pelada.status === "voting" ||
       pelada.status === "open" ||
-      pelada.status === "running"
+      pelada.status === "running",
   );
 
   if (activePeladas.length === 0) {
@@ -45,11 +45,15 @@ export default function ActiveMatchesCarousel({
   }
 
   const handlePrev = () => {
-    setActiveIndex((prev) => (prev === 0 ? activePeladas.length - 1 : prev - 1));
+    setActiveIndex((prev) =>
+      prev === 0 ? activePeladas.length - 1 : prev - 1,
+    );
   };
 
   const handleNext = () => {
-    setActiveIndex((prev) => (prev === activePeladas.length - 1 ? 0 : prev + 1));
+    setActiveIndex((prev) =>
+      prev === activePeladas.length - 1 ? 0 : prev + 1,
+    );
   };
 
   const currentPelada = activePeladas[activeIndex];
@@ -65,7 +69,10 @@ export default function ActiveMatchesCarousel({
         return {
           link: `/peladas/${currentPelada.id}/attendance`,
           text: hasResponded
-            ? t("home.carousel.actions.view_attendance", "Ver Lista de Presença")
+            ? t(
+                "home.carousel.actions.view_attendance",
+                "Ver Lista de Presença",
+              )
             : t("home.carousel.actions.confirm", "Confirmar Presença"),
           color: hasResponded ? ("success" as const) : ("warning" as const),
         };
@@ -93,24 +100,41 @@ export default function ActiveMatchesCarousel({
   };
 
   const actionDetails = getActionDetails(currentPelada.status || "open");
-  const dateObj = currentPelada.scheduled_at ? new Date(currentPelada.scheduled_at) : null;
+  const dateObj = currentPelada.scheduled_at
+    ? new Date(currentPelada.scheduled_at)
+    : null;
 
   return (
     <Box sx={{ mb: 4 }} data-testid="active-matches-carousel">
-      <Box sx={{ display: "flex", alignItems: "center", mb: 2, justifyContent: "space-between" }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          mb: 2,
+          justifyContent: "space-between",
+        }}
+      >
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <CalendarMonthIcon sx={{ mr: 1.5, color: "primary.main" }} />
           <Typography variant="h6" sx={{ fontWeight: 600 }}>
             {t("home.carousel.title", "Minhas Peladas Ativas")}
           </Typography>
         </Box>
-        
+
         {activePeladas.length > 1 && (
           <Box sx={{ display: "flex", gap: 1 }}>
-            <IconButton size="small" onClick={handlePrev} sx={{ border: 1, borderColor: "divider" }}>
+            <IconButton
+              size="small"
+              onClick={handlePrev}
+              sx={{ border: 1, borderColor: "divider" }}
+            >
               <ChevronLeftIcon />
             </IconButton>
-            <IconButton size="small" onClick={handleNext} sx={{ border: 1, borderColor: "divider" }}>
+            <IconButton
+              size="small"
+              onClick={handleNext}
+              sx={{ border: 1, borderColor: "divider" }}
+            >
               <ChevronRightIcon />
             </IconButton>
           </Box>
@@ -129,11 +153,11 @@ export default function ActiveMatchesCarousel({
             theme.palette.mode === "light"
               ? `linear-gradient(135deg, ${alpha(theme.palette.primary.light, 0.4)} 0%, ${alpha(
                   theme.palette.secondary.light,
-                  0.3
+                  0.3,
                 )} 100%)`
               : `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.2)} 0%, ${alpha(
                   theme.palette.secondary.dark,
-                  0.15
+                  0.15,
                 )} 100%)`,
           display: "flex",
           flexDirection: { xs: "column", md: "row" },
@@ -166,22 +190,42 @@ export default function ActiveMatchesCarousel({
         }}
       >
         <Box sx={{ flex: 1 }}>
-          <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 1, mb: 1.5 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+              gap: 1,
+              mb: 1.5,
+            }}
+          >
             <Chip
               icon={<SportsSoccerIcon sx={{ fontSize: "14px !important" }} />}
-              label={currentPelada.organization_name || t("common.pelada", "Pelada")}
+              label={
+                currentPelada.organization_name || t("common.pelada", "Pelada")
+              }
               size="small"
               sx={{ fontWeight: 600, bgcolor: "background.paper" }}
             />
             <Chip
-              label={t(`pelada.status.${currentPelada.status}`, currentPelada.status || "")}
+              label={t(
+                `pelada.status.${currentPelada.status}`,
+                currentPelada.status || "",
+              )}
               size="small"
               color={actionDetails.color}
-              sx={{ fontWeight: 600, textTransform: "uppercase", fontSize: "0.68rem" }}
+              sx={{
+                fontWeight: 600,
+                textTransform: "uppercase",
+                fontSize: "0.68rem",
+              }}
             />
           </Box>
 
-          <Typography variant="h5" sx={{ fontWeight: 800, mb: 1, color: "text.primary" }}>
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: 800, mb: 1, color: "text.primary" }}
+          >
             {dateObj
               ? dateObj.toLocaleDateString(t("common.locale_code", "pt-BR"), {
                   weekday: "long",
@@ -191,11 +235,19 @@ export default function ActiveMatchesCarousel({
               : t("common.date.tbd", "TBD")}
           </Typography>
 
-          <Typography variant="body2" sx={{ color: "text.secondary", display: "flex", alignItems: "center", gap: 0.5 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              color: "text.secondary",
+              display: "flex",
+              alignItems: "center",
+              gap: 0.5,
+            }}
+          >
             {dateObj
               ? `${t("home.carousel.time_prefix", "Horário:")} ${dateObj.toLocaleTimeString(
                   t("common.locale_code", "pt-BR"),
-                  { hour: "2-digit", minute: "2-digit" }
+                  { hour: "2-digit", minute: "2-digit" },
                 )}`
               : ""}
           </Typography>
@@ -240,7 +292,8 @@ export default function ActiveMatchesCarousel({
                 display: "block",
               }}
             >
-              {activeIndex + 1} {t("common.of", "de")} {activePeladas.length} {t("home.carousel.matches", "partidas")}
+              {activeIndex + 1} {t("common.of", "de")} {activePeladas.length}{" "}
+              {t("home.carousel.matches", "partidas")}
             </Typography>
           )}
         </Box>

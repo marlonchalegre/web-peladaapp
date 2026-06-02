@@ -115,6 +115,7 @@ export default function PeladaMatchesPage() {
     teamNameById,
     teams,
     teamPlayers,
+    lineupsByMatch,
     // Timers
     justFinishedMatch,
     nextScheduledMatch,
@@ -159,14 +160,19 @@ export default function PeladaMatchesPage() {
   const currentAssistEvent = useMemo(() => {
     if (!editEventDialogOpen || editEventDialogOpen.event_type !== "goal")
       return null;
+    const scorerTeamId = orgPlayerIdToTeamId[editEventDialogOpen.player_id];
     return matchEvents.find(
       (e) =>
         e.match_id === editEventDialogOpen.match_id &&
         e.event_type === "assist" &&
-        e.session_time_ms === editEventDialogOpen.session_time_ms &&
-        e.match_time_ms === editEventDialogOpen.match_time_ms,
+        ((e.parent_event_id && e.parent_event_id === editEventDialogOpen.id) ||
+          (!e.parent_event_id &&
+            e.session_time_ms === editEventDialogOpen.session_time_ms &&
+            e.match_time_ms === editEventDialogOpen.match_time_ms &&
+            (!scorerTeamId ||
+              orgPlayerIdToTeamId[e.player_id] === scorerTeamId))),
     );
-  }, [editEventDialogOpen, matchEvents]);
+  }, [editEventDialogOpen, matchEvents, orgPlayerIdToTeamId]);
 
   useEffect(() => {
     if (editEventDialogOpen) {
@@ -186,19 +192,44 @@ export default function PeladaMatchesPage() {
   }, [editEventDialogOpen, matches]);
 
   const editScorerOptions = useMemo(() => {
-    if (!editEventMatch) return [];
-    const homeTeamPlayers = teamPlayers[editEventMatch.home_team_id] || [];
-    const awayTeamPlayers = teamPlayers[editEventMatch.away_team_id] || [];
-    return [...homeTeamPlayers, ...awayTeamPlayers];
-  }, [editEventMatch, teamPlayers]);
+    if (!editEventMatch || !editEventDialogOpen) return [];
+    const scorerTeamId = orgPlayerIdToTeamId[editEventDialogOpen.player_id];
+    if (!scorerTeamId) {
+      const lu = lineupsByMatch[editEventMatch.id] || {};
+      const homeTeamPlayers =
+        lu[editEventMatch.home_team_id] ||
+        teamPlayers[editEventMatch.home_team_id] ||
+        [];
+      const awayTeamPlayers =
+        lu[editEventMatch.away_team_id] ||
+        teamPlayers[editEventMatch.away_team_id] ||
+        [];
+      return [...homeTeamPlayers, ...awayTeamPlayers];
+    }
+    const lu = lineupsByMatch[editEventMatch.id] || {};
+    return lu[scorerTeamId] || teamPlayers[scorerTeamId] || [];
+  }, [
+    editEventMatch,
+    editEventDialogOpen,
+    teamPlayers,
+    lineupsByMatch,
+    orgPlayerIdToTeamId,
+  ]);
 
   const editAssistantOptions = useMemo(() => {
     if (!editEventMatch || !selectedScorerId) return [];
     const scorerTeamId = orgPlayerIdToTeamId[selectedScorerId];
     if (!scorerTeamId) return [];
-    const teamPlayersList = teamPlayers[scorerTeamId] || [];
+    const lu = lineupsByMatch[editEventMatch.id] || {};
+    const teamPlayersList = lu[scorerTeamId] || teamPlayers[scorerTeamId] || [];
     return teamPlayersList.filter((p) => p.player_id !== selectedScorerId);
-  }, [editEventMatch, selectedScorerId, teamPlayers, orgPlayerIdToTeamId]);
+  }, [
+    editEventMatch,
+    selectedScorerId,
+    teamPlayers,
+    lineupsByMatch,
+    orgPlayerIdToTeamId,
+  ]);
 
   const handleScorerChange = (newScorerId: string) => {
     setSelectedScorerId(newScorerId);
@@ -836,6 +867,7 @@ export default function PeladaMatchesPage() {
             variant="contained"
             color="primary"
             disabled={!selectedScorerId}
+            data-testid="save-event-edit-button"
           >
             {t("common.actions.save")}
           </Button>

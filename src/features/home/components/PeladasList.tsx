@@ -1,11 +1,4 @@
-import {
-  Paper,
-  Typography,
-  Box,
-  Pagination,
-  Link,
-  Chip,
-} from "@mui/material";
+import { Paper, Typography, Box, Pagination, Link, Chip } from "@mui/material";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
@@ -70,8 +63,11 @@ export default function PeladasList({
               peladaLink = `/peladas/${pelada.id}`;
             }
 
-            const isNext = pelada.status === "attendance" || pelada.status === "open";
-            const dateObj = pelada.scheduled_at ? new Date(pelada.scheduled_at) : null;
+            const isNext =
+              pelada.status === "attendance" || pelada.status === "open";
+            const dateObj = pelada.scheduled_at
+              ? new Date(pelada.scheduled_at)
+              : null;
 
             return (
               <Paper
@@ -138,37 +134,76 @@ export default function PeladasList({
                         }}
                       >
                         {dateObj
-                          ? dateObj.toLocaleDateString(t("common.locale_code", "pt-BR"))
+                          ? dateObj.toLocaleDateString(
+                              t("common.locale_code", "pt-BR"),
+                            )
                           : t("common.date.tbd", "TBD")}
                       </Link>
 
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: "text.primary" }}>
+                      <Typography
+                        variant="body2"
+                        sx={{ fontWeight: 600, color: "text.primary" }}
+                      >
                         {pelada.organization_name || pelada.organization_id}
                       </Typography>
 
-                      {pelada.status === "attendance" && pelada.user_attendance_status && (
-                        <Typography variant="caption" sx={{ display: "block", color: pelada.user_attendance_status === "declined" ? "error.main" : "success.main", fontWeight: 600, mt: 0.25 }}>
-                          {pelada.user_attendance_status === "confirmed" && `✓ ${t("pelada.attendance.status.confirmed", "Presença Confirmada")}`}
-                          {pelada.user_attendance_status === "waitlist" && `⌛ ${t("pelada.attendance.status.waitlist", "Na Lista de Espera")}`}
-                          {pelada.user_attendance_status === "declined" && `✗ ${t("pelada.attendance.status.declined", "Presença Recusada")}`}
-                        </Typography>
-                      )}
+                      {pelada.status === "attendance" &&
+                        pelada.user_attendance_status && (
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              display: "block",
+                              color:
+                                pelada.user_attendance_status === "declined"
+                                  ? "error.main"
+                                  : "success.main",
+                              fontWeight: 600,
+                              mt: 0.25,
+                            }}
+                          >
+                            {pelada.user_attendance_status === "confirmed" &&
+                              `✓ ${t("pelada.attendance.status.confirmed", "Presença Confirmada")}`}
+                            {pelada.user_attendance_status === "waitlist" &&
+                              `⌛ ${t("pelada.attendance.status.waitlist", "Na Lista de Espera")}`}
+                            {pelada.user_attendance_status === "declined" &&
+                              `✗ ${t("pelada.attendance.status.declined", "Presença Recusada")}`}
+                          </Typography>
+                        )}
 
-                      <Typography variant="caption" sx={{ color: "text.secondary", display: "block", mt: 0.25 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          color: "text.secondary",
+                          display: "block",
+                          mt: 0.25,
+                        }}
+                      >
                         {dateObj
-                          ? dateObj.toLocaleTimeString(t("common.locale_code", "pt-BR"), {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })
+                          ? dateObj.toLocaleTimeString(
+                              t("common.locale_code", "pt-BR"),
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              },
+                            )
                           : ""}
                       </Typography>
                     </Box>
                   </Box>
 
                   {/* Right: Status & Navigation */}
-                  <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1, sm: 2 } }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: { xs: 1, sm: 2 },
+                    }}
+                  >
                     <Chip
-                      label={t(`pelada.status.${pelada.status}`, pelada.status || "")}
+                      label={t(
+                        `pelada.status.${pelada.status}`,
+                        pelada.status || "",
+                      )}
                       size="small"
                       color={
                         pelada.status === "attendance"
@@ -187,7 +222,12 @@ export default function PeladasList({
                         fontSize: { xs: "0.72rem", sm: "0.8rem" },
                       }}
                     />
-                    <ChevronRightIcon sx={{ color: "grey.300", display: { xs: "none", sm: "block" } }} />
+                    <ChevronRightIcon
+                      sx={{
+                        color: "grey.300",
+                        display: { xs: "none", sm: "block" },
+                      }}
+                    />
                   </Box>
                 </Box>
               </Paper>

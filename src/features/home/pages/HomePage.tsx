@@ -115,7 +115,12 @@ export default function HomePage() {
                 >
                   <Typography
                     variant="caption"
-                    sx={{ opacity: 0.8, display: "block", mb: 0.5, fontWeight: 600 }}
+                    sx={{
+                      opacity: 0.8,
+                      display: "block",
+                      mb: 0.5,
+                      fontWeight: 600,
+                    }}
                   >
                     ⚽ {t("home.stats.peladas_total", "Peladas Registradas")}
                   </Typography>
@@ -137,7 +142,12 @@ export default function HomePage() {
                 >
                   <Typography
                     variant="caption"
-                    sx={{ opacity: 0.8, display: "block", mb: 0.5, fontWeight: 600 }}
+                    sx={{
+                      opacity: 0.8,
+                      display: "block",
+                      mb: 0.5,
+                      fontWeight: 600,
+                    }}
                   >
                     🛡️ {t("home.stats.groups_active", "Grupos Ativos")}
                   </Typography>
@@ -159,12 +169,18 @@ export default function HomePage() {
                 >
                   <Typography
                     variant="caption"
-                    sx={{ opacity: 0.8, display: "block", mb: 0.5, fontWeight: 600 }}
+                    sx={{
+                      opacity: 0.8,
+                      display: "block",
+                      mb: 0.5,
+                      fontWeight: 600,
+                    }}
                   >
                     👑 {t("home.stats.roles", "Minhas Funções")}
                   </Typography>
                   <Typography variant="h5" sx={{ fontWeight: 800 }}>
-                    {adminOrgs.length} Admin | {memberOrgs.length} {t("common.roles.player", "Jogador")}
+                    {adminOrgs.length} Admin | {memberOrgs.length}{" "}
+                    {t("common.roles.player", "Jogador")}
                   </Typography>
                 </Paper>
               </Grid>

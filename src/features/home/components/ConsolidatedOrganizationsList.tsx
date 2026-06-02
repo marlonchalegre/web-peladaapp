@@ -86,13 +86,19 @@ export default function ConsolidatedOrganizationsList({
           >
             <InfoIcon />
           </Avatar>
-          
+
           {/* Keep test-expected keys rendered */}
           <Typography variant="body2" sx={{ color: "text.secondary" }}>
-            {t("home.sections.admin_orgs.empty", "Você não é administrador de nenhuma organização.")}
+            {t(
+              "home.sections.admin_orgs.empty",
+              "Você não é administrador de nenhuma organização.",
+            )}
           </Typography>
           <Typography variant="body2" sx={{ color: "text.secondary", mt: 1 }}>
-            {t("home.sections.member_orgs.empty_desc", "No momento, você não faz parte de nenhuma organização como jogador.")}
+            {t(
+              "home.sections.member_orgs.empty_desc",
+              "No momento, você não faz parte de nenhuma organização como jogador.",
+            )}
           </Typography>
         </Box>
       ) : (
@@ -131,7 +137,13 @@ export default function ConsolidatedOrganizationsList({
                   <ListItemButton
                     onClick={() => navigate(`/organizations/${org.id}`)}
                     data-testid={`org-link-${org.name}`}
-                    sx={{ py: 1.5, px: 2, display: "flex", alignItems: "center", gap: 2 }}
+                    sx={{
+                      py: 1.5,
+                      px: 2,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 2,
+                    }}
                   >
                     <Avatar
                       variant="rounded"
@@ -145,9 +157,18 @@ export default function ConsolidatedOrganizationsList({
                     >
                       <SportsSoccerIcon />
                     </Avatar>
-                    
-                    <Box sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: "text.primary" }}>
+
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        flexGrow: 1,
+                      }}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{ fontWeight: 600, color: "text.primary" }}
+                      >
                         {org.name}
                       </Typography>
                       <Box sx={{ mt: 0.5, display: "flex", gap: 0.5 }}>

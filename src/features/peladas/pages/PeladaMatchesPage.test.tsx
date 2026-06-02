@@ -661,4 +661,327 @@ describe("PeladaMatchesPage", () => {
       expect(screen.queryByTestId("match-summary")).not.toBeInTheDocument(),
     );
   });
+
+  it("populates edit event dropdowns correctly using lineupsByMatch when team_players_map is empty", async () => {
+    const testDashboardData = {
+      ...mockDashboardData,
+      team_players_map: {},
+      match_lineups_map: {
+        "10": {
+          "1": [{ team_id: "1", player_id: "100", is_goalkeeper: false }],
+          "2": [{ team_id: "2", player_id: "101", is_goalkeeper: false }],
+        },
+      },
+      organization_players: [
+        {
+          id: "100",
+          user_id: "1",
+          organization_id: "101",
+          user_name: "Player 1",
+        },
+        {
+          id: "101",
+          user_id: "2",
+          organization_id: "101",
+          user_name: "Player 2",
+        },
+      ],
+      users: [
+        { id: "1", name: "Player 1" },
+        { id: "2", name: "Player 2" },
+      ],
+    };
+
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/peladas/1/dashboard-data")
+        return Promise.resolve(testDashboardData);
+      if (path === "/api/organizations/101/admins")
+        return Promise.resolve([{ user_id: "1", organization_id: "101" }]);
+      if (path === "/api/organizations/101/finance")
+        return Promise.resolve({
+          mensalista_price: 0,
+          diarista_price: 0,
+          currency: "BRL",
+        });
+      return Promise.reject(new Error(`Not found: ${path}`));
+    });
+
+    renderPage();
+    await waitFor(() => screen.getByTestId("active-match-dashboard"));
+
+    // Switch to Timeline tab
+    fireEvent.click(screen.getByText("peladas.timeline.title"));
+
+    // Click edit event button
+    const editBtn = await screen.findByTestId("edit-event-1");
+    fireEvent.click(editBtn);
+
+    // Dialog should be open
+    const editDialog = await screen.findByTestId("edit-event-dialog");
+    expect(editDialog).toBeInTheDocument();
+
+    // Select should have value "100" (since player_id is 100 for event 1)
+    const scorerSelect = screen.getByTestId("edit-scorer-select");
+    expect(scorerSelect).toBeInTheDocument();
+
+    const hiddenInput = scorerSelect.querySelector("input") as HTMLInputElement;
+    expect(hiddenInput.value).toBe("100");
+
+    // Click select to open options and expect "Player 1" to be listed
+    const selectButton = within(scorerSelect).getByRole("combobox");
+    fireEvent.mouseDown(selectButton);
+
+    const listbox = await screen.findByRole("listbox");
+    const option = within(listbox).getByText("Player 1 (Time 1)");
+    expect(option).toBeInTheDocument();
+
+    // Verify that players from other teams (like Player 2 on Time 2) are NOT shown
+    const otherOption = within(listbox).queryByText("Player 2 (Time 2)");
+    expect(otherOption).toBeNull();
+  });
+
+  it("resolves the correct assistant event for goals scored at the same time by different teams", async () => {
+    const testDashboardData = {
+      ...mockDashboardData,
+      team_players_map: {},
+      match_lineups_map: {
+        "10": {
+          "1": [
+            { team_id: "1", player_id: "100", is_goalkeeper: false },
+            { team_id: "1", player_id: "102", is_goalkeeper: false },
+          ],
+          "2": [
+            { team_id: "2", player_id: "101", is_goalkeeper: false },
+            { team_id: "2", player_id: "103", is_goalkeeper: false },
+          ],
+        },
+      },
+      organization_players: [
+        {
+          id: "100",
+          user_id: "1",
+          organization_id: "101",
+          user_name: "Scorer Team 1",
+        },
+        {
+          id: "101",
+          user_id: "2",
+          organization_id: "101",
+          user_name: "Scorer Team 2",
+        },
+        {
+          id: "102",
+          user_id: "3",
+          organization_id: "101",
+          user_name: "Assist Team 1",
+        },
+        {
+          id: "103",
+          user_id: "4",
+          organization_id: "101",
+          user_name: "Assist Team 2",
+        },
+      ],
+      users: [
+        { id: "1", name: "Scorer Team 1" },
+        { id: "2", name: "Scorer Team 2" },
+        { id: "3", name: "Assist Team 1" },
+        { id: "4", name: "Assist Team 2" },
+      ],
+      match_events: [
+        {
+          id: "e-goal-1",
+          match_id: "10",
+          player_id: "100",
+          event_type: "goal",
+          session_time_ms: 1000,
+          match_time_ms: 500,
+        },
+        {
+          id: "e-assist-1",
+          match_id: "10",
+          player_id: "102",
+          event_type: "assist",
+          session_time_ms: 1000,
+          match_time_ms: 500,
+        },
+        {
+          id: "e-goal-2",
+          match_id: "10",
+          player_id: "101",
+          event_type: "goal",
+          session_time_ms: 1000,
+          match_time_ms: 500,
+        },
+        {
+          id: "e-assist-2",
+          match_id: "10",
+          player_id: "103",
+          event_type: "assist",
+          session_time_ms: 1000,
+          match_time_ms: 500,
+        },
+      ],
+    };
+
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/peladas/1/dashboard-data")
+        return Promise.resolve(testDashboardData);
+      if (path === "/api/organizations/101/admins")
+        return Promise.resolve([{ user_id: "1", organization_id: "101" }]);
+      if (path === "/api/organizations/101/finance")
+        return Promise.resolve({
+          mensalista_price: 0,
+          diarista_price: 0,
+          currency: "BRL",
+        });
+      return Promise.reject(new Error(`Not found: ${path}`));
+    });
+
+    renderPage();
+    await waitFor(() => screen.getByTestId("active-match-dashboard"));
+
+    // Switch to Timeline tab
+    fireEvent.click(screen.getByText("peladas.timeline.title"));
+
+    // Click edit on Goal 1 (e-goal-1)
+    const editBtn = await screen.findByTestId("edit-event-e-goal-1");
+    fireEvent.click(editBtn);
+
+    // Dialog should be open
+    const editDialog = await screen.findByTestId("edit-event-dialog");
+    expect(editDialog).toBeInTheDocument();
+
+    // Scorer select should be "100" (Scorer Team 1)
+    const scorerSelect = screen.getByTestId("edit-scorer-select");
+    const scorerInput = scorerSelect.querySelector("input") as HTMLInputElement;
+    expect(scorerInput.value).toBe("100");
+
+    // Assistant select should correctly resolve to "102" (Assist Team 1) instead of "103" (Assist Team 2)
+    const assistantSelect = screen.getByTestId("edit-assistant-select");
+    const assistantInput = assistantSelect.querySelector(
+      "input",
+    ) as HTMLInputElement;
+    expect(assistantInput.value).toBe("102");
+  });
+
+  it("resolves the correct assistant event for goals scored at the same time by the same team using parent_event_id", async () => {
+    const testDashboardData = {
+      ...mockDashboardData,
+      team_players_map: {},
+      match_lineups_map: {
+        "10": {
+          "1": [
+            { team_id: "1", player_id: "100", is_goalkeeper: false },
+            { team_id: "1", player_id: "101", is_goalkeeper: false },
+            { team_id: "1", player_id: "102", is_goalkeeper: false },
+            { team_id: "1", player_id: "103", is_goalkeeper: false },
+          ],
+          "2": [],
+        },
+      },
+      organization_players: [
+        {
+          id: "100",
+          user_id: "1",
+          organization_id: "101",
+          user_name: "Scorer 1",
+        },
+        {
+          id: "101",
+          user_id: "2",
+          organization_id: "101",
+          user_name: "Scorer 2",
+        },
+        {
+          id: "102",
+          user_id: "3",
+          organization_id: "101",
+          user_name: "Assist 1",
+        },
+        {
+          id: "103",
+          user_id: "4",
+          organization_id: "101",
+          user_name: "Assist 2",
+        },
+      ],
+      users: [
+        { id: "1", name: "Scorer 1" },
+        { id: "2", name: "Scorer 2" },
+        { id: "3", name: "Assist 1" },
+        { id: "4", name: "Assist 2" },
+      ],
+      match_events: [
+        {
+          id: "e-goal-1",
+          match_id: "10",
+          player_id: "100",
+          event_type: "goal",
+          session_time_ms: 1000,
+          match_time_ms: 500,
+        },
+        {
+          id: "e-assist-1",
+          match_id: "10",
+          player_id: "102",
+          event_type: "assist",
+          session_time_ms: 1000,
+          match_time_ms: 500,
+          parent_event_id: "e-goal-1",
+        },
+        {
+          id: "e-goal-2",
+          match_id: "10",
+          player_id: "101",
+          event_type: "goal",
+          session_time_ms: 1000,
+          match_time_ms: 500,
+        },
+        {
+          id: "e-assist-2",
+          match_id: "10",
+          player_id: "103",
+          event_type: "assist",
+          session_time_ms: 1000,
+          match_time_ms: 500,
+          parent_event_id: "e-goal-2",
+        },
+      ],
+    };
+
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/peladas/1/dashboard-data")
+        return Promise.resolve(testDashboardData);
+      if (path === "/api/organizations/101/admins")
+        return Promise.resolve([{ user_id: "1", organization_id: "101" }]);
+      if (path === "/api/organizations/101/finance")
+        return Promise.resolve({
+          mensalista_price: 0,
+          diarista_price: 0,
+          currency: "BRL",
+        });
+      return Promise.reject(new Error(`Not found: ${path}`));
+    });
+
+    renderPage();
+    await waitFor(() => screen.getByTestId("active-match-dashboard"));
+
+    fireEvent.click(screen.getByText("peladas.timeline.title"));
+
+    // Click edit on Goal 1 (e-goal-1)
+    const editBtn = await screen.findByTestId("edit-event-e-goal-1");
+    fireEvent.click(editBtn);
+
+    // Dialog should be open
+    const editDialog = await screen.findByTestId("edit-event-dialog");
+    expect(editDialog).toBeInTheDocument();
+
+    // Assistant select should correctly resolve to "102" (Assist 1) instead of "103" (Assist 2) because parent_event_id matches
+    const assistantSelect = screen.getByTestId("edit-assistant-select");
+    const assistantInput = assistantSelect.querySelector(
+      "input",
+    ) as HTMLInputElement;
+    expect(assistantInput.value).toBe("102");
+  });
 });

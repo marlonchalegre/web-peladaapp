@@ -126,4 +126,56 @@ describe("PeladaTimeline", () => {
 
     expect(screen.getAllByText(/common.goal/)).toHaveLength(4);
   });
+
+  it("correctly pairs goals and assists when multiple simultaneous goals are scored, using parent_event_id", () => {
+    const mockEvents = [
+      {
+        id: "goal-1",
+        event_type: "goal",
+        player_id: "p1",
+        session_time_ms: 1000,
+        match_time_ms: 1000,
+      },
+      {
+        id: "assist-1",
+        event_type: "assist",
+        player_id: "p2",
+        session_time_ms: 1000,
+        match_time_ms: 1000,
+        parent_event_id: "goal-1",
+      },
+      {
+        id: "goal-2",
+        event_type: "goal",
+        player_id: "p2",
+        session_time_ms: 1000,
+        match_time_ms: 1000,
+      },
+      {
+        id: "assist-2",
+        event_type: "assist",
+        player_id: "p1",
+        session_time_ms: 1000,
+        match_time_ms: 1000,
+        parent_event_id: "goal-2",
+      },
+    ] as any[];
+
+    render(
+      <PeladaTimeline
+        events={mockEvents}
+        userIdToName={userIdToName}
+        orgPlayerIdToUserId={orgPlayerIdToUserId}
+        teamNameById={teamNameById}
+      />,
+    );
+
+    // Goal 1 (scored by User One) should have Assist 1 (assisted by User Two)
+    expect(screen.getByText(/common.goal: User One/)).toBeInTheDocument();
+    expect(screen.getByText(/common.assist: User Two/)).toBeInTheDocument();
+
+    // Goal 2 (scored by User Two) should have Assist 2 (assisted by User One)
+    expect(screen.getByText(/common.goal: User Two/)).toBeInTheDocument();
+    expect(screen.getByText(/common.assist: User One/)).toBeInTheDocument();
+  });
 });

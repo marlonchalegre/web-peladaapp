@@ -164,8 +164,10 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
             (e) =>
               e.match_id === matchId &&
               e.event_type === "assist" &&
-              e.session_time_ms === eventToDelete.session_time_ms &&
-              e.match_time_ms === eventToDelete.match_time_ms,
+              ((e.parent_event_id && e.parent_event_id === eventToDelete.id) ||
+                (!e.parent_event_id &&
+                  e.session_time_ms === eventToDelete.session_time_ms &&
+                  e.match_time_ms === eventToDelete.match_time_ms)),
           );
           return prev.filter(
             (e) =>
@@ -188,8 +190,10 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
             (e) =>
               e.match_id === matchId &&
               e.event_type === "assist" &&
-              e.session_time_ms === goalToDelete.session_time_ms &&
-              e.match_time_ms === goalToDelete.match_time_ms,
+              ((e.parent_event_id && e.parent_event_id === goalToDelete.id) ||
+                (!e.parent_event_id &&
+                  e.session_time_ms === goalToDelete.session_time_ms &&
+                  e.match_time_ms === goalToDelete.match_time_ms)),
           );
           return prev.filter(
             (e) =>

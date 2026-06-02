@@ -322,9 +322,8 @@ export default function FinanceSection({
   };
 
   if (
-    (configLoading || dynamicLoading) &&
-    !summary &&
-    transactions.length === 0
+    configLoading ||
+    (dynamicLoading && !summary && transactions.length === 0)
   )
     return <CircularProgress data-testid="finance-loading" />;
 
