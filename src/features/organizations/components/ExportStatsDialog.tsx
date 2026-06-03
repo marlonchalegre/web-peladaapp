@@ -52,18 +52,49 @@ export default function ExportStatsDialog({
       own_goal: "own_goals",
     };
 
-    const header = Object.entries(fields)
+    const enabledFields = Object.entries(fields)
       .filter(([, enabled]) => enabled)
-      .map(([key]) =>
-        t(`organizations.stats.export.field.${translationKeyMap[key] || key}`),
-      )
-      .join("\t");
+      .map(([key]) => key as keyof typeof fields);
+
+    // Calculate maximum width for each column dynamically
+    const colWidths = enabledFields.map((key) => {
+      const headerText = t(
+        `organizations.stats.export.field.${translationKeyMap[key] || key}`,
+      );
+      const valLengths = stats.map((stat) => {
+        const val = stat[key as keyof OrganizationPlayerStats];
+        return val !== undefined && val !== null ? String(val).length : 0;
+      });
+      return Math.max(headerText.length, ...valLengths);
+    });
+
+    const header = enabledFields
+      .map((key, index) => {
+        const headerText = t(
+          `organizations.stats.export.field.${translationKeyMap[key] || key}`,
+        );
+        const colWidth = colWidths[index];
+        if (key === "player_name") {
+          return headerText.padEnd(colWidth);
+        } else {
+          return headerText.padStart(colWidth);
+        }
+      })
+      .join("  ");
 
     const rows = stats.map((stat) => {
-      return Object.entries(fields)
-        .filter(([, enabled]) => enabled)
-        .map(([key]) => stat[key as keyof OrganizationPlayerStats])
-        .join("\t");
+      return enabledFields
+        .map((key, index) => {
+          const val = stat[key as keyof OrganizationPlayerStats];
+          const valStr = val !== undefined && val !== null ? String(val) : "-";
+          const colWidth = colWidths[index];
+          if (key === "player_name") {
+            return valStr.padEnd(colWidth);
+          } else {
+            return valStr.padStart(colWidth);
+          }
+        })
+        .join("  ");
     });
 
     const text = `*${t("organizations.stats.export.title", { year })}*\n\`\`\`\n${header}\n${rows.join("\n")}\n\`\`\``;
