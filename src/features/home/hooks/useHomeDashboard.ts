@@ -85,7 +85,7 @@ export function useHomeDashboard() {
       // If admin_orgs needs to stay in sync, it should be updated via AuthContext/refreshUser.
     } catch (err) {
       const message =
-          err instanceof Error ? err.message : t("home.error.load_failed");
+        err instanceof Error ? err.message : t("home.error.load_failed");
       setError(message);
     } finally {
       setLoading(false);

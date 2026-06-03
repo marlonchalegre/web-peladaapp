@@ -246,9 +246,12 @@ describe("HomePage", () => {
 
     // Wait for the total count to be displayed
     await waitFor(() => {
-      // The widget should show the total count (10), not the page items count (2)
-      expect(screen.getByText("10")).toBeInTheDocument();
-      expect(screen.queryByText("2")).not.toBeInTheDocument();
+      // Find the card containing peladas_total and verify it displays 10 instead of 2
+      const statsCard = screen
+        .getByText(/home.stats.peladas_total/i)
+        .closest("div");
+      expect(statsCard).toHaveTextContent("10");
+      expect(statsCard).not.toHaveTextContent(/^2$/);
     });
   });
 });
