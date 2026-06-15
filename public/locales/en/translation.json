@@ -240,6 +240,11 @@
       "prefix": "Welcome, ",
       "subtitle": "Here is a summary of your activities."
     },
+    "stats": {
+      "peladas_played": "Matches Played ({{year}})",
+      "groups_active": "Active Groups",
+      "goals_assists": "Goals & Assists ({{year}})"
+    },
     "sections": {
       "pending_invitations": {
         "title": "Pending Invitations",

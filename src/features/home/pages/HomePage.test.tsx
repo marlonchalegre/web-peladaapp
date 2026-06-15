@@ -19,6 +19,11 @@ const mockUser = {
   email: "test@example.com",
   is_blocked: false,
   allow_org_creation: true,
+  stats: {
+    goals: 5,
+    assists: 3,
+    matches: 12,
+  },
 };
 
 // Mock AuthContext
@@ -209,33 +214,11 @@ describe("HomePage", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("renders the total number of peladas in the dashboard stats widget, not just the page length", async () => {
+  it("renders the player yearly statistics in the dashboard stats widgets", async () => {
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/users/1/organizations") return Promise.resolve([]);
       if (path === "/api/invitations/pending") return Promise.resolve([]);
       return Promise.resolve([]);
-    });
-
-    (api.getPaginated as Mock).mockImplementation((path: string) => {
-      if (path === "/api/users/1/peladas") {
-        return Promise.resolve({
-          data: [
-            { id: "1", status: "open", scheduled_at: "2023-01-01T10:00:00Z" },
-            { id: "2", status: "open", scheduled_at: "2023-01-02T10:00:00Z" },
-          ],
-          total: 10,
-          page: 1,
-          perPage: 2,
-          totalPages: 5,
-        });
-      }
-      return Promise.resolve({
-        data: [],
-        total: 0,
-        page: 1,
-        perPage: 10,
-        totalPages: 0,
-      });
     });
 
     render(
@@ -244,14 +227,18 @@ describe("HomePage", () => {
       </MemoryRouter>,
     );
 
-    // Wait for the total count to be displayed
+    // Wait for the stats cards to be displayed
     await waitFor(() => {
-      // Find the card containing peladas_total and verify it displays 10 instead of 2
-      const statsCard = screen
-        .getByText(/home.stats.peladas_total/i)
+      const matchesCard = screen
+        .getByText(/home.stats.peladas_played/i)
         .closest("div");
-      expect(statsCard).toHaveTextContent("10");
-      expect(statsCard).not.toHaveTextContent(/^2$/);
+      expect(matchesCard).toHaveTextContent("12");
+
+      const goalsCard = screen
+        .getByText(/home.stats.goals_assists/i)
+        .closest("div");
+      expect(goalsCard).toHaveTextContent("5");
+      expect(goalsCard).toHaveTextContent("3");
     });
   });
 });

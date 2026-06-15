@@ -1092,37 +1092,57 @@ export default function ActiveMatchDashboard(props: Props) {
                   {
                     type: "drible",
                     label: t("common.drible"),
-                    icon: <BoltIcon sx={{ fontSize: "2rem", color: "#d97706" }} />,
+                    icon: (
+                      <BoltIcon sx={{ fontSize: "2rem", color: "#d97706" }} />
+                    ),
                     color: "#d97706",
                   },
                   {
                     type: "chute",
                     label: t("common.chute"),
-                    icon: <LocalFireDepartmentIcon sx={{ fontSize: "2rem", color: "#e11d48" }} />,
+                    icon: (
+                      <LocalFireDepartmentIcon
+                        sx={{ fontSize: "2rem", color: "#e11d48" }}
+                      />
+                    ),
                     color: "#e11d48",
                   },
                   {
                     type: "falta",
                     label: t("common.falta"),
-                    icon: <WarningIcon sx={{ fontSize: "2rem", color: "#ea580c" }} />,
+                    icon: (
+                      <WarningIcon
+                        sx={{ fontSize: "2rem", color: "#ea580c" }}
+                      />
+                    ),
                     color: "#ea580c",
                   },
                   {
                     type: "furada",
                     label: t("common.furada"),
-                    icon: <SentimentVeryDissatisfiedIcon sx={{ fontSize: "2rem", color: "#6b7280" }} />,
+                    icon: (
+                      <SentimentVeryDissatisfiedIcon
+                        sx={{ fontSize: "2rem", color: "#6b7280" }}
+                      />
+                    ),
                     color: "#6b7280",
                   },
                   {
                     type: "defesa",
                     label: t("common.defesa"),
-                    icon: <ShieldIcon sx={{ fontSize: "2rem", color: "#0d9488" }} />,
+                    icon: (
+                      <ShieldIcon sx={{ fontSize: "2rem", color: "#0d9488" }} />
+                    ),
                     color: "#0d9488",
                   },
                   {
                     type: "vish",
                     label: t("common.vish"),
-                    icon: <SentimentVerySatisfiedIcon sx={{ fontSize: "2rem", color: "#7c3aed" }} />,
+                    icon: (
+                      <SentimentVerySatisfiedIcon
+                        sx={{ fontSize: "2rem", color: "#7c3aed" }}
+                      />
+                    ),
                     color: "#7c3aed",
                   },
                 ].map((ev) => {
@@ -1158,7 +1178,15 @@ export default function ActiveMatchDashboard(props: Props) {
                         }}
                         data-testid={`event-type-card-${ev.type}`}
                       >
-                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "32px", mb: 0.5 }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            height: "32px",
+                            mb: 0.5,
+                          }}
+                        >
                           {ev.icon}
                         </Box>
                         <Typography

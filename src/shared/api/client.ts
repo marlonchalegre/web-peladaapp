@@ -213,6 +213,11 @@ export type User = {
   is_super_admin?: boolean;
   is_blocked?: boolean;
   allow_org_creation?: boolean;
+  stats?: {
+    goals: number;
+    assists: number;
+    matches: number;
+  };
 };
 
 export type UserProfileUpdate = {

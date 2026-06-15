@@ -21,6 +21,7 @@ import PendingInvitations from "../components/PendingInvitations";
 export default function HomePage() {
   const { user, refreshUser } = useAuth();
   const { t } = useTranslation();
+  const currentYear = new Date().getFullYear();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   useEffect(() => {
@@ -37,7 +38,6 @@ export default function HomePage() {
     peladas,
     peladasPage,
     peladasTotalPages,
-    peladasTotal,
     handlePeladaPageChange,
     acceptInvitation,
     createOrganization,
@@ -123,10 +123,19 @@ export default function HomePage() {
                       fontWeight: 600,
                     }}
                   >
-                    ⚽ {t("home.stats.peladas_total", "Peladas Registradas")}
+                    ⚽{" "}
+                    {t(
+                      "home.stats.peladas_played",
+                      `Peladas Jogadas (${currentYear})`,
+                      { year: currentYear },
+                    )}
                   </Typography>
-                  <Typography variant="h5" sx={{ fontWeight: 800 }}>
-                    {peladasTotal}
+                  <Typography
+                    variant="h5"
+                    sx={{ fontWeight: 800 }}
+                    data-testid="home-stats-matches"
+                  >
+                    {user.stats?.matches ?? 0}
                   </Typography>
                 </Paper>
               </Grid>
@@ -152,7 +161,11 @@ export default function HomePage() {
                   >
                     🛡️ {t("home.stats.groups_active", "Grupos Ativos")}
                   </Typography>
-                  <Typography variant="h5" sx={{ fontWeight: 800 }}>
+                  <Typography
+                    variant="h5"
+                    sx={{ fontWeight: 800 }}
+                    data-testid="home-stats-groups"
+                  >
                     {adminOrgs.length + memberOrgs.length}
                   </Typography>
                 </Paper>
@@ -177,11 +190,21 @@ export default function HomePage() {
                       fontWeight: 600,
                     }}
                   >
-                    👑 {t("home.stats.roles", "Minhas Funções")}
+                    ⭐{" "}
+                    {t(
+                      "home.stats.goals_assists",
+                      `Gols & Assistências (${currentYear})`,
+                      { year: currentYear },
+                    )}
                   </Typography>
-                  <Typography variant="h5" sx={{ fontWeight: 800 }}>
-                    {adminOrgs.length} Admin | {memberOrgs.length}{" "}
-                    {t("common.roles.player", "Jogador")}
+                  <Typography
+                    variant="h5"
+                    sx={{ fontWeight: 800 }}
+                    data-testid="home-stats-goals-assists"
+                  >
+                    {user.stats?.goals ?? 0} {t("common.goals", "Gols")} |{" "}
+                    {user.stats?.assists ?? 0}{" "}
+                    {t("common.assists", "Assistências")}
                   </Typography>
                 </Paper>
               </Grid>
