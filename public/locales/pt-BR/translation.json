@@ -645,8 +645,8 @@
       },
       "button": {
         "close_list": "Fechar Lista e Criar Times",
-        "confirm": "Vou jogar",
-        "decline": "Não vou"
+        "confirm": "SIM",
+        "decline": "NÃO"
       },
       "dialog": {
         "close_title": "Fechar Lista e Criar Times?",

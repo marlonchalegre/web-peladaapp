@@ -113,24 +113,45 @@ export default function UserAttendanceStatus({
               bgcolor:
                 player.attendance_status === "confirmed"
                   ? "white"
-                  : "rgba(255, 255, 255, 0.2)",
+                  : player.attendance_status === "declined" ||
+                      player.attendance_status === "waitlist"
+                    ? "rgba(255, 255, 255, 0.1)"
+                    : "white",
               color:
                 player.attendance_status === "confirmed"
-                  ? "primary.main"
-                  : "white",
+                  ? "success.main"
+                  : player.attendance_status === "declined" ||
+                      player.attendance_status === "waitlist"
+                    ? "rgba(255, 255, 255, 0.6)"
+                    : "primary.main",
               border:
-                player.attendance_status === "confirmed"
+                player.attendance_status === "confirmed" ||
+                player.attendance_status === "pending" ||
+                !player.attendance_status
                   ? "none"
-                  : "1px solid rgba(255, 255, 255, 0.4)",
+                  : "1px solid rgba(255, 255, 255, 0.2)",
               boxShadow:
-                player.attendance_status === "confirmed"
-                  ? "0 4px 12px rgba(0,0,0,0.2)"
+                player.attendance_status === "confirmed" ||
+                player.attendance_status === "pending" ||
+                !player.attendance_status
+                  ? "0 4px 12px rgba(0,0,0,0.15)"
                   : "none",
+              "& .MuiButton-startIcon": {
+                color:
+                  player.attendance_status === "confirmed"
+                    ? "success.main"
+                    : player.attendance_status === "declined" ||
+                        player.attendance_status === "waitlist"
+                      ? "rgba(255, 255, 255, 0.6)"
+                      : "primary.main",
+              },
               "&:hover": {
                 bgcolor:
-                  player.attendance_status === "confirmed"
+                  player.attendance_status === "confirmed" ||
+                  player.attendance_status === "pending" ||
+                  !player.attendance_status
                     ? "rgba(255, 255, 255, 0.9)"
-                    : "rgba(255, 255, 255, 0.3)",
+                    : "rgba(255, 255, 255, 0.2)",
               },
               transition: "all 0.2s ease",
             }}
@@ -160,7 +181,7 @@ export default function UserAttendanceStatus({
               bgcolor:
                 player.attendance_status === "declined"
                   ? "white"
-                  : "rgba(255, 255, 255, 0.2)",
+                  : "rgba(255, 255, 255, 0.15)",
               color:
                 player.attendance_status === "declined"
                   ? "error.main"
@@ -168,16 +189,22 @@ export default function UserAttendanceStatus({
               border:
                 player.attendance_status === "declined"
                   ? "none"
-                  : "1px solid rgba(255, 255, 255, 0.4)",
+                  : "1px solid rgba(255, 255, 255, 0.3)",
               boxShadow:
                 player.attendance_status === "declined"
-                  ? "0 4px 12px rgba(0,0,0,0.2)"
+                  ? "0 4px 12px rgba(0,0,0,0.15)"
                   : "none",
+              "& .MuiButton-startIcon": {
+                color:
+                  player.attendance_status === "declined"
+                    ? "error.main"
+                    : "white",
+              },
               "&:hover": {
                 bgcolor:
                   player.attendance_status === "declined"
                     ? "rgba(255, 255, 255, 0.9)"
-                    : "rgba(255, 255, 255, 0.3)",
+                    : "rgba(255, 255, 255, 0.25)",
               },
               transition: "all 0.2s ease",
             }}

@@ -646,8 +646,8 @@
       },
       "button": {
         "close_list": "Close List and Create Teams",
-        "confirm": "I'm In",
-        "decline": "I'm Out"
+        "confirm": "YES",
+        "decline": "NO"
       },
       "dialog": {
         "close_title": "Close List and Create Teams?",
