@@ -137,7 +137,16 @@ export interface Match {
   timer_accumulated_ms?: number | null;
   timer_status?: TimerStatus | null;
 }
-export type MatchEventType = "assist" | "goal" | "own_goal";
+export type MatchEventType =
+  | "assist"
+  | "goal"
+  | "own_goal"
+  | "drible"
+  | "chute"
+  | "falta"
+  | "furada"
+  | "defesa"
+  | "vish";
 export interface MatchEvent {
   id: string;
   match_id: string;

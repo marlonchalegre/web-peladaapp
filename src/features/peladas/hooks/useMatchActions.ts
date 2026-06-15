@@ -7,6 +7,7 @@ import {
   type MatchEvent,
   type Pelada,
   type TeamPlayer,
+  type MatchEventType,
 } from "../../../shared/api/endpoints";
 import { enqueueAction, type OfflineActionType } from "../utils/offlineQueue";
 
@@ -152,7 +153,7 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
   const deleteEventAndRefresh = async (
     matchId: string,
     playerId: string,
-    type: "assist" | "goal" | "own_goal",
+    type: MatchEventType,
     eventId?: string,
   ) => {
     // Optimistic Update
@@ -245,7 +246,7 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
   const recordEvent = async (
     matchId: string,
     playerId: string,
-    type: "assist" | "goal" | "own_goal",
+    type: MatchEventType,
     sessionTimeMs?: number,
     matchTimeMs?: number,
     assistantId?: string,

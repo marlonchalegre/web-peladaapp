@@ -15,6 +15,9 @@ import {
   DialogTitle,
   DialogContent,
   ListItemText,
+  Fab,
+  alpha,
+  Paper,
 } from "@mui/material";
 import {
   type Dispatch,
@@ -28,6 +31,7 @@ import type {
   TeamPlayer,
   Player,
   Pelada,
+  MatchEventType,
 } from "../../../shared/api/endpoints";
 import MatchScoreHero from "./MatchScoreHero";
 import MatchPlayerCard from "./MatchPlayerCard";
@@ -35,6 +39,12 @@ import HistoryIcon from "@mui/icons-material/History";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import EditIcon from "@mui/icons-material/Edit";
 import BlockIcon from "@mui/icons-material/Block";
+import BoltIcon from "@mui/icons-material/Bolt";
+import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
+import WarningIcon from "@mui/icons-material/Warning";
+import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
+import ShieldIcon from "@mui/icons-material/Shield";
+import SentimentVerySatisfiedIcon from "@mui/icons-material/SentimentVerySatisfied";
 import { useTranslation } from "react-i18next";
 import PlayerSelectMenu from "./PlayerSelectMenu";
 import { POSITION_ORDER } from "../utils/playerUtils";
@@ -75,7 +85,7 @@ type Props = {
   recordEvent: (
     matchId: string,
     playerId: string,
-    type: "assist" | "goal" | "own_goal",
+    type: MatchEventType,
     sessionTimeMs?: number,
     matchTimeMs?: number,
     assistantId?: string,
@@ -83,7 +93,7 @@ type Props = {
   deleteEventAndRefresh: (
     matchId: string,
     playerId: string,
-    type: "assist" | "goal" | "own_goal",
+    type: MatchEventType,
   ) => Promise<void>;
   adjustScore: (
     matchId: string,
@@ -147,6 +157,13 @@ export default function ActiveMatchDashboard(props: Props) {
     side: "home" | "away";
   } | null>(null);
 
+  const [eventDialogOpen, setEventDialogOpen] = useState(false);
+  const [selectedEventPlayerId, setSelectedEventPlayerId] = useState<
+    string | null
+  >(null);
+  const [selectedEventType, setSelectedEventType] =
+    useState<MatchEventType | null>(null);
+
   const assistantOptions = useMemo(() => {
     if (!goalScorerInfo) return [];
     const teamPlayers =
@@ -172,6 +189,20 @@ export default function ActiveMatchDashboard(props: Props) {
   const handleCloseAssistDialog = () => {
     setAssistDialogOpen(false);
     setGoalScorerInfo(null);
+  };
+
+  const handleConfirmEvent = async () => {
+    if (!selectedEventPlayerId || !selectedEventType) return;
+    await recordEvent(
+      match.id,
+      selectedEventPlayerId,
+      selectedEventType,
+      undefined,
+      undefined,
+    );
+    setSelectedEventPlayerId(null);
+    setSelectedEventType(null);
+    setEventDialogOpen(false);
   };
 
   const effectiveFinished = finished && !isEditing;
@@ -285,6 +316,12 @@ export default function ActiveMatchDashboard(props: Props) {
     () => generateTeamList(awayPlayers, "away", match.away_team_id),
     [awayPlayers, match.away_team_id, generateTeamList],
   );
+
+  const eventPlayerOptions = useMemo(() => {
+    const home = homeList.filter((p) => !p.isEmpty);
+    const away = awayList.filter((p) => !p.isEmpty);
+    return { home, away };
+  }, [homeList, awayList]);
 
   const nextMatch = useMemo(() => {
     return (
@@ -858,6 +895,318 @@ export default function ActiveMatchDashboard(props: Props) {
           </List>
         </Box>
       </Drawer>
+
+      {/* Floating Action Button for recording custom events */}
+      {isAdmin && !effectiveFinished && (
+        <Fab
+          color="primary"
+          aria-label="record event"
+          onClick={() => setEventDialogOpen(true)}
+          sx={{
+            position: "fixed",
+            bottom: { xs: 16, sm: 24 },
+            right: { xs: 16, sm: 24 },
+            boxShadow: 4,
+            zIndex: 1000,
+          }}
+          data-testid="record-event-fab"
+        >
+          <BoltIcon />
+        </Fab>
+      )}
+
+      {/* Dialogue overlay for custom events */}
+      <Dialog
+        open={eventDialogOpen}
+        onClose={() => {
+          setSelectedEventPlayerId(null);
+          setSelectedEventType(null);
+          setEventDialogOpen(false);
+        }}
+        fullWidth
+        maxWidth="md"
+        data-testid="record-event-dialog"
+      >
+        <DialogTitle sx={{ fontWeight: "bold" }}>
+          {t("peladas.matches.record_event_title", "Registrar Evento")}
+        </DialogTitle>
+        <DialogContent>
+          <Grid container spacing={3} sx={{ mt: 0.5 }}>
+            {/* Player Selector Column */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Typography
+                variant="subtitle2"
+                sx={{ fontWeight: "bold", mb: 1.5, color: "text.secondary" }}
+              >
+                {t("peladas.matches.select_player", "SELECIONAR JOGADOR")}
+              </Typography>
+              <Box sx={{ maxHeight: 350, overflow: "auto", pr: 1 }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: "bold",
+                    color: "home.main",
+                    display: "block",
+                    mb: 1,
+                  }}
+                >
+                  {homeTeamName.toUpperCase()}
+                </Typography>
+                <List sx={{ p: 0, mb: 2 }}>
+                  {eventPlayerOptions.home.map((player) => {
+                    const name = getPlayerName(player.player_id);
+                    const playerData = orgPlayerIdToPlayer[player.player_id];
+                    const isSelected =
+                      selectedEventPlayerId === player.player_id;
+                    return (
+                      <ListItem
+                        key={player.player_id}
+                        disablePadding
+                        sx={{ mb: 0.5 }}
+                      >
+                        <ListItemButton
+                          selected={isSelected}
+                          onClick={() =>
+                            setSelectedEventPlayerId(player.player_id)
+                          }
+                          sx={{
+                            borderRadius: 2,
+                            border: "1px solid",
+                            borderColor: isSelected
+                              ? "primary.main"
+                              : "divider",
+                            bgcolor: isSelected
+                              ? alpha(theme.palette.primary.main, 0.08)
+                              : "transparent",
+                          }}
+                          data-testid={`event-player-item-${player.player_id}`}
+                        >
+                          <SecureAvatar
+                            userId={playerData?.user_id}
+                            filename={playerData?.user_avatar_filename}
+                            sx={{
+                              width: 32,
+                              height: 32,
+                              fontSize: "0.8rem",
+                              fontWeight: "bold",
+                              mr: 1.5,
+                            }}
+                            fallbackText={name.substring(0, 2).toUpperCase()}
+                          />
+                          <ListItemText
+                            primary={name}
+                            slotProps={{
+                              primary: {
+                                sx: {
+                                  fontWeight: isSelected ? "bold" : "normal",
+                                },
+                              },
+                            }}
+                          />
+                        </ListItemButton>
+                      </ListItem>
+                    );
+                  })}
+                </List>
+
+                <Typography
+                  variant="caption"
+                  sx={{
+                    fontWeight: "bold",
+                    color: "away.main",
+                    display: "block",
+                    mb: 1,
+                  }}
+                >
+                  {awayTeamName.toUpperCase()}
+                </Typography>
+                <List sx={{ p: 0 }}>
+                  {eventPlayerOptions.away.map((player) => {
+                    const name = getPlayerName(player.player_id);
+                    const playerData = orgPlayerIdToPlayer[player.player_id];
+                    const isSelected =
+                      selectedEventPlayerId === player.player_id;
+                    return (
+                      <ListItem
+                        key={player.player_id}
+                        disablePadding
+                        sx={{ mb: 0.5 }}
+                      >
+                        <ListItemButton
+                          selected={isSelected}
+                          onClick={() =>
+                            setSelectedEventPlayerId(player.player_id)
+                          }
+                          sx={{
+                            borderRadius: 2,
+                            border: "1px solid",
+                            borderColor: isSelected
+                              ? "primary.main"
+                              : "divider",
+                            bgcolor: isSelected
+                              ? alpha(theme.palette.primary.main, 0.08)
+                              : "transparent",
+                          }}
+                          data-testid={`event-player-item-${player.player_id}`}
+                        >
+                          <SecureAvatar
+                            userId={playerData?.user_id}
+                            filename={playerData?.user_avatar_filename}
+                            sx={{
+                              width: 32,
+                              height: 32,
+                              fontSize: "0.8rem",
+                              fontWeight: "bold",
+                              mr: 1.5,
+                            }}
+                            fallbackText={name.substring(0, 2).toUpperCase()}
+                          />
+                          <ListItemText
+                            primary={name}
+                            slotProps={{
+                              primary: {
+                                sx: {
+                                  fontWeight: isSelected ? "bold" : "normal",
+                                },
+                              },
+                            }}
+                          />
+                        </ListItemButton>
+                      </ListItem>
+                    );
+                  })}
+                </List>
+              </Box>
+            </Grid>
+
+            {/* Event Selector Column */}
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Typography
+                variant="subtitle2"
+                sx={{ fontWeight: "bold", mb: 1.5, color: "text.secondary" }}
+              >
+                {t("peladas.matches.select_event", "SELECIONAR EVENTO")}
+              </Typography>
+              <Grid container spacing={2}>
+                {[
+                  {
+                    type: "drible",
+                    label: t("common.drible"),
+                    icon: <BoltIcon sx={{ fontSize: "2rem", color: "#d97706" }} />,
+                    color: "#d97706",
+                  },
+                  {
+                    type: "chute",
+                    label: t("common.chute"),
+                    icon: <LocalFireDepartmentIcon sx={{ fontSize: "2rem", color: "#e11d48" }} />,
+                    color: "#e11d48",
+                  },
+                  {
+                    type: "falta",
+                    label: t("common.falta"),
+                    icon: <WarningIcon sx={{ fontSize: "2rem", color: "#ea580c" }} />,
+                    color: "#ea580c",
+                  },
+                  {
+                    type: "furada",
+                    label: t("common.furada"),
+                    icon: <SentimentVeryDissatisfiedIcon sx={{ fontSize: "2rem", color: "#6b7280" }} />,
+                    color: "#6b7280",
+                  },
+                  {
+                    type: "defesa",
+                    label: t("common.defesa"),
+                    icon: <ShieldIcon sx={{ fontSize: "2rem", color: "#0d9488" }} />,
+                    color: "#0d9488",
+                  },
+                  {
+                    type: "vish",
+                    label: t("common.vish"),
+                    icon: <SentimentVerySatisfiedIcon sx={{ fontSize: "2rem", color: "#7c3aed" }} />,
+                    color: "#7c3aed",
+                  },
+                ].map((ev) => {
+                  const isSelected = selectedEventType === ev.type;
+                  return (
+                    <Grid size={{ xs: 6 }} key={ev.type}>
+                      <Paper
+                        variant="outlined"
+                        onClick={() =>
+                          setSelectedEventType(ev.type as MatchEventType)
+                        }
+                        sx={{
+                          p: 2.5,
+                          borderRadius: 3,
+                          cursor: "pointer",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 1,
+                          border: "2px solid",
+                          borderColor: isSelected ? ev.color : "divider",
+                          bgcolor: isSelected
+                            ? alpha(ev.color, 0.08)
+                            : "background.paper",
+                          transition: "all 0.2s",
+                          "&:hover": {
+                            borderColor: ev.color,
+                            bgcolor: alpha(ev.color, 0.04),
+                            transform: "translateY(-2px)",
+                            boxShadow: 1,
+                          },
+                        }}
+                        data-testid={`event-type-card-${ev.type}`}
+                      >
+                        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", height: "32px", mb: 0.5 }}>
+                          {ev.icon}
+                        </Box>
+                        <Typography
+                          sx={{
+                            fontWeight: "bold",
+                            color: isSelected ? ev.color : "text.primary",
+                            fontSize: "0.9rem",
+                          }}
+                        >
+                          {ev.label}
+                        </Typography>
+                      </Paper>
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            </Grid>
+          </Grid>
+
+          <Stack
+            direction="row"
+            spacing={2}
+            sx={{ mt: 4, justifyContent: "flex-end" }}
+          >
+            <Button
+              variant="outlined"
+              onClick={() => {
+                setSelectedEventPlayerId(null);
+                setSelectedEventType(null);
+                setEventDialogOpen(false);
+              }}
+              sx={{ borderRadius: 2, textTransform: "none" }}
+              data-testid="cancel-event-button"
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              variant="contained"
+              disabled={!selectedEventPlayerId || !selectedEventType}
+              onClick={handleConfirmEvent}
+              sx={{ borderRadius: 2, textTransform: "none" }}
+              data-testid="confirm-event-button"
+            >
+              {t("peladas.matches.confirm_registration", "Confirmar Registro")}
+            </Button>
+          </Stack>
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 }

@@ -11,6 +11,12 @@ import ErrorOutlinedIcon from "@mui/icons-material/ErrorOutlined";
 import StarsIcon from "@mui/icons-material/Stars";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import BoltIcon from "@mui/icons-material/Bolt";
+import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
+import WarningIcon from "@mui/icons-material/Warning";
+import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
+import ShieldIcon from "@mui/icons-material/Shield";
+import SentimentVerySatisfiedIcon from "@mui/icons-material/SentimentVerySatisfied";
 import { useTranslation } from "react-i18next";
 import type { MatchEvent, Match } from "../../../shared/api/endpoints";
 
@@ -18,7 +24,16 @@ interface GroupedEvent {
   id: string;
   timeMs: number;
   matchTimeMs: number;
-  type: "goal" | "own_goal" | "assist";
+  type:
+    | "goal"
+    | "own_goal"
+    | "assist"
+    | "drible"
+    | "chute"
+    | "falta"
+    | "furada"
+    | "defesa"
+    | "vish";
   goalEvent?: MatchEvent;
   assistEvent?: MatchEvent;
   standaloneEvent?: MatchEvent;
@@ -55,9 +70,6 @@ function TimelineCard({
 }) {
   const { t } = useTranslation();
 
-  const isOwnGoal = groupedEvent.type === "own_goal";
-  const isAssist = groupedEvent.type === "assist";
-
   const scorerId =
     groupedEvent.goalEvent?.player_id ||
     groupedEvent.standaloneEvent?.player_id;
@@ -66,6 +78,78 @@ function TimelineCard({
   const assistantName = assistantId ? getPlayerName(assistantId) : null;
 
   const targetEvent = groupedEvent.goalEvent || groupedEvent.standaloneEvent;
+
+  const getEventConfig = (type: string) => {
+    switch (type) {
+      case "goal":
+        return {
+          icon: <SportsSoccerIcon fontSize="small" color="success" />,
+          title: t("common.goal"),
+        };
+      case "own_goal":
+        return {
+          icon: <ErrorOutlinedIcon fontSize="small" color="error" />,
+          title: t("common.own_goal"),
+        };
+      case "assist":
+        return {
+          icon: <StarsIcon fontSize="small" color="info" />,
+          title: t("common.assist"),
+        };
+      case "drible":
+        return {
+          icon: <BoltIcon fontSize="small" sx={{ color: "#d97706" }} />,
+          title: t("common.drible"),
+        };
+      case "chute":
+        return {
+          icon: (
+            <LocalFireDepartmentIcon
+              fontSize="small"
+              sx={{ color: "#e11d48" }}
+            />
+          ),
+          title: t("common.chute"),
+        };
+      case "falta":
+        return {
+          icon: <WarningIcon fontSize="small" sx={{ color: "#ea580c" }} />,
+          title: t("common.falta"),
+        };
+      case "furada":
+        return {
+          icon: (
+            <SentimentVeryDissatisfiedIcon
+              fontSize="small"
+              sx={{ color: "#6b7280" }}
+            />
+          ),
+          title: t("common.furada"),
+        };
+      case "defesa":
+        return {
+          icon: <ShieldIcon fontSize="small" sx={{ color: "#0d9488" }} />,
+          title: t("common.defesa"),
+        };
+      case "vish":
+        return {
+          icon: (
+            <SentimentVerySatisfiedIcon
+              fontSize="small"
+              sx={{ color: "#7c3aed" }}
+            />
+          ),
+          title: t("common.vish"),
+        };
+      default:
+        return {
+          icon: <SportsSoccerIcon fontSize="small" color="disabled" />,
+          title: t(`common.${type}`, type),
+        };
+    }
+  };
+
+  const config = getEventConfig(groupedEvent.type);
 
   return (
     <Paper
@@ -106,13 +190,7 @@ function TimelineCard({
             flexGrow: 1,
           }}
         >
-          {isOwnGoal ? (
-            <ErrorOutlinedIcon fontSize="small" color="error" />
-          ) : isAssist ? (
-            <StarsIcon fontSize="small" color="info" />
-          ) : (
-            <SportsSoccerIcon fontSize="small" color="success" />
-          )}
+          {config.icon}
 
           <Box sx={{ minWidth: 0 }}>
             <Typography
@@ -125,11 +203,7 @@ function TimelineCard({
                 fontSize: { xs: "0.75rem", sm: "0.85rem" },
               }}
             >
-              {isOwnGoal
-                ? t("common.own_goal")
-                : isAssist
-                  ? t("common.assist")
-                  : t("common.goal")}
+              {config.title}
             </Typography>
             <Typography
               variant="caption"
@@ -318,17 +392,29 @@ export default function PeladaTimeline({
           return null; // skip match if no events
         }
 
-        // Separate goals and assists
+        // Separate goals, assists, and custom events
         const goals = matchEvents.filter(
           (e) => e.event_type === "goal" || e.event_type === "own_goal",
         );
         const assists = matchEvents.filter((e) => e.event_type === "assist");
+        const customEvents = matchEvents.filter(
+          (e) => !["goal", "own_goal", "assist"].includes(e.event_type),
+        );
 
         const grouped: {
           id: string;
           timeMs: number;
           matchTimeMs: number;
-          type: "goal" | "own_goal" | "assist";
+          type:
+            | "goal"
+            | "own_goal"
+            | "assist"
+            | "drible"
+            | "chute"
+            | "falta"
+            | "furada"
+            | "defesa"
+            | "vish";
           goalEvent?: MatchEvent;
           assistEvent?: MatchEvent;
           standaloneEvent?: MatchEvent;
@@ -372,6 +458,17 @@ export default function PeladaTimeline({
               standaloneEvent: assist,
             });
           }
+        });
+
+        // Add custom match events (drible, chute, falta, furada, defesa, vish)
+        customEvents.forEach((ev) => {
+          grouped.push({
+            id: ev.id!,
+            timeMs: ev.session_time_ms ?? 0,
+            matchTimeMs: ev.match_time_ms ?? 0,
+            type: ev.event_type as GroupedEvent["type"],
+            standaloneEvent: ev,
+          });
         });
 
         // Sort match timeline events chronologically

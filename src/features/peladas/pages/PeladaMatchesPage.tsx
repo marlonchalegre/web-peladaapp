@@ -263,7 +263,7 @@ export default function PeladaMatchesPage() {
       await deleteEventAndRefresh(
         deleteEventConfirmOpen.match_id,
         deleteEventConfirmOpen.player_id,
-        deleteEventConfirmOpen.event_type as "goal" | "assist" | "own_goal",
+        deleteEventConfirmOpen.event_type,
         deleteEventConfirmOpen.id,
       );
       setDeleteEventConfirmOpen(null);
@@ -781,7 +781,9 @@ export default function PeladaMatchesPage() {
         <DialogTitle sx={{ fontWeight: "bold" }}>
           {editEventDialogOpen?.event_type === "own_goal"
             ? t("peladas.timeline.edit_own_goal", "Edit Own Goal")
-            : t("peladas.timeline.edit_goal", "Edit Goal & Assist")}
+            : editEventDialogOpen?.event_type === "goal"
+              ? t("peladas.timeline.edit_goal", "Edit Goal & Assist")
+              : t("peladas.timeline.edit_event", "Edit Event")}
         </DialogTitle>
         <DialogContent
           sx={{ pt: 2, display: "flex", flexDirection: "column", gap: 3 }}
@@ -791,7 +793,9 @@ export default function PeladaMatchesPage() {
             <InputLabel id="edit-scorer-label">
               {editEventDialogOpen?.event_type === "own_goal"
                 ? t("common.player")
-                : t("common.goal")}
+                : editEventDialogOpen?.event_type === "goal"
+                  ? t("common.goal")
+                  : t("common.player")}
             </InputLabel>
             <Select
               labelId="edit-scorer-label"
@@ -799,7 +803,9 @@ export default function PeladaMatchesPage() {
               label={
                 editEventDialogOpen?.event_type === "own_goal"
                   ? t("common.player")
-                  : t("common.goal")
+                  : editEventDialogOpen?.event_type === "goal"
+                    ? t("common.goal")
+                    : t("common.player")
               }
               onChange={(e) => handleScorerChange(e.target.value as string)}
               data-testid="edit-scorer-select"

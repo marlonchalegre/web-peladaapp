@@ -174,6 +174,12 @@
     "without_assistance": "Sem assistência",
     "own_goals": "Gols Contra",
     "own_goal": "Gol Contra",
+    "drible": "Drible",
+    "chute": "Chute",
+    "falta": "Falta",
+    "furada": "Furada",
+    "defesa": "Defesaça",
+    "vish": "Vish",
     "back": "Voltar",
     "draw": "Empate",
     "champion": "Campeão",
@@ -603,7 +609,8 @@
       "no_events": "Nenhum gol ou assistência registrado ainda.",
       "match_short": "Part.",
       "edit_goal": "Editar Gol & Assistência",
-      "edit_own_goal": "Editar Gol Contra"
+      "edit_own_goal": "Editar Gol Contra",
+      "edit_event": "Editar Evento"
     },
     "available": {
       "title": "Jogadores",
