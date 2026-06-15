@@ -5,6 +5,7 @@ import {
   Typography,
   Button,
   CircularProgress,
+  useTheme,
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -24,7 +25,88 @@ export default function UserAttendanceStatus({
   onUpdate,
 }: UserAttendanceStatusProps) {
   const { t } = useTranslation();
+  const theme = useTheme();
   const firstName = (player.user?.name || "").split(" ")[0];
+
+  const getYesButtonStyles = () => {
+    const status = player.attendance_status;
+    const attendance = theme.palette.attendance || {
+      button: {
+        confirmed: {
+          bg: "#ffffff",
+          text: theme.palette.success?.main || "#2e7d32",
+          border: "none",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+          icon: theme.palette.success?.main || "#2e7d32",
+          hoverBg: "rgba(255, 255, 255, 0.9)",
+        },
+        dimmed: {
+          bg: "rgba(255, 255, 255, 0.1)",
+          text: "rgba(255, 255, 255, 0.6)",
+          border: "1px solid rgba(255, 255, 255, 0.2)",
+          boxShadow: "none",
+          icon: "rgba(255, 255, 255, 0.6)",
+          hoverBg: "rgba(255, 255, 255, 0.2)",
+        },
+        pending: {
+          bg: "rgba(255, 255, 255, 0.15)",
+          text: "#ffffff",
+          border: "1px solid rgba(255, 255, 255, 0.3)",
+          boxShadow: "none",
+          icon: "#ffffff",
+          hoverBg: "rgba(255, 255, 255, 0.25)",
+        },
+      },
+    };
+
+    if (status === "confirmed") {
+      return attendance.button.confirmed;
+    } else if (status === "declined" || status === "waitlist") {
+      return attendance.button.dimmed;
+    } else {
+      return attendance.button.pending;
+    }
+  };
+
+  const getNoButtonStyles = () => {
+    const status = player.attendance_status;
+    const attendance = theme.palette.attendance || {
+      button: {
+        declined: {
+          bg: "#ffffff",
+          text: theme.palette.error?.main || "#d32f2f",
+          border: "none",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+          icon: theme.palette.error?.main || "#d32f2f",
+          hoverBg: "rgba(255, 255, 255, 0.9)",
+        },
+        dimmed: {
+          bg: "rgba(255, 255, 255, 0.1)",
+          text: "rgba(255, 255, 255, 0.6)",
+          border: "1px solid rgba(255, 255, 255, 0.2)",
+          boxShadow: "none",
+          icon: "rgba(255, 255, 255, 0.6)",
+          hoverBg: "rgba(255, 255, 255, 0.2)",
+        },
+        pending: {
+          bg: "rgba(255, 255, 255, 0.15)",
+          text: "#ffffff",
+          border: "1px solid rgba(255, 255, 255, 0.3)",
+          boxShadow: "none",
+          icon: "#ffffff",
+          hoverBg: "rgba(255, 255, 255, 0.25)",
+        },
+      },
+    };
+
+    if (status === "declined") {
+      return attendance.button.declined;
+    } else if (status === "confirmed" || status === "waitlist") {
+      return attendance.button.dimmed;
+    } else {
+      return attendance.button.pending;
+    }
+  };
 
   const getStatusMessage = () => {
     switch (player.attendance_status) {
@@ -110,48 +192,15 @@ export default function UserAttendanceStatus({
               px: 3,
               textTransform: "none",
               fontWeight: 800,
-              bgcolor:
-                player.attendance_status === "confirmed"
-                  ? "white"
-                  : player.attendance_status === "declined" ||
-                      player.attendance_status === "waitlist"
-                    ? "rgba(255, 255, 255, 0.1)"
-                    : "white",
-              color:
-                player.attendance_status === "confirmed"
-                  ? "success.main"
-                  : player.attendance_status === "declined" ||
-                      player.attendance_status === "waitlist"
-                    ? "rgba(255, 255, 255, 0.6)"
-                    : "primary.main",
-              border:
-                player.attendance_status === "confirmed" ||
-                player.attendance_status === "pending" ||
-                !player.attendance_status
-                  ? "none"
-                  : "1px solid rgba(255, 255, 255, 0.2)",
-              boxShadow:
-                player.attendance_status === "confirmed" ||
-                player.attendance_status === "pending" ||
-                !player.attendance_status
-                  ? "0 4px 12px rgba(0,0,0,0.15)"
-                  : "none",
+              bgcolor: getYesButtonStyles().bg,
+              color: getYesButtonStyles().text,
+              border: getYesButtonStyles().border,
+              boxShadow: getYesButtonStyles().boxShadow,
               "& .MuiButton-startIcon": {
-                color:
-                  player.attendance_status === "confirmed"
-                    ? "success.main"
-                    : player.attendance_status === "declined" ||
-                        player.attendance_status === "waitlist"
-                      ? "rgba(255, 255, 255, 0.6)"
-                      : "primary.main",
+                color: getYesButtonStyles().icon,
               },
               "&:hover": {
-                bgcolor:
-                  player.attendance_status === "confirmed" ||
-                  player.attendance_status === "pending" ||
-                  !player.attendance_status
-                    ? "rgba(255, 255, 255, 0.9)"
-                    : "rgba(255, 255, 255, 0.2)",
+                bgcolor: getYesButtonStyles().hoverBg,
               },
               transition: "all 0.2s ease",
             }}
@@ -178,33 +227,15 @@ export default function UserAttendanceStatus({
               px: 3,
               textTransform: "none",
               fontWeight: 800,
-              bgcolor:
-                player.attendance_status === "declined"
-                  ? "white"
-                  : "rgba(255, 255, 255, 0.15)",
-              color:
-                player.attendance_status === "declined"
-                  ? "error.main"
-                  : "white",
-              border:
-                player.attendance_status === "declined"
-                  ? "none"
-                  : "1px solid rgba(255, 255, 255, 0.3)",
-              boxShadow:
-                player.attendance_status === "declined"
-                  ? "0 4px 12px rgba(0,0,0,0.15)"
-                  : "none",
+              bgcolor: getNoButtonStyles().bg,
+              color: getNoButtonStyles().text,
+              border: getNoButtonStyles().border,
+              boxShadow: getNoButtonStyles().boxShadow,
               "& .MuiButton-startIcon": {
-                color:
-                  player.attendance_status === "declined"
-                    ? "error.main"
-                    : "white",
+                color: getNoButtonStyles().icon,
               },
               "&:hover": {
-                bgcolor:
-                  player.attendance_status === "declined"
-                    ? "rgba(255, 255, 255, 0.9)"
-                    : "rgba(255, 255, 255, 0.25)",
+                bgcolor: getNoButtonStyles().hoverBg,
               },
               transition: "all 0.2s ease",
             }}

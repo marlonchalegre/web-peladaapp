@@ -108,4 +108,27 @@ describe("UserAttendanceStatus", () => {
       backgroundColor: "rgb(255, 255, 255)",
     });
   });
+
+  it("does not show active state for either button when pending", () => {
+    render(
+      <ThemeContextProvider>
+        <UserAttendanceStatus
+          player={mockPlayer as PlayerWithUser}
+          isUpdating={false}
+          onUpdate={() => {}}
+        />
+      </ThemeContextProvider>,
+    );
+
+    const confirmButton = screen.getByTestId("attendance-confirm-button");
+    const declineButton = screen.getByTestId("attendance-decline-button");
+
+    // Neither button should have a white background
+    expect(confirmButton).not.toHaveStyle({
+      backgroundColor: "rgb(255, 255, 255)",
+    });
+    expect(declineButton).not.toHaveStyle({
+      backgroundColor: "rgb(255, 255, 255)",
+    });
+  });
 });

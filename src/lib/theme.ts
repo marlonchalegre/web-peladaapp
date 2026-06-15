@@ -5,15 +5,87 @@ declare module "@mui/material/styles" {
   interface Palette {
     home: Palette["primary"];
     away: Palette["primary"];
+    attendance: {
+      button: {
+        confirmed: {
+          bg: string;
+          text: string;
+          border: string;
+          boxShadow: string;
+          icon: string;
+          hoverBg: string;
+        };
+        declined: {
+          bg: string;
+          text: string;
+          border: string;
+          boxShadow: string;
+          icon: string;
+          hoverBg: string;
+        };
+        dimmed: {
+          bg: string;
+          text: string;
+          border: string;
+          boxShadow: string;
+          icon: string;
+          hoverBg: string;
+        };
+        pending: {
+          bg: string;
+          text: string;
+          border: string;
+          boxShadow: string;
+          icon: string;
+          hoverBg: string;
+        };
+      };
+    };
   }
   interface PaletteOptions {
     home?: PaletteOptions["primary"];
     away?: PaletteOptions["primary"];
+    attendance?: {
+      button?: {
+        confirmed?: {
+          bg?: string;
+          text?: string;
+          border?: string;
+          boxShadow?: string;
+          icon?: string;
+          hoverBg?: string;
+        };
+        declined?: {
+          bg?: string;
+          text?: string;
+          border?: string;
+          boxShadow?: string;
+          icon?: string;
+          hoverBg?: string;
+        };
+        dimmed?: {
+          bg?: string;
+          text?: string;
+          border?: string;
+          boxShadow?: string;
+          icon?: string;
+          hoverBg?: string;
+        };
+        pending?: {
+          bg?: string;
+          text?: string;
+          border?: string;
+          boxShadow?: string;
+          icon?: string;
+          hoverBg?: string;
+        };
+      };
+    };
   }
 }
 
-export const getTheme = (mode: PaletteMode) =>
-  createTheme({
+export const getTheme = (mode: PaletteMode) => {
+  const baseTheme = createTheme({
     palette: {
       mode,
       primary: {
@@ -142,5 +214,47 @@ export const getTheme = (mode: PaletteMode) =>
       },
     },
   });
+
+  Object.assign(baseTheme.palette, {
+    attendance: {
+      button: {
+        confirmed: {
+          bg: "#ffffff",
+          text: baseTheme.palette.success.main,
+          border: "none",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+          icon: baseTheme.palette.success.main,
+          hoverBg: alpha("#ffffff", 0.9),
+        },
+        declined: {
+          bg: "#ffffff",
+          text: baseTheme.palette.error.main,
+          border: "none",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+          icon: baseTheme.palette.error.main,
+          hoverBg: alpha("#ffffff", 0.9),
+        },
+        dimmed: {
+          bg: alpha("#ffffff", 0.1),
+          text: alpha("#ffffff", 0.6),
+          border: `1px solid ${alpha("#ffffff", 0.2)}`,
+          boxShadow: "none",
+          icon: alpha("#ffffff", 0.6),
+          hoverBg: alpha("#ffffff", 0.2),
+        },
+        pending: {
+          bg: alpha("#ffffff", 0.15),
+          text: "#ffffff",
+          border: `1px solid ${alpha("#ffffff", 0.3)}`,
+          boxShadow: "none",
+          icon: "#ffffff",
+          hoverBg: alpha("#ffffff", 0.25),
+        },
+      },
+    },
+  });
+
+  return baseTheme;
+};
 
 export default getTheme("light");
