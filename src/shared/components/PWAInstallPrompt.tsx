@@ -70,6 +70,34 @@ export function PWAInstallPrompt() {
     return () => clearInterval(interval);
   }, []);
 
+  // Automatically reload the page when the service worker is updated and takes control
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      const hasController = !!navigator.serviceWorker.controller;
+      let refreshing = false;
+
+      const handleControllerChange = () => {
+        if (refreshing) return;
+        if (hasController) {
+          refreshing = true;
+          console.log("Service worker updated. Reloading page...");
+          window.location.reload();
+        }
+      };
+
+      navigator.serviceWorker.addEventListener(
+        "controllerchange",
+        handleControllerChange,
+      );
+      return () => {
+        navigator.serviceWorker.removeEventListener(
+          "controllerchange",
+          handleControllerChange,
+        );
+      };
+    }
+  }, []);
+
   const handleClose = () => {
     setNeedRefresh(false);
     setShowIOSInstructions(false);

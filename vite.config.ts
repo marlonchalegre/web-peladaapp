@@ -9,7 +9,7 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       manifestFilename: "manifest.json",
-      injectRegister: "inline",
+      injectRegister: false,
       devOptions: {
         enabled: true,
       },
