@@ -205,7 +205,7 @@ export type User = {
   name: string;
   username: string;
   email?: string;
-  phone?: string;
+  phone?: string | null;
   admin_orgs?: string[];
   position?: string;
   avatar_filename?: string | null;

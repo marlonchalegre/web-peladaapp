@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { api } from "../../../shared/api/client";
+import { api, updateUserProfile } from "../../../shared/api/client";
 import { createApi, type User } from "../../../shared/api/endpoints";
 
 const endpoints = createApi(api);
@@ -32,6 +32,10 @@ export function useAdminUsers({ showToast, currentUser }: UseAdminUsersProps) {
   // Delete User Dialog States
   const [deleteUserTarget, setDeleteUserTarget] = useState<User | null>(null);
   const [deleteUserLoading, setDeleteUserLoading] = useState(false);
+
+  // Edit User Dialog States
+  const [editUserTarget, setEditUserTarget] = useState<User | null>(null);
+  const [editUserLoading, setEditUserLoading] = useState(false);
 
   // Fetch Users
   const fetchUsers = useCallback(
@@ -243,6 +247,42 @@ export function useAdminUsers({ showToast, currentUser }: UseAdminUsersProps) {
     }
   };
 
+  // Handlers for User Edit
+  const handleOpenEditUser = (user: User) => {
+    setEditUserTarget(user);
+  };
+
+  const handleConfirmEditUser = async (email: string, phone: string) => {
+    if (!editUserTarget) return;
+    setEditUserLoading(true);
+    try {
+      const updated = await updateUserProfile(editUserTarget.id, {
+        email,
+        phone,
+      });
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.id === editUserTarget.id
+            ? { ...u, email: updated.email, phone: updated.phone }
+            : u,
+        ),
+      );
+      showToast(
+        t("admin.success.edit_user", "Usuário atualizado com sucesso."),
+        "success",
+      );
+      setEditUserTarget(null);
+    } catch (err) {
+      console.error("Failed to update user:", err);
+      showToast(
+        t("admin.errors.edit_user", "Falha ao atualizar o usuário."),
+        "error",
+      );
+    } finally {
+      setEditUserLoading(false);
+    }
+  };
+
   return {
     userQuery,
     setUserQuery,
@@ -262,6 +302,9 @@ export function useAdminUsers({ showToast, currentUser }: UseAdminUsersProps) {
     deleteUserTarget,
     setDeleteUserTarget,
     deleteUserLoading,
+    editUserTarget,
+    setEditUserTarget,
+    editUserLoading,
     fetchUsers,
     handleUserSearch,
     handleToggleUserBlock,
@@ -271,5 +314,7 @@ export function useAdminUsers({ showToast, currentUser }: UseAdminUsersProps) {
     handleConfirmResetPassword,
     handleOpenDeleteUser,
     handleConfirmDeleteUser,
+    handleOpenEditUser,
+    handleConfirmEditUser,
   };
 }

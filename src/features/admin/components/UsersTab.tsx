@@ -24,6 +24,7 @@ import {
   Refresh as RefreshIcon,
   Delete as DeleteIcon,
   VpnKey as KeyIcon,
+  Edit as EditIcon,
 } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { type User } from "../../../shared/api/endpoints";
@@ -44,6 +45,7 @@ export interface UsersTabProps {
   onToggleGlobalAdmin: (user: User) => void;
   onOpenResetPassword: (user: User) => void;
   onOpenDeleteUser: (user: User) => void;
+  onOpenEditUser: (user: User) => void;
   actionInProgress: string | null;
   currentUser: { id: string } | null;
 }
@@ -63,6 +65,7 @@ export function UsersTab({
   onToggleGlobalAdmin,
   onOpenResetPassword,
   onOpenDeleteUser,
+  onOpenEditUser,
   actionInProgress,
   currentUser,
 }: UsersTabProps) {
@@ -237,6 +240,16 @@ export function UsersTab({
                             {user.email}
                           </Typography>
                         )}
+                        {user.phone && (
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ display: "block" }}
+                            noWrap
+                          >
+                            {user.phone}
+                          </Typography>
+                        )}
                       </Box>
                     </Box>
                   </TableCell>
@@ -283,6 +296,14 @@ export function UsersTab({
                     />
                   </TableCell>
                   <TableCell align="center" sx={{ minWidth: 120 }}>
+                    <IconButton
+                      color="primary"
+                      onClick={() => onOpenEditUser(user)}
+                      title={t("admin.actions.edit_user", "Editar Usuário")}
+                      data-testid={`edit-user-btn-${user.id}`}
+                    >
+                      <EditIcon />
+                    </IconButton>
                     <IconButton
                       color="primary"
                       onClick={() => onOpenResetPassword(user)}

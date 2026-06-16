@@ -32,6 +32,7 @@ export interface User {
   name: string;
   username: string;
   email?: string;
+  phone?: string | null;
   admin_orgs?: string[];
   position?: string;
   avatar_filename?: string | null;

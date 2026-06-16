@@ -28,6 +28,9 @@ const mockT = (key: string, arg2?: unknown, arg3?: unknown) => {
   if (key === "admin.dialogs.reset_password.description") {
     return `Digite a nova senha para o usuário ${options?.name} (@${options?.username}).`;
   }
+  if (key === "admin.dialogs.edit_user.description") {
+    return `Atualize os dados de e-mail e telefone para o usuário ${options?.name} (@${options?.username}).`;
+  }
   if (key === "admin.dialogs.delete_user.description") {
     return `Tem certeza de que deseja remover permanentemente o usuário ${options?.name} (@${options?.username})? Esta ação não pode ser desfeita e todas as informações associadas serão excluídas.`;
   }
@@ -56,6 +59,7 @@ const {
   mockAddOrganizationAdmin,
   mockRemoveOrganizationAdmin,
   mockDeleteOrganization,
+  mockUpdateUserProfile,
 } = vi.hoisted(() => ({
   mockSearchUsers: vi.fn(),
   mockListOrganizationsAdmin: vi.fn(),
@@ -65,7 +69,18 @@ const {
   mockAddOrganizationAdmin: vi.fn(),
   mockRemoveOrganizationAdmin: vi.fn(),
   mockDeleteOrganization: vi.fn(),
+  mockUpdateUserProfile: vi.fn(),
 }));
+
+// Mock client module
+vi.mock("../../../shared/api/client", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("../../../shared/api/client")>();
+  return {
+    ...actual,
+    updateUserProfile: mockUpdateUserProfile,
+  };
+});
 
 // Mock endpoints module
 vi.mock("../../../shared/api/endpoints", async (importOriginal) => {
@@ -404,6 +419,65 @@ describe("AdminPanelPage", () => {
 
     await waitFor(() => {
       expect(mockDeleteOrganization).toHaveBeenCalledWith("org-1");
+    });
+  });
+
+  it("opens edit user dialog and updates user email and phone successfully", async () => {
+    const user = userEvent.setup();
+    await act(async () => {
+      render(
+        <MemoryRouter>
+          <AdminPanelPage />
+        </MemoryRouter>,
+      );
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("John Doe")).toBeInTheDocument();
+    });
+
+    const editBtn = screen.getByTestId("edit-user-btn-user-1");
+    await user.click(editBtn);
+
+    // Dialog should be open
+    expect(
+      screen.getByText(
+        "Atualize os dados de e-mail e telefone para o usuário John Doe (@johndoe).",
+      ),
+    ).toBeInTheDocument();
+
+    const emailInput = screen.getByTestId("edit-user-email-input");
+    const phoneInput = screen.getByTestId("edit-user-phone-input");
+
+    // Clear and type new values
+    await user.clear(emailInput);
+    await user.type(emailInput, "newjohn@example.com");
+    await user.clear(phoneInput);
+    await user.type(phoneInput, "5511988888888");
+
+    const updatedUser = {
+      id: "user-1",
+      name: "John Doe",
+      username: "johndoe",
+      email: "newjohn@example.com",
+      phone: "5511988888888",
+    };
+    mockUpdateUserProfile.mockResolvedValueOnce(updatedUser);
+
+    const saveBtn = screen.getByTestId("confirm-edit-user-btn");
+    await user.click(saveBtn);
+
+    await waitFor(() => {
+      expect(mockUpdateUserProfile).toHaveBeenCalledWith("user-1", {
+        email: "newjohn@example.com",
+        phone: "5511988888888",
+      });
+    });
+
+    // Check that email and phone are updated/displayed in the list
+    await waitFor(() => {
+      expect(screen.getByText("newjohn@example.com")).toBeInTheDocument();
+      expect(screen.getByText("5511988888888")).toBeInTheDocument();
     });
   });
 });

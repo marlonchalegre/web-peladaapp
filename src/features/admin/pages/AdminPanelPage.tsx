@@ -26,6 +26,7 @@ import { UsersTab } from "../components/UsersTab";
 import { OrganizationsTab } from "../components/OrganizationsTab";
 import { ResetPasswordDialog } from "../components/ResetPasswordDialog";
 import { ConfirmDeleteUserDialog } from "../components/ConfirmDeleteUserDialog";
+import { EditUserDialog } from "../components/EditUserDialog";
 import { ManageOrgAdminsDialog } from "../components/ManageOrgAdminsDialog";
 import { ConfirmDeleteOrgDialog } from "../components/ConfirmDeleteOrgDialog";
 import { ManageFeatureFlagsDialog } from "../components/ManageFeatureFlagsDialog";
@@ -175,6 +176,7 @@ export default function AdminPanelPage() {
           onToggleGlobalAdmin={adminUsers.handleToggleUserGlobalAdmin}
           onOpenResetPassword={adminUsers.handleOpenResetPassword}
           onOpenDeleteUser={adminUsers.handleOpenDeleteUser}
+          onOpenEditUser={adminUsers.handleOpenEditUser}
           actionInProgress={adminUsers.actionInProgress}
           currentUser={currentUser}
         />
@@ -224,6 +226,15 @@ export default function AdminPanelPage() {
         user={adminUsers.deleteUserTarget}
         loading={adminUsers.deleteUserLoading}
         onConfirm={adminUsers.handleConfirmDeleteUser}
+      />
+
+      {/* Edit User Dialog */}
+      <EditUserDialog
+        open={Boolean(adminUsers.editUserTarget)}
+        onClose={() => adminUsers.setEditUserTarget(null)}
+        user={adminUsers.editUserTarget}
+        loading={adminUsers.editUserLoading}
+        onConfirm={adminUsers.handleConfirmEditUser}
       />
 
       {/* Manage Org Admins Dialog */}
