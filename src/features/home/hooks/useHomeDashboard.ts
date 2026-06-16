@@ -36,7 +36,7 @@ export function useHomeDashboard() {
 
   const fetchPeladas = useCallback(
     async (page: number) => {
-      if (!user) return;
+      if (!user?.id) return;
       try {
         const response = await endpoints.listPeladasByUser(
           user.id,
@@ -51,21 +51,21 @@ export function useHomeDashboard() {
         console.error("Failed to fetch peladas", err);
       }
     },
-    [user],
+    [user?.id],
   );
 
   const fetchPendingInvitations = useCallback(async () => {
-    if (!user) return;
+    if (!user?.id) return;
     try {
       const invites = await endpoints.listPendingInvitations();
       setPendingInvitations(invites);
     } catch (err) {
       console.error("Failed to fetch pending invitations", err);
     }
-  }, [user]);
+  }, [user?.id]);
 
   const fetchOrganizations = useCallback(async () => {
-    if (!user) return;
+    if (!user?.id) return;
     try {
       setLoading(true);
 
@@ -90,7 +90,7 @@ export function useHomeDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [user, t]);
+  }, [user?.id, t]);
 
   useEffect(() => {
     if (user?.is_blocked) {

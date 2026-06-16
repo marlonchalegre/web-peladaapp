@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: "prompt",
+      registerType: "autoUpdate",
       manifestFilename: "manifest.json",
       injectRegister: "inline",
       devOptions: {
@@ -104,8 +104,8 @@ export default defineConfig({
         globPatterns: ["**/*.{js,css,html,ico,png,svg,json}"],
         globIgnores: ["**/version.json"],
         navigateFallback: "index.html",
-        skipWaiting: false,
-        clientsClaim: false,
+        skipWaiting: true,
+        clientsClaim: true,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
