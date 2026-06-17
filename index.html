@@ -2,6 +2,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      window.addEventListener("vite:preloadError", (event) => {
+        console.warn(
+          "Preload error detected, reloading page to get the latest version...",
+          event,
+        );
+        // Prevent infinite reload loop (must not reload if we reloaded in the last 5 seconds)
+        const now = Date.now();
+        const lastReload = sessionStorage.getItem("last-preload-reload");
+        if (lastReload && now - parseInt(lastReload, 10) < 5000) {
+          console.error("Preload error loop detected. Stopping reload.");
+          return;
+        }
+        sessionStorage.setItem("last-preload-reload", now.toString());
+        window.location.reload();
+      });
+    </script>
     <link rel="icon" type="image/png" href="/logo.png" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Minha Pelada" />
