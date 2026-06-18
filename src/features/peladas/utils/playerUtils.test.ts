@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from "vitest";
-import { sortPlayersByPosition } from "./playerUtils";
+import { sortPlayersByPosition, getPlayerTeamInMatch } from "./playerUtils";
 
 describe("playerUtils", () => {
   describe("sortPlayersByPosition", () => {
@@ -56,6 +56,100 @@ describe("playerUtils", () => {
       const sorted = sortPlayersByPosition(unknown);
       expect(sorted[0].user.name).toBe("Striker");
       expect(sorted[1].user.name).toBe("Unknown");
+    });
+  });
+
+  describe("getPlayerTeamInMatch", () => {
+    const match = { home_team_id: "team-home", away_team_id: "team-away" };
+    const matchId = "match-1";
+
+    it("should return home_team_id if player is in home lineup", () => {
+      const lineupsByMatch = {
+        [matchId]: {
+          "team-home": [{ player_id: "player-1" }],
+          "team-away": [{ player_id: "player-2" }],
+        },
+      };
+      const result = getPlayerTeamInMatch(
+        "player-1",
+        matchId,
+        match,
+        lineupsByMatch,
+      );
+      expect(result).toBe("team-home");
+    });
+
+    it("should return away_team_id if player is in away lineup", () => {
+      const lineupsByMatch = {
+        [matchId]: {
+          "team-home": [{ player_id: "player-1" }],
+          "team-away": [{ player_id: "player-2" }],
+        },
+      };
+      const result = getPlayerTeamInMatch(
+        "player-2",
+        matchId,
+        match,
+        lineupsByMatch,
+      );
+      expect(result).toBe("team-away");
+    });
+
+    it("should fall back to teamPlayers if not in lineupsByMatch", () => {
+      const lineupsByMatch = {
+        [matchId]: {
+          "team-home": [{ player_id: "player-1" }],
+          "team-away": [],
+        },
+      };
+      const teamPlayers = {
+        "team-home": [{ player_id: "player-1" }],
+        "team-away": [{ player_id: "player-2" }],
+      };
+      const result = getPlayerTeamInMatch(
+        "player-2",
+        matchId,
+        match,
+        lineupsByMatch,
+        teamPlayers,
+      );
+      expect(result).toBe("team-away");
+    });
+
+    it("should fall back to orgPlayerIdToTeamId if not in lineups or teamPlayers", () => {
+      const orgPlayerIdToTeamId = {
+        "player-3": "team-away",
+        "player-4": "team-other",
+      };
+      const result = getPlayerTeamInMatch(
+        "player-3",
+        matchId,
+        match,
+        {},
+        {},
+        orgPlayerIdToTeamId,
+      );
+      expect(result).toBe("team-away");
+    });
+
+    it("should ignore orgPlayerIdToTeamId if the global team is not playing in the match", () => {
+      const orgPlayerIdToTeamId = {
+        "player-4": "team-other",
+      };
+      const result = getPlayerTeamInMatch(
+        "player-4",
+        matchId,
+        match,
+        {},
+        {},
+        orgPlayerIdToTeamId,
+      );
+      expect(result).toBeNull();
+    });
+
+    it("should return null if player is not found anywhere", () => {
+      const result = getPlayerTeamInMatch("player-999", matchId, match, {}, {});
+      expect(result).toBeNull();
     });
   });
 });

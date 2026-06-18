@@ -19,6 +19,7 @@ import ShieldIcon from "@mui/icons-material/Shield";
 import SentimentVerySatisfiedIcon from "@mui/icons-material/SentimentVerySatisfied";
 import { useTranslation } from "react-i18next";
 import type { MatchEvent, Match } from "../../../shared/api/endpoints";
+import { getPlayerTeamInMatch } from "../utils/playerUtils";
 
 interface GroupedEvent {
   id: string;
@@ -46,6 +47,8 @@ interface PeladaTimelineProps {
   teamNameById: Record<string, string>;
   matches?: Match[];
   orgPlayerIdToTeamId?: Record<string, string>;
+  lineupsByMatch?: Record<string, Record<string, { player_id: string }[]>>;
+  teamPlayers?: Record<string, { player_id: string }[]>;
   isAdmin?: boolean;
   onEditClick?: (event: MatchEvent) => void;
   onDeleteClick?: (event: MatchEvent) => void;
@@ -288,6 +291,8 @@ export default function PeladaTimeline({
   teamNameById,
   matches,
   orgPlayerIdToTeamId,
+  lineupsByMatch,
+  teamPlayers,
   isAdmin,
   onEditClick,
   onDeleteClick,
@@ -699,10 +704,16 @@ export default function PeladaTimeline({
                   const targetEvent =
                     groupedEvent.goalEvent || groupedEvent.standaloneEvent;
                   const playerId = targetEvent?.player_id;
-                  const teamId =
-                    playerId && orgPlayerIdToTeamId
-                      ? orgPlayerIdToTeamId[playerId]
-                      : null;
+                  const teamId = playerId
+                    ? getPlayerTeamInMatch(
+                        playerId,
+                        match.id,
+                        match,
+                        lineupsByMatch,
+                        teamPlayers,
+                        orgPlayerIdToTeamId,
+                      )
+                    : null;
                   const side = teamId === match.away_team_id ? "away" : "home";
 
                   return (

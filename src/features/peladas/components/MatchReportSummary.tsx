@@ -17,6 +17,7 @@ import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useTranslation } from "react-i18next";
 import type { Match, MatchEvent } from "../../../shared/api/endpoints";
+import { getPlayerTeamInMatch } from "../utils/playerUtils";
 
 interface MatchReportSummaryProps {
   open: boolean;
@@ -28,6 +29,8 @@ interface MatchReportSummaryProps {
   userIdToName: Record<string, string>;
   orgPlayerIdToUserId: Record<string, string>;
   orgPlayerIdToTeamId: Record<string, string>;
+  lineupsByMatch?: Record<string, Record<string, { player_id: string }[]>>;
+  teamPlayers?: Record<string, { player_id: string }[]>;
   teamNameById: Record<string, string>;
   nextMatch?: Match | null;
   onProceedToNext?: () => void;
@@ -54,6 +57,8 @@ export default function MatchReportSummary({
   userIdToName,
   orgPlayerIdToUserId,
   orgPlayerIdToTeamId,
+  lineupsByMatch,
+  teamPlayers,
   teamNameById,
   nextMatch,
   onProceedToNext,
@@ -67,8 +72,17 @@ export default function MatchReportSummary({
 
   const groupEventsByTeam = (teamId: string) => {
     const teamEvents = events.filter(
-      (e) => orgPlayerIdToTeamId[e.player_id] === teamId,
+      (e) =>
+        getPlayerTeamInMatch(
+          e.player_id,
+          match.id,
+          match,
+          lineupsByMatch,
+          teamPlayers,
+          orgPlayerIdToTeamId,
+        ) === teamId,
     );
+
     const grouped: Record<string, GroupedEvent> = {};
 
     teamEvents.forEach((e) => {

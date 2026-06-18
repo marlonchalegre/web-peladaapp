@@ -705,6 +705,8 @@ export default function PeladaMatchesPage() {
                 teamNameById={teamNameById}
                 matches={matches}
                 orgPlayerIdToTeamId={orgPlayerIdToTeamId}
+                lineupsByMatch={lineupsByMatch}
+                teamPlayers={teamPlayers}
                 isAdmin={isAdmin}
                 onEditClick={(event) => setEditEventDialogOpen(event)}
                 onDeleteClick={(event) => setDeleteEventConfirmOpen(event)}
@@ -726,6 +728,8 @@ export default function PeladaMatchesPage() {
             userIdToName={userIdToName}
             orgPlayerIdToUserId={orgPlayerIdToUserId}
             orgPlayerIdToTeamId={orgPlayerIdToTeamId}
+            lineupsByMatch={lineupsByMatch}
+            teamPlayers={teamPlayers}
             teamNameById={teamNameById}
             nextMatch={nextScheduledMatch}
             onProceedToNext={proceedToNextMatch}
