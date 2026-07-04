@@ -5,7 +5,9 @@ import {
   Paper,
   IconButton,
   useTheme,
+  Button,
 } from "@mui/material";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import ErrorOutlinedIcon from "@mui/icons-material/ErrorOutlined";
 import StarsIcon from "@mui/icons-material/Stars";
@@ -319,6 +321,211 @@ export default function PeladaTimeline({
     return userIdToName[userId] || `Player ${playerId}`;
   };
 
+  const handleExportTimeline = async () => {
+    const headers = [
+      t("peladas.timeline.export.headers.match", "Match"),
+      t("peladas.timeline.export.headers.session_time", "Session Time"),
+      t("peladas.timeline.export.headers.match_time", "Match Time"),
+      t("peladas.timeline.export.headers.event_type", "Event"),
+      t("peladas.timeline.export.headers.player", "Player"),
+      t("peladas.timeline.export.headers.assist", "Assist"),
+      t("peladas.timeline.export.headers.team", "Team"),
+    ];
+
+    const rows: string[][] = [];
+
+    const getEventTitle = (type: string) => {
+      switch (type) {
+        case "goal":
+          return t("common.goal");
+        case "own_goal":
+          return t("common.own_goal");
+        case "assist":
+          return t("common.assist");
+        case "drible":
+          return t("common.drible");
+        case "chute":
+          return t("common.chute");
+        case "falta":
+          return t("common.falta");
+        case "furada":
+          return t("common.furada");
+        case "defesa":
+          return t("common.defesa");
+        case "vish":
+          return t("common.vish");
+        default:
+          return t(`common.${type}`, type);
+      }
+    };
+
+    if (!matches || matches.length === 0) {
+      const sortedEvents = [...events].sort((a, b) => {
+        if (a.session_time_ms && b.session_time_ms) {
+          return a.session_time_ms - b.session_time_ms;
+        }
+        if (a.id && b.id) {
+          return String(a.id).localeCompare(String(b.id));
+        }
+        return 0;
+      });
+
+      sortedEvents.forEach((event) => {
+        const teamId = orgPlayerIdToTeamId
+          ? orgPlayerIdToTeamId[event.player_id]
+          : null;
+        const teamName = teamId ? teamNameById[teamId] || "" : "";
+        rows.push([
+          "-",
+          formatMs(event.session_time_ms),
+          formatMs(event.match_time_ms),
+          getEventTitle(event.event_type),
+          getPlayerName(event.player_id),
+          "-",
+          teamName || "-",
+        ]);
+      });
+    } else {
+      const sortedMatches = [...matches].sort(
+        (a, b) => a.sequence - b.sequence,
+      );
+
+      sortedMatches.forEach((match) => {
+        const matchEvents = events.filter((e) => e.match_id === match.id);
+        if (matchEvents.length === 0) return;
+
+        const goals = matchEvents.filter(
+          (e) => e.event_type === "goal" || e.event_type === "own_goal",
+        );
+        const assists = matchEvents.filter((e) => e.event_type === "assist");
+        const customEvents = matchEvents.filter(
+          (e) => !["goal", "own_goal", "assist"].includes(e.event_type),
+        );
+
+        const grouped: GroupedEvent[] = [];
+        const pairedAssistIds = new Set<string>();
+
+        goals.forEach((goal) => {
+          const matchingAssist = assists.find(
+            (a) =>
+              !pairedAssistIds.has(a.id!) &&
+              ((a.parent_event_id && a.parent_event_id === goal.id) ||
+                (!a.parent_event_id &&
+                  a.session_time_ms === goal.session_time_ms &&
+                  a.match_time_ms === goal.match_time_ms)),
+          );
+
+          if (matchingAssist) {
+            pairedAssistIds.add(matchingAssist.id!);
+          }
+
+          grouped.push({
+            id: goal.id!,
+            timeMs: goal.session_time_ms ?? 0,
+            matchTimeMs: goal.match_time_ms ?? 0,
+            type: goal.event_type as "goal" | "own_goal",
+            goalEvent: goal,
+            assistEvent: matchingAssist,
+          });
+        });
+
+        assists.forEach((assist) => {
+          if (!pairedAssistIds.has(assist.id!)) {
+            grouped.push({
+              id: assist.id!,
+              timeMs: assist.session_time_ms ?? 0,
+              matchTimeMs: assist.match_time_ms ?? 0,
+              type: "assist",
+              standaloneEvent: assist,
+            });
+          }
+        });
+
+        customEvents.forEach((ev) => {
+          grouped.push({
+            id: ev.id!,
+            timeMs: ev.session_time_ms ?? 0,
+            matchTimeMs: ev.match_time_ms ?? 0,
+            type: ev.event_type as GroupedEvent["type"],
+            standaloneEvent: ev,
+          });
+        });
+
+        grouped.sort((a, b) => a.timeMs - b.timeMs);
+
+        grouped.forEach((groupedEvent) => {
+          const targetEvent =
+            groupedEvent.goalEvent || groupedEvent.standaloneEvent;
+          const playerId = targetEvent?.player_id;
+          const teamId = playerId
+            ? getPlayerTeamInMatch(
+                playerId,
+                match.id,
+                match,
+                lineupsByMatch,
+                teamPlayers,
+                orgPlayerIdToTeamId,
+              )
+            : null;
+          const teamName = teamId ? teamNameById[teamId] || "" : "";
+
+          const scorerId =
+            groupedEvent.goalEvent?.player_id ||
+            groupedEvent.standaloneEvent?.player_id;
+          const scorerName = getPlayerName(scorerId || "");
+          const assistantId = groupedEvent.assistEvent?.player_id;
+          const assistantName = assistantId ? getPlayerName(assistantId) : "";
+
+          rows.push([
+            `${match.sequence}`,
+            formatMs(groupedEvent.timeMs),
+            formatMs(groupedEvent.matchTimeMs),
+            getEventTitle(groupedEvent.type),
+            scorerName,
+            assistantName,
+            teamName,
+          ]);
+        });
+      });
+    }
+
+    const tsvContent = [
+      headers.join("\t"),
+      ...rows.map((row) => row.join("\t")),
+    ].join("\n");
+
+    try {
+      await navigator.clipboard.writeText(tsvContent);
+      alert(t("peladas.timeline.export_success"));
+    } catch (err) {
+      console.error("Failed to copy timeline table:", err);
+    }
+  };
+
+  const exportButton = (
+    <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2, px: 1 }}>
+      <Button
+        variant="outlined"
+        size="small"
+        startIcon={<ContentCopyIcon />}
+        onClick={handleExportTimeline}
+        sx={{
+          borderRadius: 2,
+          textTransform: "none",
+          fontWeight: "medium",
+          borderColor: "divider",
+          color: "text.primary",
+          "&:hover": {
+            borderColor: "text.primary",
+            bgcolor: "action.hover",
+          },
+        }}
+      >
+        {t("peladas.timeline.export_tabular")}
+      </Button>
+    </Box>
+  );
+
   if (events.length === 0) {
     return (
       <Box sx={{ p: 4, textAlign: "center" }}>
@@ -343,6 +550,7 @@ export default function PeladaTimeline({
 
     return (
       <Stack spacing={2} sx={{ p: 1 }} className="MuiTimeline-root">
+        {exportButton}
         {sortedEvents.map((event, index) => {
           const isGoal =
             event.event_type === "goal" || event.event_type === "own_goal";
@@ -390,6 +598,7 @@ export default function PeladaTimeline({
 
   return (
     <Box sx={{ py: 2 }} className="MuiTimeline-root">
+      {exportButton}
       {sortedMatches.map((match, matchIdx) => {
         // Filter events for this match
         const matchEvents = events.filter((e) => e.match_id === match.id);

@@ -479,4 +479,24 @@ describe("ActiveMatchDashboard", () => {
       screen.getByText(/peladas\.matches\.status\.running/i),
     ).toBeInTheDocument();
   });
+
+  it("renders inline record event button for admin when match is not finished", async () => {
+    const user = userEvent.setup();
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          isAdmin={true}
+          finished={false}
+        />
+      </ThemeContextProvider>,
+    );
+
+    const inlineBtn = screen.getByTestId("record-event-inline-button");
+    expect(inlineBtn).toBeInTheDocument();
+
+    await user.click(inlineBtn);
+
+    expect(screen.getByTestId("record-event-dialog")).toBeInTheDocument();
+  });
 });

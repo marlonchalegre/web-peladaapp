@@ -616,7 +616,20 @@
       "match_short": "Match",
       "edit_goal": "Edit Goal & Assist",
       "edit_own_goal": "Edit Own Goal",
-      "edit_event": "Edit Event"
+      "edit_event": "Edit Event",
+      "export_tabular": "Copy Table",
+      "export_success": "Timeline copied as table!",
+      "export": {
+        "headers": {
+          "match": "Match",
+          "session_time": "Session Time",
+          "match_time": "Match Time",
+          "event_type": "Event",
+          "player": "Player",
+          "assist": "Assist",
+          "team": "Team"
+        }
+      }
     },
     "available": {
       "title": "Players",
@@ -799,6 +812,10 @@
       "confirm_close_pelada": "Are you sure you want to close this pelada? This will finish all pending matches.",
       "select_match_hint": "Select a match to view details",
       "insights_title": "Session Insights",
+      "record_event_title": "Record Event",
+      "select_player": "SELECT PLAYER",
+      "select_event": "SELECT EVENT",
+      "record_event_inline": "Record Event (Dribble, Save, Shot...)",
       "error": {
         "load_failed": "Error loading matches",
         "replace_player_failed": "Error replacing player in match",

@@ -458,6 +458,42 @@ export default function ActiveMatchDashboard(props: Props) {
           updating={updating}
         />
 
+        {isAdmin && !effectiveFinished && (
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 2, mb: 1 }}>
+            <Button
+              variant="outlined"
+              color="primary"
+              size="medium"
+              startIcon={<BoltIcon />}
+              onClick={() => setEventDialogOpen(true)}
+              data-testid="record-event-inline-button"
+              sx={{
+                borderRadius: 3,
+                px: 3,
+                py: 0.75,
+                fontWeight: "bold",
+                textTransform: "none",
+                fontSize: "0.9rem",
+                borderWidth: "1.5px",
+                borderColor: "primary.main",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                transition: "all 0.2s ease-in-out",
+                "&:hover": {
+                  borderWidth: "1.5px",
+                  transform: "translateY(-1px)",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  bgcolor: "action.hover",
+                },
+              }}
+            >
+              {t(
+                "peladas.matches.record_event_inline",
+                "Registrar Evento (Drible, Defesa, Chute...)",
+              )}
+            </Button>
+          </Box>
+        )}
+
         {/* Players Section */}
         <Grid container spacing={2}>
           {/* Home Team */}

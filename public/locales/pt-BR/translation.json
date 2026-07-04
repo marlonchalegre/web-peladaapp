@@ -615,7 +615,20 @@
       "match_short": "Part.",
       "edit_goal": "Editar Gol & Assistência",
       "edit_own_goal": "Editar Gol Contra",
-      "edit_event": "Editar Evento"
+      "edit_event": "Editar Evento",
+      "export_tabular": "Copiar Tabela",
+      "export_success": "Linha do tempo copiada como tabela!",
+      "export": {
+        "headers": {
+          "match": "Partida",
+          "session_time": "Tempo da Sessão",
+          "match_time": "Tempo da Partida",
+          "event_type": "Evento",
+          "player": "Jogador",
+          "assist": "Assistência",
+          "team": "Time"
+        }
+      }
     },
     "available": {
       "title": "Jogadores",
@@ -798,6 +811,10 @@
       "confirm_close_pelada": "Tem certeza que deseja encerrar esta pelada? Isso finalizará todas as partidas pendentes.",
       "select_match_hint": "Selecione uma partida para ver os detalhes",
       "insights_title": "Insights da Sessão",
+      "record_event_title": "Registrar Evento",
+      "select_player": "SELECIONAR JOGADOR",
+      "select_event": "SELECIONAR EVENTO",
+      "record_event_inline": "Registrar Evento (Drible, Defesa, Chute...)",
       "error": {
         "load_failed": "Erro ao carregar partidas",
         "replace_player_failed": "Erro ao trocar jogador na partida",
