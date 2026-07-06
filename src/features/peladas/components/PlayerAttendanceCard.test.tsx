@@ -46,6 +46,48 @@ describe("PlayerAttendanceCard", () => {
     ).toBeInTheDocument();
   });
 
+  it("renders temporary member types correctly", () => {
+    const tempMensalista = {
+      ...mockPlayer,
+      member_type: "mensalista_temporario" as const,
+    };
+    const { rerender } = render(
+      <ThemeContextProvider>
+        <PlayerAttendanceCard
+          player={tempMensalista as PlayerWithUser}
+          isAdmin={false}
+          isCurrentUser={false}
+          onUpdate={() => {}}
+          isUpdating={false}
+        />
+      </ThemeContextProvider>,
+    );
+
+    expect(
+      screen.getByText("• common.member_types.mensalista_temporario"),
+    ).toBeInTheDocument();
+
+    const tempDiarista = {
+      ...mockPlayer,
+      member_type: "diarista_temporario" as const,
+    };
+    rerender(
+      <ThemeContextProvider>
+        <PlayerAttendanceCard
+          player={tempDiarista as PlayerWithUser}
+          isAdmin={false}
+          isCurrentUser={false}
+          onUpdate={() => {}}
+          isUpdating={false}
+        />
+      </ThemeContextProvider>,
+    );
+
+    expect(
+      screen.getByText("• common.member_types.diarista_temporario"),
+    ).toBeInTheDocument();
+  });
+
   it("renders 'you' label for current user", () => {
     render(
       <ThemeContextProvider>

@@ -218,7 +218,9 @@
     "member_types": {
       "mensalista": "Mensalista",
       "diarista": "Diarista",
-      "convidado": "Convidado"
+      "convidado": "Convidado",
+      "mensalista_temporario": "Mensalista (Temp.)",
+      "diarista_temporario": "Diarista (Subst.)"
     },
     "errors": {
       "email_already_exists": "Este email já está sendo usado por outro usuário.",
