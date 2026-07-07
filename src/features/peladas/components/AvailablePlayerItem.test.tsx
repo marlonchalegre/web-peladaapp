@@ -241,4 +241,25 @@ describe("AvailablePlayerItem", () => {
     expect(screen.queryByTestId("paid-icon")).not.toBeInTheDocument();
     expect(screen.queryByTestId("AttachMoneyIcon")).not.toBeInTheDocument();
   });
+
+  it("renders mark-as-paid button for unpaid diarista_temporario (Admin with onMarkPaid)", async () => {
+    const user = userEvent.setup();
+    const onMarkPaid = vi.fn();
+    const player = { ...defaultPlayer, member_type: "diarista_temporario" };
+    render(
+      <ThemeContextProvider>
+        <AvailablePlayerItem
+          {...defaultProps}
+          player={player as any}
+          isPaid={false}
+          isAdmin={true}
+          onMarkPaid={onMarkPaid}
+        />
+      </ThemeContextProvider>,
+    );
+
+    const markPaidBtn = screen.getByTestId("mark-as-paid-button");
+    await user.click(markPaidBtn);
+    expect(onMarkPaid).toHaveBeenCalled();
+  });
 });

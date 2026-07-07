@@ -59,7 +59,9 @@ export default function PlayerAttendanceCard({
     .substring(0, 2);
 
   const needsPayment =
-    player.member_type === "diarista" || player.member_type === "convidado";
+    player.member_type === "diarista" ||
+    player.member_type === "diarista_temporario" ||
+    player.member_type === "convidado";
 
   return (
     <Card

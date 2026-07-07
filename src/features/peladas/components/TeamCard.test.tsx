@@ -264,4 +264,51 @@ describe("TeamCard", () => {
     // Should show static paid icon (PaidIcon)
     expect(screen.getByTestId("PaidIcon")).toBeInTheDocument();
   });
+
+  it("handles payment marking when diarista_temporario is unpaid", () => {
+    const tempDiaristaPlayer: Player & { user: User } = {
+      id: "pl_temp_diarista",
+      user_id: "u_temp_diarista",
+      organization_id: "org1",
+      member_type: "diarista_temporario",
+      user: {
+        id: "u_temp_diarista",
+        name: "Temp Diarista Player",
+        username: "temp_diarista",
+        email: "temp_diarista@e.com",
+        position: "Defender",
+      },
+    };
+
+    render(
+      <ThemeContextProvider>
+        <TeamCard
+          team={mockTeam}
+          players={[tempDiaristaPlayer]}
+          averageScore={7.33}
+          maxPlayers={5}
+          onDelete={onDelete}
+          onDrop={onDrop}
+          onDragStartPlayer={onDragStartPlayer}
+          onMoveToTeam={onMoveToTeam}
+          onSendToBench={onSendToBench}
+          onMoveToFixedGk={onMoveToFixedGk}
+          teams={[mockTeam, otherTeam]}
+          locked={false}
+          isAdminOverride={true}
+          hasFixedGoalkeepers={false}
+          peladaTransactions={[]}
+          teamOrganizationId="org1"
+          onMarkPaid={onMarkPaid}
+          onReversePayment={onReversePayment}
+        />
+      </ThemeContextProvider>
+    );
+
+    const payButtons = screen.getAllByTestId("mark-as-paid-button");
+    expect(payButtons).toHaveLength(1);
+
+    fireEvent.click(payButtons[0]);
+    expect(onMarkPaid).toHaveBeenCalledWith("pl_temp_diarista", 30);
+  });
 });

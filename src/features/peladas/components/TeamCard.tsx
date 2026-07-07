@@ -261,6 +261,7 @@ export default function TeamCard({
                 }}
               >
                 {(p.member_type === "diarista" ||
+                  p.member_type === "diarista_temporario" ||
                   p.member_type === "convidado") &&
                   (() => {
                     const isPaid = peladaTransactions.some(

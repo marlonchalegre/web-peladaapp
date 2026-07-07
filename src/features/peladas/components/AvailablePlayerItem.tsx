@@ -56,7 +56,9 @@ export default function AvailablePlayerItem({
 
   const scoreVal = typeof score === "number" ? score.toFixed(1) : "-";
   const needsPayment =
-    player.member_type === "diarista" || player.member_type === "convidado";
+    player.member_type === "diarista" ||
+    player.member_type === "diarista_temporario" ||
+    player.member_type === "convidado";
 
   const handleOpenMenu = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
