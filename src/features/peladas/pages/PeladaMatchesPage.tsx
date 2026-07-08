@@ -312,6 +312,19 @@ export default function PeladaMatchesPage() {
     (selectedMatch?.status || "").toLowerCase() === "finished",
   );
 
+  const handleStartPeladaTimer = async () => {
+    await startPeladaTimer();
+    const isFinished =
+      (selectedMatch?.status || "").toLowerCase() === "finished";
+    if (
+      selectedMatch &&
+      !isFinished &&
+      selectedMatch.timer_status !== "running"
+    ) {
+      await startMatchTimer(selectedMatch.id);
+    }
+  };
+
   const handleCopyResults = async () => {
     const text = formatPeladaSummary(
       pelada?.scheduled_at || null,
@@ -444,7 +457,7 @@ export default function PeladaMatchesPage() {
               <GlobalSessionTimer
                 pelada={pelada}
                 isAdmin={isAdmin}
-                onStartPelada={startPeladaTimer}
+                onStartPelada={handleStartPeladaTimer}
                 onPausePelada={pausePeladaTimer}
                 onOpenResetConfirm={() => handleResetClick("session")}
               />

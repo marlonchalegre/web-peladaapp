@@ -548,6 +548,105 @@ describe("useMatchActions", () => {
       expect(mockApi.resetPeladaTimer).toHaveBeenCalledWith(peladaId);
     });
 
+    it("should optimistically update pelada timer state on start, pause, and reset", async () => {
+      const { result } = renderHook(() =>
+        useMatchActions(peladaId, mockDelegates),
+      );
+
+      // 1. Test startPeladaTimer optimistic update
+      await act(async () => {
+        await result.current.startPeladaTimer();
+      });
+      expect(mockDelegates.setPelada).toHaveBeenCalled();
+      const startUpdater = (mockDelegates.setPelada as any).mock.calls[0][0];
+      const initialPelada = {
+        timer_status: "stopped" as const,
+        timer_started_at: null,
+        timer_accumulated_ms: 0,
+      };
+      const runningPelada = startUpdater(initialPelada);
+      expect(runningPelada.timer_status).toBe("running");
+      expect(runningPelada.timer_started_at).toBeTruthy();
+      expect(
+        new Date(runningPelada.timer_started_at).getTime(),
+      ).toBeGreaterThan(0);
+
+      // 2. Test pausePeladaTimer optimistic update
+      const originalNow = Date.now;
+      const baseTime = 1000000;
+      Date.now = () => baseTime + 15000; // 15 seconds after start
+
+      try {
+        await act(async () => {
+          await result.current.pausePeladaTimer();
+        });
+        expect(mockDelegates.setPelada).toHaveBeenCalled();
+        const pauseUpdater = (mockDelegates.setPelada as any).mock.calls[1][0];
+        const activePeladaState = {
+          timer_status: "running" as const,
+          timer_started_at: new Date(baseTime).toISOString(),
+          timer_accumulated_ms: 5000, // already had 5s accumulated
+        };
+        const pausedPelada = pauseUpdater(activePeladaState);
+        expect(pausedPelada.timer_status).toBe("paused");
+        expect(pausedPelada.timer_started_at).toBeNull();
+        expect(pausedPelada.timer_accumulated_ms).toBe(20000); // 5s + 15s = 20s
+      } finally {
+        Date.now = originalNow;
+      }
+    });
+
+    it("should optimistically update match timer state on start, pause, and reset", async () => {
+      const { result } = renderHook(() =>
+        useMatchActions(peladaId, mockDelegates),
+      );
+
+      // 1. Test startMatchTimer optimistic update
+      await act(async () => {
+        await result.current.startMatchTimer("m1");
+      });
+      expect(mockDelegates.setMatches).toHaveBeenCalled();
+      const startUpdater = (mockDelegates.setMatches as any).mock.calls[0][0];
+      const initialMatches = [
+        {
+          id: "m1",
+          timer_status: "stopped",
+          timer_started_at: null,
+          timer_accumulated_ms: 0,
+        },
+      ];
+      const runningMatches = startUpdater(initialMatches);
+      expect(runningMatches[0].timer_status).toBe("running");
+      expect(runningMatches[0].timer_started_at).toBeTruthy();
+
+      // 2. Test pauseMatchTimer optimistic update
+      const originalNow = Date.now;
+      const baseTime = 1000000;
+      Date.now = () => baseTime + 25000; // 25 seconds after start
+
+      try {
+        await act(async () => {
+          await result.current.pauseMatchTimer("m1");
+        });
+        expect(mockDelegates.setMatches).toHaveBeenCalled();
+        const pauseUpdater = (mockDelegates.setMatches as any).mock.calls[1][0];
+        const activeMatchesState = [
+          {
+            id: "m1",
+            timer_status: "running",
+            timer_started_at: new Date(baseTime).toISOString(),
+            timer_accumulated_ms: 10000,
+          },
+        ];
+        const pausedMatches = pauseUpdater(activeMatchesState);
+        expect(pausedMatches[0].timer_status).toBe("paused");
+        expect(pausedMatches[0].timer_started_at).toBeNull();
+        expect(pausedMatches[0].timer_accumulated_ms).toBe(35000); // 10s + 25s = 35s
+      } finally {
+        Date.now = originalNow;
+      }
+    });
+
     it("should handle match timers successfully", async () => {
       const { result } = renderHook(() =>
         useMatchActions(peladaId, mockDelegates),

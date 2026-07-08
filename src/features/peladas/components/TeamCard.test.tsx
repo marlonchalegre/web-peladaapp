@@ -302,7 +302,7 @@ describe("TeamCard", () => {
           onMarkPaid={onMarkPaid}
           onReversePayment={onReversePayment}
         />
-      </ThemeContextProvider>
+      </ThemeContextProvider>,
     );
 
     const payButtons = screen.getAllByTestId("mark-as-paid-button");

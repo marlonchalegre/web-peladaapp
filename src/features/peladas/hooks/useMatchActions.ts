@@ -553,7 +553,11 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
   const startPeladaTimer = useCallback(async () => {
     setPelada((prev: Pelada | null) =>
       prev
-        ? { ...prev, timer_status: "running" as Pelada["timer_status"] }
+        ? {
+            ...prev,
+            timer_status: "running" as Pelada["timer_status"],
+            timer_started_at: new Date().toISOString(),
+          }
         : prev,
     );
 
@@ -571,11 +575,22 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
   }, [peladaId, refreshData, setPelada, handleNetworkError]);
 
   const pausePeladaTimer = useCallback(async () => {
-    setPelada((prev: Pelada | null) =>
-      prev
-        ? { ...prev, timer_status: "paused" as Pelada["timer_status"] }
-        : prev,
-    );
+    setPelada((prev: Pelada | null) => {
+      if (!prev) return null;
+      let newAccumulated = prev.timer_accumulated_ms || 0;
+      if (prev.timer_status === "running" && prev.timer_started_at) {
+        const diff = Date.now() - new Date(prev.timer_started_at).getTime();
+        if (diff > 0) {
+          newAccumulated += diff;
+        }
+      }
+      return {
+        ...prev,
+        timer_status: "paused" as Pelada["timer_status"],
+        timer_started_at: null,
+        timer_accumulated_ms: newAccumulated,
+      };
+    });
 
     if (!navigator.onLine) {
       enqueueAction(peladaId, "PAUSE_PELADA_TIMER", { peladaId });
@@ -596,6 +611,7 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
         ? {
             ...prev,
             timer_status: "paused" as Pelada["timer_status"],
+            timer_started_at: null,
             timer_accumulated_ms: 0,
           }
         : prev,
@@ -619,7 +635,11 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
       setMatches((prev: Match[]) =>
         prev.map((m) =>
           m.id === matchId
-            ? { ...m, timer_status: "running" as Match["timer_status"] }
+            ? {
+                ...m,
+                timer_status: "running" as Match["timer_status"],
+                timer_started_at: new Date().toISOString(),
+              }
             : m,
         ),
       );
@@ -642,11 +662,22 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
   const pauseMatchTimer = useCallback(
     async (matchId: string) => {
       setMatches((prev: Match[]) =>
-        prev.map((m) =>
-          m.id === matchId
-            ? { ...m, timer_status: "paused" as Match["timer_status"] }
-            : m,
-        ),
+        prev.map((m) => {
+          if (m.id !== matchId) return m;
+          let newAccumulated = m.timer_accumulated_ms || 0;
+          if (m.timer_status === "running" && m.timer_started_at) {
+            const diff = Date.now() - new Date(m.timer_started_at).getTime();
+            if (diff > 0) {
+              newAccumulated += diff;
+            }
+          }
+          return {
+            ...m,
+            timer_status: "paused" as Match["timer_status"],
+            timer_started_at: null,
+            timer_accumulated_ms: newAccumulated,
+          };
+        }),
       );
 
       if (!navigator.onLine) {
@@ -672,6 +703,7 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
             ? {
                 ...m,
                 timer_status: "paused" as Match["timer_status"],
+                timer_started_at: null,
                 timer_accumulated_ms: 0,
               }
             : m,

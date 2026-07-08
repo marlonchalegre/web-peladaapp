@@ -15,6 +15,7 @@ export function usePeladaTimer(
 
   useEffect(() => {
     if (effectiveRunning) {
+      setNow(Date.now());
       const interval = setInterval(() => {
         setNow(Date.now());
       }, 100);

@@ -81,6 +81,7 @@ export default function GlobalSessionTimer({
             lineHeight: 1.2,
             fontSize: { xs: "1.1rem", sm: "1.5rem" },
           }}
+          data-testid="global-timer-text"
         >
           {sessionTimer.formattedTime}
         </Typography>
@@ -103,6 +104,7 @@ export default function GlobalSessionTimer({
                 size="small"
                 onClick={sessionTimer.pause}
                 color="warning"
+                data-testid="pause-global-timer-button"
               >
                 <PauseIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
               </IconButton>
@@ -113,13 +115,18 @@ export default function GlobalSessionTimer({
                 size="small"
                 onClick={sessionTimer.start}
                 color="success"
+                data-testid="start-global-timer-button"
               >
                 <PlayArrowIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
               </IconButton>
             </Tooltip>
           )}
           <Tooltip title={t("common.reset")}>
-            <IconButton size="small" onClick={onOpenResetConfirm}>
+            <IconButton
+              size="small"
+              onClick={onOpenResetConfirm}
+              data-testid="reset-global-timer-button"
+            >
               <ReplayIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
             </IconButton>
           </Tooltip>

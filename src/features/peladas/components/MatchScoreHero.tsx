@@ -216,6 +216,7 @@ export default function MatchScoreHero({
                     width: 32,
                     height: 32,
                   }}
+                  data-testid="pause-match-timer-button"
                 >
                   <PauseIcon fontSize="small" />
                 </IconButton>
@@ -244,6 +245,7 @@ export default function MatchScoreHero({
                   width: 32,
                   height: 32,
                 }}
+                data-testid="reset-match-timer-button"
               >
                 <ReplayIcon fontSize="small" />
               </IconButton>
