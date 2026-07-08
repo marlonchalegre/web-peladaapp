@@ -156,6 +156,47 @@ describe("ActiveMatchDashboard", () => {
     expect(emptySlots.length).toBe(1);
   });
 
+  it("renders correct number of empty slots when fixed_goalkeepers is enabled", () => {
+    const fixedGkPelada: Pelada = {
+      id: "1",
+      organization_id: "1",
+      status: "running",
+      fixed_goalkeepers: true,
+    };
+
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          pelada={fixedGkPelada}
+          playersPerTeam={6}
+          homePlayers={[
+            { team_id: "10", player_id: "101", is_goalkeeper: true }, // 1 fixed GK
+            { team_id: "10", player_id: "102" },
+            { team_id: "10", player_id: "103" },
+            { team_id: "10", player_id: "104" },
+            { team_id: "10", player_id: "105" },
+            { team_id: "10", player_id: "106" }, // 5 field players
+          ]}
+          awayPlayers={[
+            { team_id: "20", player_id: "201", is_goalkeeper: true }, // 1 fixed GK
+            { team_id: "20", player_id: "202" },
+            { team_id: "20", player_id: "203" },
+            { team_id: "20", player_id: "204" },
+            { team_id: "20", player_id: "205" },
+            { team_id: "20", player_id: "206" }, // 5 field players
+          ]}
+        />
+      </ThemeContextProvider>,
+    );
+
+    // Limit is 6 field players + 1 fixed GK = 7 total.
+    // Each team has 6 players, so they each need 1 empty slot.
+    // Total empty slots should be 2.
+    const emptySlots = screen.getAllByTestId("player-row-empty");
+    expect(emptySlots.length).toBe(2);
+  });
+
   it("identifies and labels the next scheduled match correctly in history drawer", async () => {
     const user = userEvent.setup();
     const matches: Match[] = [

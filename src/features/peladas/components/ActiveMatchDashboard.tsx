@@ -252,12 +252,17 @@ export default function ActiveMatchDashboard(props: Props) {
   };
 
   const targetCount = useMemo(() => {
-    return Math.max(
-      Number(playersPerTeam || 0),
-      homePlayers.length,
-      awayPlayers.length,
-    );
-  }, [playersPerTeam, homePlayers.length, awayPlayers.length]);
+    let base = Number(playersPerTeam || 0);
+    if (pelada.fixed_goalkeepers && base > 0) {
+      base += 1;
+    }
+    return Math.max(base, homePlayers.length, awayPlayers.length);
+  }, [
+    playersPerTeam,
+    pelada.fixed_goalkeepers,
+    homePlayers.length,
+    awayPlayers.length,
+  ]);
 
   const generateTeamList = useCallback(
     (players: TeamPlayer[], side: "home" | "away", teamId: string) => {
