@@ -196,11 +196,25 @@ export default function TeamsSection(props: TeamsSectionProps) {
                 fullWidth
                 data-testid="add-team-button"
                 onClick={async () => {
-                  await onCreateTeam(
-                    t("peladas.teams.default_name", {
-                      number: teams.length + 1,
-                    }),
-                  );
+                  let nextAvailableNumber = 1;
+                  while (true) {
+                    const name = t("peladas.teams.default_name", {
+                      number: nextAvailableNumber,
+                    });
+                    const exists = teams.some(
+                      (team) =>
+                        team.name.toLowerCase() === name.toLowerCase() ||
+                        team.name.toLowerCase() ===
+                          `team ${nextAvailableNumber}` ||
+                        team.name.toLowerCase() ===
+                          `time ${nextAvailableNumber}`,
+                    );
+                    if (!exists) {
+                      await onCreateTeam(name);
+                      break;
+                    }
+                    nextAvailableNumber++;
+                  }
                 }}
                 disabled={creatingTeam}
                 sx={{

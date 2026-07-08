@@ -64,8 +64,8 @@ describe("TeamsSection", () => {
     vi.clearAllMocks();
     defaultProps = {
       teams: [
-        { id: "t1", name: "Team A" },
-        { id: "t2", name: "Team B" },
+        { id: "t1", name: "Team 1" },
+        { id: "t2", name: "Team 2" },
       ] as Team[],
       teamPlayers: {
         t1: [
@@ -179,5 +179,37 @@ describe("TeamsSection", () => {
     const dropzoneT2 = screen.getByTestId("dropzone-t2");
     fireEvent.drop(dropzoneT2);
     expect(defaultProps.dropToTeam).toHaveBeenCalled();
+  });
+
+  it("calls onCreateTeam with first unused name when a team in the middle is deleted", async () => {
+    const props = {
+      ...defaultProps,
+      teams: [
+        { id: "t1", name: "Team 1" },
+        { id: "t3", name: "Team 3" },
+      ] as Team[],
+    };
+    render(<TeamsSection {...props} />);
+
+    const addButton = screen.getByTestId("add-team-button");
+    fireEvent.click(addButton);
+
+    expect(props.onCreateTeam).toHaveBeenCalledWith("Team 2");
+  });
+
+  it("calls onCreateTeam with first unused name when the first team is deleted", async () => {
+    const props = {
+      ...defaultProps,
+      teams: [
+        { id: "t2", name: "Team 2" },
+        { id: "t3", name: "Team 3" },
+      ] as Team[],
+    };
+    render(<TeamsSection {...props} />);
+
+    const addButton = screen.getByTestId("add-team-button");
+    fireEvent.click(addButton);
+
+    expect(props.onCreateTeam).toHaveBeenCalledWith("Team 1");
   });
 });
