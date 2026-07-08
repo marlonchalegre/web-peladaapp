@@ -15,6 +15,7 @@ import {
 import {
   Block as BlockIcon,
   AdminPanelSettings as AdminIcon,
+  SportsSoccer as SportsSoccerIcon,
 } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -22,13 +23,16 @@ import { useAuth } from "../../../app/providers/AuthContext";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 import { useAdminUsers } from "../hooks/useAdminUsers";
 import { useAdminOrganizations } from "../hooks/useAdminOrganizations";
+import { useAdminPeladas } from "../hooks/useAdminPeladas";
 import { UsersTab } from "../components/UsersTab";
 import { OrganizationsTab } from "../components/OrganizationsTab";
+import { PeladasTab } from "../components/PeladasTab";
 import { ResetPasswordDialog } from "../components/ResetPasswordDialog";
 import { ConfirmDeleteUserDialog } from "../components/ConfirmDeleteUserDialog";
 import { EditUserDialog } from "../components/EditUserDialog";
 import { ManageOrgAdminsDialog } from "../components/ManageOrgAdminsDialog";
 import { ConfirmDeleteOrgDialog } from "../components/ConfirmDeleteOrgDialog";
+import { ConfirmDeletePeladaDialog } from "../components/ConfirmDeletePeladaDialog";
 import { ManageFeatureFlagsDialog } from "../components/ManageFeatureFlagsDialog";
 import { type Organization } from "../../../shared/api/endpoints";
 
@@ -66,6 +70,7 @@ export default function AdminPanelPage() {
 
   const adminUsers = useAdminUsers({ showToast, currentUser });
   const adminOrgs = useAdminOrganizations({ showToast });
+  const adminPeladas = useAdminPeladas({ showToast });
   const [featureFlagsOrg, setFeatureFlagsOrg] = useState<Organization | null>(
     null,
   );
@@ -74,16 +79,20 @@ export default function AdminPanelPage() {
   useEffect(() => {
     if (tabValue === 0) {
       adminUsers.fetchUsers(adminUsers.userQuery, adminUsers.userPage);
-    } else {
+    } else if (tabValue === 1) {
       adminOrgs.fetchOrganizations(adminOrgs.orgQuery, adminOrgs.orgPage);
+    } else if (tabValue === 2) {
+      adminPeladas.fetchPeladas(adminPeladas.peladaPage);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     tabValue,
     adminUsers.userPage,
     adminOrgs.orgPage,
+    adminPeladas.peladaPage,
     adminUsers.fetchUsers,
     adminOrgs.fetchOrganizations,
+    adminPeladas.fetchPeladas,
   ]);
 
   if (!currentUser || !currentUser.is_super_admin) {
@@ -151,6 +160,12 @@ export default function AdminPanelPage() {
             iconPosition="start"
             sx={{ fontWeight: 600, py: 2 }}
           />
+          <Tab
+            label={t("admin.tabs.peladas", "Peladas")}
+            icon={<SportsSoccerIcon sx={{ mr: 1 }} />}
+            iconPosition="start"
+            sx={{ fontWeight: 600, py: 2 }}
+          />
         </Tabs>
       </Paper>
 
@@ -207,6 +222,22 @@ export default function AdminPanelPage() {
         />
       )}
 
+      {/* Peladas Tab Panel */}
+      {tabValue === 2 && (
+        <PeladasTab
+          peladas={adminPeladas.peladas}
+          peladasLoading={adminPeladas.peladasLoading}
+          peladaPage={adminPeladas.peladaPage}
+          peladaTotalPages={adminPeladas.peladaTotalPages}
+          onPageChange={(p) => {
+            adminPeladas.setPeladaPage(p);
+            adminPeladas.fetchPeladas(p);
+          }}
+          onRefresh={() => adminPeladas.fetchPeladas(adminPeladas.peladaPage)}
+          onOpenDeletePelada={adminPeladas.handleOpenDeletePelada}
+        />
+      )}
+
       {/* Reset Password Dialog */}
       <ResetPasswordDialog
         open={Boolean(adminUsers.resetPasswordUser)}
@@ -260,6 +291,15 @@ export default function AdminPanelPage() {
         organization={adminOrgs.deleteOrgTarget}
         loading={adminOrgs.deleteOrgLoading}
         onConfirm={adminOrgs.handleConfirmDeleteOrg}
+      />
+
+      {/* Confirm Delete Pelada Dialog */}
+      <ConfirmDeletePeladaDialog
+        open={Boolean(adminPeladas.deletePeladaTarget)}
+        onClose={() => adminPeladas.setDeletePeladaTarget(null)}
+        pelada={adminPeladas.deletePeladaTarget}
+        loading={adminPeladas.deletePeladaLoading}
+        onConfirm={adminPeladas.handleConfirmDeletePelada}
       />
 
       {/* Snackbar notification */}

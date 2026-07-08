@@ -40,6 +40,9 @@ const mockT = (key: string, arg2?: unknown, arg3?: unknown) => {
   if (key === "admin.dialogs.delete_org.description") {
     return `Tem certeza de que deseja remover permanentemente a organização ${options?.name}? Esta ação não pode ser desfeita e todas as informações associadas serão excluídas.`;
   }
+  if (key === "admin.dialogs.delete_pelada.description") {
+    return `Tem certeza de que deseja remover permanentemente a pelada agendada para ${options?.date} da organização ${options?.orgName}? Esta ação excluirá todos os times, estatísticas, partidas, votos, lembretes e presenças associados. Esta ação não pode ser desfeita.`;
+  }
   return key;
 };
 
@@ -60,6 +63,8 @@ const {
   mockRemoveOrganizationAdmin,
   mockDeleteOrganization,
   mockUpdateUserProfile,
+  mockListPeladasAdmin,
+  mockDeletePeladaAdmin,
 } = vi.hoisted(() => ({
   mockSearchUsers: vi.fn(),
   mockListOrganizationsAdmin: vi.fn(),
@@ -70,6 +75,8 @@ const {
   mockRemoveOrganizationAdmin: vi.fn(),
   mockDeleteOrganization: vi.fn(),
   mockUpdateUserProfile: vi.fn(),
+  mockListPeladasAdmin: vi.fn(),
+  mockDeletePeladaAdmin: vi.fn(),
 }));
 
 // Mock client module
@@ -101,6 +108,8 @@ vi.mock("../../../shared/api/endpoints", async (importOriginal) => {
       toggleOrgCreation: vi.fn(),
       toggleGlobalAdmin: vi.fn(),
       toggleBlockOrganization: vi.fn(),
+      listPeladasAdmin: mockListPeladasAdmin,
+      deletePeladaAdmin: mockDeletePeladaAdmin,
     })),
   };
 });
@@ -154,6 +163,22 @@ describe("AdminPanelPage", () => {
     totalPages: 1,
   };
 
+  const mockPeladasList = {
+    data: [
+      {
+        id: "pelada-1",
+        organization_id: "org-1",
+        organization_name: "Cool Organization",
+        status: "attendance",
+        scheduled_at: "2026-07-08T18:00:00Z",
+      },
+    ],
+    total: 1,
+    page: 1,
+    perPage: 10,
+    totalPages: 1,
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(console, "error").mockImplementation((...args) => {
@@ -162,6 +187,7 @@ describe("AdminPanelPage", () => {
     (useAuth as Mock).mockReturnValue({ user: mockCurrentUser });
     mockSearchUsers.mockResolvedValue(mockUsersList);
     mockListOrganizationsAdmin.mockResolvedValue(mockOrgsList);
+    mockListPeladasAdmin.mockResolvedValue(mockPeladasList);
   });
 
   it("renders the users list and action buttons properly", async () => {
@@ -478,6 +504,49 @@ describe("AdminPanelPage", () => {
     await waitFor(() => {
       expect(screen.getByText("newjohn@example.com")).toBeInTheDocument();
       expect(screen.getByText("5511988888888")).toBeInTheDocument();
+    });
+  });
+
+  it("allows navigation to peladas tab, displays peladas list, and deletes pelada successfully", async () => {
+    const user = userEvent.setup();
+    await act(async () => {
+      render(
+        <MemoryRouter>
+          <AdminPanelPage />
+        </MemoryRouter>,
+      );
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("John Doe")).toBeInTheDocument();
+    });
+
+    // Switch to Peladas tab
+    const peladasTab = screen.getByRole("tab", { name: "admin.tabs.peladas" });
+    await user.click(peladasTab);
+
+    await waitFor(() => {
+      expect(mockListPeladasAdmin).toHaveBeenCalled();
+    });
+
+    expect(screen.getByText("Cool Organization")).toBeInTheDocument();
+    expect(screen.getByText("pelada-1")).toBeInTheDocument();
+
+    const deleteBtn = screen.getByTestId("delete-pelada-btn-pelada-1");
+    await user.click(deleteBtn);
+
+    // Dialog should be open
+    expect(
+      screen.getByText(/Tem certeza de que deseja remover permanentemente/i),
+    ).toBeInTheDocument();
+
+    mockDeletePeladaAdmin.mockResolvedValueOnce(undefined);
+
+    const confirmBtn = screen.getByTestId("confirm-delete-pelada-btn");
+    await user.click(confirmBtn);
+
+    await waitFor(() => {
+      expect(mockDeletePeladaAdmin).toHaveBeenCalledWith("pelada-1");
     });
   });
 });

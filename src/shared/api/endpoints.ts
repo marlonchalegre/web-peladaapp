@@ -823,5 +823,12 @@ export function createApi(client: ApiClient) {
         `/api/user/${id}/reset-password`,
         { password },
       ),
+    listPeladasAdmin: (page: number = 1, perPage: number = 20) =>
+      client.getPaginated<Pelada[]>("/api/admin/peladas", {
+        page,
+        per_page: perPage,
+      }),
+    deletePeladaAdmin: (id: string) =>
+      client.delete<void>(`/api/admin/peladas/${id}`),
   };
 }
