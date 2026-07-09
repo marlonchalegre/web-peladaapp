@@ -607,6 +607,9 @@ describe("OrganizationDetailPage", () => {
     );
     fireEvent.click(deleteBtn);
 
+    const confirmBtn = await screen.findByTestId("confirm-delete-pelada-btn");
+    fireEvent.click(confirmBtn);
+
     await waitFor(() => {
       expect(api.delete).toHaveBeenCalledWith("/api/peladas/10");
       expect(api.getPaginated).toHaveBeenCalledTimes(2);
@@ -661,6 +664,9 @@ describe("OrganizationDetailPage", () => {
       "organizations.peladas.aria.delete",
     );
     fireEvent.click(deleteBtn);
+
+    const confirmBtn = await screen.findByTestId("confirm-delete-pelada-btn");
+    fireEvent.click(confirmBtn);
 
     await waitFor(() => {
       expect(api.delete).toHaveBeenCalledWith("/api/peladas/10");
