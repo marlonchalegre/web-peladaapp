@@ -28,6 +28,7 @@ import {
 import { useAuth } from "../../../app/providers/AuthContext";
 import CreatePeladaForm from "../components/CreatePeladaForm";
 import PeladasTable from "../components/PeladasTable";
+import { ConfirmDeletePeladaDialog } from "../../admin/components/ConfirmDeletePeladaDialog";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
@@ -49,6 +50,9 @@ export default function OrganizationDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [leaveDialogOpen, setLeaveDialogOpen] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [peladaToDelete, setPeladaToDelete] = useState<Pelada | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [featureFlags, setFeatureFlags] =
     useState<OrganizationFeatureFlags | null>(null);
 
@@ -319,18 +323,9 @@ export default function OrganizationDetailPage() {
             onDelete={
               isAdmin
                 ? async (id) => {
-                    try {
-                      await endpoints.deletePelada(id);
-                      fetchPeladas();
-                    } catch (error: unknown) {
-                      const message =
-                        error instanceof Error
-                          ? error.message
-                          : t(
-                              "organizations.detail.error.delete_pelada_failed",
-                            );
-                      setError(message);
-                    }
+                    const p = peladas.find((item) => item.id === id) || null;
+                    setPeladaToDelete(p);
+                    setDeleteDialogOpen(true);
                   }
                 : undefined
             }
@@ -386,6 +381,32 @@ export default function OrganizationDetailPage() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {peladaToDelete && (
+        <ConfirmDeletePeladaDialog
+          open={deleteDialogOpen}
+          onClose={() => setDeleteDialogOpen(false)}
+          pelada={peladaToDelete}
+          loading={isDeleting}
+          onConfirm={async () => {
+            if (!peladaToDelete.id) return;
+            setIsDeleting(true);
+            try {
+              await endpoints.deletePelada(peladaToDelete.id);
+              setDeleteDialogOpen(false);
+              fetchPeladas();
+            } catch (error: unknown) {
+              const message =
+                error instanceof Error
+                  ? error.message
+                  : t("organizations.detail.error.delete_pelada_failed");
+              setError(message);
+            } finally {
+              setIsDeleting(false);
+            }
+          }}
+        />
+      )}
     </Container>
   );
 }
