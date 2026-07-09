@@ -212,6 +212,18 @@ export const getTheme = (mode: PaletteMode) => {
           },
         },
       },
+      MuiTableCell: {
+        styleOverrides: {
+          head: ({ theme }) => ({
+            fontWeight: "bold",
+            color: theme.palette.text.primary,
+            fontSize: "0.875rem",
+          }),
+          body: ({ theme }) => ({
+            color: theme.palette.text.primary,
+          }),
+        },
+      },
     },
   });
 

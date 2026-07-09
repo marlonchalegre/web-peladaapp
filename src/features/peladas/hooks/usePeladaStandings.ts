@@ -100,11 +100,12 @@ export function usePeladaStandings(
     return Object.values(table)
       .map((row) => ({
         ...row,
+        points: row.wins * 3 + row.draws,
         goalDifference: row.goalsFor - row.goalsAgainst,
       }))
       .sort((a, b) => {
-        const ptsA = a.wins * 3 + a.draws;
-        const ptsB = b.wins * 3 + b.draws;
+        const ptsA = a.points;
+        const ptsB = b.points;
 
         if (ptsA !== ptsB) return ptsB - ptsA;
         if (a.goalDifference !== b.goalDifference)

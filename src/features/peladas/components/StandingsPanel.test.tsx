@@ -34,8 +34,11 @@ describe("StandingsPanel", () => {
       </ThemeContextProvider>,
     );
 
+    expect(screen.getByText("common.points_short")).toBeInTheDocument();
     expect(screen.getByText("Champions")).toBeInTheDocument();
+    expect(screen.getByText("7")).toBeInTheDocument(); // Champions Points: 2*3 + 1 = 7
     expect(screen.getByText("Runners Up")).toBeInTheDocument();
+    expect(screen.getByText("4")).toBeInTheDocument(); // Runners Up Points: 1*3 + 1 = 4
     expect(screen.getByText("5")).toBeInTheDocument(); // GP
     expect(screen.getByText("+3")).toBeInTheDocument(); // SG
   });

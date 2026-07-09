@@ -184,49 +184,95 @@ export default function StandingsPanel({ standings, showHighlights }: Props) {
         </Typography>
       </Box>
       <TableContainer>
-        <Table size="small">
+        <Table size="small" data-testid="standings-table">
           <TableHead>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>
+            <TableRow sx={{ height: 56 }}>
+              <TableCell sx={{ minWidth: { xs: 100, sm: 140 } }}>
                 {t("common.team")}
               </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+              <TableCell
+                align="center"
+                sx={{ width: { xs: 36, sm: 50 }, px: { xs: 0.5, sm: 1.5 } }}
+              >
+                {t("common.points_short")}
+              </TableCell>
+              <TableCell
+                align="center"
+                sx={{ width: { xs: 32, sm: 44 }, px: { xs: 0.5, sm: 1.5 } }}
+              >
                 {t("common.wins_short")}
               </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+              <TableCell
+                align="center"
+                sx={{ width: { xs: 32, sm: 44 }, px: { xs: 0.5, sm: 1.5 } }}
+              >
                 {t("common.draws_short")}
               </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+              <TableCell
+                align="center"
+                sx={{ width: { xs: 32, sm: 44 }, px: { xs: 0.5, sm: 1.5 } }}
+              >
                 {t("common.losses_short")}
               </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+              <TableCell
+                align="center"
+                sx={{ width: { xs: 32, sm: 44 }, px: { xs: 0.5, sm: 1.5 } }}
+              >
                 GP
               </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+              <TableCell
+                align="center"
+                sx={{ width: { xs: 32, sm: 44 }, px: { xs: 0.5, sm: 1.5 } }}
+              >
                 SG
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {standings.map((row, index) => (
-              <TableRow
-                key={`stand-${row.teamId}`}
-                hover
-                sx={{ bgcolor: index % 2 === 1 ? "action.hover" : "inherit" }}
-              >
-                <TableCell>
-                  {row.name ||
-                    t("peladas.matches.team_fallback", { id: row.teamId })}
-                </TableCell>
-                <TableCell align="center">{row.wins}</TableCell>
-                <TableCell align="center">{row.draws}</TableCell>
-                <TableCell align="center">{row.losses}</TableCell>
-                <TableCell align="center">{row.goalsFor}</TableCell>
-                <TableCell align="center">
-                  {(row.goalDifference > 0 ? "+" : "") + row.goalDifference}
-                </TableCell>
-              </TableRow>
-            ))}
+            {standings.map((row, index) => {
+              const points = row.points ?? row.wins * 3 + row.draws;
+              return (
+                <TableRow
+                  key={`stand-${row.teamId}`}
+                  hover
+                  sx={{
+                    bgcolor: index % 2 === 1 ? "action.hover" : "inherit",
+                    height: 48,
+                  }}
+                >
+                  <TableCell sx={{ minWidth: { xs: 100, sm: 140 } }}>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      {row.name ||
+                        t("peladas.matches.team_fallback", { id: row.teamId })}
+                    </Typography>
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    sx={{ fontWeight: "bold", px: { xs: 0.5, sm: 1.5 } }}
+                  >
+                    {points}
+                  </TableCell>
+                  <TableCell align="center" sx={{ px: { xs: 0.5, sm: 1.5 } }}>
+                    {row.wins}
+                  </TableCell>
+                  <TableCell align="center" sx={{ px: { xs: 0.5, sm: 1.5 } }}>
+                    {row.draws}
+                  </TableCell>
+                  <TableCell align="center" sx={{ px: { xs: 0.5, sm: 1.5 } }}>
+                    {row.losses}
+                  </TableCell>
+                  <TableCell align="center" sx={{ px: { xs: 0.5, sm: 1.5 } }}>
+                    {row.goalsFor}
+                  </TableCell>
+                  <TableCell
+                    align="center"
+                    sx={{ px: { xs: 0.5, sm: 1.5 }, fontWeight: 600 }}
+                  >
+                    {(row.goalDifference > 0 ? "+" : "") + row.goalDifference}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>

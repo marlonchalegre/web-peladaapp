@@ -315,7 +315,7 @@ describe("PeladaMatchesPage", () => {
     });
 
     // Switch to Standings tab
-    const standingsTab = screen.getByText("peladas.panel.standings.title");
+    const standingsTab = screen.getByText(/peladas\.panel\.standings\.title/i);
     fireEvent.click(standingsTab);
 
     expect(
@@ -331,7 +331,7 @@ describe("PeladaMatchesPage", () => {
     });
 
     // Switch to Standings tab
-    const standingsTab = screen.getByText("peladas.panel.standings.title");
+    const standingsTab = screen.getByText(/peladas\.panel\.standings\.title/i);
     fireEvent.click(standingsTab);
 
     expect(
@@ -433,7 +433,7 @@ describe("PeladaMatchesPage", () => {
     await waitFor(() => screen.getByTestId("active-match-dashboard"));
 
     // Go to Standings tab
-    fireEvent.click(screen.getByText("peladas.panel.standings.title"));
+    fireEvent.click(screen.getByText(/peladas\.panel\.standings\.title/i));
 
     // Click close pelada
     const closeBtn = screen.getByText("peladas.matches.button.close_pelada");
@@ -496,16 +496,11 @@ describe("PeladaMatchesPage", () => {
     renderPage();
     await waitFor(() => screen.getByTestId("active-match-dashboard"));
 
-    // Standings
-    fireEvent.click(screen.getByText("peladas.panel.standings.title"));
+    // Standings & Stats (combined)
+    fireEvent.click(screen.getByText(/peladas\.panel\.standings\.title/i));
     expect(
       screen.getByText("peladas.matches.button.close_pelada"),
     ).toBeInTheDocument();
-
-    // Stats
-    fireEvent.click(
-      screen.getByRole("tab", { name: "peladas.panel.stats.title" }),
-    );
     expect(
       screen.getAllByText("peladas.panel.stats.title").length,
     ).toBeGreaterThan(0);

@@ -236,16 +236,12 @@ export default function PlayerStatsPanel({
         </Typography>
       </Box>
       <TableContainer>
-        <Table size="small">
+        <Table size="small" data-testid="player-stats-table">
           <TableHead>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>
-                {t("common.player")}
-              </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                {t("common.matches_played")}
-              </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+            <TableRow sx={{ height: 56 }}>
+              <TableCell>{t("common.player")}</TableCell>
+              <TableCell align="center">{t("common.matches_played")}</TableCell>
+              <TableCell align="center">
                 <Stack
                   direction="row"
                   sx={{
@@ -258,14 +254,14 @@ export default function PlayerStatsPanel({
                     <IconButton
                       size="small"
                       onClick={() => onToggleSort("goals")}
-                      sx={{ ml: 0.5, p: 0 }}
+                      sx={{ ml: 0.5, p: 0, color: "inherit" }}
                     >
                       <SwapVertIcon fontSize="small" />
                     </IconButton>
                   </Tooltip>
                 </Stack>
               </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+              <TableCell align="center">
                 <Stack
                   direction="row"
                   sx={{
@@ -278,14 +274,14 @@ export default function PlayerStatsPanel({
                     <IconButton
                       size="small"
                       onClick={() => onToggleSort("assists")}
-                      sx={{ ml: 0.5, p: 0 }}
+                      sx={{ ml: 0.5, p: 0, color: "inherit" }}
                     >
                       <SwapVertIcon fontSize="small" />
                     </IconButton>
                   </Tooltip>
                 </Stack>
               </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+              <TableCell align="center">
                 {t("common.own_goals_short")}
               </TableCell>
             </TableRow>
@@ -295,7 +291,10 @@ export default function PlayerStatsPanel({
               <TableRow
                 key={`pst-${p.playerId}`}
                 hover
-                sx={{ bgcolor: index % 2 === 1 ? "action.hover" : "inherit" }}
+                sx={{
+                  bgcolor: index % 2 === 1 ? "action.hover" : "inherit",
+                  height: 48,
+                }}
               >
                 <TableCell sx={{ whiteSpace: "nowrap" }}>
                   <Stack
@@ -311,14 +310,18 @@ export default function PlayerStatsPanel({
                       sx={{ width: 28, height: 28, fontSize: "0.75rem" }}
                       fallbackText={p.name.charAt(0)}
                     />
-                    <Typography variant="body2">{p.name}</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      {p.name}
+                    </Typography>
                   </Stack>
                 </TableCell>
                 <TableCell align="center">{p.matchesPlayed ?? "-"}</TableCell>
                 <TableCell align="center" sx={{ fontWeight: "bold" }}>
                   {p.goals}
                 </TableCell>
-                <TableCell align="center">{p.assists}</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 500 }}>
+                  {p.assists}
+                </TableCell>
                 <TableCell align="center" sx={{ color: "text.secondary" }}>
                   {p.ownGoals}
                 </TableCell>

@@ -1,12 +1,11 @@
-import { Box, Tabs, Tab, Paper } from "@mui/material";
+import { Box, Tabs, Tab, Paper, Grid } from "@mui/material";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import StandingsPanel, { type StandingRow } from "./StandingsPanel";
 import PlayerStatsPanel, { type PlayerStatRow } from "./PlayerStatsPanel";
 import PeladaTimeline from "./PeladaTimeline";
 import type { MatchEvent } from "../../../shared/api/endpoints";
-import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
-import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
+import AssessmentIcon from "@mui/icons-material/Assessment";
 import HistoryIcon from "@mui/icons-material/History";
 
 interface SessionInsightsProps {
@@ -100,36 +99,36 @@ export default function SessionInsights({
           }}
         >
           <Tab
-            icon={<FormatListNumberedIcon />}
-            label={t("peladas.panel.standings.title")}
+            icon={<AssessmentIcon />}
+            label={`${t("peladas.panel.standings.title")} & ${t("peladas.panel.stats.title")}`}
             id="session-tab-0"
-          />
-          <Tab
-            icon={<SportsSoccerIcon />}
-            label={t("peladas.panel.stats.title")}
-            id="session-tab-1"
           />
           <Tab
             icon={<HistoryIcon />}
             label={t("peladas.timeline.title")}
-            id="session-tab-2"
+            id="session-tab-1"
           />
         </Tabs>
       </Box>
 
       <CustomTabPanel value={tabValue} index={0}>
-        <StandingsPanel standings={standings} showHighlights={isClosed} />
+        <Box sx={{ p: 2 }}>
+          <Grid container spacing={3}>
+            <Grid size={{ xs: 12, lg: 6 }}>
+              <StandingsPanel standings={standings} showHighlights={isClosed} />
+            </Grid>
+            <Grid size={{ xs: 12, lg: 6 }}>
+              <PlayerStatsPanel
+                playerStats={playerStats}
+                onToggleSort={onToggleSort}
+                showHighlights={isClosed}
+              />
+            </Grid>
+          </Grid>
+        </Box>
       </CustomTabPanel>
 
       <CustomTabPanel value={tabValue} index={1}>
-        <PlayerStatsPanel
-          playerStats={playerStats}
-          onToggleSort={onToggleSort}
-          showHighlights={isClosed}
-        />
-      </CustomTabPanel>
-
-      <CustomTabPanel value={tabValue} index={2}>
         <PeladaTimeline
           events={events}
           userIdToName={userIdToName}

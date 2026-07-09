@@ -21,6 +21,7 @@ import {
   FormControl,
   InputLabel,
   Select,
+  Grid,
 } from "@mui/material";
 import ActiveMatchDashboard from "../components/ActiveMatchDashboard";
 import MatchReportSummary from "../components/MatchReportSummary";
@@ -37,7 +38,6 @@ import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import RateReviewIcon from "@mui/icons-material/RateReview";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import HistoryIcon from "@mui/icons-material/History";
 import StopIcon from "@mui/icons-material/Stop";
@@ -290,7 +290,7 @@ export default function PeladaMatchesPage() {
     try {
       await executeClosePelada();
       setClosePeladaConfirmOpen(false);
-      setActiveTab(2); // Performance tab
+      setActiveTab(1); // Standings & Performance tab
     } catch {
       // Error already handled in useMatchActions
     }
@@ -573,12 +573,8 @@ export default function PeladaMatchesPage() {
           >
             <Tab icon={<SportsSoccerIcon />} label="Dashboard" />
             <Tab
-              icon={<FormatListNumberedIcon />}
-              label={t("peladas.panel.standings.title")}
-            />
-            <Tab
               icon={<AssessmentIcon />}
-              label={t("peladas.panel.stats.title")}
+              label={`${t("peladas.panel.standings.title")} & ${t("peladas.panel.stats.title")}`}
             />
             <Tab icon={<HistoryIcon />} label={t("peladas.timeline.title")} />
           </Tabs>
@@ -658,18 +654,28 @@ export default function PeladaMatchesPage() {
               </Paper>
             ))}
           {activeTab === 1 && (
-            <Paper sx={{ borderRadius: 4, overflow: "hidden", p: 2 }}>
-              <StandingsPanel
-                standings={standings}
-                showHighlights={isPeladaClosed}
-              />
+            <Box>
+              <Grid container spacing={3}>
+                <Grid size={{ xs: 12, lg: 6 }}>
+                  <StandingsPanel
+                    standings={standings}
+                    showHighlights={isPeladaClosed}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, lg: 6 }}>
+                  <PlayerStatsPanel
+                    playerStats={playerStats}
+                    onToggleSort={togglePlayerSort}
+                    showHighlights={isPeladaClosed}
+                  />
+                </Grid>
+              </Grid>
               {isAdmin && !isPeladaClosed && (
-                <Box
+                <Paper
                   sx={{
-                    mt: 4,
-                    pt: 2,
-                    borderTop: "1px solid",
-                    borderColor: "divider",
+                    mt: 3,
+                    p: 3,
+                    borderRadius: 4,
                     textAlign: "center",
                   }}
                 >
@@ -696,20 +702,11 @@ export default function PeladaMatchesPage() {
                       ? t("common.sending")
                       : t("peladas.matches.button.close_pelada")}
                   </Button>
-                </Box>
+                </Paper>
               )}
-            </Paper>
+            </Box>
           )}
           {activeTab === 2 && (
-            <Paper sx={{ borderRadius: 4, overflow: "hidden" }}>
-              <PlayerStatsPanel
-                playerStats={playerStats}
-                onToggleSort={togglePlayerSort}
-                showHighlights={isPeladaClosed}
-              />
-            </Paper>
-          )}
-          {activeTab === 3 && (
             <Box sx={{ p: 2 }}>
               <PeladaTimeline
                 events={matchEvents}

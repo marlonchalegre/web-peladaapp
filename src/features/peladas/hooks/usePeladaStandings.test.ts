@@ -33,6 +33,7 @@ describe("usePeladaStandings", () => {
     const t1 = result.current.standings.find((s) => s.teamId === "t1");
     expect(t1?.wins).toBe(1);
     expect(t1?.goalsFor).toBe(2);
+    expect(t1?.points).toBe(3); // wins * 3 + draws = 3
   });
 
   it("should handle draws and multiple matches", () => {
@@ -54,6 +55,7 @@ describe("usePeladaStandings", () => {
     const t1 = result.current.standings.find((s) => s.teamId === "t1");
     expect(t1?.wins).toBe(1);
     expect(t1?.draws).toBe(1);
+    expect(t1?.points).toBe(4); // wins * 3 + draws = 4
   });
 
   it("should aggregate stats from events if API stats are missing", () => {
