@@ -59,11 +59,10 @@ function MockMatchAttendance() {
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
         boxShadow: `0 8px 32px ${alpha(theme.palette.common.black, 0.08)}`,
       }}
     >
-      <Box>
+      <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
         <Box
           sx={{
             display: "flex",
@@ -103,7 +102,10 @@ function MockMatchAttendance() {
           )}
         </Typography>
 
-        <Stack spacing={1}>
+        <Stack
+          spacing={1.2}
+          sx={{ flexGrow: 1, justifyContent: "space-between", mt: 1 }}
+        >
           {players.map((p, i) => {
             const pos = positionConfig[p.pos as keyof typeof positionConfig];
             return (
@@ -608,21 +610,27 @@ function MockVoting() {
           >
             R
           </Avatar>
-          <Chip
-            label={t("welcome.mock.mvp", "MVP")}
-            size="small"
-            color="warning"
+          <Box
             sx={{
               position: "absolute",
               bottom: -6,
               left: "50%",
               transform: "translateX(-50%)",
-              height: 14,
-              fontSize: "0.55rem",
+              bgcolor: "warning.main",
+              color: "warning.contrastText",
+              fontSize: "0.58rem",
               fontWeight: 900,
-              px: 0.5,
+              px: 1,
+              py: 0.25,
+              borderRadius: 1,
+              lineHeight: 1,
+              whiteSpace: "nowrap",
+              boxShadow: `0 2px 4px ${alpha(theme.palette.warning.main, 0.4)}`,
+              zIndex: 1,
             }}
-          />
+          >
+            {t("welcome.mock.mvp", "MVP")}
+          </Box>
         </Box>
         <Box sx={{ textAlign: "center", width: "100%" }}>
           <Typography
@@ -633,19 +641,35 @@ function MockVoting() {
           </Typography>
           <Rating value={5} readOnly size="small" sx={{ mt: 0.25 }} />
           <Box
-            sx={{ mt: 1, display: "flex", gap: 1, justifyContent: "center" }}
+            sx={{
+              mt: 1,
+              display: "flex",
+              gap: 1,
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
           >
             <Chip
               label={t("welcome.mock.raw_stars", { val: "5.0" })}
               size="small"
               variant="outlined"
-              sx={{ height: 18, fontSize: "0.62rem", fontWeight: 700 }}
+              sx={{
+                height: 18,
+                fontSize: "0.62rem",
+                fontWeight: 700,
+                flexShrink: 0,
+              }}
             />
             <Chip
               label={t("welcome.mock.normalized_score", { val: "9.4" })}
               size="small"
               color="primary"
-              sx={{ height: 18, fontSize: "0.62rem", fontWeight: 800 }}
+              sx={{
+                height: 18,
+                fontSize: "0.62rem",
+                fontWeight: 800,
+                flexShrink: 0,
+              }}
             />
           </Box>
         </Box>
@@ -778,7 +802,7 @@ export default function WelcomePage() {
             sx={{ alignItems: "center" }}
           >
             {/* Left Content Column */}
-            <Grid size={{ xs: 12, md: 7 }}>
+            <Grid size={{ xs: 12, md: 6, lg: 5 }}>
               <Stack spacing={4}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                   <Box
@@ -799,7 +823,7 @@ export default function WelcomePage() {
                       fontSize: { xs: "2.25rem", sm: "3rem", md: "3.5rem" },
                       fontWeight: 900,
                       letterSpacing: -0.5,
-                      background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.primary.light} 90%)`,
+                      background: `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`,
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                     }}
@@ -891,7 +915,7 @@ export default function WelcomePage() {
             </Grid>
 
             {/* Right Mock Visuals Column */}
-            <Grid size={{ xs: 12, md: 5 }}>
+            <Grid size={{ xs: 12, md: 6, lg: 7 }}>
               <Grid container spacing={2}>
                 <Grid size={{ xs: 12, sm: 6, md: 12, lg: 6 }}>
                   <MockMatchAttendance />

@@ -65,9 +65,27 @@ export function PWAInstallPrompt() {
       }
     };
 
+    const checkServiceWorkerUpdate = async () => {
+      if ("serviceWorker" in navigator) {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (registration) {
+          await registration.update();
+        }
+      }
+    };
+
     checkVersion();
     const interval = setInterval(checkVersion, 30 * 60 * 1000);
-    return () => clearInterval(interval);
+
+    // Check for updates when the user returns to the app tab
+    window.addEventListener("focus", checkVersion);
+    window.addEventListener("focus", checkServiceWorkerUpdate);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", checkVersion);
+      window.removeEventListener("focus", checkServiceWorkerUpdate);
+    };
   }, []);
 
   // Automatically reload the page when the service worker is updated and takes control

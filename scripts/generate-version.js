@@ -38,4 +38,8 @@ const versionInfo = {
 const publicPath = path.resolve(__dirname, "../public/version.json");
 fs.writeFileSync(publicPath, JSON.stringify(versionInfo, null, 2));
 
+// Also write to .env.production to inject it into the Vite build bundle
+const envPath = path.resolve(__dirname, "../.env.production");
+fs.writeFileSync(envPath, `VITE_APP_VERSION=${versionInfo.version}\n`);
+
 console.log("Version info generated:", versionInfo);
