@@ -165,4 +165,79 @@ describe("usePeladaStandings", () => {
     const t2 = result.current.standings.find((s) => s.teamId === "t2");
     expect(t2?.wins).toBe(0);
   });
+
+  it("should calculate standings including running matches but ignoring scheduled matches", () => {
+    const runningMatches = [
+      {
+        id: "m_running",
+        home_team_id: "t1",
+        away_team_id: "t2",
+        home_score: 3,
+        away_score: 2,
+        status: "running",
+      } as any,
+      {
+        id: "m_scheduled",
+        home_team_id: "t1",
+        away_team_id: "t2",
+        home_score: 0,
+        away_score: 0,
+        status: "scheduled",
+      } as any,
+    ];
+    const { result } = renderHook(() =>
+      usePeladaStandings(
+        runningMatches,
+        mockTeams,
+        [],
+        null,
+        {},
+        {},
+        {},
+        {},
+        {},
+      ),
+    );
+
+    const t1 = result.current.standings.find((s) => s.teamId === "t1");
+    expect(t1?.wins).toBe(1);
+    expect(t1?.draws).toBe(0);
+    expect(t1?.goalsFor).toBe(3);
+    expect(t1?.goalsAgainst).toBe(2);
+    expect(t1?.points).toBe(3);
+  });
+
+  it("should calculate player stats including running matches for matches played and goalkeeper goals conceded", () => {
+    const runningMatches = [
+      {
+        id: "m_running",
+        home_team_id: "t1",
+        away_team_id: "t2",
+        home_score: 3,
+        away_score: 2,
+        status: "running",
+      } as any,
+    ];
+    const teamPlayers = { t1: [{ player_id: "p1" }] } as any;
+    const lineups = {
+      m_running: { t1: [{ player_id: "p1", is_goalkeeper: true }] },
+    } as any;
+    const { result } = renderHook(() =>
+      usePeladaStandings(
+        runningMatches,
+        mockTeams,
+        [],
+        null,
+        teamPlayers,
+        lineups,
+        {},
+        {},
+        {},
+      ),
+    );
+
+    const p1Stats = result.current.playerStats.find((s) => s.playerId === "p1");
+    expect(p1Stats?.matchesPlayed).toBe(1);
+    expect(p1Stats?.goalsConceded).toBe(2);
+  });
 });

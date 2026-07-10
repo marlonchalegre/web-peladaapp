@@ -78,7 +78,8 @@ export function usePeladaStandings(
       const hs = m.home_score ?? 0;
       const as = m.away_score ?? 0;
       if (!(m.home_team_id in table) || !(m.away_team_id in table)) continue;
-      if ((m.status || "").toLowerCase() !== "finished") continue;
+      const status = (m.status || "").toLowerCase();
+      if (status !== "finished" && status !== "running") continue;
 
       table[m.home_team_id].goalsFor += hs;
       table[m.home_team_id].goalsAgainst += as;
@@ -135,7 +136,8 @@ export function usePeladaStandings(
     const goalsConcededMap: Record<string, number> = {};
 
     for (const m of matches) {
-      if ((m.status || "").toLowerCase() !== "finished") continue;
+      const status = (m.status || "").toLowerCase();
+      if (status !== "finished" && status !== "running") continue;
       const lu = lineupsByMatch[m.id];
       if (!lu) continue;
       const playersInMatch = new Set<string>();
