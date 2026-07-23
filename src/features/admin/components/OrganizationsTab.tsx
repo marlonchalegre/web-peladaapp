@@ -24,6 +24,7 @@ import {
   Settings as SettingsIcon,
   Delete as DeleteIcon,
   Flag as FlagIcon,
+  Send as SendIcon,
 } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 import { type Organization } from "../../../shared/api/endpoints";
@@ -42,6 +43,7 @@ export interface OrganizationsTabProps {
   onOpenManageAdmins: (org: Organization) => void;
   onOpenDeleteOrg: (org: Organization) => void;
   onOpenFeatureFlags: (org: Organization) => void;
+  onOpenSendNotification: (org: Organization) => void;
   actionInProgress: string | null;
 }
 
@@ -59,6 +61,7 @@ export function OrganizationsTab({
   onOpenManageAdmins,
   onOpenDeleteOrg,
   onOpenFeatureFlags,
+  onOpenSendNotification,
   actionInProgress,
 }: OrganizationsTabProps) {
   const { t } = useTranslation();
@@ -238,6 +241,17 @@ export function OrganizationsTab({
                       data-testid={`manage-feature-flags-btn-${org.id}`}
                     >
                       <FlagIcon />
+                    </IconButton>
+                    <IconButton
+                      color="info"
+                      onClick={() => onOpenSendNotification(org)}
+                      title={t(
+                        "admin.actions.send_notification",
+                        "Enviar Notificação",
+                      )}
+                      data-testid={`send-notification-btn-${org.id}`}
+                    >
+                      <SendIcon />
                     </IconButton>
                     <IconButton
                       color="error"

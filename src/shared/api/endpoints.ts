@@ -396,6 +396,19 @@ export function createApi(client: ApiClient) {
         `/api/organizations/${id}/waha/test`,
         {},
       ),
+    sendNotification: (
+      id: string,
+      payload: {
+        action: "custom" | "resend";
+        message?: string;
+        notification_type?: string;
+        pelada_id?: string;
+      },
+    ) =>
+      client.post<{ status: string; message: string }>(
+        `/api/organizations/${id}/notifications/send`,
+        payload,
+      ),
     getInviteLink: (id: string) =>
       client.get<{ token: string }>(`/api/organizations/${id}/invite-link`),
     resetInviteLink: (id: string) =>

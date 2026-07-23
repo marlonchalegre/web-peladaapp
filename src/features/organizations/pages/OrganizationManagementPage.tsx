@@ -8,6 +8,8 @@ import {
   Tabs,
   Tab,
   Paper,
+  Button,
+  Snackbar,
 } from "@mui/material";
 import PeopleIcon from "@mui/icons-material/People";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
@@ -17,6 +19,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import SendIcon from "@mui/icons-material/Send";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { Loading } from "../../../shared/components/Loading";
@@ -35,6 +38,7 @@ import PlayerRatingsContent from "../components/PlayerRatingsContent";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
 import { PremiumFeatureLock } from "../../../shared/components/PremiumFeatureLock";
+import SendNotificationDialog from "../components/SendNotificationDialog";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -67,6 +71,22 @@ export default function OrganizationManagementPage() {
   const activeTab = searchParams.get("tab") || "members";
   const page = parseInt(searchParams.get("page") || "0", 10);
   const rowsPerPage = parseInt(searchParams.get("limit") || "10", 10);
+
+  const [isSendNotificationOpen, setIsSendNotificationOpen] = useState(false);
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastSeverity, setToastSeverity] = useState<
+    "success" | "error" | "info"
+  >("success");
+
+  const showToast = (
+    message: string,
+    severity: "success" | "error" | "info" = "success",
+  ) => {
+    setToastMessage(message);
+    setToastSeverity(severity);
+    setToastOpen(true);
+  };
 
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
@@ -512,11 +532,67 @@ export default function OrganizationManagementPage() {
 
         <TabPanel value={activeTab} index="settings">
           {isAdmin && (
-            <DangerZoneSection
-              orgName={org.name}
-              onDeleteClick={() => setIsDeleteDialogOpen(true)}
-              actionLoading={actionLoading}
-            />
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              {/* WhatsApp Communications Card */}
+              <Box
+                sx={{
+                  background: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "rgba(25, 25, 25, 0.45)"
+                      : "rgba(255, 255, 255, 0.45)",
+                  backdropFilter: "blur(20px)",
+                  borderRadius: "16px",
+                  p: 3,
+                  border: (theme) => `1px solid ${theme.palette.divider}`,
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  sx={{
+                    fontWeight: 700,
+                    mb: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
+                >
+                  <WhatsAppIcon color="success" />
+                  {t(
+                    "organizations.management.notifications.card_title",
+                    "Comunicações WhatsApp",
+                  )}
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mb: 3 }}
+                >
+                  {t(
+                    "organizations.management.notifications.card_desc",
+                    "Envie mensagens personalizadas ou reenvie convocações, escalações e resultados diretamente para o grupo de WhatsApp da organização.",
+                  )}
+                </Typography>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => setIsSendNotificationOpen(true)}
+                  startIcon={<SendIcon />}
+                  sx={{ borderRadius: "10px", textTransform: "none" }}
+                  data-testid="open-send-notification-btn"
+                >
+                  {t(
+                    "organizations.management.notifications.button_send",
+                    "Enviar Notificação",
+                  )}
+                </Button>
+              </Box>
+
+              <DangerZoneSection
+                orgName={org.name}
+                onDeleteClick={() => setIsDeleteDialogOpen(true)}
+                actionLoading={actionLoading}
+              />
+            </Box>
           )}
         </TabPanel>
       </Box>
@@ -575,6 +651,26 @@ export default function OrganizationManagementPage() {
         confirmLabel={t("common.reset", "Redefinir")}
         severity="warning"
       />
+      <SendNotificationDialog
+        open={isSendNotificationOpen}
+        onClose={() => setIsSendNotificationOpen(false)}
+        organization={org}
+        showToast={showToast}
+      />
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={4000}
+        onClose={() => setToastOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert
+          onClose={() => setToastOpen(false)}
+          severity={toastSeverity}
+          sx={{ width: "100%", borderRadius: "8px" }}
+        >
+          {toastMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

@@ -34,6 +34,7 @@ import { ManageOrgAdminsDialog } from "../components/ManageOrgAdminsDialog";
 import { ConfirmDeleteOrgDialog } from "../components/ConfirmDeleteOrgDialog";
 import { ConfirmDeletePeladaDialog } from "../components/ConfirmDeletePeladaDialog";
 import { ManageFeatureFlagsDialog } from "../components/ManageFeatureFlagsDialog";
+import SendNotificationDialog from "../../organizations/components/SendNotificationDialog";
 import { type Organization } from "../../../shared/api/endpoints";
 
 export default function AdminPanelPage() {
@@ -74,6 +75,8 @@ export default function AdminPanelPage() {
   const [featureFlagsOrg, setFeatureFlagsOrg] = useState<Organization | null>(
     null,
   );
+  const [sendNotificationOrg, setSendNotificationOrg] =
+    useState<Organization | null>(null);
 
   // Load Initial Data & on Tab Switch
   useEffect(() => {
@@ -217,6 +220,7 @@ export default function AdminPanelPage() {
           onToggleBlock={adminOrgs.handleToggleOrgBlock}
           onOpenManageAdmins={adminOrgs.handleOpenManageAdmins}
           onOpenFeatureFlags={setFeatureFlagsOrg}
+          onOpenSendNotification={setSendNotificationOrg}
           onOpenDeleteOrg={adminOrgs.handleOpenDeleteOrg}
           actionInProgress={adminOrgs.actionInProgress}
         />
@@ -281,6 +285,14 @@ export default function AdminPanelPage() {
         open={Boolean(featureFlagsOrg)}
         onClose={() => setFeatureFlagsOrg(null)}
         organization={featureFlagsOrg}
+        showToast={showToast}
+      />
+
+      {/* Send Notification Dialog */}
+      <SendNotificationDialog
+        open={Boolean(sendNotificationOrg)}
+        onClose={() => setSendNotificationOrg(null)}
+        organization={sendNotificationOrg}
         showToast={showToast}
       />
 
