@@ -16,6 +16,10 @@ i18n
   // init i18next
   // for all options read: https://www.i18next.com/overview/configuration-options
   .init({
+    backend: {
+      loadPath: `/locales/{{lng}}/{{ns}}.json?v=${import.meta.env.VITE_APP_VERSION || "dev"}`,
+    },
+
     fallbackLng: "pt-BR",
     debug: import.meta.env.DEV,
 

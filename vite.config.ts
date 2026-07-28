@@ -102,11 +102,25 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,json}"],
-        globIgnores: ["**/version.json"],
+        globIgnores: ["**/version.json", "**/locales/**/*.json"],
         navigateFallback: "index.html",
         skipWaiting: true,
         clientsClaim: true,
         runtimeCaching: [
+          {
+            urlPattern: /\/locales\/.*\.json/i,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "translations-cache",
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: "CacheFirst",

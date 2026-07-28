@@ -54,11 +54,35 @@ export function PWAInstallPrompt() {
           currentVersion !== "dev" &&
           data.version !== currentVersion
         ) {
-          console.log("New version detected via version.json:", data.version);
-          const registration = await navigator.serviceWorker.getRegistration();
-          if (registration) {
-            await registration.update();
+          console.log(
+            `New version detected: client=${currentVersion}, server=${data.version}. Clearing service worker and caches...`,
+          );
+
+          if ("serviceWorker" in navigator) {
+            try {
+              const registrations =
+                await navigator.serviceWorker.getRegistrations();
+              for (const r of registrations) {
+                await r.unregister();
+              }
+            } catch (err) {
+              console.warn("Failed to unregister service worker:", err);
+            }
           }
+
+          if ("caches" in window) {
+            try {
+              const cacheNames = await caches.keys();
+              for (const cacheName of cacheNames) {
+                await caches.delete(cacheName);
+              }
+            } catch (err) {
+              console.warn("Failed to clear caches:", err);
+            }
+          }
+
+          console.log("Cleanup complete. Reloading page...");
+          window.location.reload();
         }
       } catch (err) {
         console.warn("Failed to check version.json", err);
