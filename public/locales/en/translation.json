@@ -834,7 +834,14 @@
     "voting": {
       "title": "Voting for Pelada",
       "success": {
-        "saved": "Votes saved successfully!"
+        "saved": "Votes saved successfully!",
+        "player_enabled": "Player enabled for voting",
+        "player_disabled": "Player disabled from voting and previous votes removed"
+      },
+      "dialog": {
+        "disable_title": "Disable {{name}}?",
+        "disable_description": "Are you sure you want to disable voting for this player?",
+        "disable_warning": "All votes already received by this player will be discarded."
       },
       "warning": {
         "no_eligible_players": "No eligible players for voting in this pelada.",

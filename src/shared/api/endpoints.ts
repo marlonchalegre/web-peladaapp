@@ -206,6 +206,7 @@ export interface VotingInfo {
   has_voted: boolean;
   eligible_players: {
     player_id: string;
+    user_id?: string;
     name: string;
     position?: string;
     avatar_filename?: string | null;
@@ -214,6 +215,7 @@ export interface VotingInfo {
     assists?: number;
     own_goals?: number;
   }[];
+  is_admin?: boolean;
   current_votes?: { target_id: string; stars: number }[];
   voter_player_id?: string | null;
   message?: string;
@@ -249,6 +251,8 @@ export interface VotingResults {
 export interface VotingStatus {
   voters: {
     player_id: string;
+    user_id?: string;
+    avatar_filename?: string | null;
     name: string;
     has_voted: boolean;
   }[];

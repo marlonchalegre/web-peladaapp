@@ -833,7 +833,14 @@
     "voting": {
       "title": "Votação da Pelada",
       "success": {
-        "saved": "Votos registrados com sucesso!"
+        "saved": "Votos registrados com sucesso!",
+        "player_enabled": "Jogador habilitado para votação",
+        "player_disabled": "Jogador desabilitado para votação e votos anteriores removidos"
+      },
+      "dialog": {
+        "disable_title": "Desativar {{name}}?",
+        "disable_description": "Tem certeza que deseja desativar a votação para este jogador?",
+        "disable_warning": "Todos os votos já recebidos por este jogador serão descartados."
       },
       "warning": {
         "no_eligible_players": "Não há jogadores elegíveis para votação nesta pelada.",

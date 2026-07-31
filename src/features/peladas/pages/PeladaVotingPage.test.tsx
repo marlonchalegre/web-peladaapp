@@ -21,6 +21,15 @@ vi.mock("../../../app/providers/AuthContext", () => ({
   })),
 }));
 
+// Mock SecureAvatar
+vi.mock("../../../shared/components/SecureAvatar", () => ({
+  SecureAvatar: (props: { fallbackText?: string }) => (
+    <div data-testid="secure-avatar" {...props}>
+      {props.fallbackText}
+    </div>
+  ),
+}));
+
 // Mock MUI Rating component to easily test its value
 vi.mock("@mui/material", async (importOriginal) => {
   const actual = (await importOriginal()) as Record<string, unknown>;
@@ -175,8 +184,8 @@ describe("PeladaVotingPage", () => {
   });
 
   it("allows admin to disable and enable voting for players", async () => {
-    const adminDetails = { pelada: { id: "1", is_admin: true } };
-    setupMocks(mockVotingInfo, mockVotingStatus, adminDetails);
+    const adminInfo = { ...mockVotingInfo, is_admin: true };
+    setupMocks(adminInfo, mockVotingStatus);
     (api.post as Mock).mockResolvedValue({ updated: 1 });
 
     render(
@@ -316,6 +325,48 @@ describe("PeladaVotingPage", () => {
       expect(
         screen.getByText("peladas.voting.warning.no_eligible_players"),
       ).toBeInTheDocument();
+    });
+  });
+
+  it("renders player avatars in the voting cards and status sidebar", async () => {
+    const infoWithAvatars = {
+      ...mockVotingInfo,
+      eligible_players: [
+        {
+          player_id: "11",
+          user_id: "101",
+          avatar_filename: "avatar11.png",
+          name: "Target Player",
+          voting_enabled: true,
+        },
+      ],
+    };
+    const statusWithAvatars = {
+      voters: [
+        {
+          player_id: "10",
+          user_id: "100",
+          avatar_filename: "avatar10.png",
+          name: "Current User",
+          has_voted: false,
+        },
+      ],
+      total_eligible: 1,
+      total_voted: 0,
+    };
+    setupMocks(infoWithAvatars, statusWithAvatars);
+
+    render(
+      <MemoryRouter initialEntries={["/peladas/1/voting"]}>
+        <Routes>
+          <Route path="/peladas/:id/voting" element={<PeladaVotingPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      const secureAvatars = screen.getAllByTestId("secure-avatar");
+      expect(secureAvatars.length).toBeGreaterThanOrEqual(2);
     });
   });
 });
