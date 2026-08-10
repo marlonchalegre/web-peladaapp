@@ -26,6 +26,8 @@ import { useTranslation } from "react-i18next";
 import { type User, type Player } from "../../../shared/api/endpoints";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 
+const SECONDARY_TEXT_STYLE = { display: "block" } as const;
+
 interface MembersSectionProps {
   players: Player[];
   usersMap: Map<string, User>;
@@ -247,9 +249,28 @@ export default function MembersSection({
                       </Typography>
                     }
                     secondary={
-                      <Typography noWrap sx={{ color: "text.secondary" }}>
-                        {t(positionKey)}
-                      </Typography>
+                      <>
+                        {user?.username && (
+                          <Typography
+                            component="span"
+                            variant="caption"
+                            color="text.secondary"
+                            sx={SECONDARY_TEXT_STYLE}
+                            noWrap
+                          >
+                            @{user.username}
+                          </Typography>
+                        )}
+                        <Typography
+                          component="span"
+                          variant="caption"
+                          color="text.secondary"
+                          sx={SECONDARY_TEXT_STYLE}
+                          noWrap
+                        >
+                          {t(positionKey)}
+                        </Typography>
+                      </>
                     }
                     sx={{ flex: 1, minWidth: 0 }}
                   />

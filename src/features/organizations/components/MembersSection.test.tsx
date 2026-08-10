@@ -16,6 +16,7 @@ const mockUsers: User[] = [
     username: "alice",
     email: "alice@example.com",
     position: "STRIKER",
+    phone: "+5581991695823",
   },
   {
     id: "2",
@@ -56,13 +57,19 @@ describe("MembersSection", () => {
     onRowsPerPageChange: vi.fn(),
   };
 
-  it("renders the members list with positions", () => {
+  it("renders the members list with positions and usernames", () => {
     render(<MembersSection {...defaultProps} />);
     expect(screen.getByText("Alice")).toBeDefined();
+    expect(screen.getByText("@alice")).toBeDefined();
+    expect(screen.queryByText("+5581991695823")).toBeNull();
     expect(screen.getByText("common.positions.striker")).toBeDefined();
+
     expect(screen.getByText("Bob")).toBeDefined();
+    expect(screen.getByText("@bob")).toBeDefined();
     expect(screen.getByText("common.positions.goalkeeper")).toBeDefined();
+
     expect(screen.getByText("Charlie")).toBeDefined();
+    expect(screen.getByText("@charlie")).toBeDefined();
     expect(screen.getByText("common.positions.defender")).toBeDefined();
 
     // Verify email is NOT rendered
