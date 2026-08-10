@@ -13,6 +13,8 @@ import DownloadIcon from "@mui/icons-material/Download";
 import { useTranslation } from "react-i18next";
 import { usePWA } from "../../app/providers/PWAContext";
 
+let hasLoggedVersion = false;
+
 export function PWAInstallPrompt() {
   const { t } = useTranslation();
   const { showIOSInstructions, setShowIOSInstructions } = usePWA();
@@ -47,7 +49,58 @@ export function PWAInstallPrompt() {
         if (!response.ok) return;
 
         const data = await response.json();
-        const currentVersion = import.meta.env.VITE_APP_VERSION;
+        const currentVersion = import.meta.env.VITE_APP_VERSION || "dev";
+        const serverVersion = data.version || "unknown";
+
+        if (!hasLoggedVersion) {
+          hasLoggedVersion = true;
+          const asciiArt = `
+  __  __ _       _            _____      _           _       
+ |  \\/  (_)     | |          |  __ \\    | |         | |      
+ | \\  / |_ _ __ | |__   __ _ | |__) |___| | __ _  __| | __ _ 
+ | |\\/| | | '_ \\| '_ \\ / _\` ||  ___/ _ \\ |/ _\` |/ _\` |/ _\` |
+ | |  | | | | | | | | | (_| || |  |  __/ | (_| | (_| | (_| |
+ |_|  |_|_|_| |_|_| |_|\\__,_||_|   \\___|_|\\__,_|\\__,_|\\__,_|
+`;
+          const serverGitHash = data.gitHash || "unknown";
+          const serverBuildTime = data.buildTime || "unknown";
+
+          // Get Service Worker controller info
+          const hasController = !!navigator.serviceWorker?.controller;
+          const controllerState =
+            navigator.serviceWorker?.controller?.state || "none";
+          const controllerScript =
+            navigator.serviceWorker?.controller?.scriptURL || "none";
+
+          // Get Cache Storage names
+          let cacheKeys: string[] = [];
+          try {
+            if ("caches" in window) {
+              cacheKeys = await caches.keys();
+            }
+          } catch {
+            // ignore cache access issues
+          }
+
+          // Online status
+          const isOnline = navigator.onLine;
+
+          console.log(
+            `%c${asciiArt}\n%c⚽ Minha Pelada ⚽\n` +
+              `%c[App Status]\n` +
+              `• Client Version:  ${currentVersion}\n` +
+              `• Server Version:  ${serverVersion} (Build: ${serverBuildTime}, Hash: ${serverGitHash})\n` +
+              `• Network Status:  ${isOnline ? "🟢 Online" : "🔴 Offline"}\n\n` +
+              `%c[Service Worker & Cache]\n` +
+              `• Controlled:      ${hasController ? `🟢 Yes (${controllerState})` : "🔴 No"}\n` +
+              `• Controller URL:  ${controllerScript}\n` +
+              `• Active Caches:   [${cacheKeys.join(", ") || "none"}]`,
+            "color: #4caf50; font-weight: bold;", // Green for ASCII
+            "color: #2196f3; font-weight: bold; font-size: 14px;", // Blue for title
+            "color: #ff9800; font-weight: bold; font-size: 12px;", // Orange for status header
+            "color: #00bcd4; font-weight: bold; font-size: 12px;", // Cyan for SW/Cache header
+          );
+        }
 
         if (
           currentVersion &&
