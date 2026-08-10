@@ -102,13 +102,22 @@ export function PWAInstallPrompt() {
           );
         }
 
-        if (
+        const isLocalhost =
+          window.location.hostname === "localhost" ||
+          window.location.hostname === "127.0.0.1";
+
+        const hasVersionMismatch =
           currentVersion &&
           currentVersion !== "dev" &&
-          data.version !== currentVersion
-        ) {
+          data.version !== currentVersion;
+
+        // Force cache clearing on production if the client has a "dev" version cached
+        const isStuckOnProdDev =
+          !isLocalhost && currentVersion === "dev" && data.version !== "dev";
+
+        if (hasVersionMismatch || isStuckOnProdDev) {
           console.log(
-            `New version detected: client=${currentVersion}, server=${data.version}. Clearing service worker and caches...`,
+            `Version update required (mismatch=${hasVersionMismatch}, stuckProdDev=${isStuckOnProdDev}). client=${currentVersion}, server=${data.version}. Clearing service worker and caches...`,
           );
 
           if ("serviceWorker" in navigator) {
