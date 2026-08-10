@@ -152,6 +152,11 @@ jobs:
             type=sha,format=long
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
 
+      - name: Generate version string
+        id: version
+        run: |
+          echo "val=$(date +'%Y%m%d-%H%M')" >> $GITHUB_OUTPUT
+
       - name: Build and push
         uses: docker/build-push-action@v7
         with:
@@ -160,6 +165,8 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VITE_APP_VERSION=${{ steps.version.outputs.val }}
           provenance: false
           sbom: false
           cache-from: type=gha
