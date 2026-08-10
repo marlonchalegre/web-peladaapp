@@ -115,9 +115,16 @@ export function PWAInstallPrompt() {
         const isStuckOnProdDev =
           !isLocalhost && currentVersion === "dev" && data.version !== "dev";
 
-        if (hasVersionMismatch || isStuckOnProdDev) {
+        // Check local storage for version changes (crucial to catch version updates immediately on next load)
+        const lastLocalVersion = localStorage.getItem("pwa_app_version");
+        const hasLocalMismatch =
+          !isLocalhost &&
+          lastLocalVersion &&
+          lastLocalVersion !== currentVersion;
+
+        const performCleanupAndReload = async (reason: string) => {
           console.log(
-            `Version update required (mismatch=${hasVersionMismatch}, stuckProdDev=${isStuckOnProdDev}). client=${currentVersion}, server=${data.version}. Clearing service worker and caches...`,
+            `Clearing service worker and caches due to: ${reason}. client=${currentVersion}, server=${data.version}`,
           );
 
           if ("serviceWorker" in navigator) {
@@ -143,8 +150,19 @@ export function PWAInstallPrompt() {
             }
           }
 
+          localStorage.setItem("pwa_app_version", currentVersion);
           console.log("Cleanup complete. Reloading page...");
           window.location.reload();
+        };
+
+        if (hasVersionMismatch || isStuckOnProdDev || hasLocalMismatch) {
+          let reason = "Version Mismatch";
+          if (isStuckOnProdDev) reason = "Stuck on Prod Dev Build";
+          if (hasLocalMismatch)
+            reason = `Local Storage Version Mismatch (local=${lastLocalVersion})`;
+          await performCleanupAndReload(reason);
+        } else {
+          localStorage.setItem("pwa_app_version", currentVersion);
         }
       } catch (err) {
         console.warn("Failed to check version.json", err);
