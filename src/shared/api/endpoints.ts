@@ -4,6 +4,7 @@ export interface Organization {
   id: string;
   name: string;
   owner_id?: string | null;
+  priority_confirmation_limit_hours?: number | null;
   waha_api_url?: string | null;
   waha_instance?: string | null;
   waha_group_id?: string | null;

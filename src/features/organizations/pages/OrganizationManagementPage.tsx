@@ -38,6 +38,7 @@ import PlayerRatingsContent from "../components/PlayerRatingsContent";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
 import { PremiumFeatureLock } from "../../../shared/components/PremiumFeatureLock";
+import GeneralSettingsSection from "../components/GeneralSettingsSection";
 import SendNotificationDialog from "../components/SendNotificationDialog";
 
 interface TabPanelProps {
@@ -533,6 +534,11 @@ export default function OrganizationManagementPage() {
         <TabPanel value={activeTab} index="settings">
           {isAdmin && (
             <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              <GeneralSettingsSection
+                organization={org}
+                onUpdateSuccess={() => fetchData(true)}
+              />
+
               {/* WhatsApp Communications Card */}
               <Box
                 sx={{
