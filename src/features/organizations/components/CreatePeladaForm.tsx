@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Grid, Button } from "@mui/material";
+import { Grid, Button, FormControlLabel, Switch } from "@mui/material";
 import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
@@ -9,6 +9,7 @@ import type { Dayjs } from "dayjs";
 export type CreatePeladaPayload = {
   organization_id: string;
   when: string;
+  notify_casual_players?: boolean;
 };
 
 type Props = {
@@ -20,6 +21,7 @@ export default function CreatePeladaForm({ organizationId, onCreate }: Props) {
   const { t } = useTranslation();
   const [date, setDate] = useState<Dayjs | null>(dayjs());
   const [time, setTime] = useState<Dayjs | null>(dayjs());
+  const [notifyCasualPlayers, setNotifyCasualPlayers] = useState(true);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,6 +36,7 @@ export default function CreatePeladaForm({ organizationId, onCreate }: Props) {
     await onCreate({
       organization_id: organizationId,
       when,
+      notify_casual_players: notifyCasualPlayers,
     });
   };
 
@@ -65,6 +68,21 @@ export default function CreatePeladaForm({ organizationId, onCreate }: Props) {
                 required: true,
               },
             }}
+          />
+        </Grid>
+        <Grid size={{ xs: 12 }}>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={notifyCasualPlayers}
+                onChange={(e) => setNotifyCasualPlayers(e.target.checked)}
+                name="notifyCasualPlayers"
+              />
+            }
+            label={t(
+              "organizations.form.pelada.notify_casual_players",
+              "Avisar convidados e diaristas que a lista está aberta?",
+            )}
           />
         </Grid>
         <Grid size={{ xs: 12 }}>

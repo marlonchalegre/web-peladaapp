@@ -40,6 +40,7 @@ export interface User {
   is_super_admin?: boolean;
   is_blocked?: boolean;
   allow_org_creation?: boolean;
+  receive_non_mensalista_updates?: boolean;
   stats?: {
     goals: number;
     assists: number;
@@ -111,6 +112,7 @@ export interface Pelada {
   fixed_goalkeepers?: boolean | null;
   home_fixed_goalkeeper_id?: string | null;
   away_fixed_goalkeeper_id?: string | null;
+  notify_casual_players?: boolean | null;
   status?: string | null;
   closed_at?: string | null;
   is_admin?: boolean;

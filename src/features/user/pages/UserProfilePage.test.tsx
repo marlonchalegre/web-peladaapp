@@ -131,6 +131,43 @@ describe("UserProfilePage", () => {
     });
   });
 
+  it("updates user profile receive_non_mensalista_updates toggle", async () => {
+    (getUser as Mock).mockResolvedValue({
+      ...defaultUser,
+      receive_non_mensalista_updates: false,
+    });
+
+    (updateUserProfile as Mock).mockResolvedValue({
+      ...defaultUser,
+      receive_non_mensalista_updates: true,
+    });
+
+    render(
+      <MemoryRouter>
+        <UserProfilePage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByDisplayValue("Test User")).toBeInTheDocument();
+    });
+
+    const toggle = screen.getByTestId("receive-non-mensalista-updates-switch");
+
+    expect(toggle).not.toBeChecked();
+
+    fireEvent.click(toggle);
+    expect(toggle).toBeChecked();
+
+    fireEvent.click(screen.getByText("user.profile.button.save"));
+
+    await waitFor(() => {
+      expect(updateUserProfile).toHaveBeenCalledWith("1", {
+        receive_non_mensalista_updates: true,
+      });
+    });
+  });
+
   it("updates user profile name", async () => {
     (getUser as Mock).mockResolvedValue(defaultUser);
 

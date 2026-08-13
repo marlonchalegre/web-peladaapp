@@ -539,6 +539,7 @@
         "teams_count": "Quantidade de times",
         "players_per_team": "Jogadores por time",
         "fixed_goalkeepers": "Goleiros Fixos",
+        "notify_casual_players": "Avisar convidados e diaristas que a lista está aberta?",
         "submit": "Criar pelada"
       }
     },
@@ -993,7 +994,9 @@
       },
       "field": {
         "new_password": "Nova Senha",
-        "confirm_password": "Confirmar Nova Senha"
+        "confirm_password": "Confirmar Nova Senha",
+        "receive_non_mensalista_updates": "Notificações para Diaristas e Convidados",
+        "receive_non_mensalista_updates_description": "Receber notificações privadas no WhatsApp quando a lista de presença for aberta e quando a prioridade dos mensalistas encerrar (máximo de 2 mensagens por pelada)."
       },
       "hint": {
         "password": "Deixe em branco se não quiser alterar a senha"

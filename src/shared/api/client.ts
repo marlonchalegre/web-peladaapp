@@ -213,6 +213,7 @@ export type User = {
   is_super_admin?: boolean;
   is_blocked?: boolean;
   allow_org_creation?: boolean;
+  receive_non_mensalista_updates?: boolean;
   stats?: {
     goals: number;
     assists: number;
@@ -228,6 +229,7 @@ export type UserProfileUpdate = {
   phone?: string;
   position?: string;
   avatar_filename?: string | null;
+  receive_non_mensalista_updates?: boolean;
 };
 
 export const api = new ApiClient();

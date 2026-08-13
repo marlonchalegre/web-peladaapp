@@ -18,6 +18,8 @@ import {
   Select,
   MenuItem,
   IconButton,
+  FormControlLabel,
+  Switch,
 } from "@mui/material";
 import { PhotoCamera, Delete as DeleteIcon } from "@mui/icons-material";
 import {
@@ -46,7 +48,10 @@ export default function UserProfilePage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [position, setPosition] = useState("");
+  const [receiveNonMensalistaUpdates, setReceiveNonMensalistaUpdates] =
+    useState(false);
   const [avatarFilename, setAvatarFilename] = useState<string | null>(null);
+
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -73,6 +78,9 @@ export default function UserProfilePage() {
         setEmail(userData.email || "");
         setPhone(userData.phone || "");
         setPosition(userData.position || "");
+        setReceiveNonMensalistaUpdates(
+          !!userData.receive_non_mensalista_updates,
+        );
         setAvatarFilename(userData.avatar_filename || null);
       } catch (error) {
         if (!active) return;
@@ -172,6 +180,7 @@ export default function UserProfilePage() {
         phone?: string;
         password?: string;
         position?: string;
+        receive_non_mensalista_updates?: boolean;
       } = {};
 
       if (name !== authUser.name) updates.name = name;
@@ -180,6 +189,11 @@ export default function UserProfilePage() {
       if (phone !== (authUser.phone || "")) updates.phone = phone;
       if (position !== (authUser.position || ""))
         updates.position = position as UserProfileUpdate["position"];
+      if (
+        receiveNonMensalistaUpdates !==
+        !!authUser.receive_non_mensalista_updates
+      )
+        updates.receive_non_mensalista_updates = receiveNonMensalistaUpdates;
       if (password) updates.password = password;
 
       if (Object.keys(updates).length === 0) {
@@ -440,6 +454,36 @@ export default function UserProfilePage() {
                 </MenuItem>
               </Select>
             </FormControl>
+
+            <Box sx={{ mt: 1, mb: 1 }}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={receiveNonMensalistaUpdates}
+                    onChange={(e) =>
+                      setReceiveNonMensalistaUpdates(e.target.checked)
+                    }
+                    name="receiveNonMensalistaUpdates"
+                    disabled={loading}
+                    slotProps={{
+                      input: {
+                        "data-testid": "receive-non-mensalista-updates-switch",
+                      } as React.InputHTMLAttributes<HTMLInputElement>,
+                    }}
+                  />
+                }
+                label={t("user.profile.field.receive_non_mensalista_updates")}
+              />
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: "block", ml: 4, mt: -0.5 }}
+              >
+                {t(
+                  "user.profile.field.receive_non_mensalista_updates_description",
+                )}
+              </Typography>
+            </Box>
 
             <Divider sx={{ my: 2 }}>
               <Typography
