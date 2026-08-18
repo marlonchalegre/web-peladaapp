@@ -67,4 +67,93 @@ describe("CreatePeladaForm", () => {
       );
     });
   });
+
+  it("submits max_players when entered", async () => {
+    const handleCreate = vi.fn().mockResolvedValue(undefined);
+
+    render(
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <CreatePeladaForm organizationId="org-123" onCreate={handleCreate} />
+      </LocalizationProvider>,
+    );
+
+    const maxInput = screen
+      .getByTestId("create-pelada-max-players")
+      .querySelector("input")!;
+    fireEvent.change(maxInput, { target: { value: "16" } });
+
+    const submitBtn = screen.getByTestId("create-pelada-submit");
+    fireEvent.click(submitBtn);
+
+    await waitFor(() => {
+      expect(handleCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          organization_id: "org-123",
+          max_players: 16,
+        }),
+      );
+    });
+  });
+
+  it("pre-fills max_players input when defaultMaxPlayers prop is provided", async () => {
+    const handleCreate = vi.fn().mockResolvedValue(undefined);
+
+    render(
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <CreatePeladaForm
+          organizationId="org-123"
+          defaultMaxPlayers={14}
+          onCreate={handleCreate}
+        />
+      </LocalizationProvider>,
+    );
+
+    const maxInput = screen
+      .getByTestId("create-pelada-max-players")
+      .querySelector("input")!;
+    expect(maxInput.value).toBe("14");
+
+    const submitBtn = screen.getByTestId("create-pelada-submit");
+    fireEvent.click(submitBtn);
+
+    await waitFor(() => {
+      expect(handleCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          organization_id: "org-123",
+          max_players: 14,
+        }),
+      );
+    });
+  });
+
+  it("allows overriding pre-filled defaultMaxPlayers", async () => {
+    const handleCreate = vi.fn().mockResolvedValue(undefined);
+
+    render(
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <CreatePeladaForm
+          organizationId="org-123"
+          defaultMaxPlayers={14}
+          onCreate={handleCreate}
+        />
+      </LocalizationProvider>,
+    );
+
+    const maxInput = screen
+      .getByTestId("create-pelada-max-players")
+      .querySelector("input")!;
+    fireEvent.change(maxInput, { target: { value: "20" } });
+
+    const submitBtn = screen.getByTestId("create-pelada-submit");
+    fireEvent.click(submitBtn);
+
+    await waitFor(() => {
+      expect(handleCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          organization_id: "org-123",
+          max_players: 20,
+        }),
+      );
+    });
+  });
 });

@@ -1,6 +1,12 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Grid, Button, FormControlLabel, Switch } from "@mui/material";
+import {
+  Grid,
+  Button,
+  FormControlLabel,
+  Switch,
+  TextField,
+} from "@mui/material";
 import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
@@ -9,18 +15,27 @@ import type { Dayjs } from "dayjs";
 export type CreatePeladaPayload = {
   organization_id: string;
   when: string;
+  max_players?: number;
   notify_casual_players?: boolean;
 };
 
 type Props = {
   organizationId: string;
+  defaultMaxPlayers?: number | null;
   onCreate: (payload: CreatePeladaPayload) => Promise<void>;
 };
 
-export default function CreatePeladaForm({ organizationId, onCreate }: Props) {
+export default function CreatePeladaForm({
+  organizationId,
+  defaultMaxPlayers,
+  onCreate,
+}: Props) {
   const { t } = useTranslation();
   const [date, setDate] = useState<Dayjs | null>(dayjs());
   const [time, setTime] = useState<Dayjs | null>(dayjs());
+  const [maxPlayers, setMaxPlayers] = useState<string>(
+    defaultMaxPlayers != null ? String(defaultMaxPlayers) : "",
+  );
   const [notifyCasualPlayers, setNotifyCasualPlayers] = useState(true);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -33,9 +48,12 @@ export default function CreatePeladaForm({ organizationId, onCreate }: Props) {
       .second(0)
       .toISOString();
 
+    const parsedMax = maxPlayers ? parseInt(maxPlayers, 10) : undefined;
+
     await onCreate({
       organization_id: organizationId,
       when,
+      max_players: parsedMax && !isNaN(parsedMax) ? parsedMax : undefined,
       notify_casual_players: notifyCasualPlayers,
     });
   };
@@ -68,6 +86,27 @@ export default function CreatePeladaForm({ organizationId, onCreate }: Props) {
                 required: true,
               },
             }}
+          />
+        </Grid>
+        <Grid size={{ xs: 12 }}>
+          <TextField
+            fullWidth
+            type="number"
+            label={t(
+              "organizations.form.pelada.max_players",
+              "Máximo de Jogadores",
+            )}
+            value={maxPlayers}
+            onChange={(e) => setMaxPlayers(e.target.value)}
+            slotProps={{
+              htmlInput: { min: 1, step: 1 },
+            }}
+            placeholder="Ex: 14"
+            helperText={t(
+              "organizations.form.pelada.max_players_help",
+              "Limite de jogadores para essa pelada (opcional)",
+            )}
+            data-testid="create-pelada-max-players"
           />
         </Grid>
         <Grid size={{ xs: 12 }}>

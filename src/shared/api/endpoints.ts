@@ -5,6 +5,7 @@ export interface Organization {
   name: string;
   owner_id?: string | null;
   priority_confirmation_limit_hours?: number | null;
+  default_max_players?: number | null;
   waha_api_url?: string | null;
   waha_instance?: string | null;
   waha_group_id?: string | null;
@@ -108,6 +109,7 @@ export interface Pelada {
   when?: string | null;
   num_teams?: number | null;
   players_per_team?: number | null;
+  max_players?: number | null;
   creator_id?: string | null;
   fixed_goalkeepers?: boolean | null;
   home_fixed_goalkeeper_id?: string | null;

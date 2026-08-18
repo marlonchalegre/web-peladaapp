@@ -339,6 +339,16 @@
         "danger_zone": "Zona de Perigo",
         "waha": "WhatsApp (WAHA)"
       },
+      "settings": {
+        "attendance_title": "Configurações de Presença",
+        "attendance_subtitle": "Defina o prazo limite e limite de jogadores padrão para a organização.",
+        "priority_limit_hours": "Prazo Limite de Confirmação Prioritária (horas)",
+        "priority_limit_hours_help": "Horas antes da partida. Deixe em branco ou 0 para prioridade sem limite.",
+        "default_max_players": "Máximo de Jogadores Padrão",
+        "default_max_players_help": "Valor padrão preenchido automaticamente ao criar novas peladas.",
+        "save_success": "Configurações salvas com sucesso!",
+        "save_error": "Erro ao salvar configurações"
+      },
       "substitutions": {
         "empty": "Nenhuma substituição registrada.",
         "end": "Encerrar Substituição",
@@ -540,6 +550,8 @@
         "players_per_team": "Jogadores por time",
         "fixed_goalkeepers": "Goleiros Fixos",
         "notify_casual_players": "Avisar convidados e diaristas que a lista está aberta?",
+        "max_players": "Máximo de Jogadores",
+        "max_players_help": "Limite de jogadores para essa pelada (opcional)",
         "submit": "Criar pelada"
       }
     },

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Box,
   Typography,
@@ -37,13 +37,11 @@ export default function GeneralSettingsSection({
       : "",
   );
 
-  useEffect(() => {
-    setPriorityLimitHours(
-      organization.priority_confirmation_limit_hours != null
-        ? String(organization.priority_confirmation_limit_hours)
-        : "",
-    );
-  }, [organization.priority_confirmation_limit_hours]);
+  const [defaultMaxPlayers, setDefaultMaxPlayers] = useState<string>(
+    organization.default_max_players != null
+      ? String(organization.default_max_players)
+      : "",
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,10 +53,15 @@ export default function GeneralSettingsSection({
         ? null
         : Math.max(0, parseInt(priorityLimitHours, 10));
 
-    const currentValue = organization.priority_confirmation_limit_hours ?? null;
+    const parsedMaxPlayers =
+      defaultMaxPlayers.trim() === ""
+        ? null
+        : Math.max(1, parseInt(defaultMaxPlayers, 10));
 
-    // Avoid redundant network requests if setting hasn't changed
-    if (parsedValue === currentValue) {
+    const currentValue = organization.priority_confirmation_limit_hours ?? null;
+    const currentMax = organization.default_max_players ?? null;
+
+    if (parsedValue === currentValue && parsedMaxPlayers === currentMax) {
       setSuccess(true);
       return;
     }
@@ -68,6 +71,7 @@ export default function GeneralSettingsSection({
       await endpoints.updateOrganization(organization.id, {
         name: organization.name,
         priority_confirmation_limit_hours: parsedValue,
+        default_max_players: parsedMaxPlayers,
       });
 
       setSuccess(true);
@@ -169,6 +173,29 @@ export default function GeneralSettingsSection({
             helperText={t(
               "organizations.management.settings.priority_limit_hours_help",
               "Horas antes da partida. Deixe em branco ou 0 para prioridade sem limite.",
+            )}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <TextField
+            fullWidth
+            type="number"
+            label={t(
+              "organizations.management.settings.default_max_players",
+              "Máximo de Jogadores Padrão",
+            )}
+            value={defaultMaxPlayers}
+            onChange={(e) => setDefaultMaxPlayers(e.target.value)}
+            placeholder="ex: 14"
+            slotProps={{
+              htmlInput: {
+                min: 1,
+                "data-testid": "default-max-players-input",
+              },
+            }}
+            helperText={t(
+              "organizations.management.settings.default_max_players_help",
+              "Valor padrão preenchido automaticamente ao criar novas peladas.",
             )}
           />
         </Grid>

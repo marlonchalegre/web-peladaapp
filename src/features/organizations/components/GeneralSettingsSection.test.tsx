@@ -64,6 +64,34 @@ describe("GeneralSettingsSection", () => {
       expect(mockUpdateOrganization).toHaveBeenCalledWith("org-123", {
         name: "Test Org",
         priority_confirmation_limit_hours: 48,
+        default_max_players: null,
+      });
+      expect(onUpdateSuccess).toHaveBeenCalled();
+    });
+  });
+
+  it("submits updated default_max_players", async () => {
+    mockUpdateOrganization.mockResolvedValue({});
+    const onUpdateSuccess = vi.fn();
+
+    render(
+      <GeneralSettingsSection
+        organization={mockOrganization}
+        onUpdateSuccess={onUpdateSuccess}
+      />,
+    );
+
+    const maxInput = screen.getByTestId("default-max-players-input");
+    fireEvent.change(maxInput, { target: { value: "14" } });
+
+    const saveBtn = screen.getByTestId("save-general-settings-btn");
+    fireEvent.click(saveBtn);
+
+    await waitFor(() => {
+      expect(mockUpdateOrganization).toHaveBeenCalledWith("org-123", {
+        name: "Test Org",
+        priority_confirmation_limit_hours: 24,
+        default_max_players: 14,
       });
       expect(onUpdateSuccess).toHaveBeenCalled();
     });

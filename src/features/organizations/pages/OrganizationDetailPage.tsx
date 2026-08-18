@@ -299,6 +299,7 @@ export default function OrganizationDetailPage() {
             </Typography>
             <CreatePeladaForm
               organizationId={orgId}
+              defaultMaxPlayers={org.default_max_players}
               onCreate={async (payload) => {
                 try {
                   const newPelada = await endpoints.createPelada(payload);

@@ -337,6 +337,16 @@
         "danger_zone": "Danger Zone",
         "waha": "WhatsApp (WAHA)"
       },
+      "settings": {
+        "attendance_title": "Attendance Settings",
+        "attendance_subtitle": "Set priority limit deadline and default max players for the organization.",
+        "priority_limit_hours": "Priority Confirmation Limit (hours)",
+        "priority_limit_hours_help": "Hours before match. Leave blank or 0 for unlimited priority.",
+        "default_max_players": "Default Max Players",
+        "default_max_players_help": "Default max player capacity prefilled when creating new matches.",
+        "save_success": "Settings saved successfully!",
+        "save_error": "Error saving settings"
+      },
       "substitutions": {
         "empty": "No substitutions recorded.",
         "end": "End Substitution",
@@ -540,6 +550,8 @@
         "teams_count": "Number of teams",
         "players_per_team": "Players per team",
         "fixed_goalkeepers": "Fixed Goalkeepers",
+        "max_players": "Max Players",
+        "max_players_help": "Max player limit for this match (optional)",
         "submit": "Create pelada"
       }
     },
