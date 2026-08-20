@@ -686,7 +686,15 @@
       "user_status": {
         "title": "Sua presença:",
         "subtitle": "Confirme se você participará desta pelada.",
-        "prompt": "Você vai jogar hoje?",
+        "prompt": "Bora pro jogo?",
+        "prompts": [
+          "Bora pro jogo?",
+          "Vai pro jogo?",
+          "Bora pra pelada?",
+          "Pronto pra entrar em campo?",
+          "Confirmado para o próximo jogo?",
+          "Partiu pelada?"
+        ],
         "confirmed_msg": "Confirmado! Nos vemos no campo.",
         "declined_msg": "Pena que não pode vir. Esperamos você na próxima!"
       },

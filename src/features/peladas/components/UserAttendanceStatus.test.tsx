@@ -1,13 +1,18 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import UserAttendanceStatus from "./UserAttendanceStatus";
 import { ThemeContextProvider } from "../../../app/providers/ThemeProvider";
 import type { PlayerWithUser } from "../hooks/useAttendance";
 
+let mockT: (key: string, options?: { returnObjects?: boolean }) => unknown = (
+  key: string,
+) => key;
+
 // Mock react-i18next
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
-    t: (key: string) => key,
+    t: (key: string, options?: { returnObjects?: boolean }) =>
+      mockT(key, options),
   }),
 }));
 
@@ -130,5 +135,80 @@ describe("UserAttendanceStatus", () => {
     expect(declineButton).not.toHaveStyle({
       backgroundColor: "rgb(255, 255, 255)",
     });
+  });
+
+  beforeEach(() => {
+    mockT = (key: string) => key;
+  });
+
+  it("selects a prompt from the prompt pool array when available", () => {
+    mockT = (key: string, options?: { returnObjects?: boolean }) => {
+      if (
+        key === "peladas.attendance.user_status.prompts" &&
+        options?.returnObjects
+      ) {
+        return ["Prompt 1", "Prompt 2", "Prompt 3"];
+      }
+      return key;
+    };
+
+    render(
+      <ThemeContextProvider>
+        <UserAttendanceStatus
+          player={mockPlayer as PlayerWithUser}
+          isUpdating={false}
+          onUpdate={() => {}}
+        />
+      </ThemeContextProvider>,
+    );
+
+    const renderedPrompt = screen.getByText(/Prompt [123]/);
+    expect(renderedPrompt).toBeInTheDocument();
+  });
+
+  it("falls back to default prompt key when prompt pool is empty", () => {
+    mockT = (key: string, options?: { returnObjects?: boolean }) => {
+      if (
+        key === "peladas.attendance.user_status.prompts" &&
+        options?.returnObjects
+      ) {
+        return [];
+      }
+      return key;
+    };
+
+    render(
+      <ThemeContextProvider>
+        <UserAttendanceStatus
+          player={mockPlayer as PlayerWithUser}
+          isUpdating={false}
+          onUpdate={() => {}}
+        />
+      </ThemeContextProvider>,
+    );
+
+    expect(
+      screen.getByText("peladas.attendance.user_status.prompt"),
+    ).toBeInTheDocument();
+  });
+
+  it("shows waitlist status message when player status is waitlist", () => {
+    const waitlistPlayer = {
+      ...mockPlayer,
+      attendance_status: "waitlist" as const,
+    };
+    render(
+      <ThemeContextProvider>
+        <UserAttendanceStatus
+          player={waitlistPlayer as PlayerWithUser}
+          isUpdating={false}
+          onUpdate={() => {}}
+        />
+      </ThemeContextProvider>,
+    );
+
+    expect(
+      screen.getByText("peladas.attendance.user_status.waitlist_msg"),
+    ).toBeInTheDocument();
   });
 });

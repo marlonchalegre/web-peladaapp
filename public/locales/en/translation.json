@@ -686,7 +686,15 @@
       "user_status": {
         "title": "Your attendance:",
         "subtitle": "Confirm if you will participate in this pelada.",
-        "prompt": "Are you joining the game today?",
+        "prompt": "Ready for the match?",
+        "prompts": [
+          "Ready for the match?",
+          "Are you in for the game?",
+          "Count you in for the pelada?",
+          "Ready to step on the pitch?",
+          "Joining the next match?",
+          "Game time soon, are you in?"
+        ],
         "confirmed_msg": "You're in! See you on the pitch.",
         "declined_msg": "Sad to hear you can't make it. Hope to see you next time!"
       },

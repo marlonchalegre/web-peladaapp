@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Paper,
   Stack,
@@ -27,6 +28,7 @@ export default function UserAttendanceStatus({
   const { t } = useTranslation();
   const theme = useTheme();
   const firstName = (player.user?.name || "").split(" ")[0];
+  const [promptSeed] = useState(() => Math.floor(Math.random() * 1000));
 
   const getYesButtonStyles = () => {
     const status = player.attendance_status;
@@ -119,8 +121,16 @@ export default function UserAttendanceStatus({
         );
       case "declined":
         return t("peladas.attendance.user_status.declined_msg");
-      default:
+      default: {
+        const prompts = t("peladas.attendance.user_status.prompts", {
+          returnObjects: true,
+        });
+        if (Array.isArray(prompts) && prompts.length > 0) {
+          const randomIndex = promptSeed % prompts.length;
+          return prompts[randomIndex];
+        }
         return t("peladas.attendance.user_status.prompt");
+      }
     }
   };
 
