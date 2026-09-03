@@ -610,12 +610,14 @@ describe("useMatchActions", () => {
       const initialMatches = [
         {
           id: "m1",
+          status: "scheduled",
           timer_status: "stopped",
           timer_started_at: null,
           timer_accumulated_ms: 0,
         },
       ];
       const runningMatches = startUpdater(initialMatches);
+      expect(runningMatches[0].status).toBe("running");
       expect(runningMatches[0].timer_status).toBe("running");
       expect(runningMatches[0].timer_started_at).toBeTruthy();
 
@@ -852,6 +854,7 @@ describe("useMatchActions", () => {
         "peladas.matches.error.close_failed",
       );
 
+      mockApi.pauseMatchTimer.mockResolvedValue({});
       mockApi.updateMatchScore.mockRejectedValue(new Error("End Match Error"));
       await act(async () => {
         await result.current.executeEndMatch("m1");

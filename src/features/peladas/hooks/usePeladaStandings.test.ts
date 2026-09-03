@@ -240,4 +240,28 @@ describe("usePeladaStandings", () => {
     expect(p1Stats?.matchesPlayed).toBe(1);
     expect(p1Stats?.goalsConceded).toBe(2);
   });
+
+  it("should include matches where timer_status is running as an initial draw in standings", () => {
+    const matches = [
+      {
+        id: "m_next",
+        home_team_id: "t1",
+        away_team_id: "t2",
+        home_score: 0,
+        away_score: 0,
+        status: "scheduled",
+        timer_status: "running",
+      } as any,
+    ];
+    const { result } = renderHook(() =>
+      usePeladaStandings(matches, mockTeams, [], null, {}, {}, {}, {}, {}),
+    );
+
+    const t1 = result.current.standings.find((s) => s.teamId === "t1");
+    const t2 = result.current.standings.find((s) => s.teamId === "t2");
+    expect(t1?.draws).toBe(1);
+    expect(t1?.points).toBe(1);
+    expect(t2?.draws).toBe(1);
+    expect(t2?.points).toBe(1);
+  });
 });

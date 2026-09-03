@@ -79,10 +79,16 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
         throw new Error("NEGATIVE_SCORE");
       }
 
+      const isRunning =
+        match.status === "running" ||
+        match.timer_status === "running" ||
+        (match.timer_accumulated_ms ?? 0) > 0 ||
+        newHome + newAway > 0;
+
       const status =
         match.status === "finished"
           ? "finished"
-          : newHome + newAway > 0
+          : isRunning
             ? "running"
             : "scheduled";
 
@@ -632,16 +638,20 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
 
   const startMatchTimer = useCallback(
     async (matchId: string) => {
+      const updateMatchState = (m: Match) => ({
+        ...m,
+        status:
+          m.status === "scheduled" ? ("running" as Match["status"]) : m.status,
+        timer_status: "running" as Match["timer_status"],
+        timer_started_at: new Date().toISOString(),
+      });
+
       setMatches((prev: Match[]) =>
-        prev.map((m) =>
-          m.id === matchId
-            ? {
-                ...m,
-                timer_status: "running" as Match["timer_status"],
-                timer_started_at: new Date().toISOString(),
-              }
-            : m,
-        ),
+        prev.map((m) => (m.id === matchId ? updateMatchState(m) : m)),
+      );
+
+      matchesRef.current = matchesRef.current.map((m: Match) =>
+        m.id === matchId ? updateMatchState(m) : m,
       );
 
       if (!navigator.onLine) {
@@ -656,7 +666,7 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
         handleNetworkError(err, "START_MATCH_TIMER", { matchId });
       }
     },
-    [peladaId, refreshData, setMatches, handleNetworkError],
+    [peladaId, refreshData, setMatches, matchesRef, handleNetworkError],
   );
 
   const pauseMatchTimer = useCallback(
