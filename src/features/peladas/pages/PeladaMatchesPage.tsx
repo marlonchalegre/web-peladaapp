@@ -152,6 +152,8 @@ export default function PeladaMatchesPage() {
   const [selectedAssistantId, setSelectedAssistantId] = useState<string>("");
 
   const getPlayerName = (playerId: string) => {
+    const orgPlayer = orgPlayerIdToPlayer[playerId];
+    if (orgPlayer?.user_name) return orgPlayer.user_name;
     const userId = orgPlayerIdToUserId[playerId];
     return userId && userIdToName[userId]
       ? userIdToName[userId]
@@ -657,6 +659,7 @@ export default function PeladaMatchesPage() {
                 <Grid size={{ xs: 12, lg: 6 }}>
                   <StandingsPanel
                     standings={standings}
+                    matches={matches}
                     showHighlights={isPeladaClosed}
                   />
                 </Grid>
@@ -827,9 +830,7 @@ export default function PeladaMatchesPage() {
               data-testid="edit-scorer-select"
             >
               {editScorerOptions.map((player) => {
-                const name =
-                  orgPlayerIdToPlayer[player.player_id]?.user_name ||
-                  getPlayerName(player.player_id);
+                const name = getPlayerName(player.player_id);
                 const sideLabel = editEventMatch
                   ? player.team_id === editEventMatch.home_team_id
                     ? `(${teamNameById[editEventMatch.home_team_id] || "Home"})`
@@ -863,9 +864,7 @@ export default function PeladaMatchesPage() {
                   <em>{t("common.without_assistance")}</em>
                 </MenuItem>
                 {editAssistantOptions.map((player) => {
-                  const name =
-                    orgPlayerIdToPlayer[player.player_id]?.user_name ||
-                    getPlayerName(player.player_id);
+                  const name = getPlayerName(player.player_id);
                   return (
                     <MenuItem key={player.player_id} value={player.player_id}>
                       {name}

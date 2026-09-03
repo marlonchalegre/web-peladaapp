@@ -1,4 +1,4 @@
-import type { StandingRow } from "../components/StandingsPanel";
+import { getStandingPoints, type StandingRow } from "./standingsUtils";
 import type { PlayerStatRow } from "../components/PlayerStatsPanel";
 
 export function formatPeladaSummary(
@@ -26,15 +26,15 @@ export function formatPeladaSummary(
 
   const nameWidth = Math.min(Math.max(maxNameLength, 15), 30) + 2;
 
-  // Sort standings by points (calculated: wins * 3 + draws)
+  // Sort standings by points
   const sortedStandings = [...standings].sort((a, b) => {
-    const ptsA = a.wins * 3 + a.draws;
-    const ptsB = b.wins * 3 + b.draws;
+    const ptsA = getStandingPoints(a);
+    const ptsB = getStandingPoints(b);
     return ptsB - ptsA;
   });
 
   sortedStandings.forEach((s) => {
-    const pts = s.wins * 3 + s.draws;
+    const pts = getStandingPoints(s);
     const nameStr = s.name.padEnd(nameWidth);
     const sgStr = (s.goalDifference > 0 ? "+" : "") + s.goalDifference;
     text += `${nameStr} ${pts} pts (${s.wins}V ${s.draws}E ${s.losses}D) GP:${s.goalsFor} SG:${sgStr}\n`;

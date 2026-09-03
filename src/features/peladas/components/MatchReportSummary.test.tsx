@@ -246,4 +246,29 @@ describe("MatchReportSummary", () => {
       screen.queryByTestId("summary-end-pelada-section"),
     ).not.toBeInTheDocument();
   });
+
+  it("disables close button and shows sending when closing is true", () => {
+    renderWithTheme(
+      <MatchReportSummary
+        open={true}
+        onClose={vi.fn()}
+        match={mockMatch}
+        homeTeamName="Time 4"
+        awayTeamName="Time 2"
+        events={mockEvents}
+        userIdToName={mockUserIdToName}
+        orgPlayerIdToUserId={mockOrgPlayerIdToUserId}
+        orgPlayerIdToTeamId={mockOrgPlayerIdToTeamId}
+        teamNameById={mockTeamNameById}
+        nextMatch={null}
+        isAdmin={true}
+        closing={true}
+        onClosePelada={vi.fn()}
+      />,
+    );
+
+    const btn = screen.getByTestId("summary-close-pelada-button");
+    expect(btn).toBeDisabled();
+    expect(screen.getByText("common.sending")).toBeInTheDocument();
+  });
 });

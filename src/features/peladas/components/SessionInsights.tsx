@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import StandingsPanel, { type StandingRow } from "./StandingsPanel";
 import PlayerStatsPanel, { type PlayerStatRow } from "./PlayerStatsPanel";
 import PeladaTimeline from "./PeladaTimeline";
-import type { MatchEvent } from "../../../shared/api/endpoints";
+import type { Match, MatchEvent } from "../../../shared/api/endpoints";
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import HistoryIcon from "@mui/icons-material/History";
 
@@ -13,6 +13,7 @@ interface SessionInsightsProps {
   playerStats: PlayerStatRow[];
   onToggleSort: (by: "goals" | "assists") => void;
   isClosed?: boolean;
+  matches?: Match[];
   // Timeline props
   events: MatchEvent[];
   userIdToName: Record<string, string>;
@@ -48,6 +49,7 @@ export default function SessionInsights({
   playerStats,
   onToggleSort,
   isClosed,
+  matches,
   events,
   userIdToName,
   orgPlayerIdToUserId,
@@ -115,7 +117,11 @@ export default function SessionInsights({
         <Box sx={{ p: 2 }}>
           <Grid container spacing={3}>
             <Grid size={{ xs: 12, lg: 6 }}>
-              <StandingsPanel standings={standings} showHighlights={isClosed} />
+              <StandingsPanel
+                standings={standings}
+                matches={matches}
+                showHighlights={isClosed}
+              />
             </Grid>
             <Grid size={{ xs: 12, lg: 6 }}>
               <PlayerStatsPanel

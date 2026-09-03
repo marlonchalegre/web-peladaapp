@@ -17,52 +17,20 @@ import { useTranslation } from "react-i18next";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import { useMemo } from "react";
+import type { Match } from "../../../shared/api/endpoints";
+import {
+  getStandingPoints,
+  getMathematicalChampion,
+  type StandingRow,
+} from "../utils/standingsUtils";
 
-export type StandingRow = {
-  teamId: string;
-  name: string;
-  wins: number;
-  draws: number;
-  losses: number;
-  goalsFor: number;
-  goalsAgainst: number;
-  goalDifference: number;
-  points?: number;
-};
+export type { StandingRow };
 
 type Props = {
   standings: StandingRow[];
   showHighlights?: boolean;
+  matches?: Match[];
 };
-
-function getStandingPoints(
-  row: Pick<StandingRow, "wins" | "draws" | "points">,
-): number {
-  return row.points ?? row.wins * 3 + row.draws;
-}
-
-function getMathematicalChampion(standings: StandingRow[]): StandingRow | null {
-  if (!standings || standings.length === 0) return null;
-  const first = standings[0];
-  const firstPoints = getStandingPoints(first);
-
-  if (first.wins === 0 && first.draws === 0) return null;
-
-  if (standings.length > 1) {
-    const second = standings[1];
-    const secondPoints = getStandingPoints(second);
-
-    if (
-      firstPoints === secondPoints &&
-      first.goalDifference === second.goalDifference &&
-      first.goalsFor === second.goalsFor
-    ) {
-      return null;
-    }
-  }
-
-  return first;
-}
 
 function StandingsHighlights({ champion }: { champion: StandingRow }) {
   const { t } = useTranslation();
@@ -182,11 +150,15 @@ function StandingsHighlights({ champion }: { champion: StandingRow }) {
   );
 }
 
-export default function StandingsPanel({ standings, showHighlights }: Props) {
+export default function StandingsPanel({
+  standings,
+  showHighlights,
+  matches,
+}: Props) {
   const { t } = useTranslation();
   const champion = useMemo(
-    () => (showHighlights ? getMathematicalChampion(standings) : null),
-    [showHighlights, standings],
+    () => getMathematicalChampion(standings, matches),
+    [standings, matches],
   );
 
   return (

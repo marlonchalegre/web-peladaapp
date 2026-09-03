@@ -7,7 +7,7 @@ import {
   type TeamPlayer,
   type Player,
 } from "../../../shared/api/endpoints";
-import type { StandingRow } from "../components/StandingsPanel";
+import { getStandingPoints, type StandingRow } from "../utils/standingsUtils";
 import type { PlayerStatRow } from "../components/PlayerStatsPanel";
 
 type PlayerStatCounts = { goals: number; assists: number; ownGoals: number };
@@ -111,7 +111,7 @@ export function usePeladaStandings(
     return Object.values(table)
       .map((row) => ({
         ...row,
-        points: row.wins * 3 + row.draws,
+        points: getStandingPoints(row),
         goalDifference: row.goalsFor - row.goalsAgainst,
       }))
       .sort((a, b) => {

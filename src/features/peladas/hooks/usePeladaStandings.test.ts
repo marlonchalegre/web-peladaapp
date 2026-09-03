@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { usePeladaStandings } from "./usePeladaStandings";
+import { usePeladaStandings, isMatchActive } from "./usePeladaStandings";
 
 describe("usePeladaStandings", () => {
   const mockTeams = [
@@ -263,5 +263,50 @@ describe("usePeladaStandings", () => {
     expect(t1?.points).toBe(1);
     expect(t2?.draws).toBe(1);
     expect(t2?.points).toBe(1);
+  });
+
+  describe("isMatchActive", () => {
+    it("should return true for finished matches", () => {
+      expect(isMatchActive({ status: "finished" } as any)).toBe(true);
+      expect(isMatchActive({ status: "FINISHED" } as any)).toBe(true);
+    });
+
+    it("should return true for running matches", () => {
+      expect(isMatchActive({ status: "running" } as any)).toBe(true);
+      expect(isMatchActive({ status: "RUNNING" } as any)).toBe(true);
+    });
+
+    it("should return true when timer_status is running even if status is scheduled", () => {
+      expect(
+        isMatchActive({ status: "scheduled", timer_status: "running" } as any),
+      ).toBe(true);
+    });
+
+    it("should return true when paused with accumulated time > 0", () => {
+      expect(
+        isMatchActive({
+          status: "scheduled",
+          timer_status: "paused",
+          timer_accumulated_ms: 5000,
+        } as any),
+      ).toBe(true);
+    });
+
+    it("should return false when paused but timer_accumulated_ms is 0", () => {
+      expect(
+        isMatchActive({
+          status: "scheduled",
+          timer_status: "paused",
+          timer_accumulated_ms: 0,
+        } as any),
+      ).toBe(false);
+    });
+
+    it("should return false for scheduled match with stopped timer", () => {
+      expect(
+        isMatchActive({ status: "scheduled", timer_status: "stopped" } as any),
+      ).toBe(false);
+      expect(isMatchActive({ status: "scheduled" } as any)).toBe(false);
+    });
   });
 });
