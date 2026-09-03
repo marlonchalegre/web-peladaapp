@@ -11,6 +11,7 @@ import {
   Stack,
   Avatar,
   Divider,
+  Tooltip,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
@@ -34,16 +35,38 @@ type Props = {
   showHighlights?: boolean;
 };
 
+function getMathematicalChampion(standings: StandingRow[]): StandingRow | null {
+  if (!standings || standings.length === 0) return null;
+  const first = standings[0];
+  const firstPoints = first.points ?? first.wins * 3 + first.draws;
+
+  if (first.wins === 0 && first.draws === 0) return null;
+
+  if (standings.length > 1) {
+    const second = standings[1];
+    const secondPoints = second.points ?? second.wins * 3 + second.draws;
+
+    if (
+      firstPoints === secondPoints &&
+      first.goalDifference === second.goalDifference &&
+      first.goalsFor === second.goalsFor
+    ) {
+      return null;
+    }
+  }
+
+  return first;
+}
+
 function StandingsHighlights({ standings }: { standings: StandingRow[] }) {
   const { t } = useTranslation();
 
-  const champion = useMemo(() => {
-    if (standings.length === 0) return null;
-    // Assuming standings are already sorted by points, wins, GD
-    return standings[0];
-  }, [standings]);
+  const champion = useMemo(
+    () => getMathematicalChampion(standings),
+    [standings],
+  );
 
-  if (!champion || (champion.wins === 0 && champion.draws === 0)) return null;
+  if (!champion) return null;
 
   return (
     <Box sx={{ p: 2.5, bgcolor: "action.hover" }}>
@@ -162,6 +185,10 @@ function StandingsHighlights({ standings }: { standings: StandingRow[] }) {
 
 export default function StandingsPanel({ standings, showHighlights }: Props) {
   const { t } = useTranslation();
+  const champion = useMemo(
+    () => (showHighlights ? getMathematicalChampion(standings) : null),
+    [showHighlights, standings],
+  );
 
   return (
     <Paper variant="outlined" sx={{ mb: 2, overflow: "hidden" }}>
@@ -231,6 +258,7 @@ export default function StandingsPanel({ standings, showHighlights }: Props) {
           <TableBody>
             {standings.map((row, index) => {
               const points = row.points ?? row.wins * 3 + row.draws;
+              const isChampion = champion?.teamId === row.teamId;
               return (
                 <TableRow
                   key={`stand-${row.teamId}`}
@@ -241,10 +269,30 @@ export default function StandingsPanel({ standings, showHighlights }: Props) {
                   }}
                 >
                   <TableCell sx={{ minWidth: { xs: 100, sm: 140 } }}>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                      {row.name ||
-                        t("peladas.matches.team_fallback", { id: row.teamId })}
-                    </Typography>
+                    <Stack
+                      direction="row"
+                      spacing={0.75}
+                      sx={{ alignItems: "center" }}
+                    >
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        {row.name ||
+                          t("peladas.matches.team_fallback", {
+                            id: row.teamId,
+                          })}
+                      </Typography>
+                      {isChampion && (
+                        <Tooltip title={t("common.champion")}>
+                          <EmojiEventsIcon
+                            sx={{
+                              fontSize: 16,
+                              color: "warning.main",
+                              flexShrink: 0,
+                            }}
+                            data-testid="champion-trophy-icon"
+                          />
+                        </Tooltip>
+                      )}
+                    </Stack>
                   </TableCell>
                   <TableCell
                     align="center"

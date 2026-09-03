@@ -79,4 +79,65 @@ describe("StandingsPanel", () => {
 
     expect(screen.queryByText(/common\.champion/i)).not.toBeInTheDocument();
   });
+
+  it("shows champion trophy icon next to champion team name in standings table when showHighlights is true", () => {
+    render(
+      <ThemeContextProvider>
+        <StandingsPanel standings={mockStandings} showHighlights={true} />
+      </ThemeContextProvider>,
+    );
+
+    const trophy = screen.getByTestId("champion-trophy-icon");
+    expect(trophy).toBeInTheDocument();
+  });
+
+  it("does NOT show champion trophy icon when showHighlights is false", () => {
+    render(
+      <ThemeContextProvider>
+        <StandingsPanel standings={mockStandings} showHighlights={false} />
+      </ThemeContextProvider>,
+    );
+
+    expect(
+      screen.queryByTestId("champion-trophy-icon"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("does NOT show champion trophy icon if teams are tied on points, GD and GF", () => {
+    const tiedStandings: StandingRow[] = [
+      {
+        teamId: "1",
+        name: "Team Alpha",
+        wins: 1,
+        draws: 1,
+        losses: 0,
+        goalsFor: 3,
+        goalsAgainst: 1,
+        goalDifference: 2,
+        points: 4,
+      },
+      {
+        teamId: "2",
+        name: "Team Beta",
+        wins: 1,
+        draws: 1,
+        losses: 0,
+        goalsFor: 3,
+        goalsAgainst: 1,
+        goalDifference: 2,
+        points: 4,
+      },
+    ];
+
+    render(
+      <ThemeContextProvider>
+        <StandingsPanel standings={tiedStandings} showHighlights={true} />
+      </ThemeContextProvider>,
+    );
+
+    expect(
+      screen.queryByTestId("champion-trophy-icon"),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/common\.champion/i)).not.toBeInTheDocument();
+  });
 });
