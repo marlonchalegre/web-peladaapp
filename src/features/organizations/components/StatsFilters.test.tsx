@@ -63,4 +63,23 @@ describe("StatsFilters", () => {
     // This physically guarantees no bubbling path from yearSelect to filters-header click handler.
     expect(header.contains(yearSelect)).toBe(false);
   });
+
+  it("calls onNameFilterChange when typing in the search box", () => {
+    const onNameFilterChange = vi.fn();
+    render(
+      <ThemeProvider theme={theme}>
+        <StatsFilters
+          {...defaultProps}
+          onNameFilterChange={onNameFilterChange}
+        />
+      </ThemeProvider>,
+    );
+
+    const searchInput = screen.getByPlaceholderText(
+      "common.fields.player_name",
+    );
+    fireEvent.change(searchInput, { target: { value: "  Alice  " } });
+
+    expect(onNameFilterChange).toHaveBeenCalledWith("  Alice  ");
+  });
 });

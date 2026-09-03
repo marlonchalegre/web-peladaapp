@@ -140,7 +140,6 @@ export default function ActiveMatchDashboard(props: Props) {
     onOpenResetConfirm,
     recordEvent,
     deleteEventAndRefresh,
-    adjustScore,
     replacePlayerOnTeam,
 
 

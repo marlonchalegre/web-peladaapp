@@ -77,6 +77,43 @@ describe("useOrganizationStatistics", () => {
     expect(result.current.sortedStats[0].player_name).toBe("Alice");
   });
 
+  it("should trim the search box text before doing the search", async () => {
+    const mockStats = [
+      {
+        player_id: "p1",
+        player_name: "Alice",
+        goal: 10,
+        peladas_played: 5,
+        assist: 0,
+        own_goal: 0,
+      },
+      {
+        player_id: "p2",
+        player_name: "Bob",
+        goal: 5,
+        peladas_played: 5,
+        assist: 0,
+        own_goal: 0,
+      },
+    ];
+    mockApi.getOrganizationStatistics.mockResolvedValue(mockStats);
+
+    const { result } = renderHook(() => useOrganizationStatistics(orgId));
+    await waitFor(() => expect(result.current.stats).toHaveLength(2));
+    await waitFor(() => expect(result.current.org).not.toBeNull());
+
+    await act(async () => {
+      result.current.setNameFilter("   Alice   ");
+    });
+    expect(result.current.sortedStats).toHaveLength(1);
+    expect(result.current.sortedStats[0].player_name).toBe("Alice");
+
+    await act(async () => {
+      result.current.setNameFilter("   ");
+    });
+    expect(result.current.sortedStats).toHaveLength(2);
+  });
+
   it("should sort stats", async () => {
     const mockStats = [
       { player_id: "p1", player_name: "Alice", goal: 5 },

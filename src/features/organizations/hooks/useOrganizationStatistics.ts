@@ -92,10 +92,11 @@ export function useOrganizationStatistics(orgId: string) {
   };
 
   const filteredStats = useMemo(() => {
+    const trimmedNameFilter = nameFilter.trim().toLowerCase();
     return stats.filter((row) => {
       const matchesName = row.player_name
         .toLowerCase()
-        .includes(nameFilter.toLowerCase());
+        .includes(trimmedNameFilter);
       const matchesPeladas =
         minPeladas === "" || row.peladas_played >= Number(minPeladas);
       const matchesGoals = minGoals === "" || row.goal >= Number(minGoals);
