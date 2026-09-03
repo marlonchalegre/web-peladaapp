@@ -162,4 +162,88 @@ describe("MatchReportSummary", () => {
     fireEvent.click(nextBtn);
     expect(onProceed).toHaveBeenCalled();
   });
+
+  it("shows end pelada option and calls onClosePelada when clicked on the last match for admin", () => {
+    const onClosePelada = vi.fn();
+    renderWithTheme(
+      <MatchReportSummary
+        open={true}
+        onClose={vi.fn()}
+        match={mockMatch}
+        homeTeamName="Time 4"
+        awayTeamName="Time 2"
+        events={mockEvents}
+        userIdToName={mockUserIdToName}
+        orgPlayerIdToUserId={mockOrgPlayerIdToUserId}
+        orgPlayerIdToTeamId={mockOrgPlayerIdToTeamId}
+        teamNameById={mockTeamNameById}
+        nextMatch={null}
+        isAdmin={true}
+        onClosePelada={onClosePelada}
+      />,
+    );
+
+    expect(
+      screen.getByTestId("summary-end-pelada-section"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.dashboard.summary.all_matches_finished"),
+    ).toBeInTheDocument();
+    const closePeladaBtn = screen.getByTestId("summary-close-pelada-button");
+    expect(closePeladaBtn).toBeInTheDocument();
+    fireEvent.click(closePeladaBtn);
+    expect(onClosePelada).toHaveBeenCalledTimes(1);
+  });
+
+  it("does not show close pelada button if user is not admin", () => {
+    renderWithTheme(
+      <MatchReportSummary
+        open={true}
+        onClose={vi.fn()}
+        match={mockMatch}
+        homeTeamName="Time 4"
+        awayTeamName="Time 2"
+        events={mockEvents}
+        userIdToName={mockUserIdToName}
+        orgPlayerIdToUserId={mockOrgPlayerIdToUserId}
+        orgPlayerIdToTeamId={mockOrgPlayerIdToTeamId}
+        teamNameById={mockTeamNameById}
+        nextMatch={null}
+        isAdmin={false}
+        onClosePelada={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByTestId("summary-end-pelada-section"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByTestId("summary-close-pelada-button"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("does not show end pelada section if pelada is already closed", () => {
+    renderWithTheme(
+      <MatchReportSummary
+        open={true}
+        onClose={vi.fn()}
+        match={mockMatch}
+        homeTeamName="Time 4"
+        awayTeamName="Time 2"
+        events={mockEvents}
+        userIdToName={mockUserIdToName}
+        orgPlayerIdToUserId={mockOrgPlayerIdToUserId}
+        orgPlayerIdToTeamId={mockOrgPlayerIdToTeamId}
+        teamNameById={mockTeamNameById}
+        nextMatch={null}
+        isAdmin={true}
+        isPeladaClosed={true}
+        onClosePelada={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.queryByTestId("summary-end-pelada-section"),
+    ).not.toBeInTheDocument();
+  });
 });

@@ -144,10 +144,12 @@ vi.mock("../components/MatchReportSummary", () => ({
     open,
     match,
     onClose,
+    onClosePelada,
   }: {
     open: boolean;
     match?: { sequence?: number };
     onClose: () => void;
+    onClosePelada?: () => void;
   }) =>
     open ? (
       <div data-testid="match-summary">
@@ -155,6 +157,14 @@ vi.mock("../components/MatchReportSummary", () => ({
         <button data-testid="close-summary-btn" onClick={onClose}>
           Close Summary
         </button>
+        {onClosePelada && (
+          <button
+            data-testid="summary-close-pelada-button"
+            onClick={onClosePelada}
+          >
+            Close Pelada
+          </button>
+        )}
       </div>
     ) : null,
 }));
@@ -655,6 +665,60 @@ describe("PeladaMatchesPage", () => {
     await waitFor(() =>
       expect(screen.queryByTestId("match-summary")).not.toBeInTheDocument(),
     );
+  });
+
+  it("closes pelada and navigates to standings tab when closing pelada from MatchReportSummary", async () => {
+    (api.put as Mock).mockResolvedValue({
+      ...mockDashboardData.matches[1],
+      status: "finished",
+    });
+
+    await act(async () => {
+      renderPage();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("active-match-dashboard")).toBeInTheDocument();
+    });
+
+    // End match to open summary dialog
+    fireEvent.click(screen.getByTestId("select-match-11"));
+    fireEvent.click(screen.getByTestId("end-match-btn"));
+    const endConfirmBtn = screen.getAllByRole("button", {
+      name: "common.confirm",
+    })[0];
+    await act(async () => {
+      fireEvent.click(endConfirmBtn);
+    });
+
+    await waitFor(() =>
+      expect(screen.getByTestId("match-summary")).toBeInTheDocument(),
+    );
+
+    // Click close pelada inside summary
+    expect(
+      screen.getByTestId("summary-close-pelada-button"),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("summary-close-pelada-button"));
+
+    // Confirm close pelada in PrettyConfirmDialog
+    (api.put as Mock).mockResolvedValueOnce({
+      ...mockDashboardData.pelada,
+      status: "closed",
+    });
+
+    const closePeladaConfirmBtn = screen.getByRole("button", {
+      name: "common.confirm",
+    });
+    await act(async () => {
+      fireEvent.click(closePeladaConfirmBtn);
+    });
+
+    // Summary dialog should be closed and standings table displayed on tab 1
+    await waitFor(() => {
+      expect(screen.queryByTestId("match-summary")).not.toBeInTheDocument();
+      expect(screen.getByTestId("standings-table")).toBeInTheDocument();
+    });
   });
 
   it("populates edit event dropdowns correctly using lineupsByMatch when team_players_map is empty", async () => {

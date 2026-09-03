@@ -933,7 +933,9 @@
         "highlights": "Destaques",
         "next_up": "A Seguir",
         "next_match_desc": "Partida #{{seq}} está pronta para começar.",
-        "go_to_next": "Próxima Partida"
+        "go_to_next": "Próxima Partida",
+        "all_matches_finished": "Fim das Partidas",
+        "last_match_desc": "Todas as partidas foram realizadas. Deseja encerrar a pelada?"
       }
     },
     "panel": {

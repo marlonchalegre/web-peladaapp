@@ -933,7 +933,9 @@
         "highlights": "Highlights",
         "next_up": "Next Up",
         "next_match_desc": "Match #{{seq}} is ready to start.",
-        "go_to_next": "Next Match"
+        "go_to_next": "Next Match",
+        "all_matches_finished": "All Matches Finished",
+        "last_match_desc": "All scheduled matches have been played. Would you like to close the pelada?"
       }
     },
     "panel": {

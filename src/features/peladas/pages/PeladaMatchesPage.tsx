@@ -290,6 +290,7 @@ export default function PeladaMatchesPage() {
     try {
       await executeClosePelada();
       setClosePeladaConfirmOpen(false);
+      setJustFinishedMatchId(null);
       setActiveTab(1); // Standings & Performance tab
     } catch {
       // Error already handled in useMatchActions
@@ -743,6 +744,10 @@ export default function PeladaMatchesPage() {
             teamNameById={teamNameById}
             nextMatch={nextScheduledMatch}
             onProceedToNext={proceedToNextMatch}
+            onClosePelada={() => setClosePeladaConfirmOpen(true)}
+            isPeladaClosed={isPeladaClosed}
+            isAdmin={isAdmin}
+            closing={closing}
           />
         )}
       </Container>

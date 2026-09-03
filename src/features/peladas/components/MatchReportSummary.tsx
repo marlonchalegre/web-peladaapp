@@ -15,6 +15,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import StopIcon from "@mui/icons-material/Stop";
 import { useTranslation } from "react-i18next";
 import type { Match, MatchEvent } from "../../../shared/api/endpoints";
 import { getPlayerTeamInMatch } from "../utils/playerUtils";
@@ -34,6 +35,10 @@ interface MatchReportSummaryProps {
   teamNameById: Record<string, string>;
   nextMatch?: Match | null;
   onProceedToNext?: () => void;
+  onClosePelada?: () => void;
+  isPeladaClosed?: boolean;
+  isAdmin?: boolean;
+  closing?: boolean;
 }
 
 import AssistWalkerIcon from "@mui/icons-material/DirectionsRun";
@@ -62,6 +67,10 @@ export default function MatchReportSummary({
   teamNameById,
   nextMatch,
   onProceedToNext,
+  onClosePelada,
+  isPeladaClosed = false,
+  isAdmin = false,
+  closing = false,
 }: MatchReportSummaryProps) {
   const { t } = useTranslation();
 
@@ -364,7 +373,7 @@ export default function MatchReportSummary({
           <Divider sx={{ width: "100%" }} />
 
           {/* Next Match Info */}
-          {nextMatch && (
+          {nextMatch ? (
             <Box
               sx={{
                 width: "100%",
@@ -462,7 +471,57 @@ export default function MatchReportSummary({
                 })}
               </Typography>
             </Box>
-          )}
+          ) : !isPeladaClosed ? (
+            <Box
+              sx={{
+                width: "100%",
+                p: 2,
+                borderRadius: 2,
+                border: "1px dashed",
+                borderColor: "divider",
+                bgcolor: "action.hover",
+                textAlign: "center",
+              }}
+              data-testid="summary-end-pelada-section"
+            >
+              <Typography
+                variant="caption"
+                gutterBottom
+                sx={{
+                  color: "text.secondary",
+                  display: "block",
+                  fontWeight: "bold",
+                  textTransform: "uppercase",
+                }}
+              >
+                {t("peladas.dashboard.summary.all_matches_finished")}
+              </Typography>
+              <Typography
+                variant="body2"
+                sx={{
+                  color: "text.secondary",
+                  mb: isAdmin && onClosePelada ? 1.5 : 0,
+                }}
+              >
+                {t("peladas.dashboard.summary.last_match_desc")}
+              </Typography>
+              {isAdmin && onClosePelada && (
+                <Button
+                  variant="contained"
+                  color="error"
+                  startIcon={<StopIcon />}
+                  onClick={onClosePelada}
+                  disabled={closing}
+                  data-testid="summary-close-pelada-button"
+                  sx={{ borderRadius: 2, px: 3, fontWeight: "bold" }}
+                >
+                  {closing
+                    ? t("common.sending")
+                    : t("peladas.matches.button.close_pelada")}
+                </Button>
+              )}
+            </Box>
+          ) : null}
 
           {/* Actions */}
           <Stack direction="row" spacing={2} sx={{ width: "100%" }}>
