@@ -49,6 +49,7 @@ import {
   generateAnnouncementText,
   type PlayerWithUser,
 } from "../utils/exportUtils";
+import { isAssistForGoal } from "../utils/playerUtils";
 import GlobalSessionTimer from "../components/GlobalSessionTimer";
 import { usePeladaTimer } from "../hooks/usePeladaTimer";
 import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
@@ -165,12 +166,8 @@ export default function PeladaMatchesPage() {
       (e) =>
         e.match_id === editEventDialogOpen.match_id &&
         e.event_type === "assist" &&
-        ((e.parent_event_id && e.parent_event_id === editEventDialogOpen.id) ||
-          (!e.parent_event_id &&
-            e.session_time_ms === editEventDialogOpen.session_time_ms &&
-            e.match_time_ms === editEventDialogOpen.match_time_ms &&
-            (!scorerTeamId ||
-              orgPlayerIdToTeamId[e.player_id] === scorerTeamId))),
+        isAssistForGoal(e, editEventDialogOpen) &&
+        (!scorerTeamId || orgPlayerIdToTeamId[e.player_id] === scorerTeamId),
     );
   }, [editEventDialogOpen, matchEvents, orgPlayerIdToTeamId]);
 

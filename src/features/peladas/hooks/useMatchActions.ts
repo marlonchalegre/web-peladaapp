@@ -10,6 +10,7 @@ import {
   type MatchEventType,
 } from "../../../shared/api/endpoints";
 import { enqueueAction, type OfflineActionType } from "../utils/offlineQueue";
+import { isAssistForGoal } from "../utils/playerUtils";
 
 const endpoints = createApi(api);
 
@@ -162,54 +163,43 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
     type: MatchEventType,
     eventId?: string,
   ) => {
-    // Optimistic Update
     setMatchEvents((prev: MatchEvent[]) => {
+      let targetGoal: MatchEvent | undefined;
       if (eventId) {
-        const eventToDelete = prev.find((e) => e.id === eventId);
-        if (eventToDelete && eventToDelete.event_type === "goal") {
-          const matchingAssist = prev.find(
-            (e) =>
-              e.match_id === matchId &&
-              e.event_type === "assist" &&
-              ((e.parent_event_id && e.parent_event_id === eventToDelete.id) ||
-                (!e.parent_event_id &&
-                  e.session_time_ms === eventToDelete.session_time_ms &&
-                  e.match_time_ms === eventToDelete.match_time_ms)),
-          );
-          return prev.filter(
-            (e) =>
-              e.id !== eventId &&
-              (!matchingAssist || e.id !== matchingAssist.id),
-          );
-        }
-        return prev.filter((e) => e.id !== eventId);
+        targetGoal = prev.find((e) => e.id === eventId);
       } else {
-        const goalToDelete = [...prev]
-          .reverse()
-          .find(
-            (e) =>
-              e.match_id === matchId &&
-              e.player_id === playerId &&
-              e.event_type === type,
-          );
-        if (goalToDelete) {
-          const matchingAssist = prev.find(
-            (e) =>
-              e.match_id === matchId &&
-              e.event_type === "assist" &&
-              ((e.parent_event_id && e.parent_event_id === goalToDelete.id) ||
-                (!e.parent_event_id &&
-                  e.session_time_ms === goalToDelete.session_time_ms &&
-                  e.match_time_ms === goalToDelete.match_time_ms)),
-          );
-          return prev.filter(
-            (e) =>
-              e.id !== goalToDelete.id &&
-              (!matchingAssist || e.id !== matchingAssist.id),
-          );
+        for (let i = prev.length - 1; i >= 0; i--) {
+          const e = prev[i];
+          if (
+            e.match_id === matchId &&
+            e.player_id === playerId &&
+            e.event_type === type
+          ) {
+            targetGoal = e;
+            break;
+          }
         }
       }
-      return prev;
+
+      if (!targetGoal) {
+        return eventId ? prev.filter((e) => e.id !== eventId) : prev;
+      }
+
+      if (targetGoal.event_type === "goal") {
+        const matchingAssist = prev.find(
+          (e) =>
+            e.match_id === matchId &&
+            e.event_type === "assist" &&
+            isAssistForGoal(e, targetGoal),
+        );
+        return prev.filter(
+          (e) =>
+            e.id !== targetGoal.id &&
+            (!matchingAssist || e.id !== matchingAssist.id),
+        );
+      }
+
+      return prev.filter((e) => e.id !== targetGoal.id);
     });
 
     setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));

@@ -17,6 +17,7 @@ import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import StopIcon from "@mui/icons-material/Stop";
 import { useTranslation } from "react-i18next";
+import { useCallback, useMemo } from "react";
 import type { Match, MatchEvent } from "../../../shared/api/endpoints";
 import { getPlayerTeamInMatch } from "../utils/playerUtils";
 
@@ -74,46 +75,65 @@ export default function MatchReportSummary({
 }: MatchReportSummaryProps) {
   const { t } = useTranslation();
 
-  const getPlayerName = (orgPlayerId: string) => {
-    const userId = orgPlayerIdToUserId[orgPlayerId];
-    return userIdToName[userId] || t("common.unknown_player");
-  };
+  const getPlayerName = useCallback(
+    (orgPlayerId: string) => {
+      const userId = orgPlayerIdToUserId[orgPlayerId];
+      return userIdToName[userId] || t("common.unknown_player");
+    },
+    [orgPlayerIdToUserId, userIdToName, t],
+  );
 
-  const groupEventsByTeam = (teamId: string) => {
-    const teamEvents = events.filter(
-      (e) =>
-        getPlayerTeamInMatch(
-          e.player_id,
-          match.id,
-          match,
-          lineupsByMatch,
-          teamPlayers,
-          orgPlayerIdToTeamId,
-        ) === teamId,
-    );
+  const groupEventsByTeam = useCallback(
+    (teamId: string) => {
+      const teamEvents = events.filter(
+        (e) =>
+          getPlayerTeamInMatch(
+            e.player_id,
+            match.id,
+            match,
+            lineupsByMatch,
+            teamPlayers,
+            orgPlayerIdToTeamId,
+          ) === teamId,
+      );
 
-    const grouped: Record<string, GroupedEvent> = {};
+      const grouped: Record<string, GroupedEvent> = {};
 
-    teamEvents.forEach((e) => {
-      if (!grouped[e.player_id]) {
-        grouped[e.player_id] = {
-          playerId: e.player_id,
-          playerName: getPlayerName(e.player_id),
-          goals: 0,
-          assists: 0,
-          ownGoals: 0,
-        };
-      }
-      if (e.event_type === "goal") grouped[e.player_id].goals += 1;
-      if (e.event_type === "assist") grouped[e.player_id].assists += 1;
-      if (e.event_type === "own_goal") grouped[e.player_id].ownGoals += 1;
-    });
+      teamEvents.forEach((e) => {
+        if (!grouped[e.player_id]) {
+          grouped[e.player_id] = {
+            playerId: e.player_id,
+            playerName: getPlayerName(e.player_id),
+            goals: 0,
+            assists: 0,
+            ownGoals: 0,
+          };
+        }
+        if (e.event_type === "goal") grouped[e.player_id].goals += 1;
+        if (e.event_type === "assist") grouped[e.player_id].assists += 1;
+        if (e.event_type === "own_goal") grouped[e.player_id].ownGoals += 1;
+      });
 
-    return Object.values(grouped).sort((a, b) => b.goals - a.goals);
-  };
+      return Object.values(grouped).sort((a, b) => b.goals - a.goals);
+    },
+    [
+      events,
+      match,
+      lineupsByMatch,
+      teamPlayers,
+      orgPlayerIdToTeamId,
+      getPlayerName,
+    ],
+  );
 
-  const homeHighlights = groupEventsByTeam(match.home_team_id);
-  const awayHighlights = groupEventsByTeam(match.away_team_id);
+  const homeHighlights = useMemo(
+    () => groupEventsByTeam(match.home_team_id),
+    [groupEventsByTeam, match.home_team_id],
+  );
+  const awayHighlights = useMemo(
+    () => groupEventsByTeam(match.away_team_id),
+    [groupEventsByTeam, match.away_team_id],
+  );
 
   const nextHomeName = nextMatch
     ? teamNameById[nextMatch.home_team_id] ||

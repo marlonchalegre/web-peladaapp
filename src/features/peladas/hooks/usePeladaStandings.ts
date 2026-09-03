@@ -45,6 +45,17 @@ function statsMapFromApi(
   return map;
 }
 
+export function isMatchActive(m: Match): boolean {
+  const status = (m.status || "").toLowerCase();
+  const timerStatus = (m.timer_status || "").toLowerCase();
+  return (
+    status === "finished" ||
+    status === "running" ||
+    timerStatus === "running" ||
+    (timerStatus === "paused" && (m.timer_accumulated_ms ?? 0) > 0)
+  );
+}
+
 export function usePeladaStandings(
   matches: Match[],
   teams: Team[],
@@ -78,14 +89,7 @@ export function usePeladaStandings(
       const hs = m.home_score ?? 0;
       const as = m.away_score ?? 0;
       if (!(m.home_team_id in table) || !(m.away_team_id in table)) continue;
-      const status = (m.status || "").toLowerCase();
-      const timerStatus = (m.timer_status || "").toLowerCase();
-      const isMatchActive =
-        status === "finished" ||
-        status === "running" ||
-        timerStatus === "running" ||
-        (timerStatus === "paused" && (m.timer_accumulated_ms ?? 0) > 0);
-      if (!isMatchActive) continue;
+      if (!isMatchActive(m)) continue;
 
       table[m.home_team_id].goalsFor += hs;
       table[m.home_team_id].goalsAgainst += as;
@@ -142,14 +146,7 @@ export function usePeladaStandings(
     const goalsConcededMap: Record<string, number> = {};
 
     for (const m of matches) {
-      const status = (m.status || "").toLowerCase();
-      const timerStatus = (m.timer_status || "").toLowerCase();
-      const isMatchActive =
-        status === "finished" ||
-        status === "running" ||
-        timerStatus === "running" ||
-        (timerStatus === "paused" && (m.timer_accumulated_ms ?? 0) > 0);
-      if (!isMatchActive) continue;
+      if (!isMatchActive(m)) continue;
       const lu = lineupsByMatch[m.id];
       if (!lu) continue;
       const playersInMatch = new Set<string>();

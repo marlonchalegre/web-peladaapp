@@ -35,16 +35,22 @@ type Props = {
   showHighlights?: boolean;
 };
 
+function getStandingPoints(
+  row: Pick<StandingRow, "wins" | "draws" | "points">,
+): number {
+  return row.points ?? row.wins * 3 + row.draws;
+}
+
 function getMathematicalChampion(standings: StandingRow[]): StandingRow | null {
   if (!standings || standings.length === 0) return null;
   const first = standings[0];
-  const firstPoints = first.points ?? first.wins * 3 + first.draws;
+  const firstPoints = getStandingPoints(first);
 
   if (first.wins === 0 && first.draws === 0) return null;
 
   if (standings.length > 1) {
     const second = standings[1];
-    const secondPoints = second.points ?? second.wins * 3 + second.draws;
+    const secondPoints = getStandingPoints(second);
 
     if (
       firstPoints === secondPoints &&
@@ -58,15 +64,8 @@ function getMathematicalChampion(standings: StandingRow[]): StandingRow | null {
   return first;
 }
 
-function StandingsHighlights({ standings }: { standings: StandingRow[] }) {
+function StandingsHighlights({ champion }: { champion: StandingRow }) {
   const { t } = useTranslation();
-
-  const champion = useMemo(
-    () => getMathematicalChampion(standings),
-    [standings],
-  );
-
-  if (!champion) return null;
 
   return (
     <Box sx={{ p: 2.5, bgcolor: "action.hover" }}>
@@ -192,7 +191,9 @@ export default function StandingsPanel({ standings, showHighlights }: Props) {
 
   return (
     <Paper variant="outlined" sx={{ mb: 2, overflow: "hidden" }}>
-      {showHighlights && <StandingsHighlights standings={standings} />}
+      {showHighlights && champion && (
+        <StandingsHighlights champion={champion} />
+      )}
       <Box
         sx={{
           bgcolor: "action.hover",
@@ -257,7 +258,7 @@ export default function StandingsPanel({ standings, showHighlights }: Props) {
           </TableHead>
           <TableBody>
             {standings.map((row, index) => {
-              const points = row.points ?? row.wins * 3 + row.draws;
+              const points = getStandingPoints(row);
               const isChampion = champion?.teamId === row.teamId;
               return (
                 <TableRow

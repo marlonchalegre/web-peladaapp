@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect } from "vitest";
-import { sortPlayersByPosition, getPlayerTeamInMatch } from "./playerUtils";
+import {
+  sortPlayersByPosition,
+  getPlayerTeamInMatch,
+  isAssistForGoal,
+} from "./playerUtils";
 
 describe("playerUtils", () => {
   describe("sortPlayersByPosition", () => {
@@ -150,6 +154,44 @@ describe("playerUtils", () => {
     it("should return null if player is not found anywhere", () => {
       const result = getPlayerTeamInMatch("player-999", matchId, match, {}, {});
       expect(result).toBeNull();
+    });
+  });
+
+  describe("isAssistForGoal", () => {
+    it("should match by parent_event_id", () => {
+      const goal = { id: "g1", session_time_ms: 100, match_time_ms: 50 };
+      const assist = {
+        parent_event_id: "g1",
+        session_time_ms: 200,
+        match_time_ms: 150,
+      };
+      expect(isAssistForGoal(assist, goal)).toBe(true);
+    });
+
+    it("should match by matching timestamps when parent_event_id is missing", () => {
+      const goal = { id: "g1", session_time_ms: 100, match_time_ms: 50 };
+      const assist = {
+        parent_event_id: null,
+        session_time_ms: 100,
+        match_time_ms: 50,
+      };
+      expect(isAssistForGoal(assist, goal)).toBe(true);
+    });
+
+    it("should not match if parent_event_id is different or timestamps differ", () => {
+      const goal = { id: "g1", session_time_ms: 100, match_time_ms: 50 };
+      const assistDiffParent = {
+        parent_event_id: "g2",
+        session_time_ms: 100,
+        match_time_ms: 50,
+      };
+      const assistDiffTime = {
+        parent_event_id: null,
+        session_time_ms: 101,
+        match_time_ms: 50,
+      };
+      expect(isAssistForGoal(assistDiffParent, goal)).toBe(false);
+      expect(isAssistForGoal(assistDiffTime, goal)).toBe(false);
     });
   });
 });

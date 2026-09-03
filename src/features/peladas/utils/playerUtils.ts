@@ -1,4 +1,4 @@
-import type { User } from "../../../shared/api/endpoints";
+import type { MatchEvent, User } from "../../../shared/api/endpoints";
 
 export const POSITION_ORDER: Record<string, number> = {
   goalkeeper: 0,
@@ -93,4 +93,24 @@ export function getPlayerTeamInMatch(
   }
 
   return null;
+}
+
+/**
+ * Checks whether an event is the assist associated with a given goal.
+ * Matches by parent_event_id or identical session and match timestamps.
+ */
+export function isAssistForGoal(
+  assist: Pick<
+    MatchEvent,
+    "parent_event_id" | "session_time_ms" | "match_time_ms"
+  >,
+  goal: Pick<MatchEvent, "id" | "session_time_ms" | "match_time_ms">,
+): boolean {
+  if (assist.parent_event_id) {
+    return assist.parent_event_id === goal.id;
+  }
+  return (
+    assist.session_time_ms === goal.session_time_ms &&
+    assist.match_time_ms === goal.match_time_ms
+  );
 }
