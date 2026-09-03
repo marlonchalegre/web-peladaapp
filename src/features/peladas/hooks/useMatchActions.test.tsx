@@ -34,9 +34,14 @@ vi.mock("../../../shared/api/endpoints", () => ({
   createApi: vi.fn(() => mockApi),
 }));
 
-vi.mock("../utils/offlineQueue", () => ({
-  enqueueAction: mockEnqueueAction,
-}));
+vi.mock("../utils/offlineQueue", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../utils/offlineQueue")>();
+  return {
+    ...actual,
+    enqueueAction: mockEnqueueAction,
+  };
+});
+
 
 describe("useMatchActions", () => {
   const peladaId = "p1";
@@ -206,6 +211,7 @@ describe("useMatchActions", () => {
         100,
         200,
         undefined,
+        undefined,
       );
       expect(mockDelegates.refreshData).toHaveBeenCalled();
     });
@@ -224,6 +230,8 @@ describe("useMatchActions", () => {
         type: "goal",
         sessionTimeMs: 100,
         matchTimeMs: 200,
+        assistantId: undefined,
+        teamId: undefined,
       });
     });
 

@@ -10,8 +10,10 @@ import { useNetwork } from "../../../shared/hooks/useNetwork";
 import {
   getOfflineQueue,
   dequeueAction,
+  isNetworkError,
   type OfflineAction,
 } from "../utils/offlineQueue";
+
 import { api } from "../../../shared/api/client";
 import { createApi } from "../../../shared/api/endpoints";
 import CloudOffIcon from "@mui/icons-material/CloudOff";
@@ -76,8 +78,10 @@ export default function OfflineSyncManager({
               p.sessionTimeMs,
               p.matchTimeMs,
               p.assistantId,
+              p.teamId,
             );
             break;
+
           case "DELETE_EVENT":
             await endpoints.deleteMatchEvent(
               p.matchId,
@@ -150,12 +154,7 @@ export default function OfflineSyncManager({
       console.error("Sync failed:", error);
       // If it's a network error, stop syncing, but don't show a big error, just wait.
       // If it's a server error (e.g., 400), show error.
-      if (
-        error instanceof Error &&
-        error.message &&
-        (error.message.includes("Failed to fetch") ||
-          error.message.includes("Network timeout"))
-      ) {
+      if (isNetworkError(error)) {
         setSyncError("Conexão perdida durante a sincronização.");
       } else {
         setSyncError(

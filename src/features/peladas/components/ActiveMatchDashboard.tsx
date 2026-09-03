@@ -89,13 +89,16 @@ type Props = {
     sessionTimeMs?: number,
     matchTimeMs?: number,
     assistantId?: string,
+    teamId?: string,
   ) => Promise<void>;
+
   deleteEventAndRefresh: (
     matchId: string,
     playerId: string,
     type: MatchEventType,
+    eventId?: string,
   ) => Promise<void>;
-  adjustScore: (
+  adjustScore?: (
     matchId: string,
     team: "home" | "away",
     delta: 1 | -1,
@@ -139,6 +142,8 @@ export default function ActiveMatchDashboard(props: Props) {
     deleteEventAndRefresh,
     adjustScore,
     replacePlayerOnTeam,
+
+
     addPlayerToTeam,
     onEndMatch,
     matches,
@@ -171,19 +176,22 @@ export default function ActiveMatchDashboard(props: Props) {
     return teamPlayers.filter((p) => p.player_id !== goalScorerInfo.playerId);
   }, [goalScorerInfo, homePlayers, awayPlayers]);
 
-  const handleSelectAssistant = (assistantId?: string) => {
+  const handleSelectAssistant = async (assistantId?: string) => {
     if (!goalScorerInfo) return;
-    recordEvent(
+    const info = goalScorerInfo;
+    setAssistDialogOpen(false);
+    setGoalScorerInfo(null);
+    const scorerTeamId =
+      info.side === "home" ? match.home_team_id : match.away_team_id;
+    await recordEvent(
       match.id,
-      goalScorerInfo.playerId,
+      info.playerId,
       "goal",
       undefined,
       undefined,
       assistantId,
+      scorerTeamId,
     );
-    adjustScore(match.id, goalScorerInfo.side, 1);
-    setAssistDialogOpen(false);
-    setGoalScorerInfo(null);
   };
 
   const handleCloseAssistDialog = () => {
@@ -235,18 +243,20 @@ export default function ActiveMatchDashboard(props: Props) {
           setGoalScorerInfo({ playerId, side });
           setAssistDialogOpen(true);
         } else {
-          recordEvent(match.id, playerId, type, undefined, undefined);
-          if (type === "own_goal") {
-            adjustScore(match.id, side === "home" ? "away" : "home", 1);
-          }
+          const playerTeamId =
+            side === "home" ? match.home_team_id : match.away_team_id;
+          recordEvent(
+            match.id,
+            playerId,
+            type,
+            undefined,
+            undefined,
+            undefined,
+            playerTeamId,
+          );
         }
       } else {
         deleteEventAndRefresh(match.id, playerId, type);
-        if (type === "goal") {
-          adjustScore(match.id, side, -1);
-        } else if (type === "own_goal") {
-          adjustScore(match.id, side === "home" ? "away" : "home", -1);
-        }
       }
     }
   };

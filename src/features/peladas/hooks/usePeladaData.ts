@@ -18,6 +18,16 @@ import {
 
 const endpoints = createApi(api);
 
+function mapToTeamPlayers(
+  entries?: { team_id: string; player_id: string; is_goalkeeper?: boolean }[],
+): TeamPlayer[] {
+  return (entries || []).map((e) => ({
+    team_id: e.team_id,
+    player_id: e.player_id,
+    is_goalkeeper: e.is_goalkeeper,
+  }));
+}
+
 export function usePeladaData(
   peladaId: string,
   opts?: { includeFinance?: boolean },
@@ -56,6 +66,7 @@ export function usePeladaData(
   >(null);
   const [attendance, setAttendance] = useState<Attendance[]>([]);
   const [loadedPeladaId, setLoadedPeladaId] = useState<string | null>(null);
+  const fetchSeqRef = useRef(0);
   const [peladaTransactions, setPeladaTransactions] = useState<Transaction[]>(
     [],
   );
@@ -68,6 +79,8 @@ export function usePeladaData(
     async (isRefresh = false) => {
       if (!peladaId) return;
       if (!isRefresh && loadedPeladaId === peladaId) return;
+
+      const currentSeq = ++fetchSeqRef.current;
 
       if (!isRefresh) {
         setLoadedPeladaId(peladaId);
@@ -136,43 +149,42 @@ export function usePeladaData(
         for (const [teamIdStr, arr] of Object.entries(
           data.team_players_map || {},
         )) {
-          asTeamPlayers[teamIdStr] = (arr || []).map((e) => ({
-            team_id: e.team_id,
-            player_id: e.player_id,
-            is_goalkeeper: e.is_goalkeeper,
-          }));
+          asTeamPlayers[teamIdStr] = mapToTeamPlayers(arr);
         }
         setTeamPlayers(asTeamPlayers);
 
         const luMap: Record<string, Record<string, TeamPlayer[]>> = {};
-        for (const [midStr, teamPlayersGroup] of Object.entries(
+        for (const [mid, teamPlayersGroup] of Object.entries(
           data.match_lineups_map || {},
         )) {
-          const mid = midStr;
           const asTeamPlayersForMatch: Record<string, TeamPlayer[]> = {};
           for (const [teamIdStr, arr] of Object.entries(
             teamPlayersGroup || {},
           )) {
-            asTeamPlayersForMatch[teamIdStr] = (arr || []).map((e) => ({
-              team_id: e.team_id,
-              player_id: e.player_id,
-              is_goalkeeper: e.is_goalkeeper,
-            }));
+            asTeamPlayersForMatch[teamIdStr] = mapToTeamPlayers(arr);
           }
           luMap[mid] = asTeamPlayersForMatch;
         }
+
         setLineupsByMatch(luMap);
       };
 
       try {
         const data = await endpoints.getPeladaDashboardData(peladaId);
+        if (currentSeq !== fetchSeqRef.current) {
+          return;
+        }
         localStorage.setItem(
           `pelada_dashboard_cache_${peladaId}`,
           JSON.stringify(data),
         );
         applyData(data);
       } catch (err: unknown) {
+        if (currentSeq !== fetchSeqRef.current) {
+          return;
+        }
         let loadedFromCache = false;
+
         try {
           const cached = localStorage.getItem(
             `pelada_dashboard_cache_${peladaId}`,

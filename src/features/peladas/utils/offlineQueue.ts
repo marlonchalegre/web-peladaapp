@@ -65,3 +65,12 @@ export function clearOfflineQueue(peladaId: string) {
   localStorage.removeItem(getOfflineQueueKey(peladaId));
   window.dispatchEvent(new Event("offlineQueueChanged"));
 }
+
+export function isNetworkError(error: unknown): boolean {
+  return (
+    error instanceof Error &&
+    (error.message.includes("Failed to fetch") ||
+      error.message.includes("Network Error") ||
+      error.message.includes("Network timeout"))
+  );
+}

@@ -9,7 +9,11 @@ import {
   type TeamPlayer,
   type MatchEventType,
 } from "../../../shared/api/endpoints";
-import { enqueueAction, type OfflineActionType } from "../utils/offlineQueue";
+import {
+  enqueueAction,
+  isNetworkError,
+  type OfflineActionType,
+} from "../utils/offlineQueue";
 import { isAssistForGoal } from "../utils/playerUtils";
 
 const endpoints = createApi(api);
@@ -50,16 +54,11 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
 
   const handleNetworkError = useCallback(
     (error: unknown, actionType: string, payload: Record<string, unknown>) => {
-      if (
-        error instanceof Error &&
-        (error.message.includes("Failed to fetch") ||
-          error.message.includes("Network Error") ||
-          error.message.includes("Network timeout"))
-      ) {
+      if (isNetworkError(error)) {
         enqueueAction(peladaId, actionType as OfflineActionType, payload);
-        return true; // handled
+        return true;
       }
-      return false; // not a network error
+      return false;
     },
     [peladaId],
   );
@@ -246,6 +245,7 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
     sessionTimeMs?: number,
     matchTimeMs?: number,
     assistantId?: string,
+    teamId?: string,
   ) => {
     // Optimistic Update
     const newEvent = {
@@ -256,6 +256,7 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
       session_time_ms: sessionTimeMs,
       match_time_ms: matchTimeMs,
       created_at: new Date().toISOString(),
+      team_id: teamId,
     } as MatchEvent;
     const optimisticEvents = [newEvent];
     if (type === "goal" && assistantId) {
@@ -267,9 +268,36 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
         session_time_ms: sessionTimeMs,
         match_time_ms: matchTimeMs,
         created_at: new Date().toISOString(),
+        team_id: teamId,
       } as MatchEvent);
     }
     setMatchEvents((prev: MatchEvent[]) => [...prev, ...optimisticEvents]);
+
+    if (type === "goal" || type === "own_goal") {
+      const match = matchesRef.current.find((m) => m.id === matchId);
+      if (match) {
+        const isHome = teamId ? teamId === match.home_team_id : true;
+        const isHomeGoal = type === "goal" ? isHome : !isHome;
+        const newHome = isHomeGoal
+          ? (match.home_score ?? 0) + 1
+          : (match.home_score ?? 0);
+        const newAway = !isHomeGoal
+          ? (match.away_score ?? 0) + 1
+          : (match.away_score ?? 0);
+        const updated = matchesRef.current.map((m) =>
+          m.id === matchId
+            ? {
+                ...m,
+                home_score: newHome,
+                away_score: newAway,
+                status: m.status === "scheduled" ? "running" : m.status,
+              }
+            : m,
+        );
+        matchesRef.current = updated;
+        setMatches(updated);
+      }
+    }
 
     setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
 
@@ -281,6 +309,7 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
         sessionTimeMs,
         matchTimeMs,
         assistantId,
+        teamId,
       });
       setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
       return;
@@ -294,6 +323,7 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
         sessionTimeMs,
         matchTimeMs,
         assistantId,
+        teamId,
       );
       await refreshData();
     } catch (error: unknown) {
@@ -305,6 +335,7 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
           sessionTimeMs,
           matchTimeMs,
           assistantId,
+          teamId,
         })
       ) {
         setError(

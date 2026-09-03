@@ -167,7 +167,9 @@ export interface MatchEvent {
   session_time_ms?: number | null;
   match_time_ms?: number | null;
   parent_event_id?: string | null;
+  team_id?: string | null;
 }
+
 export interface PlayerStats {
   player_id: string;
   user_id: string;
@@ -668,6 +670,7 @@ export function createApi(client: ApiClient) {
       sessionTimeMs?: number,
       matchTimeMs?: number,
       assistantId?: string,
+      teamId?: string,
     ) =>
       client.post(`/api/matches/${id}/events`, {
         player_id: playerId,
@@ -675,7 +678,9 @@ export function createApi(client: ApiClient) {
         session_time_ms: sessionTimeMs,
         match_time_ms: matchTimeMs,
         assistant_id: assistantId,
+        team_id: teamId,
       }),
+
     deleteMatchEvent: (
       id: string,
       playerId: string,
@@ -706,7 +711,7 @@ export function createApi(client: ApiClient) {
       }),
     replaceMatchLineupPlayer: (
       matchId: string,
-      teamId: string | string,
+      teamId: string,
       outPlayerId: string,
       inPlayerId: string,
     ) =>

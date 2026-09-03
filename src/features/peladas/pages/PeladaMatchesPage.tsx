@@ -51,9 +51,11 @@ import {
 } from "../utils/exportUtils";
 import { isAssistForGoal } from "../utils/playerUtils";
 import GlobalSessionTimer from "../components/GlobalSessionTimer";
-import { usePeladaTimer } from "../hooks/usePeladaTimer";
+import { calculateElapsedMs } from "../hooks/usePeladaTimer";
 import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
 import OfflineSyncManager from "../components/OfflineSyncManager";
+
+const endpoints = createApi(api);
 
 export default function PeladaMatchesPage() {
   const { t } = useTranslation();
@@ -273,7 +275,6 @@ export default function PeladaMatchesPage() {
 
   useEffect(() => {
     if (pelada?.organization_id && user && !isAdmin) {
-      const endpoints = createApi(api);
       endpoints
         .listAdminsByOrganization(pelada.organization_id)
         .then((admins) => {
@@ -297,20 +298,6 @@ export default function PeladaMatchesPage() {
   };
 
   const selectedMatch = matches.find((m) => m.id === selectedMatchId) || null;
-
-  const peladaTimer = usePeladaTimer(
-    pelada?.timer_started_at,
-    pelada?.timer_accumulated_ms,
-    pelada?.timer_status,
-    isPeladaClosed,
-  );
-
-  const matchTimer = usePeladaTimer(
-    selectedMatch?.timer_started_at,
-    selectedMatch?.timer_accumulated_ms,
-    selectedMatch?.timer_status,
-    (selectedMatch?.status || "").toLowerCase() === "finished",
-  );
 
   const handleStartPeladaTimer = async () => {
     await startPeladaTimer();
@@ -611,14 +598,28 @@ export default function PeladaMatchesPage() {
                 onPauseMatch={pauseMatchTimer}
                 onResetMatch={resetMatchTimer}
                 onOpenResetConfirm={handleResetClick}
-                recordEvent={(mid, pid, type, st, mt, assistantId) =>
+                recordEvent={(mid, pid, type, st, mt, assistantId, teamId) =>
                   recordEvent(
                     mid,
                     pid,
                     type,
-                    st ?? peladaTimer.elapsedMs,
-                    mt ?? matchTimer.elapsedMs,
+                    st ??
+                      calculateElapsedMs(
+                        pelada?.timer_started_at,
+                        pelada?.timer_accumulated_ms,
+                        pelada?.timer_status,
+                        isPeladaClosed,
+                      ),
+                    mt ??
+                      calculateElapsedMs(
+                        selectedMatch.timer_started_at,
+                        selectedMatch.timer_accumulated_ms,
+                        selectedMatch.timer_status,
+                        (selectedMatch.status || "").toLowerCase() ===
+                          "finished",
+                      ),
                     assistantId,
+                    teamId,
                   )
                 }
                 deleteEventAndRefresh={(mid, pid, type) =>

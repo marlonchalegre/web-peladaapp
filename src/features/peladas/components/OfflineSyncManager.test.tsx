@@ -7,7 +7,17 @@ import { api } from "../../../shared/api/client";
 
 // Mock the dependencies
 vi.mock("../../../shared/hooks/useNetwork");
-vi.mock("../utils/offlineQueue");
+vi.mock("../utils/offlineQueue", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../utils/offlineQueue")>();
+  return {
+    ...actual,
+    getOfflineQueue: vi.fn(),
+    dequeueAction: vi.fn(),
+    clearOfflineQueue: vi.fn(),
+    enqueueAction: vi.fn(),
+  };
+});
+
 
 describe("OfflineSyncManager", () => {
   const peladaId = "123";

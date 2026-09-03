@@ -276,14 +276,12 @@ describe("ActiveMatchDashboard", () => {
   it("handles stat change: goal +1", async () => {
     const user = userEvent.setup();
     const recordEvent = vi.fn();
-    const adjustScore = vi.fn();
     render(
       <ThemeContextProvider>
         <ActiveMatchDashboard
           {...defaultProps}
           isAdmin={true}
           recordEvent={recordEvent}
-          adjustScore={adjustScore}
         />
       </ThemeContextProvider>,
     );
@@ -303,14 +301,13 @@ describe("ActiveMatchDashboard", () => {
       undefined,
       undefined,
       undefined,
+      "10",
     );
-    expect(adjustScore).toHaveBeenCalledWith("1", "home", 1);
   });
 
   it("handles stat change: goal -1", async () => {
     const user = userEvent.setup();
     const deleteEventAndRefresh = vi.fn();
-    const adjustScore = vi.fn();
     render(
       <ThemeContextProvider>
         <ActiveMatchDashboard
@@ -318,7 +315,6 @@ describe("ActiveMatchDashboard", () => {
           isAdmin={true}
           statsMap={{ 101: { goals: 1, assists: 0, ownGoals: 0 } }}
           deleteEventAndRefresh={deleteEventAndRefresh}
-          adjustScore={adjustScore}
         />
       </ThemeContextProvider>,
     );
@@ -327,20 +323,17 @@ describe("ActiveMatchDashboard", () => {
     await user.click(goalDecrement);
 
     expect(deleteEventAndRefresh).toHaveBeenCalledWith("1", "101", "goal");
-    expect(adjustScore).toHaveBeenCalledWith("1", "home", -1);
   });
 
   it("handles stat change: own_goal +1 (flips side)", async () => {
     const user = userEvent.setup();
     const recordEvent = vi.fn();
-    const adjustScore = vi.fn();
     render(
       <ThemeContextProvider>
         <ActiveMatchDashboard
           {...defaultProps}
           isAdmin={true}
           recordEvent={recordEvent}
-          adjustScore={adjustScore}
         />
       </ThemeContextProvider>,
     );
@@ -356,8 +349,9 @@ describe("ActiveMatchDashboard", () => {
       "own_goal",
       undefined,
       undefined,
+      undefined,
+      "10",
     );
-    expect(adjustScore).toHaveBeenCalledWith("1", "away", 1);
   });
 
   it("opens sub menu on player click and handles replacement", async () => {
@@ -464,7 +458,6 @@ describe("ActiveMatchDashboard", () => {
   it("handles stat change: own_goal -1 (flips side)", async () => {
     const user = userEvent.setup();
     const deleteEventAndRefresh = vi.fn();
-    const adjustScore = vi.fn();
     render(
       <ThemeContextProvider>
         <ActiveMatchDashboard
@@ -472,7 +465,6 @@ describe("ActiveMatchDashboard", () => {
           isAdmin={true}
           statsMap={{ 101: { goals: 0, assists: 0, ownGoals: 1 } }}
           deleteEventAndRefresh={deleteEventAndRefresh}
-          adjustScore={adjustScore}
         />
       </ThemeContextProvider>,
     );
@@ -483,7 +475,6 @@ describe("ActiveMatchDashboard", () => {
     await user.click(ownGoalDecrement);
 
     expect(deleteEventAndRefresh).toHaveBeenCalledWith("1", "101", "own_goal");
-    expect(adjustScore).toHaveBeenCalledWith("1", "away", -1);
   });
 
   it("handles clicking a match in the history drawer", async () => {
