@@ -3,6 +3,7 @@ import {
   Button,
   Chip,
   MenuItem,
+  Paper,
   Table,
   TableBody,
   TableCell,
@@ -16,7 +17,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import { useTranslation } from "react-i18next";
 import type { MonthlyPayment } from "../../../../shared/api/endpoints";
-import { calculateMonthlyFine } from "./utils";
+import { calculateMonthlyFine, formatCurrency } from "./utils";
 
 interface MonthlyPaymentsTableProps {
   monthlyPayments: MonthlyPayment[];
@@ -103,8 +104,15 @@ export default function MonthlyPaymentsTable({
         </TextField>
       </Box>
 
-      <TableContainer>
-        <Table size="small">
+      <TableContainer
+        component={Paper}
+        variant="outlined"
+        sx={{
+          borderRadius: 2,
+          overflow: "hidden",
+        }}
+      >
+        <Table sx={{ minWidth: 500 }}>
           <TableHead>
             <TableRow>
               <TableCell>
@@ -127,126 +135,140 @@ export default function MonthlyPaymentsTable({
             </TableRow>
           </TableHead>
           <TableBody>
-            {monthlyPayments.map((mp) => (
-              <TableRow
-                key={mp.player_id}
-                data-testid={`monthly-payment-row-${mp.player_id}`}
-              >
-                <TableCell>{mp.player_name}</TableCell>
-                <TableCell align="right">
-                  {(() => {
-                    const baseAmount = Number(mensalistaPrice || 0);
-                    // If already paid, use stored fine_amount.
-                    // Otherwise calculate what it would be today.
-                    const fine = mp.paid
-                      ? mp.fine_status === "reversed"
-                        ? 0
-                        : Number(mp.fine_amount || 0)
-                      : calculateMonthlyFine(
-                          selectedYear,
-                          selectedMonth,
-                          new Date().toISOString().split("T")[0],
-                          Number(monthlyFineAmount || 0),
-                          Number(monthlyCutOffDay || 5),
-                        );
-
-                    const total =
-                      mp.paid && mp.amount !== undefined
+            {monthlyPayments.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={isAdmin ? 4 : 3}
+                  align="center"
+                  sx={{ py: 4 }}
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    {t(
+                      "organizations.management.finance.monthly_fees.empty",
+                      "Nenhum mensalista encontrado.",
+                    )}
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            ) : (
+              monthlyPayments.map((mp) => (
+                <TableRow
+                  key={mp.player_id}
+                  data-testid={`monthly-payment-row-${mp.player_id}`}
+                  hover
+                >
+                  <TableCell>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      {mp.player_name}
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right" sx={{ whiteSpace: "nowrap" }}>
+                    {(() => {
+                      const baseAmount = Number(mensalistaPrice || 0);
+                      // If already paid, use stored fine_amount.
+                      // Otherwise calculate what it would be today.
+                      const fine = mp.paid
                         ? mp.fine_status === "reversed"
-                          ? Number(mp.amount)
-                          : Number(mp.amount) + Number(fine)
-                        : Number(baseAmount) + Number(fine);
+                          ? 0
+                          : Number(mp.fine_amount || 0)
+                        : calculateMonthlyFine(
+                            selectedYear,
+                            selectedMonth,
+                            new Date().toISOString().split("T")[0],
+                            Number(monthlyFineAmount || 0),
+                            Number(monthlyCutOffDay || 5),
+                          );
 
-                    return (
-                      <Box>
-                        <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                          {new Intl.NumberFormat(language, {
-                            style: "currency",
-                            currency: currency || "BRL",
-                          }).format(total)}
-                        </Typography>
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ display: "block" }}
-                        >
-                          {mp.paid
-                            ? t(
-                                "organizations.management.finance.monthly_fees.amount_paid",
-                                "Valor Pago",
-                              )
-                            : t(
-                                "organizations.management.finance.monthly_fees.amount_expected",
-                                "Valor Esperado",
-                              )}
-                        </Typography>
-                        {Number(fine) > 0 && (
+                      const total =
+                        mp.paid && mp.amount !== undefined
+                          ? mp.fine_status === "reversed"
+                            ? Number(mp.amount)
+                            : Number(mp.amount) + Number(fine)
+                          : Number(baseAmount) + Number(fine);
+
+                      return (
+                        <Box>
+                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            {formatCurrency(total, language, currency)}
+                          </Typography>
                           <Typography
                             variant="caption"
-                            color="error"
+                            color="text.secondary"
                             sx={{ display: "block" }}
                           >
-                            +{" "}
-                            {new Intl.NumberFormat(language, {
-                              style: "currency",
-                              currency: currency || "BRL",
-                            }).format(fine)}{" "}
-                            (
-                            {t(
-                              "organizations.management.finance.monthly_fees.fine_label",
-                              "multa",
-                            )}
-                            )
+                            {mp.paid
+                              ? t(
+                                  "organizations.management.finance.monthly_fees.amount_paid",
+                                  "Valor Pago",
+                                )
+                              : t(
+                                  "organizations.management.finance.monthly_fees.amount_expected",
+                                  "Valor Esperado",
+                                )}
                           </Typography>
-                        )}
-                      </Box>
-                    );
-                  })()}
-                </TableCell>
-                <TableCell align="center">
-                  {mp.paid ? (
-                    <Chip
-                      icon={<CheckCircleIcon />}
-                      label={t(
-                        "organizations.management.finance.monthly_fees.paid",
-                      )}
-                      color="success"
-                      size="small"
-                      data-testid="status-paid"
-                    />
-                  ) : (
-                    <Chip
-                      icon={<ErrorIcon />}
-                      label={t(
-                        "organizations.management.finance.monthly_fees.pending",
-                      )}
-                      color="warning"
-                      size="small"
-                      data-testid="status-pending"
-                    />
-                  )}
-                </TableCell>
-                {isAdmin && (
-                  <TableCell align="right">
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      color={mp.paid ? "error" : "success"}
-                      onClick={() => onMarkPayment(mp, !mp.paid)}
-                      data-testid="mark-payment-button"
-                    >
-                      {mp.paid
-                        ? t(
-                            "organizations.management.finance.monthly_fees.reverse",
-                          )
-                        : t(
-                            "organizations.management.finance.monthly_fees.mark_as_paid",
+                          {Number(fine) > 0 && (
+                            <Typography
+                              variant="caption"
+                              color="error"
+                              sx={{ display: "block" }}
+                            >
+                              + {formatCurrency(fine, language, currency)} (
+                              {t(
+                                "organizations.management.finance.monthly_fees.fine_label",
+                                "multa",
+                              )}
+                              )
+                            </Typography>
                           )}
-                    </Button>
+                        </Box>
+                      );
+                    })()}
                   </TableCell>
-                )}
-              </TableRow>
-            ))}
+                  <TableCell align="center">
+                    {mp.paid ? (
+                      <Chip
+                        icon={<CheckCircleIcon />}
+                        label={t(
+                          "organizations.management.finance.monthly_fees.paid",
+                        )}
+                        color="success"
+                        size="small"
+                        data-testid="status-paid"
+                      />
+                    ) : (
+                      <Chip
+                        icon={<ErrorIcon />}
+                        label={t(
+                          "organizations.management.finance.monthly_fees.pending",
+                        )}
+                        color="warning"
+                        size="small"
+                        data-testid="status-pending"
+                      />
+                    )}
+                  </TableCell>
+                  {isAdmin && (
+                    <TableCell align="right">
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        color={mp.paid ? "error" : "success"}
+                        onClick={() => onMarkPayment(mp, !mp.paid)}
+                        data-testid="mark-payment-button"
+                      >
+                        {mp.paid
+                          ? t(
+                              "organizations.management.finance.monthly_fees.reverse",
+                            )
+                          : t(
+                              "organizations.management.finance.monthly_fees.mark_as_paid",
+                            )}
+                      </Button>
+                    </TableCell>
+                  )}
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>

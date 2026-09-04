@@ -212,15 +212,62 @@ export const getTheme = (mode: PaletteMode) => {
           },
         },
       },
+      MuiTableHead: {
+        styleOverrides: {
+          root: ({ theme }) => ({
+            backgroundColor:
+              theme.palette.mode === "light"
+                ? alpha(theme.palette.grey[500], 0.06)
+                : alpha(theme.palette.common.white, 0.05),
+          }),
+        },
+      },
+      MuiTableBody: {
+        styleOverrides: {
+          root: ({ theme }) => ({
+            "& > .MuiTableRow-root:nth-of-type(even)": {
+              backgroundColor:
+                theme.palette.mode === "light"
+                  ? alpha(theme.palette.grey[500], 0.035)
+                  : alpha(theme.palette.common.white, 0.025),
+            },
+          }),
+        },
+      },
       MuiTableCell: {
         styleOverrides: {
+          root: ({ theme }) => ({
+            borderColor: theme.palette.divider,
+            padding: theme.spacing(1.5, 2),
+          }),
           head: ({ theme }) => ({
-            fontWeight: "bold",
-            color: theme.palette.text.primary,
-            fontSize: "0.875rem",
+            fontWeight: 700,
+            color: theme.palette.text.secondary,
+            fontSize: "0.8125rem",
+            textTransform: "uppercase",
+            letterSpacing: "0.04em",
+            borderBottom: `2px solid ${theme.palette.divider}`,
+            backgroundColor: "inherit",
           }),
           body: ({ theme }) => ({
             color: theme.palette.text.primary,
+            borderBottom: `1px solid ${theme.palette.divider}`,
+          }),
+        },
+      },
+      MuiTableRow: {
+        styleOverrides: {
+          root: ({ theme }) => ({
+            transition: "background-color 0.15s ease-in-out",
+            "&:last-child td, &:last-child th": {
+              border: 0,
+            },
+            "&.MuiTableRow-hover:hover": {
+              backgroundColor: alpha(
+                theme.palette.primary.main,
+                theme.palette.mode === "light" ? 0.05 : 0.1,
+              ),
+            },
           }),
         },
       },
