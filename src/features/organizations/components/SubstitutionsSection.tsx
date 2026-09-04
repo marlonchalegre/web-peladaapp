@@ -20,6 +20,7 @@ import {
   TextField,
   Chip,
 } from "@mui/material";
+import dayjs from "dayjs";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import StopIcon from "@mui/icons-material/Stop";
 import { useTranslation } from "react-i18next";
@@ -44,12 +45,32 @@ export default function SubstitutionsSection({
   actionLoading,
 }: SubstitutionsSectionProps) {
   const { t } = useTranslation();
+  const todayStr = useMemo(() => dayjs().format("YYYY-MM-DD"), []);
+  const lastDayOfPrevMonth = useMemo(
+    () => dayjs().subtract(1, "month").endOf("month").format("YYYY-MM-DD"),
+    [],
+  );
+
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [permanentPlayerId, setPermanentPlayerId] = useState<string | "">("");
   const [temporaryPlayerId, setTemporaryPlayerId] = useState<string | "">("");
-  const [startDate, setStartDate] = useState(
-    new Date().toISOString().split("T")[0],
+  const [startDate, setStartDate] = useState(todayStr);
+  const [endingSub, setEndingSub] = useState<MonthlyPlayerSubstitution | null>(
+    null,
   );
+  const [endDate, setEndDate] = useState(todayStr);
+
+  const handleOpenEndDialog = (sub: MonthlyPlayerSubstitution) => {
+    setEndingSub(sub);
+    setEndDate(todayStr);
+  };
+
+  const handleConfirmEnd = () => {
+    if (endingSub && endDate) {
+      onEndSubstitution(endingSub.id, endDate);
+      setEndingSub(null);
+    }
+  };
 
   const mensalistas = useMemo(
     () => players.filter((p) => p.member_type === "mensalista"),
@@ -150,8 +171,9 @@ export default function SubstitutionsSection({
               {sub.active && (
                 <IconButton
                   color="error"
-                  onClick={() => onEndSubstitution(sub.id)}
+                  onClick={() => handleOpenEndDialog(sub)}
                   disabled={actionLoading}
+                  data-testid={`end-sub-btn-${sub.id}`}
                   title={t(
                     "organizations.management.substitutions.end",
                     "End Substitution",
@@ -243,6 +265,84 @@ export default function SubstitutionsSection({
             onClick={handleCreate}
             variant="contained"
             disabled={!permanentPlayerId || !temporaryPlayerId || actionLoading}
+          >
+            {t("common.confirm")}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={Boolean(endingSub)}
+        onClose={() => setEndingSub(null)}
+        fullWidth
+        maxWidth="xs"
+      >
+        <DialogTitle>
+          {t(
+            "organizations.management.substitutions.dialog.end_title",
+            "End Substitution",
+          )}
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              {t(
+                "organizations.management.substitutions.dialog.end_desc",
+                "Select the end date for this substitution. If the permanent player returned for the current month, you can choose the end of the previous month.",
+              )}
+            </Typography>
+
+            <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+              <Chip
+                label={`${t(
+                  "organizations.management.substitutions.dialog.end_prev_month",
+                  "End of previous month",
+                )} (${lastDayOfPrevMonth})`}
+                onClick={() => setEndDate(lastDayOfPrevMonth)}
+                color={endDate === lastDayOfPrevMonth ? "primary" : "default"}
+                variant={endDate === lastDayOfPrevMonth ? "filled" : "outlined"}
+                clickable
+                size="small"
+              />
+              <Chip
+                label={`${t(
+                  "organizations.management.substitutions.dialog.end_today",
+                  "Today",
+                )} (${todayStr})`}
+                onClick={() => setEndDate(todayStr)}
+                color={endDate === todayStr ? "primary" : "default"}
+                variant={endDate === todayStr ? "filled" : "outlined"}
+                clickable
+                size="small"
+              />
+            </Box>
+
+            <TextField
+              label={t(
+                "organizations.management.substitutions.dialog.end_date",
+                "End Date",
+              )}
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              fullWidth
+              slotProps={{
+                inputLabel: { shrink: true },
+                htmlInput: { "data-testid": "end-date-input" },
+              }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEndingSub(null)}>
+            {t("common.cancel")}
+          </Button>
+          <Button
+            onClick={handleConfirmEnd}
+            variant="contained"
+            color="error"
+            disabled={!endDate || actionLoading}
+            data-testid="confirm-end-sub-button"
           >
             {t("common.confirm")}
           </Button>

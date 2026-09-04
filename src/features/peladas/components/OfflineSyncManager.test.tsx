@@ -18,7 +18,6 @@ vi.mock("../utils/offlineQueue", async (importOriginal) => {
   };
 });
 
-
 describe("OfflineSyncManager", () => {
   const peladaId = "123";
   const mockOnSyncComplete = vi.fn();

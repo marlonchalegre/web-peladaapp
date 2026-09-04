@@ -353,7 +353,12 @@
         "empty": "Nenhuma substituição registrada.",
         "end": "Encerrar Substituição",
         "dialog": {
-          "title": "Substituir Mensalista"
+          "title": "Substituir Mensalista",
+          "end_title": "Encerrar Substituição",
+          "end_desc": "Selecione a data de término desta substituição. Se o mensalista já voltou no início deste mês, você pode escolher o fim do mês anterior.",
+          "end_prev_month": "Fim do mês anterior",
+          "end_today": "Hoje",
+          "end_date": "Data de Término"
         },
         "fields": {
           "permanent_player": "Mensalista Permanente",

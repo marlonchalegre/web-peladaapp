@@ -42,7 +42,6 @@ vi.mock("../utils/offlineQueue", async (importOriginal) => {
   };
 });
 
-
 describe("useMatchActions", () => {
   const peladaId = "p1";
   let mockDelegates: MatchStateDelegates;

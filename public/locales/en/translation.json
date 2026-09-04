@@ -351,7 +351,12 @@
         "empty": "No substitutions recorded.",
         "end": "End Substitution",
         "dialog": {
-          "title": "Substitute Monthly Player"
+          "title": "Substitute Monthly Player",
+          "end_title": "End Substitution",
+          "end_desc": "Select the end date for this substitution. If the permanent player returned for the current month, you can choose the end of the previous month.",
+          "end_prev_month": "End of previous month",
+          "end_today": "Today",
+          "end_date": "End Date"
         },
         "fields": {
           "permanent_player": "Permanent Player (Mensalista)",

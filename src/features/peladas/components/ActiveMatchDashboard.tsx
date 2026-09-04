@@ -142,7 +142,6 @@ export default function ActiveMatchDashboard(props: Props) {
     deleteEventAndRefresh,
     replacePlayerOnTeam,
 
-
     addPlayerToTeam,
     onEndMatch,
     matches,
