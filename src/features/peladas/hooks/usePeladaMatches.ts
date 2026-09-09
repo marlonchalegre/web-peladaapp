@@ -55,10 +55,13 @@ export function usePeladaMatches(peladaId: string) {
 
     if (!hasMoreMatches) {
       try {
-        await actions.pauseMatchTimer(matchId);
+        const pausePromises: Promise<unknown>[] = [
+          actions.pauseMatchTimer(matchId),
+        ];
         if (pelada?.timer_status === "running") {
-          await actions.pausePeladaTimer();
+          pausePromises.push(actions.pausePeladaTimer());
         }
+        await Promise.all(pausePromises);
       } catch (err) {
         console.error("Failed to stop timers after last match:", err);
       }
@@ -72,13 +75,13 @@ export function usePeladaMatches(peladaId: string) {
 
       // Auto-start timers
       try {
-        // Start match timer
-        await actions.startMatchTimer(nextMatch.id);
-
-        // Start pelada timer if it's not running
+        const startPromises: Promise<unknown>[] = [
+          actions.startMatchTimer(nextMatch.id),
+        ];
         if (pelada?.timer_status !== "running") {
-          await actions.startPeladaTimer();
+          startPromises.push(actions.startPeladaTimer());
         }
+        await Promise.all(startPromises);
       } catch (err) {
         console.error("Failed to auto-start timers:", err);
       }
@@ -192,6 +195,34 @@ export function usePeladaMatches(peladaId: string) {
     (pelada?.status || "").toLowerCase(),
   );
 
+  const orgPlayerIdToTeamId = useMemo(() => {
+    const m: Record<string, string> = {};
+    for (const [teamId, players] of Object.entries(teamPlayers)) {
+      for (const p of players) {
+        m[p.player_id] = teamId;
+      }
+    }
+    for (const [, lineups] of Object.entries(lineupsByMatch)) {
+      for (const [teamId, players] of Object.entries(lineups)) {
+        for (const p of players) {
+          m[p.player_id] = teamId;
+        }
+      }
+    }
+    return m;
+  }, [lineupsByMatch, teamPlayers]);
+
+  const teamNameById = useMemo(() => {
+    const m: Record<string, string> = {};
+    for (const t of teams) m[t.id] = t.name;
+    return m;
+  }, [teams]);
+
+  const allOrgPlayers = useMemo(
+    () => Object.values(orgPlayerIdToPlayer),
+    [orgPlayerIdToPlayer],
+  );
+
   return {
     loading,
     error,
@@ -202,22 +233,7 @@ export function usePeladaMatches(peladaId: string) {
     teamPlayers,
     lineupsByMatch,
     orgPlayerIdToUserId,
-    orgPlayerIdToTeamId: useMemo(() => {
-      const m: Record<string, string> = {};
-      for (const [teamId, players] of Object.entries(teamPlayers)) {
-        for (const p of players) {
-          m[p.player_id] = teamId;
-        }
-      }
-      for (const [, lineups] of Object.entries(lineupsByMatch)) {
-        for (const [teamId, players] of Object.entries(lineups)) {
-          for (const p of players) {
-            m[p.player_id] = teamId;
-          }
-        }
-      }
-      return m;
-    }, [lineupsByMatch, teamPlayers]),
+    orgPlayerIdToTeamId,
     userIdToName,
     orgPlayerIdToPlayer,
     matchEvents,
@@ -227,17 +243,11 @@ export function usePeladaMatches(peladaId: string) {
     playerSort: standingsData.playerSort,
     standings: standingsData.standings,
     playerStats: standingsData.playerStats,
-    teamNameById: useMemo(() => {
-      const m: Record<string, string> = {};
-      for (const t of teams) m[t.id] = t.name;
-      return m;
-    }, [teams]),
+    teamNameById,
     teams,
+    attendance,
     currentMatchStats,
-    allOrgPlayers: useMemo(
-      () => Object.values(orgPlayerIdToPlayer),
-      [orgPlayerIdToPlayer],
-    ),
+    allOrgPlayers,
     selectedMatch,
     justFinishedMatch,
     nextScheduledMatch,

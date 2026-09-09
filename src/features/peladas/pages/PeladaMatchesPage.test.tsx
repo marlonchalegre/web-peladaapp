@@ -791,12 +791,11 @@ describe("PeladaMatchesPage", () => {
     fireEvent.mouseDown(selectButton);
 
     const listbox = await screen.findByRole("listbox");
-    const option = within(listbox).getByText("Player 1 (Time 1)");
+    const option = within(listbox).getByText("Player 1");
     expect(option).toBeInTheDocument();
 
-    // Verify that players from other teams (like Player 2 on Time 2) are NOT shown
-    const otherOption = within(listbox).queryByText("Player 2 (Time 2)");
-    expect(otherOption).toBeNull();
+    // Verify that players from the opposing team (like Player 2 on Time 2) are NOT shown
+    expect(within(listbox).queryByText(/Player 2/)).not.toBeInTheDocument();
   });
 
   it("resolves the correct assistant event for goals scored at the same time by different teams", async () => {
@@ -1042,5 +1041,238 @@ describe("PeladaMatchesPage", () => {
       "input",
     ) as HTMLInputElement;
     expect(assistantInput.value).toBe("102");
+  });
+
+  it("allows editing goal and assistance to select players from outside the original team with visual priority for team members", async () => {
+    const testDashboardData = {
+      ...mockDashboardData,
+      team_players_map: {},
+      match_lineups_map: {
+        "10": {
+          "1": [
+            { team_id: "1", player_id: "100", is_goalkeeper: false },
+            { team_id: "1", player_id: "102", is_goalkeeper: false },
+          ],
+          "2": [
+            { team_id: "2", player_id: "101", is_goalkeeper: false },
+            { team_id: "2", player_id: "103", is_goalkeeper: false },
+          ],
+        },
+      },
+      organization_players: [
+        {
+          id: "100",
+          user_id: "1",
+          organization_id: "101",
+          user_name: "Scorer Team 1",
+        },
+        {
+          id: "101",
+          user_id: "2",
+          organization_id: "101",
+          user_name: "Opponent 1",
+        },
+        {
+          id: "102",
+          user_id: "3",
+          organization_id: "101",
+          user_name: "Teammate 1",
+        },
+        {
+          id: "103",
+          user_id: "4",
+          organization_id: "101",
+          user_name: "Opponent 2",
+        },
+        {
+          id: "104",
+          user_id: "5",
+          organization_id: "101",
+          user_name: "Bench Sub",
+        },
+      ],
+      users: [
+        { id: "1", name: "Scorer Team 1" },
+        { id: "2", name: "Opponent 1" },
+        { id: "3", name: "Teammate 1" },
+        { id: "4", name: "Opponent 2" },
+        { id: "5", name: "Bench Sub" },
+      ],
+      match_events: [
+        {
+          id: "e-goal-1",
+          match_id: "10",
+          event_type: "goal",
+          player_id: "100",
+          session_time_ms: 1000,
+          match_time_ms: 500,
+        },
+      ],
+    };
+
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/peladas/1/dashboard-data")
+        return Promise.resolve(testDashboardData);
+      if (path === "/api/organizations/101/admins")
+        return Promise.resolve([{ user_id: "1", organization_id: "101" }]);
+      if (path === "/api/organizations/101/finance")
+        return Promise.resolve({
+          mensalista_price: 0,
+          diarista_price: 0,
+          currency: "BRL",
+        });
+      return Promise.reject(new Error(`Not found: ${path}`));
+    });
+
+    (api.put as Mock).mockResolvedValue({ id: "e-goal-1" });
+
+    renderPage();
+    await waitFor(() => screen.getByTestId("active-match-dashboard"));
+
+    fireEvent.click(screen.getByText("peladas.timeline.title"));
+
+    const editBtn = await screen.findByTestId("edit-event-e-goal-1");
+    fireEvent.click(editBtn);
+
+    const editDialog = await screen.findByTestId("edit-event-dialog");
+    expect(editDialog).toBeInTheDocument();
+
+    // Visual priority: quick select chips for Team 1 members exist
+    expect(screen.getByTestId("quick-select-scorer-100")).toBeInTheDocument();
+    expect(screen.getByTestId("quick-select-scorer-102")).toBeInTheDocument();
+
+    // Assistant select can select Bench Sub (104) who is outside the original team
+    const assistantSelect = screen.getByTestId("edit-assistant-select");
+    const assistCombobox = within(assistantSelect).getByRole("combobox");
+    fireEvent.mouseDown(assistCombobox);
+
+    const listbox = await screen.findByRole("listbox");
+    // Opponent players are excluded, but bench players are selectable
+    expect(within(listbox).queryByText(/Opponent 1/)).not.toBeInTheDocument();
+    const benchOption = within(listbox).getByText(/Bench Sub/);
+    expect(benchOption).toBeInTheDocument();
+
+    // Select the informal bench substitute for assistance
+    fireEvent.click(benchOption);
+
+    // Save
+    const saveBtn = screen.getByTestId("save-event-edit-button");
+    fireEvent.click(saveBtn);
+
+    await waitFor(() => {
+      expect(api.put).toHaveBeenCalledWith("/api/matches/10/events/e-goal-1", {
+        player_id: "100",
+        assistant_id: "104",
+      });
+    });
+  });
+
+  it("passes pelada fixed goalkeepers to edit timeline dialog and enables goalkeeper selection", async () => {
+    const fixedGkDashboardData = {
+      ...mockDashboardData,
+      pelada: {
+        ...mockDashboardData.pelada,
+        fixed_goalkeepers: true,
+        home_fixed_goalkeeper_id: "105",
+        away_fixed_goalkeeper_id: "106",
+      },
+      organization_players: [
+        {
+          id: "100",
+          user_id: "1",
+          organization_id: "101",
+          user_name: "Player 1",
+          user_position: "striker",
+        },
+        {
+          id: "101",
+          user_id: "2",
+          organization_id: "101",
+          user_name: "Opponent 1",
+          user_position: "striker",
+        },
+        {
+          id: "105",
+          user_id: "5",
+          organization_id: "101",
+          user_name: "Home Fixed GK",
+          user_position: "goalkeeper",
+        },
+        {
+          id: "106",
+          user_id: "6",
+          organization_id: "101",
+          user_name: "Away Fixed GK",
+          user_position: "goalkeeper",
+        },
+      ],
+      users: [
+        { id: "1", name: "Player 1" },
+        { id: "2", name: "Opponent 1" },
+        { id: "5", name: "Home Fixed GK" },
+        { id: "6", name: "Away Fixed GK" },
+      ],
+      match_events: [
+        {
+          id: "e-goal-gk",
+          match_id: "10",
+          event_type: "goal",
+          player_id: "100",
+          session_time_ms: 10000,
+          match_time_ms: 10000,
+        },
+      ],
+    };
+
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/peladas/1/dashboard-data")
+        return Promise.resolve(fixedGkDashboardData);
+      if (path === "/api/organizations/101/admins")
+        return Promise.resolve([{ user_id: "1", organization_id: "101" }]);
+      if (path === "/api/organizations/101/finance")
+        return Promise.resolve({
+          mensalista_price: 0,
+          diarista_price: 0,
+          currency: "BRL",
+        });
+      return Promise.reject(new Error(`Not found: ${path}`));
+    });
+
+    (api.put as Mock).mockResolvedValue({ id: "e-goal-gk" });
+
+    renderPage();
+    await waitFor(() => screen.getByTestId("active-match-dashboard"));
+
+    fireEvent.click(screen.getByText("peladas.timeline.title"));
+
+    const editBtn = await screen.findByTestId("edit-event-e-goal-gk");
+    fireEvent.click(editBtn);
+
+    const editDialog = await screen.findByTestId("edit-event-dialog");
+    expect(editDialog).toBeInTheDocument();
+
+    // Home fixed goalkeeper (105) should appear as a quick-select chip
+    const homeGkChip = screen.getByTestId("quick-select-scorer-105");
+    expect(homeGkChip).toBeInTheDocument();
+    expect(homeGkChip).toHaveTextContent("Home Fixed GK");
+
+    // Away fixed goalkeeper (106) should be excluded
+    expect(screen.queryByTestId("quick-select-scorer-106")).toBeNull();
+
+    // Select Home Fixed GK as assistant
+    const assistantGkChip = screen.getByTestId("quick-select-assistant-105");
+    expect(assistantGkChip).toBeInTheDocument();
+    fireEvent.click(assistantGkChip);
+
+    // Save
+    const saveBtn = screen.getByTestId("save-event-edit-button");
+    fireEvent.click(saveBtn);
+
+    await waitFor(() => {
+      expect(api.put).toHaveBeenCalledWith("/api/matches/10/events/e-goal-gk", {
+        player_id: "100",
+        assistant_id: "105",
+      });
+    });
   });
 });

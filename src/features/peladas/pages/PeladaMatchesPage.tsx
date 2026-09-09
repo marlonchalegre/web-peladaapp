@@ -14,13 +14,6 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  FormControl,
-  InputLabel,
-  Select,
   Grid,
 } from "@mui/material";
 import ActiveMatchDashboard from "../components/ActiveMatchDashboard";
@@ -31,6 +24,7 @@ import { usePeladaMatches } from "../hooks/usePeladaMatches";
 import StandingsPanel from "../components/StandingsPanel";
 import PlayerStatsPanel from "../components/PlayerStatsPanel";
 import PeladaTimeline from "../components/PeladaTimeline";
+import EditTimelineEventDialog from "../components/EditTimelineEventDialog";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { api } from "../../../shared/api/client";
 import { createApi, type MatchEvent } from "../../../shared/api/endpoints";
@@ -49,7 +43,6 @@ import {
   generateAnnouncementText,
   type PlayerWithUser,
 } from "../utils/exportUtils";
-import { isAssistForGoal } from "../utils/playerUtils";
 import GlobalSessionTimer from "../components/GlobalSessionTimer";
 import { calculateElapsedMs } from "../hooks/usePeladaTimer";
 import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
@@ -119,6 +112,7 @@ export default function PeladaMatchesPage() {
     teams,
     teamPlayers,
     lineupsByMatch,
+    attendance,
     // Timers
     justFinishedMatch,
     nextScheduledMatch,
@@ -150,107 +144,22 @@ export default function PeladaMatchesPage() {
     useState<MatchEvent | null>(null);
   const [editEventDialogOpen, setEditEventDialogOpen] =
     useState<MatchEvent | null>(null);
-  const [selectedScorerId, setSelectedScorerId] = useState<string>("");
-  const [selectedAssistantId, setSelectedAssistantId] = useState<string>("");
-
-  const getPlayerName = (playerId: string) => {
-    const orgPlayer = orgPlayerIdToPlayer[playerId];
-    if (orgPlayer?.user_name) return orgPlayer.user_name;
-    const userId = orgPlayerIdToUserId[playerId];
-    return userId && userIdToName[userId]
-      ? userIdToName[userId]
-      : `Player #${playerId}`;
-  };
-
-  const currentAssistEvent = useMemo(() => {
-    if (!editEventDialogOpen || editEventDialogOpen.event_type !== "goal")
-      return null;
-    const scorerTeamId = orgPlayerIdToTeamId[editEventDialogOpen.player_id];
-    return matchEvents.find(
-      (e) =>
-        e.match_id === editEventDialogOpen.match_id &&
-        e.event_type === "assist" &&
-        isAssistForGoal(e, editEventDialogOpen) &&
-        (!scorerTeamId || orgPlayerIdToTeamId[e.player_id] === scorerTeamId),
-    );
-  }, [editEventDialogOpen, matchEvents, orgPlayerIdToTeamId]);
-
-  useEffect(() => {
-    if (editEventDialogOpen) {
-      setSelectedScorerId(editEventDialogOpen.player_id);
-      setSelectedAssistantId(
-        currentAssistEvent ? currentAssistEvent.player_id : "none",
-      );
-    } else {
-      setSelectedScorerId("");
-      setSelectedAssistantId("");
-    }
-  }, [editEventDialogOpen, currentAssistEvent]);
-
   const editEventMatch = useMemo(() => {
     if (!editEventDialogOpen) return null;
     return matches.find((m) => m.id === editEventDialogOpen.match_id) || null;
   }, [editEventDialogOpen, matches]);
 
-  const editScorerOptions = useMemo(() => {
-    if (!editEventMatch || !editEventDialogOpen) return [];
-    const scorerTeamId = orgPlayerIdToTeamId[editEventDialogOpen.player_id];
-    if (!scorerTeamId) {
-      const lu = lineupsByMatch[editEventMatch.id] || {};
-      const homeTeamPlayers =
-        lu[editEventMatch.home_team_id] ||
-        teamPlayers[editEventMatch.home_team_id] ||
-        [];
-      const awayTeamPlayers =
-        lu[editEventMatch.away_team_id] ||
-        teamPlayers[editEventMatch.away_team_id] ||
-        [];
-      return [...homeTeamPlayers, ...awayTeamPlayers];
-    }
-    const lu = lineupsByMatch[editEventMatch.id] || {};
-    return lu[scorerTeamId] || teamPlayers[scorerTeamId] || [];
-  }, [
-    editEventMatch,
-    editEventDialogOpen,
-    teamPlayers,
-    lineupsByMatch,
-    orgPlayerIdToTeamId,
-  ]);
-
-  const editAssistantOptions = useMemo(() => {
-    if (!editEventMatch || !selectedScorerId) return [];
-    const scorerTeamId = orgPlayerIdToTeamId[selectedScorerId];
-    if (!scorerTeamId) return [];
-    const lu = lineupsByMatch[editEventMatch.id] || {};
-    const teamPlayersList = lu[scorerTeamId] || teamPlayers[scorerTeamId] || [];
-    return teamPlayersList.filter((p) => p.player_id !== selectedScorerId);
-  }, [
-    editEventMatch,
-    selectedScorerId,
-    teamPlayers,
-    lineupsByMatch,
-    orgPlayerIdToTeamId,
-  ]);
-
-  const handleScorerChange = (newScorerId: string) => {
-    setSelectedScorerId(newScorerId);
-    const oldTeamId = selectedScorerId
-      ? orgPlayerIdToTeamId[selectedScorerId]
-      : null;
-    const newTeamId = newScorerId ? orgPlayerIdToTeamId[newScorerId] : null;
-    if (newScorerId === selectedAssistantId || oldTeamId !== newTeamId) {
-      setSelectedAssistantId("none");
-    }
-  };
-
-  const handleSaveEditEvent = async () => {
+  const handleSaveEditEvent = async (
+    scorerId: string,
+    assistantId: string | null,
+  ) => {
     if (!editEventDialogOpen) return;
     try {
       await updateEvent(
         editEventDialogOpen.match_id,
         editEventDialogOpen.id!,
-        selectedScorerId,
-        selectedAssistantId === "none" ? null : selectedAssistantId,
+        scorerId,
+        assistantId,
       );
       setEditEventDialogOpen(null);
     } catch (e) {
@@ -300,15 +209,18 @@ export default function PeladaMatchesPage() {
   const selectedMatch = matches.find((m) => m.id === selectedMatchId) || null;
 
   const handleStartPeladaTimer = async () => {
-    await startPeladaTimer();
     const isFinished =
       (selectedMatch?.status || "").toLowerCase() === "finished";
-    if (
-      selectedMatch &&
-      !isFinished &&
-      selectedMatch.timer_status !== "running"
-    ) {
-      await startMatchTimer(selectedMatch.id);
+    const shouldStartMatchTimer =
+      selectedMatch && !isFinished && selectedMatch.timer_status !== "running";
+
+    if (shouldStartMatchTimer) {
+      await Promise.all([
+        startPeladaTimer(),
+        startMatchTimer(selectedMatch.id),
+      ]);
+    } else {
+      await startPeladaTimer();
     }
   };
 
@@ -791,110 +703,26 @@ export default function PeladaMatchesPage() {
         severity="error"
       />
       {/* Edit Event Dialog */}
-      <Dialog
-        open={Boolean(editEventDialogOpen)}
-        onClose={() => setEditEventDialogOpen(null)}
-        fullWidth
-        maxWidth="xs"
-        data-testid="edit-event-dialog"
-      >
-        <DialogTitle sx={{ fontWeight: "bold" }}>
-          {editEventDialogOpen?.event_type === "own_goal"
-            ? t("peladas.timeline.edit_own_goal", "Edit Own Goal")
-            : editEventDialogOpen?.event_type === "goal"
-              ? t("peladas.timeline.edit_goal", "Edit Goal & Assist")
-              : t("peladas.timeline.edit_event", "Edit Event")}
-        </DialogTitle>
-        <DialogContent
-          sx={{ pt: 2, display: "flex", flexDirection: "column", gap: 3 }}
-        >
-          {/* Scorer Select */}
-          <FormControl fullWidth size="small" sx={{ mt: 1 }}>
-            <InputLabel id="edit-scorer-label">
-              {editEventDialogOpen?.event_type === "own_goal"
-                ? t("common.player")
-                : editEventDialogOpen?.event_type === "goal"
-                  ? t("common.goal")
-                  : t("common.player")}
-            </InputLabel>
-            <Select
-              labelId="edit-scorer-label"
-              value={selectedScorerId}
-              label={
-                editEventDialogOpen?.event_type === "own_goal"
-                  ? t("common.player")
-                  : editEventDialogOpen?.event_type === "goal"
-                    ? t("common.goal")
-                    : t("common.player")
-              }
-              onChange={(e) => handleScorerChange(e.target.value as string)}
-              data-testid="edit-scorer-select"
-            >
-              {editScorerOptions.map((player) => {
-                const name = getPlayerName(player.player_id);
-                const sideLabel = editEventMatch
-                  ? player.team_id === editEventMatch.home_team_id
-                    ? `(${teamNameById[editEventMatch.home_team_id] || "Home"})`
-                    : `(${teamNameById[editEventMatch.away_team_id] || "Away"})`
-                  : "";
-                return (
-                  <MenuItem key={player.player_id} value={player.player_id}>
-                    {name} {sideLabel}
-                  </MenuItem>
-                );
-              })}
-            </Select>
-          </FormControl>
-
-          {/* Assistant Select (Only for Goal events) */}
-          {editEventDialogOpen?.event_type === "goal" && (
-            <FormControl fullWidth size="small">
-              <InputLabel id="edit-assistant-label">
-                {t("common.assist")}
-              </InputLabel>
-              <Select
-                labelId="edit-assistant-label"
-                value={selectedAssistantId}
-                label={t("common.assist")}
-                onChange={(e) =>
-                  setSelectedAssistantId(e.target.value as string)
-                }
-                data-testid="edit-assistant-select"
-              >
-                <MenuItem value="none">
-                  <em>{t("common.without_assistance")}</em>
-                </MenuItem>
-                {editAssistantOptions.map((player) => {
-                  const name = getPlayerName(player.player_id);
-                  return (
-                    <MenuItem key={player.player_id} value={player.player_id}>
-                      {name}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-          )}
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 3 }}>
-          <Button
-            onClick={() => setEditEventDialogOpen(null)}
-            variant="outlined"
-            color="inherit"
-          >
-            {t("common.actions.cancel")}
-          </Button>
-          <Button
-            onClick={handleSaveEditEvent}
-            variant="contained"
-            color="primary"
-            disabled={!selectedScorerId}
-            data-testid="save-event-edit-button"
-          >
-            {t("common.actions.save")}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {Boolean(editEventDialogOpen) && (
+        <EditTimelineEventDialog
+          open={Boolean(editEventDialogOpen)}
+          key={editEventDialogOpen?.id}
+          event={editEventDialogOpen}
+          match={editEventMatch}
+          pelada={pelada}
+          onClose={() => setEditEventDialogOpen(null)}
+          onSave={handleSaveEditEvent}
+          orgPlayerIdToPlayer={orgPlayerIdToPlayer}
+          orgPlayerIdToUserId={orgPlayerIdToUserId}
+          userIdToName={userIdToName}
+          teamNameById={teamNameById}
+          lineupsByMatch={lineupsByMatch}
+          teamPlayers={teamPlayers}
+          orgPlayerIdToTeamId={orgPlayerIdToTeamId}
+          matchEvents={matchEvents}
+          attendance={attendance}
+        />
+      )}
     </Box>
   );
 }

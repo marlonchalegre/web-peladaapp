@@ -1,4 +1,4 @@
-import type { MatchEvent, User } from "../../../shared/api/endpoints";
+import type { MatchEvent } from "../../../shared/api/endpoints";
 
 export const POSITION_ORDER: Record<string, number> = {
   goalkeeper: 0,
@@ -7,32 +7,48 @@ export const POSITION_ORDER: Record<string, number> = {
   striker: 3,
 };
 
+export interface SortablePlayer {
+  position?: string | null;
+  user_position?: string | null;
+  is_goalkeeper?: boolean;
+  isGoalkeeper?: boolean;
+  name?: string;
+  user?: { name?: string; position?: string };
+}
+
+/**
+ * Compares two players by football position (GK -> DF -> MF -> ST),
+ * with manual goalkeeper overrides taking precedence, and name as tie-breaker.
+ */
+export function comparePlayersByPosition(
+  a: SortablePlayer,
+  b: SortablePlayer,
+): number {
+  const isGkA = a.isGoalkeeper ?? a.is_goalkeeper ?? false;
+  const isGkB = b.isGoalkeeper ?? b.is_goalkeeper ?? false;
+  if (isGkA && !isGkB) return -1;
+  if (!isGkA && isGkB) return 1;
+
+  const rawPosA = a.position || a.user_position || a.user?.position || "";
+  const rawPosB = b.position || b.user_position || b.user?.position || "";
+  const posA = POSITION_ORDER[rawPosA.toLowerCase()] ?? 4;
+  const posB = POSITION_ORDER[rawPosB.toLowerCase()] ?? 4;
+  if (posA !== posB) return posA - posB;
+
+  const nameA = a.name || a.user?.name || "";
+  const nameB = b.name || b.user?.name || "";
+  return nameA.localeCompare(nameB);
+}
+
 /**
  * Sorts players by their football position (GK -> DF -> MF -> ST).
  * Manual goalkeeper overrides (is_goalkeeper property) take absolute precedence.
  * If positions are identical, players are sorted alphabetically by name.
  */
-export function sortPlayersByPosition<
-  T extends { user: User; is_goalkeeper?: boolean },
->(players: T[]): T[] {
-  return [...players].sort((a, b) => {
-    // 1. Manual goalkeeper override (highest priority)
-    if (a.is_goalkeeper && !b.is_goalkeeper) return -1;
-    if (!a.is_goalkeeper && b.is_goalkeeper) return 1;
-
-    // 2. Standard position order
-    const posA = POSITION_ORDER[(a.user?.position || "").toLowerCase()] ?? 4;
-    const posB = POSITION_ORDER[(b.user?.position || "").toLowerCase()] ?? 4;
-
-    if (posA !== posB) {
-      return posA - posB;
-    }
-
-    // 3. Alphabetical name sort (tie-breaker)
-    const nameA = a.user?.name || "";
-    const nameB = b.user?.name || "";
-    return nameA.localeCompare(nameB);
-  });
+export function sortPlayersByPosition<T extends SortablePlayer>(
+  players: T[],
+): T[] {
+  return [...players].sort(comparePlayersByPosition);
 }
 
 /**
@@ -113,4 +129,81 @@ export function isAssistForGoal(
     assist.session_time_ms === goal.session_time_ms &&
     assist.match_time_ms === goal.match_time_ms
   );
+}
+
+/**
+ * Resolves a player's display name from available lookup dictionaries.
+ */
+export function resolvePlayerName(
+  playerId: string,
+  orgPlayerIdToPlayer?: Record<string, { user_name?: string }>,
+  orgPlayerIdToUserId?: Record<string, string>,
+  userIdToName?: Record<string, string>,
+  fallback = `Player #${playerId}`,
+): string {
+  const orgPlayer = orgPlayerIdToPlayer?.[playerId];
+  if (orgPlayer?.user_name) return orgPlayer.user_name;
+  const userId = orgPlayerIdToUserId?.[playerId];
+  if (userId && userIdToName?.[userId]) return userIdToName[userId];
+  return fallback;
+}
+
+/**
+ * Extracts a player ID from an attendance record supporting various property casing.
+ */
+export function getAttendancePlayerId(att: {
+  player_id?: string;
+  "player-id"?: string;
+  playerId?: string;
+  id?: string;
+}): string | undefined {
+  return att.player_id ?? att["player-id"] ?? att.playerId ?? att.id;
+}
+
+/**
+ * Resolves the matching assist event for a given goal event in a single pass.
+ * Priority:
+ * 1. Direct parent_event_id match (immediate return)
+ * 2. Simultaneous assist events (prefers same-team candidate if goalTeamId is provided)
+ */
+export function findMatchingAssistForGoal(
+  goal:
+    | Pick<
+        MatchEvent,
+        "id" | "match_id" | "event_type" | "session_time_ms" | "match_time_ms"
+      >
+    | null
+    | undefined,
+  events: MatchEvent[],
+  goalTeamId?: string | null,
+  orgPlayerIdToTeamId?: Record<string, string>,
+): MatchEvent | null {
+  if (!goal || goal.event_type !== "goal") return null;
+
+  let fallbackCandidate: MatchEvent | null = null;
+  let sameTeamCandidate: MatchEvent | null = null;
+
+  for (let i = 0; i < events.length; i++) {
+    const e = events[i];
+    if (e.match_id !== goal.match_id || e.event_type !== "assist") continue;
+
+    if (e.parent_event_id === goal.id) return e;
+
+    if (
+      !e.parent_event_id &&
+      e.session_time_ms === goal.session_time_ms &&
+      e.match_time_ms === goal.match_time_ms
+    ) {
+      if (!fallbackCandidate) fallbackCandidate = e;
+      if (
+        goalTeamId &&
+        orgPlayerIdToTeamId &&
+        orgPlayerIdToTeamId[e.player_id] === goalTeamId
+      ) {
+        sameTeamCandidate = e;
+      }
+    }
+  }
+
+  return sameTeamCandidate || fallbackCandidate;
 }

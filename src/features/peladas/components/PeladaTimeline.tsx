@@ -21,7 +21,8 @@ import ShieldIcon from "@mui/icons-material/Shield";
 import SentimentVerySatisfiedIcon from "@mui/icons-material/SentimentVerySatisfied";
 import { useTranslation } from "react-i18next";
 import type { MatchEvent, Match } from "../../../shared/api/endpoints";
-import { getPlayerTeamInMatch } from "../utils/playerUtils";
+import { formatMs } from "../../../shared/utils/timeUtils";
+import { getPlayerTeamInMatch, isAssistForGoal } from "../utils/playerUtils";
 
 interface GroupedEvent {
   id: string;
@@ -305,17 +306,6 @@ export default function PeladaTimeline({
   const homeColor = theme.palette.home?.main || "#2563eb";
   const awayColor = theme.palette.away?.main || "#f97316";
 
-  const formatMs = (ms?: number | null) => {
-    if (ms === undefined || ms === null) return "--:--";
-    const seconds = Math.floor((ms / 1000) % 60);
-    const minutes = Math.floor((ms / (1000 * 60)) % 60);
-    const hours = Math.floor(ms / (1000 * 60 * 60));
-
-    const pad = (n: number) => n.toString().padStart(2, "0");
-    if (hours > 0) return `${hours}:${pad(minutes)}:${pad(seconds)}`;
-    return `${pad(minutes)}:${pad(seconds)}`;
-  };
-
   const getPlayerName = (playerId: string) => {
     const userId = orgPlayerIdToUserId[playerId];
     return userIdToName[userId] || `Player ${playerId}`;
@@ -407,12 +397,7 @@ export default function PeladaTimeline({
 
         goals.forEach((goal) => {
           const matchingAssist = assists.find(
-            (a) =>
-              !pairedAssistIds.has(a.id!) &&
-              ((a.parent_event_id && a.parent_event_id === goal.id) ||
-                (!a.parent_event_id &&
-                  a.session_time_ms === goal.session_time_ms &&
-                  a.match_time_ms === goal.match_time_ms)),
+            (a) => !pairedAssistIds.has(a.id!) && isAssistForGoal(a, goal),
           );
 
           if (matchingAssist) {
@@ -639,12 +624,7 @@ export default function PeladaTimeline({
         // Match goal and assist pairs
         goals.forEach((goal) => {
           const matchingAssist = assists.find(
-            (a) =>
-              !pairedAssistIds.has(a.id!) &&
-              ((a.parent_event_id && a.parent_event_id === goal.id) ||
-                (!a.parent_event_id &&
-                  a.session_time_ms === goal.session_time_ms &&
-                  a.match_time_ms === goal.match_time_ms)),
+            (a) => !pairedAssistIds.has(a.id!) && isAssistForGoal(a, goal),
           );
 
           if (matchingAssist) {

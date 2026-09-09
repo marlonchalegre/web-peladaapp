@@ -4,6 +4,9 @@ import {
   sortPlayersByPosition,
   getPlayerTeamInMatch,
   isAssistForGoal,
+  findMatchingAssistForGoal,
+  resolvePlayerName,
+  getAttendancePlayerId,
 } from "./playerUtils";
 
 describe("playerUtils", () => {
@@ -17,10 +20,10 @@ describe("playerUtils", () => {
 
     it("should sort by standard position order (GK > DF > MF > ST)", () => {
       const sorted = sortPlayersByPosition(players);
-      expect(sorted[0].user.name).toBe("Goalkeeper A");
-      expect(sorted[1].user.name).toBe("Defender A");
-      expect(sorted[2].user.name).toBe("Midfielder A");
-      expect(sorted[3].user.name).toBe("Striker A");
+      expect(sorted[0]?.user?.name).toBe("Goalkeeper A");
+      expect(sorted[1]?.user?.name).toBe("Defender A");
+      expect(sorted[2]?.user?.name).toBe("Midfielder A");
+      expect(sorted[3]?.user?.name).toBe("Striker A");
     });
 
     it("should respect manual goalkeeper override (is_goalkeeper)", () => {
@@ -37,7 +40,36 @@ describe("playerUtils", () => {
         },
       ] as any;
       const sorted = sortPlayersByPosition(mixedPlayers);
-      expect(sorted[0].user.name).toBe("ST but is GK");
+      expect(sorted[0]?.user?.name).toBe("ST but is GK");
+    });
+
+    it("should respect isGoalkeeper camelCase flag and tie-break multiple goalkeepers by name", () => {
+      const gkPlayers = [
+        { id: "1", name: "Zack GK", isGoalkeeper: true },
+        { id: "2", name: "Adam GK", isGoalkeeper: true },
+        {
+          id: "3",
+          name: "Bob Mid",
+          isGoalkeeper: false,
+          position: "midfielder",
+        },
+      ];
+      const sorted = sortPlayersByPosition(gkPlayers);
+      expect(sorted[0]?.name).toBe("Adam GK");
+      expect(sorted[1]?.name).toBe("Zack GK");
+      expect(sorted[2]?.name).toBe("Bob Mid");
+    });
+
+    it("should handle uppercase and mixed-case position strings", () => {
+      const playersWithCasing = [
+        { id: "1", name: "Striker", position: "STRIKER" },
+        { id: "2", name: "Goalkeeper", position: "GOALKEEPER" },
+        { id: "3", name: "Defender", position: "DeFeNdEr" },
+      ];
+      const sorted = sortPlayersByPosition(playersWithCasing);
+      expect(sorted[0]?.name).toBe("Goalkeeper");
+      expect(sorted[1]?.name).toBe("Defender");
+      expect(sorted[2]?.name).toBe("Striker");
     });
 
     it("should sort alphabetically by name as a tie-breaker", () => {
@@ -47,9 +79,9 @@ describe("playerUtils", () => {
         { id: "3", user: { name: "Bravo", position: "Midfielder" } },
       ] as any;
       const sorted = sortPlayersByPosition(samePos);
-      expect(sorted[0].user.name).toBe("Alpha");
-      expect(sorted[1].user.name).toBe("Bravo");
-      expect(sorted[2].user.name).toBe("Charlie");
+      expect(sorted[0]?.user?.name).toBe("Alpha");
+      expect(sorted[1]?.user?.name).toBe("Bravo");
+      expect(sorted[2]?.user?.name).toBe("Charlie");
     });
 
     it("should put unknown positions at the end", () => {
@@ -58,8 +90,8 @@ describe("playerUtils", () => {
         { id: "2", user: { name: "Striker", position: "Striker" } },
       ] as any;
       const sorted = sortPlayersByPosition(unknown);
-      expect(sorted[0].user.name).toBe("Striker");
-      expect(sorted[1].user.name).toBe("Unknown");
+      expect(sorted[0]?.user?.name).toBe("Striker");
+      expect(sorted[1]?.user?.name).toBe("Unknown");
     });
   });
 
@@ -192,6 +224,170 @@ describe("playerUtils", () => {
       };
       expect(isAssistForGoal(assistDiffParent, goal)).toBe(false);
       expect(isAssistForGoal(assistDiffTime, goal)).toBe(false);
+    });
+  });
+
+  describe("findMatchingAssistForGoal", () => {
+    const goal = {
+      id: "g1",
+      match_id: "m1",
+      event_type: "goal",
+      session_time_ms: 100,
+      match_time_ms: 50,
+    } as any;
+
+    it("should return null for non-goal events or null input", () => {
+      expect(findMatchingAssistForGoal(null, [])).toBeNull();
+      expect(
+        findMatchingAssistForGoal({ ...goal, event_type: "own_goal" }, []),
+      ).toBeNull();
+    });
+
+    it("should match by direct parent_event_id", () => {
+      const events = [
+        {
+          id: "a1",
+          match_id: "m1",
+          event_type: "assist",
+          parent_event_id: "g1",
+          player_id: "p2",
+        },
+      ] as any[];
+      expect(findMatchingAssistForGoal(goal, events)).toEqual(events[0]);
+    });
+
+    it("should match by timestamp when parent_event_id is not set", () => {
+      const events = [
+        {
+          id: "a1",
+          match_id: "m1",
+          event_type: "assist",
+          session_time_ms: 100,
+          match_time_ms: 50,
+          player_id: "p2",
+        },
+      ] as any[];
+      expect(findMatchingAssistForGoal(goal, events)).toEqual(events[0]);
+    });
+
+    it("should prioritize same-team assist when multiple assists have identical timestamps", () => {
+      const events = [
+        {
+          id: "a-team2",
+          match_id: "m1",
+          event_type: "assist",
+          session_time_ms: 100,
+          match_time_ms: 50,
+          player_id: "p-away",
+        },
+        {
+          id: "a-team1",
+          match_id: "m1",
+          event_type: "assist",
+          session_time_ms: 100,
+          match_time_ms: 50,
+          player_id: "p-home",
+        },
+      ] as any[];
+      const orgPlayerIdToTeamId = {
+        "p-home": "team-home",
+        "p-away": "team-away",
+      };
+      const result = findMatchingAssistForGoal(
+        goal,
+        events,
+        "team-home",
+        orgPlayerIdToTeamId,
+      );
+      expect(result?.id).toBe("a-team1");
+    });
+
+    it("prioritizes direct parent_event_id match over simultaneous assists", () => {
+      const events = [
+        {
+          id: "a-wrong-time",
+          match_id: "m1",
+          event_type: "assist",
+          parent_event_id: "g1",
+          session_time_ms: 999,
+          match_time_ms: 999,
+          player_id: "p2",
+        },
+        {
+          id: "a-same-time",
+          match_id: "m1",
+          event_type: "assist",
+          session_time_ms: 100,
+          match_time_ms: 50,
+          player_id: "p3",
+        },
+      ] as any[];
+      expect(findMatchingAssistForGoal(goal, events)).toEqual(events[0]);
+    });
+
+    it("ignores assists from a different match or with a different parent_event_id", () => {
+      const events = [
+        {
+          id: "a-other-match",
+          match_id: "other-m",
+          event_type: "assist",
+          session_time_ms: 100,
+          match_time_ms: 50,
+        },
+        {
+          id: "a-other-parent",
+          match_id: "m1",
+          event_type: "assist",
+          parent_event_id: "other-goal",
+          session_time_ms: 100,
+          match_time_ms: 50,
+        },
+      ] as any[];
+      expect(findMatchingAssistForGoal(goal, events)).toBeNull();
+    });
+  });
+
+  describe("resolvePlayerName", () => {
+    it("resolves name from orgPlayer.user_name", () => {
+      const orgPlayers = { p1: { user_name: "Alice" } };
+      expect(resolvePlayerName("p1", orgPlayers)).toBe("Alice");
+    });
+
+    it("resolves name from userIdToName using orgPlayerIdToUserId", () => {
+      const rel = { p1: "u1" };
+      const names = { u1: "Bob" };
+      expect(resolvePlayerName("p1", undefined, rel, names)).toBe("Bob");
+    });
+
+    it("falls back to default fallback string", () => {
+      expect(resolvePlayerName("p99")).toBe("Player #p99");
+    });
+
+    it("respects custom fallback parameter", () => {
+      expect(
+        resolvePlayerName(
+          "p99",
+          undefined,
+          undefined,
+          undefined,
+          "Custom Name",
+        ),
+      ).toBe("Custom Name");
+    });
+  });
+
+  describe("getAttendancePlayerId", () => {
+    it("handles player_id", () => {
+      expect(getAttendancePlayerId({ player_id: "p1" })).toBe("p1");
+    });
+
+    it("handles player-id and playerId", () => {
+      expect(getAttendancePlayerId({ "player-id": "p2" })).toBe("p2");
+      expect(getAttendancePlayerId({ playerId: "p3" })).toBe("p3");
+    });
+
+    it("returns undefined when no id property exists", () => {
+      expect(getAttendancePlayerId({})).toBeUndefined();
     });
   });
 });
