@@ -18,20 +18,27 @@ import {
 import AssessmentIcon from "@mui/icons-material/Assessment";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
+import HourglassTopIcon from "@mui/icons-material/HourglassTop";
+import Chip from "@mui/material/Chip";
 import { api } from "../../../shared/api/client";
 import {
   createApi,
   type Pelada,
   type Organization,
   type OrganizationFeatureFlags,
+  type Player,
+  type MonthlyWaitlistStatus,
 } from "../../../shared/api/endpoints";
 import { useAuth } from "../../../app/providers/AuthContext";
 import CreatePeladaForm from "../components/CreatePeladaForm";
 import PeladasTable from "../components/PeladasTable";
 import { ConfirmDeletePeladaDialog } from "../../admin/components/ConfirmDeletePeladaDialog";
+import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
+import { getLocalizedErrorMessage } from "../../../shared/utils/error-handler";
 
 const endpoints = createApi(api);
 
@@ -55,6 +62,12 @@ export default function OrganizationDetailPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [featureFlags, setFeatureFlags] =
     useState<OrganizationFeatureFlags | null>(null);
+  const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
+  const [waitlistStatus, setWaitlistStatus] =
+    useState<MonthlyWaitlistStatus | null>(null);
+  const [waitlistLoading, setWaitlistLoading] = useState(false);
+  const [leaveWaitlistConfirmOpen, setLeaveWaitlistConfirmOpen] =
+    useState(false);
 
   useEffect(() => {
     if (!orgId || !user) return;
@@ -84,11 +97,13 @@ export default function OrganizationDetailPage() {
         }
       })
       .catch((error: unknown) => {
-        const message =
-          error instanceof Error
-            ? error.message
-            : t("organizations.detail.error.load_failed");
-        setError(message);
+        setError(
+          getLocalizedErrorMessage(
+            error,
+            t,
+            "organizations.detail.error.load_failed",
+          ),
+        );
       });
 
     // Load feature flags
@@ -100,7 +115,30 @@ export default function OrganizationDetailPage() {
       .catch((err: unknown) => {
         console.error("Failed to load feature flags", err);
       });
-  }, [orgId, user, t, peladas.length]); // Added peladas.length as a hint to refresh when data changes
+
+    // Load player and waitlist status
+    endpoints
+      .listPlayersByOrg(orgId)
+      .then((players) => {
+        const me = players.find((p) => String(p.user_id) === String(user.id));
+        setCurrentPlayer(me || null);
+        if (
+          me &&
+          me.member_type !== "mensalista" &&
+          me.member_type !== "mensalista_temporario"
+        ) {
+          endpoints
+            .getMonthlyWaitlistStatus(orgId)
+            .then((status) => setWaitlistStatus(status))
+            .catch((err) =>
+              console.error("Failed to load waitlist status", err),
+            );
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load org players", err);
+      });
+  }, [orgId, user, t]);
 
   const fetchPeladas = useCallback(async () => {
     if (!orgId) return;
@@ -114,11 +152,13 @@ export default function OrganizationDetailPage() {
       setPeladas(response.data);
       setTotalPeladas(response.total);
     } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : t("organizations.detail.error.load_peladas_failed");
-      setError(message);
+      setError(
+        getLocalizedErrorMessage(
+          error,
+          t,
+          "organizations.detail.error.load_peladas_failed",
+        ),
+      );
     }
   }, [orgId, page, rowsPerPage, t]);
 
@@ -147,17 +187,55 @@ export default function OrganizationDetailPage() {
       await endpoints.leaveOrganization(orgId);
       navigate("/home");
     } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : t(
-              "organizations.detail.error.leave_failed",
-              "Falha ao sair da organização",
-            );
-      setError(message);
+      setError(
+        getLocalizedErrorMessage(
+          error,
+          t,
+          "organizations.detail.error.leave_failed",
+        ),
+      );
       setLeaveDialogOpen(false);
     } finally {
       setIsLeaving(false);
+    }
+  };
+
+  const handleJoinWaitlist = async () => {
+    if (!orgId) return;
+    setWaitlistLoading(true);
+    try {
+      await endpoints.joinMonthlyWaitlist(orgId);
+      setWaitlistStatus({ in_queue: true });
+    } catch (err: unknown) {
+      setError(
+        getLocalizedErrorMessage(
+          err,
+          t,
+          "organizations.management.waitlist.error.action_failed",
+        ),
+      );
+    } finally {
+      setWaitlistLoading(false);
+    }
+  };
+
+  const handleLeaveWaitlist = async () => {
+    if (!orgId || !currentPlayer) return;
+    setWaitlistLoading(true);
+    try {
+      await endpoints.leaveMonthlyWaitlist(orgId, currentPlayer.id);
+      setWaitlistStatus({ in_queue: false });
+      setLeaveWaitlistConfirmOpen(false);
+    } catch (err: unknown) {
+      setError(
+        getLocalizedErrorMessage(
+          err,
+          t,
+          "organizations.management.waitlist.error.action_failed",
+        ),
+      );
+    } finally {
+      setWaitlistLoading(false);
     }
   };
 
@@ -190,16 +268,69 @@ export default function OrganizationDetailPage() {
           px: { xs: 1, sm: 0 },
         }}
       >
-        <Typography
-          variant="h4"
-          component="h1"
-          sx={{
-            color: "primary.main",
-            fontWeight: "bold",
-          }}
-        >
-          {org.name}
-        </Typography>
+        <Box>
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{
+              color: "primary.main",
+              fontWeight: "bold",
+            }}
+          >
+            {org.name}
+          </Typography>
+          {currentPlayer &&
+            currentPlayer.member_type !== "mensalista" &&
+            currentPlayer.member_type !== "mensalista_temporario" &&
+            waitlistStatus !== null && (
+              <Box
+                sx={{
+                  mt: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  flexWrap: "wrap",
+                }}
+              >
+                {waitlistStatus.in_queue ? (
+                  <>
+                    <Chip
+                      icon={<HourglassTopIcon />}
+                      label={t("organizations.detail.waitlist.in_queue_badge")}
+                      color="primary"
+                      variant="outlined"
+                      size="small"
+                      data-testid="waitlist-in-queue-badge"
+                    />
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      onClick={() => setLeaveWaitlistConfirmOpen(true)}
+                      disabled={waitlistLoading}
+                      data-testid="leave-waitlist-button"
+                      sx={{ textTransform: "none", py: 0.25 }}
+                    >
+                      {t("organizations.detail.waitlist.leave_button")}
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    variant="outlined"
+                    color="primary"
+                    size="small"
+                    startIcon={<FormatListNumberedIcon />}
+                    onClick={handleJoinWaitlist}
+                    disabled={waitlistLoading}
+                    data-testid="join-waitlist-button"
+                    sx={{ textTransform: "none" }}
+                  >
+                    {t("organizations.detail.waitlist.candidate_button")}
+                  </Button>
+                )}
+              </Box>
+            )}
+        </Box>
         <Stack direction="row" spacing={1}>
           <Button
             {...(featureFlags?.org_statistics !== false
@@ -408,6 +539,16 @@ export default function OrganizationDetailPage() {
           }}
         />
       )}
+
+      <PrettyConfirmDialog
+        open={leaveWaitlistConfirmOpen}
+        title={t("organizations.detail.waitlist.leave_confirm_title")}
+        description={t("organizations.detail.waitlist.leave_confirm_message")}
+        confirmLabel={t("organizations.detail.waitlist.leave_button")}
+        severity="error"
+        onConfirm={handleLeaveWaitlist}
+        onClose={() => setLeaveWaitlistConfirmOpen(false)}
+      />
     </Container>
   );
 }

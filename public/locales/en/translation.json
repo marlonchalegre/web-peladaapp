@@ -298,6 +298,15 @@
       "section": {
         "new_pelada": "New Pelada"
       },
+      "waitlist": {
+        "candidate_button": "Candidate for Monthly",
+        "in_queue_badge": "You are on the monthly player waitlist",
+        "leave_button": "Leave Waitlist",
+        "leave_confirm_title": "Leave Waitlist",
+        "leave_confirm_message": "Are you sure you want to leave the monthly player waitlist?",
+        "success_join": "You joined the monthly player waitlist!",
+        "success_leave": "You left the waitlist."
+      },
       "leave_dialog": {
         "title": "Leave Organization"
       },
@@ -333,6 +342,7 @@
         "members": "Members",
         "finance": "Finance",
         "substitutions": "Substitutions",
+        "waitlist": "Waitlist",
         "admins": "Administrators",
         "danger_zone": "Danger Zone",
         "waha": "WhatsApp (WAHA)"
@@ -361,6 +371,34 @@
         "fields": {
           "permanent_player": "Permanent Player (Mensalista)",
           "temporary_player": "Temporary Substitute"
+        }
+      },
+      "waitlist": {
+        "title": "Monthly Player Waitlist",
+        "subtitle": "Manage players who want to become monthly players in this organization.",
+        "empty": "No players in the waitlist.",
+        "add_button": "Add to Waitlist",
+        "promote_button": "Promote to Monthly",
+        "promote_confirm_title": "Promote to Monthly Player",
+        "promote_confirm_message": "Are you sure you want to promote {{name}} to monthly player? They will be removed from the waitlist.",
+        "remove_button": "Remove from Waitlist",
+        "remove_confirm_title": "Remove from Waitlist",
+        "remove_confirm_message": "Are you sure you want to remove {{name}} from the waitlist?",
+        "candidate_dialog": {
+          "title": "Add Player to Waitlist",
+          "select_player": "Select Player",
+          "submit": "Add to Waitlist",
+          "cancel": "Cancel",
+          "no_eligible": "No casual or guest players available to add to the waitlist."
+        },
+        "success": {
+          "added": "Player added to waitlist successfully!",
+          "removed": "Player removed from waitlist successfully!",
+          "promoted": "Player promoted to monthly player successfully!"
+        },
+        "error": {
+          "load_failed": "Failed to load waitlist",
+          "action_failed": "Failed to update waitlist"
         }
       },
       "finance": {

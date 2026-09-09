@@ -298,6 +298,15 @@
       "section": {
         "new_pelada": "Nova Pelada"
       },
+      "waitlist": {
+        "candidate_button": "Candidatar-se a Mensalista",
+        "in_queue_badge": "Você está na fila de espera para mensalista",
+        "leave_button": "Sair da Fila",
+        "leave_confirm_title": "Sair da Fila de Espera",
+        "leave_confirm_message": "Tem certeza que deseja sair da fila de espera para se tornar mensalista?",
+        "success_join": "Você entrou na fila de espera para mensalista!",
+        "success_leave": "Você saiu da fila de espera."
+      },
       "leave_dialog": {
         "title": "Sair da Organização"
       },
@@ -323,7 +332,7 @@
       },
       "error": {
         "invalid_token": "Este link de convite é inválido ou expirou.",
-        "join_failed": "Falha ao entrar na organização. Por favor, tente novamente mais tarde."
+        "join_failed": "Erro ao entrar na organização."
       }
     },
     "management": {
@@ -335,6 +344,7 @@
         "members": "Membros",
         "finance": "Financeiro",
         "substitutions": "Substituições",
+        "waitlist": "Fila de Espera",
         "admins": "Administradores",
         "danger_zone": "Zona de Perigo",
         "waha": "WhatsApp (WAHA)"
@@ -363,6 +373,34 @@
         "fields": {
           "permanent_player": "Mensalista Permanente",
           "temporary_player": "Substituto Temporário"
+        }
+      },
+      "waitlist": {
+        "title": "Fila de Espera de Mensalistas",
+        "subtitle": "Gerencie os jogadores que desejam se tornar mensalistas nesta organização.",
+        "empty": "Nenhum jogador na fila de espera.",
+        "add_button": "Adicionar à Fila",
+        "promote_button": "Promover a Mensalista",
+        "promote_confirm_title": "Promover a Mensalista",
+        "promote_confirm_message": "Tem certeza que deseja promover {{name}} a mensalista? O jogador será removido da fila de espera.",
+        "remove_button": "Remover da Fila",
+        "remove_confirm_title": "Remover da Fila",
+        "remove_confirm_message": "Tem certeza que deseja remover {{name}} da fila de espera?",
+        "candidate_dialog": {
+          "title": "Adicionar Jogador à Fila",
+          "select_player": "Selecione o Jogador",
+          "submit": "Adicionar à Fila",
+          "cancel": "Cancelar",
+          "no_eligible": "Não há jogadores diaristas ou convidados disponíveis para adicionar à fila."
+        },
+        "success": {
+          "added": "Jogador adicionado à fila com sucesso!",
+          "removed": "Jogador removido da fila com sucesso!",
+          "promoted": "Jogador promovido a mensalista com sucesso!"
+        },
+        "error": {
+          "load_failed": "Erro ao carregar fila de espera",
+          "action_failed": "Erro ao atualizar fila de espera"
         }
       },
       "finance": {

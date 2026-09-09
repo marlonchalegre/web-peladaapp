@@ -43,6 +43,11 @@ const { mockApi } = vi.hoisted(() => ({
     createSubstitution: vi.fn(),
     endSubstitution: vi.fn(),
     addPlayersToOrganization: vi.fn(),
+    getOrgFeatureFlags: vi.fn(),
+    listMonthlyWaitlist: vi.fn(),
+    joinMonthlyWaitlist: vi.fn(),
+    leaveMonthlyWaitlist: vi.fn(),
+    promoteMonthlyWaitlistPlayer: vi.fn(),
   },
 }));
 
@@ -82,6 +87,8 @@ describe("useOrganizationManagement", () => {
     mockApi.listAdminsByOrganization.mockResolvedValue(mockAdmins);
     mockApi.listOrganizationInvitations.mockResolvedValue([]);
     mockApi.listSubstitutions.mockResolvedValue([]);
+    mockApi.listMonthlyWaitlist.mockResolvedValue([]);
+    mockApi.getOrgFeatureFlags.mockResolvedValue(null);
     mockApi.getInviteLink.mockResolvedValue({ token: "token123" });
   });
 

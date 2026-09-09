@@ -21,15 +21,17 @@ vi.mock("../../../shared/api/client", () => ({
   },
 }));
 
+const mockUser = {
+  id: "1",
+  name: "Test User",
+  email: "test@example.com",
+  admin_orgs: ["1"],
+};
+
 // Mock AuthContext
 vi.mock("../../../app/providers/AuthContext", () => ({
   useAuth: () => ({
-    user: {
-      id: "1",
-      name: "Test User",
-      email: "test@example.com",
-      admin_orgs: ["1"],
-    },
+    user: mockUser,
     isAuthenticated: true,
   }),
 }));
@@ -935,6 +937,163 @@ describe("OrganizationDetailPage", () => {
     await waitFor(() => {
       const statsBtn = screen.getByTestId("org-statistics-button");
       expect(statsBtn).toBeEnabled();
+    });
+  });
+
+  it("shows candidate button for non-mensalista players and joins waitlist on click", async () => {
+    const mockOrg = { id: "1", name: "Test Org", owner_id: "other" };
+    const mockPlayers = [
+      {
+        id: "p-user",
+        user_id: "1",
+        organization_id: "1",
+        member_type: "diarista",
+      },
+    ];
+
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/organizations/1") return Promise.resolve(mockOrg);
+      if (path === "/api/organizations/1/admins") return Promise.resolve([]);
+      if (path === "/api/organizations/1/players")
+        return Promise.resolve(mockPlayers);
+      if (path === "/api/organizations/1/monthly-waitlist/me")
+        return Promise.resolve({ in_queue: false });
+      return Promise.resolve({});
+    });
+    (api.getPaginated as Mock).mockResolvedValue({ data: [], total: 0 });
+    (api.post as Mock).mockImplementation((path: string) => {
+      if (path === "/api/organizations/1/monthly-waitlist")
+        return Promise.resolve({ status: "success" });
+      return Promise.reject(new Error("Not found"));
+    });
+
+    render(
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <MemoryRouter initialEntries={["/organizations/1"]}>
+          <Routes>
+            <Route
+              path="/organizations/:id"
+              element={<OrganizationDetailPage />}
+            />
+          </Routes>
+        </MemoryRouter>
+      </LocalizationProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("join-waitlist-button")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId("join-waitlist-button"));
+
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledWith(
+        "/api/organizations/1/monthly-waitlist",
+        { player_id: undefined },
+      );
+      expect(screen.getByTestId("waitlist-in-queue-badge")).toBeInTheDocument();
+    });
+  });
+
+  it("shows in-queue badge and leaves waitlist upon confirmation", async () => {
+    const mockOrg = { id: "1", name: "Test Org", owner_id: "other" };
+    const mockPlayers = [
+      {
+        id: "p-user",
+        user_id: "1",
+        organization_id: "1",
+        member_type: "diarista",
+      },
+    ];
+
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/organizations/1") return Promise.resolve(mockOrg);
+      if (path === "/api/organizations/1/admins") return Promise.resolve([]);
+      if (path === "/api/organizations/1/players")
+        return Promise.resolve(mockPlayers);
+      if (path === "/api/organizations/1/monthly-waitlist/me")
+        return Promise.resolve({ in_queue: true });
+      return Promise.resolve({});
+    });
+    (api.getPaginated as Mock).mockResolvedValue({ data: [], total: 0 });
+    (api.delete as Mock).mockImplementation((path: string) => {
+      if (path === "/api/organizations/1/monthly-waitlist/p-user")
+        return Promise.resolve({ status: "success" });
+      return Promise.reject(new Error("Not found"));
+    });
+
+    render(
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <MemoryRouter initialEntries={["/organizations/1"]}>
+          <Routes>
+            <Route
+              path="/organizations/:id"
+              element={<OrganizationDetailPage />}
+            />
+          </Routes>
+        </MemoryRouter>
+      </LocalizationProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("waitlist-in-queue-badge")).toBeInTheDocument();
+      expect(screen.getByTestId("leave-waitlist-button")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId("leave-waitlist-button"));
+
+    const confirmBtn = screen.getByRole("button", {
+      name: "organizations.detail.waitlist.leave_button",
+    });
+    fireEvent.click(confirmBtn);
+
+    await waitFor(() => {
+      expect(api.delete).toHaveBeenCalledWith(
+        "/api/organizations/1/monthly-waitlist/p-user",
+      );
+    });
+  });
+
+  it("does not show waitlist candidacy options when player is already mensalista", async () => {
+    const mockOrg = { id: "1", name: "Test Org", owner_id: "other" };
+    const mockPlayers = [
+      {
+        id: "p-user",
+        user_id: "1",
+        organization_id: "1",
+        member_type: "mensalista",
+      },
+    ];
+
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/organizations/1") return Promise.resolve(mockOrg);
+      if (path === "/api/organizations/1/admins") return Promise.resolve([]);
+      if (path === "/api/organizations/1/players")
+        return Promise.resolve(mockPlayers);
+      return Promise.resolve({});
+    });
+    (api.getPaginated as Mock).mockResolvedValue({ data: [], total: 0 });
+
+    render(
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <MemoryRouter initialEntries={["/organizations/1"]}>
+          <Routes>
+            <Route
+              path="/organizations/:id"
+              element={<OrganizationDetailPage />}
+            />
+          </Routes>
+        </MemoryRouter>
+      </LocalizationProvider>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.queryByTestId("join-waitlist-button"),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId("waitlist-in-queue-badge"),
+      ).not.toBeInTheDocument();
     });
   });
 });

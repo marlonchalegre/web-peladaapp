@@ -86,6 +86,22 @@ export interface MonthlyPlayerSubstitution {
   temporary_player_name?: string;
   created_at?: string;
 }
+export interface MonthlyWaitlistEntry {
+  id: string;
+  organization_id: string;
+  player_id: string;
+  user_id: string;
+  user_name?: string;
+  user_username?: string;
+  user_avatar_filename?: string;
+  position?: string;
+  member_type?: Player["member_type"];
+  created_at: string;
+}
+export interface MonthlyWaitlistStatus {
+  in_queue: boolean;
+  entry?: MonthlyWaitlistEntry;
+}
 export interface OrganizationAdmin {
   id: string;
   organization_id: string;
@@ -454,6 +470,29 @@ export function createApi(client: ApiClient) {
       client.post<{ status: string }>(
         `/api/organizations/${id}/substitutions/${subId}/end`,
         { end_date: endDate },
+      ),
+
+    // Monthly Player Waitlist
+    listMonthlyWaitlist: (id: string) =>
+      client.get<MonthlyWaitlistEntry[]>(
+        `/api/organizations/${id}/monthly-waitlist`,
+      ),
+    getMonthlyWaitlistStatus: (id: string) =>
+      client.get<MonthlyWaitlistStatus>(
+        `/api/organizations/${id}/monthly-waitlist/me`,
+      ),
+    joinMonthlyWaitlist: (id: string, playerId?: string) =>
+      client.post<{ id: string; status: string }>(
+        `/api/organizations/${id}/monthly-waitlist`,
+        { player_id: playerId },
+      ),
+    leaveMonthlyWaitlist: (id: string, playerId: string) =>
+      client.delete<{ status: string }>(
+        `/api/organizations/${id}/monthly-waitlist/${playerId}`,
+      ),
+    promoteMonthlyWaitlistPlayer: (id: string, playerId: string) =>
+      client.post<{ status: string }>(
+        `/api/organizations/${id}/monthly-waitlist/${playerId}/promote`,
       ),
 
     // Finance

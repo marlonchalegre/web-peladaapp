@@ -10,8 +10,10 @@ import {
   type OrganizationAdmin,
   type OrganizationInvitation,
   type MonthlyPlayerSubstitution,
+  type MonthlyWaitlistEntry,
   type OrganizationFeatureFlags,
 } from "../../../shared/api/endpoints";
+import { getLocalizedErrorMessage } from "../../../shared/utils/error-handler";
 
 const endpoints = createApi(api);
 
@@ -26,6 +28,7 @@ export function useOrganizationManagement(orgId: string) {
   const [substitutions, setSubstitutions] = useState<
     MonthlyPlayerSubstitution[]
   >([]);
+  const [waitlist, setWaitlist] = useState<MonthlyWaitlistEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [featureFlags, setFeatureFlags] =
@@ -96,39 +99,44 @@ export function useOrganizationManagement(orgId: string) {
       if (!silent) setLoading(true);
       setError(null);
       try {
-        const [o, p, a, i] = await Promise.all([
+        const [o, p, a, i, s, ff, w] = await Promise.all([
           endpoints.getOrganization(orgId),
           endpoints.listPlayersByOrg(orgId),
           endpoints.listAdminsByOrganization(orgId),
           endpoints.listOrganizationInvitations(orgId),
+          (endpoints.listSubstitutions?.(orgId) ?? Promise.resolve([])).catch(
+            (err) => {
+              console.error("Failed to fetch substitutions", err);
+              return [] as MonthlyPlayerSubstitution[];
+            },
+          ),
+          (
+            endpoints.getOrgFeatureFlags?.(orgId) ?? Promise.resolve(null)
+          ).catch((err) => {
+            console.error("Failed to fetch feature flags", err);
+            return null;
+          }),
+          (endpoints.listMonthlyWaitlist?.(orgId) ?? Promise.resolve([])).catch(
+            (err) => {
+              console.error("Failed to fetch waitlist", err);
+              return [] as MonthlyWaitlistEntry[];
+            },
+          ),
         ]);
         setOrg(o);
         setPlayers(p);
         setAdmins(a);
         setInvitations(i);
-
-        try {
-          const s = await endpoints.listSubstitutions(orgId);
-          setSubstitutions(s);
-        } catch (err) {
-          console.error("Failed to fetch substitutions", err);
-        }
-
-        try {
-          const ff = await endpoints.getOrgFeatureFlags(orgId);
-          setFeatureFlags(ff);
-        } catch (err) {
-          console.error("Failed to fetch feature flags", err);
-        }
+        setSubstitutions(s);
+        if (ff) setFeatureFlags(ff);
+        setWaitlist(w);
 
         // Also fetch the public invite link to show it in the invitations tab
         fetchInviteLink(true);
       } catch (err) {
-        const message =
-          err instanceof Error
-            ? err.message
-            : t("organizations.error.load_failed");
-        setError(message);
+        setError(
+          getLocalizedErrorMessage(err, t, "organizations.error.load_failed"),
+        );
       } finally {
         if (!silent) setLoading(false);
       }
@@ -407,12 +415,86 @@ export function useOrganizationManagement(orgId: string) {
     [players, usersMap, adminUserIds],
   );
 
+  const handleAddWaitlistCandidate = useCallback(
+    async (playerId: string) => {
+      setActionLoading(true);
+      try {
+        await endpoints.joinMonthlyWaitlist(orgId, playerId);
+        const w = await endpoints.listMonthlyWaitlist(orgId);
+        setWaitlist(w);
+      } catch (err) {
+        setError(
+          getLocalizedErrorMessage(
+            err,
+            t,
+            "organizations.management.waitlist.error.action_failed",
+          ),
+        );
+        throw err;
+      } finally {
+        setActionLoading(false);
+      }
+    },
+    [orgId, t],
+  );
+
+  const handleRemoveWaitlistCandidate = useCallback(
+    async (playerId: string) => {
+      setActionLoading(true);
+      try {
+        await endpoints.leaveMonthlyWaitlist(orgId, playerId);
+        const w = await endpoints.listMonthlyWaitlist(orgId);
+        setWaitlist(w);
+      } catch (err) {
+        setError(
+          getLocalizedErrorMessage(
+            err,
+            t,
+            "organizations.management.waitlist.error.action_failed",
+          ),
+        );
+        throw err;
+      } finally {
+        setActionLoading(false);
+      }
+    },
+    [orgId, t],
+  );
+
+  const handlePromoteWaitlistCandidate = useCallback(
+    async (playerId: string) => {
+      setActionLoading(true);
+      try {
+        await endpoints.promoteMonthlyWaitlistPlayer(orgId, playerId);
+        const [w, p] = await Promise.all([
+          endpoints.listMonthlyWaitlist(orgId),
+          endpoints.listPlayersByOrg(orgId),
+        ]);
+        setWaitlist(w);
+        setPlayers(p);
+      } catch (err) {
+        setError(
+          getLocalizedErrorMessage(
+            err,
+            t,
+            "organizations.management.waitlist.error.action_failed",
+          ),
+        );
+        throw err;
+      } finally {
+        setActionLoading(false);
+      }
+    },
+    [orgId, t],
+  );
+
   return {
     org,
     players,
     admins,
     invitations,
     substitutions,
+    waitlist,
     loading,
     error,
     setError,
@@ -446,6 +528,9 @@ export function useOrganizationManagement(orgId: string) {
     handleDeleteOrganization,
     handleCreateSubstitution,
     handleEndSubstitution,
+    handleAddWaitlistCandidate,
+    handleRemoveWaitlistCandidate,
+    handlePromoteWaitlistCandidate,
     refreshPlayers,
     fetchData,
     featureFlags,

@@ -19,6 +19,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 import SendIcon from "@mui/icons-material/Send";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../../app/providers/AuthContext";
@@ -30,6 +31,7 @@ import MembersSection from "../components/MembersSection";
 import FinanceSection from "../components/FinanceSection";
 import AdminsSection from "../components/AdminsSection";
 import SubstitutionsSection from "../components/SubstitutionsSection";
+import MonthlyWaitlistSection from "../components/MonthlyWaitlistSection";
 import InvitationsList from "../components/InvitationsList";
 import DangerZoneSection from "../components/DangerZoneSection";
 import WahaConfigSection from "../components/WahaConfigSection";
@@ -156,6 +158,10 @@ export default function OrganizationManagementPage() {
     handleDeleteOrganization,
     handleCreateSubstitution,
     handleEndSubstitution,
+    waitlist,
+    handleAddWaitlistCandidate,
+    handleRemoveWaitlistCandidate,
+    handlePromoteWaitlistCandidate,
     refreshPlayers,
     fetchInviteLink,
     fetchData,
@@ -277,6 +283,20 @@ export default function OrganizationManagementPage() {
             }
             value="substitutions"
             data-testid="mgmt-tab-substitutions"
+          />
+          <Tab
+            icon={<FormatListNumberedIcon />}
+            iconPosition="start"
+            label={
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
+                {t("organizations.management.sections.waitlist", "Waitlist")}
+              </Box>
+            }
+            value="waitlist"
+            data-testid="mgmt-tab-waitlist"
           />
           <Tab
             icon={<StarIcon />}
@@ -436,6 +456,28 @@ export default function OrganizationManagementPage() {
               ]}
             />
           )}
+        </TabPanel>
+
+        <TabPanel value={activeTab} index="waitlist">
+          <MonthlyWaitlistSection
+            waitlist={waitlist}
+            players={players}
+            onAddCandidate={async (playerId) => {
+              await handleAddWaitlistCandidate(playerId);
+              showToast(t("organizations.management.waitlist.success.added"));
+            }}
+            onRemoveCandidate={async (playerId) => {
+              await handleRemoveWaitlistCandidate(playerId);
+              showToast(t("organizations.management.waitlist.success.removed"));
+            }}
+            onPromoteCandidate={async (playerId) => {
+              await handlePromoteWaitlistCandidate(playerId);
+              showToast(
+                t("organizations.management.waitlist.success.promoted"),
+              );
+            }}
+            actionLoading={actionLoading}
+          />
         </TabPanel>
 
         <TabPanel value={activeTab} index="ratings">
