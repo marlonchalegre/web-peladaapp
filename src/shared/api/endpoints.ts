@@ -163,6 +163,8 @@ export interface Match {
   timer_started_at?: string | null;
   timer_accumulated_ms?: number | null;
   timer_status?: TimerStatus | null;
+  support_camera_player_id?: string | null;
+  support_stats_player_id?: string | null;
 }
 export type MatchEventType =
   | "assist"
@@ -909,6 +911,22 @@ export function createApi(client: ApiClient) {
         out_player_id: outPlayerId,
         in_player_id: inPlayerId,
       }),
+
+    // Support Lineup
+    generatePeladaSupportLineup: (peladaId: string) =>
+      client.post<Match[]>(
+        `/api/peladas/${peladaId}/support-lineup/generate`,
+        {},
+      ),
+    updateMatchSupportLineup: (
+      matchId: string,
+      data: {
+        support_camera_player_id?: string | null;
+        support_stats_player_id?: string | null;
+      },
+    ) => client.put<Match>(`/api/matches/${matchId}/support-lineup`, data),
+    rerollMatchSupportLineup: (matchId: string) =>
+      client.post<Match>(`/api/matches/${matchId}/support-lineup/reroll`, {}),
 
     // Players
     listPlayersByOrg: (organizationId: string) =>

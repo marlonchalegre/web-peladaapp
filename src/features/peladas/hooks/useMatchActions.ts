@@ -756,6 +756,73 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
     [peladaId, refreshData, setMatches, handleNetworkError],
   );
 
+  const generateSupportLineup = useCallback(async () => {
+    try {
+      const updatedMatches =
+        await endpoints.generatePeladaSupportLineup(peladaId);
+      matchesRef.current = updatedMatches;
+      setMatches(updatedMatches);
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Erro ao sortear escalação de suporte",
+      );
+      throw err;
+    }
+  }, [peladaId, setMatches, matchesRef, setError]);
+
+  const updateSupportLineup = useCallback(
+    async (
+      matchId: string,
+      payload: {
+        support_camera_player_id?: string | null;
+        support_stats_player_id?: string | null;
+      },
+    ) => {
+      try {
+        const updated = await endpoints.updateMatchSupportLineup(
+          matchId,
+          payload,
+        );
+        const nextMatches = matchesRef.current.map((m) =>
+          m.id === matchId ? { ...m, ...updated } : m,
+        );
+        matchesRef.current = nextMatches;
+        setMatches(nextMatches);
+      } catch (err: unknown) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Erro ao atualizar escalação de suporte",
+        );
+        throw err;
+      }
+    },
+    [setMatches, matchesRef, setError],
+  );
+
+  const rerollSupportLineup = useCallback(
+    async (matchId: string) => {
+      try {
+        const updated = await endpoints.rerollMatchSupportLineup(matchId);
+        const nextMatches = matchesRef.current.map((m) =>
+          m.id === matchId ? { ...m, ...updated } : m,
+        );
+        matchesRef.current = nextMatches;
+        setMatches(nextMatches);
+      } catch (err: unknown) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Erro ao re-sortear escalação de suporte",
+        );
+        throw err;
+      }
+    },
+    [setMatches, matchesRef, setError],
+  );
+
   return {
     updatingScore,
     closing,
@@ -775,5 +842,8 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
     startMatchTimer,
     pauseMatchTimer,
     resetMatchTimer,
+    generateSupportLineup,
+    updateSupportLineup,
+    rerollSupportLineup,
   };
 }

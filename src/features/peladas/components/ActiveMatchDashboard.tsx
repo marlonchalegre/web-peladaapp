@@ -18,6 +18,7 @@ import {
   Fab,
   alpha,
   Paper,
+  Tooltip,
 } from "@mui/material";
 import {
   type Dispatch,
@@ -49,6 +50,7 @@ import { useTranslation } from "react-i18next";
 import PlayerSelectMenu from "./PlayerSelectMenu";
 import { POSITION_ORDER } from "../utils/playerUtils";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
+import ActiveMatchSupportLineupCard from "./ActiveMatchSupportLineupCard";
 
 export type SelectMenuState = {
   teamId: string;
@@ -114,6 +116,17 @@ type Props = {
   matches: Match[];
   onSelectMatch: (id: string) => void;
   teamNameById: Record<string, string>;
+  // Support Lineup
+  onNavigateToSupportTab?: () => void;
+  onUpdateSupportLineup?: (
+    matchId: string,
+    data: {
+      support_camera_player_id?: string | null;
+      support_stats_player_id?: string | null;
+    },
+  ) => Promise<void>;
+  onRerollSupportLineup?: (matchId: string) => Promise<void>;
+  playerTeamMap?: Record<string, string>;
 };
 
 export default function ActiveMatchDashboard(props: Props) {
@@ -147,12 +160,16 @@ export default function ActiveMatchDashboard(props: Props) {
     matches,
     onSelectMatch,
     teamNameById,
+    onNavigateToSupportTab,
+    onUpdateSupportLineup,
+    playerTeamMap,
   } = props;
 
   const { t } = useTranslation();
   const theme = useTheme();
   const [isEditing, setIsEditing] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [supportTipOpen, setSupportTipOpen] = useState(false);
 
   const [assistDialogOpen, setAssistDialogOpen] = useState(false);
   const [goalScorerInfo, setGoalScorerInfo] = useState<{
@@ -344,6 +361,20 @@ export default function ActiveMatchDashboard(props: Props) {
     );
   }, [matches, match.sequence]);
 
+  const nextMatchSupportTooltip = useMemo(() => {
+    if (!nextMatch) return "";
+    const cam = nextMatch.support_camera_player_id
+      ? getPlayerName(nextMatch.support_camera_player_id)
+      : null;
+    const stats = nextMatch.support_stats_player_id
+      ? getPlayerName(nextMatch.support_stats_player_id)
+      : null;
+    if (!cam && !stats) return "";
+    return `${t("peladas.support_lineup.next_match_support", "Suporte do Próximo Jogo")}: ${cam ? `📹 ${cam}` : ""}${cam && stats ? " • " : ""}${stats ? `📝 ${stats}` : ""}`;
+  }, [nextMatch, getPlayerName, t]);
+
+  const hasNextMatchSupport = Boolean(nextMatchSupportTooltip);
+
   return (
     <Box sx={{ pb: 8 }}>
       <Stack spacing={2}>
@@ -380,61 +411,89 @@ export default function ActiveMatchDashboard(props: Props) {
             </Button>
 
             {nextMatch && (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  px: { xs: 1.5, sm: 2 },
-                  py: { xs: 0.6, sm: 0.8 },
-                  bgcolor: "background.paper",
-                  borderRadius: 10,
-                  border: "1px solid",
-                  borderColor: "divider",
-                  boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-                  maxWidth: { xs: "220px", sm: "none" },
-                  height: "30.75px", // Match MUI small button height roughly
-                }}
+              <Tooltip
+                title={nextMatchSupportTooltip}
+                arrow
+                open={hasNextMatchSupport && supportTipOpen}
+                onOpen={() => setSupportTipOpen(true)}
+                onClose={() => setSupportTipOpen(false)}
+                enterTouchDelay={0}
+                leaveTouchDelay={4000}
               >
-                <Typography
-                  variant="caption"
+                <Box
+                  role={hasNextMatchSupport ? "button" : undefined}
+                  tabIndex={hasNextMatchSupport ? 0 : undefined}
+                  onClick={
+                    hasNextMatchSupport
+                      ? () => setSupportTipOpen((open) => !open)
+                      : undefined
+                  }
+                  onKeyDown={
+                    hasNextMatchSupport
+                      ? (event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            setSupportTipOpen((open) => !open);
+                          }
+                        }
+                      : undefined
+                  }
                   sx={{
-                    color: "text.secondary",
-                    fontWeight: "800",
-                    fontSize: { xs: "0.6rem", sm: "0.65rem" },
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                    display: { xs: "none", sm: "block" },
-                  }}
-                >
-                  {t("peladas.dashboard.summary.next_up")}:
-                </Typography>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontWeight: "bold",
-                    fontSize: { xs: "0.75rem", sm: "0.85rem" },
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
                     display: "flex",
                     alignItems: "center",
+                    gap: 1,
+                    cursor: hasNextMatchSupport ? "pointer" : "default",
+                    px: { xs: 1.5, sm: 2 },
+                    py: { xs: 0.6, sm: 0.8 },
+                    bgcolor: "background.paper",
+                    borderRadius: 10,
+                    border: "1px solid",
+                    borderColor: "divider",
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                    maxWidth: { xs: "220px", sm: "none" },
+                    height: "30.75px", // Match MUI small button height roughly
                   }}
                 >
-                  <Box component="span" sx={{ color: "home.main" }}>
-                    {teamNameById[nextMatch.home_team_id] || "Home"}
-                  </Box>
-                  <Box
-                    component="span"
-                    sx={{ color: "text.disabled", mx: 1, fontWeight: "500" }}
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "text.secondary",
+                      fontWeight: "800",
+                      fontSize: { xs: "0.6rem", sm: "0.65rem" },
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                      display: { xs: "none", sm: "block" },
+                    }}
                   >
-                    vs
-                  </Box>
-                  <Box component="span" sx={{ color: "away.main" }}>
-                    {teamNameById[nextMatch.away_team_id] || "Away"}
-                  </Box>
-                </Typography>
-              </Box>
+                    {t("peladas.dashboard.summary.next_up")}:
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: "bold",
+                      fontSize: { xs: "0.75rem", sm: "0.85rem" },
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Box component="span" sx={{ color: "home.main" }}>
+                      {teamNameById[nextMatch.home_team_id] || "Home"}
+                    </Box>
+                    <Box
+                      component="span"
+                      sx={{ color: "text.disabled", mx: 1, fontWeight: "500" }}
+                    >
+                      vs
+                    </Box>
+                    <Box component="span" sx={{ color: "away.main" }}>
+                      {teamNameById[nextMatch.away_team_id] || "Away"}
+                    </Box>
+                  </Typography>
+                </Box>
+              </Tooltip>
             )}
           </Stack>
 
@@ -469,6 +528,28 @@ export default function ActiveMatchDashboard(props: Props) {
           onOpenResetConfirm={onOpenResetConfirm}
           onEndMatch={onEndMatch}
           updating={updating}
+        />
+
+        {/* Support Lineup Section */}
+        <ActiveMatchSupportLineupCard
+          match={match}
+          orgPlayerIdToUserId={orgPlayerIdToUserId}
+          userIdToName={userIdToName}
+          orgPlayerIdToPlayer={orgPlayerIdToPlayer}
+          teamNameById={teamNameById}
+          playerTeamMap={playerTeamMap || {}}
+          isAdmin={isAdmin}
+          onNavigateToSupportTab={onNavigateToSupportTab}
+          onSwapRoles={
+            onUpdateSupportLineup
+              ? async (m) => {
+                  await onUpdateSupportLineup(m.id, {
+                    support_camera_player_id: m.support_stats_player_id,
+                    support_stats_player_id: m.support_camera_player_id,
+                  });
+                }
+              : undefined
+          }
         />
 
         {isAdmin && !effectiveFinished && (
@@ -937,6 +1018,42 @@ export default function ActiveMatchDashboard(props: Props) {
                         {teamNameById[m.away_team_id] || "Away"}
                       </Typography>
                     </Box>
+
+                    {(m.support_camera_player_id ||
+                      m.support_stats_player_id) && (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          gap: 1.5,
+                          mt: 0.5,
+                          pt: 0.5,
+                          borderTop: "1px dashed",
+                          borderColor: "divider",
+                          width: "100%",
+                        }}
+                      >
+                        {m.support_camera_player_id && (
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ fontSize: "0.7rem" }}
+                          >
+                            📹 {getPlayerName(m.support_camera_player_id)}
+                          </Typography>
+                        )}
+                        {m.support_stats_player_id && (
+                          <Typography
+                            variant="caption"
+                            color="text.secondary"
+                            sx={{ fontSize: "0.7rem" }}
+                          >
+                            📝 {getPlayerName(m.support_stats_player_id)}
+                          </Typography>
+                        )}
+                      </Box>
+                    )}
                   </ListItemButton>
                 </ListItem>
               );

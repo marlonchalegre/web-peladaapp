@@ -273,5 +273,8 @@ export function usePeladaMatches(peladaId: string) {
     startMatchTimer: actions.startMatchTimer,
     pauseMatchTimer: actions.pauseMatchTimer,
     resetMatchTimer: actions.resetMatchTimer,
+    generateSupportLineup: actions.generateSupportLineup,
+    updateSupportLineup: actions.updateSupportLineup,
+    rerollSupportLineup: actions.rerollSupportLineup,
   };
 }

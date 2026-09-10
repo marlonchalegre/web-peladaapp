@@ -273,6 +273,78 @@ describe("ActiveMatchDashboard", () => {
     ).toBeInTheDocument();
   });
 
+  it("exposes next match support info on tap and keyboard focus, not hover only", async () => {
+    const user = userEvent.setup();
+    const matches: Match[] = [
+      mockMatch,
+      {
+        id: "2",
+        pelada_id: "1",
+        sequence: 2,
+        home_team_id: "30",
+        away_team_id: "40",
+        home_score: 0,
+        away_score: 0,
+        status: "scheduled",
+        support_camera_player_id: "101",
+        support_stats_player_id: "201",
+      },
+    ];
+
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          match={matches[0]}
+          matches={matches}
+        />
+      </ThemeContextProvider>,
+    );
+
+    // Touch devices never fire hover, so the pill has to be a real control
+    // that opens on tap and is reachable by keyboard.
+    const pill = screen.getByRole("button", {
+      name: /next_match_support/i,
+    });
+    expect(pill).toHaveAttribute("tabindex", "0");
+
+    await user.click(pill);
+
+    const tip = await screen.findByRole("tooltip");
+    expect(tip).toHaveTextContent("Player One");
+    expect(tip).toHaveTextContent("Player Two");
+  });
+
+  it("leaves the next match pill non-interactive when no support is assigned", () => {
+    const matches: Match[] = [
+      mockMatch,
+      {
+        id: "2",
+        pelada_id: "1",
+        sequence: 2,
+        home_team_id: "30",
+        away_team_id: "40",
+        home_score: 0,
+        away_score: 0,
+        status: "scheduled",
+      },
+    ];
+
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          match={matches[0]}
+          matches={matches}
+        />
+      </ThemeContextProvider>,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: /next_match_support/i }),
+    ).not.toBeInTheDocument();
+  });
+
   it("handles stat change: goal +1", async () => {
     const user = userEvent.setup();
     const recordEvent = vi.fn();

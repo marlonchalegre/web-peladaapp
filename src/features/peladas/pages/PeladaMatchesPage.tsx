@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import ActiveMatchDashboard from "../components/ActiveMatchDashboard";
 import MatchReportSummary from "../components/MatchReportSummary";
+import SupportLineupTab from "../components/SupportLineupTab";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import { usePeladaMatches } from "../hooks/usePeladaMatches";
@@ -30,6 +31,7 @@ import { api } from "../../../shared/api/client";
 import { createApi, type MatchEvent } from "../../../shared/api/endpoints";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 import AssessmentIcon from "@mui/icons-material/Assessment";
+import AssignmentIcon from "@mui/icons-material/Assignment";
 import RateReviewIcon from "@mui/icons-material/RateReview";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
@@ -127,6 +129,9 @@ export default function PeladaMatchesPage() {
     pauseMatchTimer,
     resetMatchTimer,
     refreshStats,
+    generateSupportLineup,
+    updateSupportLineup,
+    rerollSupportLineup,
   } = usePeladaMatches(peladaId);
 
   const isAdmin = useMemo(() => {
@@ -476,6 +481,11 @@ export default function PeladaMatchesPage() {
               label={`${t("peladas.panel.standings.title")} & ${t("peladas.panel.stats.title")}`}
             />
             <Tab icon={<HistoryIcon />} label={t("peladas.timeline.title")} />
+            <Tab
+              icon={<AssignmentIcon />}
+              label={t("peladas.support_lineup.tab_title", "Support Lineup")}
+              data-testid="tab-support-lineup"
+            />
           </Tabs>
         </Box>
 
@@ -553,6 +563,10 @@ export default function PeladaMatchesPage() {
                 matches={matches}
                 onSelectMatch={setSelectedMatchId}
                 teamNameById={teamNameById}
+                onNavigateToSupportTab={() => setActiveTab(3)}
+                onUpdateSupportLineup={updateSupportLineup}
+                onRerollSupportLineup={rerollSupportLineup}
+                playerTeamMap={orgPlayerIdToTeamId}
               />
             ) : (
               <Paper sx={{ p: 8, textAlign: "center", borderRadius: 4 }}>
@@ -636,7 +650,22 @@ export default function PeladaMatchesPage() {
                 onDeleteClick={(event) => setDeleteEventConfirmOpen(event)}
               />
             </Box>
-          )}{" "}
+          )}
+          {activeTab === 3 && (
+            <SupportLineupTab
+              matches={matches}
+              teams={teams}
+              teamPlayers={teamPlayers}
+              orgPlayerIdToUserId={orgPlayerIdToUserId}
+              userIdToName={userIdToName}
+              orgPlayerIdToPlayer={orgPlayerIdToPlayer}
+              attendance={attendance}
+              isAdmin={isAdmin}
+              onGenerateAll={generateSupportLineup}
+              onUpdateMatch={updateSupportLineup}
+              onRerollMatch={rerollSupportLineup}
+            />
+          )}
         </Box>
 
         {justFinishedMatch && (
