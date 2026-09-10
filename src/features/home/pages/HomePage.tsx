@@ -41,6 +41,7 @@ export default function HomePage() {
     handlePeladaPageChange,
     acceptInvitation,
     createOrganization,
+    updateAttendance,
   } = useHomeDashboard();
 
   if (!user) {
@@ -218,7 +219,10 @@ export default function HomePage() {
           />
 
           {/* Active Matches Carousel */}
-          <ActiveMatchesCarousel peladas={peladas} />
+          <ActiveMatchesCarousel
+            peladas={peladas}
+            onUpdateAttendance={updateAttendance}
+          />
 
           {/* Two-Column Main Layout */}
           <Grid container spacing={4}>

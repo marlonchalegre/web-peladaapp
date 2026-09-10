@@ -5,6 +5,7 @@ import {
   createApi,
   type Pelada,
   type OrganizationInvitation,
+  type AttendanceStatus,
 } from "../../../shared/api/endpoints";
 import { useTranslation } from "react-i18next";
 
@@ -136,6 +137,25 @@ export function useHomeDashboard() {
     [fetchOrganizations, refreshUser],
   );
 
+  const updateAttendance = useCallback(
+    async (peladaId: string, status: AttendanceStatus) => {
+      setPeladas((prev) =>
+        prev.map((p) =>
+          p.id === peladaId ? { ...p, user_attendance_status: status } : p,
+        ),
+      );
+      try {
+        await endpoints.updateAttendance(peladaId, status);
+        await fetchPeladas(peladasPage);
+      } catch (err) {
+        console.error("Failed to update attendance", err);
+        await fetchPeladas(peladasPage);
+        throw err;
+      }
+    },
+    [fetchPeladas, peladasPage],
+  );
+
   return {
     loading,
     error,
@@ -150,5 +170,6 @@ export function useHomeDashboard() {
     handlePeladaPageChange,
     acceptInvitation,
     createOrganization,
+    updateAttendance,
   };
 }

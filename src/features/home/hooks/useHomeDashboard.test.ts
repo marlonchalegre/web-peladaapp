@@ -130,4 +130,158 @@ describe("useHomeDashboard", () => {
     expect(result.current.peladasTotal).toBe(15);
     expect(result.current.peladas).toHaveLength(2);
   });
+
+  it("should handle updateAttendance successfully", async () => {
+    mockApiClient.getPaginated.mockResolvedValue({
+      data: [{ id: "pelada-1", user_attendance_status: null }],
+      page: 1,
+      totalPages: 1,
+      total: 1,
+    });
+
+    const { result } = renderHook(() => useHomeDashboard());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await act(async () => {
+      await result.current.updateAttendance("pelada-1", "confirmed");
+    });
+
+    expect(mockApiClient.post).toHaveBeenCalledWith(
+      expect.stringContaining("/api/peladas/pelada-1/attendance"),
+      expect.objectContaining({ status: "confirmed" }),
+    );
+  });
+
+  it("shows the new status before the request comes back", async () => {
+    mockApiClient.getPaginated.mockResolvedValue({
+      data: [{ id: "pelada-1", user_attendance_status: null }],
+      page: 1,
+      totalPages: 1,
+      total: 1,
+    });
+    let resolvePost: (value: unknown) => void = () => {};
+    mockApiClient.post.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolvePost = resolve;
+        }),
+    );
+
+    const { result } = renderHook(() => useHomeDashboard());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    let pending: Promise<void> | undefined;
+    act(() => {
+      pending = result.current.updateAttendance("pelada-1", "confirmed");
+    });
+
+    await waitFor(() =>
+      expect((result.current.peladas[0] as any).user_attendance_status).toBe(
+        "confirmed",
+      ),
+    );
+
+    await act(async () => {
+      resolvePost({});
+      await pending;
+    });
+  });
+
+  it("refetches so the server value replaces the optimistic one", async () => {
+    mockApiClient.getPaginated
+      .mockResolvedValueOnce({
+        data: [{ id: "pelada-1", user_attendance_status: null }],
+        page: 1,
+        totalPages: 1,
+        total: 1,
+      })
+      .mockResolvedValue({
+        // The pelada was full, so the server put the player on the waitlist.
+        data: [{ id: "pelada-1", user_attendance_status: "waitlist" }],
+        page: 1,
+        totalPages: 1,
+        total: 1,
+      });
+    mockApiClient.post.mockResolvedValue({});
+
+    const { result } = renderHook(() => useHomeDashboard());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await act(async () => {
+      await result.current.updateAttendance("pelada-1", "confirmed");
+    });
+
+    expect((result.current.peladas[0] as any).user_attendance_status).toBe(
+      "waitlist",
+    );
+  });
+
+  it("rolls back and rethrows when the update fails", async () => {
+    mockApiClient.getPaginated.mockResolvedValue({
+      data: [{ id: "pelada-1", user_attendance_status: "declined" }],
+      page: 1,
+      totalPages: 1,
+      total: 1,
+    });
+    mockApiClient.post.mockRejectedValue(new Error("network down"));
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+
+    const { result } = renderHook(() => useHomeDashboard());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await act(async () => {
+      await expect(
+        result.current.updateAttendance("pelada-1", "confirmed"),
+      ).rejects.toThrow("network down");
+    });
+
+    // The refetch restored what the server actually holds.
+    expect((result.current.peladas[0] as any).user_attendance_status).toBe(
+      "declined",
+    );
+    consoleError.mockRestore();
+  });
+
+  it("only touches the pelada being updated", async () => {
+    mockApiClient.getPaginated.mockResolvedValue({
+      data: [
+        { id: "pelada-1", user_attendance_status: null },
+        { id: "pelada-2", user_attendance_status: "declined" },
+      ],
+      page: 1,
+      totalPages: 1,
+      total: 2,
+    });
+    let resolvePost: (value: unknown) => void = () => {};
+    mockApiClient.post.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolvePost = resolve;
+        }),
+    );
+
+    const { result } = renderHook(() => useHomeDashboard());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    let pending: Promise<void> | undefined;
+    act(() => {
+      pending = result.current.updateAttendance("pelada-1", "confirmed");
+    });
+
+    await waitFor(() =>
+      expect((result.current.peladas[0] as any).user_attendance_status).toBe(
+        "confirmed",
+      ),
+    );
+    expect((result.current.peladas[1] as any).user_attendance_status).toBe(
+      "declined",
+    );
+
+    await act(async () => {
+      resolvePost({});
+      await pending;
+    });
+  });
 });

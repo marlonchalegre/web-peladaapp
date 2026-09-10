@@ -119,7 +119,10 @@ describe("usePeladaDetail", () => {
       timeout: 2000,
     });
     await act(async () => {
-      await result.current.handleRandomizeTeams();
+      await result.current.handleRandomizeTeams({
+        algorithm: "classic",
+        useHistory: false,
+      });
     });
     expect(mockApiClient.post).toHaveBeenCalledWith(
       expect.stringContaining("randomize"),
@@ -247,6 +250,121 @@ describe("usePeladaDetail", () => {
     );
   });
 
+  it("defaults to the classic draw and keeps history off", async () => {
+    const { result } = renderHook(() => usePeladaDetail(peladaId), {
+      wrapper: MemoryRouter,
+    });
+    await waitFor(() => expect(result.current.pelada).not.toBe(null), {
+      timeout: 2000,
+    });
+    await act(async () => {
+      await result.current.handleRandomizeTeams({
+        algorithm: "classic",
+        useHistory: false,
+      });
+    });
+    expect(mockApiClient.post).toHaveBeenCalledWith(
+      expect.stringContaining("randomize"),
+      expect.objectContaining({ algorithm: "classic", use_history: false }),
+    );
+  });
+
+  it("sends the chosen algorithm and chemistry flag", async () => {
+    const { result } = renderHook(() => usePeladaDetail(peladaId), {
+      wrapper: MemoryRouter,
+    });
+    await waitFor(() => expect(result.current.pelada).not.toBe(null), {
+      timeout: 2000,
+    });
+    await act(async () => {
+      await result.current.handleRandomizeTeams({
+        algorithm: "gemini",
+        useHistory: true,
+      });
+    });
+    expect(mockApiClient.post).toHaveBeenCalledWith(
+      expect.stringContaining("randomize"),
+      expect.objectContaining({ algorithm: "gemini", use_history: true }),
+    );
+  });
+
+  it("keeps the justification the draw returned", async () => {
+    const justification = { algorithm: "gpt", teams: [], metrics: {} };
+    mockApiClient.post.mockResolvedValueOnce({
+      success: true,
+      algorithm: "gpt",
+      justification,
+    });
+
+    const { result } = renderHook(() => usePeladaDetail(peladaId), {
+      wrapper: MemoryRouter,
+    });
+    await waitFor(() => expect(result.current.pelada).not.toBe(null), {
+      timeout: 2000,
+    });
+    await act(async () => {
+      await result.current.handleRandomizeTeams({
+        algorithm: "gpt",
+        useHistory: false,
+      });
+    });
+    expect(result.current.drawJustification).toEqual(justification);
+  });
+
+  it("holds no justification for the classic draw", async () => {
+    mockApiClient.post.mockResolvedValueOnce({
+      success: true,
+      algorithm: "classic",
+      justification: null,
+    });
+
+    const { result } = renderHook(() => usePeladaDetail(peladaId), {
+      wrapper: MemoryRouter,
+    });
+    await waitFor(() => expect(result.current.pelada).not.toBe(null), {
+      timeout: 2000,
+    });
+    await act(async () => {
+      await result.current.handleRandomizeTeams({
+        algorithm: "classic",
+        useHistory: false,
+      });
+    });
+    expect(result.current.drawJustification).toBeNull();
+  });
+
+  it("drops any previous justification when a draw fails", async () => {
+    const { result } = renderHook(() => usePeladaDetail(peladaId), {
+      wrapper: MemoryRouter,
+    });
+    await waitFor(() => expect(result.current.pelada).not.toBe(null), {
+      timeout: 2000,
+    });
+
+    mockApiClient.post.mockResolvedValueOnce({
+      success: true,
+      algorithm: "gpt",
+      justification: { algorithm: "gpt", teams: [], metrics: {} },
+    });
+    await act(async () => {
+      await result.current.handleRandomizeTeams({
+        algorithm: "gpt",
+        useHistory: false,
+      });
+    });
+    expect(result.current.drawJustification).not.toBeNull();
+
+    mockApiClient.post.mockRejectedValueOnce(new Error("Draw Error"));
+    await act(async () => {
+      await result.current.handleRandomizeTeams({
+        algorithm: "gpt",
+        useHistory: false,
+      });
+    });
+    expect(result.current.drawJustification).toBeNull();
+    expect(result.current.error).toBe("Draw Error");
+  });
+
   it("should set error if handleRandomizeTeams fails", async () => {
     const { result } = renderHook(() => usePeladaDetail(peladaId), {
       wrapper: MemoryRouter,
@@ -256,7 +374,10 @@ describe("usePeladaDetail", () => {
     });
     mockApiClient.post.mockRejectedValueOnce(new Error("Randomize Error"));
     await act(async () => {
-      await result.current.handleRandomizeTeams();
+      await result.current.handleRandomizeTeams({
+        algorithm: "classic",
+        useHistory: false,
+      });
     });
     expect(result.current.error).toBe("Randomize Error");
   });

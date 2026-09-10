@@ -761,10 +761,13 @@
         "randomize": "RANDOMIZE"
       },
       "randomize_dialog": {
-        "title": "Randomize Teams",
-        "description": "This action will redistribute confirmed players into new teams, maintaining position balance and technical level. Do you want to continue?",
-        "confirm": "Randomize",
-        "cancel": "Cancel"
+        "title": "Draw Teams",
+        "description": "Choose how the confirmed players will be split. The draw replaces the current teams.",
+        "confirm": "Draw",
+        "cancel": "Cancel",
+        "use_history": "Consider chemistry / history",
+        "use_history_hint": "Uses duos, titles, title droughts and assists from previous closed peladas.",
+        "use_history_unavailable": "The classic count does not use history."
       },
       "per_team": "PER TEAM",
       "schedule": {
@@ -802,6 +805,60 @@
         "no_template": "No saved template for this configuration.",
         "planned_matches": "Planned Matches",
         "random_tip": "Reset schedule to algorithmic default"
+      },
+      "draw_report": {
+        "title": "Draw justifications",
+        "history_on": "History on",
+        "history_off": "No history",
+        "players_considered": "{{count}} players considered.",
+        "source_attendance": "Source: confirmed attendance.",
+        "source_board": "Source: players on the board.",
+        "mean": "avg",
+        "anchors": "Reference players, one per team",
+        "anchor_hint": "Reference player of this team",
+        "history_changed": "History changed the division",
+        "history_unchanged": "History did not change the division in this run: the composition matches the no-history mode.",
+        "benched": "Left out (over capacity)",
+        "champion_pairs": "Duos with titles together",
+        "no_champion_pairs": "No duo in this team has a recorded title together.",
+        "top_pairs": "Most repeated partnerships (together/both present)",
+        "assist_links": "Assist connections",
+        "short_history_players": "Few recorded nights",
+        "top_winner": "Most titles",
+        "longest_drought": "Longest drought (peladas without winning)",
+        "new_pairs": "Brand-new duos (times they faced each other)",
+        "caveat": "Historical signals are heuristic preferences, not a prediction. Balanced grades and indices do not guarantee balance on the pitch.",
+        "metric": {
+          "squad_mean": "Squad average",
+          "team_mean_gap": "Average gap",
+          "sector_gap": "Midfield gap",
+          "short_history": "Max few-nights/team",
+          "overall_gap": "Overall gap",
+          "defense_gap": "Defense gap",
+          "offense_gap": "Attack gap",
+          "overall": "Overall",
+          "defense": "Defense",
+          "offense": "Attack"
+        }
+      },
+      "draw": {
+        "algorithm": {
+          "classic": {
+            "name": "Classic",
+            "tag": "Original",
+            "description": "The usual count: balances grade and position, with no history."
+          },
+          "gemini": {
+            "name": "Gemini",
+            "tag": "Chemistry",
+            "description": "Balances overall, defensive and attacking strength from grades, votes and stats. With chemistry on, it breaks up winning cliques, spreads titles and droughts and rewards brand-new duos."
+          },
+          "gpt": {
+            "name": "GPT",
+            "tag": "Tactical Balance",
+            "description": "Applies rules in order: one reference per team, team averages within tolerance, little-observed players spread out, midfield levelled."
+          }
+        }
       }
     },
     "dialog": {

@@ -761,10 +761,13 @@
         "randomize": "RANDOMIZAR"
       },
       "randomize_dialog": {
-        "title": "Randomizar Times",
-        "description": "Esta ação irá redistribuir os jogadores confirmados em novos times, mantendo o equilíbrio de posições e nível técnico. Deseja continuar?",
-        "confirm": "Randomizar",
-        "cancel": "Cancelar"
+        "title": "Sortear Times",
+        "description": "Escolha como os jogadores confirmados serão divididos. O sorteio substitui os times atuais.",
+        "confirm": "Sortear",
+        "cancel": "Cancelar",
+        "use_history": "Considerar química / histórico",
+        "use_history_hint": "Usa duplas, títulos, jejum e assistências das peladas anteriores já encerradas.",
+        "use_history_unavailable": "A conta clássica não usa histórico."
       },
       "per_team": "POR TIME",
       "schedule": {
@@ -802,6 +805,60 @@
         "no_template": "Nenhum modelo salvo para esta configuração.",
         "planned_matches": "Partidas Planejadas",
         "random_tip": "Redefinir tabela para o padrão algorítmico"
+      },
+      "draw_report": {
+        "title": "Justificativas do sorteio",
+        "history_on": "Histórico ativo",
+        "history_off": "Sem histórico",
+        "players_considered": "{{count}} jogadores considerados.",
+        "source_attendance": "Fonte: confirmados na pelada.",
+        "source_board": "Fonte: jogadores no quadro.",
+        "mean": "média",
+        "anchors": "Referências pela nota, uma por time",
+        "anchor_hint": "Referência pela nota neste time",
+        "history_changed": "O histórico mudou a divisão",
+        "history_unchanged": "O histórico não mudou a divisão nesta execução: a composição é a mesma do modo sem histórico.",
+        "benched": "Fora da divisão (excedentes)",
+        "champion_pairs": "Duplas com título junto",
+        "no_champion_pairs": "Nenhuma dupla deste time tem título conjunto registrado.",
+        "top_pairs": "Parcerias mais repetidas (juntos/ambos presentes)",
+        "assist_links": "Conexões de assistência",
+        "short_history_players": "Poucas noites registradas",
+        "top_winner": "Maior campeão",
+        "longest_drought": "Maior jejum (peladas sem vencer)",
+        "new_pairs": "Duplas inéditas (vezes que se enfrentaram)",
+        "caveat": "Os sinais históricos são preferências heurísticas, não previsão de resultado. Equilibrar notas e índices não garante equilíbrio em campo.",
+        "metric": {
+          "squad_mean": "Média do grupo",
+          "team_mean_gap": "Dif. das médias",
+          "sector_gap": "Dif. do meio",
+          "short_history": "Máx. poucas noites/time",
+          "overall_gap": "Dif. geral",
+          "defense_gap": "Dif. defesa",
+          "offense_gap": "Dif. ataque",
+          "overall": "Geral",
+          "defense": "Defesa",
+          "offense": "Ataque"
+        }
+      },
+      "draw": {
+        "algorithm": {
+          "classic": {
+            "name": "Clássico",
+            "tag": "Original",
+            "description": "A conta de sempre: equilibra nota e posição, sem olhar histórico."
+          },
+          "gemini": {
+            "name": "Gemini",
+            "tag": "Química",
+            "description": "Equilibra força geral, defesa e ataque com nota, votos e estatísticas. Com química ligada, separa panelas campeãs, distribui títulos e jejum e estimula duplas inéditas."
+          },
+          "gpt": {
+            "name": "GPT",
+            "tag": "Equilíbrio Tático",
+            "description": "Aplica regras em ordem: uma referência por time, diferença de média dentro da tolerância, distribui quem tem poucas noites e nivela o meio-campo."
+          }
+        }
       }
     },
     "dialog": {

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import ActiveMatchesCarousel from "./ActiveMatchesCarousel";
 import { BrowserRouter } from "react-router-dom";
 
@@ -13,6 +13,8 @@ vi.mock("react-router-dom", async () => {
     useNavigate: () => mockNavigate,
   };
 });
+
+const mockUpdateAttendance = vi.fn();
 
 // Mock useTranslation
 vi.mock("react-i18next", () => ({
@@ -60,12 +62,16 @@ describe("ActiveMatchesCarousel", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUpdateAttendance.mockResolvedValue(undefined);
   });
 
   it("renders nothing if there are no active peladas", () => {
     const { container } = render(
       <BrowserRouter>
-        <ActiveMatchesCarousel peladas={[]} />
+        <ActiveMatchesCarousel
+          peladas={[]}
+          onUpdateAttendance={mockUpdateAttendance}
+        />
       </BrowserRouter>,
     );
     expect(container.firstChild).toBeNull();
@@ -75,6 +81,7 @@ describe("ActiveMatchesCarousel", () => {
       <BrowserRouter>
         <ActiveMatchesCarousel
           peladas={[{ id: "5", status: "closed" }] as any}
+          onUpdateAttendance={mockUpdateAttendance}
         />
       </BrowserRouter>,
     );
@@ -84,7 +91,10 @@ describe("ActiveMatchesCarousel", () => {
   it("filters out closed peladas and renders the first active pelada on mount", () => {
     render(
       <BrowserRouter>
-        <ActiveMatchesCarousel peladas={mockPeladas} />
+        <ActiveMatchesCarousel
+          peladas={mockPeladas}
+          onUpdateAttendance={mockUpdateAttendance}
+        />
       </BrowserRouter>,
     );
 
@@ -98,7 +108,10 @@ describe("ActiveMatchesCarousel", () => {
   it("navigates through active peladas using next and prev buttons", () => {
     render(
       <BrowserRouter>
-        <ActiveMatchesCarousel peladas={mockPeladas} />
+        <ActiveMatchesCarousel
+          peladas={mockPeladas}
+          onUpdateAttendance={mockUpdateAttendance}
+        />
       </BrowserRouter>,
     );
 
@@ -149,13 +162,18 @@ describe("ActiveMatchesCarousel", () => {
   it("directs user to the correct link based on status when action button is clicked", () => {
     render(
       <BrowserRouter>
-        <ActiveMatchesCarousel peladas={mockPeladas} />
+        <ActiveMatchesCarousel
+          peladas={mockPeladas}
+          onUpdateAttendance={mockUpdateAttendance}
+        />
       </BrowserRouter>,
     );
 
-    // Initial state: Org A (attendance) -> Link /peladas/1/attendance
-    const btn = screen.getByRole("button", { name: /Confirmar Presença/ });
-    fireEvent.click(btn);
+    // Initial state: Org A (attendance) -> Link /peladas/1/attendance via "Ver Lista de Presença"
+    const viewListBtn = screen.getByRole("button", {
+      name: /Ver Lista de Presença/,
+    });
+    fireEvent.click(viewListBtn);
     expect(mockNavigate).toHaveBeenCalledWith("/peladas/1/attendance");
 
     // Clear mocks, navigate to Org B (voting) -> Link /peladas/2/voting
@@ -171,7 +189,7 @@ describe("ActiveMatchesCarousel", () => {
     expect(mockNavigate).toHaveBeenCalledWith("/peladas/2/voting");
   });
 
-  it("renders 'Ver Lista de Presença' and success color if user has already responded to attendance", () => {
+  it("renders both attendance buttons and highlights confirm when user is confirmed", () => {
     const mockPeladaConfirmed = [
       {
         id: "1",
@@ -184,12 +202,322 @@ describe("ActiveMatchesCarousel", () => {
 
     render(
       <BrowserRouter>
-        <ActiveMatchesCarousel peladas={mockPeladaConfirmed as any} />
+        <ActiveMatchesCarousel
+          peladas={mockPeladaConfirmed as any}
+          onUpdateAttendance={mockUpdateAttendance}
+        />
       </BrowserRouter>,
     );
 
-    expect(
-      screen.getByRole("button", { name: /Ver Lista de Presença/ }),
-    ).toBeInTheDocument();
+    const confirmBtn = screen.getByTestId("carousel-attendance-confirm-btn");
+    const cancelBtn = screen.getByTestId("carousel-attendance-cancel-btn");
+
+    expect(confirmBtn).toBeInTheDocument();
+    expect(cancelBtn).toBeInTheDocument();
+    expect(confirmBtn.className).toContain("MuiButton-contained");
+    expect(confirmBtn.className).toContain("MuiButton-colorSuccess");
+    expect(cancelBtn.className).toContain("MuiButton-outlined");
+    expect(cancelBtn.className).toContain("MuiButton-colorError");
+  });
+
+  it("renders both attendance buttons and highlights decline when user is declined", () => {
+    const mockPeladaDeclined = [
+      {
+        id: "1",
+        status: "attendance",
+        organization_name: "Org A",
+        scheduled_at: "2026-05-01T19:30:00Z",
+        user_attendance_status: "declined",
+      },
+    ];
+
+    render(
+      <BrowserRouter>
+        <ActiveMatchesCarousel
+          peladas={mockPeladaDeclined as any}
+          onUpdateAttendance={mockUpdateAttendance}
+        />
+      </BrowserRouter>,
+    );
+
+    const confirmBtn = screen.getByTestId("carousel-attendance-confirm-btn");
+    const cancelBtn = screen.getByTestId("carousel-attendance-cancel-btn");
+
+    expect(confirmBtn).toBeInTheDocument();
+    expect(cancelBtn).toBeInTheDocument();
+    expect(confirmBtn.className).toContain("MuiButton-outlined");
+    expect(confirmBtn.className).toContain("MuiButton-colorSuccess");
+    expect(cancelBtn.className).toContain("MuiButton-contained");
+    expect(cancelBtn.className).toContain("MuiButton-colorError");
+  });
+
+  it("allows switching attendance response directly on screen", async () => {
+    const onUpdateAttendance = vi.fn().mockResolvedValue(undefined);
+    const mockPeladaConfirmed = [
+      {
+        id: "1",
+        status: "attendance",
+        organization_name: "Org A",
+        scheduled_at: "2026-05-01T19:30:00Z",
+        user_attendance_status: "confirmed",
+      },
+    ];
+
+    render(
+      <BrowserRouter>
+        <ActiveMatchesCarousel
+          peladas={mockPeladaConfirmed as any}
+          onUpdateAttendance={onUpdateAttendance}
+        />
+      </BrowserRouter>,
+    );
+
+    const cancelBtn = screen.getByTestId("carousel-attendance-cancel-btn");
+    await act(async () => {
+      fireEvent.click(cancelBtn);
+    });
+
+    expect(onUpdateAttendance).toHaveBeenCalledWith("1", "declined");
+  });
+
+  describe("attendance edge cases", () => {
+    const attendancePelada = (
+      id: string,
+      user_attendance_status?: string | null,
+    ) =>
+      ({
+        id,
+        status: "attendance",
+        organization_name: `Org ${id}`,
+        scheduled_at: "2026-05-01T19:30:00Z",
+        user_attendance_status,
+      }) as any;
+
+    it("treats a waitlisted player as confirmed", () => {
+      render(
+        <BrowserRouter>
+          <ActiveMatchesCarousel
+            peladas={[attendancePelada("1", "waitlist")] as any}
+            onUpdateAttendance={mockUpdateAttendance}
+          />
+        </BrowserRouter>,
+      );
+
+      expect(
+        screen.getByTestId("carousel-attendance-confirm-btn").className,
+      ).toContain("MuiButton-contained");
+    });
+
+    it("leaves both buttons outlined when the player has not answered", () => {
+      render(
+        <BrowserRouter>
+          <ActiveMatchesCarousel
+            peladas={[attendancePelada("1", null)] as any}
+            onUpdateAttendance={mockUpdateAttendance}
+          />
+        </BrowserRouter>,
+      );
+
+      expect(
+        screen.getByTestId("carousel-attendance-confirm-btn").className,
+      ).toContain("MuiButton-outlined");
+      expect(
+        screen.getByTestId("carousel-attendance-cancel-btn").className,
+      ).toContain("MuiButton-outlined");
+    });
+
+    it("blocks both buttons while the update is in flight", async () => {
+      let resolveUpdate: () => void = () => {};
+      const onUpdateAttendance = vi.fn(
+        () =>
+          new Promise<void>((resolve) => {
+            resolveUpdate = resolve;
+          }),
+      );
+
+      render(
+        <BrowserRouter>
+          <ActiveMatchesCarousel
+            peladas={[attendancePelada("1", null)] as any}
+            onUpdateAttendance={onUpdateAttendance}
+          />
+        </BrowserRouter>,
+      );
+
+      fireEvent.click(screen.getByTestId("carousel-attendance-confirm-btn"));
+
+      expect(
+        screen.getByTestId("carousel-attendance-confirm-btn"),
+      ).toBeDisabled();
+      expect(
+        screen.getByTestId("carousel-attendance-cancel-btn"),
+      ).toBeDisabled();
+
+      await act(async () => {
+        resolveUpdate();
+      });
+
+      expect(
+        screen.getByTestId("carousel-attendance-confirm-btn"),
+      ).not.toBeDisabled();
+    });
+
+    it("lets the refreshed pelada win over the optimistic value", async () => {
+      // The server can answer with a different status than the one requested —
+      // a full pelada turns a confirmation into a waitlist entry. Once the
+      // parent has refetched, its value has to be the one on screen.
+      const onUpdateAttendance = vi.fn().mockResolvedValue(undefined);
+      const { rerender } = render(
+        <BrowserRouter>
+          <ActiveMatchesCarousel
+            peladas={[attendancePelada("1", null)] as any}
+            onUpdateAttendance={onUpdateAttendance}
+          />
+        </BrowserRouter>,
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("carousel-attendance-confirm-btn"));
+      });
+
+      rerender(
+        <BrowserRouter>
+          <ActiveMatchesCarousel
+            peladas={[attendancePelada("1", "declined")] as any}
+            onUpdateAttendance={onUpdateAttendance}
+          />
+        </BrowserRouter>,
+      );
+
+      expect(
+        screen.getByTestId("carousel-attendance-cancel-btn").className,
+      ).toContain("MuiButton-contained");
+    });
+
+    it("rolls back to the previous answer when the update fails", async () => {
+      const consoleError = vi
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      const onUpdateAttendance = vi
+        .fn()
+        .mockRejectedValue(new Error("network down"));
+
+      render(
+        <BrowserRouter>
+          <ActiveMatchesCarousel
+            peladas={[attendancePelada("1", "confirmed")] as any}
+            onUpdateAttendance={onUpdateAttendance}
+          />
+        </BrowserRouter>,
+      );
+
+      await act(async () => {
+        fireEvent.click(screen.getByTestId("carousel-attendance-cancel-btn"));
+      });
+
+      expect(
+        screen.getByTestId("carousel-attendance-confirm-btn").className,
+      ).toContain("MuiButton-contained");
+      expect(
+        screen.getByTestId("carousel-attendance-cancel-btn").className,
+      ).toContain("MuiButton-outlined");
+      consoleError.mockRestore();
+    });
+
+    it("survives the list shrinking under the current index", () => {
+      // Confirming attendance makes the parent refetch, and a pelada that
+      // closed meanwhile drops out of the list.
+      const three = [
+        attendancePelada("1", null),
+        attendancePelada("2", null),
+        attendancePelada("3", null),
+      ];
+      const { rerender } = render(
+        <BrowserRouter>
+          <ActiveMatchesCarousel
+            peladas={three as any}
+            onUpdateAttendance={mockUpdateAttendance}
+          />
+        </BrowserRouter>,
+      );
+
+      fireEvent.click(screen.getByTestId("carousel-next-btn"));
+      fireEvent.click(screen.getByTestId("carousel-next-btn"));
+      expect(screen.getByText("Org 3")).toBeInTheDocument();
+
+      expect(() =>
+        rerender(
+          <BrowserRouter>
+            <ActiveMatchesCarousel
+              peladas={[attendancePelada("1", null)] as any}
+              onUpdateAttendance={mockUpdateAttendance}
+            />
+          </BrowserRouter>,
+        ),
+      ).not.toThrow();
+
+      expect(screen.getByText("Org 1")).toBeInTheDocument();
+    });
+
+    it("still steps through what is left after the list shrinks", () => {
+      const three = [
+        attendancePelada("1", null),
+        attendancePelada("2", null),
+        attendancePelada("3", null),
+      ];
+      const { rerender } = render(
+        <BrowserRouter>
+          <ActiveMatchesCarousel
+            peladas={three as any}
+            onUpdateAttendance={mockUpdateAttendance}
+          />
+        </BrowserRouter>,
+      );
+
+      fireEvent.click(screen.getByTestId("carousel-next-btn"));
+      fireEvent.click(screen.getByTestId("carousel-next-btn"));
+
+      rerender(
+        <BrowserRouter>
+          <ActiveMatchesCarousel
+            peladas={
+              [attendancePelada("1", null), attendancePelada("2", null)] as any
+            }
+            onUpdateAttendance={mockUpdateAttendance}
+          />
+        </BrowserRouter>,
+      );
+
+      expect(screen.getByText("Org 2")).toBeInTheDocument();
+      fireEvent.click(screen.getByTestId("carousel-next-btn"));
+      expect(screen.getByText("Org 1")).toBeInTheDocument();
+    });
+
+    it("shows a single call to action outside the attendance phase", () => {
+      render(
+        <BrowserRouter>
+          <ActiveMatchesCarousel
+            peladas={
+              [
+                {
+                  id: "1",
+                  status: "running",
+                  organization_name: "Org A",
+                  scheduled_at: "2026-05-01T19:30:00Z",
+                },
+              ] as any
+            }
+            onUpdateAttendance={mockUpdateAttendance}
+          />
+        </BrowserRouter>,
+      );
+
+      expect(
+        screen.queryByTestId("carousel-attendance-confirm-btn"),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId("carousel-attendance-cancel-btn"),
+      ).not.toBeInTheDocument();
+    });
   });
 });
