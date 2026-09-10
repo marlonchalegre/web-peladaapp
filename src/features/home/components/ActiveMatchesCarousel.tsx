@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import {
   Paper,
   Box,
@@ -6,6 +6,8 @@ import {
   Button,
   IconButton,
   Chip,
+  Stack,
+  CircularProgress,
   alpha,
   useTheme,
 } from "@mui/material";
@@ -14,21 +16,65 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined";
+import CancelIcon from "@mui/icons-material/Cancel";
+import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { Pelada } from "../../../shared/api/endpoints";
+import type { Pelada, AttendanceStatus } from "../../../shared/api/endpoints";
+
+const ATTENDANCE_CHOICES = [
+  {
+    status: "confirmed",
+    color: "success",
+    activeIcon: <CheckCircleIcon />,
+    idleIcon: <CheckCircleOutlinedIcon />,
+    labelKey: "home.carousel.actions.confirm_presence",
+    labelFallback: "Confirmar Presença",
+    testId: "carousel-attendance-confirm-btn",
+  },
+  {
+    status: "declined",
+    color: "error",
+    activeIcon: <CancelIcon />,
+    idleIcon: <CancelOutlinedIcon />,
+    labelKey: "home.carousel.actions.cancel_presence",
+    labelFallback: "Cancelar Presença",
+    testId: "carousel-attendance-cancel-btn",
+  },
+] as const satisfies readonly {
+  status: AttendanceStatus;
+  color: "success" | "error";
+  activeIcon: ReactNode;
+  idleIcon: ReactNode;
+  labelKey: string;
+  labelFallback: string;
+  testId: string;
+}[];
 
 interface ActiveMatchesCarouselProps {
   peladas: Pelada[];
+  onUpdateAttendance: (
+    peladaId: string,
+    status: AttendanceStatus,
+  ) => Promise<void>;
 }
 
 export default function ActiveMatchesCarousel({
   peladas,
+  onUpdateAttendance,
 }: ActiveMatchesCarouselProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const theme = useTheme();
   const [activeIndex, setActiveIndex] = useState(0);
+  // One in-flight answer at a time: it both drives the spinner and stands in
+  // for the pelada's status until the parent's refetch makes it authoritative.
+  const [pending, setPending] = useState<{
+    peladaId: string;
+    status: AttendanceStatus;
+  } | null>(null);
 
   // Filter for active/upcoming matches: status is not closed, or scheduled in the future/present
   // Let's filter matches where action is likely needed or they are upcoming
@@ -44,28 +90,55 @@ export default function ActiveMatchesCarousel({
     return null;
   }
 
+  // Both wrap around a clamped index, so a list that shrank under us still
+  // steps through the peladas that remain.
   const handlePrev = () => {
-    setActiveIndex((prev) =>
-      prev === 0 ? activePeladas.length - 1 : prev - 1,
-    );
+    setActiveIndex((prev) => {
+      const current = Math.min(prev, activePeladas.length - 1);
+      return current === 0 ? activePeladas.length - 1 : current - 1;
+    });
   };
 
   const handleNext = () => {
-    setActiveIndex((prev) =>
-      prev === activePeladas.length - 1 ? 0 : prev + 1,
-    );
+    setActiveIndex((prev) => {
+      const current = Math.min(prev, activePeladas.length - 1);
+      return current === activePeladas.length - 1 ? 0 : current + 1;
+    });
   };
 
-  const currentPelada = activePeladas[activeIndex];
+  // The list can shrink under the current index between renders.
+  const safeIndex = Math.min(activeIndex, activePeladas.length - 1);
+  const currentPelada = activePeladas[safeIndex];
+
+  const pendingStatus =
+    pending?.peladaId === currentPelada.id ? pending.status : null;
+  const userAttendanceStatus =
+    pendingStatus ?? currentPelada.user_attendance_status;
+
+  const isConfirmed =
+    userAttendanceStatus === "confirmed" || userAttendanceStatus === "waitlist";
+  const isDeclined = userAttendanceStatus === "declined";
+  const hasResponded = isConfirmed || isDeclined;
+
+  const handleAttendance = async (status: AttendanceStatus) => {
+    const peladaId = currentPelada.id;
+    setPending({ peladaId, status });
+    try {
+      await onUpdateAttendance(peladaId, status);
+    } catch (err) {
+      console.error("Failed to update attendance", err);
+    } finally {
+      // The parent has refetched by now, so its prop is the fresher of the two
+      // — including a status the server chose itself, such as a confirmation
+      // into a full pelada landing on the waitlist.
+      setPending(null);
+    }
+  };
 
   // Helper to determine route and CTA text based on pelada status
   const getActionDetails = (status: string) => {
     switch (status) {
       case "attendance": {
-        const hasResponded =
-          currentPelada.user_attendance_status === "confirmed" ||
-          currentPelada.user_attendance_status === "waitlist" ||
-          currentPelada.user_attendance_status === "declined";
         return {
           link: `/peladas/${currentPelada.id}/attendance`,
           text: hasResponded
@@ -126,6 +199,7 @@ export default function ActiveMatchesCarousel({
             <IconButton
               size="small"
               onClick={handlePrev}
+              data-testid="carousel-prev-btn"
               sx={{ border: 1, borderColor: "divider" }}
             >
               <ChevronLeftIcon />
@@ -133,6 +207,7 @@ export default function ActiveMatchesCarousel({
             <IconButton
               size="small"
               onClick={handleNext}
+              data-testid="carousel-next-btn"
               sx={{ border: 1, borderColor: "divider" }}
             >
               <ChevronRightIcon />
@@ -261,25 +336,112 @@ export default function ActiveMatchesCarousel({
             width: { xs: "100%", md: "auto" },
           }}
         >
-          <Button
-            variant="contained"
-            color={actionDetails.color}
-            endIcon={<ArrowForwardIcon />}
-            onClick={() => navigate(actionDetails.link)}
-            sx={{
-              py: 1.5,
-              px: 4,
-              borderRadius: 3,
-              fontWeight: 700,
-              textTransform: "none",
-              boxShadow: "none",
-              "&:hover": {
+          {currentPelada.status === "attendance" ? (
+            <>
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={1.5}
+                sx={{ width: { xs: "100%", sm: "auto" } }}
+              >
+                {ATTENDANCE_CHOICES.map(
+                  ({
+                    status,
+                    color,
+                    activeIcon,
+                    idleIcon,
+                    labelKey,
+                    labelFallback,
+                    testId,
+                  }) => {
+                    const active =
+                      status === "confirmed" ? isConfirmed : isDeclined;
+                    const shadow = (opacity: number) =>
+                      `0 4px 12px ${alpha(theme.palette[color].main, opacity)}`;
+                    return (
+                      <Button
+                        key={status}
+                        variant={active ? "contained" : "outlined"}
+                        color={color}
+                        disabled={Boolean(pending)}
+                        startIcon={
+                          pending?.status === status ? (
+                            <CircularProgress size={18} color="inherit" />
+                          ) : active ? (
+                            activeIcon
+                          ) : (
+                            idleIcon
+                          )
+                        }
+                        onClick={() => handleAttendance(status)}
+                        data-testid={testId}
+                        sx={{
+                          py: 1.25,
+                          px: 2.5,
+                          borderRadius: 3,
+                          fontWeight: 700,
+                          textTransform: "none",
+                          boxShadow: active ? shadow(0.25) : "none",
+                          "&:hover": {
+                            boxShadow: active ? shadow(0.35) : "none",
+                          },
+                        }}
+                      >
+                        {t(labelKey, labelFallback)}
+                      </Button>
+                    );
+                  },
+                )}
+              </Stack>
+
+              <Button
+                variant="text"
+                size="small"
+                onClick={() => navigate(actionDetails.link)}
+                endIcon={
+                  <ArrowForwardIcon sx={{ fontSize: "14px !important" }} />
+                }
+                data-testid="carousel-view-attendance-btn"
+                sx={{
+                  mt: 1,
+                  textTransform: "none",
+                  fontWeight: 600,
+                  fontSize: "0.8rem",
+                  color: "text.secondary",
+                  alignSelf: { xs: "center", sm: "flex-end" },
+                  "&:hover": {
+                    color: "text.primary",
+                    bgcolor: "transparent",
+                    textDecoration: "underline",
+                  },
+                }}
+              >
+                {t(
+                  "home.carousel.actions.view_attendance",
+                  "Ver Lista de Presença",
+                )}
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="contained"
+              color={actionDetails.color}
+              endIcon={<ArrowForwardIcon />}
+              onClick={() => navigate(actionDetails.link)}
+              sx={{
+                py: 1.5,
+                px: 4,
+                borderRadius: 3,
+                fontWeight: 700,
+                textTransform: "none",
                 boxShadow: "none",
-              },
-            }}
-          >
-            {actionDetails.text}
-          </Button>
+                "&:hover": {
+                  boxShadow: "none",
+                },
+              }}
+            >
+              {actionDetails.text}
+            </Button>
+          )}
 
           {activePeladas.length > 1 && (
             <Typography

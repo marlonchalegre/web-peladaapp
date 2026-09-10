@@ -6,6 +6,7 @@ import { Loading } from "../../../shared/components/Loading";
 import TeamsSection from "../components/TeamsSection";
 import AvailablePlayersPanel from "../components/AvailablePlayersPanel";
 import FixedGoalkeepersSection from "../components/FixedGoalkeepersSection";
+import DrawJustificationDialog from "../components/DrawJustificationDialog";
 import { usePeladaDetail } from "../hooks/usePeladaDetail";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { api } from "../../../shared/api/client";
@@ -58,6 +59,8 @@ export default function PeladaDetailPage() {
     dropToFixedGk,
     removeFixedGk,
     handleRandomizeTeams,
+    drawJustification,
+    dismissDrawJustification,
     handleBeginPelada,
     handleCreateTeam,
     handleDeleteTeam,
@@ -317,6 +320,12 @@ export default function PeladaDetailPage() {
         changingStatus={changingStatus}
         processing={processing}
         isAdminOverride={isAdmin}
+      />
+
+      <DrawJustificationDialog
+        open={Boolean(drawJustification)}
+        onClose={dismissDrawJustification}
+        justification={drawJustification}
       />
 
       <div

@@ -1,5 +1,6 @@
 import type { Player, Team, User } from "../../../shared/api/endpoints";
 import { sortPlayersByPosition } from "./playerUtils";
+import { formatDecimal } from "./formatNumber";
 
 export type PlayerWithUser = Player & { user: User; is_goalkeeper?: boolean };
 
@@ -45,8 +46,7 @@ export function generateAvailablePlayersText(
       text += `${pos}\n`;
       posPlayers.forEach((p) => {
         const score = scores[p.id] ?? p.grade;
-        const scoreStr =
-          typeof score === "number" ? score.toFixed(1).replace(".", ",") : "-";
+        const scoreStr = formatDecimal(score, 1);
         text += `${p.user.name.padEnd(25)} ${scoreStr}\n`;
       });
       text += "\n";
@@ -88,15 +88,14 @@ export function generateExportText(
       vals.length > 0 ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
 
     const teamName = team.name.toUpperCase();
-    const avgStr = avg.toFixed(2).replace(".", ",");
+    const avgStr = formatDecimal(avg);
 
     // Header: TEAM NAME (padded) MÉDIA AVG
     text += `${teamName.padEnd(nameWidth + 3)} MÉDIA  ${avgStr}\n`;
 
     sortedPlayers.forEach((p, i) => {
       const score = scores[p.id] ?? p.grade;
-      const scoreStr =
-        typeof score === "number" ? score.toFixed(2).replace(".", ",") : "-";
+      const scoreStr = formatDecimal(score);
 
       const posMap: Record<string, string> = {
         defender: "Z",
@@ -188,8 +187,7 @@ export function generateExportCsv(
 
     sortedPlayers.forEach((p) => {
       const score = scores[p.id] ?? p.grade;
-      const scoreStr =
-        typeof score === "number" ? score.toFixed(2).replace(".", ",") : "-";
+      const scoreStr = formatDecimal(score);
 
       const posMap: Record<string, string> = {
         defender: "Z",

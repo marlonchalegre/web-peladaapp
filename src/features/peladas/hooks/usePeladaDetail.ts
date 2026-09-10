@@ -16,6 +16,9 @@ import {
   type VotingInfo,
   type User,
   type Transaction,
+  type DrawAlgorithm,
+  type DrawJustification,
+  type RandomizeTeamsResponse,
 } from "../../../shared/api/endpoints";
 import { useAuth } from "../../../app/providers/AuthContext";
 
@@ -40,6 +43,9 @@ export function usePeladaDetail(peladaId: string) {
   >([]);
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [drawJustification, setDrawJustification] =
+    useState<DrawJustification | null>(null);
+  const dismissDrawJustification = () => setDrawJustification(null);
   const [changingStatus, setChangingStatus] = useState(false);
   const [live, setLive] = useState("");
   const [votingInfo, setVotingInfo] = useState<VotingInfo | null>(null);
@@ -374,7 +380,10 @@ export function usePeladaDetail(peladaId: string) {
     }
   };
 
-  const handleRandomizeTeams = async () => {
+  const handleRandomizeTeams = async (options: {
+    algorithm: DrawAlgorithm;
+    useHistory: boolean;
+  }) => {
     if (!peladaId || processing) return;
     const playersPerTeam = pelada?.players_per_team || 5;
     const numTeams = pelada?.num_teams || teams.length || 2;
@@ -386,11 +395,19 @@ export function usePeladaDetail(peladaId: string) {
       const benchPlayerIds = benchPlayers.map((p) => p.id);
       const allPlayerIds = [...benchPlayerIds, ...teamPlayerIds];
 
-      await api.post(`/api/peladas/${peladaId}/teams/randomize`, {
-        player_ids: allPlayerIds,
-        players_per_team: playersPerTeam,
-        num_teams: numTeams,
-      });
+      // Only used for peladas assembled by hand: the draw prefers the
+      // confirmed attendance it reads server-side.
+      const response = await api.post<RandomizeTeamsResponse>(
+        `/api/peladas/${peladaId}/teams/randomize`,
+        {
+          player_ids: allPlayerIds,
+          players_per_team: playersPerTeam,
+          num_teams: numTeams,
+          algorithm: options.algorithm,
+          use_history: options.useHistory,
+        },
+      );
+      setDrawJustification(response?.justification ?? null);
       await fetchPeladaData();
     } catch (error: unknown) {
       const message =
@@ -398,6 +415,7 @@ export function usePeladaDetail(peladaId: string) {
           ? error.message
           : t("peladas.detail.error.randomize_failed");
       setError(message);
+      setDrawJustification(null);
     } finally {
       setProcessing(false);
     }
@@ -646,6 +664,8 @@ export function usePeladaDetail(peladaId: string) {
     handleSetGoalkeeper,
     handleRemovePlayer,
     handleRandomizeTeams,
+    drawJustification,
+    dismissDrawJustification,
     handleBeginPelada,
     handleCreateTeam,
     handleDeleteTeam,

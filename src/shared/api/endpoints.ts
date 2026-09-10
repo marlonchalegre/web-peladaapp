@@ -138,7 +138,7 @@ export interface Pelada {
   timer_started_at?: string | null;
   timer_accumulated_ms?: number | null;
   timer_status?: TimerStatus | null;
-  user_attendance_status?: string | null;
+  user_attendance_status?: AttendanceStatus | null;
 }
 
 export interface Team {
@@ -386,6 +386,156 @@ export interface PeladaFullDetailsResponse {
   users_map: Record<string, User>;
   org_players_map: Record<string, Player>;
   voting_info: VotingInfo | null;
+}
+
+/**
+ * Team draw algorithms.
+ * - `classic`: the original balance-by-grade shuffle.
+ * - `gemini`: cost-driven chemistry draw.
+ * - `gpt`: constraint-first tactical draw.
+ */
+export const DRAW_ALGORITHMS = ["classic", "gemini", "gpt"] as const;
+
+export type DrawAlgorithm = (typeof DRAW_ALGORITHMS)[number];
+
+export interface DrawPlayer {
+  id: string;
+  name: string;
+  position: string;
+  position_code: string;
+  grade: number;
+  is_anchor?: boolean;
+  short_history?: boolean;
+  overall?: number;
+  offense?: number;
+  defense?: number;
+  titles?: number;
+  drought?: number;
+  matches?: number;
+  goals?: number;
+  assists?: number;
+  bayes_vote?: number | null;
+}
+
+export interface DrawPairEvidence {
+  players: [string, string] | string[];
+  nights_together?: number;
+  nights_both_present?: number;
+  titles_together?: number;
+  title_opportunities?: number;
+  faced_each_other?: number;
+}
+
+interface DrawTeamBase {
+  index: number;
+  name: string;
+  mean: number;
+  formation: string;
+  players: DrawPlayer[];
+  champion_pairs?: DrawPairEvidence[];
+}
+
+export interface DrawTacticalTeam extends DrawTeamBase {
+  total?: number;
+  diff_to_squad_mean?: number;
+  main_sector?: string;
+  sector_means?: Record<string, number>;
+  anchors?: string[];
+  short_history?: string[];
+  titles?: { name: string; titles: number; title_opportunities: number }[];
+  top_pairs?: DrawPairEvidence[];
+  rarest_pair?: DrawPairEvidence | null;
+  assist_links?: { from: string; to: string; count: number }[];
+}
+
+export interface DrawChemistryTeam extends DrawTeamBase {
+  overall?: number;
+  defense?: number;
+  offense?: number;
+  titles_total?: number;
+  drought_total?: number;
+  top_winner?: { name: string; titles: number } | null;
+  longest_drought?: { name: string; drought: number } | null;
+  new_pairs?: DrawPairEvidence[];
+}
+
+export type DrawTeamReport = DrawTacticalTeam | DrawChemistryTeam;
+
+export interface DrawTacticalMetrics {
+  squad_mean?: number;
+  team_mean_gap?: number;
+  sector_gap?: number;
+  main_sector?: string;
+  tolerance?: number;
+  tolerance_respected?: boolean;
+  anchors_respected?: boolean;
+  max_short_history_per_team?: number;
+  short_history_threshold?: number;
+  anchors?: string[];
+  short_history_players?: string[];
+  restarts?: number;
+}
+
+export interface DrawChemistryMetrics {
+  squad_mean?: number;
+  cost?: number;
+  grade_gap?: number;
+  overall_gap?: number;
+  defense_gap?: number;
+  offense_gap?: number;
+  overall_means?: number[];
+  defense_means?: number[];
+  offense_means?: number[];
+  titles_spread?: number;
+  drought_spread?: number;
+  champion_penalty?: number;
+  novelty_bonus?: number;
+  titles_penalty?: number;
+  drought_penalty?: number;
+  restarts?: number;
+  steps?: number;
+}
+
+interface DrawJustificationBase {
+  benched: { name: string; grade: number }[];
+  use_history: boolean;
+  players_considered: number;
+  source: "confirmed_attendance" | "board";
+  history: {
+    enabled: boolean;
+    weight?: number;
+    penalty?: number;
+    baseline_penalty?: number;
+    components?: Record<string, number>;
+    baseline_components?: Record<string, number>;
+    changed_vs_baseline?: boolean;
+    moves?: { name: string; from: number; to: number }[];
+    coverage?: Record<string, number>;
+    champion_duo_threshold?: number;
+    novelty_opposition_threshold?: number;
+  };
+}
+
+export interface DrawTacticalJustification extends DrawJustificationBase {
+  algorithm: "gpt";
+  teams: DrawTacticalTeam[];
+  metrics: DrawTacticalMetrics;
+}
+
+export interface DrawChemistryJustification extends DrawJustificationBase {
+  algorithm: "gemini";
+  teams: DrawChemistryTeam[];
+  metrics: DrawChemistryMetrics;
+}
+
+export type DrawJustification =
+  | DrawTacticalJustification
+  | DrawChemistryJustification;
+
+export interface RandomizeTeamsResponse {
+  success: boolean;
+  algorithm: DrawAlgorithm;
+  justification: DrawJustification | null;
 }
 
 export interface PaginatedResponse<T> {

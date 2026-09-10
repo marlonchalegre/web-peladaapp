@@ -24,12 +24,16 @@ import Divider from "@mui/material/Divider";
 
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import AssessmentIcon from "@mui/icons-material/Assessment";
-import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
+import RandomizeTeamsDialog from "./RandomizeTeamsDialog";
 import { Link as RouterLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import type { MouseEvent } from "react";
-import { type Pelada, type VotingInfo } from "../../../shared/api/endpoints";
+import {
+  type Pelada,
+  type VotingInfo,
+  type DrawAlgorithm,
+} from "../../../shared/api/endpoints";
 
 interface PeladaDetailHeaderProps {
   pelada: Pelada;
@@ -39,7 +43,10 @@ interface PeladaDetailHeaderProps {
   onCopyAnnouncement: () => void;
   onToggleFixedGk: (enabled: boolean) => void;
   onUpdatePlayersPerTeam: (count: number) => void;
-  onRandomizeTeams: () => void;
+  onRandomizeTeams: (options: {
+    algorithm: DrawAlgorithm;
+    useHistory: boolean;
+  }) => void;
   playersPerTeam: number;
   changingStatus: boolean;
   processing: boolean;
@@ -433,15 +440,11 @@ export default function PeladaDetailHeader({
         </MenuItem>
       </Menu>
 
-      <PrettyConfirmDialog
+      <RandomizeTeamsDialog
         open={randomizeDialogOpen}
         onClose={() => setRandomizeDialogOpen(false)}
         onConfirm={onRandomizeTeams}
-        title={t("peladas.detail.randomize_dialog.title")}
-        description={t("peladas.detail.randomize_dialog.description")}
-        confirmLabel={t("peladas.detail.randomize_dialog.confirm")}
-        cancelLabel={t("peladas.detail.randomize_dialog.cancel")}
-        severity="primary"
+        loading={processing}
       />
     </Box>
   );

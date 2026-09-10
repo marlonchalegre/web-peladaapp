@@ -270,7 +270,73 @@ describe("PeladaDetailHeader", () => {
     expect(onRandomize).not.toHaveBeenCalled();
 
     // Click confirm in the dialog
-    fireEvent.click(screen.getByTestId("pretty-confirm-button"));
+    fireEvent.click(screen.getByTestId("confirm-randomize-button"));
     expect(onRandomize).toHaveBeenCalled();
+  });
+
+  it("passes the selected algorithm and history flag to the draw", () => {
+    const onRandomize = vi.fn();
+    render(
+      <MemoryRouter>
+        <ThemeContextProvider>
+          <PeladaDetailHeader
+            pelada={{ ...mockPelada, status: "open" }}
+            votingInfo={null}
+            onStartClick={() => {}}
+            onCopyClipboard={() => {}}
+            onCopyAnnouncement={() => {}}
+            onToggleFixedGk={() => {}}
+            onUpdatePlayersPerTeam={() => {}}
+            onRandomizeTeams={onRandomize}
+            playersPerTeam={5}
+            changingStatus={false}
+            processing={false}
+            isAdminOverride={true}
+          />
+        </ThemeContextProvider>
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(screen.getByTestId("randomize-teams-button"));
+    fireEvent.click(screen.getByTestId("draw-algorithm-gpt"));
+    fireEvent.click(screen.getByTestId("confirm-randomize-button"));
+
+    expect(onRandomize).toHaveBeenCalledWith({
+      algorithm: "gpt",
+      useHistory: true,
+    });
+  });
+
+  it("does not send history for the classic algorithm", () => {
+    const onRandomize = vi.fn();
+    render(
+      <MemoryRouter>
+        <ThemeContextProvider>
+          <PeladaDetailHeader
+            pelada={{ ...mockPelada, status: "open" }}
+            votingInfo={null}
+            onStartClick={() => {}}
+            onCopyClipboard={() => {}}
+            onCopyAnnouncement={() => {}}
+            onToggleFixedGk={() => {}}
+            onUpdatePlayersPerTeam={() => {}}
+            onRandomizeTeams={onRandomize}
+            playersPerTeam={5}
+            changingStatus={false}
+            processing={false}
+            isAdminOverride={true}
+          />
+        </ThemeContextProvider>
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(screen.getByTestId("randomize-teams-button"));
+    fireEvent.click(screen.getByTestId("draw-algorithm-classic"));
+    fireEvent.click(screen.getByTestId("confirm-randomize-button"));
+
+    expect(onRandomize).toHaveBeenCalledWith({
+      algorithm: "classic",
+      useHistory: false,
+    });
   });
 });
