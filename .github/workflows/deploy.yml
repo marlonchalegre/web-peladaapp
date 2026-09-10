@@ -175,6 +175,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             VITE_APP_VERSION=${{ steps.version.outputs.val }}
+            VITE_GOOGLE_ANALYTICS_ID=${{ secrets.VITE_GOOGLE_ANALYTICS_ID }}
           provenance: false
           sbom: false
           cache-from: type=gha
