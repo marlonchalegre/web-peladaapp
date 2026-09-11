@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -31,7 +31,14 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import "dayjs/locale/pt-br";
 import ProtectedRoute from "./app/routing/ProtectedRoute";
 import { SecureAvatar } from "./shared/components/SecureAvatar";
-import { initGA, logPageView, logClickEvent } from "./lib/analytics";
+import {
+  initGA,
+  logPageView,
+  logClickEvent,
+  extractClickDetails,
+  getMeasurementId,
+} from "./lib/analytics";
+import { getPageTitle } from "./lib/pageTitles";
 import { PWAInstallPrompt } from "./shared/components/PWAInstallPrompt";
 import { PullToRefresh } from "./shared/components/PullToRefresh";
 import { usePWA } from "./app/providers/PWAContext";
@@ -133,44 +140,42 @@ function PageLoading() {
 
 function AnalyticsTracker() {
   const location = useLocation();
+  const currentPathRef = useRef(location.pathname);
+
+  useEffect(() => {
+    currentPathRef.current = location.pathname;
+  }, [location.pathname]);
 
   useEffect(() => {
     initGA();
+  }, []);
 
-    const getPageName = (path: string) => {
-      const parts = path.split("/").filter(Boolean);
-      if (parts.length === 0) return "Home";
-      return parts
-        .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
-        .join(" > ");
-    };
+  useEffect(() => {
+    if (!getMeasurementId()) return;
 
     const handleGlobalClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      const clickable = target.closest("button, a, [role='button']");
+      const clickable = target.closest<HTMLElement>(
+        "button, a, [role='button']",
+      );
+      if (!clickable) return;
 
-      if (clickable) {
-        const analyticsId = clickable.getAttribute("data-analytics-id");
-        const elementText =
-          clickable.textContent?.trim() ||
-          clickable.getAttribute("aria-label") ||
-          clickable.getAttribute("title") ||
-          "unnamed-element";
-
-        const pageName = getPageName(location.pathname);
-        const elementName = analyticsId || clickable.tagName.toLowerCase();
-
-        logClickEvent(pageName, elementName, elementText);
-      }
+      const clickDetails = extractClickDetails(
+        clickable,
+        currentPathRef.current,
+      );
+      logClickEvent(clickDetails);
     };
 
     document.addEventListener("click", handleGlobalClick);
     return () => document.removeEventListener("click", handleGlobalClick);
-  }, [location.pathname]);
+  }, []);
 
   useEffect(() => {
-    logPageView(location.pathname + location.search);
-  }, [location]);
+    const title = getPageTitle(location.pathname);
+    document.title = title;
+    logPageView(location.pathname + location.search, title);
+  }, [location.pathname, location.search]);
 
   return null;
 }

@@ -1,22 +1,22 @@
 import { onCLS, onINP, onLCP, onFCP, onTTFB, type Metric } from "web-vitals";
-import ReactGA from "react-ga4";
+import { logCustomEvent } from "./analytics";
 
-const GA_MEASUREMENT_ID = import.meta.env.VITE_GOOGLE_ANALYTICS_ID;
-
-function sendToAnalytics(metric: Metric) {
-  if (!GA_MEASUREMENT_ID) return;
-
+export function sendToAnalytics(metric: Metric) {
   const { name, delta, id, value } = metric;
+  const isCLS = name === "CLS";
 
-  ReactGA.event({
+  // Group all Core Web Vitals under a single "web_vitals" event
+  // to avoid cluttering GA4 event reports with separate FCP, LCP, CLS, INP, TTFB events
+  logCustomEvent("web_vitals", {
+    metric_name: name,
+    value: Math.round(isCLS ? value * 1000 : value),
+    metric_delta: Math.round(isCLS ? delta * 1000 : delta),
+    metric_id: id,
     category: "Web Vitals",
-    action: name,
-    value: Math.round(name === "CLS" ? value * 1000 : value), // values must be integers
-    label: id, // id unique to current page load
-    nonInteraction: true, // avoids affecting bounce rate
+    label: name,
+    non_interaction: true,
   });
 
-  // Also log to console in development
   if (import.meta.env.DEV) {
     console.log("[Web Vitals]", name, value, delta, id);
   }
