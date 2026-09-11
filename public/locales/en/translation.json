@@ -990,7 +990,13 @@
         "view_full_schedule": "View full schedule",
         "unassigned": "Unassigned",
         "active_match_title": "Match Support",
-        "next_match_support": "Next Match Support"
+        "next_match_support": "Next Match Support",
+        "notify_whatsapp_button": "Notify on WhatsApp",
+        "confirm_notify_title": "Notify Support Lineup?",
+        "confirm_notify_desc": "Do you want to send the full support lineup to the WhatsApp group mentioning each designated player per match?",
+        "confirm_notify_action": "Send Notification",
+        "notify_success": "Notification sent successfully to WhatsApp group!",
+        "notify_error": "Error sending support lineup notification"
       }
     },
     "voting": {

@@ -276,5 +276,6 @@ export function usePeladaMatches(peladaId: string) {
     generateSupportLineup: actions.generateSupportLineup,
     updateSupportLineup: actions.updateSupportLineup,
     rerollSupportLineup: actions.rerollSupportLineup,
+    notifySupportLineup: actions.notifySupportLineup,
   };
 }

@@ -823,6 +823,26 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
     [setMatches, matchesRef, setError],
   );
 
+  const notifySupportLineup = useCallback(
+    async (organizationId: string) => {
+      try {
+        await endpoints.sendNotification(organizationId, {
+          action: "resend",
+          notification_type: "support-lineup",
+          pelada_id: peladaId,
+        });
+      } catch (err: unknown) {
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Erro ao enviar notificação da escala de suporte",
+        );
+        throw err;
+      }
+    },
+    [peladaId, setError],
+  );
+
   return {
     updatingScore,
     closing,
@@ -845,5 +865,6 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
     generateSupportLineup,
     updateSupportLineup,
     rerollSupportLineup,
+    notifySupportLineup,
   };
 }

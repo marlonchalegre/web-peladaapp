@@ -990,7 +990,13 @@
         "view_full_schedule": "Ver escala completa",
         "unassigned": "Não definido",
         "active_match_title": "Suporte da Partida",
-        "next_match_support": "Suporte do Próximo Jogo"
+        "next_match_support": "Suporte do Próximo Jogo",
+        "notify_whatsapp_button": "Notificar no WhatsApp",
+        "confirm_notify_title": "Notificar Escalação de Suporte?",
+        "confirm_notify_desc": "Deseja enviar a escala completa de apoio para o grupo do WhatsApp mencionando os jogadores escalados para cada partida?",
+        "confirm_notify_action": "Enviar Notificação",
+        "notify_success": "Notificação enviada com sucesso para o grupo do WhatsApp!",
+        "notify_error": "Erro ao enviar notificação da escalação de suporte"
       }
     },
     "voting": {

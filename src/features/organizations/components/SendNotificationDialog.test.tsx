@@ -214,4 +214,66 @@ describe("SendNotificationDialog", () => {
       expect(defaultProps.onClose).toHaveBeenCalled();
     });
   });
+
+  it("successfully resends support-lineup notification", async () => {
+    const user = userEvent.setup();
+    mockListPeladasByOrg.mockResolvedValue({
+      data: [
+        {
+          id: "pelada-active-1",
+          status: "running",
+          scheduled_at: "2026-03-20T10:00:00Z",
+        },
+      ],
+      total: 1,
+    });
+    mockSendNotification.mockResolvedValue({
+      status: "success",
+      message: "Sucesso",
+    });
+
+    render(<SendNotificationDialog {...defaultProps} />);
+
+    // Switch to Resend tab
+    const resendTab = screen.getByRole("tab", { name: "Reenviar Notificação" });
+    await user.click(resendTab);
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("notification-type-select"),
+      ).toBeInTheDocument();
+    });
+
+    // Select notification type
+    const typeSelectWrapper = screen.getByTestId("notification-type-select");
+    const typeTrigger =
+      typeSelectWrapper.querySelector("[role='combobox']") || typeSelectWrapper;
+    fireEvent.mouseDown(typeTrigger);
+
+    const supportLineupOption = screen.getByText(
+      "Escalação de Suporte (Câmera e Súmula)",
+    );
+    fireEvent.click(supportLineupOption);
+
+    // Select pelada
+    const peladaSelectWrapper = screen.getByTestId("pelada-select");
+    const peladaTrigger =
+      peladaSelectWrapper.querySelector("[role='combobox']") ||
+      peladaSelectWrapper;
+    fireEvent.mouseDown(peladaTrigger);
+
+    const activePeladaOption = screen.getAllByRole("option")[0];
+    fireEvent.click(activePeladaOption);
+
+    const sendBtn = screen.getByRole("button", { name: "Enviar" });
+    expect(sendBtn).toBeEnabled();
+
+    await user.click(sendBtn);
+
+    expect(mockSendNotification).toHaveBeenCalledWith("org-123", {
+      action: "resend",
+      notification_type: "support-lineup",
+      pelada_id: "pelada-active-1",
+    });
+  });
 });

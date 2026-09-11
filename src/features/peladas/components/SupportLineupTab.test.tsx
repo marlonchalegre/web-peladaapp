@@ -381,4 +381,89 @@ describe("SupportLineupTab", () => {
       screen.getAllByText(/unassigned|Não definido/i).length,
     ).toBeGreaterThan(0);
   });
+
+  it("handles WhatsApp notification confirmation flow for admin", async () => {
+    const mockNotify = vi.fn().mockResolvedValue(undefined);
+
+    render(
+      <ThemeContextProvider>
+        <SupportLineupTab
+          matches={mockMatches}
+          teams={mockTeams}
+          teamPlayers={mockTeamPlayers}
+          orgPlayerIdToUserId={mockOrgPlayerIdToUserId}
+          userIdToName={mockUserIdToName}
+          orgPlayerIdToPlayer={mockOrgPlayerIdToPlayer}
+          attendance={[]}
+          isAdmin={true}
+          onGenerateAll={vi.fn()}
+          onUpdateMatch={vi.fn()}
+          onRerollMatch={vi.fn()}
+          onNotifyWhatsApp={mockNotify}
+        />
+      </ThemeContextProvider>,
+    );
+
+    const notifyBtn = screen.getByTestId("notify-whatsapp-support-button");
+    expect(notifyBtn).toBeInTheDocument();
+    expect(notifyBtn).toBeEnabled();
+
+    fireEvent.click(notifyBtn);
+
+    // Dialog should be visible
+    expect(
+      screen.getByText(/confirm_notify_title|Notificar Escalação de Suporte/i),
+    ).toBeInTheDocument();
+    const confirmBtn = screen.getByTestId("pretty-confirm-button");
+    fireEvent.click(confirmBtn);
+
+    await waitFor(() => {
+      expect(mockNotify).toHaveBeenCalledTimes(1);
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("notify-support-success-alert"),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("disables WhatsApp notification button when no support assignments exist", () => {
+    const unassignedMatches: Match[] = [
+      {
+        id: "match-empty",
+        pelada_id: "pelada-1",
+        sequence: 1,
+        home_team_id: "team-1",
+        away_team_id: "team-2",
+        home_score: 0,
+        away_score: 0,
+        status: "scheduled",
+        support_camera_player_id: null,
+        support_stats_player_id: null,
+      },
+    ];
+
+    render(
+      <ThemeContextProvider>
+        <SupportLineupTab
+          matches={unassignedMatches}
+          teams={mockTeams}
+          teamPlayers={mockTeamPlayers}
+          orgPlayerIdToUserId={mockOrgPlayerIdToUserId}
+          userIdToName={mockUserIdToName}
+          orgPlayerIdToPlayer={mockOrgPlayerIdToPlayer}
+          attendance={[]}
+          isAdmin={true}
+          onGenerateAll={vi.fn()}
+          onUpdateMatch={vi.fn()}
+          onRerollMatch={vi.fn()}
+          onNotifyWhatsApp={vi.fn()}
+        />
+      </ThemeContextProvider>,
+    );
+
+    const notifyBtn = screen.getByTestId("notify-whatsapp-support-button");
+    expect(notifyBtn).toBeDisabled();
+  });
 });

@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import {
   Box,
   Paper,
@@ -36,6 +36,7 @@ import AutorenewIcon from "@mui/icons-material/Autorenew";
 import GroupIcon from "@mui/icons-material/Group";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import type {
   Match,
   Team,
@@ -65,6 +66,7 @@ interface Props {
     },
   ) => Promise<void>;
   onRerollMatch: (matchId: string) => Promise<void>;
+  onNotifyWhatsApp?: () => Promise<void>;
 }
 
 export default function SupportLineupTab({
@@ -79,18 +81,31 @@ export default function SupportLineupTab({
   onGenerateAll,
   onUpdateMatch,
   onRerollMatch,
+  onNotifyWhatsApp,
 }: Props) {
   const { t } = useTranslation();
   const theme = useTheme();
 
   const [confirmRerollAllOpen, setConfirmRerollAllOpen] = useState(false);
+  const [confirmNotifyOpen, setConfirmNotifyOpen] = useState(false);
   const [matchToReroll, setMatchToReroll] = useState<{
     id: string;
     sequence: number;
   } | null>(null);
   const [loadingMatchId, setLoadingMatchId] = useState<string | null>(null);
   const [generatingAll, setGeneratingAll] = useState(false);
+  const [notifying, setNotifying] = useState(false);
+  const [notifySuccess, setNotifySuccess] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const notifyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (notifyTimeoutRef.current) {
+        clearTimeout(notifyTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const teamNameById = useMemo(() => {
     const m: Record<string, string> = {};
@@ -280,6 +295,39 @@ export default function SupportLineupTab({
     }
   };
 
+  const hasSupportAssignments = matches.some((m) =>
+    Boolean(m.support_camera_player_id || m.support_stats_player_id),
+  );
+
+  const handleNotifyWhatsApp = useCallback(async () => {
+    if (!onNotifyWhatsApp) return;
+    setNotifying(true);
+    setActionError(null);
+    try {
+      await onNotifyWhatsApp();
+      setConfirmNotifyOpen(false);
+      if (notifyTimeoutRef.current) {
+        clearTimeout(notifyTimeoutRef.current);
+      }
+      setNotifySuccess(true);
+      notifyTimeoutRef.current = setTimeout(
+        () => setNotifySuccess(false),
+        5000,
+      );
+    } catch (err: unknown) {
+      setActionError(
+        err instanceof Error
+          ? err.message
+          : t(
+              "peladas.support_lineup.notify_error",
+              "Erro ao enviar notificação da escalação de suporte",
+            ),
+      );
+    } finally {
+      setNotifying(false);
+    }
+  }, [onNotifyWhatsApp, t]);
+
   // Players list for the duty summary bar
   const allTeamPlayersList = useMemo(() => {
     const list: Array<{
@@ -352,6 +400,20 @@ export default function SupportLineupTab({
           onClose={() => setActionError(null)}
         >
           {actionError}
+        </Alert>
+      )}
+
+      {notifySuccess && (
+        <Alert
+          severity="success"
+          sx={{ mb: 2 }}
+          onClose={() => setNotifySuccess(false)}
+          data-testid="notify-support-success-alert"
+        >
+          {t(
+            "peladas.support_lineup.notify_success",
+            "Notificação enviada com sucesso para o grupo do WhatsApp!",
+          )}
         </Alert>
       )}
 
@@ -434,6 +496,33 @@ export default function SupportLineupTab({
                 {t(
                   "peladas.support_lineup.reroll_all_button",
                   "Re-sortear Escala Completa",
+                )}
+              </Button>
+            )}
+
+            {isAdmin && onNotifyWhatsApp && (
+              <Button
+                variant="outlined"
+                color="success"
+                startIcon={
+                  notifying ? (
+                    <CircularProgress size={16} color="inherit" />
+                  ) : (
+                    <WhatsAppIcon />
+                  )
+                }
+                disabled={notifying || !hasSupportAssignments}
+                onClick={() => setConfirmNotifyOpen(true)}
+                data-testid="notify-whatsapp-support-button"
+                sx={{
+                  textTransform: "none",
+                  borderRadius: 2,
+                  fontWeight: "bold",
+                }}
+              >
+                {t(
+                  "peladas.support_lineup.notify_whatsapp_button",
+                  "Notificar no WhatsApp",
                 )}
               </Button>
             )}
@@ -878,6 +967,26 @@ export default function SupportLineupTab({
         )}
         onClose={() => setConfirmRerollAllOpen(false)}
         onConfirm={handleRerollAll}
+      />
+
+      {/* Confirmation Dialog for WhatsApp Notification */}
+      <PrettyConfirmDialog
+        open={confirmNotifyOpen}
+        title={t(
+          "peladas.support_lineup.confirm_notify_title",
+          "Notificar Escalação de Suporte?",
+        )}
+        description={t(
+          "peladas.support_lineup.confirm_notify_desc",
+          "Deseja enviar a escala completa de apoio para o grupo do WhatsApp mencionando os jogadores escalados para cada partida?",
+        )}
+        confirmLabel={t(
+          "peladas.support_lineup.confirm_notify_action",
+          "Enviar Notificação",
+        )}
+        cancelLabel={t("common.cancel", "Cancelar")}
+        onClose={() => setConfirmNotifyOpen(false)}
+        onConfirm={handleNotifyWhatsApp}
       />
 
       {/* Confirmation Dialog for Re-roll Single Match */}

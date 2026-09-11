@@ -1,5 +1,5 @@
 import { useParams, Link as RouterLink } from "react-router-dom";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Paper,
   Button,
@@ -43,6 +43,7 @@ import { formatPeladaSummary } from "../utils/formatSummary";
 import {
   generateExportText,
   generateAnnouncementText,
+  copyToClipboard,
   type PlayerWithUser,
 } from "../utils/exportUtils";
 import GlobalSessionTimer from "../components/GlobalSessionTimer";
@@ -132,6 +133,7 @@ export default function PeladaMatchesPage() {
     generateSupportLineup,
     updateSupportLineup,
     rerollSupportLineup,
+    notifySupportLineup,
   } = usePeladaMatches(peladaId);
 
   const isAdmin = useMemo(() => {
@@ -236,13 +238,17 @@ export default function PeladaMatchesPage() {
       playerStats,
     );
 
-    try {
-      await navigator.clipboard.writeText(text);
+    const success = await copyToClipboard(text);
+    if (success) {
       alert(t("peladas.matches.summary_copied"));
-    } catch (err) {
-      console.error("Error copying to clipboard:", err);
     }
   };
+
+  const handleNotifySupportLineup = useCallback(async () => {
+    if (pelada?.organization_id) {
+      await notifySupportLineup(pelada.organization_id);
+    }
+  }, [pelada?.organization_id, notifySupportLineup]);
 
   const getFullTeamPlayers = () => {
     const full: Record<string, PlayerWithUser[]> = {};
@@ -279,21 +285,17 @@ export default function PeladaMatchesPage() {
 
   const handleCopyTeams = async () => {
     const text = generateExportText(teams, getFullTeamPlayers(), {});
-    try {
-      await navigator.clipboard.writeText(text);
+    const success = await copyToClipboard(text);
+    if (success) {
       alert(t("common.actions.copy_success"));
-    } catch (err) {
-      console.error("Error copying to clipboard:", err);
     }
   };
 
   const handleCopyAnnouncement = async () => {
     const text = generateAnnouncementText(teams, getFullTeamPlayers());
-    try {
-      await navigator.clipboard.writeText(text);
+    const success = await copyToClipboard(text);
+    if (success) {
       alert(t("common.actions.copy_success"));
-    } catch (err) {
-      console.error("Error copying to clipboard:", err);
     }
   };
 
@@ -664,6 +666,9 @@ export default function PeladaMatchesPage() {
               onGenerateAll={generateSupportLineup}
               onUpdateMatch={updateSupportLineup}
               onRerollMatch={rerollSupportLineup}
+              onNotifyWhatsApp={
+                pelada?.organization_id ? handleNotifySupportLineup : undefined
+              }
             />
           )}
         </Box>

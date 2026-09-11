@@ -41,6 +41,15 @@ interface SendNotificationDialogProps {
   showToast: (message: string, severity: "success" | "error" | "info") => void;
 }
 
+export type WahaNotificationType =
+  | "new-pelada"
+  | "attendance-reminder"
+  | "start"
+  | "support-lineup"
+  | "end"
+  | "vote-reminder"
+  | "vote-ended";
+
 export default function SendNotificationDialog({
   open,
   onClose,
@@ -57,7 +66,9 @@ export default function SendNotificationDialog({
   const [customMessage, setCustomMessage] = useState("");
 
   // Resend Notification states
-  const [notificationType, setNotificationType] = useState("");
+  const [notificationType, setNotificationType] = useState<
+    WahaNotificationType | ""
+  >("");
   const [selectedPeladaId, setSelectedPeladaId] = useState("");
   const [peladas, setPeladas] = useState<Pelada[]>([]);
   const [loadingPeladas, setLoadingPeladas] = useState(false);
@@ -374,6 +385,12 @@ export default function SendNotificationDialog({
                   {t(
                     "organizations.management.notifications.types.start",
                     "Escalação / Pelada Iniciada",
+                  )}
+                </MenuItem>
+                <MenuItem value="support-lineup">
+                  {t(
+                    "organizations.management.notifications.types.support_lineup",
+                    "Escalação de Suporte (Câmera e Súmula)",
                   )}
                 </MenuItem>
                 <MenuItem value="end">
