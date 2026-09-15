@@ -17,7 +17,7 @@ import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
 import type { Match, Player } from "../../../shared/api/endpoints";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
-import { resolvePlayerName } from "../utils/playerUtils";
+import { resolvePlayerName, getPlayerInitials } from "../utils/playerUtils";
 
 interface Props {
   match: Match;
@@ -30,6 +30,8 @@ interface Props {
   onNavigateToSupportTab?: () => void;
   onSwapRoles?: (match: Match) => Promise<void>;
 }
+
+const AVATAR_SX = { width: 26, height: 26, fontSize: "0.75rem" } as const;
 
 function ActiveMatchSupportLineupCard({
   match,
@@ -136,8 +138,8 @@ function ActiveMatchSupportLineupCard({
             <SecureAvatar
               userId={camUid}
               filename={camPlayer?.user_avatar_filename}
-              fallbackText={camName}
-              sx={{ width: 26, height: 26 }}
+              fallbackText={getPlayerInitials(camName)}
+              sx={AVATAR_SX}
             />
           )}
           <Box>
@@ -188,8 +190,8 @@ function ActiveMatchSupportLineupCard({
             <SecureAvatar
               userId={statsUid}
               filename={statsPlayer?.user_avatar_filename}
-              fallbackText={statsName}
-              sx={{ width: 26, height: 26 }}
+              fallbackText={getPlayerInitials(statsName)}
+              sx={AVATAR_SX}
             />
           )}
           <Box>

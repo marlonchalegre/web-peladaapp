@@ -41,6 +41,7 @@ import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
+import { getPlayerInitials } from "../utils/playerUtils";
 
 const endpoints = createApi(api);
 
@@ -56,8 +57,6 @@ type PlayerVote = {
   own_goals: number;
   voting_enabled: boolean;
 };
-
-const getInitials = (name?: string) => (name?.charAt(0) || "").toUpperCase();
 
 interface VoterStatusItem {
   player_id: string;
@@ -84,7 +83,7 @@ function VoterListItem({
         <SecureAvatar
           userId={voter.user_id}
           filename={voter.avatar_filename}
-          fallbackText={getInitials(voter.name)}
+          fallbackText={getPlayerInitials(voter.name)}
           sx={{
             width: 28,
             height: 28,
@@ -453,7 +452,7 @@ export default function PeladaVotingPage() {
                           <SecureAvatar
                             userId={pv.userId}
                             filename={pv.avatarFilename}
-                            fallbackText={getInitials(pv.playerName)}
+                            fallbackText={getPlayerInitials(pv.playerName)}
                             sx={{
                               width: 48,
                               height: 48,

@@ -251,7 +251,7 @@ describe("SendNotificationDialog", () => {
     fireEvent.mouseDown(typeTrigger);
 
     const supportLineupOption = screen.getByText(
-      "Escalação de Suporte (Câmera e Súmula)",
+      "Escalação de Apoio (Câmera e Súmula)",
     );
     fireEvent.click(supportLineupOption);
 

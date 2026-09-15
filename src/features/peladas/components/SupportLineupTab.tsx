@@ -46,7 +46,11 @@ import type {
 } from "../../../shared/api/endpoints";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
-import { resolvePlayerName, getAttendancePlayerId } from "../utils/playerUtils";
+import {
+  resolvePlayerName,
+  getAttendancePlayerId,
+  getPlayerInitials,
+} from "../utils/playerUtils";
 
 interface Props {
   matches: Match[];
@@ -68,6 +72,26 @@ interface Props {
   onRerollMatch: (matchId: string) => Promise<void>;
   onNotifyWhatsApp?: () => Promise<void>;
 }
+
+const ACTION_BUTTON_SX = {
+  textTransform: "none",
+  borderRadius: 2,
+  fontWeight: 600,
+  fontSize: "0.8125rem",
+  whiteSpace: "nowrap",
+} as const;
+
+const TABLE_AVATAR_SX = {
+  width: 28,
+  height: 28,
+  fontSize: "0.75rem",
+} as const;
+
+const DIALOG_AVATAR_SX = {
+  width: 26,
+  height: 26,
+  fontSize: "0.75rem",
+} as const;
 
 export default function SupportLineupTab({
   matches,
@@ -233,8 +257,12 @@ export default function SupportLineupTab({
   };
 
   const handleSwapRoles = async (match: Match) => {
-    if (!match.support_camera_player_id && !match.support_stats_player_id)
+    if (!match.support_camera_player_id && !match.support_stats_player_id) {
       return;
+    }
+    if (match.support_camera_player_id === match.support_stats_player_id) {
+      return;
+    }
     try {
       setLoadingMatchId(match.id);
       setActionError(null);
@@ -264,11 +292,15 @@ export default function SupportLineupTab({
   };
 
   const handleChangeCamera = async (match: Match, newPlayerId: string) => {
+    const nextId = newPlayerId || null;
+    if ((match.support_camera_player_id || null) === nextId) {
+      return;
+    }
     try {
       setLoadingMatchId(match.id);
       setActionError(null);
       await onUpdateMatch(match.id, {
-        support_camera_player_id: newPlayerId || null,
+        support_camera_player_id: nextId,
       });
     } catch (err: unknown) {
       setActionError(
@@ -280,11 +312,15 @@ export default function SupportLineupTab({
   };
 
   const handleChangeStats = async (match: Match, newPlayerId: string) => {
+    const nextId = newPlayerId || null;
+    if ((match.support_stats_player_id || null) === nextId) {
+      return;
+    }
     try {
       setLoadingMatchId(match.id);
       setActionError(null);
       await onUpdateMatch(match.id, {
-        support_stats_player_id: newPlayerId || null,
+        support_stats_player_id: nextId,
       });
     } catch (err: unknown) {
       setActionError(
@@ -320,7 +356,7 @@ export default function SupportLineupTab({
           ? err.message
           : t(
               "peladas.support_lineup.notify_error",
-              "Erro ao enviar notificação da escalação de suporte",
+              "Erro ao enviar notificação da escalação de apoio",
             ),
       );
     } finally {
@@ -361,6 +397,15 @@ export default function SupportLineupTab({
   const [transparencyDialogOpen, setTransparencyDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState<number | "all">("all");
+
+  const handleOpenTransparency = useCallback(
+    (filter: number | "all" = "all") => {
+      setSelectedFilter(filter);
+      setSearchQuery("");
+      setTransparencyDialogOpen(true);
+    },
+    [],
+  );
 
   const distributionBuckets = useMemo(() => {
     const map: Record<number, number> = {};
@@ -439,7 +484,7 @@ export default function SupportLineupTab({
         >
           <Box>
             <Typography variant="h5" sx={{ fontWeight: "bold", mb: 0.5 }}>
-              {t("peladas.support_lineup.title", "Escalação de Suporte")}
+              {t("peladas.support_lineup.title", "Escalação de Apoio")}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               {t(
@@ -449,21 +494,20 @@ export default function SupportLineupTab({
             </Typography>
           </Box>
 
-          <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{ alignItems: "center", flexWrap: "wrap", gap: 1 }}
+          >
             <Button
+              size="small"
               variant="outlined"
               color="inherit"
-              startIcon={<GroupIcon />}
-              onClick={() => {
-                setSelectedFilter("all");
-                setSearchQuery("");
-                setTransparencyDialogOpen(true);
-              }}
+              startIcon={<GroupIcon fontSize="small" />}
+              onClick={() => handleOpenTransparency("all")}
               data-testid="view-participation-button"
               sx={{
-                textTransform: "none",
-                borderRadius: 2,
-                fontWeight: "bold",
+                ...ACTION_BUTTON_SX,
                 borderColor: "divider",
               }}
             >
@@ -475,23 +519,20 @@ export default function SupportLineupTab({
 
             {isAdmin && (
               <Button
+                size="small"
                 variant="outlined"
                 color="primary"
                 startIcon={
                   generatingAll ? (
-                    <CircularProgress size={16} />
+                    <CircularProgress size={14} />
                   ) : (
-                    <AutorenewIcon />
+                    <AutorenewIcon fontSize="small" />
                   )
                 }
                 disabled={generatingAll || matches.length === 0}
                 onClick={() => setConfirmRerollAllOpen(true)}
                 data-testid="reroll-all-support-button"
-                sx={{
-                  textTransform: "none",
-                  borderRadius: 2,
-                  fontWeight: "bold",
-                }}
+                sx={ACTION_BUTTON_SX}
               >
                 {t(
                   "peladas.support_lineup.reroll_all_button",
@@ -502,23 +543,20 @@ export default function SupportLineupTab({
 
             {isAdmin && onNotifyWhatsApp && (
               <Button
+                size="small"
                 variant="outlined"
                 color="success"
                 startIcon={
                   notifying ? (
-                    <CircularProgress size={16} color="inherit" />
+                    <CircularProgress size={14} color="inherit" />
                   ) : (
-                    <WhatsAppIcon />
+                    <WhatsAppIcon fontSize="small" />
                   )
                 }
                 disabled={notifying || !hasSupportAssignments}
                 onClick={() => setConfirmNotifyOpen(true)}
                 data-testid="notify-whatsapp-support-button"
-                sx={{
-                  textTransform: "none",
-                  borderRadius: 2,
-                  fontWeight: "bold",
-                }}
+                sx={ACTION_BUTTON_SX}
               >
                 {t(
                   "peladas.support_lineup.notify_whatsapp_button",
@@ -571,11 +609,7 @@ export default function SupportLineupTab({
               }`}
               variant={bucket.dutyCount > 0 ? "filled" : "outlined"}
               color={bucket.dutyCount > 0 ? "primary" : "default"}
-              onClick={() => {
-                setSelectedFilter(bucket.dutyCount);
-                setSearchQuery("");
-                setTransparencyDialogOpen(true);
-              }}
+              onClick={() => handleOpenTransparency(bucket.dutyCount)}
               sx={{
                 fontWeight: 600,
                 fontSize: "0.75rem",
@@ -596,11 +630,7 @@ export default function SupportLineupTab({
 
         <Button
           size="small"
-          onClick={() => {
-            setSelectedFilter("all");
-            setSearchQuery("");
-            setTransparencyDialogOpen(true);
-          }}
+          onClick={() => handleOpenTransparency("all")}
           sx={{
             textTransform: "none",
             fontWeight: "bold",
@@ -627,12 +657,18 @@ export default function SupportLineupTab({
           <TableHead sx={{ bgcolor: "action.hover" }}>
             <TableRow>
               <TableCell
-                sx={{ fontWeight: "bold", width: { xs: "80px", sm: "100px" } }}
+                sx={{ fontWeight: "bold", width: { xs: "60px", sm: "80px" } }}
               >
                 Partida
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Confronto</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>
+              <TableCell
+                sx={{ fontWeight: "bold", width: { xs: "120px", sm: "160px" } }}
+              >
+                Confronto
+              </TableCell>
+              <TableCell
+                sx={{ fontWeight: "bold", width: { xs: "auto", sm: "35%" } }}
+              >
                 <Stack
                   direction="row"
                   spacing={1}
@@ -644,7 +680,9 @@ export default function SupportLineupTab({
                   </span>
                 </Stack>
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>
+              <TableCell
+                sx={{ fontWeight: "bold", width: { xs: "auto", sm: "35%" } }}
+              >
                 <Stack
                   direction="row"
                   spacing={1}
@@ -659,7 +697,7 @@ export default function SupportLineupTab({
               {isAdmin && (
                 <TableCell
                   align="right"
-                  sx={{ fontWeight: "bold", width: "120px" }}
+                  sx={{ fontWeight: "bold", width: "100px" }}
                 >
                   Ações
                 </TableCell>
@@ -701,13 +739,6 @@ export default function SupportLineupTab({
                 ? playerTeamMap[m.support_stats_player_id]
                 : undefined;
 
-              const statusColor =
-                m.status === "finished"
-                  ? "success"
-                  : m.status === "running"
-                    ? "primary"
-                    : "default";
-
               return (
                 <TableRow
                   key={m.id}
@@ -722,22 +753,26 @@ export default function SupportLineupTab({
                 >
                   {/* Sequence & Status */}
                   <TableCell>
-                    <Stack spacing={0.5}>
+                    <Stack spacing={0.5} sx={{ alignItems: "flex-start" }}>
                       <Typography variant="body2" sx={{ fontWeight: "bold" }}>
                         #{m.sequence}
                       </Typography>
-                      <Chip
-                        label={
-                          m.status === "running"
-                            ? "Ao Vivo"
-                            : m.status === "finished"
-                              ? "Finalizado"
-                              : "Agendado"
-                        }
-                        size="small"
-                        color={statusColor}
-                        sx={{ fontSize: "0.65rem", height: 20 }}
-                      />
+                      {m.status === "running" && (
+                        <Chip
+                          label="Ao Vivo"
+                          size="small"
+                          color="primary"
+                          sx={{ fontSize: "0.65rem", height: 20 }}
+                        />
+                      )}
+                      {m.status === "finished" && (
+                        <Chip
+                          label="Finalizado"
+                          size="small"
+                          color="success"
+                          sx={{ fontSize: "0.65rem", height: 20 }}
+                        />
+                      )}
                     </Stack>
                   </TableCell>
 
@@ -764,9 +799,10 @@ export default function SupportLineupTab({
                   </TableCell>
 
                   {/* Camera Column */}
-                  <TableCell>
+                  <TableCell sx={{ width: { xs: "auto", sm: "35%" } }}>
                     {isAdmin ? (
                       <Select
+                        fullWidth
                         size="small"
                         value={m.support_camera_player_id || ""}
                         onChange={(e) => handleChangeCamera(m, e.target.value)}
@@ -774,7 +810,6 @@ export default function SupportLineupTab({
                         displayEmpty
                         data-testid={`camera-select-${m.sequence}`}
                         sx={{
-                          minWidth: { xs: 150, sm: 200 },
                           borderRadius: 2,
                           fontSize: "0.85rem",
                         }}
@@ -803,8 +838,8 @@ export default function SupportLineupTab({
                           <SecureAvatar
                             userId={camUid}
                             filename={camPlayer?.user_avatar_filename}
-                            fallbackText={camName}
-                            sx={{ width: 28, height: 28 }}
+                            fallbackText={getPlayerInitials(camName)}
+                            sx={TABLE_AVATAR_SX}
                           />
                         )}
                         <Box>
@@ -828,9 +863,10 @@ export default function SupportLineupTab({
                   </TableCell>
 
                   {/* Stats Column */}
-                  <TableCell>
+                  <TableCell sx={{ width: { xs: "auto", sm: "35%" } }}>
                     {isAdmin ? (
                       <Select
+                        fullWidth
                         size="small"
                         value={m.support_stats_player_id || ""}
                         onChange={(e) => handleChangeStats(m, e.target.value)}
@@ -838,7 +874,6 @@ export default function SupportLineupTab({
                         displayEmpty
                         data-testid={`stats-select-${m.sequence}`}
                         sx={{
-                          minWidth: { xs: 150, sm: 200 },
                           borderRadius: 2,
                           fontSize: "0.85rem",
                         }}
@@ -867,8 +902,8 @@ export default function SupportLineupTab({
                           <SecureAvatar
                             userId={statsUid}
                             filename={statsPlayer?.user_avatar_filename}
-                            fallbackText={statsName}
-                            sx={{ width: 28, height: 28 }}
+                            fallbackText={getPlayerInitials(statsName)}
+                            sx={TABLE_AVATAR_SX}
                           />
                         )}
                         <Box>
@@ -974,7 +1009,7 @@ export default function SupportLineupTab({
         open={confirmNotifyOpen}
         title={t(
           "peladas.support_lineup.confirm_notify_title",
-          "Notificar Escalação de Suporte?",
+          "Notificar Escalação de Apoio?",
         )}
         description={t(
           "peladas.support_lineup.confirm_notify_desc",
@@ -1181,12 +1216,8 @@ export default function SupportLineupTab({
                               <SecureAvatar
                                 userId={uid}
                                 filename={pObj?.user_avatar_filename}
-                                fallbackText={player.name}
-                                sx={{
-                                  width: 26,
-                                  height: 26,
-                                  fontSize: "0.75rem",
-                                }}
+                                fallbackText={getPlayerInitials(player.name)}
+                                sx={DIALOG_AVATAR_SX}
                               />
                               <Typography
                                 variant="body2"

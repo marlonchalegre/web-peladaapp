@@ -207,3 +207,17 @@ export function findMatchingAssistForGoal(
 
   return sameTeamCandidate || fallbackCandidate;
 }
+
+/**
+ * Returns 1-2 uppercase initials for a given player name.
+ */
+export function getPlayerInitials(name?: string | null): string {
+  if (!name) return "";
+  const trimmed = name.trim();
+  if (!trimmed) return "";
+  const parts = trimmed.split(/\s+/);
+  if (parts.length === 1) {
+    return parts[0].charAt(0).toUpperCase();
+  }
+  return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+}
