@@ -44,6 +44,8 @@ import { PullToRefresh } from "./shared/components/PullToRefresh";
 import { usePWA } from "./app/providers/PWAContext";
 import { PWAProvider } from "./app/providers/PWAProvider";
 import { lazyRetry } from "./shared/utils/lazyRetry";
+import BottomNav from "./shared/components/BottomNav";
+import DesktopHeader from "./shared/components/DesktopHeader";
 
 // Lazy load pages to reduce initial bundle size
 const LoginPage = lazyRetry(
@@ -238,10 +240,33 @@ function Footer() {
 function AppLayout() {
   const { isAuthenticated, user, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { mode, toggleTheme } = useAppTheme();
   const { t } = useTranslation();
   const { isInstallable, installApp } = usePWA();
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+
+  const isRedesignRoute = [
+    "/home",
+    "/profile",
+    "/organizations",
+    "/peladas",
+  ].some((path) => location.pathname.startsWith(path));
+
+  const isMatchRoute = Boolean(
+    location.pathname.match(/^\/peladas\/[^/]+\/matches/),
+  );
+
+  const shouldRenderDesktopHeader =
+    isAuthenticated && isRedesignRoute && !isMatchRoute;
+
+  const showBottomNav =
+    isAuthenticated &&
+    !isMatchRoute &&
+    (location.pathname === "/home" ||
+      location.pathname === "/profile" ||
+      (location.pathname.startsWith("/organizations") &&
+        !location.pathname.includes("/management")));
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
@@ -273,7 +298,12 @@ function AppLayout() {
           bgcolor: "background.default",
         }}
       >
-        {isAuthenticated && (
+        {shouldRenderDesktopHeader && (
+          <Box sx={{ display: { xs: "none", md: "block" } }}>
+            <DesktopHeader />
+          </Box>
+        )}
+        {isAuthenticated && !isRedesignRoute && (
           <AppBar
             position="static"
             color="inherit"
@@ -412,7 +442,12 @@ function AppLayout() {
         )}
         <Box
           component="main"
-          sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
+          sx={{
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+            pb: showBottomNav ? "68px" : 0,
+          }}
         >
           <PullToRefresh>
             <Suspense fallback={<PageLoading />}>
@@ -475,7 +510,9 @@ function AppLayout() {
             </Suspense>
           </PullToRefresh>
         </Box>
-        <Footer /> <PWAInstallPrompt />
+        {!isRedesignRoute && <Footer />}
+        {showBottomNav && <BottomNav />}
+        <PWAInstallPrompt />
       </Box>
     </>
   );

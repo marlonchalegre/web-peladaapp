@@ -6,6 +6,7 @@ export interface Organization {
   owner_id?: string | null;
   priority_confirmation_limit_hours?: number | null;
   default_max_players?: number | null;
+  default_location?: string | null;
   waha_api_url?: string | null;
   waha_instance?: string | null;
   waha_group_id?: string | null;
@@ -46,6 +47,8 @@ export interface User {
     goals: number;
     assists: number;
     matches: number;
+    attendance_rate?: number | null;
+    current_streak?: number | null;
   };
 }
 export interface Player {
@@ -126,6 +129,9 @@ export interface Pelada {
   num_teams?: number | null;
   players_per_team?: number | null;
   max_players?: number | null;
+  location?: string | null;
+  confirmed_count?: number | null;
+  confirmed_preview?: string | null;
   creator_id?: string | null;
   fixed_goalkeepers?: boolean | null;
   home_fixed_goalkeeper_id?: string | null;
@@ -139,6 +145,80 @@ export interface Pelada {
   timer_accumulated_ms?: number | null;
   timer_status?: TimerStatus | null;
   user_attendance_status?: AttendanceStatus | null;
+}
+
+export interface PeladaHistoryUserLine {
+  player_id: string;
+  player_name: string;
+  team_name?: string | null;
+  team_position?: number | null;
+  goals: number;
+  assists: number;
+  own_goals: number;
+  avg_stars?: number | null;
+  is_mvp: boolean;
+  is_garcom: boolean;
+}
+
+export interface PeladaHistoryEntry {
+  id: string;
+  scheduled_at?: string | null;
+  location?: string | null;
+  max_players?: number | null;
+  matches_count: number;
+  players_count: number;
+  champion_team_name?: string | null;
+  user?: PeladaHistoryUserLine | null;
+}
+
+export interface ProfileSummary {
+  avg_rating: number | null;
+  avg_stars: number | null;
+  matches_played: number;
+  goals: number;
+  assists: number;
+  titles: number;
+  mvp_count: number;
+  garcom_count: number;
+  attendance_rate: number | null;
+}
+
+export interface ProfileSkills {
+  passing: number | null;
+  ball_control: number | null;
+  velocity: number | null;
+  shooting: number | null;
+  dribbling: number | null;
+  defending: number | null;
+  ratings_count: number;
+}
+
+export interface ProfileGroupStat {
+  organization_id: string;
+  organization_name: string;
+  peladas_played: number;
+  goals: number;
+  assists: number;
+  titles: number;
+}
+
+export interface ProfilePresenceWeek {
+  week_start: string;
+  status: "present" | "absent" | "no_game";
+}
+
+export type ProfileRecentPelada = PeladaHistoryEntry & {
+  organization_id: string;
+  organization_name: string;
+};
+
+export interface UserProfileDashboard {
+  year: number;
+  summary: ProfileSummary;
+  skills: ProfileSkills;
+  groups: ProfileGroupStat[];
+  presence: ProfilePresenceWeek[];
+  recent_peladas: ProfileRecentPelada[];
 }
 
 export interface Team {
@@ -207,6 +287,13 @@ export interface OrganizationPlayerStats {
   assist: number;
   own_goal: number;
   avg_rating: number;
+  titles?: number;
+  total_peladas?: number;
+}
+
+export interface WeeklyPresence {
+  week_start: string;
+  confirmed: number;
 }
 export interface MatchLineupEntry {
   team_id: string;
@@ -600,6 +687,14 @@ export function createApi(client: ApiClient) {
         `/api/organizations/${id}/statistics`,
         { year },
       ),
+    getOrganizationHistory: (id: string, year?: number) =>
+      client.get<PeladaHistoryEntry[]>(`/api/organizations/${id}/history`, {
+        year: year ?? 0,
+      }),
+    getWeeklyPresence: (id: string, weeks = 12) =>
+      client.get<WeeklyPresence[]>(`/api/organizations/${id}/weekly-presence`, {
+        weeks,
+      }),
 
     // Monthly Player Substitutions
     listSubstitutions: (id: string) =>
@@ -939,6 +1034,11 @@ export function createApi(client: ApiClient) {
 
     // Users
     listUsers: () => client.get<User[]>("/api/users"),
+    getProfileDashboard: (userId: string, year?: number) =>
+      client.get<UserProfileDashboard>(
+        `/api/user/${userId}/profile-dashboard`,
+        { year: year ?? 0 },
+      ),
     searchUsers: (query: string, page: number = 1, perPage: number = 20) =>
       client.getPaginated<User[]>("/api/users/search", {
         q: query,

@@ -1,19 +1,12 @@
 import {
-  Paper,
   Box,
   Typography,
   Avatar,
-  List,
-  ListItem,
-  ListItemButton,
   Chip,
   IconButton,
   Tooltip,
-  Divider,
 } from "@mui/material";
-import GroupsIcon from "@mui/icons-material/Groups";
 import SettingsIcon from "@mui/icons-material/Settings";
-import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
 import InfoIcon from "@mui/icons-material/Info";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -37,37 +30,51 @@ export default function ConsolidatedOrganizationsList({
   ];
 
   return (
-    <Paper
-      elevation={0}
+    <Box
       data-testid="admin-orgs-list"
       sx={{
-        border: 1,
-        borderColor: "divider",
-        borderRadius: 3,
-        overflow: "hidden",
-        bgcolor: "background.paper",
+        bgcolor: "#ffffff",
+        border: "1.5px solid #eae6db",
+        borderRadius: "16px",
+        p: { xs: 2, sm: 2.5 },
       }}
     >
       <Box
         sx={{
-          p: 2,
-          bgcolor: "background.default",
-          borderBottom: 1,
-          borderColor: "divider",
           display: "flex",
+          justifyContent: "space-between",
           alignItems: "center",
+          mb: 1.5,
         }}
       >
-        <GroupsIcon sx={{ mr: 1, color: "primary.main" }} />
-        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-          {t("home.sections.my_organizations", "Meus Grupos")}
+        <Typography
+          sx={{
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 700,
+            fontSize: "9.5px",
+            letterSpacing: "0.18em",
+            color: "#6b675c",
+            textTransform: "uppercase",
+          }}
+        >
+          {t("home.sections.my_organizations", "MEUS GRUPOS")}
+        </Typography>
+        <Typography
+          sx={{
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 700,
+            fontSize: "11px",
+            color: "#6b675c",
+          }}
+        >
+          {allOrgs.length}
         </Typography>
       </Box>
 
       {allOrgs.length === 0 ? (
         <Box
           sx={{
-            py: 6,
+            py: 4,
             px: 2,
             display: "flex",
             flexDirection: "column",
@@ -77,24 +84,35 @@ export default function ConsolidatedOrganizationsList({
         >
           <Avatar
             sx={{
-              bgcolor: "grey.100",
-              color: "grey.400",
-              width: 48,
-              height: 48,
-              mb: 2,
+              bgcolor: "#f6f4ee",
+              color: "#6b675c",
+              border: "1.5px solid #ddd8cc",
+              width: 44,
+              height: 44,
+              mb: 1.5,
             }}
           >
             <InfoIcon />
           </Avatar>
 
           {/* Keep test-expected keys rendered */}
-          <Typography variant="body2" sx={{ color: "text.secondary" }}>
+          <Typography
+            variant="body2"
+            sx={{ fontFamily: "Archivo, sans-serif", color: "#6b675c" }}
+          >
             {t(
               "home.sections.admin_orgs.empty",
               "Você não é administrador de nenhuma organização.",
             )}
           </Typography>
-          <Typography variant="body2" sx={{ color: "text.secondary", mt: 1 }}>
+          <Typography
+            variant="body2"
+            sx={{
+              fontFamily: "Archivo, sans-serif",
+              color: "#6b675c",
+              mt: 0.5,
+            }}
+          >
             {t(
               "home.sections.member_orgs.empty_desc",
               "No momento, você não faz parte de nenhuma organização como jogador.",
@@ -102,102 +120,155 @@ export default function ConsolidatedOrganizationsList({
           </Typography>
         </Box>
       ) : (
-        <List disablePadding>
-          {allOrgs.map((org, index) => {
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1.2 }}>
+          {allOrgs.map((org) => {
             const isAdmin = org.role === "admin";
+            const initials = org.name
+              .split(" ")
+              .map((w) => w[0])
+              .filter(Boolean)
+              .slice(0, 2)
+              .join("")
+              .toUpperCase();
+
             return (
-              <Box key={org.id}>
-                <ListItem
-                  disablePadding
-                  secondaryAction={
-                    isAdmin ? (
-                      <Tooltip title={t("common.actions.manage", "Gerenciar")}>
-                        <IconButton
-                          edge="end"
-                          aria-label="manage"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/organizations/${org.id}/management`);
-                          }}
-                          data-testid={`manage-org-${org.id}`}
-                          sx={{
-                            color: "text.secondary",
-                            "&:hover": {
-                              color: "primary.main",
-                              bgcolor: "action.hover",
-                            },
-                          }}
-                        >
-                          <SettingsIcon sx={{ fontSize: 20 }} />
-                        </IconButton>
-                      </Tooltip>
-                    ) : null
-                  }
+              <Box
+                key={org.id}
+                onClick={() => navigate(`/organizations/${org.id}`)}
+                data-testid={`org-link-${org.name}`}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1.5,
+                  border: "1.5px solid #eae6db",
+                  borderRadius: "14px",
+                  p: "11px 13px",
+                  bgcolor: "#ffffff",
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                  "&:hover": {
+                    borderColor: "#17181a",
+                    bgcolor: "#fbfaf7",
+                  },
+                }}
+              >
+                {/* Initials circle avatar */}
+                <Box
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: "50%",
+                    bgcolor: isAdmin ? "#146b3a" : "#a8452a",
+                    border: "2px solid #17181a",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontFamily: "Archivo, sans-serif",
+                    fontWeight: 800,
+                    fontSize: "10px",
+                    color: "#ffffff",
+                    flexShrink: 0,
+                  }}
                 >
-                  <ListItemButton
-                    onClick={() => navigate(`/organizations/${org.id}`)}
-                    data-testid={`org-link-${org.name}`}
+                  {initials || "MP"}
+                </Box>
+
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Typography
+                    noWrap
                     sx={{
-                      py: 1.5,
-                      px: 2,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 2,
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 800,
+                      fontSize: "12.5px",
+                      lineHeight: 1.2,
+                      color: "#17181a",
                     }}
                   >
-                    <Avatar
-                      variant="rounded"
-                      sx={{
-                        bgcolor: isAdmin ? "success.light" : "primary.light",
-                        color: isAdmin ? "success.main" : "primary.main",
-                        borderRadius: 2,
-                        width: 40,
-                        height: 40,
-                      }}
-                    >
-                      <SportsSoccerIcon />
-                    </Avatar>
+                    {org.name}
+                  </Typography>
 
-                    <Box
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 0.8,
+                      mt: 0.4,
+                    }}
+                  >
+                    <Typography
                       sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        flexGrow: 1,
+                        fontFamily: "Archivo, sans-serif",
+                        fontWeight: 600,
+                        fontSize: "10.5px",
+                        color: "#6b675c",
                       }}
                     >
-                      <Typography
-                        variant="body2"
-                        sx={{ fontWeight: 600, color: "text.primary" }}
-                      >
-                        {org.name}
-                      </Typography>
-                      <Box sx={{ mt: 0.5, display: "flex", gap: 0.5 }}>
-                        <Chip
-                          label={
-                            isAdmin
-                              ? t("common.roles.admin", "Administrador")
-                              : t("common.roles.player", "Jogador")
-                          }
-                          size="small"
-                          variant="outlined"
-                          color={isAdmin ? "success" : "default"}
-                          sx={{
-                            height: 18,
-                            fontSize: "0.68rem",
-                            fontWeight: 500,
-                            width: "fit-content",
-                            "& .MuiChip-label": { px: 0.75 },
-                          }}
-                        />
-                      </Box>
-                    </Box>
-                  </ListItemButton>
-                </ListItem>
-                {index < allOrgs.length - 1 && <Divider component="li" />}
+                      Futebol ·
+                    </Typography>
+                    <Chip
+                      label={
+                        isAdmin
+                          ? t("common.roles.admin", "Administrador")
+                          : t("common.roles.player", "Jogador")
+                      }
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        height: 18,
+                        fontSize: "0.65rem",
+                        fontFamily: "Archivo, sans-serif",
+                        fontWeight: 700,
+                        letterSpacing: "0.04em",
+                        borderRadius: "5px",
+                        borderColor: isAdmin ? "#146b3a" : "#ddd8cc",
+                        color: isAdmin ? "#146b3a" : "#6b675c",
+                        bgcolor: isAdmin ? "#f4f8f5" : "transparent",
+                        "& .MuiChip-label": { px: 0.6 },
+                      }}
+                    />
+                  </Box>
+                </Box>
+
+                {isAdmin && (
+                  <Tooltip title={t("common.actions.manage", "Gerenciar")}>
+                    <IconButton
+                      size="small"
+                      aria-label="manage"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(`/organizations/${org.id}/management`);
+                      }}
+                      data-testid={`manage-org-${org.id}`}
+                      sx={{
+                        color: "#6b675c",
+                        p: 0.5,
+                        "&:hover": {
+                          color: "#146b3a",
+                          bgcolor: "transparent",
+                        },
+                      }}
+                    >
+                      <SettingsIcon sx={{ fontSize: 18 }} />
+                    </IconButton>
+                  </Tooltip>
+                )}
+
+                <Typography
+                  sx={{
+                    fontFamily: "Archivo, sans-serif",
+                    fontWeight: 700,
+                    fontSize: "16px",
+                    lineHeight: 1,
+                    color: "#6b675c",
+                    flexShrink: 0,
+                  }}
+                >
+                  ›
+                </Typography>
               </Box>
             );
           })}
-        </List>
+        </Box>
       )}
 
       {/* Hidden placeholders to satisfy empty state checks in unit tests if only one list is empty */}
@@ -211,6 +282,6 @@ export default function ConsolidatedOrganizationsList({
           <Typography>{t("home.sections.member_orgs.empty_desc")}</Typography>
         </div>
       )}
-    </Paper>
+    </Box>
   );
 }

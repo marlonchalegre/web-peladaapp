@@ -44,8 +44,29 @@ export function usePeladaDetail(peladaId: string) {
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [drawJustification, setDrawJustification] =
-    useState<DrawJustification | null>(null);
-  const dismissDrawJustification = () => setDrawJustification(null);
+    useState<DrawJustification | null>(() => {
+      if (typeof window !== "undefined" && peladaId) {
+        try {
+          const saved = sessionStorage.getItem(
+            `pelada_draw_justification_${peladaId}`,
+          );
+          return saved ? JSON.parse(saved) : null;
+        } catch {
+          return null;
+        }
+      }
+      return null;
+    });
+  const dismissDrawJustification = () => {
+    setDrawJustification(null);
+    if (typeof window !== "undefined" && peladaId) {
+      try {
+        sessionStorage.removeItem(`pelada_draw_justification_${peladaId}`);
+      } catch {
+        // ignore
+      }
+    }
+  };
   const [changingStatus, setChangingStatus] = useState(false);
   const [live, setLive] = useState("");
   const [votingInfo, setVotingInfo] = useState<VotingInfo | null>(null);
@@ -407,7 +428,22 @@ export function usePeladaDetail(peladaId: string) {
           use_history: options.useHistory,
         },
       );
-      setDrawJustification(response?.justification ?? null);
+      const newJustification = response?.justification ?? null;
+      setDrawJustification(newJustification);
+      if (typeof window !== "undefined" && peladaId) {
+        try {
+          if (newJustification) {
+            sessionStorage.setItem(
+              `pelada_draw_justification_${peladaId}`,
+              JSON.stringify(newJustification),
+            );
+          } else {
+            sessionStorage.removeItem(`pelada_draw_justification_${peladaId}`);
+          }
+        } catch {
+          // ignore
+        }
+      }
       await fetchPeladaData();
     } catch (error: unknown) {
       const message =
@@ -416,6 +452,13 @@ export function usePeladaDetail(peladaId: string) {
           : t("peladas.detail.error.randomize_failed");
       setError(message);
       setDrawJustification(null);
+      if (typeof window !== "undefined" && peladaId) {
+        try {
+          sessionStorage.removeItem(`pelada_draw_justification_${peladaId}`);
+        } catch {
+          // ignore
+        }
+      }
     } finally {
       setProcessing(false);
     }

@@ -12,6 +12,7 @@
     "organizations": "Organizações",
     "users": "Usuários",
     "profile": "Perfil",
+    "myCard": "Minha ficha",
     "adminPanel": "Painel de Admin"
   },
   "auth": {
@@ -356,6 +357,9 @@
         "priority_limit_hours_help": "Horas antes da partida. Deixe em branco ou 0 para prioridade sem limite.",
         "default_max_players": "Máximo de Jogadores Padrão",
         "default_max_players_help": "Valor padrão preenchido automaticamente ao criar novas peladas.",
+        "default_location": "Local Padrão",
+        "default_location_placeholder": "Ex: Arena Vila Nova · Q2",
+        "default_location_help": "Endereço ou arena padrão preenchido automaticamente ao criar novas peladas. Suporta busca via OpenStreetMap.",
         "save_success": "Configurações salvas com sucesso!",
         "save_error": "Erro ao salvar configurações"
       },
@@ -532,6 +536,7 @@
     },
     "stats": {
       "title": "{{name}} - Estatísticas",
+      "season_title": "Estatísticas da temporada",
       "cards": {
         "top_scorer": "Artilheiro",
         "top_assister": "Garçom",
@@ -595,6 +600,8 @@
         "notify_casual_players": "Avisar convidados e diaristas que a lista está aberta?",
         "max_players": "Máximo de Jogadores",
         "max_players_help": "Limite de jogadores para essa pelada (opcional)",
+        "location": "Local",
+        "location_placeholder": "Ex: Arena Vila Nova · Q2",
         "submit": "Criar pelada"
       }
     },
@@ -889,12 +896,12 @@
           "gemini": {
             "name": "Gemini",
             "tag": "Química",
-            "description": "Equilibra força geral, defesa e ataque com nota, votos e estatísticas. Com química ligada, separa panelas campeãs, distribui títulos e jejum e estimula duplas inéditas."
+            "description": "Equilibra os times usando nota, votos e estatísticas, separando panelas e estimulando duplas inéditas."
           },
           "gpt": {
-            "name": "GPT",
+            "name": "ChatGPT",
             "tag": "Equilíbrio Tático",
-            "description": "Aplica regras em ordem: uma referência por time, diferença de média dentro da tolerância, distribui quem tem poucas noites e nivela o meio-campo."
+            "description": "Aplica regras em ordem: uma referência por time, média equilibrada, distribui quem tem poucas noites e nivela o meio-campo."
           }
         }
       }
@@ -996,8 +1003,21 @@
         "confirm_notify_desc": "Deseja enviar a escala completa de apoio para o grupo do WhatsApp mencionando os jogadores escalados para cada partida?",
         "confirm_notify_action": "Enviar Notificação",
         "notify_success": "Notificação enviada com sucesso para o grupo do WhatsApp!",
-        "notify_error": "Erro ao enviar notificação da escalação de suporte"
-      }
+        "notify_error": "Erro ao enviar notificação da escalação de suporte",
+        "view_escalation": "Escala"
+      },
+      "match_x_of_y": "PARTIDA {{n}} DE {{m}}",
+      "who_scored": "Quem marcou?",
+      "who_scored_own_goal": "Quem fez o gol contra?",
+      "own_goal_btn": "GOL CONTRA",
+      "own_goal_unidentified": "GOL CONTRA NÃO IDENTIFICADO",
+      "goal_unidentified": "GOL NÃO IDENTIFICADO",
+      "defending_team_players": "Jogador do {{team}}",
+      "goal_sheet_title": "GOL DO {{team}} · {{time}}",
+      "event_sheet_title": "REGISTRAR LANCE · {{time}}",
+      "event_what": "Que lance foi?",
+      "event_who": "Quem fez o lance?",
+      "own_goal_skip": "GOL CONTRA / NÃO IDENTIFICADO"
     },
     "voting": {
       "title": "Votação da Pelada",
@@ -1084,6 +1104,33 @@
         "go_to_next": "Próxima Partida",
         "all_matches_finished": "Fim das Partidas",
         "last_match_desc": "Todas as partidas foram realizadas. Deseja encerrar a pelada?"
+      },
+      "live_state": {
+        "session": "SESSÃO",
+        "running": "EM ANDAMENTO",
+        "paused": "PAUSADO",
+        "pause": "PAUSAR",
+        "resume": "RETOMAR",
+        "reset": "ZERAR",
+        "reset_match_timer": "Zerar cronômetro da partida",
+        "options": "Opções",
+        "players_on_field": "EM CAMPO",
+        "other_event": "OUTRO LANCE",
+        "other_event_hint": "DRIBLE · CHUTE · FALTA · DEFESAÇA",
+        "live_standings": "CLASSIFICAÇÃO AO VIVO",
+        "table_button": "TABELA",
+        "sumula_button": "SÚMULA",
+        "end_match": "ENCERRAR",
+        "swap_button": "TROCAR",
+        "swap_hint": "toque em ⇄ para substituir",
+        "on_field": "EM CAMPO",
+        "view_timeline": "VER LINHA DO TEMPO COMPLETA",
+        "records_count": "{{count}} registros",
+        "no_events": "Nenhum lance registrado ainda",
+        "support_label": "SUPORTE",
+        "end_match_full": "ENCERRAR PARTIDA",
+        "reset_session_timer": "Zerar cronômetro da sessão",
+        "other_event_short": "DRIBLE, CHUTE, FALTA…"
       }
     },
     "panel": {

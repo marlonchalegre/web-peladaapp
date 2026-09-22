@@ -65,6 +65,7 @@ describe("GeneralSettingsSection", () => {
         name: "Test Org",
         priority_confirmation_limit_hours: 48,
         default_max_players: null,
+        default_location: null,
       });
       expect(onUpdateSuccess).toHaveBeenCalled();
     });
@@ -92,6 +93,39 @@ describe("GeneralSettingsSection", () => {
         name: "Test Org",
         priority_confirmation_limit_hours: 24,
         default_max_players: 14,
+        default_location: null,
+      });
+      expect(onUpdateSuccess).toHaveBeenCalled();
+    });
+  });
+
+  it("submits updated default_location", async () => {
+    mockUpdateOrganization.mockResolvedValue({});
+    const onUpdateSuccess = vi.fn();
+
+    render(
+      <GeneralSettingsSection
+        organization={mockOrganization}
+        onUpdateSuccess={onUpdateSuccess}
+      />,
+    );
+
+    const locationInput = screen.getByTestId(
+      "default-location-autocomplete-input",
+    );
+    fireEvent.change(locationInput, {
+      target: { value: "Arena Central · Quadra 1" },
+    });
+
+    const saveBtn = screen.getByTestId("save-general-settings-btn");
+    fireEvent.click(saveBtn);
+
+    await waitFor(() => {
+      expect(mockUpdateOrganization).toHaveBeenCalledWith("org-123", {
+        name: "Test Org",
+        priority_confirmation_limit_hours: 24,
+        default_max_players: null,
+        default_location: "Arena Central · Quadra 1",
       });
       expect(onUpdateSuccess).toHaveBeenCalled();
     });

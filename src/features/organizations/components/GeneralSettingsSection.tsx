@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import type { Organization } from "../../../shared/api/endpoints";
 import { createApi } from "../../../shared/api/endpoints";
 import { api } from "../../../shared/api/client";
+import LocationAutocomplete from "../../../shared/components/LocationAutocomplete";
 
 interface GeneralSettingsSectionProps {
   organization: Organization;
@@ -43,6 +44,10 @@ export default function GeneralSettingsSection({
       : "",
   );
 
+  const [defaultLocation, setDefaultLocation] = useState<string>(
+    organization.default_location != null ? organization.default_location : "",
+  );
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSuccess(false);
@@ -58,10 +63,18 @@ export default function GeneralSettingsSection({
         ? null
         : Math.max(1, parseInt(defaultMaxPlayers, 10));
 
+    const parsedLocation =
+      defaultLocation.trim() === "" ? null : defaultLocation.trim();
+
     const currentValue = organization.priority_confirmation_limit_hours ?? null;
     const currentMax = organization.default_max_players ?? null;
+    const currentLocation = organization.default_location ?? null;
 
-    if (parsedValue === currentValue && parsedMaxPlayers === currentMax) {
+    if (
+      parsedValue === currentValue &&
+      parsedMaxPlayers === currentMax &&
+      parsedLocation === currentLocation
+    ) {
       setSuccess(true);
       return;
     }
@@ -72,6 +85,7 @@ export default function GeneralSettingsSection({
         name: organization.name,
         priority_confirmation_limit_hours: parsedValue,
         default_max_players: parsedMaxPlayers,
+        default_location: parsedLocation,
       });
 
       setSuccess(true);
@@ -197,6 +211,25 @@ export default function GeneralSettingsSection({
               "organizations.management.settings.default_max_players_help",
               "Valor padrão preenchido automaticamente ao criar novas peladas.",
             )}
+          />
+        </Grid>
+        <Grid size={{ xs: 12 }}>
+          <LocationAutocomplete
+            value={defaultLocation}
+            onChange={(val) => setDefaultLocation(val)}
+            label={t(
+              "organizations.management.settings.default_location",
+              "Local Padrão",
+            )}
+            placeholder={t(
+              "organizations.management.settings.default_location_placeholder",
+              "Ex: Arena Vila Nova · Q2",
+            )}
+            helperText={t(
+              "organizations.management.settings.default_location_help",
+              "Endereço ou arena padrão preenchido automaticamente ao criar novas peladas. Suporta busca via OpenStreetMap.",
+            )}
+            dataTestId="default-location-autocomplete"
           />
         </Grid>
       </Grid>

@@ -38,6 +38,7 @@ import WahaConfigSection from "../components/WahaConfigSection";
 import DeleteOrganizationDialog from "../components/DeleteOrganizationDialog";
 import PlayerRatingsContent from "../components/PlayerRatingsContent";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
+import GroupTabsBar, { type GroupTabKey } from "../components/GroupTabsBar";
 import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
 import { PremiumFeatureLock } from "../../../shared/components/PremiumFeatureLock";
 import GeneralSettingsSection from "../components/GeneralSettingsSection";
@@ -170,9 +171,20 @@ export default function OrganizationManagementPage() {
 
   const { user } = useAuth();
   const isAdmin = useMemo(() => {
-    if (!user || !admins) return false;
+    if (!user) return false;
+    if (user.is_super_admin) return true;
+    if (org?.owner_id === user.id) return true;
+    if (!admins) return false;
     return admins.some((a) => a.user_id === user.id);
-  }, [user, admins]);
+  }, [user, admins, org]);
+
+  const groupTab: GroupTabKey =
+    activeTab === "finance"
+      ? "finance"
+      : activeTab === "settings"
+        ? "settings"
+        : "roster";
+
   if (loading && !org)
     return (
       <Loading message={t("common.loading")} data-testid="org-mgmt-loading" />
@@ -187,538 +199,569 @@ export default function OrganizationManagementPage() {
     );
 
   return (
-    <Container
-      maxWidth="lg"
-      sx={{ py: { xs: 2, sm: 4 }, px: { xs: 0, sm: 2 } }}
-      disableGutters
+    <Box
+      sx={{
+        width: "100%",
+        bgcolor: "#f6f4ee",
+        minHeight: "100vh",
+        pb: { xs: 2, sm: 4 },
+      }}
       data-testid="org-mgmt-container"
     >
-      <Box sx={{ px: { xs: 1.5, sm: 0 } }}>
-        <BreadcrumbNav
-          items={[
-            { label: org.name, path: `/organizations/${orgId}` },
-            { label: t("organizations.detail.button.management") },
-          ]}
-        />
+      <GroupTabsBar
+        orgId={orgId}
+        orgName={org.name}
+        active={groupTab}
+        playersCount={players.length}
+      />
+      <Box sx={{ maxWidth: 1124, mx: "auto", px: { xs: 2, md: 4, lg: 5 } }}>
+        <Box sx={{ px: { xs: 1.5, sm: 0 } }}>
+          <BreadcrumbNav
+            items={[
+              { label: org.name, path: `/organizations/${orgId}` },
+              { label: t("organizations.detail.button.management") },
+            ]}
+          />
 
-        <Typography
-          variant="h4"
-          gutterBottom
-          color="primary"
+          <Typography
+            variant="h4"
+            gutterBottom
+            sx={{
+              fontFamily: "Archivo, sans-serif",
+              fontWeight: 800,
+              fontSize: "24px",
+              color: "#17181a",
+            }}
+          >
+            {t("organizations.management.title", { name: org.name })}
+          </Typography>
+
+          {error && (
+            <Alert
+              severity="error"
+              sx={{ mb: 3 }}
+              onClose={() => setError(null)}
+              data-testid="org-mgmt-error"
+            >
+              {error}
+            </Alert>
+          )}
+        </Box>
+        <Paper
+          elevation={0}
           sx={{
-            fontWeight: "bold",
+            borderBottom: "1.5px solid #eae6db",
+            bgcolor: "background.paper",
           }}
         >
-          {t("organizations.management.title", { name: org.name })}
-        </Typography>
-
-        {error && (
-          <Alert
-            severity="error"
-            sx={{ mb: 3 }}
-            onClose={() => setError(null)}
-            data-testid="org-mgmt-error"
-          >
-            {error}
-          </Alert>
-        )}
-      </Box>
-      <Paper
-        elevation={0}
-        sx={{
-          borderBottom: 1,
-          borderColor: "divider",
-          bgcolor: "background.paper",
-        }}
-      >
-        <Tabs
-          value={activeTab}
-          onChange={handleTabChange}
-          aria-label="organization management tabs"
-          variant="scrollable"
-          scrollButtons="auto"
-          allowScrollButtonsMobile
-        >
-          <Tab
-            icon={<PeopleIcon />}
-            iconPosition="start"
-            label={
-              <Box
-                component="span"
-                sx={{ display: { xs: "none", sm: "inline" } }}
-              >
-                {t("organizations.management.sections.members")}
-              </Box>
-            }
-            value="members"
-            data-testid="mgmt-tab-members"
-          />
-          <Tab
-            icon={<AttachMoneyIcon />}
-            iconPosition="start"
-            label={
-              <Box
-                component="span"
-                sx={{ display: { xs: "none", sm: "inline" } }}
-              >
-                {t("organizations.management.sections.finance")}
-              </Box>
-            }
-            value="finance"
-            data-testid="mgmt-tab-finance"
-          />
-          <Tab
-            icon={<SwapHorizIcon />}
-            iconPosition="start"
-            label={
-              <Box
-                component="span"
-                sx={{ display: { xs: "none", sm: "inline" } }}
-              >
-                {t(
-                  "organizations.management.sections.substitutions",
-                  "Substitutions",
-                )}
-              </Box>
-            }
-            value="substitutions"
-            data-testid="mgmt-tab-substitutions"
-          />
-          <Tab
-            icon={<FormatListNumberedIcon />}
-            iconPosition="start"
-            label={
-              <Box
-                component="span"
-                sx={{ display: { xs: "none", sm: "inline" } }}
-              >
-                {t("organizations.management.sections.waitlist", "Waitlist")}
-              </Box>
-            }
-            value="waitlist"
-            data-testid="mgmt-tab-waitlist"
-          />
-          <Tab
-            icon={<StarIcon />}
-            iconPosition="start"
-            label={
-              <Box
-                component="span"
-                sx={{ display: { xs: "none", sm: "inline" } }}
-              >
-                {t("organizations.detail.button.ratings")}
-              </Box>
-            }
-            value="ratings"
-            data-testid="mgmt-tab-ratings"
-          />
-          <Tab
-            icon={<AdminPanelSettingsIcon />}
-            iconPosition="start"
-            label={
-              <Box
-                component="span"
-                sx={{ display: { xs: "none", sm: "inline" } }}
-              >
-                {t("organizations.management.sections.admins")}
-              </Box>
-            }
-            value="admins"
-            data-testid="mgmt-tab-admins"
-          />
-          <Tab
-            icon={<MailIcon />}
-            iconPosition="start"
-            label={
-              <Box
-                component="span"
-                sx={{ display: { xs: "none", sm: "inline" } }}
-              >
-                {t("organizations.management.sections.invitations")}
-              </Box>
-            }
-            value="invitations"
-            data-testid="mgmt-tab-invitations"
-          />
-          <Tab
-            icon={<WhatsAppIcon />}
-            iconPosition="start"
-            label={
-              <Box
-                component="span"
-                sx={{ display: { xs: "none", sm: "inline" } }}
-              >
-                {t("organizations.management.sections.waha")}
-              </Box>
-            }
-            value="waha"
-            data-testid="mgmt-tab-waha"
-          />
-          <Tab
-            icon={<SettingsIcon />}
-            iconPosition="start"
-            label={
-              <Box
-                component="span"
-                sx={{ display: { xs: "none", sm: "inline" } }}
-              >
-                {t("common.actions.manage")}
-              </Box>
-            }
-            value="settings"
-            data-testid="mgmt-tab-settings"
-          />
-        </Tabs>
-      </Paper>
-      <Box sx={{ mt: 2 }}>
-        <TabPanel value={activeTab} index="members">
-          <MembersSection
-            players={players}
-            usersMap={usersMap}
-            onAddClick={() => {
-              setSelectedUserIds(new Set());
-              setIsAddPlayersOpen(true);
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            aria-label="organization management tabs"
+            variant="scrollable"
+            scrollButtons="auto"
+            allowScrollButtonsMobile
+            sx={{
+              minHeight: 46,
+              "& .MuiTab-root": {
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 700,
+                fontSize: "11.5px",
+                letterSpacing: ".04em",
+                textTransform: "uppercase",
+                color: "#6b675c",
+                minHeight: 46,
+              },
+              "& .MuiTab-root.Mui-selected": { color: "#17181a" },
+              "& .MuiTabs-indicator": {
+                backgroundColor: "#17181a",
+                height: 3,
+              },
             }}
-            onInviteClick={() => setIsInviteOpen(true)}
-            onRemovePlayer={handleRemovePlayer}
-            onUpdatePlayer={handleUpdatePlayer}
-            actionLoading={actionLoading}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            onPageChange={handlePageChange}
-            onRowsPerPageChange={handleRowsPerPageChange}
-          />
-        </TabPanel>
-
-        <TabPanel value={activeTab} index="finance">
-          {featureFlags?.finance_control !== false ? (
-            <FinanceSection orgId={orgId} isAdmin={isAdmin} />
-          ) : (
-            <PremiumFeatureLock
-              title={t(
-                "common.premium.finance_title",
-                "Controle Financeiro Premium",
-              )}
-              description={t(
-                "common.premium.finance_description",
-                "Monitore o fluxo de caixa, pagamentos de mensalistas e diaristas, e controle a saúde financeira do seu grupo.",
-              )}
-              benefits={[
-                t(
-                  "common.premium.finance_benefit1",
-                  "Fluxo de caixa completo de receitas e despesas",
-                ),
-                t(
-                  "common.premium.finance_benefit2",
-                  "Acompanhamento detalhado de pagamentos por jogador",
-                ),
-                t(
-                  "common.premium.finance_benefit3",
-                  "Histórico completo de transações da organização",
-                ),
-              ]}
+          >
+            <Tab
+              icon={<PeopleIcon />}
+              iconPosition="start"
+              label={
+                <Box
+                  component="span"
+                  sx={{ display: { xs: "none", sm: "inline" } }}
+                >
+                  {t("organizations.management.sections.members")}
+                </Box>
+              }
+              value="members"
+              data-testid="mgmt-tab-members"
             />
-          )}
-        </TabPanel>
-
-        <TabPanel value={activeTab} index="substitutions">
-          {featureFlags?.monthly_substitutions !== false ? (
-            <SubstitutionsSection
+            <Tab
+              icon={<AttachMoneyIcon />}
+              iconPosition="start"
+              label={
+                <Box
+                  component="span"
+                  sx={{ display: { xs: "none", sm: "inline" } }}
+                >
+                  {t("organizations.management.sections.finance")}
+                </Box>
+              }
+              value="finance"
+              data-testid="mgmt-tab-finance"
+            />
+            <Tab
+              icon={<SwapHorizIcon />}
+              iconPosition="start"
+              label={
+                <Box
+                  component="span"
+                  sx={{ display: { xs: "none", sm: "inline" } }}
+                >
+                  {t(
+                    "organizations.management.sections.substitutions",
+                    "Substitutions",
+                  )}
+                </Box>
+              }
+              value="substitutions"
+              data-testid="mgmt-tab-substitutions"
+            />
+            <Tab
+              icon={<FormatListNumberedIcon />}
+              iconPosition="start"
+              label={
+                <Box
+                  component="span"
+                  sx={{ display: { xs: "none", sm: "inline" } }}
+                >
+                  {t("organizations.management.sections.waitlist", "Waitlist")}
+                </Box>
+              }
+              value="waitlist"
+              data-testid="mgmt-tab-waitlist"
+            />
+            <Tab
+              icon={<StarIcon />}
+              iconPosition="start"
+              label={
+                <Box
+                  component="span"
+                  sx={{ display: { xs: "none", sm: "inline" } }}
+                >
+                  {t("organizations.detail.button.ratings")}
+                </Box>
+              }
+              value="ratings"
+              data-testid="mgmt-tab-ratings"
+            />
+            <Tab
+              icon={<AdminPanelSettingsIcon />}
+              iconPosition="start"
+              label={
+                <Box
+                  component="span"
+                  sx={{ display: { xs: "none", sm: "inline" } }}
+                >
+                  {t("organizations.management.sections.admins")}
+                </Box>
+              }
+              value="admins"
+              data-testid="mgmt-tab-admins"
+            />
+            <Tab
+              icon={<MailIcon />}
+              iconPosition="start"
+              label={
+                <Box
+                  component="span"
+                  sx={{ display: { xs: "none", sm: "inline" } }}
+                >
+                  {t("organizations.management.sections.invitations")}
+                </Box>
+              }
+              value="invitations"
+              data-testid="mgmt-tab-invitations"
+            />
+            <Tab
+              icon={<WhatsAppIcon />}
+              iconPosition="start"
+              label={
+                <Box
+                  component="span"
+                  sx={{ display: { xs: "none", sm: "inline" } }}
+                >
+                  {t("organizations.management.sections.waha")}
+                </Box>
+              }
+              value="waha"
+              data-testid="mgmt-tab-waha"
+            />
+            <Tab
+              icon={<SettingsIcon />}
+              iconPosition="start"
+              label={
+                <Box
+                  component="span"
+                  sx={{ display: { xs: "none", sm: "inline" } }}
+                >
+                  {t("common.actions.manage")}
+                </Box>
+              }
+              value="settings"
+              data-testid="mgmt-tab-settings"
+            />
+          </Tabs>
+        </Paper>
+        <Box sx={{ mt: 2 }}>
+          <TabPanel value={activeTab} index="members">
+            <MembersSection
               players={players}
-              substitutions={substitutions}
-              onCreateSubstitution={handleCreateSubstitution}
-              onEndSubstitution={handleEndSubstitution}
+              usersMap={usersMap}
+              onAddClick={() => {
+                setSelectedUserIds(new Set());
+                setIsAddPlayersOpen(true);
+              }}
+              onInviteClick={() => setIsInviteOpen(true)}
+              onRemovePlayer={handleRemovePlayer}
+              onUpdatePlayer={handleUpdatePlayer}
+              actionLoading={actionLoading}
+              page={page}
+              rowsPerPage={rowsPerPage}
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
+            />
+          </TabPanel>
+
+          <TabPanel value={activeTab} index="finance">
+            {featureFlags?.finance_control !== false ? (
+              <FinanceSection orgId={orgId} isAdmin={isAdmin} />
+            ) : (
+              <PremiumFeatureLock
+                title={t(
+                  "common.premium.finance_title",
+                  "Controle Financeiro Premium",
+                )}
+                description={t(
+                  "common.premium.finance_description",
+                  "Monitore o fluxo de caixa, pagamentos de mensalistas e diaristas, e controle a saúde financeira do seu grupo.",
+                )}
+                benefits={[
+                  t(
+                    "common.premium.finance_benefit1",
+                    "Fluxo de caixa completo de receitas e despesas",
+                  ),
+                  t(
+                    "common.premium.finance_benefit2",
+                    "Acompanhamento detalhado de pagamentos por jogador",
+                  ),
+                  t(
+                    "common.premium.finance_benefit3",
+                    "Histórico completo de transações da organização",
+                  ),
+                ]}
+              />
+            )}
+          </TabPanel>
+
+          <TabPanel value={activeTab} index="substitutions">
+            {featureFlags?.monthly_substitutions !== false ? (
+              <SubstitutionsSection
+                players={players}
+                substitutions={substitutions}
+                onCreateSubstitution={handleCreateSubstitution}
+                onEndSubstitution={handleEndSubstitution}
+                actionLoading={actionLoading}
+              />
+            ) : (
+              <PremiumFeatureLock
+                title={t(
+                  "common.premium.substitutions_title",
+                  "Substituições de Mensalistas",
+                )}
+                description={t(
+                  "common.premium.substitutions_description",
+                  "Gerencie o afastamento temporário ou definitivo de mensalistas e a substituição por diaristas de forma automática.",
+                )}
+                benefits={[
+                  t(
+                    "common.premium.substitutions_benefit1",
+                    "Substituições temporárias com data de término",
+                  ),
+                  t(
+                    "common.premium.substitutions_benefit2",
+                    "Substituições permanentes de membros",
+                  ),
+                  t(
+                    "common.premium.substitutions_benefit3",
+                    "Histórico de substituições realizadas",
+                  ),
+                ]}
+              />
+            )}
+          </TabPanel>
+
+          <TabPanel value={activeTab} index="waitlist">
+            <MonthlyWaitlistSection
+              waitlist={waitlist}
+              players={players}
+              onAddCandidate={async (playerId) => {
+                await handleAddWaitlistCandidate(playerId);
+                showToast(t("organizations.management.waitlist.success.added"));
+              }}
+              onRemoveCandidate={async (playerId) => {
+                await handleRemoveWaitlistCandidate(playerId);
+                showToast(
+                  t("organizations.management.waitlist.success.removed"),
+                );
+              }}
+              onPromoteCandidate={async (playerId) => {
+                await handlePromoteWaitlistCandidate(playerId);
+                showToast(
+                  t("organizations.management.waitlist.success.promoted"),
+                );
+              }}
               actionLoading={actionLoading}
             />
-          ) : (
-            <PremiumFeatureLock
-              title={t(
-                "common.premium.substitutions_title",
-                "Substituições de Mensalistas",
-              )}
-              description={t(
-                "common.premium.substitutions_description",
-                "Gerencie o afastamento temporário ou definitivo de mensalistas e a substituição por diaristas de forma automática.",
-              )}
-              benefits={[
-                t(
-                  "common.premium.substitutions_benefit1",
-                  "Substituições temporárias com data de término",
-                ),
-                t(
-                  "common.premium.substitutions_benefit2",
-                  "Substituições permanentes de membros",
-                ),
-                t(
-                  "common.premium.substitutions_benefit3",
-                  "Histórico de substituições realizadas",
-                ),
-              ]}
+          </TabPanel>
+
+          <TabPanel value={activeTab} index="ratings">
+            {featureFlags?.player_characteristics !== false ? (
+              <PlayerRatingsContent
+                orgId={orgId}
+                initialPlayers={players}
+                orgName={org.name}
+                onUpdateSuccess={refreshPlayers}
+              />
+            ) : (
+              <PremiumFeatureLock
+                title={t(
+                  "common.premium.characteristics_title",
+                  "Avaliações e Características de Jogadores",
+                )}
+                description={t(
+                  "common.premium.characteristics_description",
+                  "Defina os atributos técnicos e físicos de seus atletas para gerar gráficos de radar personalizados.",
+                )}
+                benefits={[
+                  t(
+                    "common.premium.characteristics_benefit1",
+                    "Gráficos de radar de habilidades de 6 eixos",
+                  ),
+                  t(
+                    "common.premium.characteristics_benefit2",
+                    "Atributos personalizados (Chute, Velocidade, Passe, etc.)",
+                  ),
+                  t(
+                    "common.premium.characteristics_benefit3",
+                    "Melhor balanceamento de times baseado em dados reais",
+                  ),
+                ]}
+              />
+            )}
+          </TabPanel>
+
+          <TabPanel value={activeTab} index="admins">
+            <AdminsSection
+              admins={admins}
+              playersNotAdmins={playersNotAdmins}
+              selectedAdminUserId={selectedAdminUserId}
+              onAdminUserChange={setSelectedAdminUserId}
+              onAddAdmin={handleAddAdmin}
+              onRemoveAdmin={handleRemoveAdmin}
+              actionLoading={actionLoading}
             />
-          )}
-        </TabPanel>
+          </TabPanel>
 
-        <TabPanel value={activeTab} index="waitlist">
-          <MonthlyWaitlistSection
-            waitlist={waitlist}
-            players={players}
-            onAddCandidate={async (playerId) => {
-              await handleAddWaitlistCandidate(playerId);
-              showToast(t("organizations.management.waitlist.success.added"));
-            }}
-            onRemoveCandidate={async (playerId) => {
-              await handleRemoveWaitlistCandidate(playerId);
-              showToast(t("organizations.management.waitlist.success.removed"));
-            }}
-            onPromoteCandidate={async (playerId) => {
-              await handlePromoteWaitlistCandidate(playerId);
-              showToast(
-                t("organizations.management.waitlist.success.promoted"),
-              );
-            }}
-            actionLoading={actionLoading}
-          />
-        </TabPanel>
-
-        <TabPanel value={activeTab} index="ratings">
-          {featureFlags?.player_characteristics !== false ? (
-            <PlayerRatingsContent
-              orgId={orgId}
-              initialPlayers={players}
-              orgName={org.name}
-              onUpdateSuccess={refreshPlayers}
+          <TabPanel value={activeTab} index="invitations">
+            <InvitationsList
+              invitations={invitations}
+              publicInviteLink={publicInviteLink}
+              onRevoke={handleRevokeInvitation}
+              onResetLink={() => setIsResetConfirmOpen(true)}
+              onInviteClick={() => setIsInviteOpen(true)}
+              actionLoading={actionLoading}
             />
-          ) : (
-            <PremiumFeatureLock
-              title={t(
-                "common.premium.characteristics_title",
-                "Avaliações e Características de Jogadores",
-              )}
-              description={t(
-                "common.premium.characteristics_description",
-                "Defina os atributos técnicos e físicos de seus atletas para gerar gráficos de radar personalizados.",
-              )}
-              benefits={[
-                t(
-                  "common.premium.characteristics_benefit1",
-                  "Gráficos de radar de habilidades de 6 eixos",
-                ),
-                t(
-                  "common.premium.characteristics_benefit2",
-                  "Atributos personalizados (Chute, Velocidade, Passe, etc.)",
-                ),
-                t(
-                  "common.premium.characteristics_benefit3",
-                  "Melhor balanceamento de times baseado em dados reais",
-                ),
-              ]}
-            />
-          )}
-        </TabPanel>
+          </TabPanel>
 
-        <TabPanel value={activeTab} index="admins">
-          <AdminsSection
-            admins={admins}
-            playersNotAdmins={playersNotAdmins}
-            selectedAdminUserId={selectedAdminUserId}
-            onAdminUserChange={setSelectedAdminUserId}
-            onAddAdmin={handleAddAdmin}
-            onRemoveAdmin={handleRemoveAdmin}
-            actionLoading={actionLoading}
-          />
-        </TabPanel>
-
-        <TabPanel value={activeTab} index="invitations">
-          <InvitationsList
-            invitations={invitations}
-            publicInviteLink={publicInviteLink}
-            onRevoke={handleRevokeInvitation}
-            onResetLink={() => setIsResetConfirmOpen(true)}
-            onInviteClick={() => setIsInviteOpen(true)}
-            actionLoading={actionLoading}
-          />
-        </TabPanel>
-
-        <TabPanel value={activeTab} index="waha">
-          {featureFlags?.waha_communications !== false ? (
-            <WahaConfigSection
-              organization={org}
-              onUpdateSuccess={() => fetchData(true)}
-            />
-          ) : (
-            <PremiumFeatureLock
-              title={t(
-                "common.premium.waha_title",
-                "Comunicações Automatizadas via WhatsApp",
-              )}
-              description={t(
-                "common.premium.waha_description",
-                "Integre sua organização com o WhatsApp para automatizar notificações de peladas, presenças e listas de espera.",
-              )}
-              benefits={[
-                t(
-                  "common.premium.waha_benefit1",
-                  "Notificações automáticas de novos eventos",
-                ),
-                t(
-                  "common.premium.waha_benefit2",
-                  "Alertas de confirmação de presença",
-                ),
-                t(
-                  "common.premium.waha_benefit3",
-                  "Integração direta com o serviço WAHA API",
-                ),
-              ]}
-            />
-          )}
-        </TabPanel>
-
-        <TabPanel value={activeTab} index="settings">
-          {isAdmin && (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              <GeneralSettingsSection
+          <TabPanel value={activeTab} index="waha">
+            {featureFlags?.waha_communications !== false ? (
+              <WahaConfigSection
                 organization={org}
                 onUpdateSuccess={() => fetchData(true)}
               />
+            ) : (
+              <PremiumFeatureLock
+                title={t(
+                  "common.premium.waha_title",
+                  "Comunicações Automatizadas via WhatsApp",
+                )}
+                description={t(
+                  "common.premium.waha_description",
+                  "Integre sua organização com o WhatsApp para automatizar notificações de peladas, presenças e listas de espera.",
+                )}
+                benefits={[
+                  t(
+                    "common.premium.waha_benefit1",
+                    "Notificações automáticas de novos eventos",
+                  ),
+                  t(
+                    "common.premium.waha_benefit2",
+                    "Alertas de confirmação de presença",
+                  ),
+                  t(
+                    "common.premium.waha_benefit3",
+                    "Integração direta com o serviço WAHA API",
+                  ),
+                ]}
+              />
+            )}
+          </TabPanel>
 
-              {/* WhatsApp Communications Card */}
-              <Box
-                sx={{
-                  background: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "rgba(25, 25, 25, 0.45)"
-                      : "rgba(255, 255, 255, 0.45)",
-                  backdropFilter: "blur(20px)",
-                  borderRadius: "16px",
-                  p: 3,
-                  border: (theme) => `1px solid ${theme.palette.divider}`,
-                }}
-              >
-                <Typography
-                  variant="h6"
+          <TabPanel value={activeTab} index="settings">
+            {isAdmin && (
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                <GeneralSettingsSection
+                  organization={org}
+                  onUpdateSuccess={() => fetchData(true)}
+                />
+
+                {/* WhatsApp Communications Card */}
+                <Box
                   sx={{
-                    fontWeight: 700,
-                    mb: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
+                    background: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? "rgba(25, 25, 25, 0.45)"
+                        : "rgba(255, 255, 255, 0.45)",
+                    backdropFilter: "blur(20px)",
+                    borderRadius: "16px",
+                    p: 3,
+                    border: (theme) => `1px solid ${theme.palette.divider}`,
                   }}
                 >
-                  <WhatsAppIcon color="success" />
-                  {t(
-                    "organizations.management.notifications.card_title",
-                    "Comunicações WhatsApp",
-                  )}
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ mb: 3 }}
-                >
-                  {t(
-                    "organizations.management.notifications.card_desc",
-                    "Envie mensagens personalizadas ou reenvie convocações, escalações e resultados diretamente para o grupo de WhatsApp da organização.",
-                  )}
-                </Typography>
-                <Button
-                  variant="contained"
-                  color="success"
-                  onClick={() => setIsSendNotificationOpen(true)}
-                  startIcon={<SendIcon />}
-                  sx={{ borderRadius: "10px", textTransform: "none" }}
-                  data-testid="open-send-notification-btn"
-                >
-                  {t(
-                    "organizations.management.notifications.button_send",
-                    "Enviar Notificação",
-                  )}
-                </Button>
-              </Box>
+                  <Typography
+                    variant="h6"
+                    sx={{
+                      fontWeight: 700,
+                      mb: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <WhatsAppIcon color="success" />
+                    {t(
+                      "organizations.management.notifications.card_title",
+                      "Comunicações WhatsApp",
+                    )}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 3 }}
+                  >
+                    {t(
+                      "organizations.management.notifications.card_desc",
+                      "Envie mensagens personalizadas ou reenvie convocações, escalações e resultados diretamente para o grupo de WhatsApp da organização.",
+                    )}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    onClick={() => setIsSendNotificationOpen(true)}
+                    startIcon={<SendIcon />}
+                    sx={{ borderRadius: "10px", textTransform: "none" }}
+                    data-testid="open-send-notification-btn"
+                  >
+                    {t(
+                      "organizations.management.notifications.button_send",
+                      "Enviar Notificação",
+                    )}
+                  </Button>
+                </Box>
 
-              <DangerZoneSection
-                orgName={org.name}
-                onDeleteClick={() => setIsDeleteDialogOpen(true)}
-                actionLoading={actionLoading}
-              />
-            </Box>
+                <DangerZoneSection
+                  orgName={org.name}
+                  onDeleteClick={() => setIsDeleteDialogOpen(true)}
+                  actionLoading={actionLoading}
+                />
+              </Box>
+            )}
+          </TabPanel>
+        </Box>
+        <DeleteOrganizationDialog
+          open={isDeleteDialogOpen}
+          orgName={org.name}
+          confirmName={confirmOrgName}
+          onConfirmNameChange={setConfirmOrgName}
+          onClose={() => {
+            setIsDeleteDialogOpen(false);
+            setConfirmOrgName("");
+          }}
+          onDelete={handleDeleteOrganization}
+          actionLoading={actionLoading}
+        />
+        <AddPlayersDialog
+          open={isAddPlayersOpen}
+          selectedIds={selectedUserIds}
+          onSelectAll={(ids) => setSelectedUserIds(new Set(ids))}
+          onClear={() => setSelectedUserIds(new Set())}
+          onToggle={(id, checked) =>
+            setSelectedUserIds((prev) => {
+              const next = new Set(prev);
+              if (checked) next.add(id);
+              else next.delete(id);
+              return next;
+            })
+          }
+          onAddSelected={() => handleAddPlayers()}
+          onClose={() => setIsAddPlayersOpen(false)}
+          excludeUserIds={new Set(players.map((p) => p.user_id))}
+        />
+        <InvitePlayerDialog
+          open={isInviteOpen}
+          onClose={() => setIsInviteOpen(false)}
+          onInvite={handleInvitePlayer}
+          invitedUser={invitedUser}
+          onClearInvited={() => setInvitedUser(null)}
+          publicInviteLink={publicInviteLink}
+          onFetchPublicLink={fetchInviteLink}
+          onResetPublicLink={() => setIsResetConfirmOpen(true)}
+          loading={actionLoading}
+        />
+        <PrettyConfirmDialog
+          open={isResetConfirmOpen}
+          onClose={() => setIsResetConfirmOpen(false)}
+          onConfirm={handleResetInviteLink}
+          title={t(
+            "organizations.management.reset_invite_link_title",
+            "Redefinir Link de Convite",
           )}
-        </TabPanel>
-      </Box>
-      <DeleteOrganizationDialog
-        open={isDeleteDialogOpen}
-        orgName={org.name}
-        confirmName={confirmOrgName}
-        onConfirmNameChange={setConfirmOrgName}
-        onClose={() => {
-          setIsDeleteDialogOpen(false);
-          setConfirmOrgName("");
-        }}
-        onDelete={handleDeleteOrganization}
-        actionLoading={actionLoading}
-      />
-      <AddPlayersDialog
-        open={isAddPlayersOpen}
-        selectedIds={selectedUserIds}
-        onSelectAll={(ids) => setSelectedUserIds(new Set(ids))}
-        onClear={() => setSelectedUserIds(new Set())}
-        onToggle={(id, checked) =>
-          setSelectedUserIds((prev) => {
-            const next = new Set(prev);
-            if (checked) next.add(id);
-            else next.delete(id);
-            return next;
-          })
-        }
-        onAddSelected={() => handleAddPlayers()}
-        onClose={() => setIsAddPlayersOpen(false)}
-        excludeUserIds={new Set(players.map((p) => p.user_id))}
-      />
-      <InvitePlayerDialog
-        open={isInviteOpen}
-        onClose={() => setIsInviteOpen(false)}
-        onInvite={handleInvitePlayer}
-        invitedUser={invitedUser}
-        onClearInvited={() => setInvitedUser(null)}
-        publicInviteLink={publicInviteLink}
-        onFetchPublicLink={fetchInviteLink}
-        onResetPublicLink={() => setIsResetConfirmOpen(true)}
-        loading={actionLoading}
-      />
-      <PrettyConfirmDialog
-        open={isResetConfirmOpen}
-        onClose={() => setIsResetConfirmOpen(false)}
-        onConfirm={handleResetInviteLink}
-        title={t(
-          "organizations.management.reset_invite_link_title",
-          "Redefinir Link de Convite",
-        )}
-        description={t(
-          "organizations.management.reset_invite_link_confirm",
-          "Tem certeza que deseja redefinir o link de convite? O link atual deixará de funcionar imediatamente.",
-        )}
-        confirmLabel={t("common.reset", "Redefinir")}
-        severity="warning"
-      />
-      <SendNotificationDialog
-        open={isSendNotificationOpen}
-        onClose={() => setIsSendNotificationOpen(false)}
-        organization={org}
-        showToast={showToast}
-      />
-      <Snackbar
-        open={toastOpen}
-        autoHideDuration={4000}
-        onClose={() => setToastOpen(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        <Alert
+          description={t(
+            "organizations.management.reset_invite_link_confirm",
+            "Tem certeza que deseja redefinir o link de convite? O link atual deixará de funcionar imediatamente.",
+          )}
+          confirmLabel={t("common.reset", "Redefinir")}
+          severity="warning"
+        />
+        <SendNotificationDialog
+          open={isSendNotificationOpen}
+          onClose={() => setIsSendNotificationOpen(false)}
+          organization={org}
+          showToast={showToast}
+        />
+        <Snackbar
+          open={toastOpen}
+          autoHideDuration={4000}
           onClose={() => setToastOpen(false)}
-          severity={toastSeverity}
-          sx={{ width: "100%", borderRadius: "8px" }}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         >
-          {toastMessage}
-        </Alert>
-      </Snackbar>
-    </Container>
+          <Alert
+            onClose={() => setToastOpen(false)}
+            severity={toastSeverity}
+            sx={{ width: "100%", borderRadius: "8px" }}
+          >
+            {toastMessage}
+          </Alert>
+        </Snackbar>
+      </Box>
+    </Box>
   );
 }

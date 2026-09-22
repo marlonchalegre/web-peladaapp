@@ -1,61 +1,56 @@
+import { useState, useMemo, useCallback } from "react";
 import {
-  Stack,
+  Avatar,
   Box,
-  Typography,
   Button,
-  Grid,
+  Chip,
+  Dialog,
+  DialogContent,
   Drawer,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
-  Chip,
-  Avatar,
-  useTheme,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  ListItemText,
-  Fab,
-  alpha,
-  Paper,
+  Portal,
+  Stack,
   Tooltip,
+  Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
-import {
-  type Dispatch,
-  type SetStateAction,
-  useState,
-  useMemo,
-  useCallback,
-} from "react";
+import VideocamOutlinedIcon from "@mui/icons-material/VideocamOutlined";
+import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
+import { useTranslation } from "react-i18next";
 import type {
   Match,
   TeamPlayer,
   Player,
   Pelada,
+  MatchEvent,
   MatchEventType,
 } from "../../../shared/api/endpoints";
 import MatchScoreHero from "./MatchScoreHero";
 import MatchPlayerCard from "./MatchPlayerCard";
-import HistoryIcon from "@mui/icons-material/History";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import EditIcon from "@mui/icons-material/Edit";
-import BlockIcon from "@mui/icons-material/Block";
-import BoltIcon from "@mui/icons-material/Bolt";
-import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
-import WarningIcon from "@mui/icons-material/Warning";
-import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
-import ShieldIcon from "@mui/icons-material/Shield";
-import SentimentVerySatisfiedIcon from "@mui/icons-material/SentimentVerySatisfied";
-import { useTranslation } from "react-i18next";
 import PlayerSelectMenu from "./PlayerSelectMenu";
-import { POSITION_ORDER } from "../utils/playerUtils";
-import { SecureAvatar } from "../../../shared/components/SecureAvatar";
-import ActiveMatchSupportLineupCard from "./ActiveMatchSupportLineupCard";
+import { POSITION_ORDER, resolvePlayerName } from "../utils/playerUtils";
+import type { StandingRow } from "../utils/standingsUtils";
+import { usePeladaTimer } from "../hooks/usePeladaTimer";
 
 export type SelectMenuState = {
   teamId: string;
   forPlayerId?: string;
   type: "replace" | "add";
+} | null;
+
+type GoalSheetState = {
+  side: "home" | "away";
+  step: "scorer" | "assist" | "own_goal";
+  scorerId?: string;
+} | null;
+
+type EventSheetState = {
+  step: "type" | "player";
+  type?: MatchEventType;
 } | null;
 
 type Props = {
@@ -77,12 +72,13 @@ type Props = {
   isAdmin: boolean;
   updating: boolean;
   selectMenu: SelectMenuState;
-  setSelectMenu: Dispatch<SetStateAction<SelectMenuState>>;
+  setSelectMenu: React.Dispatch<React.SetStateAction<SelectMenuState>>;
   playersPerTeam?: number | null;
-  // Timer Actions
+  standings: StandingRow[];
+  matchEvents: MatchEvent[];
+  // Timer actions
   onStartMatch: (id: string) => Promise<void>;
   onPauseMatch: (id: string) => Promise<void>;
-  onResetMatch: (id: string) => Promise<void>;
   onOpenResetConfirm: (type: "session" | "match") => void;
   recordEvent: (
     matchId: string,
@@ -93,7 +89,6 @@ type Props = {
     assistantId?: string,
     teamId?: string,
   ) => Promise<void>;
-
   deleteEventAndRefresh: (
     matchId: string,
     playerId: string,
@@ -112,22 +107,45 @@ type Props = {
   ) => Promise<void>;
   addPlayerToTeam: (teamId: string, playerId: string) => Promise<void>;
   onEndMatch: () => void;
-  // History Drawer
+  // History
   matches: Match[];
   onSelectMatch: (id: string) => void;
   teamNameById: Record<string, string>;
-  // Support Lineup
+  // Tab navigation
+  onNavigateToTimeline?: () => void;
+  onNavigateToStandings?: () => void;
   onNavigateToSupportTab?: () => void;
-  onUpdateSupportLineup?: (
-    matchId: string,
-    data: {
-      support_camera_player_id?: string | null;
-      support_stats_player_id?: string | null;
-    },
-  ) => Promise<void>;
-  onRerollSupportLineup?: (matchId: string) => Promise<void>;
   playerTeamMap?: Record<string, string>;
 };
+
+const bottomSheetPaperSx = {
+  borderRadius: { xs: "24px 24px 0 0", sm: "20px" },
+  bgcolor: "#f6f4ee",
+  m: 0,
+  width: "100%",
+  maxWidth: { xs: "100%", sm: "460px" },
+  position: { xs: "fixed", sm: "relative" } as const,
+  bottom: { xs: 0, sm: "auto" },
+  left: { xs: 0, sm: "auto" },
+  right: { xs: 0, sm: "auto" },
+  boxShadow: {
+    xs: "0 -8px 30px rgba(0,0,0,0.2)",
+    sm: "0 20px 50px rgba(0,0,0,0.3)",
+  },
+};
+
+const EVENT_TYPES: {
+  type: MatchEventType;
+  label: string;
+  color: string;
+}[] = [
+  { type: "drible", label: "Drible", color: "#c9591c" },
+  { type: "chute", label: "Chute", color: "#1f5f9c" },
+  { type: "falta", label: "Falta", color: "#a8452a" },
+  { type: "furada", label: "Furada", color: "#8a857a" },
+  { type: "defesa", label: "Defesaça", color: "#146b3a" },
+  { type: "vish", label: "Vish", color: "#6b4b9c" },
+];
 
 export default function ActiveMatchDashboard(props: Props) {
   const {
@@ -148,133 +166,71 @@ export default function ActiveMatchDashboard(props: Props) {
     selectMenu,
     setSelectMenu,
     playersPerTeam,
+    standings,
     onStartMatch,
     onPauseMatch,
     onOpenResetConfirm,
     recordEvent,
-    deleteEventAndRefresh,
+    adjustScore,
     replacePlayerOnTeam,
-
     addPlayerToTeam,
     onEndMatch,
     matches,
     onSelectMatch,
     teamNameById,
+    onNavigateToTimeline,
+    onNavigateToStandings,
     onNavigateToSupportTab,
-    onUpdateSupportLineup,
     playerTeamMap,
   } = props;
 
   const { t } = useTranslation();
   const theme = useTheme();
-  const [isEditing, setIsEditing] = useState(false);
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const [historyOpen, setHistoryOpen] = useState(false);
-  const [supportTipOpen, setSupportTipOpen] = useState(false);
 
-  const [assistDialogOpen, setAssistDialogOpen] = useState(false);
-  const [goalScorerInfo, setGoalScorerInfo] = useState<{
-    playerId: string;
-    side: "home" | "away";
-  } | null>(null);
+  const [goalSheet, setGoalSheet] = useState<GoalSheetState>(null);
+  const [eventSheet, setEventSheet] = useState<EventSheetState>(null);
 
-  const [eventDialogOpen, setEventDialogOpen] = useState(false);
-  const [selectedEventPlayerId, setSelectedEventPlayerId] = useState<
-    string | null
-  >(null);
-  const [selectedEventType, setSelectedEventType] =
-    useState<MatchEventType | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const finishedMatch = (match.status || "").toLowerCase() === "finished";
+  const isMatchFinished = finished || finishedMatch;
+  const effectiveFinished = isEditing ? false : isMatchFinished;
 
-  const assistantOptions = useMemo(() => {
-    if (!goalScorerInfo) return [];
-    const teamPlayers =
-      goalScorerInfo.side === "home" ? homePlayers : awayPlayers;
-    return teamPlayers.filter((p) => p.player_id !== goalScorerInfo.playerId);
-  }, [goalScorerInfo, homePlayers, awayPlayers]);
-
-  const handleSelectAssistant = async (assistantId?: string) => {
-    if (!goalScorerInfo) return;
-    const info = goalScorerInfo;
-    setAssistDialogOpen(false);
-    setGoalScorerInfo(null);
-    const scorerTeamId =
-      info.side === "home" ? match.home_team_id : match.away_team_id;
-    await recordEvent(
-      match.id,
-      info.playerId,
-      "goal",
-      undefined,
-      undefined,
-      assistantId,
-      scorerTeamId,
-    );
-  };
-
-  const handleCloseAssistDialog = () => {
-    setAssistDialogOpen(false);
-    setGoalScorerInfo(null);
-  };
-
-  const handleConfirmEvent = async () => {
-    if (!selectedEventPlayerId || !selectedEventType) return;
-    await recordEvent(
-      match.id,
-      selectedEventPlayerId,
-      selectedEventType,
-      undefined,
-      undefined,
-    );
-    setSelectedEventPlayerId(null);
-    setSelectedEventType(null);
-    setEventDialogOpen(false);
-  };
-
-  const effectiveFinished = finished && !isEditing;
-
-  const getPlayerName = useCallback(
-    (pid: string) => {
-      const uid = orgPlayerIdToUserId[pid];
-      return uid && userIdToName[uid] ? userIdToName[uid] : `Player #${pid}`;
-    },
-    [orgPlayerIdToUserId, userIdToName],
+  const matchTimer = usePeladaTimer(
+    match.timer_started_at,
+    match.timer_accumulated_ms,
+    match.timer_status,
+    finishedMatch,
+    () => onStartMatch(match.id),
+    () => onPauseMatch(match.id),
   );
 
-  const nextMatchId = useMemo(() => {
-    if (matches.some((m) => m.status === "running")) return null;
-    return matches.find((m) => m.status === "scheduled")?.id || null;
-  }, [matches]);
+  const sessionTimer = usePeladaTimer(
+    pelada.timer_started_at,
+    pelada.timer_accumulated_ms,
+    pelada.timer_status,
+    (pelada.status || "").toLowerCase() === "closed",
+  );
 
-  const handleStatChange = (
-    playerId: string,
-    type: "goal" | "assist" | "own_goal",
-    diff: number,
-    side: "home" | "away",
-  ) => {
-    if (diff === 0) return;
+  const clockLabel = matchTimer.formattedTime.substring(3);
+  const sessionLabel = `${t("peladas.dashboard.live_state.session", "SESSÃO")} ${sessionTimer.formattedTime.substring(0, 5)}`;
 
-    const absDiff = Math.abs(diff);
-    for (let i = 0; i < absDiff; i++) {
-      if (diff > 0) {
-        if (type === "goal") {
-          setGoalScorerInfo({ playerId, side });
-          setAssistDialogOpen(true);
-        } else {
-          const playerTeamId =
-            side === "home" ? match.home_team_id : match.away_team_id;
-          recordEvent(
-            match.id,
-            playerId,
-            type,
-            undefined,
-            undefined,
-            undefined,
-            playerTeamId,
-          );
-        }
-      } else {
-        deleteEventAndRefresh(match.id, playerId, type);
-      }
-    }
-  };
+  const getPlayerName = useCallback(
+    (pid: string) =>
+      resolvePlayerName(
+        pid,
+        orgPlayerIdToPlayer,
+        orgPlayerIdToUserId,
+        userIdToName,
+        `Player #${pid.slice(0, 6)}`,
+      ),
+    [orgPlayerIdToPlayer, orgPlayerIdToUserId, userIdToName],
+  );
+
+  const canRecord = isAdmin && !effectiveFinished;
+
+  /* ---------- lineup ---------- */
 
   const targetCount = useMemo(() => {
     let base = Number(playersPerTeam || 0);
@@ -291,16 +247,13 @@ export default function ActiveMatchDashboard(props: Props) {
 
   const generateTeamList = useCallback(
     (players: TeamPlayer[], side: "home" | "away", teamId: string) => {
-      // Sort by position then name
       const sortedPlayers = [...players].sort((a, b) => {
         const playerA = orgPlayerIdToPlayer[a.player_id];
         const playerB = orgPlayerIdToPlayer[b.player_id];
 
-        // 1. Manual goalkeeper override (highest priority)
         if (a.is_goalkeeper && !b.is_goalkeeper) return -1;
         if (!a.is_goalkeeper && b.is_goalkeeper) return 1;
 
-        // 2. Standard position order
         const getPosStr = (p?: Player) =>
           (p?.position || p?.user_position || "").toLowerCase();
 
@@ -347,11 +300,10 @@ export default function ActiveMatchDashboard(props: Props) {
     [awayPlayers, match.away_team_id, generateTeamList],
   );
 
-  const eventPlayerOptions = useMemo(() => {
-    const home = homeList.filter((p) => !p.isEmpty);
-    const away = awayList.filter((p) => !p.isEmpty);
-    return { home, away };
-  }, [homeList, awayList]);
+  const allOnFieldPlayers = useMemo(
+    () => [...homeList, ...awayList].filter((p) => !p.isEmpty),
+    [homeList, awayList],
+  );
 
   const nextMatch = useMemo(() => {
     return (
@@ -361,361 +313,1515 @@ export default function ActiveMatchDashboard(props: Props) {
     );
   }, [matches, match.sequence]);
 
-  const nextMatchSupportTooltip = useMemo(() => {
-    if (!nextMatch) return "";
-    const cam = nextMatch.support_camera_player_id
-      ? getPlayerName(nextMatch.support_camera_player_id)
-      : null;
-    const stats = nextMatch.support_stats_player_id
-      ? getPlayerName(nextMatch.support_stats_player_id)
-      : null;
-    if (!cam && !stats) return "";
-    return `${t("peladas.support_lineup.next_match_support", "Suporte do Próximo Jogo")}: ${cam ? `📹 ${cam}` : ""}${cam && stats ? " • " : ""}${stats ? `📝 ${stats}` : ""}`;
-  }, [nextMatch, getPlayerName, t]);
+  /* ---------- live standings (all teams) ---------- */
 
-  const hasNextMatchSupport = Boolean(nextMatchSupportTooltip);
+  const liveMatchTable = useMemo(() => {
+    return standings.map((row, index) => {
+      const games = row.wins + row.draws + row.losses;
+      const v = row.wins;
+      const e = row.draws;
+      const d = row.losses;
+      const sg = row.goalsFor - row.goalsAgainst;
+      const p = row.points ?? v * 3 + e;
 
-  return (
-    <Box sx={{ pb: 8 }}>
-      <Stack spacing={2}>
-        {/* Top Actions Row */}
-        <Stack
-          direction="row"
-          sx={{
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Stack
-            direction="row"
-            spacing={1}
+      let color: string;
+      if (row.teamId === match.home_team_id) {
+        color = "#c9591c";
+      } else if (row.teamId === match.away_team_id) {
+        color = "#1f5f9c";
+      } else {
+        const palette = ["#146b3a", "#6b4b9c", "#d97706", "#0284c7"];
+        color = palette[index % palette.length];
+      }
+
+      const teamName =
+        row.teamId === match.home_team_id
+          ? homeTeamName || row.name
+          : row.teamId === match.away_team_id
+            ? awayTeamName || row.name
+            : row.name;
+
+      return {
+        teamId: row.teamId,
+        position: index + 1,
+        name: teamName,
+        color,
+        record: `${games}J · ${v}V ${e}E ${d}D`,
+        sgLabel: (sg > 0 ? "+" : "") + sg,
+        p,
+        isPlaying:
+          row.teamId === match.home_team_id ||
+          row.teamId === match.away_team_id,
+      };
+    });
+  }, [
+    standings,
+    match.home_team_id,
+    match.away_team_id,
+    homeTeamName,
+    awayTeamName,
+  ]);
+
+  /* ---------- flows ---------- */
+
+  const goalSideList = goalSheet?.side === "home" ? homeList : awayList;
+  const goalSideName = goalSheet?.side === "home" ? homeTeamName : awayTeamName;
+  const defendingSideList = goalSheet?.side === "home" ? awayList : homeList;
+  const defendingSideName =
+    goalSheet?.side === "home" ? awayTeamName : homeTeamName;
+
+  const assistantOptions = useMemo(() => {
+    if (!goalSheet || goalSheet.step !== "assist" || !goalSheet.scorerId)
+      return [];
+    const list = goalSheet.side === "home" ? homeList : awayList;
+    return list.filter((p) => p.player_id !== goalSheet.scorerId);
+  }, [goalSheet, homeList, awayList]);
+
+  const commitGoal = async (assistantId?: string) => {
+    if (!goalSheet?.scorerId) return;
+    const { scorerId, side } = goalSheet;
+    setGoalSheet(null);
+    const scorerTeamId =
+      side === "home" ? match.home_team_id : match.away_team_id;
+    await recordEvent(
+      match.id,
+      scorerId,
+      "goal",
+      undefined,
+      undefined,
+      assistantId,
+      scorerTeamId,
+    );
+  };
+
+  const commitOwnGoal = async (playerId: string) => {
+    if (!goalSheet) return;
+    const side = goalSheet.side;
+    const defendingTeamId =
+      side === "home" ? match.away_team_id : match.home_team_id;
+    setGoalSheet(null);
+    if (!defendingTeamId) return;
+
+    await recordEvent(
+      match.id,
+      playerId,
+      "own_goal",
+      undefined,
+      undefined,
+      undefined,
+      defendingTeamId,
+    );
+  };
+
+  const handleSkipOwnGoal = async () => {
+    if (!goalSheet) return;
+    const side = goalSheet.side;
+    setGoalSheet(null);
+    if (adjustScore) {
+      await adjustScore(match.id, side, 1);
+    }
+  };
+
+  const handleConfirmEvent = async (playerId: string) => {
+    if (!eventSheet?.type) return;
+    setEventSheet(null);
+    await recordEvent(
+      match.id,
+      playerId,
+      eventSheet.type,
+      undefined,
+      undefined,
+      undefined,
+      playerTeamMap?.[playerId],
+    );
+  };
+
+  /* ---------- sections ---------- */
+
+  const teamSection = (side: "home" | "away") => {
+    const list = side === "home" ? homeList : awayList;
+    const name = side === "home" ? homeTeamName : awayTeamName;
+    const color = side === "home" ? "#c9591c" : "#1f5f9c";
+    return (
+      <Box data-testid={`${side}-team-match-section`} sx={{ minWidth: 0 }}>
+        {isDesktop ? (
+          <Box
             sx={{
+              display: "flex",
               alignItems: "center",
+              gap: "8px",
+              mb: "8px",
             }}
           >
-            <Button
-              onClick={() => setHistoryOpen(true)}
-              size="small"
-              variant="outlined"
-              startIcon={<HistoryIcon />}
-              data-testid="toggle-history-drawer"
+            <Box
               sx={{
-                textTransform: "none",
-                borderRadius: 1.5,
-                fontWeight: "bold",
-                minWidth: "auto",
-                px: 1,
+                width: 3,
+                height: 14,
+                borderRadius: "2px",
+                bgcolor: color,
+                flexShrink: 0,
+              }}
+            />
+            <Typography
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 800,
+                fontSize: "10px",
+                lineHeight: 1,
+                letterSpacing: "0.14em",
+                color: "#6b675c",
               }}
             >
-              {t("peladas.dashboard.button.history")}
-            </Button>
+              {name.toUpperCase()}
+            </Typography>
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              mt: side === "away" ? "16px" : 0,
+              mb: "9px",
+            }}
+          >
+            <Box
+              sx={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                bgcolor: color,
+                flexShrink: 0,
+              }}
+            />
+            <Typography
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 800,
+                fontSize: "10px",
+                lineHeight: 1,
+                letterSpacing: "0.12em",
+                color: color,
+              }}
+            >
+              {name.toUpperCase()}
+            </Typography>
+          </Box>
+        )}
+        <Stack spacing={isDesktop ? "8px" : "7px"}>
+          {list.map((p) => (
+            <MatchPlayerCard
+              key={p.player_id}
+              player={p}
+              playerName={getPlayerName(p.player_id)}
+              playerData={orgPlayerIdToPlayer[p.player_id]}
+              stats={
+                statsMap[p.player_id] || { goals: 0, assists: 0, ownGoals: 0 }
+              }
+              finished={effectiveFinished}
+              isAdmin={isAdmin}
+              variant={isDesktop ? "desktop" : "mobile"}
+              onSubClick={() =>
+                setSelectMenu({
+                  teamId: p.teamId,
+                  forPlayerId: p.player_id,
+                  type: p.isEmpty ? "add" : "replace",
+                })
+              }
+            />
+          ))}
+        </Stack>
+      </Box>
+    );
+  };
 
-            {nextMatch && (
-              <Tooltip
-                title={nextMatchSupportTooltip}
-                arrow
-                open={hasNextMatchSupport && supportTipOpen}
-                onOpen={() => setSupportTipOpen(true)}
-                onClose={() => setSupportTipOpen(false)}
-                enterTouchDelay={0}
-                leaveTouchDelay={4000}
+  const liveStandingsCard = (
+    <Box
+      sx={{
+        bgcolor: "#fff",
+        border: "1.5px solid #e4e0d6",
+        borderRadius: "13px",
+        px: "13px",
+        py: "12px",
+      }}
+      data-testid="live-standings-card"
+    >
+      <Typography
+        sx={{
+          fontFamily: "Archivo, sans-serif",
+          fontWeight: 800,
+          fontSize: "9.5px",
+          lineHeight: 1,
+          letterSpacing: "0.14em",
+          color: "#8a857a",
+          mb: "9px",
+        }}
+      >
+        {t(
+          "peladas.dashboard.live_state.live_standings",
+          "CLASSIFICAÇÃO AO VIVO",
+        )}
+      </Typography>
+      {liveMatchTable.map((row) => (
+        <Box
+          key={row.teamId}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            py: "7px",
+            borderTop: "1px solid #efece4",
+          }}
+        >
+          <Typography
+            sx={{
+              fontFamily: "Archivo, sans-serif",
+              fontWeight: 800,
+              fontSize: "11px",
+              lineHeight: 1,
+              color: "#8a857a",
+              width: "18px",
+              flexShrink: 0,
+            }}
+          >
+            {row.position}º
+          </Typography>
+          <Box
+            sx={{
+              width: 8,
+              height: 8,
+              borderRadius: "50%",
+              bgcolor: row.color,
+              flexShrink: 0,
+            }}
+          />
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography
+              noWrap
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: row.isPlaying ? 900 : 700,
+                fontSize: "12px",
+                lineHeight: 1,
+                color: "#1a1a1a",
+                textTransform: "uppercase",
+              }}
+            >
+              {row.name}
+            </Typography>
+            <Typography
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontSize: "9.5px",
+                fontWeight: 600,
+                lineHeight: 1,
+                color: "#8a857a",
+                mt: "3px",
+              }}
+            >
+              {row.record} · SG {row.sgLabel}
+            </Typography>
+          </Box>
+          <Typography
+            sx={{
+              fontFamily: "'Anton', sans-serif",
+              fontSize: "20px",
+              lineHeight: 1,
+              color: "#1a1a1a",
+            }}
+          >
+            {row.p}
+          </Typography>
+        </Box>
+      ))}
+    </Box>
+  );
+
+  const nextMatchSection = () => {
+    if (!nextMatch) return null;
+    const homeName = teamNameById[nextMatch.home_team_id] || "TIME 3";
+    const awayName = teamNameById[nextMatch.away_team_id] || "TIME 4";
+    if (isDesktop) {
+      return (
+        <Box
+          sx={{
+            p: "12px 14px",
+            bgcolor: "#fff",
+            border: "1.5px solid #e4e0d6",
+            borderRadius: "13px",
+          }}
+          data-testid="next-match-card"
+        >
+          <Typography
+            sx={{
+              fontFamily: "Archivo, sans-serif",
+              fontWeight: 800,
+              fontSize: "9.5px",
+              lineHeight: 1,
+              letterSpacing: "0.14em",
+              color: "#8a857a",
+            }}
+          >
+            {t("peladas.dashboard.summary.next_up", "A SEGUIR")}
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              mt: "8px",
+            }}
+          >
+            <Box
+              sx={{
+                width: 10,
+                height: 10,
+                borderRadius: "50%",
+                bgcolor: "#c9591c",
+                border: "1px solid rgba(0,0,0,0.15)",
+                flexShrink: 0,
+              }}
+            />
+            <Typography
+              noWrap
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 800,
+                fontSize: "13px",
+                lineHeight: 1,
+                color: "#1a1a1a",
+              }}
+            >
+              {homeName.toUpperCase()}
+            </Typography>
+            <Typography
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 700,
+                fontSize: "10px",
+                lineHeight: 1,
+                letterSpacing: "0.08em",
+                color: "#8a857a",
+              }}
+            >
+              LARANJA
+            </Typography>
+            <Typography
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 600,
+                fontSize: "11px",
+                lineHeight: 1,
+                color: "#8a857a",
+              }}
+            >
+              vs
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              mt: "6px",
+            }}
+          >
+            <Box
+              sx={{
+                width: 10,
+                height: 10,
+                borderRadius: "50%",
+                bgcolor: "#1f5f9c",
+                border: "1px solid rgba(0,0,0,0.15)",
+                flexShrink: 0,
+              }}
+            />
+            <Typography
+              noWrap
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 800,
+                fontSize: "13px",
+                lineHeight: 1,
+                color: "#1a1a1a",
+              }}
+            >
+              {awayName.toUpperCase()}
+            </Typography>
+            <Typography
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 700,
+                fontSize: "10px",
+                lineHeight: 1,
+                letterSpacing: "0.08em",
+                color: "#8a857a",
+              }}
+            >
+              AZUL
+            </Typography>
+          </Box>
+        </Box>
+      );
+    }
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          mt: 0,
+          mb: "8px",
+          p: "12px 14px",
+          bgcolor: "#efece4",
+          borderRadius: "13px",
+        }}
+        data-testid="next-match-card"
+      >
+        <Typography
+          sx={{
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 800,
+            fontSize: "10px",
+            lineHeight: 1,
+            letterSpacing: "0.14em",
+            color: "#8a857a",
+          }}
+        >
+          {t("peladas.dashboard.summary.next_up", "A SEGUIR")}
+        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "7px",
+            flex: 1,
+            minWidth: 0,
+          }}
+        >
+          <Box
+            sx={{
+              width: 10,
+              height: 10,
+              borderRadius: "50%",
+              bgcolor: "#c9591c",
+              border: "1px solid rgba(0,0,0,0.15)",
+              flexShrink: 0,
+            }}
+          />
+          <Typography
+            noWrap
+            sx={{
+              fontFamily: "Archivo, sans-serif",
+              fontWeight: 800,
+              fontSize: "12.5px",
+              lineHeight: 1,
+              color: "#1a1a1a",
+            }}
+          >
+            {homeName}
+          </Typography>
+          <Typography
+            sx={{
+              fontFamily: "Archivo, sans-serif",
+              fontWeight: 600,
+              fontSize: "11px",
+              lineHeight: 1,
+              color: "#8a857a",
+            }}
+          >
+            vs
+          </Typography>
+          <Box
+            sx={{
+              width: 10,
+              height: 10,
+              borderRadius: "50%",
+              bgcolor: "#1f5f9c",
+              border: "1px solid rgba(0,0,0,0.15)",
+              flexShrink: 0,
+            }}
+          />
+          <Typography
+            noWrap
+            sx={{
+              fontFamily: "Archivo, sans-serif",
+              fontWeight: 800,
+              fontSize: "12.5px",
+              lineHeight: 1,
+              color: "#1a1a1a",
+            }}
+          >
+            {awayName}
+          </Typography>
+        </Box>
+      </Box>
+    );
+  };
+
+  const tabButtons = (withEnd: boolean) => (
+    <Box sx={{ display: "flex", gap: "8px", mt: withEnd ? "18px" : 0 }}>
+      {onNavigateToStandings && (
+        <Button
+          onClick={onNavigateToStandings}
+          data-testid="go-to-standings-button"
+          sx={{
+            flex: 1,
+            border: "1.5px solid #ddd8cc",
+            bgcolor: "#fff",
+            color: "#6b675c",
+            borderRadius: "11px",
+            py: withEnd ? "12px" : "11px",
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 800,
+            fontSize: withEnd ? "11px" : "10.5px",
+            lineHeight: 1,
+            letterSpacing: "0.05em",
+            "&:hover": { borderColor: "#6b675c" },
+          }}
+        >
+          {t("peladas.dashboard.live_state.table_button", "TABELA")}
+        </Button>
+      )}
+      {onNavigateToTimeline && (
+        <Button
+          onClick={onNavigateToTimeline}
+          data-testid="go-to-timeline-button"
+          sx={{
+            flex: 1,
+            border: "1.5px solid #ddd8cc",
+            bgcolor: "#fff",
+            color: "#6b675c",
+            borderRadius: "11px",
+            py: withEnd ? "12px" : "11px",
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 800,
+            fontSize: withEnd ? "11px" : "10.5px",
+            lineHeight: 1,
+            letterSpacing: "0.05em",
+            "&:hover": { borderColor: "#6b675c" },
+          }}
+        >
+          {t("peladas.dashboard.live_state.sumula_button", "SÚMULA")}
+        </Button>
+      )}
+      {withEnd && isAdmin && !effectiveFinished && (
+        <Button
+          onClick={onEndMatch}
+          data-testid="end-match-button"
+          sx={{
+            flex: 1,
+            border: "1.5px solid #e2c3bb",
+            bgcolor: "#fff",
+            color: "#a8452a",
+            borderRadius: "11px",
+            py: "12px",
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 800,
+            fontSize: "11px",
+            lineHeight: 1,
+            letterSpacing: "0.05em",
+            "&:hover": {
+              borderColor: "#a8452a",
+            },
+          }}
+        >
+          {t("peladas.dashboard.live_state.end_match", "ENCERRAR")}
+        </Button>
+      )}
+    </Box>
+  );
+
+  const supportRow = () => {
+    const cam = match.support_camera_player_id
+      ? getPlayerName(match.support_camera_player_id)
+      : null;
+    const stats = match.support_stats_player_id
+      ? getPlayerName(match.support_stats_player_id)
+      : null;
+    const unassigned = t(
+      "peladas.matches.support_lineup.unassigned",
+      "Não definido",
+    );
+    const camTitle = t("peladas.matches.support_lineup.camera_short", "Câmera");
+    const statsTitle = t(
+      "peladas.matches.support_lineup.stats_short",
+      "Súmula",
+    );
+    const escalaLink = onNavigateToSupportTab && (
+      <Button
+        onClick={onNavigateToSupportTab}
+        data-testid="view-full-support-schedule"
+        sx={{
+          minWidth: 0,
+          p: 0,
+          fontFamily: "Archivo, sans-serif",
+          fontWeight: 700,
+          fontSize: "11.5px",
+          lineHeight: 1,
+          color: "#146b3a",
+          "&:hover": { bgcolor: "transparent", textDecoration: "underline" },
+        }}
+      >
+        {t("peladas.support_lineup.view_escalation", "Escala")}
+      </Button>
+    );
+
+    if (isDesktop) {
+      return (
+        <Box
+          sx={{
+            p: "12px 14px",
+            border: "1.5px dashed #ddd8cc",
+            borderRadius: "13px",
+          }}
+          data-testid="active-match-support-lineup-card"
+        >
+          <Typography
+            sx={{
+              fontFamily: "Archivo, sans-serif",
+              fontWeight: 800,
+              fontSize: "9.5px",
+              lineHeight: 1,
+              letterSpacing: "0.14em",
+              color: "#8a857a",
+            }}
+          >
+            {t("peladas.dashboard.live_state.support_label", "SUPORTE")}
+          </Typography>
+          <Box
+            sx={{
+              mt: "7px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "6px",
+            }}
+          >
+            <Box
+              data-testid="support-camera-person"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: "7px",
+                minWidth: 0,
+              }}
+            >
+              <Tooltip title={camTitle}>
+                <VideocamOutlinedIcon
+                  data-testid="support-camera-icon"
+                  aria-label={camTitle}
+                  sx={{ fontSize: 16, color: "#8a857a", flexShrink: 0 }}
+                />
+              </Tooltip>
+              <Typography
+                noWrap
+                sx={{
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 600,
+                  fontSize: "12px",
+                  lineHeight: 1.2,
+                  color: "#6b675c",
+                }}
               >
-                <Box
-                  role={hasNextMatchSupport ? "button" : undefined}
-                  tabIndex={hasNextMatchSupport ? 0 : undefined}
-                  onClick={
-                    hasNextMatchSupport
-                      ? () => setSupportTipOpen((open) => !open)
-                      : undefined
-                  }
-                  onKeyDown={
-                    hasNextMatchSupport
-                      ? (event) => {
-                          if (event.key === "Enter" || event.key === " ") {
-                            event.preventDefault();
-                            setSupportTipOpen((open) => !open);
-                          }
-                        }
-                      : undefined
-                  }
+                {cam || unassigned}
+              </Typography>
+            </Box>
+
+            <Box
+              data-testid="support-stats-person"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: "7px",
+                minWidth: 0,
+              }}
+            >
+              <Tooltip title={statsTitle}>
+                <AssignmentOutlinedIcon
+                  data-testid="support-stats-icon"
+                  aria-label={statsTitle}
+                  sx={{ fontSize: 16, color: "#8a857a", flexShrink: 0 }}
+                />
+              </Tooltip>
+              <Typography
+                noWrap
+                sx={{
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 600,
+                  fontSize: "12px",
+                  lineHeight: 1.2,
+                  color: "#6b675c",
+                }}
+              >
+                {stats || unassigned}
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+      );
+    }
+
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          mt: 0,
+          mb: "12px",
+          p: "12px 14px",
+          border: "1.5px dashed #ddd8cc",
+          borderRadius: "13px",
+        }}
+        data-testid="active-match-support-lineup-card"
+      >
+        <Typography
+          sx={{
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 800,
+            fontSize: "10px",
+            lineHeight: 1,
+            letterSpacing: "0.14em",
+            color: "#8a857a",
+            flexShrink: 0,
+          }}
+        >
+          {t("peladas.dashboard.live_state.support_label", "SUPORTE")}
+        </Typography>
+
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            flex: 1,
+            minWidth: 0,
+            overflow: "hidden",
+          }}
+        >
+          <Box
+            data-testid="support-camera-person"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "5px",
+              minWidth: 0,
+              overflow: "hidden",
+            }}
+          >
+            <Tooltip title={camTitle}>
+              <VideocamOutlinedIcon
+                data-testid="support-camera-icon"
+                aria-label={camTitle}
+                sx={{ fontSize: 15, color: "#8a857a", flexShrink: 0 }}
+              />
+            </Tooltip>
+            <Typography
+              noWrap
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 600,
+                fontSize: "11.5px",
+                lineHeight: 1.2,
+                color: "#6b675c",
+              }}
+            >
+              {cam || unassigned}
+            </Typography>
+          </Box>
+
+          <Box
+            data-testid="support-stats-person"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "5px",
+              minWidth: 0,
+              overflow: "hidden",
+            }}
+          >
+            <Tooltip title={statsTitle}>
+              <AssignmentOutlinedIcon
+                data-testid="support-stats-icon"
+                aria-label={statsTitle}
+                sx={{ fontSize: 15, color: "#8a857a", flexShrink: 0 }}
+              />
+            </Tooltip>
+            <Typography
+              noWrap
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 600,
+                fontSize: "11.5px",
+                lineHeight: 1.2,
+                color: "#6b675c",
+              }}
+            >
+              {stats || unassigned}
+            </Typography>
+          </Box>
+        </Box>
+
+        {escalaLink}
+      </Box>
+    );
+  };
+
+  const eventTypesGrid = (
+    <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+      {EVENT_TYPES.map((ev) => (
+        <Button
+          key={ev.type}
+          onClick={() => setEventSheet({ step: "player", type: ev.type })}
+          data-testid={`event-type-card-${ev.type}`}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "9px",
+            border: "2px solid #e4e0d6",
+            bgcolor: "#fff",
+            borderRadius: "14px",
+            p: "15px 13px",
+            cursor: "pointer",
+            textAlign: "left",
+            "&:hover": {
+              borderColor: "#123c26",
+              bgcolor: "#f2f8f4",
+            },
+          }}
+        >
+          <Box
+            sx={{
+              width: 9,
+              height: 9,
+              borderRadius: "50%",
+              bgcolor: ev.color,
+              flexShrink: 0,
+            }}
+          />
+          <Typography
+            sx={{
+              fontFamily: "Archivo, sans-serif",
+              fontWeight: 800,
+              fontSize: "13.5px",
+              lineHeight: 1,
+              color: "#1a1a1a",
+            }}
+          >
+            {ev.label}
+          </Typography>
+        </Button>
+      ))}
+    </Box>
+  );
+
+  const positionLabel = (p: { player_id: string; is_goalkeeper?: boolean }) => {
+    if (p.is_goalkeeper) return "GOL";
+    const data = orgPlayerIdToPlayer[p.player_id];
+    const pos = (
+      data?.position ||
+      data?.user_position ||
+      "player"
+    ).toLowerCase();
+    const short: Record<string, string> = {
+      goalkeeper: "GOL",
+      defender: "ZAG",
+      midfielder: "MEI",
+      striker: "ATA",
+    };
+    return short[pos] || pos.toUpperCase();
+  };
+
+  const playersGrid = (
+    players: (TeamPlayer & { isEmpty?: boolean; side: "home" | "away" })[],
+    onPick: (playerId: string) => void,
+    testidPrefix: "goal" | "assistant" | "event" | "own_goal",
+    showTeamTag: boolean,
+  ) => (
+    <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
+      {players.map((p) => {
+        const name = getPlayerName(p.player_id);
+        const isHome = p.side === "home";
+        return (
+          <Button
+            key={`${p.side}-${p.player_id}`}
+            onClick={() => onPick(p.player_id)}
+            data-testid={`${testidPrefix}-player-item-${p.player_id}`}
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+              gap: "4px",
+              border: "2px solid #e4e0d6",
+              bgcolor: "#fff",
+              borderRadius: "14px",
+              p: "13px 12px",
+              cursor: "pointer",
+              textAlign: "left",
+              "&:hover": {
+                borderColor: "#123c26",
+                bgcolor: "#f2f8f4",
+              },
+            }}
+          >
+            <Typography
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 700,
+                fontSize: "13px",
+                lineHeight: 1.15,
+                color: "#1a1a1a",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+                maxWidth: "100%",
+              }}
+            >
+              {name}
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                gap: "7px",
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 700,
+                fontSize: "9.5px",
+                lineHeight: 1,
+                letterSpacing: "0.08em",
+                color: "#8a857a",
+              }}
+            >
+              <span>{positionLabel(p)}</span>
+              {showTeamTag && <span>{isHome ? "LARANJA" : "AZUL"}</span>}
+            </Box>
+          </Button>
+        );
+      })}
+    </Box>
+  );
+
+  return (
+    <Box sx={{ bgcolor: "#f6f4ee" }}>
+      {isDesktop ? (
+        /* ---------- Desktop / tablet largo (referência 1b) ---------- */
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "1fr 316px",
+            minHeight: 0,
+          }}
+        >
+          {/* Coluna Esquerda: Placar + 3 botões + Escalações lado a lado */}
+          <Box
+            sx={{
+              padding: "22px 22px 22px 26px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
+              minHeight: 0,
+            }}
+          >
+            {/* Placar Hero dentro da coluna esquerda */}
+            <MatchScoreHero
+              match={match}
+              pelada={pelada}
+              homeTeamName={homeTeamName}
+              awayTeamName={awayTeamName}
+              isAdmin={isAdmin}
+              totalMatches={matches.length}
+              standings={standings}
+              clockLabel={clockLabel}
+              running={matchTimer.status === "running"}
+              sessionLabel={sessionLabel}
+              homeOnFieldCount={homePlayers.length}
+              awayOnFieldCount={awayPlayers.length}
+              onToggleHistory={() => setHistoryOpen(true)}
+              onToggleRun={() => {
+                if (matchTimer.status === "running") matchTimer.pause?.();
+                else matchTimer.start?.();
+              }}
+              onOpenResetConfirm={onOpenResetConfirm}
+              onEndMatch={onEndMatch}
+              updating={updating}
+              finished={isMatchFinished}
+              isEditing={isEditing}
+              onToggleEdit={() => setIsEditing(!isEditing)}
+            />
+
+            {/* Linha com os 3 botões de ação: GOL TIME 1, GOL TIME 2, OUTRO LANCE */}
+            {canRecord && (
+              <Box sx={{ display: "flex", gap: "14px", flexShrink: 0 }}>
+                <Button
+                  onClick={() => setGoalSheet({ side: "home", step: "scorer" })}
+                  data-testid="goal-button-home"
                   sx={{
+                    flex: 1,
                     display: "flex",
                     alignItems: "center",
-                    gap: 1,
-                    cursor: hasNextMatchSupport ? "pointer" : "default",
-                    px: { xs: 1.5, sm: 2 },
-                    py: { xs: 0.6, sm: 0.8 },
-                    bgcolor: "background.paper",
-                    borderRadius: 10,
-                    border: "1px solid",
-                    borderColor: "divider",
-                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
-                    maxWidth: { xs: "220px", sm: "none" },
-                    height: "30.75px", // Match MUI small button height roughly
+                    justifyContent: "center",
+                    gap: "12px",
+                    border: 0,
+                    borderRadius: "16px",
+                    bgcolor: "#c9591c",
+                    color: "#fff",
+                    py: "17px",
+                    cursor: "pointer",
+                    boxShadow: "0 4px 0 #8f3d12",
+                    "&:hover": { bgcolor: "#a8480f" },
+                    "&:active": {
+                      transform: "translateY(3px)",
+                      boxShadow: "0 1px 0 #8f3d12",
+                    },
                   }}
                 >
                   <Typography
-                    variant="caption"
+                    component="span"
                     sx={{
-                      color: "text.secondary",
-                      fontWeight: "800",
-                      fontSize: { xs: "0.6rem", sm: "0.65rem" },
-                      textTransform: "uppercase",
-                      letterSpacing: "0.05em",
-                      display: { xs: "none", sm: "block" },
+                      fontFamily: "'Anton', sans-serif",
+                      fontWeight: 400,
+                      fontSize: "26px",
+                      lineHeight: 1,
+                      letterSpacing: "0.04em",
                     }}
                   >
-                    {t("peladas.dashboard.summary.next_up")}:
+                    GOL
                   </Typography>
                   <Typography
-                    variant="caption"
+                    component="span"
                     sx={{
-                      fontWeight: "bold",
-                      fontSize: { xs: "0.75rem", sm: "0.85rem" },
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      display: "flex",
-                      alignItems: "center",
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 800,
+                      fontSize: "11px",
+                      lineHeight: 1,
+                      letterSpacing: "0.14em",
+                      color: "#f3c19c",
                     }}
                   >
-                    <Box component="span" sx={{ color: "home.main" }}>
-                      {teamNameById[nextMatch.home_team_id] || "Home"}
-                    </Box>
-                    <Box
-                      component="span"
-                      sx={{ color: "text.disabled", mx: 1, fontWeight: "500" }}
-                    >
-                      vs
-                    </Box>
-                    <Box component="span" sx={{ color: "away.main" }}>
-                      {teamNameById[nextMatch.away_team_id] || "Away"}
-                    </Box>
+                    {homeTeamName.toUpperCase()}
                   </Typography>
-                </Box>
-              </Tooltip>
+                </Button>
+
+                <Button
+                  onClick={() => setGoalSheet({ side: "away", step: "scorer" })}
+                  data-testid="goal-button-away"
+                  sx={{
+                    flex: 1,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: "12px",
+                    border: 0,
+                    borderRadius: "16px",
+                    bgcolor: "#1f5f9c",
+                    color: "#fff",
+                    py: "17px",
+                    cursor: "pointer",
+                    boxShadow: "0 4px 0 #164674",
+                    "&:hover": { bgcolor: "#19507f" },
+                    "&:active": {
+                      transform: "translateY(3px)",
+                      boxShadow: "0 1px 0 #164674",
+                    },
+                  }}
+                >
+                  <Typography
+                    component="span"
+                    sx={{
+                      fontFamily: "'Anton', sans-serif",
+                      fontWeight: 400,
+                      fontSize: "26px",
+                      lineHeight: 1,
+                      letterSpacing: "0.04em",
+                    }}
+                  >
+                    GOL
+                  </Typography>
+                  <Typography
+                    component="span"
+                    sx={{
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 800,
+                      fontSize: "11px",
+                      lineHeight: 1,
+                      letterSpacing: "0.14em",
+                      color: "#a9caea",
+                    }}
+                  >
+                    {awayTeamName.toUpperCase()}
+                  </Typography>
+                </Button>
+
+                <Button
+                  onClick={() => setEventSheet({ step: "type" })}
+                  data-testid="record-event-inline-button"
+                  sx={{
+                    flexShrink: 0,
+                    width: 210,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: "5px",
+                    border: "1.5px solid #ddd8cc",
+                    borderRadius: "16px",
+                    bgcolor: "#fff",
+                    color: "#123c26",
+                    py: "14px",
+                    cursor: "pointer",
+                    "&:hover": {
+                      borderColor: "#123c26",
+                      bgcolor: "#f2f8f4",
+                    },
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 800,
+                      fontSize: "13px",
+                      lineHeight: 1,
+                      letterSpacing: "0.06em",
+                    }}
+                  >
+                    ＋{" "}
+                    {t(
+                      "peladas.dashboard.live_state.other_event",
+                      "OUTRO LANCE",
+                    )}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 600,
+                      fontSize: "9.5px",
+                      lineHeight: 1,
+                      letterSpacing: "0.06em",
+                      color: "#8a857a",
+                    }}
+                  >
+                    DRIBLE · CHUTE · FALTA · DEFESAÇA
+                  </Typography>
+                </Button>
+              </Box>
             )}
-          </Stack>
 
-          {isAdmin && finished && (
-            <Button
-              startIcon={isEditing ? <CheckCircleIcon /> : <EditIcon />}
-              color={isEditing ? "success" : "warning"}
-              variant={isEditing ? "contained" : "outlined"}
-              onClick={() => setIsEditing(!isEditing)}
-              size="small"
-              sx={{ textTransform: "none", borderRadius: 2 }}
-              data-testid={
-                isEditing ? "finish-editing-button" : "edit-match-button"
-              }
-            >
-              {isEditing
-                ? t("peladas.dashboard.button.finish_editing")
-                : t("peladas.dashboard.button.edit_match")}
-            </Button>
-          )}
-        </Stack>
-
-        {/* Hero Scoreboard */}
-        <MatchScoreHero
-          match={match}
-          pelada={pelada}
-          homeTeamName={homeTeamName}
-          awayTeamName={awayTeamName}
-          isAdmin={isAdmin}
-          onStartMatch={onStartMatch}
-          onPauseMatch={onPauseMatch}
-          onOpenResetConfirm={onOpenResetConfirm}
-          onEndMatch={onEndMatch}
-          updating={updating}
-        />
-
-        {/* Support Lineup Section */}
-        <ActiveMatchSupportLineupCard
-          match={match}
-          orgPlayerIdToUserId={orgPlayerIdToUserId}
-          userIdToName={userIdToName}
-          orgPlayerIdToPlayer={orgPlayerIdToPlayer}
-          teamNameById={teamNameById}
-          playerTeamMap={playerTeamMap || {}}
-          isAdmin={isAdmin}
-          onNavigateToSupportTab={onNavigateToSupportTab}
-          onSwapRoles={
-            onUpdateSupportLineup
-              ? async (m) => {
-                  await onUpdateSupportLineup(m.id, {
-                    support_camera_player_id: m.support_stats_player_id,
-                    support_stats_player_id: m.support_camera_player_id,
-                  });
-                }
-              : undefined
-          }
-        />
-
-        {isAdmin && !effectiveFinished && (
-          <Box sx={{ display: "flex", justifyContent: "center", mt: 2, mb: 1 }}>
-            <Button
-              variant="outlined"
-              color="primary"
-              size="medium"
-              startIcon={<BoltIcon />}
-              onClick={() => setEventDialogOpen(true)}
-              data-testid="record-event-inline-button"
+            {/* Escalações dos dois times em duas colunas */}
+            <Box
               sx={{
-                borderRadius: 3,
-                px: 3,
-                py: 0.75,
-                fontWeight: "bold",
-                textTransform: "none",
-                fontSize: "0.9rem",
-                borderWidth: "1.5px",
-                borderColor: "primary.main",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-                transition: "all 0.2s ease-in-out",
-                "&:hover": {
-                  borderWidth: "1.5px",
-                  transform: "translateY(-1px)",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                  bgcolor: "action.hover",
-                },
+                flex: 1,
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: "14px",
+                minHeight: 0,
               }}
             >
-              {t(
-                "peladas.matches.record_event_inline",
-                "Registrar Evento (Drible, Defesa, Chute...)",
-              )}
-            </Button>
+              {teamSection("home")}
+              {teamSection("away")}
+            </Box>
           </Box>
-        )}
 
-        {/* Players Section */}
-        <Grid container spacing={2}>
-          {/* Home Team */}
-          <Grid size={{ xs: 12, sm: 6 }} data-testid="home-team-match-section">
+          {/* Coluna Direita: Classificação ao vivo + Linha do tempo + A seguir + Suporte + Botões Tabela/Súmula */}
+          <Box
+            sx={{
+              borderLeft: "1.5px solid #e4e0d6",
+              bgcolor: "#f1eee6",
+              p: "22px 22px 22px 20px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "10px",
+              minHeight: 0,
+            }}
+          >
+            {/* Card Classificação ao vivo */}
+            {liveStandingsCard}
+
+            {/* A Seguir */}
+            {nextMatchSection()}
+
+            {/* Suporte */}
+            {supportRow()}
+
+            {/* Botões Tabela & Súmula */}
+            {tabButtons(false)}
+          </Box>
+        </Box>
+      ) : (
+        /* ---------- Mobile (referência 1a) ---------- */
+        <Box sx={{ pb: 0 }}>
+          {/* Header Placar Mobile */}
+          <MatchScoreHero
+            match={match}
+            pelada={pelada}
+            homeTeamName={homeTeamName}
+            awayTeamName={awayTeamName}
+            isAdmin={isAdmin}
+            totalMatches={matches.length}
+            standings={standings}
+            clockLabel={clockLabel}
+            running={matchTimer.status === "running"}
+            sessionLabel={sessionLabel}
+            homeOnFieldCount={homePlayers.length}
+            awayOnFieldCount={awayPlayers.length}
+            onToggleHistory={() => setHistoryOpen(true)}
+            onToggleRun={() => {
+              if (matchTimer.status === "running") matchTimer.pause?.();
+              else matchTimer.start?.();
+            }}
+            onOpenResetConfirm={onOpenResetConfirm}
+            onEndMatch={onEndMatch}
+            updating={updating}
+            finished={isMatchFinished}
+            isEditing={isEditing}
+            onToggleEdit={() => setIsEditing(!isEditing)}
+          />
+
+          {/* Área de conteúdo rolável */}
+          <Box sx={{ p: "16px", pb: canRecord ? "190px" : "16px" }}>
+            {nextMatchSection()}
+
+            {supportRow()}
+
             <Box
               sx={{
-                mb: 1.5,
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                pl: 1,
+                bgcolor: "#fff",
+                border: "1.5px solid #e4e0d6",
+                borderRadius: "15px",
+                p: "14px",
               }}
+              data-testid="on-field-card"
             >
               <Box
                 sx={{
-                  width: 4,
-                  height: 16,
-                  bgcolor: theme.palette.home.main,
-                  borderRadius: 1,
-                }}
-              />
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  fontWeight: "bold",
-                  color: "text.secondary",
+                  display: "flex",
+                  alignItems: "baseline",
+                  justifyContent: "space-between",
+                  mb: "12px",
                 }}
               >
-                {homeTeamName.toUpperCase()}
-              </Typography>
-            </Box>
-            <Stack spacing={1}>
-              {homeList.map((p) => {
-                return (
-                  <MatchPlayerCard
-                    key={p.player_id}
-                    player={p}
-                    playerName={getPlayerName(p.player_id)}
-                    playerData={orgPlayerIdToPlayer[p.player_id]}
-                    stats={
-                      statsMap[p.player_id] || {
-                        goals: 0,
-                        assists: 0,
-                        ownGoals: 0,
-                      }
-                    }
-                    finished={effectiveFinished}
-                    isAdmin={isAdmin}
-                    onStatChange={(type, diff, side) =>
-                      handleStatChange(p.player_id, type, diff, side)
-                    }
-                    onSubClick={() =>
-                      setSelectMenu({
-                        teamId: p.teamId,
-                        forPlayerId: p.player_id,
-                        type: p.isEmpty ? "add" : "replace",
-                      })
-                    }
-                  />
-                );
-              })}
-            </Stack>
-          </Grid>
+                <Typography
+                  sx={{
+                    fontFamily: "Archivo, sans-serif",
+                    fontWeight: 800,
+                    fontSize: "10px",
+                    lineHeight: 1,
+                    letterSpacing: "0.16em",
+                    color: "#6b675c",
+                  }}
+                >
+                  {t("peladas.dashboard.live_state.on_field", "EM CAMPO")}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontFamily: "Archivo, sans-serif",
+                    fontSize: "10px",
+                    fontWeight: 600,
+                    lineHeight: 1,
+                    color: "#8a857a",
+                  }}
+                >
+                  {t(
+                    "peladas.dashboard.live_state.swap_hint",
+                    "toque em ⇄ para substituir",
+                  )}
+                </Typography>
+              </Box>
 
-          {/* Away Team */}
-          <Grid size={{ xs: 12, sm: 6 }} data-testid="away-team-match-section">
-            <Box
-              sx={{
-                mb: 1.5,
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-                pl: 1,
-              }}
-            >
+              {teamSection("home")}
+              {teamSection("away")}
+            </Box>
+
+            {onNavigateToTimeline && (
+              <Button
+                onClick={onNavigateToTimeline}
+                data-testid="go-to-timeline-button"
+                sx={{
+                  width: "100%",
+                  mt: "12px",
+                  border: "1.5px dashed #ddd8cc",
+                  bgcolor: "transparent",
+                  color: "#146b3a",
+                  borderRadius: "12px",
+                  py: "11px",
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 800,
+                  fontSize: "10.5px",
+                  lineHeight: 1,
+                  letterSpacing: "0.1em",
+                  cursor: "pointer",
+                  "&:hover": {
+                    borderColor: "#146b3a",
+                    bgcolor: "#f2f8f4",
+                  },
+                }}
+              >
+                {t(
+                  "peladas.dashboard.live_state.view_timeline",
+                  "VER LINHA DO TEMPO COMPLETA",
+                )}
+              </Button>
+            )}
+
+            {tabButtons(false)}
+          </Box>
+
+          {/* Barra inferior fixa para o polegar */}
+          {canRecord && (
+            <Portal>
               <Box
                 sx={{
-                  width: 4,
-                  height: 16,
-                  bgcolor: theme.palette.away.main,
-                  borderRadius: 1,
+                  position: "fixed",
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  zIndex: 1100,
+                  p: "14px 16px 26px",
+                  background:
+                    "linear-gradient(180deg, rgba(246,244,238,0) 0%, #f6f4ee 34%)",
                 }}
-              />
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  fontWeight: "bold",
-                  color: "text.secondary",
-                }}
+                data-testid="live-action-bar"
               >
-                {awayTeamName.toUpperCase()}
-              </Typography>
-            </Box>
-            <Stack spacing={1}>
-              {awayList.map((p) => {
-                return (
-                  <MatchPlayerCard
-                    key={p.player_id}
-                    player={p}
-                    playerName={getPlayerName(p.player_id)}
-                    playerData={orgPlayerIdToPlayer[p.player_id]}
-                    stats={
-                      statsMap[p.player_id] || {
-                        goals: 0,
-                        assists: 0,
-                        ownGoals: 0,
-                      }
+                <Button
+                  onClick={() => setEventSheet({ step: "type" })}
+                  data-testid="record-event-inline-button"
+                  sx={{
+                    width: "100%",
+                    mb: "9px",
+                    border: "1.5px solid #ddd8cc",
+                    bgcolor: "#fff",
+                    color: "#123c26",
+                    borderRadius: "13px",
+                    py: "13px",
+                    fontFamily: "Archivo, sans-serif",
+                    fontWeight: 800,
+                    fontSize: "11.5px",
+                    lineHeight: 1,
+                    letterSpacing: "0.08em",
+                    cursor: "pointer",
+                    "&:hover": {
+                      borderColor: "#123c26",
+                      bgcolor: "#f2f8f4",
+                    },
+                  }}
+                >
+                  ＋{" "}
+                  {t("peladas.dashboard.live_state.other_event", "OUTRO LANCE")}{" "}
+                  · DRIBLE, CHUTE, FALTA…
+                </Button>
+                <Box sx={{ display: "flex", gap: "10px" }}>
+                  <Button
+                    onClick={() =>
+                      setGoalSheet({ side: "home", step: "scorer" })
                     }
-                    finished={effectiveFinished}
-                    isAdmin={isAdmin}
-                    onStatChange={(type, diff, side) =>
-                      handleStatChange(p.player_id, type, diff, side)
+                    data-testid="goal-button-home"
+                    sx={{
+                      flex: 1,
+                      border: 0,
+                      borderRadius: "16px",
+                      bgcolor: "#c9591c",
+                      color: "#fff",
+                      py: "18px",
+                      pb: "20px",
+                      cursor: "pointer",
+                      boxShadow: "0 4px 0 #8f3d12",
+                      "&:hover": { bgcolor: "#a8480f" },
+                      "&:active": {
+                        transform: "translateY(3px)",
+                        boxShadow: "0 1px 0 #8f3d12",
+                      },
+                    }}
+                  >
+                    <Box sx={{ display: "block", textAlign: "center" }}>
+                      <Typography
+                        component="span"
+                        sx={{
+                          display: "block",
+                          fontFamily: "'Anton', sans-serif",
+                          fontWeight: 400,
+                          fontSize: "30px",
+                          lineHeight: 1,
+                          letterSpacing: "0.04em",
+                        }}
+                      >
+                        GOL
+                      </Typography>
+                      <Typography
+                        component="span"
+                        sx={{
+                          display: "block",
+                          fontFamily: "Archivo, sans-serif",
+                          fontWeight: 800,
+                          fontSize: "10px",
+                          lineHeight: 1,
+                          letterSpacing: "0.14em",
+                          color: "#f3c19c",
+                          mt: "6px",
+                        }}
+                      >
+                        {homeTeamName.toUpperCase()}
+                      </Typography>
+                    </Box>
+                  </Button>
+
+                  <Button
+                    onClick={() =>
+                      setGoalSheet({ side: "away", step: "scorer" })
                     }
-                    onSubClick={() =>
-                      setSelectMenu({
-                        teamId: p.teamId,
-                        forPlayerId: p.player_id,
-                        type: p.isEmpty ? "add" : "replace",
-                      })
-                    }
-                  />
-                );
-              })}
-            </Stack>
-          </Grid>
-        </Grid>
-      </Stack>
-      {/* Substitute Selector */}
+                    data-testid="goal-button-away"
+                    sx={{
+                      flex: 1,
+                      border: 0,
+                      borderRadius: "16px",
+                      bgcolor: "#1f5f9c",
+                      color: "#fff",
+                      py: "18px",
+                      pb: "20px",
+                      cursor: "pointer",
+                      boxShadow: "0 4px 0 #164674",
+                      "&:hover": { bgcolor: "#19507f" },
+                      "&:active": {
+                        transform: "translateY(3px)",
+                        boxShadow: "0 1px 0 #164674",
+                      },
+                    }}
+                  >
+                    <Box sx={{ display: "block", textAlign: "center" }}>
+                      <Typography
+                        component="span"
+                        sx={{
+                          display: "block",
+                          fontFamily: "'Anton', sans-serif",
+                          fontWeight: 400,
+                          fontSize: "30px",
+                          lineHeight: 1,
+                          letterSpacing: "0.04em",
+                        }}
+                      >
+                        GOL
+                      </Typography>
+                      <Typography
+                        component="span"
+                        sx={{
+                          display: "block",
+                          fontFamily: "Archivo, sans-serif",
+                          fontWeight: 800,
+                          fontSize: "10px",
+                          lineHeight: 1,
+                          letterSpacing: "0.14em",
+                          color: "#a9caea",
+                          mt: "6px",
+                        }}
+                      >
+                        {awayTeamName.toUpperCase()}
+                      </Typography>
+                    </Box>
+                  </Button>
+                </Box>
+              </Box>
+            </Portal>
+          )}
+        </Box>
+      )}
+
+      {/* Seletor de Substituição */}
       {selectMenu && (
         <PlayerSelectMenu
           teamId={selectMenu.teamId}
@@ -735,79 +1841,411 @@ export default function ActiveMatchDashboard(props: Props) {
           getPlayerName={getPlayerName}
         />
       )}
-      {/* Who Assisted Dialog */}
+
+      {/* Goal Sheet: scorer -> assist / own_goal */}
       <Dialog
-        open={assistDialogOpen}
-        onClose={handleCloseAssistDialog}
-        fullWidth
-        maxWidth="xs"
-        data-testid="assist-select-dialog"
+        open={Boolean(goalSheet)}
+        onClose={() => setGoalSheet(null)}
+        slotProps={{ paper: { sx: bottomSheetPaperSx } }}
+        data-testid={
+          goalSheet?.step === "assist"
+            ? "assist-select-dialog"
+            : goalSheet?.step === "own_goal"
+              ? "own-goal-select-dialog"
+              : "goal-select-dialog"
+        }
       >
-        <DialogTitle sx={{ fontWeight: "bold" }}>
-          {t("peladas.matches.who_assisted", "Who assisted?")}
-        </DialogTitle>
-        <DialogContent sx={{ p: 0 }}>
-          <List sx={{ pt: 0, maxHeight: 400, overflow: "auto" }}>
-            <ListItem disablePadding>
-              <ListItemButton
-                onClick={() => handleSelectAssistant(undefined)}
-                data-testid="without-assistance-option"
+        <DialogContent sx={{ p: { xs: "20px 18px 26px", sm: "22px" } }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              mb: "14px",
+            }}
+          >
+            <Box
+              sx={{
+                width: 9,
+                height: 9,
+                borderRadius: "50%",
+                bgcolor:
+                  goalSheet?.step === "own_goal"
+                    ? "#a8452a"
+                    : goalSheet?.side === "away"
+                      ? "#1f5f9c"
+                      : "#c9591c",
+                flexShrink: 0,
+              }}
+            />
+            <Typography
+              sx={{
+                flex: 1,
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 800,
+                fontSize: "10px",
+                lineHeight: 1,
+                letterSpacing: "0.16em",
+                color: "#6b675c",
+              }}
+            >
+              {goalSheet?.step === "own_goal"
+                ? `GOL CONTRA A FAVOR DO ${goalSideName.toUpperCase()} · ${clockLabel}`
+                : `GOL DO ${goalSideName.toUpperCase()} · ${clockLabel}`}
+            </Typography>
+            <IconButton
+              onClick={() => setGoalSheet(null)}
+              aria-label={t("common.close")}
+              sx={{
+                border: "1.5px solid #ddd8cc",
+                bgcolor: "#fff",
+                color: "#6b675c",
+                width: 30,
+                height: 30,
+                borderRadius: "10px",
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 700,
+                fontSize: "13px",
+                lineHeight: 1,
+                p: 0,
+                "&:hover": {
+                  borderColor: "#a8452a",
+                  color: "#a8452a",
+                },
+              }}
+            >
+              ✕
+            </IconButton>
+          </Box>
+
+          <Typography
+            sx={{
+              fontFamily: "Archivo, sans-serif",
+              fontWeight: 800,
+              fontSize: { xs: "21px", sm: "22px" },
+              lineHeight: 1.2,
+              color: "#1a1a1a",
+              mb: "14px",
+            }}
+            data-testid="goal-sheet-question"
+          >
+            {goalSheet?.step === "scorer"
+              ? t("peladas.matches.who_scored", "Quem marcou?")
+              : goalSheet?.step === "assist"
+                ? t("peladas.matches.who_assisted", "Quem deu a assistência?")
+                : t(
+                    "peladas.matches.who_scored_own_goal",
+                    "Quem fez o gol contra?",
+                  )}
+          </Typography>
+
+          {goalSheet?.step === "scorer" ? (
+            <>
+              {playersGrid(
+                goalSideList.filter((p) => !p.isEmpty),
+                (pid) => {
+                  if (goalSheet) {
+                    setGoalSheet({
+                      side: goalSheet.side,
+                      step: "assist",
+                      scorerId: pid,
+                    });
+                  }
+                },
+                "goal",
+                false,
+              )}
+              <Button
+                onClick={() => {
+                  if (goalSheet) {
+                    setGoalSheet({
+                      side: goalSheet.side,
+                      step: "own_goal",
+                    });
+                  }
+                }}
+                data-testid="own-goal-option"
+                sx={{
+                  width: "100%",
+                  mt: "12px",
+                  border: 0,
+                  borderRadius: "13px",
+                  bgcolor: "#123c26",
+                  color: "#fff",
+                  py: "15px",
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 800,
+                  fontSize: "12.5px",
+                  lineHeight: 1,
+                  letterSpacing: "0.06em",
+                  cursor: "pointer",
+                  "&:hover": { bgcolor: "#0d2e1d" },
+                }}
               >
-                <Avatar
+                {t("peladas.matches.own_goal_btn", "GOL CONTRA")}
+              </Button>
+              <Button
+                onClick={handleSkipOwnGoal}
+                data-testid="own-goal-skip-option"
+                sx={{
+                  width: "100%",
+                  mt: "6px",
+                  borderRadius: "13px",
+                  bgcolor: "transparent",
+                  color: "#6b675c",
+                  py: "10px",
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 700,
+                  fontSize: "11px",
+                  letterSpacing: "0.06em",
+                  cursor: "pointer",
+                  "&:hover": { bgcolor: "#efece4" },
+                }}
+              >
+                {t("peladas.matches.goal_unidentified", "GOL NÃO IDENTIFICADO")}
+              </Button>
+            </>
+          ) : goalSheet?.step === "assist" ? (
+            <>
+              {playersGrid(
+                assistantOptions,
+                (pid) => commitGoal(pid),
+                "assistant",
+                false,
+              )}
+              <Button
+                onClick={() => commitGoal(undefined)}
+                data-testid="without-assistance-option"
+                sx={{
+                  width: "100%",
+                  mt: "12px",
+                  border: 0,
+                  borderRadius: "13px",
+                  bgcolor: "#123c26",
+                  color: "#fff",
+                  py: "15px",
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 800,
+                  fontSize: "12.5px",
+                  lineHeight: 1,
+                  letterSpacing: "0.06em",
+                  cursor: "pointer",
+                  "&:hover": { bgcolor: "#0d2e1d" },
+                }}
+              >
+                SEM ASSISTÊNCIA
+              </Button>
+            </>
+          ) : (
+            <>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  mb: "10px",
+                }}
+              >
+                <Box
                   sx={{
-                    bgcolor: "text.disabled",
-                    width: 40,
-                    height: 40,
-                    mr: 2,
-                  }}
-                >
-                  <BlockIcon />
-                </Avatar>
-                <ListItemText
-                  primary={t("common.without_assistance")}
-                  slotProps={{
-                    primary: {
-                      sx: { fontWeight: "bold", color: "text.secondary" },
-                    },
+                    width: 7,
+                    height: 7,
+                    borderRadius: "50%",
+                    bgcolor: goalSheet?.side === "home" ? "#1f5f9c" : "#c9591c",
                   }}
                 />
-              </ListItemButton>
-            </ListItem>
+                <Typography
+                  sx={{
+                    fontFamily: "Archivo, sans-serif",
+                    fontWeight: 800,
+                    fontSize: "11px",
+                    lineHeight: 1,
+                    letterSpacing: "0.08em",
+                    color: "#6b675c",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  {t(
+                    "peladas.matches.defending_team_players",
+                    "Jogador do {{team}}",
+                    { team: defendingSideName },
+                  )}
+                </Typography>
+              </Box>
 
-            {assistantOptions.map((player) => {
-              const name = getPlayerName(player.player_id);
-              const playerData = orgPlayerIdToPlayer[player.player_id];
-              return (
-                <ListItem key={player.player_id} disablePadding>
-                  <ListItemButton
-                    onClick={() => handleSelectAssistant(player.player_id)}
-                    data-testid={`assistant-player-item-${player.player_id}`}
-                  >
-                    <SecureAvatar
-                      userId={playerData?.user_id}
-                      filename={playerData?.user_avatar_filename}
-                      sx={{
-                        width: 40,
-                        height: 40,
-                        fontSize: "0.9rem",
-                        fontWeight: "bold",
-                        mr: 2,
-                      }}
-                      fallbackText={name.substring(0, 2).toUpperCase()}
-                    />
-                    <ListItemText
-                      primary={name}
-                      slotProps={{
-                        primary: { sx: { fontWeight: "bold" } },
-                      }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              );
-            })}
-          </List>
+              {playersGrid(
+                defendingSideList.filter((p) => !p.isEmpty),
+                (pid) => commitOwnGoal(pid),
+                "own_goal",
+                false,
+              )}
+
+              <Button
+                onClick={handleSkipOwnGoal}
+                data-testid="unidentified-own-goal-option"
+                sx={{
+                  width: "100%",
+                  mt: "12px",
+                  border: 0,
+                  borderRadius: "13px",
+                  bgcolor: "#123c26",
+                  color: "#fff",
+                  py: "15px",
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 800,
+                  fontSize: "12.5px",
+                  lineHeight: 1,
+                  letterSpacing: "0.06em",
+                  cursor: "pointer",
+                  "&:hover": { bgcolor: "#0d2e1d" },
+                }}
+              >
+                {t(
+                  "peladas.matches.own_goal_unidentified",
+                  "GOL CONTRA NÃO IDENTIFICADO",
+                )}
+              </Button>
+
+              <Button
+                onClick={() => {
+                  if (goalSheet) {
+                    setGoalSheet({ side: goalSheet.side, step: "scorer" });
+                  }
+                }}
+                data-testid="back-to-scorer-option"
+                sx={{
+                  width: "100%",
+                  mt: "6px",
+                  borderRadius: "13px",
+                  bgcolor: "transparent",
+                  color: "#6b675c",
+                  py: "10px",
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 700,
+                  fontSize: "11px",
+                  letterSpacing: "0.06em",
+                  cursor: "pointer",
+                  "&:hover": { bgcolor: "#efece4" },
+                }}
+              >
+                {t("common.back", "VOLTAR")}
+              </Button>
+            </>
+          )}
         </DialogContent>
       </Dialog>
+
+      {/* Event Sheet: type -> player */}
+      <Dialog
+        open={Boolean(eventSheet)}
+        onClose={() => setEventSheet(null)}
+        slotProps={{ paper: { sx: bottomSheetPaperSx } }}
+        data-testid="record-event-dialog"
+      >
+        <DialogContent sx={{ p: { xs: "20px 18px 26px", sm: "22px" } }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              mb: "14px",
+            }}
+          >
+            <Box
+              sx={{
+                width: 9,
+                height: 9,
+                borderRadius: "50%",
+                bgcolor: "#6b675c",
+                flexShrink: 0,
+              }}
+            />
+            <Typography
+              sx={{
+                flex: 1,
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 800,
+                fontSize: "10px",
+                lineHeight: 1,
+                letterSpacing: "0.16em",
+                color: "#6b675c",
+              }}
+            >
+              {`REGISTRAR LANCE · ${clockLabel}`}
+            </Typography>
+            <IconButton
+              onClick={() => setEventSheet(null)}
+              aria-label={t("common.close")}
+              sx={{
+                border: "1.5px solid #ddd8cc",
+                bgcolor: "#fff",
+                color: "#6b675c",
+                width: 30,
+                height: 30,
+                borderRadius: "10px",
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 700,
+                fontSize: "13px",
+                lineHeight: 1,
+                p: 0,
+                "&:hover": {
+                  borderColor: "#a8452a",
+                  color: "#a8452a",
+                },
+              }}
+            >
+              ✕
+            </IconButton>
+          </Box>
+
+          <Typography
+            sx={{
+              fontFamily: "Archivo, sans-serif",
+              fontWeight: 800,
+              fontSize: { xs: "21px", sm: "22px" },
+              lineHeight: 1.2,
+              color: "#1a1a1a",
+              mb: "14px",
+            }}
+          >
+            {eventSheet?.step === "type"
+              ? "Que lance foi?"
+              : "Quem fez o lance?"}
+          </Typography>
+
+          {eventSheet?.step === "type" ? (
+            eventTypesGrid
+          ) : (
+            <>
+              {playersGrid(
+                allOnFieldPlayers,
+                handleConfirmEvent,
+                "event",
+                true,
+              )}
+              <Button
+                onClick={() => setEventSheet({ step: "type" })}
+                sx={{
+                  width: "100%",
+                  mt: "12px",
+                  borderRadius: "13px",
+                  bgcolor: "transparent",
+                  color: "#6b675c",
+                  py: "12px",
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 800,
+                  fontSize: "11px",
+                  lineHeight: 1,
+                  letterSpacing: "0.06em",
+                }}
+              >
+                {t("common.back", "VOLTAR")}
+              </Button>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* History Drawer */}
       <Drawer
         anchor="left"
@@ -819,17 +2257,18 @@ export default function ActiveMatchDashboard(props: Props) {
           <Typography
             variant="h6"
             sx={{
+              fontFamily: "Archivo, sans-serif",
               fontWeight: "bold",
               mb: 3,
               px: 1,
             }}
           >
-            {t("peladas.matches.history_title")}
+            {t("peladas.matches.history_title", "Histórico de Partidas")}
           </Typography>
           <List sx={{ px: 0 }}>
             {matches.map((m) => {
               const isSelected = match.id === m.id;
-              const isNext = m.id === nextMatchId;
+              const isNext = m.id === nextMatch?.id;
               const status = isNext ? "next" : m.status;
 
               const statusColor =
@@ -882,14 +2321,13 @@ export default function ActiveMatchDashboard(props: Props) {
                         justifyContent: "space-between",
                         alignItems: "center",
                         mb: 0.5,
+                        width: "100%",
                       }}
                     >
                       <Stack
                         direction="row"
                         spacing={1}
-                        sx={{
-                          alignItems: "center",
-                        }}
+                        sx={{ alignItems: "center" }}
                       >
                         <Avatar
                           sx={{
@@ -916,6 +2354,7 @@ export default function ActiveMatchDashboard(props: Props) {
                                 : "text.secondary"
                           }
                           sx={{
+                            fontFamily: "Archivo, sans-serif",
                             fontWeight: "bold",
                           }}
                         >
@@ -948,6 +2387,7 @@ export default function ActiveMatchDashboard(props: Props) {
                         justifyContent: "space-between",
                         alignItems: "center",
                         gap: 1,
+                        width: "100%",
                       }}
                     >
                       <Typography
@@ -977,29 +2417,16 @@ export default function ActiveMatchDashboard(props: Props) {
                           justifyContent: "center",
                         }}
                       >
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontWeight: "900",
-                          }}
-                        >
+                        <Typography variant="body2" sx={{ fontWeight: "900" }}>
                           {m.home_score}
                         </Typography>
                         <Typography
                           variant="caption"
-                          sx={{
-                            color: "text.disabled",
-                            fontWeight: "bold",
-                          }}
+                          sx={{ color: "text.disabled", fontWeight: "bold" }}
                         >
                           x
                         </Typography>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            fontWeight: "900",
-                          }}
-                        >
+                        <Typography variant="body2" sx={{ fontWeight: "900" }}>
                           {m.away_score}
                         </Typography>
                       </Box>
@@ -1018,42 +2445,6 @@ export default function ActiveMatchDashboard(props: Props) {
                         {teamNameById[m.away_team_id] || "Away"}
                       </Typography>
                     </Box>
-
-                    {(m.support_camera_player_id ||
-                      m.support_stats_player_id) && (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: 1.5,
-                          mt: 0.5,
-                          pt: 0.5,
-                          borderTop: "1px dashed",
-                          borderColor: "divider",
-                          width: "100%",
-                        }}
-                      >
-                        {m.support_camera_player_id && (
-                          <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{ fontSize: "0.7rem" }}
-                          >
-                            📹 {getPlayerName(m.support_camera_player_id)}
-                          </Typography>
-                        )}
-                        {m.support_stats_player_id && (
-                          <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{ fontSize: "0.7rem" }}
-                          >
-                            📝 {getPlayerName(m.support_stats_player_id)}
-                          </Typography>
-                        )}
-                      </Box>
-                    )}
                   </ListItemButton>
                 </ListItem>
               );
@@ -1061,346 +2452,6 @@ export default function ActiveMatchDashboard(props: Props) {
           </List>
         </Box>
       </Drawer>
-
-      {/* Floating Action Button for recording custom events */}
-      {isAdmin && !effectiveFinished && (
-        <Fab
-          color="primary"
-          aria-label="record event"
-          onClick={() => setEventDialogOpen(true)}
-          sx={{
-            position: "fixed",
-            bottom: { xs: 16, sm: 24 },
-            right: { xs: 16, sm: 24 },
-            boxShadow: 4,
-            zIndex: 1000,
-          }}
-          data-testid="record-event-fab"
-        >
-          <BoltIcon />
-        </Fab>
-      )}
-
-      {/* Dialogue overlay for custom events */}
-      <Dialog
-        open={eventDialogOpen}
-        onClose={() => {
-          setSelectedEventPlayerId(null);
-          setSelectedEventType(null);
-          setEventDialogOpen(false);
-        }}
-        fullWidth
-        maxWidth="md"
-        data-testid="record-event-dialog"
-      >
-        <DialogTitle sx={{ fontWeight: "bold" }}>
-          {t("peladas.matches.record_event_title", "Registrar Evento")}
-        </DialogTitle>
-        <DialogContent>
-          <Grid container spacing={3} sx={{ mt: 0.5 }}>
-            {/* Player Selector Column */}
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Typography
-                variant="subtitle2"
-                sx={{ fontWeight: "bold", mb: 1.5, color: "text.secondary" }}
-              >
-                {t("peladas.matches.select_player", "SELECIONAR JOGADOR")}
-              </Typography>
-              <Box sx={{ maxHeight: 350, overflow: "auto", pr: 1 }}>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontWeight: "bold",
-                    color: "home.main",
-                    display: "block",
-                    mb: 1,
-                  }}
-                >
-                  {homeTeamName.toUpperCase()}
-                </Typography>
-                <List sx={{ p: 0, mb: 2 }}>
-                  {eventPlayerOptions.home.map((player) => {
-                    const name = getPlayerName(player.player_id);
-                    const playerData = orgPlayerIdToPlayer[player.player_id];
-                    const isSelected =
-                      selectedEventPlayerId === player.player_id;
-                    return (
-                      <ListItem
-                        key={player.player_id}
-                        disablePadding
-                        sx={{ mb: 0.5 }}
-                      >
-                        <ListItemButton
-                          selected={isSelected}
-                          onClick={() =>
-                            setSelectedEventPlayerId(player.player_id)
-                          }
-                          sx={{
-                            borderRadius: 2,
-                            border: "1px solid",
-                            borderColor: isSelected
-                              ? "primary.main"
-                              : "divider",
-                            bgcolor: isSelected
-                              ? alpha(theme.palette.primary.main, 0.08)
-                              : "transparent",
-                          }}
-                          data-testid={`event-player-item-${player.player_id}`}
-                        >
-                          <SecureAvatar
-                            userId={playerData?.user_id}
-                            filename={playerData?.user_avatar_filename}
-                            sx={{
-                              width: 32,
-                              height: 32,
-                              fontSize: "0.8rem",
-                              fontWeight: "bold",
-                              mr: 1.5,
-                            }}
-                            fallbackText={name.substring(0, 2).toUpperCase()}
-                          />
-                          <ListItemText
-                            primary={name}
-                            slotProps={{
-                              primary: {
-                                sx: {
-                                  fontWeight: isSelected ? "bold" : "normal",
-                                },
-                              },
-                            }}
-                          />
-                        </ListItemButton>
-                      </ListItem>
-                    );
-                  })}
-                </List>
-
-                <Typography
-                  variant="caption"
-                  sx={{
-                    fontWeight: "bold",
-                    color: "away.main",
-                    display: "block",
-                    mb: 1,
-                  }}
-                >
-                  {awayTeamName.toUpperCase()}
-                </Typography>
-                <List sx={{ p: 0 }}>
-                  {eventPlayerOptions.away.map((player) => {
-                    const name = getPlayerName(player.player_id);
-                    const playerData = orgPlayerIdToPlayer[player.player_id];
-                    const isSelected =
-                      selectedEventPlayerId === player.player_id;
-                    return (
-                      <ListItem
-                        key={player.player_id}
-                        disablePadding
-                        sx={{ mb: 0.5 }}
-                      >
-                        <ListItemButton
-                          selected={isSelected}
-                          onClick={() =>
-                            setSelectedEventPlayerId(player.player_id)
-                          }
-                          sx={{
-                            borderRadius: 2,
-                            border: "1px solid",
-                            borderColor: isSelected
-                              ? "primary.main"
-                              : "divider",
-                            bgcolor: isSelected
-                              ? alpha(theme.palette.primary.main, 0.08)
-                              : "transparent",
-                          }}
-                          data-testid={`event-player-item-${player.player_id}`}
-                        >
-                          <SecureAvatar
-                            userId={playerData?.user_id}
-                            filename={playerData?.user_avatar_filename}
-                            sx={{
-                              width: 32,
-                              height: 32,
-                              fontSize: "0.8rem",
-                              fontWeight: "bold",
-                              mr: 1.5,
-                            }}
-                            fallbackText={name.substring(0, 2).toUpperCase()}
-                          />
-                          <ListItemText
-                            primary={name}
-                            slotProps={{
-                              primary: {
-                                sx: {
-                                  fontWeight: isSelected ? "bold" : "normal",
-                                },
-                              },
-                            }}
-                          />
-                        </ListItemButton>
-                      </ListItem>
-                    );
-                  })}
-                </List>
-              </Box>
-            </Grid>
-
-            {/* Event Selector Column */}
-            <Grid size={{ xs: 12, md: 6 }}>
-              <Typography
-                variant="subtitle2"
-                sx={{ fontWeight: "bold", mb: 1.5, color: "text.secondary" }}
-              >
-                {t("peladas.matches.select_event", "SELECIONAR EVENTO")}
-              </Typography>
-              <Grid container spacing={2}>
-                {[
-                  {
-                    type: "drible",
-                    label: t("common.drible"),
-                    icon: (
-                      <BoltIcon sx={{ fontSize: "2rem", color: "#d97706" }} />
-                    ),
-                    color: "#d97706",
-                  },
-                  {
-                    type: "chute",
-                    label: t("common.chute"),
-                    icon: (
-                      <LocalFireDepartmentIcon
-                        sx={{ fontSize: "2rem", color: "#e11d48" }}
-                      />
-                    ),
-                    color: "#e11d48",
-                  },
-                  {
-                    type: "falta",
-                    label: t("common.falta"),
-                    icon: (
-                      <WarningIcon
-                        sx={{ fontSize: "2rem", color: "#ea580c" }}
-                      />
-                    ),
-                    color: "#ea580c",
-                  },
-                  {
-                    type: "furada",
-                    label: t("common.furada"),
-                    icon: (
-                      <SentimentVeryDissatisfiedIcon
-                        sx={{ fontSize: "2rem", color: "#6b7280" }}
-                      />
-                    ),
-                    color: "#6b7280",
-                  },
-                  {
-                    type: "defesa",
-                    label: t("common.defesa"),
-                    icon: (
-                      <ShieldIcon sx={{ fontSize: "2rem", color: "#0d9488" }} />
-                    ),
-                    color: "#0d9488",
-                  },
-                  {
-                    type: "vish",
-                    label: t("common.vish"),
-                    icon: (
-                      <SentimentVerySatisfiedIcon
-                        sx={{ fontSize: "2rem", color: "#7c3aed" }}
-                      />
-                    ),
-                    color: "#7c3aed",
-                  },
-                ].map((ev) => {
-                  const isSelected = selectedEventType === ev.type;
-                  return (
-                    <Grid size={{ xs: 6 }} key={ev.type}>
-                      <Paper
-                        variant="outlined"
-                        onClick={() =>
-                          setSelectedEventType(ev.type as MatchEventType)
-                        }
-                        sx={{
-                          p: 2.5,
-                          borderRadius: 3,
-                          cursor: "pointer",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          gap: 1,
-                          border: "2px solid",
-                          borderColor: isSelected ? ev.color : "divider",
-                          bgcolor: isSelected
-                            ? alpha(ev.color, 0.08)
-                            : "background.paper",
-                          transition: "all 0.2s",
-                          "&:hover": {
-                            borderColor: ev.color,
-                            bgcolor: alpha(ev.color, 0.04),
-                            transform: "translateY(-2px)",
-                            boxShadow: 1,
-                          },
-                        }}
-                        data-testid={`event-type-card-${ev.type}`}
-                      >
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            height: "32px",
-                            mb: 0.5,
-                          }}
-                        >
-                          {ev.icon}
-                        </Box>
-                        <Typography
-                          sx={{
-                            fontWeight: "bold",
-                            color: isSelected ? ev.color : "text.primary",
-                            fontSize: "0.9rem",
-                          }}
-                        >
-                          {ev.label}
-                        </Typography>
-                      </Paper>
-                    </Grid>
-                  );
-                })}
-              </Grid>
-            </Grid>
-          </Grid>
-
-          <Stack
-            direction="row"
-            spacing={2}
-            sx={{ mt: 4, justifyContent: "flex-end" }}
-          >
-            <Button
-              variant="outlined"
-              onClick={() => {
-                setSelectedEventPlayerId(null);
-                setSelectedEventType(null);
-                setEventDialogOpen(false);
-              }}
-              sx={{ borderRadius: 2, textTransform: "none" }}
-              data-testid="cancel-event-button"
-            >
-              {t("common.cancel")}
-            </Button>
-            <Button
-              variant="contained"
-              disabled={!selectedEventPlayerId || !selectedEventType}
-              onClick={handleConfirmEvent}
-              sx={{ borderRadius: 2, textTransform: "none" }}
-              data-testid="confirm-event-button"
-            >
-              {t("peladas.matches.confirm_registration", "Confirmar Registro")}
-            </Button>
-          </Stack>
-        </DialogContent>
-      </Dialog>
     </Box>
   );
 }

@@ -23,11 +23,10 @@ describe("MatchPlayerCard", () => {
     stats: { goals: 0, assists: 0, ownGoals: 0 },
     finished: false,
     isAdmin: true,
-    onStatChange: vi.fn(),
     onSubClick: vi.fn(),
   };
 
-  it("renders player name and default position", () => {
+  it("renders player name and short position code", () => {
     render(
       <ThemeContextProvider>
         <MatchPlayerCard {...defaultProps} />
@@ -35,11 +34,10 @@ describe("MatchPlayerCard", () => {
     );
 
     expect(screen.getByText("Marlon")).toBeInTheDocument();
-    // common.positions.striker
-    expect(screen.getByText(/common\.positions\.striker/i)).toBeInTheDocument();
+    expect(screen.getByText("ATA")).toBeInTheDocument();
   });
 
-  it("prioritizes is_goalkeeper status over default position", () => {
+  it("prioritizes is_goalkeeper status over player position", () => {
     render(
       <ThemeContextProvider>
         <MatchPlayerCard
@@ -49,96 +47,29 @@ describe("MatchPlayerCard", () => {
       </ThemeContextProvider>,
     );
 
-    // Should show common.positions.goalkeeper
-    expect(
-      screen.getByText(/common\.positions\.goalkeeper/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText("GOL")).toBeInTheDocument();
   });
 
-  it("renders own goals with different color if > 0", () => {
+  it("maps defender and midfielder to short codes", () => {
     const { rerender } = render(
       <ThemeContextProvider>
         <MatchPlayerCard
           {...defaultProps}
-          stats={{ goals: 0, assists: 0, ownGoals: 0 }}
+          playerData={{ ...defaultProps.playerData, position: "defender" }}
         />
       </ThemeContextProvider>,
     );
-
-    const contraLabel = screen.getByText(/common\.own_goals_short/i);
-    // MUI text.secondary in default theme is rgb(100, 116, 139) or similar
-    // Let's just check it HAS a style color and then it CHANGES.
-    expect(contraLabel).toHaveStyle("color: rgb(100, 116, 139)");
+    expect(screen.getByText("ZAG")).toBeInTheDocument();
 
     rerender(
       <ThemeContextProvider>
         <MatchPlayerCard
           {...defaultProps}
-          stats={{ goals: 0, assists: 0, ownGoals: 1 }}
+          playerData={{ ...defaultProps.playerData, position: "midfielder" }}
         />
       </ThemeContextProvider>,
     );
-
-    const contraLabelUpdated = screen.getByText(/common\.own_goals_short/i);
-    expect(contraLabelUpdated).not.toHaveStyle("color: rgb(100, 116, 139)");
-  });
-
-  it("renders empty slot correctly", () => {
-    render(
-      <ThemeContextProvider>
-        <MatchPlayerCard
-          {...defaultProps}
-          player={{ ...defaultProps.player, isEmpty: true }}
-        />
-      </ThemeContextProvider>,
-    );
-
-    expect(screen.getByTestId("player-row-empty")).toBeInTheDocument();
-    expect(
-      screen.getByText(/peladas\.dashboard\.empty_slot/i),
-    ).toBeInTheDocument();
-    expect(screen.getByRole("button")).toBeInTheDocument(); // Sub button in empty slot
-  });
-
-  it("hides sub button in empty slot for non-admins", () => {
-    render(
-      <ThemeContextProvider>
-        <MatchPlayerCard
-          {...defaultProps}
-          player={{ ...defaultProps.player, isEmpty: true }}
-          isAdmin={false}
-        />
-      </ThemeContextProvider>,
-    );
-
-    expect(screen.queryByRole("button")).not.toBeInTheDocument();
-  });
-
-  it("hides sub button in empty slot when match is finished", () => {
-    render(
-      <ThemeContextProvider>
-        <MatchPlayerCard
-          {...defaultProps}
-          player={{ ...defaultProps.player, isEmpty: true }}
-          finished={true}
-        />
-      </ThemeContextProvider>,
-    );
-
-    expect(screen.queryByRole("button")).not.toBeInTheDocument();
-  });
-
-  it("renders correctly for away side", () => {
-    render(
-      <ThemeContextProvider>
-        <MatchPlayerCard
-          {...defaultProps}
-          player={{ ...defaultProps.player, side: "away" }}
-        />
-      </ThemeContextProvider>,
-    );
-    // Just verify it renders without crash and uses away side logic
-    expect(screen.getByTestId("player-row")).toBeInTheDocument();
+    expect(screen.getByText("MEI")).toBeInTheDocument();
   });
 
   it("uses user_position when position is missing", () => {
@@ -156,12 +87,10 @@ describe("MatchPlayerCard", () => {
         />
       </ThemeContextProvider>,
     );
-    expect(
-      screen.getByText(/common\.positions\.defender/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText("ZAG")).toBeInTheDocument();
   });
 
-  it("falls back to 'player' position when both are missing", () => {
+  it("falls back to generic position label when unknown", () => {
     render(
       <ThemeContextProvider>
         <MatchPlayerCard
@@ -179,7 +108,64 @@ describe("MatchPlayerCard", () => {
     expect(screen.getByText(/common\.positions\.player/i)).toBeInTheDocument();
   });
 
-  it("hides controls when not admin", () => {
+  it("renders empty slot with add button for admins", () => {
+    render(
+      <ThemeContextProvider>
+        <MatchPlayerCard
+          {...defaultProps}
+          player={{ ...defaultProps.player, isEmpty: true }}
+        />
+      </ThemeContextProvider>,
+    );
+
+    expect(screen.getByTestId("player-row-empty")).toBeInTheDocument();
+    expect(
+      screen.getByText(/peladas\.dashboard\.empty_slot/i),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("add-player-button")).toBeInTheDocument();
+  });
+
+  it("hides add button in empty slot for non-admins", () => {
+    render(
+      <ThemeContextProvider>
+        <MatchPlayerCard
+          {...defaultProps}
+          player={{ ...defaultProps.player, isEmpty: true }}
+          isAdmin={false}
+        />
+      </ThemeContextProvider>,
+    );
+
+    expect(screen.queryByTestId("add-player-button")).not.toBeInTheDocument();
+  });
+
+  it("hides add button in empty slot when match is finished", () => {
+    render(
+      <ThemeContextProvider>
+        <MatchPlayerCard
+          {...defaultProps}
+          player={{ ...defaultProps.player, isEmpty: true }}
+          finished={true}
+        />
+      </ThemeContextProvider>,
+    );
+
+    expect(screen.queryByTestId("add-player-button")).not.toBeInTheDocument();
+  });
+
+  it("renders correctly for away side", () => {
+    render(
+      <ThemeContextProvider>
+        <MatchPlayerCard
+          {...defaultProps}
+          player={{ ...defaultProps.player, side: "away" }}
+        />
+      </ThemeContextProvider>,
+    );
+    expect(screen.getByTestId("player-row-Marlon")).toBeInTheDocument();
+  });
+
+  it("hides swap button when not admin", () => {
     render(
       <ThemeContextProvider>
         <MatchPlayerCard {...defaultProps} isAdmin={false} />
@@ -187,12 +173,9 @@ describe("MatchPlayerCard", () => {
     );
 
     expect(screen.queryByTestId("sub-button")).not.toBeInTheDocument();
-    expect(
-      screen.queryByTestId("stat-goals-increment"),
-    ).not.toBeInTheDocument();
   });
 
-  it("hides controls when finished", () => {
+  it("hides swap button when finished", () => {
     render(
       <ThemeContextProvider>
         <MatchPlayerCard {...defaultProps} finished={true} />
@@ -200,66 +183,9 @@ describe("MatchPlayerCard", () => {
     );
 
     expect(screen.queryByTestId("sub-button")).not.toBeInTheDocument();
-    expect(
-      screen.queryByTestId("stat-goals-increment"),
-    ).not.toBeInTheDocument();
   });
 
-  it("triggers onStatChange for goals", async () => {
-    const user = userEvent.setup();
-    const onStatChange = vi.fn();
-    render(
-      <ThemeContextProvider>
-        <MatchPlayerCard
-          {...defaultProps}
-          onStatChange={onStatChange}
-          stats={{ goals: 1, assists: 0, ownGoals: 0 }}
-        />
-      </ThemeContextProvider>,
-    );
-
-    await user.click(screen.getByTestId("stat-goals-increment"));
-    expect(onStatChange).toHaveBeenCalledWith("goal", 1, "home");
-
-    await user.click(screen.getByTestId("stat-goals-decrement"));
-    expect(onStatChange).toHaveBeenCalledWith("goal", -1, "home");
-  });
-
-  it("triggers onStatChange for own goals", async () => {
-    const user = userEvent.setup();
-    const onStatChange = vi.fn();
-    render(
-      <ThemeContextProvider>
-        <MatchPlayerCard
-          {...defaultProps}
-          onStatChange={onStatChange}
-          stats={{ goals: 0, assists: 0, ownGoals: 1 }}
-        />
-      </ThemeContextProvider>,
-    );
-
-    await user.click(screen.getByTestId("stat-own-goals-increment"));
-    expect(onStatChange).toHaveBeenCalledWith("own_goal", 1, "home");
-
-    await user.click(screen.getByTestId("stat-own-goals-decrement"));
-    expect(onStatChange).toHaveBeenCalledWith("own_goal", -1, "home");
-  });
-
-  it("disables decrement buttons when stats are zero", () => {
-    render(
-      <ThemeContextProvider>
-        <MatchPlayerCard
-          {...defaultProps}
-          stats={{ goals: 0, assists: 0, ownGoals: 0 }}
-        />
-      </ThemeContextProvider>,
-    );
-
-    expect(screen.getByTestId("stat-goals-decrement")).toBeDisabled();
-    expect(screen.getByTestId("stat-own-goals-decrement")).toBeDisabled();
-  });
-
-  it("triggers onSubClick when sub button is clicked", async () => {
+  it("triggers onSubClick when swap button is clicked", async () => {
     const user = userEvent.setup();
     const onSubClick = vi.fn();
     render(
@@ -272,21 +198,74 @@ describe("MatchPlayerCard", () => {
     expect(onSubClick).toHaveBeenCalled();
   });
 
-  it("renders colored backgrounds for stats when not in control mode", () => {
+  it("mobile variant shows swap button with label", () => {
+    render(
+      <ThemeContextProvider>
+        <MatchPlayerCard {...defaultProps} />
+      </ThemeContextProvider>,
+    );
+
+    const swap = screen.getByTestId("sub-button");
+    expect(swap).toHaveTextContent(
+      /peladas\.dashboard\.live_state\.swap_button/i,
+    );
+  });
+
+  it("desktop variant shows live stat and icon-only swap", () => {
     render(
       <ThemeContextProvider>
         <MatchPlayerCard
           {...defaultProps}
-          isAdmin={false}
-          stats={{ goals: 1, assists: 1, ownGoals: 1 }}
+          variant="desktop"
+          stats={{ goals: 1, assists: 2, ownGoals: 0 }}
         />
       </ThemeContextProvider>,
     );
 
-    // Verify the stats are shown in circles (no controls)
-    // We can check the test-ids of values
-    expect(screen.getByTestId("stat-goals-value")).toBeInTheDocument();
-    expect(screen.getByTestId("stat-assists-value")).toBeInTheDocument();
-    expect(screen.getByTestId("stat-own-goals-value")).toBeInTheDocument();
+    expect(screen.getByText("1G")).toBeInTheDocument();
+    expect(screen.getByText("2A")).toBeInTheDocument();
+    const swap = screen.getByTestId("sub-button");
+    expect(swap.tagName).toBe("BUTTON");
+    expect(swap).not.toHaveTextContent(/swap_button/i);
+  });
+
+  it("renders own goals when player has own goals", () => {
+    render(
+      <ThemeContextProvider>
+        <MatchPlayerCard
+          {...defaultProps}
+          variant="desktop"
+          stats={{ goals: 0, assists: 0, ownGoals: 1 }}
+        />
+      </ThemeContextProvider>,
+    );
+
+    expect(screen.getByText("1GC")).toBeInTheDocument();
+  });
+
+  it("renders position label next to player name", () => {
+    render(
+      <ThemeContextProvider>
+        <MatchPlayerCard {...defaultProps} />
+      </ThemeContextProvider>,
+    );
+
+    const posLabel = screen.getByTestId("player-position-label");
+    expect(posLabel).toHaveTextContent("ATA");
+    expect(posLabel.parentElement).toContainElement(
+      screen.getByTestId("player-name"),
+    );
+  });
+
+  it("desktop variant hides stat when player has no goals, assists, or own goals", () => {
+    render(
+      <ThemeContextProvider>
+        <MatchPlayerCard {...defaultProps} variant="desktop" />
+      </ThemeContextProvider>,
+    );
+
+    expect(
+      screen.queryByTestId("player-stats-container"),
+    ).not.toBeInTheDocument();
   });
 });

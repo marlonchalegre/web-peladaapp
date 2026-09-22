@@ -48,14 +48,11 @@ const StatCard = ({
       sx={{
         flex: 1,
         minWidth: { xs: "100%", sm: "280px" },
-        borderRadius: 4,
-        boxShadow: isDarkMode
-          ? "0px 4px 20px rgba(0, 0, 0, 0.4)"
-          : "0px 4px 20px rgba(0, 0, 0, 0.05)",
+        borderRadius: "18px",
+        boxShadow: "5px 5px 0 #17181a",
         bgcolor: "background.paper",
         backgroundImage: "none",
-        border: isDarkMode ? "1px solid" : "none",
-        borderColor: alpha(theme.palette.common.white, 0.1),
+        border: "2px solid #17181a",
       }}
     >
       <CardContent sx={{ p: 3, "&:last-child": { pb: 3 } }}>

@@ -1,21 +1,7 @@
-import {
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  IconButton,
-  Link,
-  Chip,
-  Typography,
-  Box,
-  Stack,
-  Tooltip,
-} from "@mui/material";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Box, Chip, IconButton, Tooltip, Typography } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import type { Pelada } from "../../../shared/api/endpoints";
 import { useTranslation } from "react-i18next";
 
@@ -31,11 +17,7 @@ export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
   if (!peladas.length) {
     return (
       <Box sx={{ p: 4, textAlign: "center" }}>
-        <Typography
-          sx={{
-            color: "text.secondary",
-          }}
-        >
+        <Typography sx={{ color: "text.secondary" }}>
           {t("organizations.peladas.empty")}
         </Typography>
       </Box>
@@ -56,164 +38,109 @@ export default function PeladasTable({ peladas, onDelete }: PeladasTableProps) {
   };
 
   return (
-    <Box sx={{ width: "100%", overflowX: "auto" }}>
-      <Table>
-        <TableHead sx={{ bgcolor: "background.default" }}>
-          <TableRow>
-            <TableCell
-              sx={{
-                color: "text.secondary",
-                fontWeight: 600,
-                fontSize: "0.75rem",
-                letterSpacing: "0.05em",
-                textTransform: "uppercase",
-              }}
-            >
-              {t("common.fields.date", "DATA")}
-            </TableCell>
-            <TableCell
-              sx={{
-                color: "text.secondary",
-                fontWeight: 600,
-                fontSize: "0.75rem",
-                letterSpacing: "0.05em",
-                textTransform: "uppercase",
-              }}
-            >
-              {t("common.fields.name", "NOME")}
-            </TableCell>
-            <TableCell
-              sx={{
-                color: "text.secondary",
-                fontWeight: 600,
-                fontSize: "0.75rem",
-                letterSpacing: "0.05em",
-                textTransform: "uppercase",
-              }}
-            >
-              {t("home.table.headers.status", "STATUS")}
-            </TableCell>
-            <TableCell align="right" sx={{ pr: 3 }}>
-              {t("common.actions.title", "AÇÕES")}
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {peladas.map((p) => {
-            const peladaLink = getPeladaLink(p);
-            return (
-              <TableRow
-                key={`pelada-${p.id}`}
-                hover
-                onClick={() => navigate(peladaLink)}
-                data-testid="pelada-row"
+    <Box sx={{ width: "100%" }}>
+      {peladas.map((p) => {
+        const peladaLink = getPeladaLink(p);
+        const isOpen = p.status === "attendance" || p.status === "open";
+        const date = p.scheduled_at ? new Date(p.scheduled_at) : null;
+        const dateDisplay = date
+          ? `${String(date.getDate()).padStart(2, "0")}/${String(
+              date.getMonth() + 1,
+            ).padStart(2, "0")}/${date.getFullYear()}`
+          : t("common.date.tbd", "TBD");
+        const timeDisplay = date
+          ? `${date
+              .toLocaleDateString(t("common.locale_code", "pt-BR"), {
+                weekday: "short",
+              })
+              .replace(".", "")} · ${date.toLocaleTimeString(
+              t("common.locale_code", "pt-BR"),
+              { hour: "2-digit", minute: "2-digit", hour12: false },
+            )}`
+          : "";
+
+        return (
+          <Box
+            key={`pelada-${p.id}`}
+            data-testid="pelada-row"
+            onClick={() => navigate(peladaLink)}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1.5,
+              px: 2,
+              py: 1.75,
+              cursor: "pointer",
+              borderBottom: "1.5px solid #f2efe7",
+              "&:last-of-type": { borderBottom: "none" },
+              "&:hover": { bgcolor: "#f9f8f4" },
+            }}
+          >
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <Typography
                 sx={{
-                  cursor: "pointer",
-                  "&:last-child td, &:last-child th": { border: 0 },
+                  fontFamily: "'Archivo Narrow', Archivo, sans-serif",
+                  fontWeight: 700,
+                  fontSize: "15px",
+                  color: "#17181a",
                 }}
               >
-                <TableCell sx={{ py: 2 }}>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      fontWeight: 500,
-                    }}
-                  >
-                    {p.scheduled_at
-                      ? new Date(p.scheduled_at).toLocaleDateString(
-                          t("common.locale_code", "pt-BR"),
-                        )
-                      : t("common.date.tbd", "TBD")}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: "text.secondary",
-                    }}
-                  >
-                    {p.scheduled_at
-                      ? new Date(p.scheduled_at).toLocaleTimeString(
-                          t("common.locale_code", "pt-BR"),
-                          {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                            hour12: false,
-                          },
-                        )
-                      : ""}
-                  </Typography>
-                </TableCell>
-                <TableCell sx={{ py: 2 }}>
-                  <Link
-                    component={RouterLink}
-                    to={peladaLink}
-                    underline="hover"
-                    color="primary"
-                    onClick={(e) => e.stopPropagation()}
-                    data-testid={`pelada-link-${p.id}`}
-                    sx={{
-                      fontWeight: 600,
-                    }}
-                  >
-                    {t("organizations.peladas.item_name", { id: p.id })}
-                  </Link>
-                </TableCell>
-                <TableCell sx={{ py: 2 }}>
-                  <Chip
-                    label={t(`pelada.status.${p.status}`, p.status || "")}
-                    size="small"
-                    color={
-                      p.status === "closed"
-                        ? "default"
-                        : p.status === "running"
-                          ? "primary"
-                          : "success"
-                    }
-                    variant={p.status === "closed" ? "outlined" : "filled"}
-                    sx={{ fontWeight: 500, borderRadius: 1 }}
-                  />
-                </TableCell>
-                <TableCell align="right" sx={{ py: 2, pr: 2 }}>
-                  <Stack
-                    direction="row"
-                    spacing={1}
-                    onClick={(e) => e.stopPropagation()}
-                    sx={{
-                      justifyContent: "flex-end",
-                    }}
-                  >
-                    <Tooltip title={t("common.actions.view", "Visualizar")}>
-                      <IconButton
-                        component={RouterLink}
-                        to={peladaLink}
-                        size="small"
-                        color="primary"
-                      >
-                        <VisibilityIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    {onDelete && (
-                      <Tooltip title={t("common.delete", "Excluir")}>
-                        <IconButton
-                          aria-label={t("organizations.peladas.aria.delete", {
-                            id: p.id,
-                          })}
-                          onClick={() => onDelete(p.id)}
-                          size="small"
-                          color="error"
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    <ChevronRightIcon sx={{ color: "grey.300", ml: 1 }} />
-                  </Stack>
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
+                {dateDisplay}
+              </Typography>
+              <Typography
+                sx={{
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 600,
+                  fontSize: "10px",
+                  color: "#6b675c",
+                  mt: 0.25,
+                  textTransform: "capitalize",
+                }}
+              >
+                {timeDisplay}
+              </Typography>
+            </Box>
+
+            <Chip
+              label={t(`pelada.status.${p.status}`, p.status || "")}
+              size="small"
+              data-testid={`pelada-link-${p.id}`}
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 800,
+                fontSize: "9px",
+                letterSpacing: ".06em",
+                textTransform: "uppercase",
+                borderRadius: "6px",
+                height: 22,
+                bgcolor: isOpen ? "#146b3a" : "transparent",
+                color: isOpen ? "#ffffff" : "#6b675c",
+                border: isOpen ? "none" : "1.5px solid #ddd8cc",
+              }}
+            />
+
+            {onDelete && (
+              <Tooltip title={t("common.delete", "Excluir")}>
+                <IconButton
+                  aria-label={t("organizations.peladas.aria.delete", {
+                    id: p.id,
+                  })}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(p.id);
+                  }}
+                  size="small"
+                  sx={{ color: "#a8452a" }}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            )}
+
+            <ChevronRightIcon sx={{ color: "#c9c4b6", fontSize: 20 }} />
+          </Box>
+        );
+      })}
     </Box>
   );
 }

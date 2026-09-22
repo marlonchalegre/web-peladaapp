@@ -308,5 +308,16 @@ describe("usePeladaStandings", () => {
       ).toBe(false);
       expect(isMatchActive({ status: "scheduled" } as any)).toBe(false);
     });
+
+    it("should return true for match with scores even if scheduled", () => {
+      expect(
+        isMatchActive({
+          status: "scheduled",
+          timer_status: "stopped",
+          home_score: 1,
+          away_score: 0,
+        } as any),
+      ).toBe(true);
+    });
   });
 });

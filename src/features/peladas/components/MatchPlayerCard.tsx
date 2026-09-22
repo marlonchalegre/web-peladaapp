@@ -1,20 +1,15 @@
-import {
-  Box,
-  Paper,
-  Typography,
-  IconButton,
-  Stack,
-  Avatar,
-  Tooltip,
-  useTheme,
-  alpha,
-} from "@mui/material";
+import { Box, Button, IconButton, Stack, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
-import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import { useTranslation } from "react-i18next";
 import type { TeamPlayer, Player } from "../../../shared/api/endpoints";
+
+const POSITION_SHORT: Record<string, string> = {
+  goalkeeper: "GOL",
+  defender: "ZAG",
+  midfielder: "MEI",
+  striker: "ATA",
+};
 
 interface MatchPlayerCardProps {
   player: TeamPlayer & { isEmpty?: boolean; side: "home" | "away" };
@@ -23,12 +18,8 @@ interface MatchPlayerCardProps {
   stats: { goals: number; assists: number; ownGoals: number };
   finished: boolean;
   isAdmin: boolean;
-  onStatChange: (
-    type: "goal" | "assist" | "own_goal",
-    diff: number,
-    side: "home" | "away",
-  ) => void;
   onSubClick: () => void;
+  variant?: "mobile" | "desktop";
 }
 
 export default function MatchPlayerCard({
@@ -38,388 +29,238 @@ export default function MatchPlayerCard({
   stats,
   finished,
   isAdmin,
-  onStatChange,
   onSubClick,
+  variant = "mobile",
 }: MatchPlayerCardProps) {
   const { t } = useTranslation();
-  const theme = useTheme();
+  const isDesktop = variant === "desktop";
+  const teamColor = player.side === "home" ? "#c9591c" : "#1f5f9c";
+
+  const positionLabel = () => {
+    if (player.is_goalkeeper) return POSITION_SHORT.goalkeeper;
+    const pos = (
+      playerData?.position ||
+      playerData?.user_position ||
+      ""
+    ).toLowerCase();
+    if (pos in POSITION_SHORT) return POSITION_SHORT[pos];
+    return t(`common.positions.${pos || "player"}`).toUpperCase();
+  };
 
   if (player.isEmpty) {
     return (
-      <Paper
-        variant="outlined"
+      <Box
         data-testid="player-row-empty"
         sx={{
-          p: { xs: 1.5, sm: 1.5, md: 2.5 },
-          borderRadius: 2,
-          borderStyle: "dashed",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          bgcolor: "action.hover",
-          minHeight: { xs: 60, sm: 60, md: 80 },
+          gap: 1,
+          bgcolor: "transparent",
+          border: "1.5px dashed #ddd8cc",
+          borderRadius: "12px",
+          px: isDesktop ? "12px" : "12px",
+          py: isDesktop ? "10px" : "8px",
+          minHeight: isDesktop ? 48 : 44,
         }}
       >
-        <Stack
-          direction="row"
-          spacing={2}
-          sx={{
-            alignItems: "center",
-          }}
-        >
-          <Avatar
-            sx={{
-              bgcolor: "text.disabled",
-              width: { xs: 32, sm: 32, md: 40 },
-              height: { xs: 32, sm: 32, md: 40 },
-            }}
-          >
-            <PersonAddIcon fontSize="small" />
-          </Avatar>
+        <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+          <PersonAddIcon sx={{ fontSize: 16, color: "text.disabled" }} />
           <Typography
-            variant="body2"
             sx={{
-              color: "text.secondary",
+              fontFamily: "Archivo, sans-serif",
+              fontSize: "11px",
+              fontWeight: 600,
+              color: "text.disabled",
             }}
           >
-            {t("peladas.dashboard.empty_slot")}
+            {t("peladas.dashboard.empty_slot", "Vaga disponível")}
           </Typography>
         </Stack>
         {isAdmin && !finished && (
-          <IconButton onClick={onSubClick} size="small" color="primary">
-            <AddIcon />
+          <IconButton
+            onClick={onSubClick}
+            size="small"
+            data-testid="add-player-button"
+            sx={{ color: teamColor, p: 0.5 }}
+          >
+            <AddIcon sx={{ fontSize: 18 }} />
           </IconButton>
         )}
-      </Paper>
+      </Box>
     );
   }
 
-  const teamColor =
-    player.side === "home" ? theme.palette.home.main : theme.palette.away.main;
-
-  const getPositionKey = () => {
-    if (player.is_goalkeeper) return "goalkeeper";
-
-    // Try position string first
-    if (playerData?.position) {
-      return playerData.position.toLowerCase();
-    }
-
-    // Try user_position string
-    if (playerData?.user_position) {
-      return playerData.user_position.toLowerCase();
-    }
-
-    return "player";
-  };
-
-  const positionKey = getPositionKey();
-
-  const showControls = isAdmin && !finished;
-
-  return (
-    <Paper
-      elevation={0}
-      data-testid="player-row"
+  const swapButton = isDesktop ? (
+    <IconButton
+      onClick={onSubClick}
+      data-testid="sub-button"
+      aria-label={t("peladas.dashboard.live_state.swap_button", "Trocar")}
       sx={{
-        p: { xs: 1.25, sm: 1.5 },
-        borderRadius: 3,
-        border: "1px solid",
-        borderColor: "divider",
-        transition: "all 0.2s",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        overflow: "hidden",
-        "&:hover": { bgcolor: "action.hover", boxShadow: 1 },
+        flexShrink: 0,
+        width: 26,
+        height: 26,
+        minWidth: 0,
+        p: 0,
+        borderRadius: "8px",
+        border: "1.5px solid #e4e0d6",
+        bgcolor: "#faf8f3",
+        color: "#6b675c",
+        fontFamily: "Archivo, sans-serif",
+        fontWeight: 700,
+        fontSize: "11px",
+        lineHeight: 1,
+        "&:hover": {
+          borderColor: teamColor,
+          color: teamColor,
+          bgcolor: "#faf8f3",
+        },
       }}
     >
-      <Stack spacing={1.5}>
-        {/* Top Row: Sub Icon + Player Info */}
-        <Stack
-          direction="row"
-          spacing={1.5}
+      ⇄
+    </IconButton>
+  ) : (
+    <Button
+      onClick={onSubClick}
+      data-testid="sub-button"
+      sx={{
+        flexShrink: 0,
+        minWidth: 0,
+        ml: "auto",
+        border: "1.5px solid #ddd8cc",
+        bgcolor: "#fff",
+        color: "#123c26",
+        borderRadius: "10px",
+        px: "11px",
+        py: "9px",
+        fontFamily: "Archivo, sans-serif",
+        fontWeight: 800,
+        fontSize: "10px",
+        lineHeight: 1,
+        letterSpacing: "0.06em",
+        "&:hover": {
+          bgcolor: "#fff",
+          borderColor: teamColor,
+          color: teamColor,
+        },
+      }}
+    >
+      ⇄ {t("peladas.dashboard.live_state.swap_button", "TROCAR")}
+    </Button>
+  );
+
+  return (
+    <Box
+      data-testid={`player-row-${playerName}`}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: isDesktop ? "10px" : "9px",
+        bgcolor: isDesktop ? "#fff" : "#faf8f3",
+        border: "1.5px solid",
+        borderColor: isDesktop ? "#e4e0d6" : "#efece4",
+        borderRadius: "12px",
+        px: isDesktop ? "12px" : "8px",
+        pl: isDesktop ? "12px" : "12px",
+        py: isDesktop ? "10px" : "8px",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: "6px",
+          flex: 1,
+          minWidth: 0,
+          overflow: "hidden",
+        }}
+      >
+        <Typography
+          data-testid="player-name"
+          noWrap
           sx={{
-            alignItems: "center",
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 700,
+            fontSize: isDesktop ? "13px" : "12.5px",
+            lineHeight: 1.2,
+            color: "#1a1a1a",
           }}
         >
-          {showControls && (
-            <Tooltip title={t("common.sub")}>
-              <IconButton
-                onClick={onSubClick}
-                size="small"
-                sx={{
-                  color: teamColor,
-                  p: { xs: 0.4, sm: 0.6 },
-                  bgcolor: alpha(teamColor, 0.08),
-                  border: "1px solid",
-                  borderColor: alpha(teamColor, 0.12),
-                  "&:hover": {
-                    bgcolor: alpha(teamColor, 0.16),
-                    borderColor: alpha(teamColor, 0.2),
-                  },
-                }}
-                data-testid="sub-button"
-              >
-                <SwapHorizIcon sx={{ fontSize: { xs: 20, sm: 24 } }} />
-              </IconButton>
-            </Tooltip>
-          )}
+          {playerName}
+        </Typography>
 
-          <Box sx={{ minWidth: 0, flexGrow: 1 }}>
-            <Typography
-              variant="body2"
-              sx={{
-                fontWeight: "bold",
-                fontSize: { xs: "0.85rem", sm: "1rem" },
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-                lineHeight: 1.2,
-              }}
-              data-testid="player-name"
-            >
-              {playerName}
-            </Typography>
-            <Stack
-              direction="row"
-              spacing={1}
-              sx={{
-                alignItems: "center",
-              }}
-            >
-              <Typography
-                variant="caption"
-                sx={{
-                  color: "text.secondary",
-                  display: "block",
-                  fontSize: { xs: "0.65rem", sm: "0.75rem" },
-                  fontWeight: "medium",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {t(`common.positions.${positionKey}`).toUpperCase()}
-              </Typography>
-            </Stack>
-          </Box>
-        </Stack>
-
-        {/* Bottom Row: Actions Container (Left Aligned) */}
-        <Stack
-          direction="row"
-          spacing={{ xs: 1.5, sm: 2 }}
+        <Typography
+          data-testid="player-position-label"
           sx={{
+            flexShrink: 0,
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 700,
+            fontSize: isDesktop ? "9.5px" : "9px",
+            letterSpacing: isDesktop ? "0.08em" : "0.06em",
+            color: "#8a857a",
+          }}
+        >
+          {positionLabel()}
+        </Typography>
+      </Box>
+
+      {/* Live Match Stats: Goals, Assists, Own Goals */}
+      {(stats.goals > 0 || stats.assists > 0 || stats.ownGoals > 0) && (
+        <Box
+          data-testid="player-stats-container"
+          sx={{
+            display: "flex",
             alignItems: "center",
-            justifyContent: "flex-start",
-
-            // Simplified, no offset needed in this vertical stack
-            pl: showControls ? 0 : 0,
-
+            gap: "5px",
             flexShrink: 0,
           }}
         >
-          {/* Goal Controls/Stats */}
-          <Box sx={{ textAlign: "center", flexShrink: 0 }}>
+          {stats.goals > 0 && (
             <Typography
-              variant="caption"
+              data-testid="player-stat-goals"
               sx={{
-                display: "block",
-                fontSize: "0.5rem",
-                fontWeight: "bold",
-                color: "success.main",
-                mb: 0.1,
-                opacity: 0.8,
+                fontFamily: "ui-monospace, Menlo, monospace",
+                fontWeight: 700,
+                fontSize: isDesktop ? "11px" : "10px",
+                lineHeight: 1,
+                color: teamColor,
               }}
             >
-              {t("common.goals_short")}
+              {stats.goals}G
             </Typography>
-            <Stack
-              direction="row"
-              sx={{
-                alignItems: "center",
-                justifyContent: "center",
-                border: "2px solid",
-                borderColor: "success.main",
-                borderRadius: showControls ? 1.5 : "50%",
-                width: showControls ? "auto" : { xs: 26, sm: 28, md: 32 },
-                height: showControls ? "auto" : { xs: 26, sm: 28, md: 32 },
-                overflow: "hidden",
-
-                bgcolor:
-                  stats.goals > 0 && !showControls
-                    ? alpha(theme.palette.success.main, 0.05)
-                    : "background.paper",
-
-                transition: "all 0.2s",
-              }}
-            >
-              {showControls && (
-                <IconButton
-                  size="small"
-                  onClick={() => onStatChange("goal", -1, player.side)}
-                  disabled={stats.goals <= 0}
-                  sx={{ p: { xs: 0.4, sm: 0.6, md: 0.8 }, borderRadius: 0 }}
-                  data-testid="stat-goals-decrement"
-                >
-                  <RemoveIcon sx={{ fontSize: { xs: 14, sm: 16, md: 18 } }} />
-                </IconButton>
-              )}
-              <Box
-                sx={{
-                  minWidth: showControls ? { xs: 20, sm: 24, md: 28 } : "auto",
-                  textAlign: "center",
-                  fontWeight: "bold",
-                  fontSize: { xs: "0.8rem", sm: "0.85rem", md: "1rem" },
-                  color: stats.goals > 0 ? "success.main" : "text.secondary",
-                }}
-                data-testid="stat-goals-value"
-              >
-                {stats.goals}
-              </Box>
-              {showControls && (
-                <IconButton
-                  size="small"
-                  onClick={() => onStatChange("goal", 1, player.side)}
-                  sx={{
-                    p: { xs: 0.4, sm: 0.6, md: 0.8 },
-                    borderRadius: 0,
-                    color: "success.main",
-                  }}
-                  data-testid="stat-goals-increment"
-                >
-                  <AddIcon sx={{ fontSize: { xs: 14, sm: 16, md: 18 } }} />
-                </IconButton>
-              )}
-            </Stack>
-          </Box>
-
-          {/* Assist Controls/Stats */}
-          <Box sx={{ textAlign: "center", flexShrink: 0 }}>
+          )}
+          {stats.assists > 0 && (
             <Typography
-              variant="caption"
+              data-testid="player-stat-assists"
               sx={{
-                display: "block",
-                fontSize: "0.5rem",
-                fontWeight: "bold",
-                color: "info.main",
-                mb: 0.1,
-                opacity: 0.8,
+                fontFamily: "ui-monospace, Menlo, monospace",
+                fontWeight: 700,
+                fontSize: isDesktop ? "11px" : "10px",
+                lineHeight: 1,
+                color: "#146b3a",
               }}
             >
-              {t("common.assists_short")}
+              {stats.assists}A
             </Typography>
-            <Stack
-              direction="row"
-              sx={{
-                alignItems: "center",
-                justifyContent: "center",
-                border: "2px solid",
-                borderColor: "info.light",
-                borderRadius: "50%",
-                width: { xs: 26, sm: 28, md: 32 },
-                height: { xs: 26, sm: 28, md: 32 },
-                overflow: "hidden",
-
-                bgcolor:
-                  stats.assists > 0
-                    ? alpha(theme.palette.primary.main, 0.05)
-                    : "background.paper",
-
-                transition: "all 0.2s",
-              }}
-            >
-              <Box
-                sx={{
-                  textAlign: "center",
-                  fontWeight: "bold",
-                  fontSize: { xs: "0.8rem", sm: "0.85rem", md: "1rem" },
-                  color: stats.assists > 0 ? "info.main" : "text.secondary",
-                }}
-                data-testid="stat-assists-value"
-              >
-                {stats.assists}
-              </Box>
-            </Stack>
-          </Box>
-
-          {/* Own Goal Controls/Stats */}
-          <Box sx={{ textAlign: "center", flexShrink: 0 }}>
+          )}
+          {stats.ownGoals > 0 && (
             <Typography
-              variant="caption"
+              data-testid="player-stat-own-goals"
               sx={{
-                display: "block",
-                fontSize: "0.5rem",
-                fontWeight: "bold",
-                color: stats.ownGoals > 0 ? "error.main" : "text.secondary",
-                mb: 0.1,
-                opacity: 0.8,
+                fontFamily: "ui-monospace, Menlo, monospace",
+                fontWeight: 700,
+                fontSize: isDesktop ? "11px" : "10px",
+                lineHeight: 1,
+                color: "#a8452a",
               }}
             >
-              {t("common.own_goals_short")}
+              {stats.ownGoals}GC
             </Typography>
-            <Stack
-              direction="row"
-              sx={{
-                alignItems: "center",
-                justifyContent: "center",
-                border: "2px solid",
-                borderColor: stats.ownGoals > 0 ? "error.light" : "divider",
-                borderRadius: showControls ? 1.5 : "50%",
-                width: showControls ? "auto" : { xs: 26, sm: 28, md: 32 },
-                height: showControls ? "auto" : { xs: 26, sm: 28, md: 32 },
-                overflow: "hidden",
+          )}
+        </Box>
+      )}
 
-                bgcolor:
-                  stats.ownGoals > 0 && !showControls
-                    ? alpha(theme.palette.error.main, 0.05)
-                    : "background.paper",
-
-                transition: "all 0.2s",
-              }}
-            >
-              {showControls && (
-                <IconButton
-                  size="small"
-                  onClick={() => onStatChange("own_goal", -1, player.side)}
-                  disabled={stats.ownGoals <= 0}
-                  sx={{ p: { xs: 0.4, sm: 0.6, md: 0.8 }, borderRadius: 0 }}
-                  data-testid="stat-own-goals-decrement"
-                >
-                  <RemoveIcon sx={{ fontSize: { xs: 14, sm: 16, md: 18 } }} />
-                </IconButton>
-              )}
-              <Box
-                sx={{
-                  minWidth: showControls ? { xs: 20, sm: 24, md: 28 } : "auto",
-                  textAlign: "center",
-                  fontWeight: "bold",
-                  fontSize: { xs: "0.8rem", sm: "0.85rem", md: "1rem" },
-                  color: stats.ownGoals > 0 ? "error.main" : "text.secondary",
-                }}
-                data-testid="stat-own-goals-value"
-              >
-                {stats.ownGoals}
-              </Box>
-              {showControls && (
-                <IconButton
-                  size="small"
-                  onClick={() => onStatChange("own_goal", 1, player.side)}
-                  sx={{
-                    p: { xs: 0.4, sm: 0.6, md: 0.8 },
-                    borderRadius: 0,
-                    color: stats.ownGoals > 0 ? "error.main" : "text.disabled",
-                  }}
-                  data-testid="stat-own-goals-increment"
-                >
-                  <AddIcon sx={{ fontSize: { xs: 14, sm: 16, md: 18 } }} />
-                </IconButton>
-              )}
-            </Stack>
-          </Box>
-        </Stack>
-      </Stack>
-    </Paper>
+      {isAdmin && !finished && swapButton}
+    </Box>
   );
 }

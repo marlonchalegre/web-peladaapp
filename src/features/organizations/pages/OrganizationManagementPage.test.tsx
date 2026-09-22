@@ -228,7 +228,7 @@ describe("OrganizationManagementPage", () => {
 
   it("renders page header and breadcrumbs", () => {
     renderPage();
-    expect(screen.getByText("Org 1")).toBeInTheDocument();
+    expect(screen.getAllByText("Org 1").length).toBeGreaterThan(0);
   });
 
   it("switches tabs correctly", () => {

@@ -84,7 +84,7 @@ describe("OrganizationDetailPage", () => {
     await waitFor(() => {
       expect(screen.getAllByText("Test Org").length).toBeGreaterThan(0);
       // Pelada #1 -> organizations.peladas.item_name with simple mock
-      const items = screen.getAllByText("organizations.peladas.item_name");
+      const items = screen.getAllByTestId("pelada-row");
       expect(items.length).toBeGreaterThan(0);
     });
 
@@ -141,9 +141,7 @@ describe("OrganizationDetailPage", () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getAllByText("organizations.peladas.item_name").length,
-      ).toBeGreaterThan(0);
+      expect(screen.getAllByTestId("pelada-row").length).toBeGreaterThan(0);
     });
 
     // Click next page button
@@ -151,9 +149,7 @@ describe("OrganizationDetailPage", () => {
     fireEvent.click(nextButton);
 
     await waitFor(() => {
-      expect(
-        screen.getAllByText("organizations.peladas.item_name").length,
-      ).toBeGreaterThan(0);
+      expect(screen.getAllByTestId("pelada-row").length).toBeGreaterThan(0);
     });
   });
 
@@ -835,9 +831,7 @@ describe("OrganizationDetailPage", () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getAllByText("organizations.peladas.item_name").length,
-      ).toBeGreaterThan(0);
+      expect(screen.getAllByTestId("pelada-row").length).toBeGreaterThan(0);
     });
 
     // Find and change rows per page
@@ -1094,6 +1088,63 @@ describe("OrganizationDetailPage", () => {
       expect(
         screen.queryByTestId("waitlist-in-queue-badge"),
       ).not.toBeInTheDocument();
+    });
+  });
+
+  it("renders desktop 4b layout when viewport is md or larger", async () => {
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: true,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }));
+
+    const mockOrg = { id: "1", name: "Test Org", owner_id: "1" };
+    const mockPeladas = {
+      data: [{ id: "1", organization_id: "1", status: "open" }],
+      total: 1,
+      page: 1,
+      perPage: 10,
+      totalPages: 1,
+    };
+
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/organizations/1") return Promise.resolve(mockOrg);
+      if (path === "/api/organizations/1/admins") return Promise.resolve([]);
+      if (path === "/api/organizations/1/feature-flags")
+        return Promise.resolve({});
+      if (path === "/api/organizations/1/players") return Promise.resolve([]);
+      return Promise.reject(new Error(`Not found: ${path}`));
+    });
+    (api.getPaginated as Mock).mockImplementation((path: string) => {
+      if (path === "/api/organizations/1/peladas")
+        return Promise.resolve(mockPeladas);
+      return Promise.reject(new Error("Not found"));
+    });
+
+    render(
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <MemoryRouter initialEntries={["/organizations/1"]}>
+          <Routes>
+            <Route
+              path="/organizations/:id"
+              element={<OrganizationDetailPage />}
+            />
+          </Routes>
+        </MemoryRouter>
+      </LocalizationProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("AGENDA DO GRUPO")).toBeInTheDocument();
+      expect(screen.getByText("NOVA PELADA")).toBeInTheDocument();
+      expect(screen.getByText("PELADAS")).toBeInTheDocument();
+      expect(screen.getByText("MÉDIA DE PRESENÇA")).toBeInTheDocument();
+      expect(screen.getByText("NA FILA DE ESPERA")).toBeInTheDocument();
     });
   });
 });

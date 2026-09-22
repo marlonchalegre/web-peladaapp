@@ -33,82 +33,70 @@ vi.mock("react-i18next", () => ({
   }),
 }));
 
-vi.mock("../components/FixedGoalkeepersSection", () => ({
-  default: () => <div data-testid="mock-fixed-gk-section" />,
-}));
-
-vi.mock("../components/PeladaDetailHeader", () => ({
-  default: ({
-    pelada,
-    onStartClick,
-    onCopyClipboard,
-    onCopyAnnouncement,
-  }: any) => (
+const MockPeladaView = (props: any) => (
+  <div>
+    {props.pelada?.fixed_goalkeepers && (
+      <div data-testid="mock-fixed-gk-section" />
+    )}
     <div data-testid="mock-detail-header">
-      <button data-testid="start-pelada-button" onClick={onStartClick}>
-        Start
-      </button>
-      {!pelada.has_schedule_plan && (
+      {props.isAdmin && (
+        <button data-testid="start-pelada-button" onClick={props.onStartClick}>
+          Start
+        </button>
+      )}
+      {!props.pelada?.has_schedule_plan && (
         <button data-testid="build-schedule-button">Build</button>
       )}
-      <button data-testid="export-menu-button" onClick={onCopyClipboard}>
+      <button
+        data-testid="export-menu-button"
+        onClick={props.onCopyAnnouncement}
+      >
         Export
       </button>
-      <button data-testid="copy-clipboard-button" onClick={onCopyClipboard}>
+      <button
+        data-testid="copy-clipboard-button"
+        onClick={props.onCopyAnnouncement}
+      >
         Copy Clip
       </button>
       <button
         data-testid="copy-announcement-button"
-        onClick={onCopyAnnouncement}
+        onClick={props.onCopyAnnouncement}
       >
         Copy Ann
       </button>
     </div>
-  ),
-}));
 
-// Mock the nested subcomponents to test container page logic directly
-vi.mock("../components/TeamsSection", () => ({
-  default: ({
-    onMoveToTeam,
-    onCreateTeam,
-    onReversePayment,
-    onMarkPaid,
-    dropToTeam,
-    onSendToBench,
-    onMoveToFixedGk,
-    onDeleteTeam,
-  }: any) => (
     <div data-testid="mock-teams-section">
       <button
         data-testid="trigger-move-player"
-        onClick={() => onMoveToTeam?.("11", "1")} // Move Player 2 (id "11") to Team 1 (id "1")
+        onClick={() => props.onMoveToTeam?.("11", "1")} // Move Player 2 (id "11") to Team 1 (id "1")
       >
         Move Player
       </button>
       <button
         data-testid="trigger-delete-team"
         onClick={() => {
-          onDeleteTeam?.("1");
+          props.onDeleteTeam?.("1");
         }}
       >
         Delete Team
       </button>
       <button
         data-testid="trigger-create-team"
-        onClick={() => onCreateTeam?.("New Team")}
+        onClick={() => props.onCreateTeam?.("New Team")}
       >
         Create Team
       </button>
       <button
         data-testid="trigger-reverse-payment"
-        onClick={() => onReversePayment?.("10")} // Player 1 (id "10")
+        onClick={() => props.onReversePayment?.("10")} // Player 1 (id "10")
       >
         Reverse Payment
       </button>
       <button
         data-testid="trigger-mark-paid"
-        onClick={() => onMarkPaid?.("10", 20)}
+        onClick={() => props.onMarkPaid?.("10", 20)}
       >
         Mark Paid
       </button>
@@ -125,7 +113,7 @@ vi.mock("../components/TeamsSection", () => ({
                 ),
             },
           } as any;
-          dropToTeam?.(e, "1");
+          props.dropToTeam?.(e, "1");
         }}
       >
         Drop To Team
@@ -143,7 +131,7 @@ vi.mock("../components/TeamsSection", () => ({
                 ),
             },
           } as any;
-          dropToTeam?.(e, "1");
+          props.dropToTeam?.(e, "1");
         }}
       >
         Drop To Team Same
@@ -157,7 +145,7 @@ vi.mock("../components/TeamsSection", () => ({
               getData: vi.fn().mockReturnValue("invalid-json"),
             },
           } as any;
-          dropToTeam?.(e, "1");
+          props.dropToTeam?.(e, "1");
         }}
       >
         Drop To Team Invalid JSON
@@ -171,52 +159,33 @@ vi.mock("../components/TeamsSection", () => ({
               getData: vi.fn().mockReturnValue(""),
             },
           } as any;
-          dropToTeam?.(e, "1");
+          props.dropToTeam?.(e, "1");
         }}
       >
         Drop To Team Empty Data
       </button>
       <button
         data-testid="trigger-send-to-bench"
-        onClick={() => onSendToBench?.("10")}
+        onClick={() => props.onSendToBench?.("10")}
       >
         Send to Bench
       </button>
       <button
         data-testid="trigger-send-to-bench-not-found"
-        onClick={() => onSendToBench?.("999")}
+        onClick={() => props.onSendToBench?.("999")}
       >
         Send to Bench Not Found
       </button>
       <button
         data-testid="trigger-move-to-fixed-gk"
-        onClick={() => onMoveToFixedGk?.("10", "home")}
+        onClick={() => props.onMoveToFixedGk?.("10", "home")}
       >
         Move to Fixed GK
       </button>
     </div>
-  ),
-}));
 
-vi.mock("../components/AvailablePlayersPanel", () => ({
-  default: ({
-    onDropToBench,
-    onDragStartPlayer,
-    onAddPlayersFromOrg,
-    isAdmin,
-    onMarkPaid,
-    onReversePayment,
-    onMoveToTeam,
-    onMoveToFixedGk,
-  }: any) => (
     <div data-testid="mock-available-players">
-      {isAdmin && <span data-testid="admin-bench-indicator" />}
-      <button
-        data-testid="trigger-add-players-from-org"
-        onClick={() => onAddPlayersFromOrg?.(["12"])}
-      >
-        Add Players from Org
-      </button>
+      {props.isAdmin && <span data-testid="admin-bench-indicator" />}
       <button
         data-testid="trigger-drop-to-bench"
         onClick={() => {
@@ -230,7 +199,7 @@ vi.mock("../components/AvailablePlayersPanel", () => ({
                 ),
             },
           } as any;
-          onDropToBench?.(e);
+          props.dropToBench?.(e);
         }}
       >
         Drop to Bench
@@ -244,7 +213,7 @@ vi.mock("../components/AvailablePlayersPanel", () => ({
               getData: vi.fn().mockReturnValue("invalid"),
             },
           } as any;
-          onDropToBench?.(e);
+          props.dropToBench?.(e);
         }}
       >
         Drop to Bench Invalid
@@ -258,41 +227,45 @@ vi.mock("../components/AvailablePlayersPanel", () => ({
               effectAllowed: "none",
             },
           } as any;
-          onDragStartPlayer?.(e, "10");
+          props.onDragStartPlayer?.(e, "10");
         }}
       >
         Drag Start
       </button>
       <button
         data-testid="trigger-bench-mark-paid"
-        onClick={() => onMarkPaid?.("10", 25)}
+        onClick={() => props.onMarkPaid?.("10", 25)}
       >
         Bench Mark Paid
       </button>
       <button
         data-testid="trigger-bench-reverse-payment"
-        onClick={() => onReversePayment?.("10")}
+        onClick={() => props.onReversePayment?.("10")}
       >
         Bench Reverse Payment
       </button>
       <button
         data-testid="trigger-bench-move-to-team"
-        onClick={() => onMoveToTeam?.("11", "1")}
+        onClick={() => props.onMoveToTeam?.("11", "1")}
       >
         Bench Move to Team
       </button>
       <button
         data-testid="trigger-bench-move-to-fixed-gk"
-        onClick={() => onMoveToFixedGk?.("10", "home")}
+        onClick={() => props.onMoveToFixedGk?.("10", "home")}
       >
         Bench Move to Fixed GK
       </button>
     </div>
-  ),
+  </div>
+);
+
+vi.mock("../components/PeladaTeamsDesktopView", () => ({
+  default: (props: any) => <MockPeladaView {...props} />,
 }));
 
-vi.mock("../components/FixedGoalkeepersSection", () => ({
-  default: () => <div data-testid="mock-fixed-goalkeepers" />,
+vi.mock("../components/PeladaTeamsMobileView", () => ({
+  default: (props: any) => <MockPeladaView {...props} />,
 }));
 
 describe("PeladaDetailPage", () => {
