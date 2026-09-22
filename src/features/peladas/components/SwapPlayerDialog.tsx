@@ -16,7 +16,7 @@ import {
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useTranslation } from "react-i18next";
 import { type Player, type User } from "../../../shared/api/endpoints";
-import { sortPlayersByPosition } from "../utils/playerUtils";
+import { sortPlayersByPosition, getPlayerInitials } from "../utils/playerUtils";
 
 type PlayerWithUser = Player & { user: User };
 
@@ -38,16 +38,6 @@ export default function SwapPlayerDialog({
   onSwap,
 }: SwapPlayerDialogProps) {
   const { t } = useTranslation();
-
-  const getInitials = (name?: string | null) => {
-    return (name || "")
-      .split(" ")
-      .filter(Boolean)
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
-  };
 
   const sortedPlayers = sortPlayersByPosition(targetTeamPlayers);
 
@@ -100,7 +90,7 @@ export default function SwapPlayerDialog({
                         fontSize: "0.85rem",
                       }}
                     >
-                      {getInitials(player.user?.name)}
+                      {getPlayerInitials(player.user?.name)}
                     </Avatar>
                   </ListItemAvatar>
                   <ListItemText

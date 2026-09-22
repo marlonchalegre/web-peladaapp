@@ -7,6 +7,7 @@ import {
   findMatchingAssistForGoal,
   resolvePlayerName,
   getAttendancePlayerId,
+  getPlayerInitials,
 } from "./playerUtils";
 
 describe("playerUtils", () => {
@@ -388,6 +389,26 @@ describe("playerUtils", () => {
 
     it("returns undefined when no id property exists", () => {
       expect(getAttendancePlayerId({})).toBeUndefined();
+    });
+  });
+
+  describe("getPlayerInitials", () => {
+    it("returns empty string for null, undefined or empty input", () => {
+      expect(getPlayerInitials(null)).toBe("");
+      expect(getPlayerInitials(undefined)).toBe("");
+      expect(getPlayerInitials("")).toBe("");
+      expect(getPlayerInitials("   ")).toBe("");
+    });
+
+    it("returns single initial for single word name", () => {
+      expect(getPlayerInitials("Aragorn")).toBe("A");
+      expect(getPlayerInitials("arwen")).toBe("A");
+    });
+
+    it("returns two initials for multi-word names", () => {
+      expect(getPlayerInitials("Samwise Gamgee")).toBe("SG");
+      expect(getPlayerInitials("Witch King")).toBe("WK");
+      expect(getPlayerInitials("Frodo Baggins of the Shire")).toBe("FS");
     });
   });
 });

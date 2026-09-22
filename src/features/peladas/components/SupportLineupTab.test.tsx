@@ -412,7 +412,7 @@ describe("SupportLineupTab", () => {
 
     // Dialog should be visible
     expect(
-      screen.getByText(/confirm_notify_title|Notificar Escalação de Suporte/i),
+      screen.getByText(/confirm_notify_title|Notificar Escalação de Apoio/i),
     ).toBeInTheDocument();
     const confirmBtn = screen.getByTestId("pretty-confirm-button");
     fireEvent.click(confirmBtn);
@@ -465,5 +465,91 @@ describe("SupportLineupTab", () => {
 
     const notifyBtn = screen.getByTestId("notify-whatsapp-support-button");
     expect(notifyBtn).toBeDisabled();
+  });
+
+  it("does not render redundant Agendado badge for scheduled matches, but shows status for live and finished", () => {
+    const mixedStatusMatches: Match[] = [
+      {
+        id: "match-1",
+        pelada_id: "pelada-1",
+        sequence: 1,
+        home_team_id: "team-1",
+        away_team_id: "team-2",
+        home_score: 1,
+        away_score: 0,
+        status: "finished",
+      },
+      {
+        id: "match-2",
+        pelada_id: "pelada-1",
+        sequence: 2,
+        home_team_id: "team-2",
+        away_team_id: "team-3",
+        home_score: 0,
+        away_score: 0,
+        status: "running",
+      },
+      {
+        id: "match-3",
+        pelada_id: "pelada-1",
+        sequence: 3,
+        home_team_id: "team-1",
+        away_team_id: "team-3",
+        home_score: 0,
+        away_score: 0,
+        status: "scheduled",
+      },
+    ];
+
+    render(
+      <ThemeContextProvider>
+        <SupportLineupTab
+          matches={mixedStatusMatches}
+          teams={mockTeams}
+          teamPlayers={mockTeamPlayers}
+          orgPlayerIdToUserId={mockOrgPlayerIdToUserId}
+          userIdToName={mockUserIdToName}
+          orgPlayerIdToPlayer={mockOrgPlayerIdToPlayer}
+          attendance={[]}
+          isAdmin={false}
+          onGenerateAll={vi.fn()}
+          onUpdateMatch={vi.fn()}
+          onRerollMatch={vi.fn()}
+        />
+      </ThemeContextProvider>,
+    );
+
+    expect(screen.getByText("Finalizado")).toBeInTheDocument();
+    expect(screen.getByText("Ao Vivo")).toBeInTheDocument();
+    expect(screen.queryByText("Agendado")).not.toBeInTheDocument();
+  });
+
+  it("renders player initials in SecureAvatar fallback to prevent overflowing text", () => {
+    render(
+      <ThemeContextProvider>
+        <SupportLineupTab
+          matches={mockMatches}
+          teams={mockTeams}
+          teamPlayers={mockTeamPlayers}
+          orgPlayerIdToUserId={mockOrgPlayerIdToUserId}
+          userIdToName={mockUserIdToName}
+          orgPlayerIdToPlayer={mockOrgPlayerIdToPlayer}
+          attendance={[]}
+          isAdmin={false}
+          onGenerateAll={vi.fn()}
+          onUpdateMatch={vi.fn()}
+          onRerollMatch={vi.fn()}
+        />
+      </ThemeContextProvider>,
+    );
+
+    const avatars = screen.getAllByTestId("secure-avatar");
+    expect(avatars.length).toBeGreaterThan(0);
+    // Avatars should display initials (e.g. "C" for Charlie, "D" for David), not the entire name
+    const avatarTexts = avatars.map((a) => a.textContent?.trim());
+    expect(avatarTexts).toContain("C");
+    expect(avatarTexts).toContain("D");
+    expect(avatarTexts).not.toContain("Charlie");
+    expect(avatarTexts).not.toContain("David");
   });
 });

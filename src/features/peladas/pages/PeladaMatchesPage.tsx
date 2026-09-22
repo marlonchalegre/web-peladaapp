@@ -668,7 +668,10 @@ export default function PeladaMatchesPage() {
             <Tab icon={<HistoryIcon />} label={t("peladas.timeline.title")} />
             <Tab
               icon={<AssignmentIcon />}
-              label={t("peladas.support_lineup.tab_title", "Support Lineup")}
+              label={t(
+                "peladas.support_lineup.tab_title",
+                "Escalação de Apoio",
+              )}
               data-testid="tab-support-lineup"
             />
           </Tabs>

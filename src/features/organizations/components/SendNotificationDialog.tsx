@@ -390,7 +390,7 @@ export default function SendNotificationDialog({
                 <MenuItem value="support-lineup">
                   {t(
                     "organizations.management.notifications.types.support_lineup",
-                    "Escalação de Suporte (Câmera e Súmula)",
+                    "Escalação de Apoio (Câmera e Súmula)",
                   )}
                 </MenuItem>
                 <MenuItem value="end">
