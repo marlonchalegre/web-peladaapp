@@ -199,6 +199,42 @@ export default function UserAttendanceStatus({
           NÃO
         </Button>
       </Stack>
+
+      <Button
+        fullWidth
+        variant="outlined"
+        onClick={() => onUpdate("waitlist")}
+        disabled={isUpdating}
+        data-testid="attendance-waitlist-button"
+        sx={{
+          mt: 1.25,
+          borderRadius: "14px",
+          py: 1.25,
+          textTransform: "uppercase",
+          fontFamily: "Archivo, sans-serif",
+          fontWeight: 800,
+          fontSize: "13px",
+          letterSpacing: ".06em",
+          bgcolor:
+            player.attendance_status === "waitlist" ? "#a8452a" : "#ffffff",
+          color:
+            player.attendance_status === "waitlist" ? "#ffffff" : "#a8452a",
+          border:
+            player.attendance_status === "waitlist"
+              ? "2px solid #a8452a"
+              : "2px solid #e2c9bd",
+          "&:hover": {
+            bgcolor:
+              player.attendance_status === "waitlist" ? "#8a351e" : "#fdf6f3",
+            borderColor: "#a8452a",
+          },
+        }}
+      >
+        {t(
+          "peladas.attendance.user_status.waitlist_button",
+          "Fila de espera",
+        )}
+      </Button>
     </Paper>
   );
 }

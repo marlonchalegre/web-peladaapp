@@ -10,7 +10,11 @@ import {
   MenuItem,
   IconButton,
 } from "@mui/material";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import {
+  Link as RouterLink,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { Loading } from "../../../shared/components/Loading";
@@ -24,6 +28,7 @@ import PendingInvitations from "../components/PendingInvitations";
 export default function HomePage() {
   const { user, refreshUser, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { t, i18n } = useTranslation();
   const currentYear = new Date().getFullYear();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -62,6 +67,16 @@ export default function HomePage() {
     createOrganization,
     updateAttendance,
   } = useHomeDashboard();
+
+  useEffect(() => {
+    const hash = location.hash.replace("#", "");
+    if (!hash || loading) return;
+    const timeout = window.setTimeout(() => {
+      const el = document.getElementById(hash);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 80);
+    return () => window.clearTimeout(timeout);
+  }, [location.hash, loading]);
 
   if (!user) {
     return (

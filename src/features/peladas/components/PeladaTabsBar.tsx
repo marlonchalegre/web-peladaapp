@@ -95,6 +95,9 @@ export default function PeladaTabsBar({
           display: "flex",
           alignItems: "center",
           overflowX: "auto",
+          overflowY: "hidden",
+          scrollbarWidth: "none",
+          "&::-webkit-scrollbar": { display: "none" },
         }}
       >
         <Typography

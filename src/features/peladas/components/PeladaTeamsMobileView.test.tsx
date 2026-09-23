@@ -166,7 +166,7 @@ describe("PeladaTeamsMobileView", () => {
     const geminiBtn = screen.getByText("Equilíbrio tático");
     fireEvent.click(geminiBtn);
 
-    const drawBtn = screen.getByText("SORTEAR DE NOVO");
+    const drawBtn = screen.getByTestId("draw-teams-button");
     fireEvent.click(drawBtn);
 
     expect(defaultProps.onRandomizeTeams).toHaveBeenCalledWith({
@@ -189,13 +189,42 @@ describe("PeladaTeamsMobileView", () => {
     });
     fireEvent.click(historySwitch);
 
-    const drawBtn = screen.getByText("SORTEAR DE NOVO");
+    const drawBtn = screen.getByTestId("draw-teams-button");
     fireEvent.click(drawBtn);
 
     expect(defaultProps.onRandomizeTeams).toHaveBeenCalledWith({
       algorithm: "gpt",
       useHistory: false,
     });
+  });
+
+  it("updates the number of teams and players per team from the mobile draw format steppers", () => {
+    const onUpdateNumTeams = vi.fn();
+    const onUpdatePlayersPerTeam = vi.fn();
+    renderComponent({ onUpdateNumTeams, onUpdatePlayersPerTeam });
+
+    fireEvent.click(screen.getByText("SORTEAR"));
+
+    fireEvent.click(screen.getByTestId("mobile-num-teams-increment"));
+    expect(onUpdateNumTeams).toHaveBeenCalledWith(3);
+
+    fireEvent.click(screen.getByTestId("mobile-players-per-team-increment"));
+    expect(onUpdatePlayersPerTeam).toHaveBeenCalledWith(6);
+
+    fireEvent.click(screen.getByTestId("mobile-players-per-team-decrement"));
+    expect(onUpdatePlayersPerTeam).toHaveBeenCalledWith(4);
+  });
+
+  it("decrements the number of teams when more than two are configured", () => {
+    const onUpdateNumTeams = vi.fn();
+    renderComponent({
+      pelada: { ...mockPelada, num_teams: 4 },
+      onUpdateNumTeams,
+    });
+
+    fireEvent.click(screen.getByText("SORTEAR"));
+    fireEvent.click(screen.getByTestId("mobile-num-teams-decrement"));
+    expect(onUpdateNumTeams).toHaveBeenCalledWith(3);
   });
 
   it("toggles fixed goalkeepers switch", () => {

@@ -43,6 +43,10 @@ describe("OrganizationDetailPage", () => {
     vi.clearAllMocks();
   });
 
+  const openOrgMenu = () => {
+    fireEvent.click(screen.getByTestId("org-menu-button"));
+  };
+
   it("renders organization details and paginated peladas", async () => {
     const mockOrg = { id: "1", name: "Test Org", owner_id: "1" };
     const mockPeladas = {
@@ -83,30 +87,20 @@ describe("OrganizationDetailPage", () => {
 
     await waitFor(() => {
       expect(screen.getAllByText("Test Org").length).toBeGreaterThan(0);
-      // Pelada #1 -> organizations.peladas.item_name with simple mock
       const items = screen.getAllByTestId("pelada-row");
       expect(items.length).toBeGreaterThan(0);
     });
 
-    // Check pagination info
-    // Pagination text comes from MUI TablePagination component which might not be fully using my i18n keys for "1-10 of 25" unless configured.
-    // MUI uses its own localization.
-    expect(screen.getByText("1–10 of 25")).toBeInTheDocument();
+    // The mobile agenda paginates with a compact "1–N de TOTAL" label.
+    expect(screen.getByText(/1–2 de 25/)).toBeInTheDocument();
   });
 
-  it("handles page change", async () => {
+  it("loads more peladas when tapping ver mais", async () => {
     const mockOrg = { id: "1", name: "Test Org", owner_id: "1" };
-    const mockPeladasPage1 = {
-      data: [{ id: "1", organization_id: "1", status: "open" }],
+    const mockPeladas = {
+      data: [{ id: "1", organization_id: "1", status: "closed" }],
       total: 25,
       page: 1,
-      perPage: 10,
-      totalPages: 3,
-    };
-    const mockPeladasPage2 = {
-      data: [{ id: "11", organization_id: "1", status: "open" }],
-      total: 25,
-      page: 2,
       perPage: 10,
       totalPages: 3,
     };
@@ -116,15 +110,7 @@ describe("OrganizationDetailPage", () => {
       if (path === "/api/organizations/1/admins") return Promise.resolve([]);
       return Promise.reject(new Error(`Not found: ${path}`));
     });
-    (api.getPaginated as Mock).mockImplementation(
-      (path: string, params: { page: number }) => {
-        if (path === "/api/organizations/1/peladas") {
-          if (params.page === 2) return Promise.resolve(mockPeladasPage2);
-          return Promise.resolve(mockPeladasPage1);
-        }
-        return Promise.reject(new Error("Not found"));
-      },
-    );
+    (api.getPaginated as Mock).mockResolvedValue(mockPeladas);
 
     render(
       <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -144,12 +130,13 @@ describe("OrganizationDetailPage", () => {
       expect(screen.getAllByTestId("pelada-row").length).toBeGreaterThan(0);
     });
 
-    // Click next page button
-    const nextButton = screen.getByTitle("Go to next page");
-    fireEvent.click(nextButton);
+    fireEvent.click(screen.getByTestId("load-more-peladas"));
 
     await waitFor(() => {
-      expect(screen.getAllByTestId("pelada-row").length).toBeGreaterThan(0);
+      expect(api.getPaginated).toHaveBeenLastCalledWith(
+        "/api/organizations/1/peladas",
+        expect.objectContaining({ per_page: 20, page: 1 }),
+      );
     });
   });
 
@@ -263,6 +250,7 @@ describe("OrganizationDetailPage", () => {
     });
 
     // Button should be present for non-admins
+    openOrgMenu();
     const leaveButton = screen.getByTestId("leave-org-button");
     expect(leaveButton).toBeInTheDocument();
 
@@ -370,6 +358,7 @@ describe("OrganizationDetailPage", () => {
       expect(screen.getAllByText("Non-Admin Org").length).toBeGreaterThan(0);
     });
 
+    openOrgMenu();
     const leaveButton = screen.getByTestId("leave-org-button");
     fireEvent.click(leaveButton);
 
@@ -429,6 +418,7 @@ describe("OrganizationDetailPage", () => {
       expect(screen.getAllByText("Non-Admin Org").length).toBeGreaterThan(0);
     });
 
+    openOrgMenu();
     const leaveButton = screen.getByTestId("leave-org-button");
     fireEvent.click(leaveButton);
 
@@ -484,6 +474,7 @@ describe("OrganizationDetailPage", () => {
       expect(screen.getAllByText("Non-Admin Org").length).toBeGreaterThan(0);
     });
 
+    openOrgMenu();
     const leaveButton = screen.getByTestId("leave-org-button");
     fireEvent.click(leaveButton);
 
@@ -774,6 +765,7 @@ describe("OrganizationDetailPage", () => {
     });
 
     // Open leave dialog
+    openOrgMenu();
     fireEvent.click(screen.getByTestId("leave-org-button"));
     await waitFor(() => {
       expect(
@@ -799,56 +791,6 @@ describe("OrganizationDetailPage", () => {
     });
   });
 
-  it("handles rows per page change", async () => {
-    const mockOrg = { id: "1", name: "Test Org", owner_id: "1" };
-    const mockPeladas = {
-      data: [{ id: "1", organization_id: "1", status: "open" }],
-      total: 25,
-      page: 1,
-      perPage: 10,
-      totalPages: 3,
-    };
-
-    (api.get as Mock).mockImplementation((path: string) => {
-      if (path === "/api/organizations/1") return Promise.resolve(mockOrg);
-      if (path === "/api/organizations/1/admins") return Promise.resolve([]);
-      return Promise.reject(new Error("Not found"));
-    });
-    (api.getPaginated as Mock).mockResolvedValue(mockPeladas);
-
-    render(
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <MemoryRouter initialEntries={["/organizations/1"]}>
-          <Routes>
-            <Route
-              path="/organizations/:id"
-              element={<OrganizationDetailPage />}
-            />
-            <Route path="/home" element={<div>Home Page</div>} />
-          </Routes>
-        </MemoryRouter>
-      </LocalizationProvider>,
-    );
-
-    await waitFor(() => {
-      expect(screen.getAllByTestId("pelada-row").length).toBeGreaterThan(0);
-    });
-
-    // Find and change rows per page
-    const select = screen.getByRole("combobox", {
-      name: "common.pagination.rows_per_page",
-    });
-    fireEvent.mouseDown(select);
-    const option = screen.getByRole("option", { name: "25" });
-    fireEvent.click(option);
-
-    await waitFor(() => {
-      expect(api.getPaginated).toHaveBeenLastCalledWith(
-        "/api/organizations/1/peladas",
-        expect.objectContaining({ per_page: 25, page: 1 }),
-      );
-    });
-  });
 
   it("disables statistics button when org_statistics feature flag is false", async () => {
     const mockOrg = { id: "1", name: "Test Org", owner_id: "1" };

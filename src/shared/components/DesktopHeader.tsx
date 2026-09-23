@@ -310,6 +310,8 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
                 color: "#f6f4ee",
                 borderRadius: "12px",
                 mt: 1,
+                minWidth: 220,
+                maxHeight: 360,
               },
             },
           }}
@@ -324,7 +326,9 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               sx={{
                 fontFamily: "Archivo, sans-serif",
                 fontWeight: 700,
-                fontSize: "12px",
+                fontSize: "13px",
+                px: 2,
+                py: 1.25,
                 display: "flex",
                 alignItems: "center",
                 gap: 1.25,
@@ -354,7 +358,9 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
             sx={{
               fontFamily: "Archivo, sans-serif",
               fontWeight: 700,
-              fontSize: "12px",
+              fontSize: "13px",
+              px: 2,
+              py: 1.25,
               "&:hover": { bgcolor: "#242628" },
             }}
           >
@@ -364,17 +370,17 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
             onClick={() => {
               handleCloseOrgMenu();
               navigate("/home#meus-grupos");
-              const el = document.getElementById("meus-grupos");
-              if (el) el.scrollIntoView({ behavior: "smooth" });
             }}
             sx={{
               fontFamily: "Archivo, sans-serif",
               fontWeight: 700,
-              fontSize: "12px",
+              fontSize: "13px",
+              px: 2,
+              py: 1.25,
               "&:hover": { bgcolor: "#242628" },
             }}
           >
-            {t("organizations.management.title", "Ver todos os meus grupos")}
+            {t("navigation.myGroups", "Ver todos os meus grupos")}
           </MenuItem>
         </Menu>
 
@@ -484,6 +490,7 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
                   color: "#f6f4ee",
                   borderRadius: "12px",
                   mt: 1,
+                  minWidth: 220,
                 },
               },
             }}
@@ -496,11 +503,13 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               sx={{
                 fontFamily: "Archivo, sans-serif",
                 fontWeight: 700,
-                fontSize: "12px",
+                fontSize: "13px",
+                px: 2,
+                py: 1.25,
                 "&:hover": { bgcolor: "#242628" },
               }}
             >
-              {t("navigation.profile", "Minha ficha")}
+              {t("navigation.profile", "Perfil")}
             </MenuItem>
 
             {user?.is_super_admin && (
@@ -512,7 +521,9 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
                 sx={{
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 700,
-                  fontSize: "12px",
+                  fontSize: "13px",
+                  px: 2,
+                  py: 1.25,
                   "&:hover": { bgcolor: "#242628" },
                 }}
               >
@@ -526,7 +537,9 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               sx={{
                 fontFamily: "Archivo, sans-serif",
                 fontWeight: 700,
-                fontSize: "12px",
+                fontSize: "13px",
+                px: 2,
+                py: 1.25,
                 color: "#e57373",
                 "&:hover": { bgcolor: "#242628" },
               }}

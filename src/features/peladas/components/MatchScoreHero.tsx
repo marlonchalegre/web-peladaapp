@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import ReplayIcon from "@mui/icons-material/Replay";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import HistoryIcon from "@mui/icons-material/History";
 import type { Match, Pelada } from "../../../shared/api/endpoints";
 import type { StandingRow } from "../utils/standingsUtils";
 import { useTranslation } from "react-i18next";
@@ -500,14 +501,11 @@ export default function MatchScoreHero({
             width: 34,
             height: 34,
             borderRadius: "10px",
-            fontFamily: "Archivo, sans-serif",
-            fontWeight: 700,
-            fontSize: "16px",
             p: 0,
             "&:hover": { bgcolor: "rgba(255,255,255,0.22)" },
           }}
         >
-          ‹
+          <HistoryIcon sx={{ fontSize: 18 }} />
         </IconButton>
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Typography

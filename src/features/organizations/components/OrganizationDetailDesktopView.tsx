@@ -1026,7 +1026,7 @@ export default function OrganizationDetailDesktopView({
                   {/* AÇÃO */}
                   <Box
                     sx={{
-                      width: 170,
+                      width: 250,
                       flexShrink: 0,
                       display: "flex",
                       justifyContent: "flex-end",
@@ -1034,27 +1034,56 @@ export default function OrganizationDetailDesktopView({
                     }}
                   >
                     {isOpen ? (
-                      <Box
-                        component="button"
-                        onClick={() =>
-                          navigate(`/peladas/${pelada.id}/attendance`)
-                        }
-                        sx={{
-                          border: "none",
-                          borderRadius: "10px",
-                          bgcolor: "#17181a",
-                          color: "#ffffff",
-                          p: "10px 13px",
-                          fontFamily: "Archivo, sans-serif",
-                          fontWeight: 800,
-                          fontSize: "10.5px",
-                          letterSpacing: ".06em",
-                          cursor: "pointer",
-                          "&:hover": { bgcolor: "#000000" },
-                        }}
-                      >
-                        FECHAR E SORTEAR
-                      </Box>
+                      <>
+                        <Box
+                          component="button"
+                          onClick={() =>
+                            navigate(`/peladas/${pelada.id}/attendance`)
+                          }
+                          data-testid={`view-list-${pelada.id}`}
+                          sx={{
+                            border: "1.5px solid #ddd8cc",
+                            borderRadius: "10px",
+                            bgcolor: "#ffffff",
+                            color: "#17181a",
+                            p: "9px 13px",
+                            fontFamily: "Archivo, sans-serif",
+                            fontWeight: 800,
+                            fontSize: "10.5px",
+                            letterSpacing: ".06em",
+                            cursor: "pointer",
+                            "&:hover": {
+                              borderColor: "#17181a",
+                              bgcolor: "#f6f4ee",
+                            },
+                          }}
+                        >
+                          VER LISTA
+                        </Box>
+                        {isAdmin && (
+                          <Box
+                            component="button"
+                            onClick={() =>
+                              navigate(`/peladas/${pelada.id}/attendance`)
+                            }
+                            sx={{
+                              border: "none",
+                              borderRadius: "10px",
+                              bgcolor: "#17181a",
+                              color: "#ffffff",
+                              p: "10px 13px",
+                              fontFamily: "Archivo, sans-serif",
+                              fontWeight: 800,
+                              fontSize: "10.5px",
+                              letterSpacing: ".06em",
+                              cursor: "pointer",
+                              "&:hover": { bgcolor: "#000000" },
+                            }}
+                          >
+                            FECHAR E SORTEAR
+                          </Box>
+                        )}
+                      </>
                     ) : (
                       <Box
                         component="button"

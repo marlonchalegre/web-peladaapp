@@ -62,6 +62,8 @@ export default function PeladaDetailPage() {
     handleDeleteTeam,
     handlePerformSwap: handlePerformSwapHook,
     handleToggleFixedGoalkeepers,
+    handleUpdatePlayersPerTeam,
+    handleUpdateNumTeams,
     handleMarkPaid,
     handleReversePayment,
     peladaTransactions,
@@ -316,6 +318,8 @@ export default function PeladaDetailPage() {
           onSendToBench={handleSendToBench}
           onMoveToFixedGk={handleMoveToFixedGk}
           onRandomizeTeams={handleRandomizeTeams}
+          onUpdatePlayersPerTeam={handleUpdatePlayersPerTeam}
+          onUpdateNumTeams={handleUpdateNumTeams}
           drawJustification={drawJustification}
           onOpenJustificationDialog={() => setJustificationDialogOpen(true)}
           onCreateTeam={handleCreateTeam}
@@ -347,6 +351,8 @@ export default function PeladaDetailPage() {
           onMoveToFixedGk={handleMoveToFixedGk}
           onRemoveFixedGk={removeFixedGk}
           onRandomizeTeams={handleRandomizeTeams}
+          onUpdatePlayersPerTeam={handleUpdatePlayersPerTeam}
+          onUpdateNumTeams={handleUpdateNumTeams}
           drawJustification={drawJustification}
           onOpenJustificationDialog={() => setJustificationDialogOpen(true)}
           onCreateTeam={handleCreateTeam}

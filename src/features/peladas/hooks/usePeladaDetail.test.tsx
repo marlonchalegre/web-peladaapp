@@ -146,6 +146,22 @@ describe("usePeladaDetail", () => {
     );
   });
 
+  it("should handle handleUpdateNumTeams successfully", async () => {
+    const { result } = renderHook(() => usePeladaDetail(peladaId), {
+      wrapper: MemoryRouter,
+    });
+    await waitFor(() => expect(result.current.pelada).not.toBe(null), {
+      timeout: 2000,
+    });
+    await act(async () => {
+      await result.current.handleUpdateNumTeams(3);
+    });
+    expect(mockApiClient.put).toHaveBeenCalledWith(
+      expect.stringContaining(peladaId),
+      expect.objectContaining({ num_teams: 3 }),
+    );
+  });
+
   it("should handle handleAddPlayersFromOrg successfully", async () => {
     const { result } = renderHook(() => usePeladaDetail(peladaId), {
       wrapper: MemoryRouter,

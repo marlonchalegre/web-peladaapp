@@ -13,6 +13,7 @@
     "users": "Usuários",
     "profile": "Perfil",
     "myCard": "Minha ficha",
+    "myGroups": "Ver todos os meus grupos",
     "adminPanel": "Painel de Admin"
   },
   "auth": {
@@ -232,6 +233,7 @@
     }
   },
   "home": {
+    "all_groups": "Todos os grupos",
     "blocked_message": "Sua conta está bloqueada. Você não pode participar de peladas ou ver estatísticas, mas pode acessar seu perfil.",
     "org_creation_disabled": "Criação de organização não permitida para sua conta.",
     "error": {
@@ -536,6 +538,7 @@
     },
     "stats": {
       "title": "{{name}} - Estatísticas",
+      "title_short": "Estatísticas",
       "season_title": "Estatísticas da temporada",
       "cards": {
         "top_scorer": "Artilheiro",
@@ -754,7 +757,9 @@
           "Partiu pelada?"
         ],
         "confirmed_msg": "Confirmado! Nos vemos no campo.",
-        "declined_msg": "Pena que não pode vir. Esperamos você na próxima!"
+        "declined_msg": "Pena que não pode vir. Esperamos você na próxima!",
+        "waitlist_msg": "Você está na lista de espera.",
+        "waitlist_button": "Fila de espera"
       },
       "status": {
         "confirmed": "Confirmado",

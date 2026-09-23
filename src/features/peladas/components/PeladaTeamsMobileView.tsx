@@ -8,12 +8,14 @@ import {
   MenuItem,
   CircularProgress,
   Divider,
+  IconButton,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CasinoIcon from "@mui/icons-material/Casino";
 import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 import type {
   Pelada,
   Team,
@@ -44,6 +46,8 @@ export interface PeladaTeamsMobileViewProps {
     algorithm: DrawAlgorithm;
     useHistory: boolean;
   }) => void;
+  onUpdatePlayersPerTeam?: (count: number) => void;
+  onUpdateNumTeams?: (count: number) => void;
   drawJustification: DrawJustification | null;
   onOpenJustificationDialog?: () => void;
   onCreateTeam?: (name: string) => Promise<void> | void;
@@ -79,6 +83,8 @@ export default function PeladaTeamsMobileView({
   onMoveToTeam,
   onSendToBench,
   onRandomizeTeams,
+  onUpdatePlayersPerTeam,
+  onUpdateNumTeams,
   drawJustification,
   onOpenJustificationDialog,
   onCreateTeam,
@@ -143,6 +149,7 @@ export default function PeladaTeamsMobileView({
   const totalConfirmed =
     Object.values(teamPlayers).flat().length + benchPlayers.length;
   const playersPerTeam = pelada.players_per_team || 5;
+  const numTeams = pelada.num_teams || teams.length || 2;
 
   // Paid set
   const paidPlayerIds = useMemo(
@@ -677,6 +684,156 @@ export default function PeladaTeamsMobileView({
               </Box>
             </Box>
 
+            {/* Formato do sorteio: número de times e jogadores por time */}
+            <Box
+              sx={{
+                mt: 2,
+                pt: 1.5,
+                borderTop: "1.5px dashed #ddd8cc",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 700,
+                  fontSize: "9px",
+                  letterSpacing: ".14em",
+                  color: "#6b675c",
+                  textTransform: "uppercase",
+                }}
+              >
+                FORMATO DO SORTEIO
+              </Typography>
+
+              <Box sx={{ display: "flex", gap: 1, mt: 1.25 }}>
+                <Box
+                  sx={{
+                    flex: 1,
+                    border: "1.5px solid #ddd8cc",
+                    borderRadius: "12px",
+                    p: "9px 10px",
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 700,
+                      fontSize: "9px",
+                      letterSpacing: ".08em",
+                      color: "#6b675c",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    TIMES
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      mt: 0.75,
+                    }}
+                  >
+                    <IconButton
+                      size="small"
+                      onClick={() => onUpdateNumTeams?.(numTeams - 1)}
+                      disabled={processing || numTeams <= 2}
+                      data-testid="mobile-num-teams-decrement"
+                      sx={{ p: 0.25 }}
+                    >
+                      <RemoveIcon sx={{ fontSize: 15 }} />
+                    </IconButton>
+                    <Typography
+                      data-testid="mobile-num-teams-value"
+                      sx={{
+                        fontFamily: "'Archivo Narrow', Archivo, sans-serif",
+                        fontWeight: 700,
+                        fontSize: "20px",
+                        lineHeight: 1,
+                        color: "#17181a",
+                      }}
+                    >
+                      {numTeams}
+                    </Typography>
+                    <IconButton
+                      size="small"
+                      onClick={() => onUpdateNumTeams?.(numTeams + 1)}
+                      disabled={processing || numTeams >= 8}
+                      data-testid="mobile-num-teams-increment"
+                      sx={{ p: 0.25 }}
+                    >
+                      <AddIcon sx={{ fontSize: 15 }} />
+                    </IconButton>
+                  </Box>
+                </Box>
+
+                <Box
+                  sx={{
+                    flex: 1,
+                    border: "1.5px solid #ddd8cc",
+                    borderRadius: "12px",
+                    p: "9px 10px",
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 700,
+                      fontSize: "9px",
+                      letterSpacing: ".08em",
+                      color: "#6b675c",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    POR TIME
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      mt: 0.75,
+                    }}
+                  >
+                    <IconButton
+                      size="small"
+                      onClick={() =>
+                        onUpdatePlayersPerTeam?.(playersPerTeam - 1)
+                      }
+                      disabled={processing || playersPerTeam <= 2}
+                      data-testid="mobile-players-per-team-decrement"
+                      sx={{ p: 0.25 }}
+                    >
+                      <RemoveIcon sx={{ fontSize: 15 }} />
+                    </IconButton>
+                    <Typography
+                      data-testid="mobile-players-per-team-value"
+                      sx={{
+                        fontFamily: "'Archivo Narrow', Archivo, sans-serif",
+                        fontWeight: 700,
+                        fontSize: "20px",
+                        lineHeight: 1,
+                        color: "#17181a",
+                      }}
+                    >
+                      {playersPerTeam}
+                    </Typography>
+                    <IconButton
+                      size="small"
+                      onClick={() =>
+                        onUpdatePlayersPerTeam?.(playersPerTeam + 1)
+                      }
+                      disabled={processing || playersPerTeam >= 11}
+                      data-testid="mobile-players-per-team-increment"
+                      sx={{ p: 0.25 }}
+                    >
+                      <AddIcon sx={{ fontSize: 15 }} />
+                    </IconButton>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+
             {/* Historical signals toggle */}
             <Box
               sx={{
@@ -777,6 +934,7 @@ export default function PeladaTeamsMobileView({
               variant="contained"
               disabled={processing}
               onClick={handleExecuteDraw}
+              data-testid="draw-teams-button"
               sx={{
                 mt: 2,
                 py: 1.5,
@@ -794,7 +952,7 @@ export default function PeladaTeamsMobileView({
               {processing ? (
                 <CircularProgress size={22} color="inherit" />
               ) : (
-                "SORTEAR DE NOVO"
+                "SORTEAR"
               )}
             </Button>
           </Box>

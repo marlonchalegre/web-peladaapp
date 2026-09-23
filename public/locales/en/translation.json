@@ -13,6 +13,7 @@
     "users": "Users",
     "profile": "Profile",
     "myCard": "My card",
+    "myGroups": "See all my groups",
     "adminPanel": "Admin Panel"
   },
   "auth": {
@@ -232,6 +233,7 @@
     }
   },
   "home": {
+    "all_groups": "All groups",
     "blocked_message": "Your account is blocked. You cannot participate in peladas or see statistics, but you can access your profile.",
     "org_creation_disabled": "Organization creation is not allowed for your account.",
     "error": {
@@ -537,6 +539,7 @@
     },
     "stats": {
       "title": "{{name}} - Statistics",
+      "title_short": "Statistics",
       "season_title": "Season statistics",
       "cards": {
         "top_scorer": "Top Scorer",
@@ -754,7 +757,9 @@
           "Game time soon, are you in?"
         ],
         "confirmed_msg": "You're in! See you on the pitch.",
-        "declined_msg": "Sad to hear you can't make it. Hope to see you next time!"
+        "declined_msg": "Sad to hear you can't make it. Hope to see you next time!",
+        "waitlist_msg": "You are on the waitlist.",
+        "waitlist_button": "Waitlist"
       },
       "status": {
         "confirmed": "Confirmed",

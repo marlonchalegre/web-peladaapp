@@ -110,6 +110,17 @@ describe("OrganizationDetailDesktopView", () => {
     expect(screen.getAllByText(/VER SÚMULA/)).toHaveLength(1);
   });
 
+  it("offers a VER LISTA action on open peladas so players can join the list", () => {
+    renderView();
+    expect(screen.getAllByText("VER LISTA")).toHaveLength(3);
+  });
+
+  it("keeps VER LISTA for non-admins but hides the admin close shortcut", () => {
+    renderView({ isAdmin: false });
+    expect(screen.getAllByText("VER LISTA")).toHaveLength(3);
+    expect(screen.queryByText("FECHAR E SORTEAR")).not.toBeInTheDocument();
+  });
+
   it("shows an empty message when the filter matches nothing", () => {
     renderView({ peladas: [] });
     fireEvent.click(screen.getByText("ABERTAS"));

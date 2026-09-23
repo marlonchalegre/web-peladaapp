@@ -209,6 +209,55 @@ describe("PeladaTeamsDesktopView", () => {
     expect(onCreateTeam).toHaveBeenCalledWith("Time 4");
   });
 
+  it("shows the player position on bench cards instead of a waitlist label", () => {
+    render(
+      <MemoryRouter>
+        <PeladaTeamsDesktopView {...defaultProps} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("meia · no banco")).toBeInTheDocument();
+    expect(screen.queryByText(/veio da fila/)).not.toBeInTheDocument();
+  });
+
+  it("labels the draw action as SORTEAR", () => {
+    render(
+      <MemoryRouter>
+        <PeladaTeamsDesktopView {...defaultProps} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByTestId("draw-again-button")).toHaveTextContent(
+      "SORTEAR",
+    );
+  });
+
+  it("updates the number of teams and players per team from the draw format steppers", () => {
+    const onUpdateNumTeams = vi.fn();
+    const onUpdatePlayersPerTeam = vi.fn();
+    render(
+      <MemoryRouter>
+        <PeladaTeamsDesktopView
+          {...defaultProps}
+          onUpdateNumTeams={onUpdateNumTeams}
+          onUpdatePlayersPerTeam={onUpdatePlayersPerTeam}
+        />
+      </MemoryRouter>,
+    );
+
+    fireEvent.click(screen.getByTestId("num-teams-increment"));
+    expect(onUpdateNumTeams).toHaveBeenCalledWith(4);
+
+    fireEvent.click(screen.getByTestId("num-teams-decrement"));
+    expect(onUpdateNumTeams).toHaveBeenCalledWith(2);
+
+    fireEvent.click(screen.getByTestId("players-per-team-increment"));
+    expect(onUpdatePlayersPerTeam).toHaveBeenCalledWith(6);
+
+    fireEvent.click(screen.getByTestId("players-per-team-decrement"));
+    expect(onUpdatePlayersPerTeam).toHaveBeenCalledWith(4);
+  });
+
   it("sends the classic draw without history signals", () => {
     const onRandomizeTeams = vi.fn();
     render(

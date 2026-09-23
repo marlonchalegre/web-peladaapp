@@ -79,6 +79,9 @@ export default function GroupTabsBar({
           display: "flex",
           alignItems: "center",
           overflowX: "auto",
+          overflowY: "hidden",
+          scrollbarWidth: "none",
+          "&::-webkit-scrollbar": { display: "none" },
         }}
       >
         <Typography

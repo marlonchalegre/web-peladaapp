@@ -1,6 +1,8 @@
 import { useState, type DragEvent } from "react";
 import { Box, Typography, Switch, IconButton, Button } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 import { useTranslation } from "react-i18next";
 import type {
   Pelada,
@@ -44,6 +46,8 @@ export interface PeladaTeamsDesktopViewProps {
     algorithm: DrawAlgorithm;
     useHistory: boolean;
   }) => void;
+  onUpdatePlayersPerTeam?: (count: number) => void;
+  onUpdateNumTeams?: (count: number) => void;
   drawJustification: DrawJustification | null;
   onCreateTeam: (name: string) => Promise<void>;
   onDeleteTeam: (teamId: string) => Promise<void>;
@@ -92,6 +96,8 @@ export default function PeladaTeamsDesktopView({
   dropToFixedGk,
   removeFixedGk,
   onRandomizeTeams,
+  onUpdatePlayersPerTeam,
+  onUpdateNumTeams,
   drawJustification,
   onOpenJustificationDialog,
   onCreateTeam,
@@ -105,6 +111,7 @@ export default function PeladaTeamsDesktopView({
   const [useHistory, setUseHistory] = useState(true);
 
   const playersPerTeam = pelada.players_per_team || 5;
+  const numTeams = pelada.num_teams || teams.length || 2;
 
   // Total confirmed players count
   const allTeamPlayers = Object.values(teamPlayers).flat();
@@ -144,6 +151,26 @@ export default function PeladaTeamsDesktopView({
       .toUpperCase();
   };
 
+  const formatPosition = (pos?: string) => {
+    if (!pos) return "meia";
+    switch (pos.toLowerCase()) {
+      case "goalkeeper":
+      case "goleiro":
+        return "goleiro";
+      case "defender":
+      case "zagueiro":
+        return "zagueiro";
+      case "midfielder":
+      case "meio-campo":
+        return "meia";
+      case "striker":
+      case "atacante":
+        return "atacante";
+      default:
+        return pos.toLowerCase();
+    }
+  };
+
   // Calculate team stats for justifications
   const teamAverages: {
     teamId: string;
@@ -165,6 +192,23 @@ export default function PeladaTeamsDesktopView({
       algorithm,
       useHistory: algorithm !== "classic" && useHistory,
     });
+  };
+
+  const handleAddTeam = async () => {
+    let nextNum = teams.length + 1;
+    while (
+      teams.some(
+        (team) =>
+          team.name.toLowerCase() === `time ${nextNum}`.toLowerCase() ||
+          team.name.toLowerCase() === `team ${nextNum}`.toLowerCase(),
+      )
+    ) {
+      nextNum++;
+    }
+    await onCreateTeam(
+      t("peladas.teams.default_name", { number: nextNum }) ||
+        `Time ${nextNum}`,
+    );
   };
 
   return (
@@ -659,6 +703,158 @@ export default function PeladaTeamsDesktopView({
                   </Box>
                 </Box>
 
+                {/* Formato do sorteio: número de times e jogadores por time */}
+                {isAdmin && (
+                  <Box
+                    sx={{
+                      mt: 2,
+                      pt: 2,
+                      borderTop: "1.5px dashed #ddd8cc",
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontFamily: "Archivo, sans-serif",
+                        fontWeight: 700,
+                        fontSize: "9px",
+                        letterSpacing: ".14em",
+                        color: "#6b675c",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      FORMATO DO SORTEIO
+                    </Typography>
+
+                    <Box sx={{ display: "flex", gap: 1, mt: 1.25 }}>
+                      <Box
+                        sx={{
+                          flex: 1,
+                          border: "1.5px solid #ddd8cc",
+                          borderRadius: "12px",
+                          p: "9px 10px",
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontFamily: "Archivo, sans-serif",
+                            fontWeight: 700,
+                            fontSize: "9px",
+                            letterSpacing: ".08em",
+                            color: "#6b675c",
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          TIMES
+                        </Typography>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            mt: 0.75,
+                          }}
+                        >
+                          <IconButton
+                            size="small"
+                            onClick={() => onUpdateNumTeams?.(numTeams - 1)}
+                            disabled={processing || numTeams <= 2}
+                            data-testid="num-teams-decrement"
+                            sx={{ p: 0.25 }}
+                          >
+                            <RemoveIcon sx={{ fontSize: 15 }} />
+                          </IconButton>
+                          <Typography
+                            data-testid="num-teams-value"
+                            sx={{
+                              fontFamily: "'Archivo Narrow', Archivo, sans-serif",
+                              fontWeight: 700,
+                              fontSize: "20px",
+                              lineHeight: 1,
+                              color: "#17181a",
+                            }}
+                          >
+                            {numTeams}
+                          </Typography>
+                          <IconButton
+                            size="small"
+                            onClick={() => onUpdateNumTeams?.(numTeams + 1)}
+                            disabled={processing || numTeams >= 8}
+                            data-testid="num-teams-increment"
+                            sx={{ p: 0.25 }}
+                          >
+                            <AddIcon sx={{ fontSize: 15 }} />
+                          </IconButton>
+                        </Box>
+                      </Box>
+
+                      <Box
+                        sx={{
+                          flex: 1,
+                          border: "1.5px solid #ddd8cc",
+                          borderRadius: "12px",
+                          p: "9px 10px",
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            fontFamily: "Archivo, sans-serif",
+                            fontWeight: 700,
+                            fontSize: "9px",
+                            letterSpacing: ".08em",
+                            color: "#6b675c",
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          POR TIME
+                        </Typography>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            mt: 0.75,
+                          }}
+                        >
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              onUpdatePlayersPerTeam?.(playersPerTeam - 1)
+                            }
+                            disabled={processing || playersPerTeam <= 2}
+                            data-testid="players-per-team-decrement"
+                            sx={{ p: 0.25 }}
+                          >
+                            <RemoveIcon sx={{ fontSize: 15 }} />
+                          </IconButton>
+                          <Typography
+                            data-testid="players-per-team-value"
+                            sx={{
+                              fontFamily: "'Archivo Narrow', Archivo, sans-serif",
+                              fontWeight: 700,
+                              fontSize: "20px",
+                              lineHeight: 1,
+                              color: "#17181a",
+                            }}
+                          >
+                            {playersPerTeam}
+                          </Typography>
+                          <IconButton
+                            size="small"
+                            onClick={() =>
+                              onUpdatePlayersPerTeam?.(playersPerTeam + 1)
+                            }
+                            disabled={processing || playersPerTeam >= 11}
+                            data-testid="players-per-team-increment"
+                            sx={{ p: 0.25 }}
+                          >
+                            <AddIcon sx={{ fontSize: 15 }} />
+                          </IconButton>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Box>
+                )}
+
                 {/* Sinais históricos toggle */}
                 <Box
                   sx={{
@@ -944,7 +1140,7 @@ export default function PeladaTeamsDesktopView({
                     "&:hover": { bgcolor: "#0e5c31" },
                   }}
                 >
-                  SORTEAR DE NOVO
+                  SORTEAR
                 </Button>
               </Box>
             </Box>
@@ -983,16 +1179,46 @@ export default function PeladaTeamsDesktopView({
               >
                 TIMES · {playersPerTeam} POR LADO
               </Typography>
-              <Typography
-                sx={{
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: 600,
-                  fontSize: "11.5px",
-                  color: "#6b675c",
-                }}
-              >
-                arraste um jogador para trocar de time
-              </Typography>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                <Typography
+                  sx={{
+                    fontFamily: "Archivo, sans-serif",
+                    fontWeight: 600,
+                    fontSize: "11.5px",
+                    color: "#6b675c",
+                  }}
+                >
+                  arraste um jogador para trocar de time
+                </Typography>
+                {isAdmin && (
+                  <Box
+                    component="button"
+                    onClick={handleAddTeam}
+                    data-testid="desktop-add-team-button"
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      border: "1.5px dashed #c9c4b6",
+                      bgcolor: "#ffffff",
+                      borderRadius: "10px",
+                      p: "7px 12px",
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 800,
+                      fontSize: "10.5px",
+                      letterSpacing: ".04em",
+                      color: "#6b675c",
+                      cursor: "pointer",
+                      "&:hover": {
+                        borderColor: "#146b3a",
+                        color: "#146b3a",
+                      },
+                    }}
+                  >
+                    + ADICIONAR TIME
+                  </Box>
+                )}
+              </Box>
             </Box>
 
             {/* Teams Grid */}
@@ -1372,55 +1598,13 @@ export default function PeladaTeamsDesktopView({
                           mt: 0.25,
                         }}
                       >
-                        {bp.position || "jogador"} · veio da fila
+                        {formatPosition(bp.position || bp.user?.position)} · no
+                        banco
                       </Typography>
                     </Box>
                   </Box>
                 ))}
 
-                {isAdmin && (
-                  <Box
-                    onClick={async () => {
-                      let nextNum = teams.length + 1;
-                      while (
-                        teams.some(
-                          (team) =>
-                            team.name.toLowerCase() ===
-                              `time ${nextNum}`.toLowerCase() ||
-                            team.name.toLowerCase() ===
-                              `team ${nextNum}`.toLowerCase(),
-                        )
-                      ) {
-                        nextNum++;
-                      }
-                      await onCreateTeam(
-                        t("peladas.teams.default_name", { number: nextNum }) ||
-                          `Time ${nextNum}`,
-                      );
-                    }}
-                    data-testid="desktop-add-team-button"
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      border: "1.5px dashed #c9c4b6",
-                      borderRadius: "12px",
-                      p: "10px 14px",
-                      fontFamily: "Archivo, sans-serif",
-                      fontWeight: 800,
-                      fontSize: "10.5px",
-                      letterSpacing: ".04em",
-                      color: "#6b675c",
-                      cursor: "pointer",
-                      "&:hover": {
-                        borderColor: "#146b3a",
-                        color: "#146b3a",
-                      },
-                    }}
-                  >
-                    + ADICIONAR TIME
-                  </Box>
-                )}
               </Box>
             </Box>
           </Box>

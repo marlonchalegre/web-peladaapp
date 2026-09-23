@@ -401,6 +401,25 @@ export function usePeladaDetail(peladaId: string) {
     }
   };
 
+  const handleUpdateNumTeams = async (count: number) => {
+    if (processing || !peladaId) return;
+    setProcessing(true);
+    try {
+      await api.put(`/api/peladas/${peladaId}`, {
+        num_teams: count,
+      });
+      await fetchPeladaData();
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : t("peladas.detail.error.update_failed");
+      setError(message);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   const handleRandomizeTeams = async (options: {
     algorithm: DrawAlgorithm;
     useHistory: boolean;
@@ -715,6 +734,7 @@ export function usePeladaDetail(peladaId: string) {
     handlePerformSwap,
     handleToggleFixedGoalkeepers,
     handleUpdatePlayersPerTeam,
+    handleUpdateNumTeams,
     handleAddPlayersFromOrg,
     handleMarkPaid,
     handleReversePayment,
