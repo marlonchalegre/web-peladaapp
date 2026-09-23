@@ -206,8 +206,7 @@ export default function PeladaTeamsDesktopView({
       nextNum++;
     }
     await onCreateTeam(
-      t("peladas.teams.default_name", { number: nextNum }) ||
-        `Time ${nextNum}`,
+      t("peladas.teams.default_name", { number: nextNum }) || `Time ${nextNum}`,
     );
   };
 
@@ -766,7 +765,8 @@ export default function PeladaTeamsDesktopView({
                           <Typography
                             data-testid="num-teams-value"
                             sx={{
-                              fontFamily: "'Archivo Narrow', Archivo, sans-serif",
+                              fontFamily:
+                                "'Archivo Narrow', Archivo, sans-serif",
                               fontWeight: 700,
                               fontSize: "20px",
                               lineHeight: 1,
@@ -829,7 +829,8 @@ export default function PeladaTeamsDesktopView({
                           <Typography
                             data-testid="players-per-team-value"
                             sx={{
-                              fontFamily: "'Archivo Narrow', Archivo, sans-serif",
+                              fontFamily:
+                                "'Archivo Narrow', Archivo, sans-serif",
                               fontWeight: 700,
                               fontSize: "20px",
                               lineHeight: 1,
@@ -1604,7 +1605,6 @@ export default function PeladaTeamsDesktopView({
                     </Box>
                   </Box>
                 ))}
-
               </Box>
             </Box>
           </Box>

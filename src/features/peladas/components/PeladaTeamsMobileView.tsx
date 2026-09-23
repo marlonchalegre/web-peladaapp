@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -16,6 +17,7 @@ import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CasinoIcon from "@mui/icons-material/Casino";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import type {
   Pelada,
   Team,
@@ -97,6 +99,8 @@ export default function PeladaTeamsMobileView({
   onMarkPaid,
   onReversePayment,
 }: PeladaTeamsMobileViewProps) {
+  const navigate = useNavigate();
+
   // Local draw options state
   const [selectedAlgorithm, setSelectedAlgorithm] =
     useState<DrawAlgorithm>("classic");
@@ -257,60 +261,84 @@ export default function PeladaTeamsMobileView({
     >
       {/* 1. Header Section */}
       <Box sx={{ mb: 2 }}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            flexWrap: "wrap",
-            fontFamily: "Archivo, sans-serif",
-            fontWeight: 700,
-            fontSize: "9.5px",
-            letterSpacing: ".16em",
-            color: "#6b675c",
-            textTransform: "uppercase",
-          }}
-        >
-          <Typography
-            component="span"
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
+          <IconButton
+            onClick={() => {
+              if (pelada.organization_id) {
+                navigate(`/organizations/${pelada.organization_id}`);
+              } else {
+                navigate(-1);
+              }
+            }}
+            size="small"
+            aria-label="Voltar"
+            data-testid="back-to-org-button"
             sx={{
-              fontFamily: "inherit",
-              fontWeight: "inherit",
-              fontSize: "inherit",
-              letterSpacing: "inherit",
-              color: "inherit",
-              textTransform: "inherit",
+              color: "#17181a",
+              p: 0.5,
+              ml: -0.5,
+              "&:hover": {
+                bgcolor: "rgba(0,0,0,0.04)",
+              },
             }}
           >
-            {pelada.organization_name || "PELADA"} · {weekdayStr} {dayStr}/
-            {monthStr} · {timeStr}
-          </Typography>
-          {pelada.location && (
-            <>
-              <Typography
-                component="span"
-                sx={{
-                  mx: 0.5,
-                  fontFamily: "inherit",
-                  fontWeight: "inherit",
-                  fontSize: "inherit",
-                  color: "inherit",
-                }}
-              >
-                ·
-              </Typography>
-              <LocationDisplay
-                location={pelada.location}
-                textSx={{
-                  fontFamily: "inherit",
-                  fontWeight: "inherit",
-                  fontSize: "inherit",
-                  letterSpacing: "inherit",
-                  color: "#146b3a",
-                  textTransform: "inherit",
-                }}
-              />
-            </>
-          )}
+            <ArrowBackIosNewIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              fontFamily: "Archivo, sans-serif",
+              fontWeight: 700,
+              fontSize: "9.5px",
+              letterSpacing: ".16em",
+              color: "#6b675c",
+              textTransform: "uppercase",
+            }}
+          >
+            <Typography
+              component="span"
+              sx={{
+                fontFamily: "inherit",
+                fontWeight: "inherit",
+                fontSize: "inherit",
+                letterSpacing: "inherit",
+                color: "inherit",
+                textTransform: "inherit",
+              }}
+            >
+              {pelada.organization_name || "PELADA"} · {weekdayStr} {dayStr}/
+              {monthStr} · {timeStr}
+            </Typography>
+            {pelada.location && (
+              <>
+                <Typography
+                  component="span"
+                  sx={{
+                    mx: 0.5,
+                    fontFamily: "inherit",
+                    fontWeight: "inherit",
+                    fontSize: "inherit",
+                    color: "inherit",
+                  }}
+                >
+                  ·
+                </Typography>
+                <LocationDisplay
+                  location={pelada.location}
+                  textSx={{
+                    fontFamily: "inherit",
+                    fontWeight: "inherit",
+                    fontSize: "inherit",
+                    letterSpacing: "inherit",
+                    color: "#146b3a",
+                    textTransform: "inherit",
+                  }}
+                />
+              </>
+            )}
+          </Box>
         </Box>
 
         <Typography

@@ -115,7 +115,9 @@ const metricUnit = (metric: MetricType, value: number) => {
 };
 
 const monthLabel = (iso: string) =>
-  new Date(iso).toLocaleDateString("pt-BR", { month: "short" }).replace(".", "");
+  new Date(iso)
+    .toLocaleDateString("pt-BR", { month: "short" })
+    .replace(".", "");
 
 const dayMonth = (iso: string) =>
   new Date(iso).toLocaleDateString("pt-BR", {
@@ -171,7 +173,7 @@ export default function OrganizationStatisticsMobileView({
   const isMe = (item: OrganizationPlayerStats) =>
     Boolean(
       currentUser &&
-        (item.user_id === currentUser.id || item.player_id === currentUser.id),
+      (item.user_id === currentUser.id || item.player_id === currentUser.id),
     );
 
   const myIndex = sortedByMetric.findIndex(isMe);
@@ -214,7 +216,10 @@ export default function OrganizationStatisticsMobileView({
     const pick = (
       candidates: OrganizationPlayerStats[],
       eligible: (s: OrganizationPlayerStats) => boolean,
-      compare: (a: OrganizationPlayerStats, b: OrganizationPlayerStats) => number,
+      compare: (
+        a: OrganizationPlayerStats,
+        b: OrganizationPlayerStats,
+      ) => number,
     ) =>
       [...candidates]
         .filter((s) => eligible(s) && !used.has(s.player_id))
@@ -669,7 +674,9 @@ export default function OrganizationStatisticsMobileView({
               color: "#6b675c",
             }}
           >
-            {METRIC_TABS.find((m) => m.key === activeMetric)?.label.toLowerCase()}{" "}
+            {METRIC_TABS.find(
+              (m) => m.key === activeMetric,
+            )?.label.toLowerCase()}{" "}
             · {sortedByMetric.length} jogadores
           </Typography>
         </Box>
@@ -874,11 +881,9 @@ export default function OrganizationStatisticsMobileView({
               >
                 <span>{monthLabel(weeklyPresence[0].week_start)}</span>
                 <span>
-                  {
-                    monthLabel(
-                      weeklyPresence[weeklyPresence.length - 1].week_start,
-                    )
-                  }
+                  {monthLabel(
+                    weeklyPresence[weeklyPresence.length - 1].week_start,
+                  )}
                 </span>
               </Box>
               <Typography

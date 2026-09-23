@@ -36,6 +36,8 @@ export default function GroupTabsBar({
   const navigate = useNavigate();
 
   const tabSx = (key: GroupTabKey) => ({
+    background: "none",
+    border: "none",
     py: 1.75,
     px: 1.9,
     borderBottom:
@@ -47,9 +49,15 @@ export default function GroupTabsBar({
     letterSpacing: ".04em",
     color: active === key ? "#17181a" : "#6b675c",
     cursor: "pointer",
+    outline: "none",
     whiteSpace: "nowrap" as const,
     textTransform: "uppercase" as const,
     "&:hover": { color: "#17181a" },
+    "&:focus-visible": {
+      color: "#17181a",
+      outline: "2px solid #146b3a",
+      outlineOffset: "2px",
+    },
   });
 
   const count = (value?: number) =>
@@ -102,12 +110,16 @@ export default function GroupTabsBar({
         </Typography>
 
         <Box
+          component="button"
+          type="button"
           onClick={() => navigate(`/organizations/${orgId}`)}
           sx={tabSx("agenda")}
         >
           AGENDA
         </Box>
         <Box
+          component="button"
+          type="button"
           onClick={() =>
             navigate(`/organizations/${orgId}/management?tab=members`)
           }
@@ -116,12 +128,16 @@ export default function GroupTabsBar({
           ELENCO {count(playersCount)}
         </Box>
         <Box
+          component="button"
+          type="button"
           onClick={() => navigate(`/organizations/${orgId}/statistics`)}
           sx={tabSx("statistics")}
         >
           ESTATÍSTICAS
         </Box>
         <Box
+          component="button"
+          type="button"
           onClick={() =>
             navigate(`/organizations/${orgId}/management?tab=finance`)
           }
@@ -130,6 +146,8 @@ export default function GroupTabsBar({
           FINANCEIRO {count(financePending)}
         </Box>
         <Box
+          component="button"
+          type="button"
           onClick={() =>
             navigate(`/organizations/${orgId}/management?tab=settings`)
           }

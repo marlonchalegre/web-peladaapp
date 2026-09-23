@@ -26,9 +26,7 @@ import type {
   MonthlyWaitlistStatus,
   User,
 } from "../../../shared/api/endpoints";
-import CreatePeladaForm, {
-  type CreatePeladaPayload,
-} from "./CreatePeladaForm";
+import CreatePeladaForm, { type CreatePeladaPayload } from "./CreatePeladaForm";
 import OrganizationRosterDialog from "./OrganizationRosterDialog";
 
 interface OrganizationDetailMobileViewProps {
@@ -123,9 +121,7 @@ const formatWeekday = (dateStr?: string | null) => {
   if (!dateStr) return "";
   const date = new Date(dateStr);
   if (Number.isNaN(date.getTime())) return "";
-  return date
-    .toLocaleDateString("pt-BR", { weekday: "long" })
-    .toUpperCase();
+  return date.toLocaleDateString("pt-BR", { weekday: "long" }).toUpperCase();
 };
 
 const formatMonth = (dateStr?: string | null) => {
@@ -366,7 +362,9 @@ export default function OrganizationDetailMobileView({
             artilharia, presença, títulos
           </Typography>
         </Box>
-        <Typography sx={{ font: "700 15px/1 Archivo,sans-serif", color: "#9a958a" }}>
+        <Typography
+          sx={{ font: "700 15px/1 Archivo,sans-serif", color: "#9a958a" }}
+        >
           ›
         </Typography>
       </Box>
@@ -777,9 +775,7 @@ export default function OrganizationDetailMobileView({
                 <>
                   <Chip
                     icon={<HourglassTopIcon />}
-                    label={t(
-                      "organizations.detail.waitlist.in_queue_badge",
-                    )}
+                    label={t("organizations.detail.waitlist.in_queue_badge")}
                     color="primary"
                     variant="outlined"
                     size="small"

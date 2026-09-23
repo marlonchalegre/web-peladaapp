@@ -10,11 +10,7 @@ import {
   MenuItem,
   IconButton,
 } from "@mui/material";
-import {
-  Link as RouterLink,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { Loading } from "../../../shared/components/Loading";

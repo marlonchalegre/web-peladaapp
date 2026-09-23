@@ -230,10 +230,7 @@ export default function UserAttendanceStatus({
           },
         }}
       >
-        {t(
-          "peladas.attendance.user_status.waitlist_button",
-          "Fila de espera",
-        )}
+        {t("peladas.attendance.user_status.waitlist_button", "Fila de espera")}
       </Button>
     </Paper>
   );

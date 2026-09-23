@@ -30,14 +30,13 @@ export default function DrawJustificationCard({
   awayGkName,
   onOpenDialog,
 }: DrawJustificationCardProps) {
-  const minAvg =
-    teamAverages.length > 0
-      ? Math.min(...teamAverages.map((t) => t.avg)).toFixed(1)
-      : "7.0";
-  const maxAvg =
-    teamAverages.length > 0
-      ? Math.max(...teamAverages.map((t) => t.avg)).toFixed(1)
-      : "7.5";
+  const hasAverages = teamAverages.length > 0;
+  const minAvg = hasAverages
+    ? Math.min(...teamAverages.map((t) => t.avg)).toFixed(1)
+    : "—";
+  const maxAvg = hasAverages
+    ? Math.max(...teamAverages.map((t) => t.avg)).toFixed(1)
+    : "—";
   const diffAvg =
     teamAverages.length > 1
       ? (
@@ -322,29 +321,31 @@ export default function DrawJustificationCard({
       {/* Explanatory bullet points */}
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1.2 }}>
         {/* Balance */}
-        <Box sx={{ display: "flex", gap: 1.2 }}>
-          <Box
-            sx={{
-              width: 6,
-              height: 6,
-              borderRadius: "50%",
-              bgcolor: "#146b3a",
-              flexShrink: 0,
-              mt: 0.6,
-            }}
-          />
-          <Typography
-            sx={{
-              fontFamily: "Archivo, sans-serif",
-              fontWeight: 600,
-              fontSize: "11.5px",
-              lineHeight: 1.4,
-              color: "#4a4740",
-            }}
-          >
-            Média por time entre {minAvg} e {maxAvg} — diferença de {diffAvg}.
-          </Typography>
-        </Box>
+        {hasAverages && (
+          <Box sx={{ display: "flex", gap: 1.2 }}>
+            <Box
+              sx={{
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                bgcolor: "#146b3a",
+                flexShrink: 0,
+                mt: 0.6,
+              }}
+            />
+            <Typography
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 600,
+                fontSize: "11.5px",
+                lineHeight: 1.4,
+                color: "#4a4740",
+              }}
+            >
+              Média por time entre {minAvg} e {maxAvg} — diferença de {diffAvg}.
+            </Typography>
+          </Box>
+        )}
 
         {/* AI Tactical or Chemistry summary */}
         {justification && (

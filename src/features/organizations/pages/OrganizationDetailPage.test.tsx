@@ -791,7 +791,6 @@ describe("OrganizationDetailPage", () => {
     });
   });
 
-
   it("disables statistics button when org_statistics feature flag is false", async () => {
     const mockOrg = { id: "1", name: "Test Org", owner_id: "1" };
     const mockPeladas = {

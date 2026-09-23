@@ -246,7 +246,12 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
 
         {/* Group Selector Pill */}
         <Box
+          component="button"
+          type="button"
           onClick={handleOpenOrgMenu}
+          aria-haspopup="true"
+          aria-expanded={Boolean(anchorElOrg)}
+          aria-label={t("navigation.selectGroup", "Selecionar grupo")}
           sx={{
             display: "flex",
             alignItems: "center",
@@ -255,11 +260,17 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
             borderRadius: "11px",
             px: 1.25,
             py: 0.75,
+            bgcolor: "transparent",
             cursor: "pointer",
             flexShrink: 0,
+            outline: "none",
             transition: "border-color 0.15s ease",
             "&:hover": {
               borderColor: "#6b675c",
+            },
+            "&:focus-visible": {
+              borderColor: "#146b3a",
+              boxShadow: "0 0 0 2px rgba(20, 107, 58, 0.4)",
             },
           }}
         >
@@ -395,6 +406,9 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
         >
           {/* Language Switcher Pill */}
           <Box
+            component="button"
+            type="button"
+            aria-label={t("navigation.switchLanguage", "Alternar idioma")}
             onClick={() => {
               const newLang = i18n.language?.startsWith("pt") ? "en" : "pt-BR";
               i18n.changeLanguage(newLang);
@@ -404,6 +418,7 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               height: 32,
               borderRadius: "10px",
               border: "1.5px solid #3a3b3e",
+              bgcolor: "transparent",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -412,10 +427,15 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               fontSize: "11px",
               color: "#9a958a",
               cursor: "pointer",
+              outline: "none",
               transition: "all 0.15s ease",
               "&:hover": {
                 color: "#f6f4ee",
                 borderColor: "#6b675c",
+              },
+              "&:focus-visible": {
+                borderColor: "#146b3a",
+                boxShadow: "0 0 0 2px rgba(20, 107, 58, 0.4)",
               },
             }}
           >
@@ -453,7 +473,12 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
 
           {/* User Avatar */}
           <Box
+            component="button"
+            type="button"
             onClick={handleOpenUserMenu}
+            aria-haspopup="true"
+            aria-expanded={Boolean(anchorElUser)}
+            aria-label={t("navigation.userMenu", "Menu do usuário")}
             data-testid="user-settings-button"
             sx={{
               width: 32,
@@ -469,9 +494,14 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               color: "#ffffff",
               cursor: "pointer",
               border: "2px solid rgba(255, 255, 255, 0.2)",
+              outline: "none",
               transition: "transform 0.15s ease",
               "&:hover": {
                 transform: "scale(1.05)",
+              },
+              "&:focus-visible": {
+                borderColor: "#ffffff",
+                boxShadow: "0 0 0 2px rgba(255, 255, 255, 0.5)",
               },
             }}
           >

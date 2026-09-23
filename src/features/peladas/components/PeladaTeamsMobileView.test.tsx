@@ -6,6 +6,15 @@ import PeladaTeamsMobileView, {
 import { MemoryRouter } from "react-router-dom";
 import type { Pelada, Team, User } from "../../../shared/api/endpoints";
 
+const mockNavigate = vi.fn();
+vi.mock("react-router-dom", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("react-router-dom")>();
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string, options?: { number?: number } | string) => {
@@ -373,5 +382,24 @@ describe("PeladaTeamsMobileView", () => {
     expect(
       screen.queryByRole("checkbox", { name: "Goleiros fixos" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("renders back button and navigates to organization page", () => {
+    renderComponent();
+
+    const backBtn = screen.getByTestId("back-to-org-button");
+    expect(backBtn).toBeInTheDocument();
+    fireEvent.click(backBtn);
+    expect(mockNavigate).toHaveBeenCalledWith("/organizations/org-1");
+  });
+
+  it("navigates back (-1) when pelada has no organization_id", () => {
+    renderComponent({
+      pelada: { ...mockPelada, organization_id: "" },
+    });
+
+    const backBtn = screen.getByTestId("back-to-org-button");
+    fireEvent.click(backBtn);
+    expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
 });

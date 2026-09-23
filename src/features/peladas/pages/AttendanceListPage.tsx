@@ -814,7 +814,9 @@ export default function AttendanceListPage() {
                         >
                           <IconButton
                             size="small"
-                            onClick={() => handleUpdateAttendance("declined")}
+                            onClick={() =>
+                              handleUpdateAttendance("declined", p.id)
+                            }
                             title="Remover da lista"
                             sx={{ color: "#a8452a", p: 0.25 }}
                           >
@@ -949,7 +951,9 @@ export default function AttendanceListPage() {
                       <Box sx={{ ml: "auto", display: "flex", gap: 0.5 }}>
                         <IconButton
                           size="small"
-                          onClick={() => handleUpdateAttendance("confirmed")}
+                          onClick={() =>
+                            handleUpdateAttendance("confirmed", p.id)
+                          }
                           title="Promover para confirmados"
                           sx={{ color: "#146b3a", p: 0.2 }}
                         >

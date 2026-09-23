@@ -144,13 +144,17 @@ describe("OrganizationStatisticsMobileView", () => {
   it("renders the weekly presence chart and highlights", () => {
     renderView();
 
-    expect(screen.getByText("PRESENÇA DO GRUPO · 12 SEMANAS")).toBeInTheDocument();
+    expect(
+      screen.getByText("PRESENÇA DO GRUPO · 12 SEMANAS"),
+    ).toBeInTheDocument();
     expect(screen.getByTestId("presence-summary")).toHaveTextContent(
       /Média de 23 jogadores por pelada · pior semana em \d{2}\/\d{2} com 11/,
     );
     expect(screen.getByText("DESTAQUES DA TEMPORADA")).toBeInTheDocument();
     expect(screen.getByText("Mais títulos · 9 noites")).toBeInTheDocument();
-    expect(screen.getByText("Presença perfeita · 28 de 28")).toBeInTheDocument();
+    expect(
+      screen.getByText("Presença perfeita · 28 de 28"),
+    ).toBeInTheDocument();
     expect(screen.getByText("Maior nota média · 8,1")).toBeInTheDocument();
   });
 

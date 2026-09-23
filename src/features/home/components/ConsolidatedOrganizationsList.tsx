@@ -134,9 +134,23 @@ export default function ConsolidatedOrganizationsList({
             return (
               <Box
                 key={org.id}
+                role="button"
+                tabIndex={0}
                 onClick={() => navigate(`/organizations/${org.id}`)}
+                onKeyDown={(e) => {
+                  if (
+                    e.target === e.currentTarget &&
+                    (e.key === "Enter" || e.key === " ")
+                  ) {
+                    e.preventDefault();
+                    navigate(`/organizations/${org.id}`);
+                  }
+                }}
                 data-testid={`org-link-${org.name}`}
+                aria-label={org.name}
                 sx={{
+                  width: "100%",
+                  textAlign: "left",
                   display: "flex",
                   alignItems: "center",
                   gap: 1.5,
@@ -145,10 +159,15 @@ export default function ConsolidatedOrganizationsList({
                   p: "11px 13px",
                   bgcolor: "#ffffff",
                   cursor: "pointer",
+                  outline: "none",
                   transition: "all 0.15s ease",
                   "&:hover": {
                     borderColor: "#17181a",
                     bgcolor: "#fbfaf7",
+                  },
+                  "&:focus-visible": {
+                    borderColor: "#17181a",
+                    boxShadow: "0 0 0 2px rgba(23, 24, 26, 0.2)",
                   },
                 }}
               >

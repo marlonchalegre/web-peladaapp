@@ -51,6 +51,11 @@ describe("DrawJustificationCard", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("does not render team average balance row when teamAverages is empty", () => {
+    render(<DrawJustificationCard justification={null} teamAverages={[]} />);
+    expect(screen.queryByText(/Média por time entre/)).not.toBeInTheDocument();
+  });
+
   it("renders the gemini chip and chemistry metrics", () => {
     render(
       <DrawJustificationCard

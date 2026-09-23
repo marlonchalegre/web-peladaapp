@@ -1,12 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import {
-  Container,
-  Alert,
-  Box,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { Container, Alert, Box, useMediaQuery, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import { useOrganizationStatistics } from "../hooks/useOrganizationStatistics";
@@ -28,8 +22,16 @@ export default function OrganizationStatisticsPage() {
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const { user } = useAuth();
 
-  const { org, year, setYear, error, stats, sortedStats, players, handleImport } =
-    useOrganizationStatistics(orgId);
+  const {
+    org,
+    year,
+    setYear,
+    error,
+    stats,
+    sortedStats,
+    players,
+    handleImport,
+  } = useOrganizationStatistics(orgId);
 
   const [importOpen, setImportOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
@@ -119,7 +121,6 @@ export default function OrganizationStatisticsPage() {
       </Box>
     );
   }
-
 
   return (
     <Box sx={{ width: "100%", bgcolor: "#f6f4ee", minHeight: "100vh" }}>
