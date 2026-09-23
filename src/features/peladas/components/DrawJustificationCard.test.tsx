@@ -74,6 +74,9 @@ describe("DrawJustificationCard", () => {
     expect(screen.getByText("GAP DEFESA")).toBeInTheDocument();
     expect(screen.getByText("GAP ATAQUE")).toBeInTheDocument();
     expect(
+      screen.getByText("Média por time entre 7,2 e 7,6 — diferença de 0,4."),
+    ).toBeInTheDocument();
+    expect(
       screen.queryByText("VER JUSTIFICATIVA COMPLETA"),
     ).not.toBeInTheDocument();
   });

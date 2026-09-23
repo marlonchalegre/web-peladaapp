@@ -32,18 +32,19 @@ export default function DrawJustificationCard({
 }: DrawJustificationCardProps) {
   const hasAverages = teamAverages.length > 0;
   const minAvg = hasAverages
-    ? Math.min(...teamAverages.map((t) => t.avg)).toFixed(1)
+    ? formatDecimal(Math.min(...teamAverages.map((t) => t.avg)), 1)
     : "—";
   const maxAvg = hasAverages
-    ? Math.max(...teamAverages.map((t) => t.avg)).toFixed(1)
+    ? formatDecimal(Math.max(...teamAverages.map((t) => t.avg)), 1)
     : "—";
   const diffAvg =
     teamAverages.length > 1
-      ? (
+      ? formatDecimal(
           Math.max(...teamAverages.map((t) => t.avg)) -
-          Math.min(...teamAverages.map((t) => t.avg))
-        ).toFixed(1)
-      : "0.0";
+            Math.min(...teamAverages.map((t) => t.avg)),
+          1,
+        )
+      : formatDecimal(0, 1);
 
   const algorithm = justification?.algorithm;
   const isAi = algorithm === "gpt" || algorithm === "gemini";
