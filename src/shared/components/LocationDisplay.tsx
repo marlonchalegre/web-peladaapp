@@ -6,6 +6,7 @@ import {
   type SxProps,
   type Theme,
 } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import {
   formatLocationDisplay,
@@ -33,13 +34,24 @@ export default function LocationDisplay({
   textSx,
   dataTestId = "location-display",
 }: LocationDisplayProps) {
+  const { t } = useTranslation();
   if (!location) return null;
 
   const shortName = formatLocationDisplay(location);
   const mapsUrl = getGoogleMapsUrl(location);
 
   return (
-    <Tooltip title={`Abrir "${location}" no Google Maps`} arrow placement="top">
+    <Tooltip
+      title={t(
+        "location.open_in_google_maps",
+        `Abrir "${location}" no Google Maps`,
+        {
+          location,
+        },
+      )}
+      arrow
+      placement="top"
+    >
       <Link
         href={mapsUrl}
         target="_blank"

@@ -197,17 +197,18 @@ export default function HomePage() {
                         width: 32,
                         height: 32,
                         borderRadius: "10px",
-                        border: "1.5px solid #ddd8cc",
-                        bgcolor: "#ffffff",
+                        border: "1.5px solid",
+                        borderColor: "divider",
+                        bgcolor: "background.paper",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 700,
                         fontSize: "12px",
-                        color: "#6b675c",
+                        color: "text.secondary",
                         cursor: "pointer",
-                        "&:hover": { borderColor: "#17181a" },
+                        "&:hover": { borderColor: "text.primary" },
                       }}
                     >
                       {i18n.language?.startsWith("pt") ? "PT" : "EN"}
@@ -305,7 +306,8 @@ export default function HomePage() {
                   >
                     <Box
                       sx={{
-                        bgcolor: "#17181a",
+                        bgcolor: (theme) =>
+                          theme.palette.mode === "dark" ? "#2d3035" : "#17181a",
                         color: "#ffffff",
                         borderRadius: "9px",
                         px: 1.5,
@@ -317,14 +319,16 @@ export default function HomePage() {
                         cursor: "pointer",
                       }}
                     >
-                      TODOS · {adminOrgs.length + memberOrgs.length}
+                      {t("home.filters.all", "TODOS")} ·{" "}
+                      {adminOrgs.length + memberOrgs.length}
                     </Box>
                     {[...adminOrgs, ...memberOrgs].map((org, i) => (
                       <Box
                         key={`desktop-chip-${org.id}`}
                         sx={{
-                          bgcolor: "#ffffff",
-                          border: "1.5px solid #ddd8cc",
+                          bgcolor: "background.paper",
+                          border: "1.5px solid",
+                          borderColor: "divider",
                           borderRadius: "9px",
                           px: 1.2,
                           py: 0.7,
@@ -332,7 +336,7 @@ export default function HomePage() {
                           alignItems: "center",
                           gap: 0.8,
                           cursor: "pointer",
-                          "&:hover": { borderColor: "#17181a" },
+                          "&:hover": { borderColor: "text.primary" },
                         }}
                       >
                         <Box
@@ -348,7 +352,7 @@ export default function HomePage() {
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: 700,
                             fontSize: "10.5px",
-                            color: "#17181a",
+                            color: "text.primary",
                           }}
                         >
                           • {org.name}
@@ -369,7 +373,8 @@ export default function HomePage() {
                 >
                   <Box
                     sx={{
-                      bgcolor: "#17181a",
+                      bgcolor: (theme) =>
+                        theme.palette.mode === "dark" ? "#2d3035" : "#17181a",
                       color: "#ffffff",
                       borderRadius: "9px",
                       px: 1.5,
@@ -381,14 +386,16 @@ export default function HomePage() {
                       cursor: "pointer",
                     }}
                   >
-                    TODOS · {adminOrgs.length + memberOrgs.length}
+                    {t("home.filters.all", "TODOS")} ·{" "}
+                    {adminOrgs.length + memberOrgs.length}
                   </Box>
                   {[...adminOrgs, ...memberOrgs].map((org, i) => (
                     <Box
                       key={org.id}
                       sx={{
-                        bgcolor: "#ffffff",
-                        border: "1.5px solid #ddd8cc",
+                        bgcolor: "background.paper",
+                        border: "1.5px solid",
+                        borderColor: "divider",
                         borderRadius: "9px",
                         px: 1.2,
                         py: 0.7,
@@ -396,7 +403,7 @@ export default function HomePage() {
                         alignItems: "center",
                         gap: 0.8,
                         cursor: "pointer",
-                        "&:hover": { borderColor: "#17181a" },
+                        "&:hover": { borderColor: "text.primary" },
                       }}
                     >
                       <Box
@@ -412,7 +419,7 @@ export default function HomePage() {
                           fontFamily: "Archivo, sans-serif",
                           fontWeight: 700,
                           fontSize: "10.5px",
-                          color: "#17181a",
+                          color: "text.primary",
                         }}
                       >
                         • {org.name}
@@ -486,8 +493,9 @@ export default function HomePage() {
                 sx={{
                   gridColumn: { xs: "1", md: "2" },
                   order: { xs: 4, md: 1 },
-                  bgcolor: "#ffffff",
-                  border: "1.5px solid #eae6db",
+                  bgcolor: "background.paper",
+                  border: "1.5px solid",
+                  borderColor: "divider",
                   borderRadius: "18px",
                   p: { xs: 2, sm: 2.5 },
                   width: "100%",
@@ -501,24 +509,31 @@ export default function HomePage() {
                       fontWeight: 700,
                       fontSize: "9.5px",
                       letterSpacing: "0.18em",
-                      color: "#6b675c",
+                      color: "text.secondary",
                       textTransform: "uppercase",
                       mb: 0.5,
                     }}
                   >
-                    TEMPORADA {currentYear}
+                    {t("home.season.title", "TEMPORADA {{year}}", {
+                      year: currentYear,
+                    })}
                   </Typography>
                   <Typography
                     sx={{
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 600,
                       fontSize: "12px",
-                      color: "#6b675c",
+                      color: "text.secondary",
                     }}
                   >
-                    {user.stats?.matches ?? 0} jogos em{" "}
-                    {adminOrgs.length + memberOrgs.length} grupos · cada esporte
-                    conta o seu
+                    {t(
+                      "home.season.subtitle",
+                      "{{matches}} jogos em {{groups}} grupos · cada esporte conta o seu",
+                      {
+                        matches: user.stats?.matches ?? 0,
+                        groups: adminOrgs.length + memberOrgs.length,
+                      },
+                    )}
                   </Typography>
                 </Box>
 
@@ -527,7 +542,8 @@ export default function HomePage() {
                   <Grid size={{ xs: 12 }}>
                     <Box
                       sx={{
-                        border: "1.5px solid #eae6db",
+                        border: "1.5px solid",
+                        borderColor: "divider",
                         borderRadius: "16px",
                         overflow: "hidden",
                       }}
@@ -538,8 +554,12 @@ export default function HomePage() {
                           alignItems: "center",
                           gap: 1,
                           p: "10px 14px",
-                          bgcolor: "#f4f8f5",
-                          borderBottom: "1.5px solid #eae6db",
+                          bgcolor: (theme) =>
+                            theme.palette.mode === "dark"
+                              ? "rgba(20, 107, 58, 0.15)"
+                              : "#f4f8f5",
+                          borderBottom: "1.5px solid",
+                          borderColor: "divider",
                         }}
                       >
                         <Box
@@ -555,7 +575,7 @@ export default function HomePage() {
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: 800,
                             fontSize: "11px",
-                            color: "#17181a",
+                            color: "text.primary",
                           }}
                         >
                           {t(
@@ -569,10 +589,13 @@ export default function HomePage() {
                             fontWeight: 700,
                             fontSize: "9.5px",
                             letterSpacing: "0.1em",
-                            color: "#6b675c",
+                            color: "text.secondary",
                           }}
                         >
-                          FUTEBOL · MENSALISTA
+                          {t(
+                            "home.stats.sport_mensalista",
+                            "FUTEBOL · MENSALISTA",
+                          )}
                         </Typography>
                       </Box>
 
@@ -581,12 +604,12 @@ export default function HomePage() {
                           display: "grid",
                           gridTemplateColumns: "repeat(3, 1fr)",
                           gap: "1px",
-                          bgcolor: "#eae6db",
+                          bgcolor: "divider",
                         }}
                       >
                         <Box
                           sx={{
-                            bgcolor: "#ffffff",
+                            bgcolor: "background.paper",
                             p: "12px 10px",
                             textAlign: "center",
                           }}
@@ -606,7 +629,7 @@ export default function HomePage() {
                               fontWeight: 700,
                               fontSize: "26px",
                               lineHeight: 1,
-                              color: "#17181a",
+                              color: "text.primary",
                             }}
                           >
                             {user.stats?.matches ?? 0}
@@ -617,17 +640,17 @@ export default function HomePage() {
                               fontWeight: 700,
                               fontSize: "8.5px",
                               letterSpacing: "0.1em",
-                              color: "#6b675c",
+                              color: "text.secondary",
                               mt: 0.5,
                             }}
                           >
-                            JOGOS
+                            {t("home.stats.matches_short", "JOGOS")}
                           </Typography>
                         </Box>
 
                         <Box
                           sx={{
-                            bgcolor: "#ffffff",
+                            bgcolor: "background.paper",
                             p: "12px 10px",
                             textAlign: "center",
                           }}
@@ -649,7 +672,7 @@ export default function HomePage() {
                               fontWeight: 700,
                               fontSize: "26px",
                               lineHeight: 1,
-                              color: "#17181a",
+                              color: "text.primary",
                             }}
                           >
                             {user.stats?.goals ?? 0}
@@ -660,17 +683,17 @@ export default function HomePage() {
                               fontWeight: 700,
                               fontSize: "8.5px",
                               letterSpacing: "0.1em",
-                              color: "#6b675c",
+                              color: "text.secondary",
                               mt: 0.5,
                             }}
                           >
-                            GOLS
+                            {t("home.stats.goals_short", "GOLS")}
                           </Typography>
                         </Box>
 
                         <Box
                           sx={{
-                            bgcolor: "#ffffff",
+                            bgcolor: "background.paper",
                             p: "12px 10px",
                             textAlign: "center",
                           }}
@@ -693,11 +716,11 @@ export default function HomePage() {
                               fontWeight: 700,
                               fontSize: "8.5px",
                               letterSpacing: "0.1em",
-                              color: "#6b675c",
+                              color: "text.secondary",
                               mt: 0.5,
                             }}
                           >
-                            ASSIST.
+                            {t("home.stats.assists_short", "ASSIST.")}
                           </Typography>
                         </Box>
                       </Box>
@@ -709,9 +732,13 @@ export default function HomePage() {
                     <Box
                       sx={{
                         p: 2,
-                        border: "1.5px solid #eae6db",
+                        border: "1.5px solid",
+                        borderColor: "divider",
                         borderRadius: "16px",
-                        bgcolor: "#fbfaf7",
+                        bgcolor: (theme) =>
+                          theme.palette.mode === "dark"
+                            ? "background.default"
+                            : "#fbfaf7",
                         display: "flex",
                         flexDirection: "column",
                         justifyContent: "space-between",
@@ -730,11 +757,11 @@ export default function HomePage() {
                             fontWeight: 700,
                             fontSize: "9.5px",
                             letterSpacing: "0.14em",
-                            color: "#6b675c",
+                            color: "text.secondary",
                             textTransform: "uppercase",
                           }}
                         >
-                          Resumo da Conta
+                          {t("home.stats.account_summary", "Resumo da Conta")}
                         </Typography>
                         <Box
                           component="span"
@@ -743,7 +770,7 @@ export default function HomePage() {
                             fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                             fontWeight: 700,
                             fontSize: "18px",
-                            color: "#17181a",
+                            color: "text.primary",
                           }}
                         >
                           {adminOrgs.length + memberOrgs.length}
@@ -757,7 +784,7 @@ export default function HomePage() {
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: 700,
                             fontSize: "13px",
-                            color: "#17181a",
+                            color: "text.primary",
                           }}
                         >
                           {user.stats?.goals ?? 0} {t("common.goals", "Gols")} |{" "}
@@ -773,7 +800,8 @@ export default function HomePage() {
                           justifyContent: "space-between",
                           mt: 1.5,
                           pt: 1.5,
-                          borderTop: "1.5px dashed #ddd8cc",
+                          borderTop: "1.5px dashed",
+                          borderColor: "divider",
                         }}
                       >
                         <Typography
@@ -781,17 +809,20 @@ export default function HomePage() {
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: 600,
                             fontSize: "12px",
-                            color: "#6b675c",
+                            color: "text.secondary",
                           }}
                         >
-                          Presença:{" "}
-                          <strong style={{ color: "#17181a" }}>
+                          {t("home.stats.attendance", "Presença")}:{" "}
+                          <Box
+                            component="span"
+                            sx={{ color: "text.primary", fontWeight: 700 }}
+                          >
                             {user.stats?.attendance_rate == null
                               ? "—"
                               : `${Math.round(user.stats.attendance_rate)}%`}
-                          </strong>
+                          </Box>
                           {(user.stats?.current_streak ?? 0) > 0
-                            ? ` · sequência de ${user.stats?.current_streak} jogos`
+                            ? ` · ${t("home.stats.streak", "sequência de {{count}} jogos", { count: user.stats?.current_streak ?? 0 })}`
                             : ""}
                         </Typography>
                         <Button
@@ -810,7 +841,7 @@ export default function HomePage() {
                             },
                           }}
                         >
-                          Minha ficha →
+                          {t("home.stats.my_profile", "Minha ficha →")}
                         </Button>
                       </Box>
                     </Box>
@@ -851,11 +882,13 @@ export default function HomePage() {
                     letterSpacing: "0.06em",
                     textTransform: "uppercase",
                     bgcolor: "transparent",
-                    color: "#17181a",
-                    border: "1.5px dashed #c9c4b6",
+                    color: "text.primary",
+                    border: "1.5px dashed",
+                    borderColor: (theme) =>
+                      theme.palette.mode === "dark" ? "#4a4d55" : "#c9c4b6",
                     "&:hover": {
-                      bgcolor: "#ffffff",
-                      borderColor: "#17181a",
+                      bgcolor: "background.paper",
+                      borderColor: "text.primary",
                     },
                   }}
                 >
@@ -868,8 +901,9 @@ export default function HomePage() {
                 sx={{
                   gridColumn: { xs: "1", md: "2" },
                   order: { xs: 6, md: 3 },
-                  bgcolor: "#ffffff",
-                  border: "1.5px solid #eae6db",
+                  bgcolor: "background.paper",
+                  border: "1.5px solid",
+                  borderColor: "divider",
                   borderRadius: "18px",
                   p: { xs: 2, sm: 2.5 },
                   width: "100%",
@@ -882,12 +916,12 @@ export default function HomePage() {
                     fontWeight: 700,
                     fontSize: "9.5px",
                     letterSpacing: "0.18em",
-                    color: "#6b675c",
+                    color: "text.secondary",
                     textTransform: "uppercase",
                     mb: 1.5,
                   }}
                 >
-                  PRECISA DE VOCÊ
+                  {t("home.needs_you.title", "PRECISA DE VOCÊ")}
                 </Typography>
                 <Box
                   sx={{ display: "flex", flexDirection: "column", gap: 1.25 }}
@@ -897,10 +931,14 @@ export default function HomePage() {
                       display: "flex",
                       alignItems: "center",
                       gap: 1.25,
-                      border: "1.5px solid #eae6db",
+                      border: "1.5px solid",
+                      borderColor: "divider",
                       borderRadius: "14px",
                       p: "12px 13px",
-                      bgcolor: "#fbfaf7",
+                      bgcolor: (theme) =>
+                        theme.palette.mode === "dark"
+                          ? "background.default"
+                          : "#fbfaf7",
                     }}
                   >
                     <Box
@@ -919,23 +957,32 @@ export default function HomePage() {
                           fontWeight: 700,
                           fontSize: "12px",
                           lineHeight: 1.25,
-                          color: "#17181a",
+                          color: "text.primary",
                         }}
                       >
                         {peladas.some((p) => p.status === "attendance")
-                          ? "Confirmar presença na pelada"
-                          : "Próximos jogos em breve"}
+                          ? t(
+                              "home.needs_you.confirm_attendance",
+                              "Confirmar presença na pelada",
+                            )
+                          : t(
+                              "home.needs_you.upcoming_matches",
+                              "Próximos jogos em breve",
+                            )}
                       </Typography>
                       <Typography
                         sx={{
                           fontFamily: "Archivo, sans-serif",
                           fontWeight: 600,
                           fontSize: "10.5px",
-                          color: "#6b675c",
+                          color: "text.secondary",
                           mt: 0.25,
                         }}
                       >
-                        fique atento aos prazos da lista
+                        {t(
+                          "home.needs_you.attendance_deadline",
+                          "fique atento aos prazos da lista",
+                        )}
                       </Typography>
                     </Box>
                   </Box>
@@ -945,10 +992,14 @@ export default function HomePage() {
                       display: "flex",
                       alignItems: "center",
                       gap: 1.25,
-                      border: "1.5px solid #eae6db",
+                      border: "1.5px solid",
+                      borderColor: "divider",
                       borderRadius: "14px",
                       p: "12px 13px",
-                      bgcolor: "#fbfaf7",
+                      bgcolor: (theme) =>
+                        theme.palette.mode === "dark"
+                          ? "background.default"
+                          : "#fbfaf7",
                     }}
                   >
                     <Box
@@ -967,21 +1018,24 @@ export default function HomePage() {
                           fontWeight: 700,
                           fontSize: "12px",
                           lineHeight: 1.25,
-                          color: "#17181a",
+                          color: "text.primary",
                         }}
                       >
-                        Votação no MVP
+                        {t("home.needs_you.mvp_vote", "Votação no MVP")}
                       </Typography>
                       <Typography
                         sx={{
                           fontFamily: "Archivo, sans-serif",
                           fontWeight: 600,
                           fontSize: "10.5px",
-                          color: "#6b675c",
+                          color: "text.secondary",
                           mt: 0.25,
                         }}
                       >
-                        participe ao fim de cada pelada
+                        {t(
+                          "home.needs_you.mvp_desc",
+                          "participe ao fim de cada pelada",
+                        )}
                       </Typography>
                     </Box>
                   </Box>

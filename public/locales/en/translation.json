@@ -9,12 +9,23 @@
   },
   "navigation": {
     "home": "Home",
+    "groups": "Groups",
     "organizations": "Organizations",
     "users": "Users",
     "profile": "Profile",
-    "myCard": "My card",
+    "myCard": "My profile",
     "myGroups": "See all my groups",
-    "adminPanel": "Admin Panel"
+    "adminPanel": "Admin Panel",
+    "navLabel": "Bottom navigation",
+    "home_short": "HOME",
+    "groups_short": "GROUPS",
+    "profile_short": "PROFILE",
+    "selectGroup": "Select group",
+    "switchLanguage": "Switch language",
+    "userMenu": "User menu"
+  },
+  "location": {
+    "open_in_google_maps": "Open \"{{location}}\" in Google Maps"
   },
   "auth": {
     "login": {
@@ -95,6 +106,10 @@
   },
   "common": {
     "locale_code": "en-US",
+    "theme": {
+      "light": "Light Mode",
+      "dark": "Dark Mode"
+    },
     "characteristics": {
       "title": "Player Characteristics",
       "passing": "Passing",
@@ -210,6 +225,9 @@
       "admin": "Administrator",
       "player": "Player"
     },
+    "sports": {
+      "football": "Football"
+    },
     "positions": {
       "goalkeeper": "Goalkeeper",
       "striker": "Striker",
@@ -246,12 +264,59 @@
       "prefix": "Welcome, ",
       "subtitle": "Here is a summary of your activities."
     },
+    "filters": {
+      "all": "ALL"
+    },
+    "season": {
+      "title": "SEASON {{year}}",
+      "subtitle": "{{matches}} matches in {{groups}} groups · each sport has its own"
+    },
+    "carousel": {
+      "section_title": "YOUR WEEK",
+      "single_match": "match",
+      "plural_matches": "matches",
+      "pending": "pending",
+      "of_slots": "of",
+      "on_list": "on roster",
+      "on_roster_header": "ON ROSTER",
+      "presence_confirmed": "CONFIRMED",
+      "presence_declined": "Declined",
+      "matches": "matches",
+      "actions": {
+        "confirm_presence": "COUNT ME IN",
+        "cancel_presence": "Can't make it",
+        "view_list": "View list →",
+        "view_attendance": "View Attendance",
+        "confirm": "Confirm Attendance",
+        "vote": "Vote for MVP",
+        "running": "Follow Match",
+        "view": "View Details"
+      }
+    },
+    "needs_you": {
+      "title": "ACTION NEEDED",
+      "confirm_attendance": "Confirm attendance for match",
+      "upcoming_matches": "Upcoming matches soon",
+      "attendance_deadline": "pay attention to roster deadlines",
+      "mvp_vote": "MVP Voting",
+      "mvp_desc": "vote after each match"
+    },
     "stats": {
       "peladas_played": "Matches Played ({{year}})",
       "groups_active": "Active Groups",
-      "goals_assists": "Goals & Assists ({{year}})"
+      "goals_assists": "Goals & Assists ({{year}})",
+      "season_group_title": "Group Season",
+      "sport_mensalista": "FOOTBALL · MONTHLY",
+      "matches_short": "MATCHES",
+      "goals_short": "GOALS",
+      "assists_short": "ASSISTS",
+      "account_summary": "Account Summary",
+      "attendance": "Attendance",
+      "streak": "streak of {{count}} matches",
+      "my_profile": "My profile →"
     },
     "sections": {
+      "my_organizations": "MY GROUPS",
       "pending_invitations": {
         "title": "Pending Invitations",
         "invited_to_join": "You have been invited to join this organization."
@@ -283,6 +348,13 @@
     }
   },
   "organizations": {
+    "tabs": {
+      "agenda": "SCHEDULE",
+      "roster": "ROSTER",
+      "statistics": "STATISTICS",
+      "finance": "FINANCES",
+      "settings": "SETTINGS"
+    },
     "list": {
       "title": "Organizations",
       "loading": "Loading organizations...",

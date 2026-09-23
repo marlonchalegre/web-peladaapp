@@ -33,8 +33,9 @@ export default function ConsolidatedOrganizationsList({
     <Box
       data-testid="admin-orgs-list"
       sx={{
-        bgcolor: "#ffffff",
-        border: "1.5px solid #eae6db",
+        bgcolor: "background.paper",
+        border: "1.5px solid",
+        borderColor: "divider",
         borderRadius: "16px",
         p: { xs: 2, sm: 2.5 },
       }}
@@ -53,7 +54,7 @@ export default function ConsolidatedOrganizationsList({
             fontWeight: 700,
             fontSize: "9.5px",
             letterSpacing: "0.18em",
-            color: "#6b675c",
+            color: "text.secondary",
             textTransform: "uppercase",
           }}
         >
@@ -64,7 +65,7 @@ export default function ConsolidatedOrganizationsList({
             fontFamily: "Archivo, sans-serif",
             fontWeight: 700,
             fontSize: "11px",
-            color: "#6b675c",
+            color: "text.secondary",
           }}
         >
           {allOrgs.length}
@@ -84,9 +85,11 @@ export default function ConsolidatedOrganizationsList({
         >
           <Avatar
             sx={{
-              bgcolor: "#f6f4ee",
-              color: "#6b675c",
-              border: "1.5px solid #ddd8cc",
+              bgcolor: (theme) =>
+                theme.palette.mode === "dark" ? "#2d3035" : "#f6f4ee",
+              color: "text.secondary",
+              border: "1.5px solid",
+              borderColor: "divider",
               width: 44,
               height: 44,
               mb: 1.5,
@@ -98,7 +101,7 @@ export default function ConsolidatedOrganizationsList({
           {/* Keep test-expected keys rendered */}
           <Typography
             variant="body2"
-            sx={{ fontFamily: "Archivo, sans-serif", color: "#6b675c" }}
+            sx={{ fontFamily: "Archivo, sans-serif", color: "text.secondary" }}
           >
             {t(
               "home.sections.admin_orgs.empty",
@@ -109,7 +112,7 @@ export default function ConsolidatedOrganizationsList({
             variant="body2"
             sx={{
               fontFamily: "Archivo, sans-serif",
-              color: "#6b675c",
+              color: "text.secondary",
               mt: 0.5,
             }}
           >
@@ -154,19 +157,24 @@ export default function ConsolidatedOrganizationsList({
                   display: "flex",
                   alignItems: "center",
                   gap: 1.5,
-                  border: "1.5px solid #eae6db",
+                  border: "1.5px solid",
+                  borderColor: "divider",
                   borderRadius: "14px",
                   p: "11px 13px",
-                  bgcolor: "#ffffff",
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? theme.palette.background.default
+                      : "#ffffff",
                   cursor: "pointer",
                   outline: "none",
                   transition: "all 0.15s ease",
                   "&:hover": {
-                    borderColor: "#17181a",
-                    bgcolor: "#fbfaf7",
+                    borderColor: "text.primary",
+                    bgcolor: (theme) =>
+                      theme.palette.mode === "dark" ? "#2a2d32" : "#fbfaf7",
                   },
                   "&:focus-visible": {
-                    borderColor: "#17181a",
+                    borderColor: "text.primary",
                     boxShadow: "0 0 0 2px rgba(23, 24, 26, 0.2)",
                   },
                 }}
@@ -178,7 +186,10 @@ export default function ConsolidatedOrganizationsList({
                     height: 32,
                     borderRadius: "50%",
                     bgcolor: isAdmin ? "#146b3a" : "#a8452a",
-                    border: "2px solid #17181a",
+                    border: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? "2px solid #2d3035"
+                        : "2px solid #17181a",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -200,7 +211,7 @@ export default function ConsolidatedOrganizationsList({
                       fontWeight: 800,
                       fontSize: "12.5px",
                       lineHeight: 1.2,
-                      color: "#17181a",
+                      color: "text.primary",
                     }}
                   >
                     {org.name}
@@ -219,10 +230,10 @@ export default function ConsolidatedOrganizationsList({
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 600,
                         fontSize: "10.5px",
-                        color: "#6b675c",
+                        color: "text.secondary",
                       }}
                     >
-                      Futebol ·
+                      {t("common.sports.football", "Futebol")} ·
                     </Typography>
                     <Chip
                       label={
@@ -239,9 +250,20 @@ export default function ConsolidatedOrganizationsList({
                         fontWeight: 700,
                         letterSpacing: "0.04em",
                         borderRadius: "5px",
-                        borderColor: isAdmin ? "#146b3a" : "#ddd8cc",
-                        color: isAdmin ? "#146b3a" : "#6b675c",
-                        bgcolor: isAdmin ? "#f4f8f5" : "transparent",
+                        borderColor: (theme) =>
+                          isAdmin ? "#146b3a" : theme.palette.divider,
+                        color: (theme) =>
+                          isAdmin
+                            ? theme.palette.mode === "dark"
+                              ? "#bfe6ce"
+                              : "#146b3a"
+                            : theme.palette.text.secondary,
+                        bgcolor: (theme) =>
+                          isAdmin
+                            ? theme.palette.mode === "dark"
+                              ? "rgba(20, 107, 58, 0.2)"
+                              : "#f4f8f5"
+                            : "transparent",
                         "& .MuiChip-label": { px: 0.6 },
                       }}
                     />
@@ -259,7 +281,7 @@ export default function ConsolidatedOrganizationsList({
                       }}
                       data-testid={`manage-org-${org.id}`}
                       sx={{
-                        color: "#6b675c",
+                        color: "text.secondary",
                         p: 0.5,
                         "&:hover": {
                           color: "#146b3a",
@@ -278,7 +300,7 @@ export default function ConsolidatedOrganizationsList({
                     fontWeight: 700,
                     fontSize: "16px",
                     lineHeight: 1,
-                    color: "#6b675c",
+                    color: "text.secondary",
                     flexShrink: 0,
                   }}
                 >

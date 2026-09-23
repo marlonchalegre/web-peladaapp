@@ -19,7 +19,11 @@ describe("GroupTabsBar", () => {
 
   const renderBar = (
     active: GroupTabKey = "agenda",
-    extra: { playersCount?: number; financePending?: number } = {},
+    extra: {
+      playersCount?: number;
+      financePending?: number;
+      isAdmin?: boolean;
+    } = {},
   ) =>
     render(
       <MemoryRouter>
@@ -32,52 +36,95 @@ describe("GroupTabsBar", () => {
       </MemoryRouter>,
     );
 
-  it("renders the group name and all five tabs", () => {
-    renderBar();
+  it("renders non-admin tabs and hides admin tabs when isAdmin is false", () => {
+    renderBar("agenda", { isAdmin: false });
     expect(screen.getByLabelText("Group sub-navigation")).toBeInTheDocument();
     expect(screen.getByText("100Fôlego")).toBeInTheDocument();
-    expect(screen.getByText(/AGENDA/)).toBeInTheDocument();
-    expect(screen.getByText(/ELENCO/)).toBeInTheDocument();
-    expect(screen.getByText(/ESTATÍSTICAS/)).toBeInTheDocument();
-    expect(screen.getByText(/FINANCEIRO/)).toBeInTheDocument();
-    expect(screen.getByText(/AJUSTES/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/organizations\.tabs\.agenda|AGENDA/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/organizations\.tabs\.roster|ELENCO/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/organizations\.tabs\.statistics|ESTATÍSTICAS/),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/organizations\.tabs\.finance|FINANCEIRO/),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/organizations\.tabs\.settings|AJUSTES/),
+    ).not.toBeInTheDocument();
   });
 
-  it("navigates to each destination on click", () => {
-    renderBar();
+  it("renders the group name and all five tabs when isAdmin is true", () => {
+    renderBar("agenda", { isAdmin: true });
+    expect(screen.getByLabelText("Group sub-navigation")).toBeInTheDocument();
+    expect(screen.getByText("100Fôlego")).toBeInTheDocument();
+    expect(
+      screen.getByText(/organizations\.tabs\.agenda|AGENDA/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/organizations\.tabs\.roster|ELENCO/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/organizations\.tabs\.statistics|ESTATÍSTICAS/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/organizations\.tabs\.finance|FINANCEIRO/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/organizations\.tabs\.settings|AJUSTES/),
+    ).toBeInTheDocument();
+  });
 
-    fireEvent.click(screen.getByText(/AGENDA/));
+  it("navigates to each destination on click when isAdmin is true", () => {
+    renderBar("agenda", { isAdmin: true });
+
+    fireEvent.click(screen.getByText(/organizations\.tabs\.agenda|AGENDA/));
     expect(mockNavigate).toHaveBeenCalledWith("/organizations/org-1");
 
-    fireEvent.click(screen.getByText(/ELENCO/));
+    fireEvent.click(screen.getByText(/organizations\.tabs\.roster|ELENCO/));
     expect(mockNavigate).toHaveBeenCalledWith(
       "/organizations/org-1/management?tab=members",
     );
 
-    fireEvent.click(screen.getByText(/ESTATÍSTICAS/));
+    fireEvent.click(
+      screen.getByText(/organizations\.tabs\.statistics|ESTATÍSTICAS/),
+    );
     expect(mockNavigate).toHaveBeenCalledWith(
       "/organizations/org-1/statistics",
     );
 
-    fireEvent.click(screen.getByText(/FINANCEIRO/));
+    fireEvent.click(
+      screen.getByText(/organizations\.tabs\.finance|FINANCEIRO/),
+    );
     expect(mockNavigate).toHaveBeenCalledWith(
       "/organizations/org-1/management?tab=finance",
     );
 
-    fireEvent.click(screen.getByText(/AJUSTES/));
+    fireEvent.click(screen.getByText(/organizations\.tabs\.settings|AJUSTES/));
     expect(mockNavigate).toHaveBeenCalledWith(
       "/organizations/org-1/management?tab=settings",
     );
   });
 
   it("shows positive counts next to ELENCO and FINANCEIRO", () => {
-    renderBar("agenda", { playersCount: 12, financePending: 3 });
+    renderBar("agenda", {
+      playersCount: 12,
+      financePending: 3,
+      isAdmin: true,
+    });
     expect(screen.getByText("12")).toBeInTheDocument();
     expect(screen.getByText("3")).toBeInTheDocument();
   });
 
   it("hides counts when zero or unset", () => {
-    renderBar("agenda", { playersCount: 0, financePending: 0 });
+    renderBar("agenda", {
+      playersCount: 0,
+      financePending: 0,
+      isAdmin: true,
+    });
     expect(screen.queryByText("0")).not.toBeInTheDocument();
   });
 });

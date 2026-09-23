@@ -1,5 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export type GroupTabKey =
   | "agenda"
@@ -14,6 +15,7 @@ interface GroupTabsBarProps {
   active: GroupTabKey;
   playersCount?: number;
   financePending?: number;
+  isAdmin?: boolean;
   /**
    * When true (default) the strip uses negative margins to reach the viewport
    * edges, for pages whose container is full-width on desktop.
@@ -32,8 +34,10 @@ export default function GroupTabsBar({
   active,
   playersCount,
   financePending,
+  isAdmin = false,
 }: GroupTabsBarProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const tabSx = (key: GroupTabKey) => ({
     background: "none",
@@ -115,7 +119,7 @@ export default function GroupTabsBar({
           onClick={() => navigate(`/organizations/${orgId}`)}
           sx={tabSx("agenda")}
         >
-          AGENDA
+          {t("organizations.tabs.agenda", "AGENDA")}
         </Box>
         <Box
           component="button"
@@ -125,7 +129,7 @@ export default function GroupTabsBar({
           }
           sx={tabSx("roster")}
         >
-          ELENCO {count(playersCount)}
+          {t("organizations.tabs.roster", "ELENCO")} {count(playersCount)}
         </Box>
         <Box
           component="button"
@@ -133,28 +137,33 @@ export default function GroupTabsBar({
           onClick={() => navigate(`/organizations/${orgId}/statistics`)}
           sx={tabSx("statistics")}
         >
-          ESTATÍSTICAS
+          {t("organizations.tabs.statistics", "ESTATÍSTICAS")}
         </Box>
-        <Box
-          component="button"
-          type="button"
-          onClick={() =>
-            navigate(`/organizations/${orgId}/management?tab=finance`)
-          }
-          sx={tabSx("finance")}
-        >
-          FINANCEIRO {count(financePending)}
-        </Box>
-        <Box
-          component="button"
-          type="button"
-          onClick={() =>
-            navigate(`/organizations/${orgId}/management?tab=settings`)
-          }
-          sx={tabSx("settings")}
-        >
-          AJUSTES
-        </Box>
+        {isAdmin && (
+          <Box
+            component="button"
+            type="button"
+            onClick={() =>
+              navigate(`/organizations/${orgId}/management?tab=finance`)
+            }
+            sx={tabSx("finance")}
+          >
+            {t("organizations.tabs.finance", "FINANCEIRO")}{" "}
+            {count(financePending)}
+          </Box>
+        )}
+        {isAdmin && (
+          <Box
+            component="button"
+            type="button"
+            onClick={() =>
+              navigate(`/organizations/${orgId}/management?tab=settings`)
+            }
+            sx={tabSx("settings")}
+          >
+            {t("organizations.tabs.settings", "AJUSTES")}
+          </Box>
+        )}
       </Box>
     </Box>
   );

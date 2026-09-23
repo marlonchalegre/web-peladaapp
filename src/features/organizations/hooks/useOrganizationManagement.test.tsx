@@ -609,4 +609,29 @@ describe("useOrganizationManagement", () => {
       pNotAdmins.find((u) => u.name === "Player 2" || u.name === "User"),
     ).toBeTruthy();
   });
+
+  it("should successfully load org and players when user is non-admin and invitation endpoints reject with 403", async () => {
+    mockApi.listOrganizationInvitations.mockRejectedValue(
+      new Error(
+        "You must be an admin of this organization to perform this action",
+      ),
+    );
+    mockApi.getInviteLink.mockRejectedValue(
+      new Error(
+        "You must be an admin of this organization to perform this action",
+      ),
+    );
+
+    const { result } = renderHook(() => useOrganizationManagement(orgId), {
+      wrapper: MemoryRouter,
+    });
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.error).toBeNull();
+    expect(result.current.org).toEqual(mockOrg);
+    expect(result.current.players).toEqual(mockPlayers);
+    expect(result.current.invitations).toEqual([]);
+    expect(result.current.publicInviteLink).toBeNull();
+  });
 });

@@ -445,7 +445,9 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
           {/* Theme Switcher */}
           <Tooltip
             title={
-              mode === "dark" ? t("common.theme.light") : t("common.theme.dark")
+              mode === "dark"
+                ? t("common.theme.light", "Modo Claro")
+                : t("common.theme.dark", "Modo Escuro")
             }
           >
             <IconButton

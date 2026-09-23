@@ -1,10 +1,12 @@
 import { Box, Typography } from "@mui/material";
 import { Link as RouterLink, useLocation } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 
 export default function BottomNav() {
+  const { t } = useTranslation();
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -14,14 +16,15 @@ export default function BottomNav() {
   return (
     <Box
       component="nav"
-      aria-label="Navegação inferior"
+      aria-label={t("navigation.navLabel", "Navegação inferior")}
       sx={{
         position: "fixed",
         bottom: 0,
         left: 0,
         right: 0,
-        bgcolor: "#ffffff",
-        borderTop: "1.5px solid #eae6db",
+        bgcolor: "background.paper",
+        borderTop: "1.5px solid",
+        borderColor: "divider",
         py: 1,
         px: 2,
         display: { xs: "flex", md: "none" },
@@ -55,8 +58,9 @@ export default function BottomNav() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            color: isHome ? "#ffffff" : "#6b675c",
-            border: isHome ? "none" : "2px solid #c9c4b6",
+            color: isHome ? "#ffffff" : "text.secondary",
+            border: isHome ? "none" : "2px solid",
+            borderColor: "divider",
           }}
         >
           <HomeRoundedIcon sx={{ fontSize: 18 }} />
@@ -67,11 +71,11 @@ export default function BottomNav() {
             fontWeight: isHome ? 800 : 700,
             fontSize: "9.5px",
             letterSpacing: "0.06em",
-            color: isHome ? "#17181a" : "#6b675c",
+            color: isHome ? "text.primary" : "text.secondary",
             textTransform: "uppercase",
           }}
         >
-          INÍCIO
+          {t("navigation.home_short", "INÍCIO")}
         </Typography>
       </Box>
 
@@ -103,8 +107,9 @@ export default function BottomNav() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            color: "#6b675c",
-            border: "2px solid #c9c4b6",
+            color: "text.secondary",
+            border: "2px solid",
+            borderColor: "divider",
           }}
         >
           <GroupsRoundedIcon sx={{ fontSize: 18 }} />
@@ -115,11 +120,11 @@ export default function BottomNav() {
             fontWeight: 700,
             fontSize: "9.5px",
             letterSpacing: "0.06em",
-            color: "#6b675c",
+            color: "text.secondary",
             textTransform: "uppercase",
           }}
         >
-          GRUPOS
+          {t("navigation.groups_short", "GRUPOS")}
         </Typography>
       </Box>
 
@@ -147,8 +152,9 @@ export default function BottomNav() {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            color: isProfile ? "#ffffff" : "#6b675c",
-            border: isProfile ? "none" : "2px solid #c9c4b6",
+            color: isProfile ? "#ffffff" : "text.secondary",
+            border: isProfile ? "none" : "2px solid",
+            borderColor: "divider",
           }}
         >
           <PersonRoundedIcon sx={{ fontSize: 18 }} />
@@ -159,11 +165,11 @@ export default function BottomNav() {
             fontWeight: isProfile ? 800 : 700,
             fontSize: "9.5px",
             letterSpacing: "0.06em",
-            color: isProfile ? "#17181a" : "#6b675c",
+            color: isProfile ? "text.primary" : "text.secondary",
             textTransform: "uppercase",
           }}
         >
-          PERFIL
+          {t("navigation.profile_short", "PERFIL")}
         </Typography>
       </Box>
     </Box>

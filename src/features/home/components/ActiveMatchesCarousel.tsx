@@ -213,7 +213,7 @@ export default function ActiveMatchesCarousel({
         </Box>
 
         {activePeladas.length > 1 && (
-          <Box sx={{ display: "flex", gap: 0.8 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
             <IconButton
               size="small"
               onClick={handlePrev}
@@ -222,15 +222,37 @@ export default function ActiveMatchesCarousel({
                 width: 28,
                 height: 28,
                 borderRadius: "8px",
-                border: "1.5px solid #ddd8cc",
-                bgcolor: "#ffffff",
-                color: "#17181a",
+                border: "1.5px solid",
+                borderColor: "divider",
+                bgcolor: "background.paper",
+                color: "text.primary",
                 p: 0,
-                "&:hover": { bgcolor: "#f6f4ee" },
+                "&:hover": {
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark" ? "#2d3035" : "#f6f4ee",
+                },
               }}
             >
               <ChevronLeftIcon sx={{ fontSize: 18 }} />
             </IconButton>
+
+            <Typography
+              data-testid="carousel-pagination-indicator"
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 700,
+                fontSize: "9.5px",
+                letterSpacing: "0.18em",
+                color: "text.secondary",
+                textTransform: "uppercase",
+                px: 0.5,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {safeIndex + 1} {t("common.of", "de")} {activePeladas.length}{" "}
+              {t("home.carousel.matches", "partidas")}
+            </Typography>
+
             <IconButton
               size="small"
               onClick={handleNext}
@@ -239,11 +261,15 @@ export default function ActiveMatchesCarousel({
                 width: 28,
                 height: 28,
                 borderRadius: "8px",
-                border: "1.5px solid #ddd8cc",
-                bgcolor: "#ffffff",
-                color: "#17181a",
+                border: "1.5px solid",
+                borderColor: "divider",
+                bgcolor: "background.paper",
+                color: "text.primary",
                 p: 0,
-                "&:hover": { bgcolor: "#f6f4ee" },
+                "&:hover": {
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark" ? "#2d3035" : "#f6f4ee",
+                },
               }}
             >
               <ChevronRightIcon sx={{ fontSize: 18 }} />
@@ -255,11 +281,17 @@ export default function ActiveMatchesCarousel({
       {/* Tactile Card based on Template 2a */}
       <Box
         sx={{
-          bgcolor: "#ffffff",
-          border: "2px solid #17181a",
+          bgcolor: "background.paper",
+          border: (theme) =>
+            theme.palette.mode === "dark"
+              ? "2px solid #2d3035"
+              : "2px solid #17181a",
           borderRadius: "18px",
           overflow: "hidden",
-          boxShadow: "5px 5px 0 #17181a",
+          boxShadow: (theme) =>
+            theme.palette.mode === "dark"
+              ? "5px 5px 0 #000000"
+              : "5px 5px 0 #17181a",
           transition: "all 0.2s ease",
         }}
       >
@@ -338,7 +370,10 @@ export default function ActiveMatchesCarousel({
           <Box
             sx={{
               p: { xs: 2, sm: 2.5, md: 2.5 },
-              borderRight: { xs: "none", md: "1.5px dashed #ddd8cc" },
+              borderRight: {
+                xs: "none",
+                md: (theme) => `1.5px dashed ${theme.palette.divider}`,
+              },
               flex: { md: "0 0 auto" },
               display: "flex",
               alignItems: "flex-end",
@@ -352,7 +387,7 @@ export default function ActiveMatchesCarousel({
                 fontSize: { xs: "48px", sm: "58px", md: "62px" },
                 lineHeight: 0.85,
                 letterSpacing: "-0.03em",
-                color: "#17181a",
+                color: "text.primary",
               }}
             >
               {dayNumber}
@@ -364,7 +399,7 @@ export default function ActiveMatchesCarousel({
                   fontWeight: 800,
                   fontSize: "13.5px",
                   lineHeight: 1.1,
-                  color: "#17181a",
+                  color: "text.primary",
                 }}
               >
                 {weekday}
@@ -374,7 +409,7 @@ export default function ActiveMatchesCarousel({
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 600,
                   fontSize: "12.5px",
-                  color: "#6b675c",
+                  color: "text.secondary",
                 }}
               >
                 {monthAndTime}
@@ -406,7 +441,7 @@ export default function ActiveMatchesCarousel({
                   sx={{
                     font: "700 9.5px/1 Archivo, sans-serif",
                     letterSpacing: ".16em",
-                    color: "#6b675c",
+                    color: "text.secondary",
                   }}
                 >
                   NA LISTA
@@ -414,7 +449,7 @@ export default function ActiveMatchesCarousel({
                 <Typography
                   sx={{
                     font: "700 12.5px/1 Archivo, sans-serif",
-                    color: "#17181a",
+                    color: "text.primary",
                   }}
                 >
                   {confirmedCount}
@@ -423,7 +458,7 @@ export default function ActiveMatchesCarousel({
                       {" "}
                       <Box
                         component="span"
-                        sx={{ color: "#6b675c", fontWeight: 600 }}
+                        sx={{ color: "text.secondary", fontWeight: 600 }}
                       >
                         de {maxPlayers}
                       </Box>
@@ -435,7 +470,8 @@ export default function ActiveMatchesCarousel({
                 sx={{
                   height: 7,
                   borderRadius: 4,
-                  bgcolor: "#eae6db",
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark" ? "#33363d" : "#eae6db",
                   overflow: "hidden",
                   display: "flex",
                   mt: 1,
@@ -477,7 +513,8 @@ export default function ActiveMatchesCarousel({
                       bgcolor: ["#c9d9cd", "#dcd3bd", "#cdd6e0", "#e2cfc7"][
                         idx % 4
                       ],
-                      border: "2px solid #ffffff",
+                      border: (theme) =>
+                        `2px solid ${theme.palette.background.paper}`,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -499,7 +536,8 @@ export default function ActiveMatchesCarousel({
                       height: 28,
                       borderRadius: "50%",
                       bgcolor: "#17181a",
-                      border: "2px solid #ffffff",
+                      border: (theme) =>
+                        `2px solid ${theme.palette.background.paper}`,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -521,13 +559,13 @@ export default function ActiveMatchesCarousel({
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 700,
                   fontSize: "12px",
-                  color: "#17181a",
+                  color: "text.primary",
                 }}
               >
                 {confirmedCount}{" "}
                 <Box
                   component="span"
-                  sx={{ color: "#6b675c", fontWeight: 600 }}
+                  sx={{ color: "text.secondary", fontWeight: 600 }}
                 >
                   {maxPlayers
                     ? `${t("home.carousel.of_slots", "de")} ${maxPlayers} ${t(
@@ -546,7 +584,7 @@ export default function ActiveMatchesCarousel({
                   display: "flex",
                   alignItems: "center",
                   pt: 1.5,
-                  borderTop: "1.5px dashed #ddd8cc",
+                  borderTop: (theme) => `1.5px dashed ${theme.palette.divider}`,
                 }}
               >
                 <LocationDisplay
@@ -557,7 +595,7 @@ export default function ActiveMatchesCarousel({
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 600,
                     fontSize: "12.5px",
-                    color: "#4a4740",
+                    color: "text.secondary",
                   }}
                   dataTestId="carousel-pelada-location"
                 />
@@ -570,8 +608,15 @@ export default function ActiveMatchesCarousel({
             sx={{
               p: { xs: "0 16px 16px", md: 2.5 },
               width: { xs: "100%", md: 220 },
-              bgcolor: { xs: "transparent", md: "#f6f4ee" },
-              borderLeft: { xs: "none", md: "1.5px solid #eae6db" },
+              bgcolor: {
+                xs: "transparent",
+                md: (theme) =>
+                  theme.palette.mode === "dark" ? "#1c1e22" : "#f6f4ee",
+              },
+              borderLeft: {
+                xs: "none",
+                md: (theme) => `1.5px solid ${theme.palette.divider}`,
+              },
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
@@ -662,7 +707,7 @@ export default function ActiveMatchesCarousel({
                       textDecoration: "underline",
                       textTransform: "none",
                       boxShadow: "none !important",
-                      "&:hover": { color: "#17181a", background: "none" },
+                      "&:hover": { color: "text.primary", background: "none" },
                     }}
                   >
                     {isDeclined
@@ -715,11 +760,13 @@ export default function ActiveMatchesCarousel({
                   fontWeight: 800,
                   fontSize: "15px",
                   letterSpacing: "0.04em",
-                  bgcolor: "#17181a",
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark" ? "#2d3035" : "#17181a",
                   color: "#ffffff",
                   boxShadow: "0 3px 0 #000000",
                   "&:hover": {
-                    bgcolor: "#000000",
+                    bgcolor: (theme) =>
+                      theme.palette.mode === "dark" ? "#383b42" : "#000000",
                   },
                 }}
               >
@@ -727,22 +774,6 @@ export default function ActiveMatchesCarousel({
               </Button>
             )}
           </Box>
-
-          {activePeladas.length > 1 && (
-            <Typography
-              sx={{
-                fontFamily: "Archivo, sans-serif",
-                fontSize: "10.5px",
-                fontWeight: 600,
-                color: "#6b675c",
-                textAlign: "center",
-                mt: 1.5,
-              }}
-            >
-              {safeIndex + 1} {t("common.of", "de")} {activePeladas.length}{" "}
-              {t("home.carousel.matches", "partidas")}
-            </Typography>
-          )}
         </Box>
       </Box>
     </Box>

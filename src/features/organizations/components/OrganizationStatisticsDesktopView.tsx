@@ -37,6 +37,7 @@ export default function OrganizationStatisticsDesktopView({
   years,
   onYearChange,
   currentUser,
+  isAdmin = false,
   weeklyPresence = [],
 }: OrganizationStatisticsDesktopViewProps) {
   const { t } = useTranslation();
@@ -204,6 +205,7 @@ export default function OrganizationStatisticsDesktopView({
         orgName={org.name}
         active="statistics"
         playersCount={stats.length}
+        isAdmin={isAdmin}
       />
       <Box
         sx={{

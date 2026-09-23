@@ -78,9 +78,9 @@ export default function LocationAutocomplete({
     const timer = setTimeout(async () => {
       setLoading(true);
       try {
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+        const url = `/api/geo/search?q=${encodeURIComponent(
           inputValue.trim(),
-        )}&addressdetails=1&limit=5`;
+        )}`;
         const res = await fetch(url, {
           signal: controller.signal,
           headers: {

@@ -19,6 +19,13 @@ export interface Organization {
   waha_use_all_mention?: boolean | null;
   is_blocked?: boolean;
 }
+export interface GeoLocationSuggestion {
+  place_id: number | string;
+  display_name: string;
+  name?: string;
+  lat?: string;
+  lon?: string;
+}
 export interface OrganizationFeatureFlags {
   organization_id: string;
   finance_control: boolean;
@@ -1164,5 +1171,9 @@ export function createApi(client: ApiClient) {
       }),
     deletePeladaAdmin: (id: string) =>
       client.delete<void>(`/api/admin/peladas/${id}`),
+    searchLocations: (query: string) =>
+      client.get<GeoLocationSuggestion[]>("/api/geo/search", {
+        q: query.trim(),
+      }),
   };
 }

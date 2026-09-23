@@ -9,12 +9,23 @@
   },
   "navigation": {
     "home": "Início",
+    "groups": "Grupos",
     "organizations": "Organizações",
     "users": "Usuários",
     "profile": "Perfil",
     "myCard": "Minha ficha",
     "myGroups": "Ver todos os meus grupos",
-    "adminPanel": "Painel de Admin"
+    "adminPanel": "Painel de Admin",
+    "navLabel": "Navegação inferior",
+    "home_short": "INÍCIO",
+    "groups_short": "GRUPOS",
+    "profile_short": "PERFIL",
+    "selectGroup": "Selecionar grupo",
+    "switchLanguage": "Alternar idioma",
+    "userMenu": "Menu do usuário"
+  },
+  "location": {
+    "open_in_google_maps": "Abrir \"{{location}}\" no Google Maps"
   },
   "auth": {
     "login": {
@@ -95,6 +106,10 @@
   },
   "common": {
     "locale_code": "pt-BR",
+    "theme": {
+      "light": "Modo Claro",
+      "dark": "Modo Escuro"
+    },
     "characteristics": {
       "title": "Características do Jogador",
       "passing": "Passe",
@@ -210,6 +225,9 @@
       "admin": "Administrador",
       "player": "Jogador"
     },
+    "sports": {
+      "football": "Futebol"
+    },
     "positions": {
       "goalkeeper": "Goleiro",
       "striker": "Atacante",
@@ -246,12 +264,59 @@
       "prefix": "Bem-vindo, ",
       "subtitle": "Aqui está o resumo das suas atividades."
     },
+    "filters": {
+      "all": "TODOS"
+    },
+    "season": {
+      "title": "TEMPORADA {{year}}",
+      "subtitle": "{{matches}} jogos em {{groups}} grupos · cada esporte conta o seu"
+    },
+    "carousel": {
+      "section_title": "SUA SEMANA",
+      "single_match": "jogo",
+      "plural_matches": "jogos",
+      "pending": "pendente",
+      "of_slots": "de",
+      "on_list": "na lista",
+      "on_roster_header": "NA LISTA",
+      "presence_confirmed": "CONFIRMADO",
+      "presence_declined": "Você recusou",
+      "matches": "partidas",
+      "actions": {
+        "confirm_presence": "BORA PRO JOGO",
+        "cancel_presence": "Não vou dessa vez",
+        "view_list": "Ver lista →",
+        "view_attendance": "Ver Presença",
+        "confirm": "Confirmar Presença",
+        "vote": "Votar no MVP",
+        "running": "Acompanhar Partida",
+        "view": "Ver Detalhes"
+      }
+    },
+    "needs_you": {
+      "title": "PRECISA DE VOCÊ",
+      "confirm_attendance": "Confirmar presença na pelada",
+      "upcoming_matches": "Próximos jogos em breve",
+      "attendance_deadline": "fique atento aos prazos da lista",
+      "mvp_vote": "Votação no MVP",
+      "mvp_desc": "participe ao fim de cada pelada"
+    },
     "stats": {
       "peladas_played": "Peladas Jogadas ({{year}})",
       "groups_active": "Grupos Ativos",
-      "goals_assists": "Gols & Assistências ({{year}})"
+      "goals_assists": "Gols & Assistências ({{year}})",
+      "season_group_title": "Temporada do Grupo",
+      "sport_mensalista": "FUTEBOL · MENSALISTA",
+      "matches_short": "JOGOS",
+      "goals_short": "GOLS",
+      "assists_short": "ASSIST.",
+      "account_summary": "Resumo da Conta",
+      "attendance": "Presença",
+      "streak": "sequência de {{count}} jogos",
+      "my_profile": "Minha ficha →"
     },
     "sections": {
+      "my_organizations": "MEUS GRUPOS",
       "pending_invitations": {
         "title": "Convites Pendentes",
         "invited_to_join": "Você foi convidado para participar desta organização."
@@ -283,6 +348,13 @@
     }
   },
   "organizations": {
+    "tabs": {
+      "agenda": "AGENDA",
+      "roster": "ELENCO",
+      "statistics": "ESTATÍSTICAS",
+      "finance": "FINANCEIRO",
+      "settings": "AJUSTES"
+    },
     "list": {
       "title": "Organizações",
       "loading": "Carregando organizações...",

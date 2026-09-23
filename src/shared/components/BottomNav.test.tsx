@@ -33,26 +33,26 @@ describe("BottomNav", () => {
       "href",
       "/profile",
     );
-    expect(screen.getByLabelText("Navegação inferior")).toBeInTheDocument();
+    expect(screen.getByLabelText("navigation.navLabel")).toBeInTheDocument();
   });
 
   it("marks the profile tab as active on /profile", () => {
     renderAt("/profile");
     expect(screen.getByTestId("bottom-nav-profile")).toBeInTheDocument();
-    expect(screen.getByText("PERFIL")).toBeInTheDocument();
-    expect(screen.getByText("INÍCIO")).toBeInTheDocument();
+    expect(screen.getByText("navigation.profile_short")).toBeInTheDocument();
+    expect(screen.getByText("navigation.home_short")).toBeInTheDocument();
   });
 
   it("marks home as active on /home and inactive on /profile", () => {
     const { rerender } = renderAt("/home");
-    expect(screen.getByText("INÍCIO")).toBeInTheDocument();
+    expect(screen.getByText("navigation.home_short")).toBeInTheDocument();
 
     rerender(
       <MemoryRouter initialEntries={["/profile"]}>
         <BottomNav />
       </MemoryRouter>,
     );
-    expect(screen.getByText("PERFIL")).toBeInTheDocument();
+    expect(screen.getByText("navigation.profile_short")).toBeInTheDocument();
   });
 
   it("scrolls to the groups anchor when tapping GRUPOS", () => {

@@ -72,7 +72,7 @@ export default function OrganizationManagementPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const orgId = id!;
 
-  const activeTab = searchParams.get("tab") || "members";
+  const requestedTab = searchParams.get("tab") || "members";
   const page = parseInt(searchParams.get("page") || "0", 10);
   const rowsPerPage = parseInt(searchParams.get("limit") || "10", 10);
 
@@ -178,6 +178,20 @@ export default function OrganizationManagementPage() {
     return admins.some((a) => a.user_id === user.id);
   }, [user, admins, org]);
 
+  const activeTab = useMemo(() => {
+    const adminOnlyTabs = [
+      "finance",
+      "admins",
+      "invitations",
+      "waha",
+      "settings",
+    ];
+    if (!isAdmin && adminOnlyTabs.includes(requestedTab)) {
+      return "members";
+    }
+    return requestedTab;
+  }, [isAdmin, requestedTab]);
+
   const groupTab: GroupTabKey =
     activeTab === "finance"
       ? "finance"
@@ -213,6 +227,7 @@ export default function OrganizationManagementPage() {
         orgName={org.name}
         active={groupTab}
         playersCount={players.length}
+        isAdmin={isAdmin}
       />
       <Box sx={{ maxWidth: 1124, mx: "auto", px: { xs: 2, md: 4, lg: 5 } }}>
         <Box sx={{ px: { xs: 1.5, sm: 0 } }}>
@@ -293,20 +308,22 @@ export default function OrganizationManagementPage() {
               value="members"
               data-testid="mgmt-tab-members"
             />
-            <Tab
-              icon={<AttachMoneyIcon />}
-              iconPosition="start"
-              label={
-                <Box
-                  component="span"
-                  sx={{ display: { xs: "none", sm: "inline" } }}
-                >
-                  {t("organizations.management.sections.finance")}
-                </Box>
-              }
-              value="finance"
-              data-testid="mgmt-tab-finance"
-            />
+            {isAdmin && (
+              <Tab
+                icon={<AttachMoneyIcon />}
+                iconPosition="start"
+                label={
+                  <Box
+                    component="span"
+                    sx={{ display: { xs: "none", sm: "inline" } }}
+                  >
+                    {t("organizations.management.sections.finance")}
+                  </Box>
+                }
+                value="finance"
+                data-testid="mgmt-tab-finance"
+              />
+            )}
             <Tab
               icon={<SwapHorizIcon />}
               iconPosition="start"
@@ -352,62 +369,70 @@ export default function OrganizationManagementPage() {
               value="ratings"
               data-testid="mgmt-tab-ratings"
             />
-            <Tab
-              icon={<AdminPanelSettingsIcon />}
-              iconPosition="start"
-              label={
-                <Box
-                  component="span"
-                  sx={{ display: { xs: "none", sm: "inline" } }}
-                >
-                  {t("organizations.management.sections.admins")}
-                </Box>
-              }
-              value="admins"
-              data-testid="mgmt-tab-admins"
-            />
-            <Tab
-              icon={<MailIcon />}
-              iconPosition="start"
-              label={
-                <Box
-                  component="span"
-                  sx={{ display: { xs: "none", sm: "inline" } }}
-                >
-                  {t("organizations.management.sections.invitations")}
-                </Box>
-              }
-              value="invitations"
-              data-testid="mgmt-tab-invitations"
-            />
-            <Tab
-              icon={<WhatsAppIcon />}
-              iconPosition="start"
-              label={
-                <Box
-                  component="span"
-                  sx={{ display: { xs: "none", sm: "inline" } }}
-                >
-                  {t("organizations.management.sections.waha")}
-                </Box>
-              }
-              value="waha"
-              data-testid="mgmt-tab-waha"
-            />
-            <Tab
-              icon={<SettingsIcon />}
-              iconPosition="start"
-              label={
-                <Box
-                  component="span"
-                  sx={{ display: { xs: "none", sm: "inline" } }}
-                >
-                  {t("common.actions.manage")}
-                </Box>
-              }
-              value="settings"
-              data-testid="mgmt-tab-settings"
-            />
+            {isAdmin && (
+              <Tab
+                icon={<AdminPanelSettingsIcon />}
+                iconPosition="start"
+                label={
+                  <Box
+                    component="span"
+                    sx={{ display: { xs: "none", sm: "inline" } }}
+                  >
+                    {t("organizations.management.sections.admins")}
+                  </Box>
+                }
+                value="admins"
+                data-testid="mgmt-tab-admins"
+              />
+            )}
+            {isAdmin && (
+              <Tab
+                icon={<MailIcon />}
+                iconPosition="start"
+                label={
+                  <Box
+                    component="span"
+                    sx={{ display: { xs: "none", sm: "inline" } }}
+                  >
+                    {t("organizations.management.sections.invitations")}
+                  </Box>
+                }
+                value="invitations"
+                data-testid="mgmt-tab-invitations"
+              />
+            )}
+            {isAdmin && (
+              <Tab
+                icon={<WhatsAppIcon />}
+                iconPosition="start"
+                label={
+                  <Box
+                    component="span"
+                    sx={{ display: { xs: "none", sm: "inline" } }}
+                  >
+                    {t("organizations.management.sections.waha")}
+                  </Box>
+                }
+                value="waha"
+                data-testid="mgmt-tab-waha"
+              />
+            )}
+            {isAdmin && (
+              <Tab
+                icon={<SettingsIcon />}
+                iconPosition="start"
+                label={
+                  <Box
+                    component="span"
+                    sx={{ display: { xs: "none", sm: "inline" } }}
+                  >
+                    {t("common.actions.manage")}
+                  </Box>
+                }
+                value="settings"
+                data-testid="mgmt-tab-settings"
+              />
+            )}
           </Tabs>
         </Paper>
         <Box sx={{ mt: 2 }}>
@@ -415,6 +440,7 @@ export default function OrganizationManagementPage() {
             <MembersSection
               players={players}
               usersMap={usersMap}
+              isAdmin={isAdmin}
               onAddClick={() => {
                 setSelectedUserIds(new Set());
                 setIsAddPlayersOpen(true);

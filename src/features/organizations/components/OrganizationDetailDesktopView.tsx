@@ -123,6 +123,7 @@ export default function OrganizationDetailDesktopView({
         orgName={org.name}
         active="agenda"
         playersCount={playersCount}
+        isAdmin={isAdmin}
       />
       <Box
         sx={{
