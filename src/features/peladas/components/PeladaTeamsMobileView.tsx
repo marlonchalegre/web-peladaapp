@@ -29,6 +29,7 @@ import type {
 import type { PlayerWithUser } from "./TeamsSection";
 import DrawJustificationCard from "./DrawJustificationCard";
 import LocationDisplay from "../../../shared/components/LocationDisplay";
+import { getInitials, formatPosition } from "../utils/playerUtils";
 
 export interface PeladaTeamsMobileViewProps {
   pelada: Pelada;
@@ -205,37 +206,6 @@ export default function PeladaTeamsMobileView({
     "#d3cfc4",
     "#e2cfc7",
   ];
-
-  const getInitials = (name?: string) => {
-    if (!name) return "JG";
-    return name
-      .split(" ")
-      .filter(Boolean)
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
-  };
-
-  const formatPosition = (pos?: string) => {
-    if (!pos) return "meia";
-    switch (pos.toLowerCase()) {
-      case "goalkeeper":
-      case "goleiro":
-        return "goleiro";
-      case "defender":
-      case "zagueiro":
-        return "zagueiro";
-      case "midfielder":
-      case "meio-campo":
-        return "meia";
-      case "striker":
-      case "atacante":
-        return "atacante";
-      default:
-        return pos.toLowerCase();
-    }
-  };
 
   const isDiarista = (memberType?: string) =>
     memberType === "diarista" ||

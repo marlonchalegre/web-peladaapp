@@ -16,6 +16,11 @@ import type { PlayerWithUser } from "./TeamsSection";
 import PeladaTabsBar from "./PeladaTabsBar";
 import DrawJustificationCard from "./DrawJustificationCard";
 import LocationDisplay from "../../../shared/components/LocationDisplay";
+import {
+  AVATAR_BG_COLORS,
+  getInitials,
+  formatPosition,
+} from "../utils/playerUtils";
 
 export interface PeladaTeamsDesktopViewProps {
   pelada: Pelada;
@@ -68,16 +73,6 @@ const VEST_LABELS = [
   "COLETE LARANJA",
   "COLETE BRANCO",
   "COLETE PRETO",
-];
-
-const AVATAR_BG_COLORS = [
-  "#dcd3bd",
-  "#c9d9cd",
-  "#d3cfc4",
-  "#cfd8cd",
-  "#e2cfc7",
-  "#cdd6e0",
-  "#d8d2c4",
 ];
 
 export default function PeladaTeamsDesktopView({
@@ -139,37 +134,6 @@ export default function PeladaTeamsDesktopView({
         minute: "2-digit",
       })
     : "19:00";
-
-  const getInitials = (name?: string) => {
-    if (!name) return "JG";
-    return name
-      .split(" ")
-      .filter(Boolean)
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
-  };
-
-  const formatPosition = (pos?: string) => {
-    if (!pos) return "meia";
-    switch (pos.toLowerCase()) {
-      case "goalkeeper":
-      case "goleiro":
-        return "goleiro";
-      case "defender":
-      case "zagueiro":
-        return "zagueiro";
-      case "midfielder":
-      case "meio-campo":
-        return "meia";
-      case "striker":
-      case "atacante":
-        return "atacante";
-      default:
-        return pos.toLowerCase();
-    }
-  };
 
   // Calculate team stats for justifications
   const teamAverages: {

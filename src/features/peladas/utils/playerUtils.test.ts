@@ -8,6 +8,9 @@ import {
   resolvePlayerName,
   getAttendancePlayerId,
   getPlayerInitials,
+  getInitials,
+  formatPosition,
+  AVATAR_BG_COLORS,
 } from "./playerUtils";
 
 describe("playerUtils", () => {
@@ -409,6 +412,50 @@ describe("playerUtils", () => {
       expect(getPlayerInitials("Samwise Gamgee")).toBe("SG");
       expect(getPlayerInitials("Witch King")).toBe("WK");
       expect(getPlayerInitials("Frodo Baggins of the Shire")).toBe("FS");
+    });
+  });
+
+  describe("getInitials", () => {
+    it("returns fallback for empty or missing name", () => {
+      expect(getInitials("")).toBe("JG");
+      expect(getInitials(null)).toBe("JG");
+      expect(getInitials(undefined, "AB")).toBe("AB");
+    });
+
+    it("extracts first two word initials uppercase", () => {
+      expect(getInitials("Neymar Jr")).toBe("NJ");
+      expect(getInitials("Lionel Andres Messi")).toBe("LA");
+    });
+  });
+
+  describe("formatPosition", () => {
+    it("returns default fallback when position is empty", () => {
+      expect(formatPosition("")).toBe("meia");
+      expect(formatPosition(null)).toBe("meia");
+      expect(formatPosition(undefined, "atacante")).toBe("atacante");
+    });
+
+    it("formats known positions correctly", () => {
+      expect(formatPosition("goalkeeper")).toBe("goleiro");
+      expect(formatPosition("goleiro")).toBe("goleiro");
+      expect(formatPosition("defender")).toBe("zagueiro");
+      expect(formatPosition("zagueiro")).toBe("zagueiro");
+      expect(formatPosition("midfielder")).toBe("meia");
+      expect(formatPosition("meio-campo")).toBe("meia");
+      expect(formatPosition("striker")).toBe("atacante");
+      expect(formatPosition("atacante")).toBe("atacante");
+    });
+
+    it("falls back to lowercase pos for unknown positions", () => {
+      expect(formatPosition("winger")).toBe("winger");
+    });
+  });
+
+  describe("AVATAR_BG_COLORS", () => {
+    it("exports an array of hex color strings", () => {
+      expect(Array.isArray(AVATAR_BG_COLORS)).toBe(true);
+      expect(AVATAR_BG_COLORS.length).toBeGreaterThan(0);
+      expect(AVATAR_BG_COLORS[0]).toMatch(/^#[0-9a-fA-F]{6}$/);
     });
   });
 });
