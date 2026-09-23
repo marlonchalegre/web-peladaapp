@@ -39,6 +39,7 @@ export default function AttendanceListPage() {
   const [isOrgAdmin, setIsOrgAdmin] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [showAllConfirmed, setShowAllConfirmed] = useState(false);
+  const [copiedList, setCopiedList] = useState(false);
 
   const {
     pelada,
@@ -136,8 +137,10 @@ export default function AttendanceListPage() {
           `${idx + 1}. ${p.user?.name || "Jogador"} (${t(`common.member_types.${p.member_type || "diarista"}`)})`,
       )
       .join("\n");
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(text);
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).catch(() => {});
+      setCopiedList(true);
+      setTimeout(() => setCopiedList(false), 2000);
     }
   };
 
@@ -628,7 +631,9 @@ export default function AttendanceListPage() {
                   "&:hover": { textDecoration: "underline" },
                 }}
               >
-                {t("peladas.attendance.copy_list", "Copiar lista")}
+                {copiedList
+                  ? t("common.copied", "Copiado!")
+                  : t("peladas.attendance.copy_list", "Copiar lista")}
               </Typography>
             </Box>
 

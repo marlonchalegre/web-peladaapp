@@ -10,6 +10,7 @@ import type {
 import type { PlayerWithUser } from "../hooks/useAttendance";
 import PeladaTabsBar from "./PeladaTabsBar";
 import LocationDisplay from "../../../shared/components/LocationDisplay";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
 interface AttendanceListDesktopViewProps {
   pelada: Pelada;
@@ -66,6 +67,22 @@ export default function AttendanceListDesktopView({
     "confirmed" | "waitlist" | "pending" | "declined"
   >("confirmed");
   const [showAll, setShowAll] = useState(false);
+  const [copiedList, setCopiedList] = useState(false);
+
+  const handleCopyList = () => {
+    const targetList = activeTab === "waitlist" ? waitlist : confirmed;
+    const text = targetList
+      .map(
+        (p, idx) =>
+          `${idx + 1}. ${p.user?.name || "Jogador"} (${t(`common.member_types.${p.member_type || "diarista"}`)})`,
+      )
+      .join("\n");
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).catch(() => {});
+      setCopiedList(true);
+      setTimeout(() => setCopiedList(false), 2000);
+    }
+  };
 
   const getInitials = (name?: string) => {
     if (!name) return "JG";
@@ -482,86 +499,121 @@ export default function AttendanceListDesktopView({
             <Box
               sx={{
                 display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
                 borderBottom: "1.5px solid #ddd8cc",
                 mb: 0,
               }}
             >
-              <Box
-                onClick={() => setActiveTab("confirmed")}
-                sx={{
-                  p: "11px 16px",
-                  borderBottom:
-                    activeTab === "confirmed" ? "3px solid #17181a" : "none",
-                  mb: activeTab === "confirmed" ? "-1.5px" : 0,
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: activeTab === "confirmed" ? 800 : 700,
-                  fontSize: "12px",
-                  letterSpacing: ".04em",
-                  color: activeTab === "confirmed" ? "#17181a" : "#6b675c",
-                  cursor: "pointer",
-                }}
-              >
-                CONFIRMADOS{" "}
-                <Box component="span" sx={{ color: "#146b3a" }}>
-                  {confirmed.length}
+              <Box sx={{ display: "flex" }}>
+                <Box
+                  onClick={() => setActiveTab("confirmed")}
+                  sx={{
+                    p: "11px 16px",
+                    borderBottom:
+                      activeTab === "confirmed" ? "3px solid #17181a" : "none",
+                    mb: activeTab === "confirmed" ? "-1.5px" : 0,
+                    fontFamily: "Archivo, sans-serif",
+                    fontWeight: activeTab === "confirmed" ? 800 : 700,
+                    fontSize: "12px",
+                    letterSpacing: ".04em",
+                    color: activeTab === "confirmed" ? "#17181a" : "#6b675c",
+                    cursor: "pointer",
+                  }}
+                >
+                  CONFIRMADOS{" "}
+                  <Box component="span" sx={{ color: "#146b3a" }}>
+                    {confirmed.length}
+                  </Box>
+                </Box>
+                <Box
+                  onClick={() => setActiveTab("waitlist")}
+                  sx={{
+                    p: "11px 16px",
+                    borderBottom:
+                      activeTab === "waitlist" ? "3px solid #17181a" : "none",
+                    mb: activeTab === "waitlist" ? "-1.5px" : 0,
+                    fontFamily: "Archivo, sans-serif",
+                    fontWeight: activeTab === "waitlist" ? 800 : 700,
+                    fontSize: "12px",
+                    letterSpacing: ".04em",
+                    color: activeTab === "waitlist" ? "#17181a" : "#6b675c",
+                    cursor: "pointer",
+                  }}
+                >
+                  FILA DE ESPERA{" "}
+                  <Box component="span" sx={{ color: "#a8452a" }}>
+                    {waitlist.length}
+                  </Box>
+                </Box>
+                <Box
+                  onClick={() => setActiveTab("pending")}
+                  sx={{
+                    p: "11px 16px",
+                    borderBottom:
+                      activeTab === "pending" ? "3px solid #17181a" : "none",
+                    mb: activeTab === "pending" ? "-1.5px" : 0,
+                    fontFamily: "Archivo, sans-serif",
+                    fontWeight: activeTab === "pending" ? 800 : 700,
+                    fontSize: "12px",
+                    letterSpacing: ".04em",
+                    color: activeTab === "pending" ? "#17181a" : "#6b675c",
+                    cursor: "pointer",
+                  }}
+                >
+                  PENDENTES{" "}
+                  <Box component="span" sx={{ color: "#a8452a" }}>
+                    {pending.length}
+                  </Box>
+                </Box>
+                <Box
+                  onClick={() => setActiveTab("declined")}
+                  sx={{
+                    p: "11px 16px",
+                    borderBottom:
+                      activeTab === "declined" ? "3px solid #17181a" : "none",
+                    mb: activeTab === "declined" ? "-1.5px" : 0,
+                    fontFamily: "Archivo, sans-serif",
+                    fontWeight: activeTab === "declined" ? 800 : 700,
+                    fontSize: "12px",
+                    letterSpacing: ".04em",
+                    color: activeTab === "declined" ? "#17181a" : "#6b675c",
+                    cursor: "pointer",
+                  }}
+                >
+                  RECUSARAM {declined.length}
                 </Box>
               </Box>
+
               <Box
-                onClick={() => setActiveTab("waitlist")}
+                component="button"
+                onClick={handleCopyList}
                 sx={{
-                  p: "11px 16px",
-                  borderBottom:
-                    activeTab === "waitlist" ? "3px solid #17181a" : "none",
-                  mb: activeTab === "waitlist" ? "-1.5px" : 0,
+                  background: "none",
+                  border: "none",
+                  p: "6px 12px",
+                  mr: 1,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 0.75,
                   fontFamily: "Archivo, sans-serif",
-                  fontWeight: activeTab === "waitlist" ? 800 : 700,
-                  fontSize: "12px",
+                  fontWeight: 700,
+                  fontSize: "11px",
                   letterSpacing: ".04em",
-                  color: activeTab === "waitlist" ? "#17181a" : "#6b675c",
+                  color: "#146b3a",
                   cursor: "pointer",
+                  borderRadius: "6px",
+                  transition: "background-color 0.15s ease",
+                  "&:hover": {
+                    bgcolor: "rgba(20, 107, 58, 0.08)",
+                    textDecoration: "underline",
+                  },
                 }}
               >
-                FILA DE ESPERA{" "}
-                <Box component="span" sx={{ color: "#a8452a" }}>
-                  {waitlist.length}
-                </Box>
-              </Box>
-              <Box
-                onClick={() => setActiveTab("pending")}
-                sx={{
-                  p: "11px 16px",
-                  borderBottom:
-                    activeTab === "pending" ? "3px solid #17181a" : "none",
-                  mb: activeTab === "pending" ? "-1.5px" : 0,
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: activeTab === "pending" ? 800 : 700,
-                  fontSize: "12px",
-                  letterSpacing: ".04em",
-                  color: activeTab === "pending" ? "#17181a" : "#6b675c",
-                  cursor: "pointer",
-                }}
-              >
-                PENDENTES{" "}
-                <Box component="span" sx={{ color: "#a8452a" }}>
-                  {pending.length}
-                </Box>
-              </Box>
-              <Box
-                onClick={() => setActiveTab("declined")}
-                sx={{
-                  p: "11px 16px",
-                  borderBottom:
-                    activeTab === "declined" ? "3px solid #17181a" : "none",
-                  mb: activeTab === "declined" ? "-1.5px" : 0,
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: activeTab === "declined" ? 800 : 700,
-                  fontSize: "12px",
-                  letterSpacing: ".04em",
-                  color: activeTab === "declined" ? "#17181a" : "#6b675c",
-                  cursor: "pointer",
-                }}
-              >
-                RECUSARAM {declined.length}
+                <ContentCopyIcon sx={{ fontSize: "14px" }} />
+                {copiedList
+                  ? t("common.copied", "Copiado!")
+                  : t("peladas.attendance.copy_list", "Copiar lista")}
               </Box>
             </Box>
 
