@@ -40,6 +40,7 @@ interface MembersSectionProps {
   rowsPerPage: number;
   onPageChange: (newPage: number) => void;
   onRowsPerPageChange: (newRowsPerPage: number) => void;
+  isAdmin?: boolean;
 }
 
 export default function MembersSection({
@@ -54,6 +55,7 @@ export default function MembersSection({
   rowsPerPage,
   onPageChange,
   onRowsPerPageChange,
+  isAdmin = true,
 }: MembersSectionProps) {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
@@ -102,52 +104,54 @@ export default function MembersSection({
         >
           {t("organizations.management.sections.members")}
         </Typography>
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <Button
-            variant="outlined"
-            onClick={onInviteClick}
-            disabled={actionLoading}
-            data-testid="members-invite-button"
-            size="small"
-            sx={{
-              minWidth: { xs: "40px", sm: "auto" },
-              px: { xs: 0, sm: 2 },
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <EmailIcon sx={{ mr: { xs: 0, sm: 1 } }} />
-            <Box
-              component="span"
-              sx={{ display: { xs: "none", sm: "inline" } }}
+        {isAdmin && (
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Button
+              variant="outlined"
+              onClick={onInviteClick}
+              disabled={actionLoading}
+              data-testid="members-invite-button"
+              size="small"
+              sx={{
+                minWidth: { xs: "40px", sm: "auto" },
+                px: { xs: 0, sm: 2 },
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              {t("organizations.dialog.invite_player.title")}
-            </Box>
-          </Button>
-          <Button
-            variant="contained"
-            onClick={onAddClick}
-            disabled={actionLoading}
-            data-testid="members-add-button"
-            size="small"
-            sx={{
-              minWidth: { xs: "40px", sm: "auto" },
-              px: { xs: 0, sm: 2 },
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <PersonAddIcon sx={{ mr: { xs: 0, sm: 1 } }} />
-            <Box
-              component="span"
-              sx={{ display: { xs: "none", sm: "inline" } }}
+              <EmailIcon sx={{ mr: { xs: 0, sm: 1 } }} />
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
+                {t("organizations.dialog.invite_player.title")}
+              </Box>
+            </Button>
+            <Button
+              variant="contained"
+              onClick={onAddClick}
+              disabled={actionLoading}
+              data-testid="members-add-button"
+              size="small"
+              sx={{
+                minWidth: { xs: "40px", sm: "auto" },
+                px: { xs: 0, sm: 2 },
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              {t("common.add")}
-            </Box>
-          </Button>
-        </Box>
+              <PersonAddIcon sx={{ mr: { xs: 0, sm: 1 } }} />
+              <Box
+                component="span"
+                sx={{ display: { xs: "none", sm: "inline" } }}
+              >
+                {t("common.add")}
+              </Box>
+            </Button>
+          </Box>
+        )}
       </Box>
       <Divider sx={{ mb: 2 }} />
       <Box sx={{ mb: 2 }}>
@@ -301,7 +305,7 @@ export default function MembersSection({
                                 | "diarista_temporario",
                             })
                           }
-                          disabled={actionLoading || isTemporary}
+                          disabled={!isAdmin || actionLoading || isTemporary}
                           disableUnderline
                           sx={{ fontSize: "0.85rem", width: "100%" }}
                           data-testid={`member-type-select-${player.id}`}
@@ -344,15 +348,17 @@ export default function MembersSection({
                       </FormControl>
                     );
                   })()}
-                  <IconButton
-                    edge="end"
-                    color="error"
-                    onClick={() => onRemovePlayer(player.id)}
-                    disabled={actionLoading}
-                    size="small"
-                  >
-                    <DeleteIcon />
-                  </IconButton>
+                  {isAdmin && (
+                    <IconButton
+                      edge="end"
+                      color="error"
+                      onClick={() => onRemovePlayer(player.id)}
+                      disabled={actionLoading}
+                      size="small"
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  )}
                 </Box>
               </ListItem>
             );

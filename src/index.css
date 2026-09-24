@@ -1,7 +1,14 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  font-family:
+    Archivo,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  line-height: 1.4;
+  font-weight: 500;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -11,9 +18,29 @@
 
 body {
   margin: 0;
+  background-color: #f6f4ee;
+  color: #17181a;
+  font-family: Archivo, system-ui, sans-serif;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+.font-narrow {
+  font-family: "Archivo Narrow", Archivo, sans-serif;
+}
+
+.tactile-card {
+  background: #ffffff;
+  border: 2px solid #17181a;
+  border-radius: 18px;
+  box-shadow: 5px 5px 0 #17181a;
+}
+
+.tactile-card-sm {
+  background: #ffffff;
+  border: 1.5px solid #17181a;
+  border-radius: 14px;
+  box-shadow: 3px 3px 0 #17181a;
+}
+
+.dashed-divider {
+  border-top: 1.5px dashed #ddd8cc;
 }

@@ -141,7 +141,10 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
       </Box>
       <Box
         sx={{
-          transform: `translateY(${isRefreshing ? pullThreshold / 2 : pullDistance / 2}px)`,
+          transform:
+            isPulling || isRefreshing || pullDistance > 0
+              ? `translateY(${isRefreshing ? pullThreshold / 2 : pullDistance / 2}px)`
+              : "none",
           transition: isPulling ? "none" : "transform 0.3s ease",
           display: "flex",
           flexDirection: "column",

@@ -89,66 +89,74 @@ export const getTheme = (mode: PaletteMode) => {
     palette: {
       mode,
       primary: {
-        main: "#2563eb", // blue-600
-        dark: "#1d4ed8", // blue-700
-        light: mode === "light" ? "#dbeafe" : "#1e293b", // blue-100 or blue-900
+        main: "#146b3a", // Pitch green
+        dark: "#0f5c33",
+        light: "#bfe6ce",
+        contrastText: "#ffffff",
       },
       secondary: {
-        main: "#6366f1", // indigo-500
-        light: mode === "light" ? "#e0e7ff" : "#312e81", // indigo-100 or indigo-900
+        main: "#a8452a", // Terracotta / warm red
+        dark: "#8a351f",
+        light: "#f6ece8",
+        contrastText: "#ffffff",
       },
       home: {
-        main: "#f97316", // orange-500
+        main: "#146b3a",
       },
       away: {
-        main: "#2563eb", // blue-600
+        main: "#a8452a",
       },
       success: {
-        main: mode === "light" ? "#166534" : "#4ade80", // green-800 or green-400
-        light: mode === "light" ? "#dcfce7" : "#064e3b", // green-100 or green-900
+        main: "#146b3a",
+        light: "#bfe6ce",
       },
       warning: {
-        main: "#e65100", // orange-900
-        light: "#ffe0b2", // orange-100
+        main: "#f2a100", // Amber / stats accent
+        light: "#fef3d6",
       },
       text: {
-        primary: mode === "light" ? "#0f172a" : "#f1f5f9", // slate-900 or slate-100
-        secondary: mode === "light" ? "#64748b" : "#94a3b8", // slate-500 or slate-400
+        primary: mode === "light" ? "#17181a" : "#f6f4ee",
+        secondary: mode === "light" ? "#6b675c" : "#9a958a",
       },
       background: {
-        default: mode === "light" ? "#f8f9fa" : "#020617", // slate-50 or slate-950
-        paper: mode === "light" ? "#ffffff" : "#0f172a", // white or slate-900
+        default: mode === "light" ? "#f6f4ee" : "#17181a",
+        paper: mode === "light" ? "#ffffff" : "#222428",
       },
       grey: {
-        50: "#f8f9fa",
-        100: "#f1f5f9",
-        200: "#e2e8f0",
-        300: "#cbd5e1",
-        400: "#94a3b8",
-        500: "#64748b",
-        600: "#475569",
-        700: "#334155",
-        800: "#1e293b",
-        900: "#0f172a",
+        50: "#fbfaf7",
+        100: "#f6f4ee",
+        200: "#eae6db",
+        300: "#ddd8cc",
+        400: "#c9c4b6",
+        500: "#9a958a",
+        600: "#6b675c",
+        700: "#4a4740",
+        800: "#2d2c29",
+        900: "#17181a",
       },
-      divider: mode === "light" ? "#e2e8f0" : "#1e293b",
+      divider: mode === "light" ? "#eae6db" : "#2d3035",
     },
     typography: {
       fontFamily: [
-        "Inter",
+        "Archivo",
         "system-ui",
-        "Avenir",
-        "Helvetica",
-        "Arial",
+        "-apple-system",
+        "BlinkMacSystemFont",
         "sans-serif",
       ].join(", "),
-      h1: { fontSize: "2.25rem", fontWeight: 700 },
-      h2: { fontSize: "1.75rem", fontWeight: 700 },
-      h3: { fontSize: "1.5rem", fontWeight: 700 },
-      h4: { fontSize: "1.25rem", fontWeight: 700 },
-      h6: { fontWeight: 600 },
+      h1: { fontSize: "2.25rem", fontWeight: 800, letterSpacing: "-0.02em" },
+      h2: { fontSize: "1.75rem", fontWeight: 800, letterSpacing: "-0.01em" },
+      h3: { fontSize: "1.5rem", fontWeight: 800 },
+      h4: { fontSize: "1.25rem", fontWeight: 800 },
+      h5: { fontSize: "1.1rem", fontWeight: 700 },
+      h6: { fontSize: "0.95rem", fontWeight: 700 },
+      button: {
+        fontWeight: 800,
+        textTransform: "none",
+        letterSpacing: "0.04em",
+      },
     },
-    shape: { borderRadius: 8 },
+    shape: { borderRadius: 14 },
     components: {
       MuiCssBaseline: {
         styleOverrides: (theme) => ({
@@ -279,35 +287,35 @@ export const getTheme = (mode: PaletteMode) => {
       button: {
         confirmed: {
           bg: "#ffffff",
-          text: baseTheme.palette.success.main,
-          border: "none",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-          icon: baseTheme.palette.success.main,
+          text: "#146b3a",
+          border: "2px solid #146b3a",
+          boxShadow: "0 3px 0 #0d4526",
+          icon: "#146b3a",
           hoverBg: alpha("#ffffff", 0.9),
         },
         declined: {
           bg: "#ffffff",
-          text: baseTheme.palette.error.main,
-          border: "none",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-          icon: baseTheme.palette.error.main,
+          text: "#a8452a",
+          border: "2px solid #a8452a",
+          boxShadow: "0 3px 0 #5c2011",
+          icon: "#a8452a",
           hoverBg: alpha("#ffffff", 0.9),
         },
         dimmed: {
-          bg: alpha("#ffffff", 0.1),
-          text: alpha("#ffffff", 0.6),
-          border: `1px solid ${alpha("#ffffff", 0.2)}`,
+          bg: "#eae6db",
+          text: "#6b675c",
+          border: "1.5px solid #ddd8cc",
           boxShadow: "none",
-          icon: alpha("#ffffff", 0.6),
-          hoverBg: alpha("#ffffff", 0.2),
+          icon: "#6b675c",
+          hoverBg: "#ddd8cc",
         },
         pending: {
-          bg: alpha("#ffffff", 0.15),
-          text: "#ffffff",
-          border: `1px solid ${alpha("#ffffff", 0.3)}`,
-          boxShadow: "none",
-          icon: "#ffffff",
-          hoverBg: alpha("#ffffff", 0.25),
+          bg: "#f6f4ee",
+          text: "#17181a",
+          border: "2px solid #17181a",
+          boxShadow: "0 3px 0 #17181a",
+          icon: "#17181a",
+          hoverBg: "#eae6db",
         },
       },
     },

@@ -35,6 +35,7 @@ import HistoryIcon from "@mui/icons-material/History";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
+import PeladaTabsBar from "../components/PeladaTabsBar";
 import { api } from "../../../shared/api/client";
 import { createApi, type Team } from "../../../shared/api/endpoints";
 
@@ -210,343 +211,348 @@ export default function ScheduleBuilderPage() {
   if (loading && teams.length === 0) return <Loading />;
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Box sx={{ mb: 4 }}>
-        <BreadcrumbNav
-          items={[
-            {
-              label: t("common.organization"),
-              path: `/organizations/${organizationId}`,
-            },
-            {
-              label: t("peladas.detail.title"),
-              path: `/peladas/${peladaId}`,
-            },
-            { label: t("peladas.detail.button.build_schedule") },
-          ]}
-        />
+    <Box sx={{ bgcolor: "#f6f4ee", minHeight: "100vh" }}>
+      <PeladaTabsBar peladaId={peladaId} status="open" active="matches" />
+      <Container maxWidth="md" sx={{ py: 4 }}>
+        <Box sx={{ mb: 4 }}>
+          <BreadcrumbNav
+            items={[
+              {
+                label: t("common.organization"),
+                path: `/organizations/${organizationId}`,
+              },
+              {
+                label: t("peladas.detail.title"),
+                path: `/peladas/${peladaId}`,
+              },
+              { label: t("peladas.detail.button.build_schedule") },
+            ]}
+          />
 
-        <Stack
-          direction="row"
+          <Stack
+            direction="row"
+            sx={{
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Box>
+              <Typography
+                variant="h4"
+                gutterBottom
+                sx={{
+                  fontWeight: "bold",
+                }}
+              >
+                {t("peladas.detail.button.build_schedule")}
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: "text.secondary",
+                }}
+              >
+                {t("peladas.detail.schedule.subtitle")}
+              </Typography>
+            </Box>
+          </Stack>
+        </Box>
+        {error && (
+          <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
+            {error}
+          </Alert>
+        )}
+        {teams.length < 2 && (
+          <Alert severity="warning" sx={{ mb: 3 }}>
+            {t("peladas.detail.schedule.warning.not_enough_teams")}
+          </Alert>
+        )}
+        <Card
           sx={{
+            mb: 4,
+            borderRadius: 3,
+            boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+          }}
+        >
+          <CardContent sx={{ p: 3 }}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={3}
+              sx={{
+                alignItems: { xs: "stretch", sm: "center" },
+              }}
+            >
+              <FormControl sx={{ minWidth: 200 }} size="small">
+                <InputLabel id="matches-per-team-label">
+                  {t("peladas.detail.schedule.matches_per_team_label")}
+                </InputLabel>
+                <Select
+                  labelId="matches-per-team-label"
+                  value={matchesPerTeam}
+                  label={t("peladas.detail.schedule.matches_per_team_label")}
+                  data-testid="matches-per-team-select"
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setMatchesPerTeam(val);
+                    handleFetchOptions(val);
+                  }}
+                  disabled={loading || teams.length < 2}
+                >
+                  {[1, 2, 3, 4, 5, 6].map((v) => (
+                    <MuiMenuItem key={v} value={v}>
+                      {t("peladas.detail.schedule.match_count", { count: v })}
+                    </MuiMenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<HistoryIcon />}
+                onClick={handleResetToDefault}
+                disabled={loading || teams.length < 2}
+                sx={{ borderRadius: 2, py: 1, px: 3, fontWeight: "bold" }}
+              >
+                {t("peladas.detail.schedule.button.use_random")}
+              </Button>
+
+              <Box sx={{ flexGrow: 1 }} />
+
+              <Button
+                variant="outlined"
+                color="primary"
+                startIcon={<AddIcon />}
+                onClick={handleAddMatch}
+                disabled={loading || teams.length < 2}
+                data-testid="add-match-button"
+                sx={{ borderRadius: 2, fontWeight: "bold" }}
+              >
+                {t("peladas.detail.schedule.button.add_match")}
+              </Button>
+            </Stack>
+          </CardContent>
+        </Card>
+        <Box
+          sx={{
+            mb: 2,
+            display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
           }}
         >
-          <Box>
-            <Typography
-              variant="h4"
-              gutterBottom
-              sx={{
-                fontWeight: "bold",
-              }}
-            >
-              {t("peladas.detail.button.build_schedule")}
-            </Typography>
-            <Typography
-              variant="body1"
-              sx={{
-                color: "text.secondary",
-              }}
-            >
-              {t("peladas.detail.schedule.subtitle")}
-            </Typography>
-          </Box>
-        </Stack>
-      </Box>
-      {error && (
-        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
-          {error}
-        </Alert>
-      )}
-      {teams.length < 2 && (
-        <Alert severity="warning" sx={{ mb: 3 }}>
-          {t("peladas.detail.schedule.warning.not_enough_teams")}
-        </Alert>
-      )}
-      <Card
-        sx={{
-          mb: 4,
-          borderRadius: 3,
-          boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
-        }}
-      >
-        <CardContent sx={{ p: 3 }}>
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            spacing={3}
+          <Typography
+            variant="h6"
             sx={{
-              alignItems: { xs: "stretch", sm: "center" },
+              fontWeight: "bold",
             }}
           >
-            <FormControl sx={{ minWidth: 200 }} size="small">
-              <InputLabel id="matches-per-team-label">
-                {t("peladas.detail.schedule.matches_per_team_label")}
-              </InputLabel>
-              <Select
-                labelId="matches-per-team-label"
-                value={matchesPerTeam}
-                label={t("peladas.detail.schedule.matches_per_team_label")}
-                data-testid="matches-per-team-select"
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setMatchesPerTeam(val);
-                  handleFetchOptions(val);
-                }}
-                disabled={loading || teams.length < 2}
-              >
-                {[1, 2, 3, 4, 5, 6].map((v) => (
-                  <MuiMenuItem key={v} value={v}>
-                    {t("peladas.detail.schedule.match_count", { count: v })}
-                  </MuiMenuItem>
-                ))}
-              </Select>
-            </FormControl>
-
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<HistoryIcon />}
-              onClick={handleResetToDefault}
-              disabled={loading || teams.length < 2}
-              sx={{ borderRadius: 2, py: 1, px: 3, fontWeight: "bold" }}
-            >
-              {t("peladas.detail.schedule.button.use_random")}
-            </Button>
-
-            <Box sx={{ flexGrow: 1 }} />
-
-            <Button
-              variant="outlined"
-              color="primary"
-              startIcon={<AddIcon />}
-              onClick={handleAddMatch}
-              disabled={loading || teams.length < 2}
-              data-testid="add-match-button"
-              sx={{ borderRadius: 2, fontWeight: "bold" }}
-            >
-              {t("peladas.detail.schedule.button.add_match")}
-            </Button>
-          </Stack>
-        </CardContent>
-      </Card>
-      <Box
-        sx={{
-          mb: 2,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Typography
-          variant="h6"
+            {t("peladas.detail.schedule.planned_matches")}
+          </Typography>
+        </Box>
+        <TableContainer
+          component={Paper}
           sx={{
-            fontWeight: "bold",
+            borderRadius: 3,
+            overflow: "hidden",
+            border: "1px solid",
+            borderColor: "divider",
           }}
         >
-          {t("peladas.detail.schedule.planned_matches")}
-        </Typography>
-      </Box>
-      <TableContainer
-        component={Paper}
-        sx={{
-          borderRadius: 3,
-          overflow: "hidden",
-          border: "1px solid",
-          borderColor: "divider",
-        }}
-      >
-        <Table>
-          <TableHead sx={{ bgcolor: "action.hover" }}>
-            <TableRow>
-              <TableCell
-                width={60}
-                align="center"
-                sx={{ fontWeight: "bold", color: "text.secondary" }}
-              >
-                #
-              </TableCell>
-              <TableCell
-                align="center"
-                sx={{ fontWeight: "bold", color: "text.secondary" }}
-              >
-                {t("peladas.detail.schedule.home")}
-              </TableCell>
-              <TableCell width={40} />
-              <TableCell
-                align="center"
-                sx={{ fontWeight: "bold", color: "text.secondary" }}
-              >
-                {t("peladas.detail.schedule.away")}
-              </TableCell>
-              <TableCell
-                align="center"
-                width={180}
-                sx={{ fontWeight: "bold", color: "text.secondary" }}
-              >
-                {t("common.actions.title")}
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {matches.map((match, index) => {
-              const isInvalid = match.home === match.away;
-              return (
-                <TableRow
-                  key={index}
-                  hover
-                  sx={isInvalid ? { bgcolor: "error.lighter" } : {}}
+          <Table>
+            <TableHead sx={{ bgcolor: "action.hover" }}>
+              <TableRow>
+                <TableCell
+                  width={60}
+                  align="center"
+                  sx={{ fontWeight: "bold", color: "text.secondary" }}
                 >
-                  <TableCell align="center">
-                    <Typography
-                      variant="body2"
-                      color={isInvalid ? "error.main" : "text.secondary"}
-                      sx={{
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {index + 1}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <FormControl fullWidth size="small" error={isInvalid}>
-                      <Select
-                        value={match.home}
-                        onChange={(e) =>
-                          handleUpdateMatch(index, "home", e.target.value)
-                        }
-                        sx={{ borderRadius: 2, bgcolor: "background.paper" }}
-                        data-testid={`home-select-${index}`}
-                      >
-                        {teams.map((t) => (
-                          <MuiMenuItem key={t.id} value={t.id}>
-                            {t.name}
-                          </MuiMenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Box
-                      sx={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: "50%",
-                        bgcolor: isInvalid ? "error.main" : "action.selected",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
+                  #
+                </TableCell>
+                <TableCell
+                  align="center"
+                  sx={{ fontWeight: "bold", color: "text.secondary" }}
+                >
+                  {t("peladas.detail.schedule.home")}
+                </TableCell>
+                <TableCell width={40} />
+                <TableCell
+                  align="center"
+                  sx={{ fontWeight: "bold", color: "text.secondary" }}
+                >
+                  {t("peladas.detail.schedule.away")}
+                </TableCell>
+                <TableCell
+                  align="center"
+                  width={180}
+                  sx={{ fontWeight: "bold", color: "text.secondary" }}
+                >
+                  {t("common.actions.title")}
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {matches.map((match, index) => {
+                const isInvalid = match.home === match.away;
+                return (
+                  <TableRow
+                    key={index}
+                    hover
+                    sx={isInvalid ? { bgcolor: "error.lighter" } : {}}
+                  >
+                    <TableCell align="center">
                       <Typography
-                        variant="caption"
-                        color={isInvalid ? "white" : "text.secondary"}
+                        variant="body2"
+                        color={isInvalid ? "error.main" : "text.secondary"}
                         sx={{
                           fontWeight: "bold",
                         }}
                       >
-                        VS
+                        {index + 1}
                       </Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <FormControl fullWidth size="small" error={isInvalid}>
-                      <Select
-                        value={match.away}
-                        onChange={(e) =>
-                          handleUpdateMatch(index, "away", e.target.value)
-                        }
-                        sx={{ borderRadius: 2, bgcolor: "background.paper" }}
-                        data-testid={`away-select-${index}`}
+                    </TableCell>
+                    <TableCell>
+                      <FormControl fullWidth size="small" error={isInvalid}>
+                        <Select
+                          value={match.home}
+                          onChange={(e) =>
+                            handleUpdateMatch(index, "home", e.target.value)
+                          }
+                          sx={{ borderRadius: 2, bgcolor: "background.paper" }}
+                          data-testid={`home-select-${index}`}
+                        >
+                          {teams.map((t) => (
+                            <MuiMenuItem key={t.id} value={t.id}>
+                              {t.name}
+                            </MuiMenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Box
+                        sx={{
+                          width: 28,
+                          height: 28,
+                          borderRadius: "50%",
+                          bgcolor: isInvalid ? "error.main" : "action.selected",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
                       >
-                        {teams.map((t) => (
-                          <MuiMenuItem key={t.id} value={t.id}>
-                            {t.name}
-                          </MuiMenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Stack
-                      direction="row"
-                      spacing={0.5}
-                      sx={{
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Tooltip title={t("peladas.detail.schedule.button.swap")}>
+                        <Typography
+                          variant="caption"
+                          color={isInvalid ? "white" : "text.secondary"}
+                          sx={{
+                            fontWeight: "bold",
+                          }}
+                        >
+                          VS
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>
+                      <FormControl fullWidth size="small" error={isInvalid}>
+                        <Select
+                          value={match.away}
+                          onChange={(e) =>
+                            handleUpdateMatch(index, "away", e.target.value)
+                          }
+                          sx={{ borderRadius: 2, bgcolor: "background.paper" }}
+                          data-testid={`away-select-${index}`}
+                        >
+                          {teams.map((t) => (
+                            <MuiMenuItem key={t.id} value={t.id}>
+                              {t.name}
+                            </MuiMenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Stack
+                        direction="row"
+                        spacing={0.5}
+                        sx={{
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Tooltip
+                          title={t("peladas.detail.schedule.button.swap")}
+                        >
+                          <IconButton
+                            size="small"
+                            onClick={() => handleSwap(index)}
+                            sx={{ color: "primary.main" }}
+                            data-testid={`swap-button-${index}`}
+                          >
+                            <SwapHorizIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Divider
+                          orientation="vertical"
+                          flexItem
+                          sx={{ mx: 0.5 }}
+                        />
                         <IconButton
                           size="small"
-                          onClick={() => handleSwap(index)}
-                          sx={{ color: "primary.main" }}
-                          data-testid={`swap-button-${index}`}
+                          onClick={() => handleMoveUp(index)}
+                          disabled={index === 0}
                         >
-                          <SwapHorizIcon fontSize="small" />
+                          <ArrowUpwardIcon fontSize="small" />
                         </IconButton>
-                      </Tooltip>
-                      <Divider
-                        orientation="vertical"
-                        flexItem
-                        sx={{ mx: 0.5 }}
-                      />
-                      <IconButton
-                        size="small"
-                        onClick={() => handleMoveUp(index)}
-                        disabled={index === 0}
-                      >
-                        <ArrowUpwardIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleMoveDown(index)}
-                        disabled={index === matches.length - 1}
-                      >
-                        <ArrowDownwardIcon fontSize="small" />
-                      </IconButton>
-                      <Divider
-                        orientation="vertical"
-                        flexItem
-                        sx={{ mx: 0.5 }}
-                      />
-                      <IconButton
-                        size="small"
-                        color="error"
-                        onClick={() => handleRemoveMatch(index)}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Stack>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <Box sx={{ mt: 4, display: "flex", justifyContent: "flex-end" }}>
-        <Button
-          variant="contained"
-          size="large"
-          color="primary"
-          startIcon={<SaveIcon />}
-          onClick={handleSave}
-          disabled={saving || !isScheduleValid}
-          data-testid="save-schedule-button"
-          sx={{
-            borderRadius: 3,
-            px: 6,
-            py: 1.5,
-            fontWeight: "bold",
-            fontSize: "1.1rem",
-            boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
-          }}
-        >
-          {saving
-            ? t("common.actions.using")
-            : t("peladas.detail.schedule.button.use")}
-        </Button>
-      </Box>
-    </Container>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleMoveDown(index)}
+                          disabled={index === matches.length - 1}
+                        >
+                          <ArrowDownwardIcon fontSize="small" />
+                        </IconButton>
+                        <Divider
+                          orientation="vertical"
+                          flexItem
+                          sx={{ mx: 0.5 }}
+                        />
+                        <IconButton
+                          size="small"
+                          color="error"
+                          onClick={() => handleRemoveMatch(index)}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <Box sx={{ mt: 4, display: "flex", justifyContent: "flex-end" }}>
+          <Button
+            variant="contained"
+            size="large"
+            color="primary"
+            startIcon={<SaveIcon />}
+            onClick={handleSave}
+            disabled={saving || !isScheduleValid}
+            data-testid="save-schedule-button"
+            sx={{
+              borderRadius: 3,
+              px: 6,
+              py: 1.5,
+              fontWeight: "bold",
+              fontSize: "1.1rem",
+              boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
+            }}
+          >
+            {saving
+              ? t("common.actions.using")
+              : t("peladas.detail.schedule.button.use")}
+          </Button>
+        </Box>
+      </Container>
+    </Box>
   );
 }

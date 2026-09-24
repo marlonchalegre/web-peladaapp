@@ -145,9 +145,12 @@ describe("SendNotificationDialog", () => {
     // Verify listPeladasByOrg was called
     expect(mockListPeladasByOrg).toHaveBeenCalledWith("org-123", 1, 100);
 
-    // Wait for the loader to clear and the select element to be rendered
+    // Wait for the loader to clear and the select element to be rendered and enabled
     await waitFor(() => {
       expect(screen.getByTestId("pelada-select")).toBeInTheDocument();
+      expect(screen.getByTestId("pelada-select")).not.toHaveClass(
+        "Mui-disabled",
+      );
     });
 
     // Click the pelada select trigger using fireEvent.mouseDown on role="combobox"

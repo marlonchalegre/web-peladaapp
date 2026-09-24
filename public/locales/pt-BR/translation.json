@@ -9,10 +9,23 @@
   },
   "navigation": {
     "home": "Início",
+    "groups": "Grupos",
     "organizations": "Organizações",
     "users": "Usuários",
     "profile": "Perfil",
-    "adminPanel": "Painel de Admin"
+    "myCard": "Minha ficha",
+    "myGroups": "Ver todos os meus grupos",
+    "adminPanel": "Painel de Admin",
+    "navLabel": "Navegação inferior",
+    "home_short": "INÍCIO",
+    "groups_short": "GRUPOS",
+    "profile_short": "PERFIL",
+    "selectGroup": "Selecionar grupo",
+    "switchLanguage": "Alternar idioma",
+    "userMenu": "Menu do usuário"
+  },
+  "location": {
+    "open_in_google_maps": "Abrir \"{{location}}\" no Google Maps"
   },
   "auth": {
     "login": {
@@ -93,6 +106,10 @@
   },
   "common": {
     "locale_code": "pt-BR",
+    "theme": {
+      "light": "Modo Claro",
+      "dark": "Modo Escuro"
+    },
     "characteristics": {
       "title": "Características do Jogador",
       "passing": "Passe",
@@ -208,6 +225,9 @@
       "admin": "Administrador",
       "player": "Jogador"
     },
+    "sports": {
+      "football": "Futebol"
+    },
     "positions": {
       "goalkeeper": "Goleiro",
       "striker": "Atacante",
@@ -231,6 +251,7 @@
     }
   },
   "home": {
+    "all_groups": "Todos os grupos",
     "blocked_message": "Sua conta está bloqueada. Você não pode participar de peladas ou ver estatísticas, mas pode acessar seu perfil.",
     "org_creation_disabled": "Criação de organização não permitida para sua conta.",
     "error": {
@@ -243,12 +264,59 @@
       "prefix": "Bem-vindo, ",
       "subtitle": "Aqui está o resumo das suas atividades."
     },
+    "filters": {
+      "all": "TODOS"
+    },
+    "season": {
+      "title": "TEMPORADA {{year}}",
+      "subtitle": "{{matches}} jogos em {{groups}} grupos · cada esporte conta o seu"
+    },
+    "carousel": {
+      "section_title": "SUA SEMANA",
+      "single_match": "jogo",
+      "plural_matches": "jogos",
+      "pending": "pendente",
+      "of_slots": "de",
+      "on_list": "na lista",
+      "on_roster_header": "NA LISTA",
+      "presence_confirmed": "CONFIRMADO",
+      "presence_declined": "Você recusou",
+      "matches": "partidas",
+      "actions": {
+        "confirm_presence": "BORA PRO JOGO",
+        "cancel_presence": "Não vou dessa vez",
+        "view_list": "Ver lista →",
+        "view_attendance": "Ver Presença",
+        "confirm": "Confirmar Presença",
+        "vote": "Votar no MVP",
+        "running": "Acompanhar Partida",
+        "view": "Ver Detalhes"
+      }
+    },
+    "needs_you": {
+      "title": "PRECISA DE VOCÊ",
+      "confirm_attendance": "Confirmar presença na pelada",
+      "upcoming_matches": "Próximos jogos em breve",
+      "attendance_deadline": "fique atento aos prazos da lista",
+      "mvp_vote": "Votação no MVP",
+      "mvp_desc": "participe ao fim de cada pelada"
+    },
     "stats": {
       "peladas_played": "Peladas Jogadas ({{year}})",
       "groups_active": "Grupos Ativos",
-      "goals_assists": "Gols & Assistências ({{year}})"
+      "goals_assists": "Gols & Assistências ({{year}})",
+      "season_group_title": "Temporada do Grupo",
+      "sport_mensalista": "FUTEBOL · MENSALISTA",
+      "matches_short": "JOGOS",
+      "goals_short": "GOLS",
+      "assists_short": "ASSIST.",
+      "account_summary": "Resumo da Conta",
+      "attendance": "Presença",
+      "streak": "sequência de {{count}} jogos",
+      "my_profile": "Minha ficha →"
     },
     "sections": {
+      "my_organizations": "MEUS GRUPOS",
       "pending_invitations": {
         "title": "Convites Pendentes",
         "invited_to_join": "Você foi convidado para participar desta organização."
@@ -280,6 +348,13 @@
     }
   },
   "organizations": {
+    "tabs": {
+      "agenda": "AGENDA",
+      "roster": "ELENCO",
+      "statistics": "ESTATÍSTICAS",
+      "finance": "FINANCEIRO",
+      "settings": "AJUSTES"
+    },
     "list": {
       "title": "Organizações",
       "loading": "Carregando organizações...",
@@ -356,6 +431,9 @@
         "priority_limit_hours_help": "Horas antes da partida. Deixe em branco ou 0 para prioridade sem limite.",
         "default_max_players": "Máximo de Jogadores Padrão",
         "default_max_players_help": "Valor padrão preenchido automaticamente ao criar novas peladas.",
+        "default_location": "Local Padrão",
+        "default_location_placeholder": "Ex: Arena Vila Nova · Q2",
+        "default_location_help": "Endereço ou arena padrão preenchido automaticamente ao criar novas peladas. Suporta busca via OpenStreetMap.",
         "save_success": "Configurações salvas com sucesso!",
         "save_error": "Erro ao salvar configurações"
       },
@@ -532,6 +610,8 @@
     },
     "stats": {
       "title": "{{name}} - Estatísticas",
+      "title_short": "Estatísticas",
+      "season_title": "Estatísticas da temporada",
       "cards": {
         "top_scorer": "Artilheiro",
         "top_assister": "Garçom",
@@ -595,6 +675,8 @@
         "notify_casual_players": "Avisar convidados e diaristas que a lista está aberta?",
         "max_players": "Máximo de Jogadores",
         "max_players_help": "Limite de jogadores para essa pelada (opcional)",
+        "location": "Local",
+        "location_placeholder": "Ex: Arena Vila Nova · Q2",
         "submit": "Criar pelada"
       }
     },
@@ -747,7 +829,9 @@
           "Partiu pelada?"
         ],
         "confirmed_msg": "Confirmado! Nos vemos no campo.",
-        "declined_msg": "Pena que não pode vir. Esperamos você na próxima!"
+        "declined_msg": "Pena que não pode vir. Esperamos você na próxima!",
+        "waitlist_msg": "Você está na lista de espera.",
+        "waitlist_button": "Fila de espera"
       },
       "status": {
         "confirmed": "Confirmado",
@@ -889,12 +973,12 @@
           "gemini": {
             "name": "Gemini",
             "tag": "Química",
-            "description": "Equilibra força geral, defesa e ataque com nota, votos e estatísticas. Com química ligada, separa panelas campeãs, distribui títulos e jejum e estimula duplas inéditas."
+            "description": "Equilibra os times usando nota, votos e estatísticas, separando panelas e estimulando duplas inéditas."
           },
           "gpt": {
-            "name": "GPT",
+            "name": "ChatGPT",
             "tag": "Equilíbrio Tático",
-            "description": "Aplica regras em ordem: uma referência por time, diferença de média dentro da tolerância, distribui quem tem poucas noites e nivela o meio-campo."
+            "description": "Aplica regras em ordem: uma referência por time, média equilibrada, distribui quem tem poucas noites e nivela o meio-campo."
           }
         }
       }
@@ -996,8 +1080,21 @@
         "confirm_notify_desc": "Deseja enviar a escala completa de apoio para o grupo do WhatsApp mencionando os jogadores escalados para cada partida?",
         "confirm_notify_action": "Enviar Notificação",
         "notify_success": "Notificação enviada com sucesso para o grupo do WhatsApp!",
-        "notify_error": "Erro ao enviar notificação da escalação de apoio"
-      }
+        "notify_error": "Erro ao enviar notificação da escalação de apoio",
+        "view_escalation": "Escala"
+      },
+      "match_x_of_y": "PARTIDA {{n}} DE {{m}}",
+      "who_scored": "Quem marcou?",
+      "who_scored_own_goal": "Quem fez o gol contra?",
+      "own_goal_btn": "GOL CONTRA",
+      "own_goal_unidentified": "GOL CONTRA NÃO IDENTIFICADO",
+      "goal_unidentified": "GOL NÃO IDENTIFICADO",
+      "defending_team_players": "Jogador do {{team}}",
+      "goal_sheet_title": "GOL DO {{team}} · {{time}}",
+      "event_sheet_title": "REGISTRAR LANCE · {{time}}",
+      "event_what": "Que lance foi?",
+      "event_who": "Quem fez o lance?",
+      "own_goal_skip": "GOL CONTRA / NÃO IDENTIFICADO"
     },
     "voting": {
       "title": "Votação da Pelada",
@@ -1084,6 +1181,33 @@
         "go_to_next": "Próxima Partida",
         "all_matches_finished": "Fim das Partidas",
         "last_match_desc": "Todas as partidas foram realizadas. Deseja encerrar a pelada?"
+      },
+      "live_state": {
+        "session": "SESSÃO",
+        "running": "EM ANDAMENTO",
+        "paused": "PAUSADO",
+        "pause": "PAUSAR",
+        "resume": "RETOMAR",
+        "reset": "ZERAR",
+        "reset_match_timer": "Zerar cronômetro da partida",
+        "options": "Opções",
+        "players_on_field": "EM CAMPO",
+        "other_event": "OUTRO LANCE",
+        "other_event_hint": "DRIBLE · CHUTE · FALTA · DEFESAÇA",
+        "live_standings": "CLASSIFICAÇÃO AO VIVO",
+        "table_button": "TABELA",
+        "sumula_button": "SÚMULA",
+        "end_match": "ENCERRAR",
+        "swap_button": "TROCAR",
+        "swap_hint": "toque em ⇄ para substituir",
+        "on_field": "EM CAMPO",
+        "view_timeline": "VER LINHA DO TEMPO COMPLETA",
+        "records_count": "{{count}} registros",
+        "no_events": "Nenhum lance registrado ainda",
+        "support_label": "SUPORTE",
+        "end_match_full": "ENCERRAR PARTIDA",
+        "reset_session_timer": "Zerar cronômetro da sessão",
+        "other_event_short": "DRIBLE, CHUTE, FALTA…"
       }
     },
     "panel": {

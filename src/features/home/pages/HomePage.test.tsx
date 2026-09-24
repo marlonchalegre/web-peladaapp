@@ -214,6 +214,38 @@ describe("HomePage", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("scrolls to the groups section when opened with the #meus-grupos hash", async () => {
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/users/1/organizations") return Promise.resolve([]);
+      if (path === "/api/invitations/pending") return Promise.resolve([]);
+      return Promise.resolve([]);
+    });
+
+    const scrollSpy = vi.fn();
+    const originalScrollIntoView = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = scrollSpy;
+
+    try {
+      render(
+        <MemoryRouter initialEntries={["/home#meus-grupos"]}>
+          <HomePage />
+        </MemoryRouter>,
+      );
+
+      await waitFor(
+        () => {
+          expect(scrollSpy).toHaveBeenCalled();
+        },
+        { timeout: 2000 },
+      );
+      expect(scrollSpy.mock.instances[0]).toBe(
+        document.getElementById("meus-grupos"),
+      );
+    } finally {
+      Element.prototype.scrollIntoView = originalScrollIntoView;
+    }
+  });
+
   it("renders the player yearly statistics in the dashboard stats widgets", async () => {
     (api.get as Mock).mockImplementation((path: string) => {
       if (path === "/api/users/1/organizations") return Promise.resolve([]);

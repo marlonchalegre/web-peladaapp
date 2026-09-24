@@ -734,4 +734,75 @@ describe("endpoints", () => {
       );
     });
   });
+
+  describe("History, weekly presence and profile dashboard", () => {
+    it("getOrganizationHistory calls the history endpoint with a year", async () => {
+      mockResponse([{ id: "p1", matches_count: 2 }]);
+      const result = await api.getOrganizationHistory("org1", 2026);
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining("/api/organizations/org1/history"),
+        expect.anything(),
+      );
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining("year=2026"),
+        expect.anything(),
+      );
+      expect(result).toHaveLength(1);
+    });
+
+    it("getOrganizationHistory defaults to year 0 (all years)", async () => {
+      mockResponse([]);
+      await api.getOrganizationHistory("org1");
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining("year=0"),
+        expect.anything(),
+      );
+    });
+
+    it("getWeeklyPresence calls the weekly-presence endpoint with default weeks", async () => {
+      mockResponse([{ week_start: "2026-09-07", confirmed: 3 }]);
+      const result = await api.getWeeklyPresence("org1");
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining("/api/organizations/org1/weekly-presence"),
+        expect.anything(),
+      );
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining("weeks=12"),
+        expect.anything(),
+      );
+      expect(result[0].confirmed).toBe(3);
+    });
+
+    it("getWeeklyPresence forwards a custom weeks value", async () => {
+      mockResponse([]);
+      await api.getWeeklyPresence("org1", 4);
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining("weeks=4"),
+        expect.anything(),
+      );
+    });
+
+    it("getProfileDashboard calls the profile-dashboard endpoint", async () => {
+      mockResponse({ year: 2026, summary: { matches_played: 10 } });
+      const result = await api.getProfileDashboard("u1", 2026);
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining("/api/user/u1/profile-dashboard"),
+        expect.anything(),
+      );
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining("year=2026"),
+        expect.anything(),
+      );
+      expect(result.summary.matches_played).toBe(10);
+    });
+
+    it("getProfileDashboard defaults to year 0", async () => {
+      mockResponse({ year: 0 });
+      await api.getProfileDashboard("u1");
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining("year=0"),
+        expect.anything(),
+      );
+    });
+  });
 });

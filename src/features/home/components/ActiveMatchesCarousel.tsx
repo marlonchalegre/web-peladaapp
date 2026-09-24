@@ -1,57 +1,17 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import {
-  Paper,
   Box,
   Typography,
   Button,
   IconButton,
-  Chip,
-  Stack,
   CircularProgress,
-  alpha,
-  useTheme,
 } from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined";
-import CancelIcon from "@mui/icons-material/Cancel";
-import CancelOutlinedIcon from "@mui/icons-material/CancelOutlined";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { Pelada, AttendanceStatus } from "../../../shared/api/endpoints";
-
-const ATTENDANCE_CHOICES = [
-  {
-    status: "confirmed",
-    color: "success",
-    activeIcon: <CheckCircleIcon />,
-    idleIcon: <CheckCircleOutlinedIcon />,
-    labelKey: "home.carousel.actions.confirm_presence",
-    labelFallback: "Confirmar Presença",
-    testId: "carousel-attendance-confirm-btn",
-  },
-  {
-    status: "declined",
-    color: "error",
-    activeIcon: <CancelIcon />,
-    idleIcon: <CancelOutlinedIcon />,
-    labelKey: "home.carousel.actions.cancel_presence",
-    labelFallback: "Cancelar Presença",
-    testId: "carousel-attendance-cancel-btn",
-  },
-] as const satisfies readonly {
-  status: AttendanceStatus;
-  color: "success" | "error";
-  activeIcon: ReactNode;
-  idleIcon: ReactNode;
-  labelKey: string;
-  labelFallback: string;
-  testId: string;
-}[];
+import LocationDisplay from "../../../shared/components/LocationDisplay";
 
 interface ActiveMatchesCarouselProps {
   peladas: Pelada[];
@@ -67,7 +27,6 @@ export default function ActiveMatchesCarousel({
 }: ActiveMatchesCarouselProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const theme = useTheme();
   const [activeIndex, setActiveIndex] = useState(0);
   // One in-flight answer at a time: it both drives the spinner and stands in
   // for the pelada's status until the parent's refetch makes it authoritative.
@@ -109,6 +68,25 @@ export default function ActiveMatchesCarousel({
   // The list can shrink under the current index between renders.
   const safeIndex = Math.min(activeIndex, activePeladas.length - 1);
   const currentPelada = activePeladas[safeIndex];
+
+  const confirmedCount = currentPelada.confirmed_count ?? 0;
+  const maxPlayers = currentPelada.max_players ?? null;
+  const previewInitials = (currentPelada.confirmed_preview ?? "")
+    .split("|")
+    .filter(Boolean)
+    .map((name) =>
+      name
+        .split(" ")
+        .filter(Boolean)
+        .map((part) => part[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase(),
+    );
+  const remainingConfirmed = Math.max(
+    0,
+    confirmedCount - previewInitials.length,
+  );
 
   const pendingStatus =
     pending?.peladaId === currentPelada.id ? pending.status : null;
@@ -177,289 +155,627 @@ export default function ActiveMatchesCarousel({
     ? new Date(currentPelada.scheduled_at)
     : null;
 
+  const dayNumber = dateObj ? dateObj.getDate() : "--";
+  const weekday = dateObj
+    ? dateObj
+        .toLocaleDateString(t("common.locale_code", "pt-BR"), {
+          weekday: "long",
+        })
+        .toUpperCase()
+    : "";
+  const monthAndTime = dateObj
+    ? `${dateObj.toLocaleDateString(t("common.locale_code", "pt-BR"), {
+        month: "long",
+      })} · ${dateObj.toLocaleTimeString(t("common.locale_code", "pt-BR"), {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}`
+    : "";
+
   return (
     <Box sx={{ mb: 4 }} data-testid="active-matches-carousel">
+      {/* Header with Title and pagination controls */}
       <Box
         sx={{
           display: "flex",
-          alignItems: "center",
-          mb: 2,
           justifyContent: "space-between",
+          alignItems: "baseline",
+          mb: 1.5,
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <CalendarMonthIcon sx={{ mr: 1.5, color: "primary.main" }} />
-          <Typography variant="h6" sx={{ fontWeight: 600 }}>
-            {t("home.carousel.title", "Minhas Peladas Ativas")}
+        <Box sx={{ display: "flex", alignItems: "baseline", gap: 1.5 }}>
+          <Typography
+            sx={{
+              fontFamily: "Archivo, sans-serif",
+              fontWeight: 700,
+              fontSize: "9.5px",
+              letterSpacing: "0.18em",
+              color: "#6b675c",
+              textTransform: "uppercase",
+            }}
+          >
+            {t("home.carousel.section_title", "SUA SEMANA")}
+          </Typography>
+          <Typography
+            sx={{
+              fontFamily: "Archivo, sans-serif",
+              fontWeight: 700,
+              fontSize: "11px",
+              color: "#6b675c",
+            }}
+          >
+            {activePeladas.length}{" "}
+            {activePeladas.length === 1
+              ? t("home.carousel.single_match", "jogo")
+              : t("home.carousel.plural_matches", "jogos")}
+            {activePeladas.length > 1 ? ` · 1 pendente` : ""}
           </Typography>
         </Box>
 
         {activePeladas.length > 1 && (
-          <Box sx={{ display: "flex", gap: 1 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
             <IconButton
               size="small"
               onClick={handlePrev}
               data-testid="carousel-prev-btn"
-              sx={{ border: 1, borderColor: "divider" }}
+              sx={{
+                width: 28,
+                height: 28,
+                borderRadius: "8px",
+                border: "1.5px solid",
+                borderColor: "divider",
+                bgcolor: "background.paper",
+                color: "text.primary",
+                p: 0,
+                "&:hover": {
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark" ? "#2d3035" : "#f6f4ee",
+                },
+              }}
             >
-              <ChevronLeftIcon />
+              <ChevronLeftIcon sx={{ fontSize: 18 }} />
             </IconButton>
+
+            <Typography
+              data-testid="carousel-pagination-indicator"
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 700,
+                fontSize: "9.5px",
+                letterSpacing: "0.18em",
+                color: "text.secondary",
+                textTransform: "uppercase",
+                px: 0.5,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {safeIndex + 1} {t("common.of", "de")} {activePeladas.length}{" "}
+              {t("home.carousel.matches", "partidas")}
+            </Typography>
+
             <IconButton
               size="small"
               onClick={handleNext}
               data-testid="carousel-next-btn"
-              sx={{ border: 1, borderColor: "divider" }}
+              sx={{
+                width: 28,
+                height: 28,
+                borderRadius: "8px",
+                border: "1.5px solid",
+                borderColor: "divider",
+                bgcolor: "background.paper",
+                color: "text.primary",
+                p: 0,
+                "&:hover": {
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark" ? "#2d3035" : "#f6f4ee",
+                },
+              }}
             >
-              <ChevronRightIcon />
+              <ChevronRightIcon sx={{ fontSize: 18 }} />
             </IconButton>
           </Box>
         )}
       </Box>
 
-      <Paper
-        elevation={0}
+      {/* Tactile Card based on Template 2a */}
+      <Box
         sx={{
-          position: "relative",
-          p: { xs: 2.5, sm: 4 },
-          border: 1,
-          borderColor: "divider",
-          borderRadius: 4,
-          background:
-            theme.palette.mode === "light"
-              ? `linear-gradient(135deg, ${alpha(theme.palette.primary.light, 0.4)} 0%, ${alpha(
-                  theme.palette.secondary.light,
-                  0.3,
-                )} 100%)`
-              : `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.2)} 0%, ${alpha(
-                  theme.palette.secondary.dark,
-                  0.15,
-                )} 100%)`,
-          display: "flex",
-          flexDirection: { xs: "column", md: "row" },
-          alignItems: { xs: "flex-start", md: "center" },
-          justifyContent: "space-between",
-          gap: 3,
+          bgcolor: "background.paper",
+          border: (theme) =>
+            theme.palette.mode === "dark"
+              ? "2px solid #2d3035"
+              : "2px solid #17181a",
+          borderRadius: "18px",
           overflow: "hidden",
-          "&::before, &::after": {
-            content: '""',
-            position: "absolute",
-            width: 20,
-            height: 20,
-            borderRadius: "50%",
-            bgcolor: "background.default",
-            border: "1px solid",
-            borderColor: "divider",
-            display: { xs: "none", md: "block" },
-          },
-          // Match ticket indentations on the left and right sides
-          "&::before": {
-            left: -11,
-            top: "calc(50% - 10px)",
-            boxShadow: `inset -2px 0 4px ${alpha(theme.palette.common.black, 0.05)}`,
-          },
-          "&::after": {
-            right: -11,
-            top: "calc(50% - 10px)",
-            boxShadow: `inset 2px 0 4px ${alpha(theme.palette.common.black, 0.05)}`,
-          },
+          boxShadow: (theme) =>
+            theme.palette.mode === "dark"
+              ? "5px 5px 0 #000000"
+              : "5px 5px 0 #17181a",
+          transition: "all 0.2s ease",
         }}
       >
-        <Box sx={{ flex: 1 }}>
-          <Box
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              gap: 1,
-              mb: 1.5,
-            }}
-          >
-            <Chip
-              icon={<SportsSoccerIcon sx={{ fontSize: "14px !important" }} />}
-              label={
-                currentPelada.organization_name || t("common.pelada", "Pelada")
-              }
-              size="small"
-              sx={{ fontWeight: 600, bgcolor: "background.paper" }}
-            />
-            <Chip
-              label={t(
-                `pelada.status.${currentPelada.status}`,
-                currentPelada.status || "",
-              )}
-              size="small"
-              color={actionDetails.color}
+        {/* Top bar strip */}
+        <Box
+          sx={{
+            bgcolor: "#146b3a",
+            px: 2,
+            py: 1.1,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <Box
+              component="span"
               sx={{
-                fontWeight: 600,
-                textTransform: "uppercase",
-                fontSize: "0.68rem",
+                bgcolor: "rgba(255, 255, 255, 0.22)",
+                borderRadius: "5px",
+                px: "6px",
+                py: "3px",
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 800,
+                fontSize: "9px",
+                letterSpacing: "0.1em",
+                color: "#ffffff",
               }}
-            />
+            >
+              FUT
+            </Box>
+            <Typography
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 800,
+                fontSize: "11px",
+                letterSpacing: "0.06em",
+                color: "#ffffff",
+                textTransform: "uppercase",
+              }}
+            >
+              {currentPelada.organization_name || t("common.pelada", "Pelada")}
+            </Typography>
           </Box>
 
           <Typography
-            variant="h5"
-            sx={{ fontWeight: 800, mb: 1, color: "text.primary" }}
-          >
-            {dateObj
-              ? dateObj.toLocaleDateString(t("common.locale_code", "pt-BR"), {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                })
-              : t("common.date.tbd", "TBD")}
-          </Typography>
-
-          <Typography
-            variant="body2"
             sx={{
-              color: "text.secondary",
-              display: "flex",
-              alignItems: "center",
-              gap: 0.5,
+              fontFamily: "Archivo, sans-serif",
+              fontWeight: 700,
+              fontSize: "11px",
+              color: "#bfe6ce",
             }}
           >
-            {dateObj
-              ? `${t("home.carousel.time_prefix", "Horário:")} ${dateObj.toLocaleTimeString(
-                  t("common.locale_code", "pt-BR"),
-                  { hour: "2-digit", minute: "2-digit" },
-                )}`
-              : ""}
+            {currentPelada.status === "attendance"
+              ? isConfirmed
+                ? "presença confirmada"
+                : "lista aberta"
+              : t(
+                  `pelada.status.${currentPelada.status}`,
+                  currentPelada.status || "",
+                )}
           </Typography>
         </Box>
 
+        {/* Card Content */}
+        {/* Card Content: 3 horizontal sections on desktop (4a), vertical on mobile (2a) */}
         <Box
           sx={{
             display: "flex",
-            flexDirection: "column",
-            alignItems: { xs: "stretch", md: "flex-end" },
-            width: { xs: "100%", md: "auto" },
+            flexDirection: { xs: "column", md: "row" },
+            alignItems: { xs: "stretch", md: "stretch" },
+            boxSizing: "border-box",
           }}
         >
-          {currentPelada.status === "attendance" ? (
-            <>
-              <Stack
-                direction={{ xs: "column", sm: "row" }}
-                spacing={1.5}
-                sx={{ width: { xs: "100%", sm: "auto" } }}
-              >
-                {ATTENDANCE_CHOICES.map(
-                  ({
-                    status,
-                    color,
-                    activeIcon,
-                    idleIcon,
-                    labelKey,
-                    labelFallback,
-                    testId,
-                  }) => {
-                    const active =
-                      status === "confirmed" ? isConfirmed : isDeclined;
-                    const shadow = (opacity: number) =>
-                      `0 4px 12px ${alpha(theme.palette[color].main, opacity)}`;
-                    return (
-                      <Button
-                        key={status}
-                        variant={active ? "contained" : "outlined"}
-                        color={color}
-                        disabled={Boolean(pending)}
-                        startIcon={
-                          pending?.status === status ? (
-                            <CircularProgress size={18} color="inherit" />
-                          ) : active ? (
-                            activeIcon
-                          ) : (
-                            idleIcon
-                          )
-                        }
-                        onClick={() => handleAttendance(status)}
-                        data-testid={testId}
-                        sx={{
-                          py: 1.25,
-                          px: 2.5,
-                          borderRadius: 3,
-                          fontWeight: 700,
-                          textTransform: "none",
-                          boxShadow: active ? shadow(0.25) : "none",
-                          "&:hover": {
-                            boxShadow: active ? shadow(0.35) : "none",
-                          },
-                        }}
-                      >
-                        {t(labelKey, labelFallback)}
-                      </Button>
-                    );
-                  },
-                )}
-              </Stack>
-
-              <Button
-                variant="text"
-                size="small"
-                onClick={() => navigate(actionDetails.link)}
-                endIcon={
-                  <ArrowForwardIcon sx={{ fontSize: "14px !important" }} />
-                }
-                data-testid="carousel-view-attendance-btn"
+          {/* Section 1: Big Date Block */}
+          <Box
+            sx={{
+              p: { xs: 2, sm: 2.5, md: 2.5 },
+              borderRight: {
+                xs: "none",
+                md: (theme) => `1.5px dashed ${theme.palette.divider}`,
+              },
+              flex: { md: "0 0 auto" },
+              display: "flex",
+              alignItems: "flex-end",
+              gap: 1.5,
+            }}
+          >
+            <Typography
+              sx={{
+                fontFamily: "'Archivo Narrow', Archivo, sans-serif",
+                fontWeight: 700,
+                fontSize: { xs: "48px", sm: "58px", md: "62px" },
+                lineHeight: 0.85,
+                letterSpacing: "-0.03em",
+                color: "text.primary",
+              }}
+            >
+              {dayNumber}
+            </Typography>
+            <Box sx={{ pb: 0.5 }}>
+              <Typography
                 sx={{
-                  mt: 1,
-                  textTransform: "none",
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 800,
+                  fontSize: "13.5px",
+                  lineHeight: 1.1,
+                  color: "text.primary",
+                }}
+              >
+                {weekday}
+              </Typography>
+              <Typography
+                sx={{
+                  fontFamily: "Archivo, sans-serif",
                   fontWeight: 600,
-                  fontSize: "0.8rem",
+                  fontSize: "12.5px",
                   color: "text.secondary",
-                  alignSelf: { xs: "center", sm: "flex-end" },
-                  "&:hover": {
+                }}
+              >
+                {monthAndTime}
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* Section 2: Details (Progress, Avatars, Location) */}
+          <Box
+            sx={{
+              p: { xs: "0 16px 16px", md: 2.5 },
+              flex: { md: "1 1 200px" },
+              minWidth: 0,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+            }}
+          >
+            {/* NA LISTA Header & Progress Bar (Desktop 4a) */}
+            <Box sx={{ display: { xs: "none", md: "block" }, mb: 1 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "baseline",
+                }}
+              >
+                <Typography
+                  sx={{
+                    font: "700 9.5px/1 Archivo, sans-serif",
+                    letterSpacing: ".16em",
+                    color: "text.secondary",
+                  }}
+                >
+                  NA LISTA
+                </Typography>
+                <Typography
+                  sx={{
+                    font: "700 12.5px/1 Archivo, sans-serif",
                     color: "text.primary",
-                    bgcolor: "transparent",
-                    textDecoration: "underline",
+                  }}
+                >
+                  {confirmedCount}
+                  {maxPlayers ? (
+                    <>
+                      {" "}
+                      <Box
+                        component="span"
+                        sx={{ color: "text.secondary", fontWeight: 600 }}
+                      >
+                        de {maxPlayers}
+                      </Box>
+                    </>
+                  ) : null}
+                </Typography>
+              </Box>
+              <Box
+                sx={{
+                  height: 7,
+                  borderRadius: 4,
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark" ? "#33363d" : "#eae6db",
+                  overflow: "hidden",
+                  display: "flex",
+                  mt: 1,
+                }}
+              >
+                <Box
+                  sx={{
+                    width: `${
+                      maxPlayers
+                        ? Math.min(
+                            100,
+                            Math.round((confirmedCount / maxPlayers) * 100),
+                          )
+                        : 0
+                    }%`,
+                    bgcolor: "#146b3a",
+                  }}
+                />
+              </Box>
+            </Box>
+
+            {/* Attendance Avatars Stack & Count */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1.5,
+                mb: 1.5,
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                {previewInitials.map((initials, idx) => (
+                  <Box
+                    key={`${initials}-${idx}`}
+                    sx={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: "50%",
+                      bgcolor: ["#c9d9cd", "#dcd3bd", "#cdd6e0", "#e2cfc7"][
+                        idx % 4
+                      ],
+                      border: (theme) =>
+                        `2px solid ${theme.palette.background.paper}`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 800,
+                      fontSize: "9.5px",
+                      color: "#17181a",
+                      ml: idx > 0 ? "-8px" : 0,
+                      zIndex: 4 - idx,
+                    }}
+                  >
+                    {initials}
+                  </Box>
+                ))}
+                {remainingConfirmed > 0 && (
+                  <Box
+                    sx={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: "50%",
+                      bgcolor: "#17181a",
+                      border: (theme) =>
+                        `2px solid ${theme.palette.background.paper}`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 800,
+                      fontSize: "9px",
+                      color: "#ffffff",
+                      ml: "-8px",
+                    }}
+                  >
+                    +{remainingConfirmed}
+                  </Box>
+                )}
+              </Box>
+
+              <Typography
+                sx={{
+                  display: { xs: "block", md: "none" },
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 700,
+                  fontSize: "12px",
+                  color: "text.primary",
+                }}
+              >
+                {confirmedCount}{" "}
+                <Box
+                  component="span"
+                  sx={{ color: "text.secondary", fontWeight: 600 }}
+                >
+                  {maxPlayers
+                    ? `${t("home.carousel.of_slots", "de")} ${maxPlayers} ${t(
+                        "home.carousel.on_list",
+                        "na lista",
+                      )}`
+                    : t("home.carousel.on_list", "na lista")}
+                </Box>
+              </Typography>
+            </Box>
+
+            {/* Location with indicator */}
+            {currentPelada.location && (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  pt: 1.5,
+                  borderTop: (theme) => `1.5px dashed ${theme.palette.divider}`,
+                }}
+              >
+                <LocationDisplay
+                  location={currentPelada.location}
+                  showDot
+                  dotColor="#146b3a"
+                  textSx={{
+                    fontFamily: "Archivo, sans-serif",
+                    fontWeight: 600,
+                    fontSize: "12.5px",
+                    color: "text.secondary",
+                  }}
+                  dataTestId="carousel-pelada-location"
+                />
+              </Box>
+            )}
+          </Box>
+
+          {/* Section 3: Action Area (Right column on desktop, bottom on mobile) */}
+          <Box
+            sx={{
+              p: { xs: "0 16px 16px", md: 2.5 },
+              width: { xs: "100%", md: 220 },
+              bgcolor: {
+                xs: "transparent",
+                md: (theme) =>
+                  theme.palette.mode === "dark" ? "#1c1e22" : "#f6f4ee",
+              },
+              borderLeft: {
+                xs: "none",
+                md: (theme) => `1.5px solid ${theme.palette.divider}`,
+              },
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              gap: 1.5,
+              boxSizing: "border-box",
+            }}
+          >
+            {currentPelada.status === "attendance" ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 1.5,
+                  mt: 1,
+                }}
+              >
+                {/* Primary CTA: BORA PRO JOGO */}
+                <Button
+                  color="success"
+                  variant={isConfirmed ? "contained" : "outlined"}
+                  fullWidth
+                  disabled={Boolean(pending)}
+                  onClick={() => handleAttendance("confirmed")}
+                  data-testid="carousel-attendance-confirm-btn"
+                  aria-label={t(
+                    "peladas.home_carousel.attendance.confirm",
+                    "Confirmar Presença",
+                  )}
+                  startIcon={
+                    pending?.status === "confirmed" ? (
+                      <CircularProgress size={18} color="inherit" />
+                    ) : null
+                  }
+                  sx={{
+                    py: 2,
+                    borderRadius: "14px",
+                    bgcolor: isConfirmed ? "#0d4526" : "#146b3a",
+                    color: "#ffffff",
+                    fontFamily: "Archivo, sans-serif",
+                    fontWeight: 800,
+                    fontSize: "17px",
+                    letterSpacing: "0.04em",
+                    textTransform: "uppercase",
+                    boxShadow: "0 3px 0 #0d4526",
+                    border: "none",
+                    "&:hover": {
+                      bgcolor: "#0e5c31",
+                      border: "none",
+                    },
+                  }}
+                >
+                  {isConfirmed
+                    ? t("home.carousel.presence_confirmed", "CONFIRMADO")
+                    : t(
+                        "home.carousel.actions.confirm_presence",
+                        "BORA PRO JOGO",
+                      )}
+                </Button>
+
+                {/* Sub-actions: Não vou dessa vez (left) | Ver lista → (right) */}
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    px: 0.5,
+                  }}
+                >
+                  <Button
+                    color="error"
+                    variant={isDeclined ? "contained" : "outlined"}
+                    onClick={() => handleAttendance("declined")}
+                    data-testid="carousel-attendance-cancel-btn"
+                    disabled={Boolean(pending)}
+                    aria-label={t(
+                      "peladas.home_carousel.attendance.decline",
+                      "Recusar Presença",
+                    )}
+                    sx={{
+                      background: "none !important",
+                      border: "none !important",
+                      p: 0,
+                      minWidth: "auto",
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 600,
+                      fontSize: "12px",
+                      color: isDeclined ? "#a8452a" : "#6b675c",
+                      textDecoration: "underline",
+                      textTransform: "none",
+                      boxShadow: "none !important",
+                      "&:hover": { color: "text.primary", background: "none" },
+                    }}
+                  >
+                    {isDeclined
+                      ? t("home.carousel.presence_declined", "Você recusou")
+                      : t(
+                          "home.carousel.actions.cancel_presence",
+                          "Não vou dessa vez",
+                        )}
+                  </Button>
+
+                  <Button
+                    onClick={() => navigate(actionDetails.link)}
+                    data-testid="carousel-view-attendance-btn"
+                    aria-label={t(
+                      "peladas.home_carousel.attendance.view_list",
+                      "Ver Lista de Presença",
+                    )}
+                    sx={{
+                      background: "none !important",
+                      border: "none !important",
+                      p: 0,
+                      minWidth: "auto",
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 700,
+                      fontSize: "12px",
+                      color: "#146b3a",
+                      textTransform: "none",
+                      boxShadow: "none !important",
+                      "&:hover": {
+                        textDecoration: "underline",
+                        background: "none",
+                      },
+                    }}
+                  >
+                    {t("home.carousel.actions.view_list", "Ver lista →")}
+                  </Button>
+                </Box>
+              </Box>
+            ) : (
+              <Button
+                variant="contained"
+                fullWidth
+                color={actionDetails.color}
+                onClick={() => navigate(actionDetails.link)}
+                data-testid="carousel-action-btn"
+                sx={{
+                  py: 1.6,
+                  borderRadius: "14px",
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 800,
+                  fontSize: "15px",
+                  letterSpacing: "0.04em",
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark" ? "#2d3035" : "#17181a",
+                  color: "#ffffff",
+                  boxShadow: "0 3px 0 #000000",
+                  "&:hover": {
+                    bgcolor: (theme) =>
+                      theme.palette.mode === "dark" ? "#383b42" : "#000000",
                   },
                 }}
               >
-                {t(
-                  "home.carousel.actions.view_attendance",
-                  "Ver Lista de Presença",
-                )}
+                {actionDetails.text}
               </Button>
-            </>
-          ) : (
-            <Button
-              variant="contained"
-              color={actionDetails.color}
-              endIcon={<ArrowForwardIcon />}
-              onClick={() => navigate(actionDetails.link)}
-              sx={{
-                py: 1.5,
-                px: 4,
-                borderRadius: 3,
-                fontWeight: 700,
-                textTransform: "none",
-                boxShadow: "none",
-                "&:hover": {
-                  boxShadow: "none",
-                },
-              }}
-            >
-              {actionDetails.text}
-            </Button>
-          )}
-
-          {activePeladas.length > 1 && (
-            <Typography
-              variant="caption"
-              sx={{
-                mt: 1.5,
-                color: "text.secondary",
-                textAlign: "center",
-                width: "100%",
-                display: "block",
-              }}
-            >
-              {activeIndex + 1} {t("common.of", "de")} {activePeladas.length}{" "}
-              {t("home.carousel.matches", "partidas")}
-            </Typography>
-          )}
+            )}
+          </Box>
         </Box>
-      </Paper>
+      </Box>
     </Box>
   );
 }

@@ -68,16 +68,20 @@ export default function PlayerAttendanceCard({
       elevation={0}
       data-testid={testId}
       sx={{
-        borderRadius: 2,
-        border: "1px solid",
+        borderRadius: "12px",
+        border: "1.5px solid",
         borderColor: "divider",
-        "&:hover": { borderColor: "primary.main", bgcolor: "action.hover" },
-        transition: "all 0.1s ease-in-out",
+        bgcolor: "#ffffff",
+        "&:hover": {
+          borderColor: "#17181a",
+          bgcolor: "background.paper",
+        },
+        transition: "all 0.15s ease",
       }}
     >
       <CardContent
         sx={{
-          p: "12px !important",
+          p: "10px 14px !important",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
@@ -90,15 +94,14 @@ export default function PlayerAttendanceCard({
               player.user?.avatar_filename || player.user_avatar_filename
             }
             sx={{
-              width: 36,
-              height: 36,
+              width: 34,
+              height: 34,
               mr: 1.5,
-              bgcolor: isCurrentUser ? "primary.main" : "grey.200",
-              color: isCurrentUser ? "white" : "text.primary",
+              bgcolor: isCurrentUser ? "#146b3a" : "#eae6db",
+              color: isCurrentUser ? "#ffffff" : "#17181a",
               fontSize: "0.75rem",
               fontWeight: 800,
-              border: isCurrentUser ? "none" : "1px solid",
-              borderColor: "divider",
+              border: isCurrentUser ? "none" : "1.5px solid #ddd8cc",
             }}
             fallbackText={initials}
           />
@@ -109,8 +112,10 @@ export default function PlayerAttendanceCard({
               noWrap
               data-testid="attendance-card-name"
               sx={{
-                fontWeight: 600,
+                fontWeight: 800,
+                fontSize: "0.95rem",
                 lineHeight: 1.2,
+                color: "#17181a",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
               }}
@@ -119,10 +124,11 @@ export default function PlayerAttendanceCard({
             </Typography>
             <Stack
               direction="row"
-              spacing={1}
+              spacing={0.5}
               sx={{
                 alignItems: "center",
                 flexWrap: "wrap",
+                mt: 0.25,
               }}
             >
               {isCurrentUser && (
@@ -130,7 +136,8 @@ export default function PlayerAttendanceCard({
                   variant="caption"
                   sx={{
                     color: "primary.main",
-                    fontWeight: "bold",
+                    fontWeight: 800,
+                    letterSpacing: "0.04em",
                   }}
                 >
                   {t("common.you")}
@@ -142,6 +149,7 @@ export default function PlayerAttendanceCard({
                   color: "text.secondary",
                   display: "flex",
                   alignItems: "center",
+                  fontWeight: 600,
                 }}
               >
                 {isCurrentUser && " • "}
@@ -158,6 +166,7 @@ export default function PlayerAttendanceCard({
                     color: "text.secondary",
                     display: "flex",
                     alignItems: "center",
+                    fontWeight: 600,
                   }}
                 >
                   • {t(`common.member_types.${player.member_type}`)}

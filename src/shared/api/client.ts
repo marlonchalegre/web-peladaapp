@@ -218,6 +218,8 @@ export type User = {
     goals: number;
     assists: number;
     matches: number;
+    attendance_rate?: number | null;
+    current_streak?: number | null;
   };
 };
 

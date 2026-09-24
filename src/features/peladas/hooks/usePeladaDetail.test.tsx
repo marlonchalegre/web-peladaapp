@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { renderHook, act, waitFor } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { usePeladaDetail } from "./usePeladaDetail";
 import { MemoryRouter } from "react-router-dom";
 
@@ -143,6 +143,22 @@ describe("usePeladaDetail", () => {
     expect(mockApiClient.put).toHaveBeenCalledWith(
       expect.stringContaining(peladaId),
       expect.objectContaining({ players_per_team: 5 }),
+    );
+  });
+
+  it("should handle handleUpdateNumTeams successfully", async () => {
+    const { result } = renderHook(() => usePeladaDetail(peladaId), {
+      wrapper: MemoryRouter,
+    });
+    await waitFor(() => expect(result.current.pelada).not.toBe(null), {
+      timeout: 2000,
+    });
+    await act(async () => {
+      await result.current.handleUpdateNumTeams(3);
+    });
+    expect(mockApiClient.put).toHaveBeenCalledWith(
+      expect.stringContaining(peladaId),
+      expect.objectContaining({ num_teams: 3 }),
     );
   });
 
@@ -885,5 +901,127 @@ describe("usePeladaDetail", () => {
       await result.current.handleReversePayment("pl1");
     });
     expect(mockApi.reverseTransaction).not.toHaveBeenCalled();
+  });
+
+  describe("draw justification sessionStorage persistence", () => {
+    const storageKey = `pelada_draw_justification_${peladaId}`;
+    const justification = {
+      algorithm: "gpt",
+      teams: [],
+      metrics: { squad_mean: 7.2 },
+    };
+
+    beforeEach(() => {
+      sessionStorage.clear();
+    });
+
+    afterEach(() => {
+      sessionStorage.clear();
+    });
+
+    it("restores a previously saved justification on mount", () => {
+      sessionStorage.setItem(storageKey, JSON.stringify(justification));
+
+      const { result } = renderHook(() => usePeladaDetail(peladaId), {
+        wrapper: MemoryRouter,
+      });
+
+      expect(result.current.drawJustification).toEqual(justification);
+    });
+
+    it("treats a corrupted stored value as no justification", () => {
+      sessionStorage.setItem(storageKey, "{not-json");
+
+      const { result } = renderHook(() => usePeladaDetail(peladaId), {
+        wrapper: MemoryRouter,
+      });
+
+      expect(result.current.drawJustification).toBeNull();
+    });
+
+    it("persists the justification after a successful AI draw", async () => {
+      mockApiClient.post.mockResolvedValueOnce({
+        success: true,
+        algorithm: "gpt",
+        justification,
+      });
+
+      const { result } = renderHook(() => usePeladaDetail(peladaId), {
+        wrapper: MemoryRouter,
+      });
+      await waitFor(() => expect(result.current.pelada).not.toBe(null), {
+        timeout: 2000,
+      });
+
+      await act(async () => {
+        await result.current.handleRandomizeTeams({
+          algorithm: "gpt",
+          useHistory: false,
+        });
+      });
+
+      const stored = sessionStorage.getItem(storageKey);
+      expect(stored).toBeTruthy();
+      expect(JSON.parse(stored!)).toEqual(justification);
+    });
+
+    it("removes the stored justification when the draw returns none", async () => {
+      sessionStorage.setItem(storageKey, JSON.stringify(justification));
+      mockApiClient.post.mockResolvedValueOnce({
+        success: true,
+        algorithm: "classic",
+        justification: null,
+      });
+
+      const { result } = renderHook(() => usePeladaDetail(peladaId), {
+        wrapper: MemoryRouter,
+      });
+      expect(result.current.drawJustification).toEqual(justification);
+
+      await act(async () => {
+        await result.current.handleRandomizeTeams({
+          algorithm: "classic",
+          useHistory: false,
+        });
+      });
+
+      expect(result.current.drawJustification).toBeNull();
+      expect(sessionStorage.getItem(storageKey)).toBeNull();
+    });
+
+    it("removes the stored justification when a draw fails", async () => {
+      sessionStorage.setItem(storageKey, JSON.stringify(justification));
+      mockApiClient.post.mockRejectedValueOnce(new Error("Draw down"));
+
+      const { result } = renderHook(() => usePeladaDetail(peladaId), {
+        wrapper: MemoryRouter,
+      });
+
+      await act(async () => {
+        await result.current.handleRandomizeTeams({
+          algorithm: "gpt",
+          useHistory: false,
+        });
+      });
+
+      expect(result.current.drawJustification).toBeNull();
+      expect(sessionStorage.getItem(storageKey)).toBeNull();
+    });
+
+    it("clears state and storage when the justification is dismissed", async () => {
+      sessionStorage.setItem(storageKey, JSON.stringify(justification));
+
+      const { result } = renderHook(() => usePeladaDetail(peladaId), {
+        wrapper: MemoryRouter,
+      });
+      expect(result.current.drawJustification).toEqual(justification);
+
+      act(() => {
+        result.current.dismissDrawJustification();
+      });
+
+      expect(result.current.drawJustification).toBeNull();
+      expect(sessionStorage.getItem(storageKey)).toBeNull();
+    });
   });
 });

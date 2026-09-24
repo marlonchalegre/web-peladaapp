@@ -221,3 +221,51 @@ export function getPlayerInitials(name?: string | null): string {
   }
   return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
 }
+
+export const AVATAR_BG_COLORS = [
+  "#dcd3bd",
+  "#c9d9cd",
+  "#d8d2c4",
+  "#cfd8cd",
+  "#cdd6e0",
+  "#d3cfc4",
+  "#e2cfc7",
+];
+
+/**
+ * Returns first two initials for a given name.
+ */
+export function getInitials(name?: string | null, fallback = "JG"): string {
+  if (!name) return fallback;
+  const initials = name
+    .split(" ")
+    .filter(Boolean)
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+  return initials || fallback;
+}
+
+/**
+ * Formats a football position code to a localized pt-BR label.
+ */
+export function formatPosition(pos?: string | null, fallback = "meia"): string {
+  if (!pos) return fallback;
+  switch (pos.toLowerCase()) {
+    case "goalkeeper":
+    case "goleiro":
+      return "goleiro";
+    case "defender":
+    case "zagueiro":
+      return "zagueiro";
+    case "midfielder":
+    case "meio-campo":
+      return "meia";
+    case "striker":
+    case "atacante":
+      return "atacante";
+    default:
+      return pos.toLowerCase();
+  }
+}

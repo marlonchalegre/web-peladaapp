@@ -7,7 +7,6 @@ import {
   Typography,
   Alert,
   Stack,
-  Container,
   Tabs,
   Tab,
   Menu,
@@ -19,6 +18,7 @@ import {
 import ActiveMatchDashboard from "../components/ActiveMatchDashboard";
 import MatchReportSummary from "../components/MatchReportSummary";
 import SupportLineupTab from "../components/SupportLineupTab";
+import PeladaTabsBar from "../components/PeladaTabsBar";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import { usePeladaMatches } from "../hooks/usePeladaMatches";
@@ -47,9 +47,10 @@ import {
   type PlayerWithUser,
 } from "../utils/exportUtils";
 import GlobalSessionTimer from "../components/GlobalSessionTimer";
-import { calculateElapsedMs } from "../hooks/usePeladaTimer";
+import { calculateElapsedMs, usePeladaTimer } from "../hooks/usePeladaTimer";
 import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
 import OfflineSyncManager from "../components/OfflineSyncManager";
+import DesktopHeader from "../../../shared/components/DesktopHeader";
 
 const endpoints = createApi(api);
 
@@ -215,6 +216,8 @@ export default function PeladaMatchesPage() {
 
   const selectedMatch = matches.find((m) => m.id === selectedMatchId) || null;
 
+  const liveView = activeTab === 0 && !!selectedMatch && !!activeMatchData;
+
   const handleStartPeladaTimer = async () => {
     const isFinished =
       (selectedMatch?.status || "").toLowerCase() === "finished";
@@ -230,6 +233,15 @@ export default function PeladaMatchesPage() {
       await startPeladaTimer();
     }
   };
+
+  const sessionTimer = usePeladaTimer(
+    pelada?.timer_started_at,
+    pelada?.timer_accumulated_ms,
+    pelada?.timer_status,
+    isPeladaClosed,
+    handleStartPeladaTimer,
+    pausePeladaTimer,
+  );
 
   const handleCopyResults = async () => {
     const text = formatPeladaSummary(
@@ -317,13 +329,184 @@ export default function PeladaMatchesPage() {
   if (error) return <Alert severity="error">{error}</Alert>;
 
   return (
-    <Box sx={{ bgcolor: "background.default", minHeight: "100%" }}>
-      <Container
-        maxWidth="lg"
-        sx={{ py: { xs: 2, sm: 3 }, px: { xs: 1, sm: 2 } }}
-        disableGutters
+    <Box
+      sx={{
+        bgcolor: "#f6f4ee",
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {!liveView && (
+        <Box sx={{ display: { xs: "none", md: "block" } }}>
+          <DesktopHeader currentOrgName={pelada?.organization_name} />
+        </Box>
+      )}
+      {!liveView && (
+        <PeladaTabsBar
+          peladaId={peladaId}
+          status={pelada?.status}
+          active="matches"
+        />
+      )}
+
+      {liveView && (
+        <Box
+          component="header"
+          sx={{
+            display: { xs: "none", md: "flex" },
+            alignItems: "center",
+            gap: "26px",
+            bgcolor: "#123c26",
+            color: "#fff",
+            px: "22px",
+            height: "64px",
+            width: "100%",
+            flexShrink: 0,
+          }}
+        >
+          <Box
+            component={RouterLink}
+            to="/home"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "9px",
+              textDecoration: "none",
+              color: "#fff",
+            }}
+          >
+            <Box
+              sx={{
+                width: 26,
+                height: 26,
+                borderRadius: "7px",
+                bgcolor: "#146b3a",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 900,
+                fontSize: "10px",
+                color: "#fff",
+              }}
+            >
+              MP
+            </Box>
+            <Typography
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 900,
+                fontSize: "12.5px",
+                lineHeight: 1,
+                letterSpacing: ".1em",
+                color: "#fff",
+              }}
+            >
+              MINHA PELADA
+            </Typography>
+          </Box>
+
+          <Box
+            sx={{
+              display: "flex",
+              gap: "20px",
+              fontFamily: "Archivo, sans-serif",
+              fontWeight: 700,
+              fontSize: "12px",
+              color: "#9ecfb2",
+            }}
+          >
+            <Box
+              component={RouterLink}
+              to="/home"
+              sx={{
+                color: "#9ecfb2",
+                textDecoration: "none",
+                "&:hover": { color: "#fff" },
+              }}
+            >
+              Início
+            </Box>
+            <Box
+              component={RouterLink}
+              to="/home#meus-grupos"
+              sx={{
+                color: "#fff",
+                textDecoration: "none",
+              }}
+            >
+              Grupos
+            </Box>
+            <Box
+              component={RouterLink}
+              to="/profile"
+              sx={{
+                color: "#9ecfb2",
+                textDecoration: "none",
+                "&:hover": { color: "#fff" },
+              }}
+            >
+              Minha ficha
+            </Box>
+          </Box>
+
+          <Box sx={{ flex: 1 }} />
+
+          <Typography
+            sx={{
+              fontFamily: "Archivo, sans-serif",
+              fontWeight: 700,
+              fontSize: "11px",
+              lineHeight: 1,
+              color: "#9ecfb2",
+            }}
+          >
+            SESSÃO {sessionTimer.formattedTime}
+          </Typography>
+
+          <Box
+            component={RouterLink}
+            to={
+              pelada?.organization_id
+                ? `/organizations/${pelada.organization_id}`
+                : "/home"
+            }
+            sx={{
+              padding: "7px 12px",
+              border: "1.5px solid rgba(255,255,255,.25)",
+              borderRadius: "9px",
+              fontFamily: "Archivo, sans-serif",
+              fontWeight: 700,
+              fontSize: "11px",
+              lineHeight: 1,
+              color: "#fff",
+              textDecoration: "none",
+              "&:hover": { borderColor: "#fff" },
+            }}
+          >
+            {pelada?.organization_name || "100Fôlego"}
+          </Box>
+        </Box>
+      )}
+
+      <Box
+        id="pelada-matches-page-container"
+        sx={{
+          maxWidth: liveView ? { xs: "100%", md: 1024 } : 1200,
+          mx: "auto",
+          width: "100%",
+          flex: 1,
+          px: liveView ? 0 : { xs: 1, sm: 2 },
+          py: liveView ? 0 : { xs: 2, sm: 3 },
+        }}
       >
-        <Box sx={{ px: { xs: 1.5, sm: 0 } }}>
+        <Box
+          sx={{
+            px: { xs: 1.5, sm: 0 },
+            display: liveView ? "none" : "block",
+          }}
+        >
           <BreadcrumbNav
             items={[
               {
@@ -347,7 +530,7 @@ export default function PeladaMatchesPage() {
         <Box
           sx={{
             mb: 3,
-            display: "flex",
+            display: liveView ? "none" : "flex",
             flexDirection: { xs: "column", md: "row" },
             alignItems: "center",
             justifyContent: "space-between",
@@ -469,7 +652,7 @@ export default function PeladaMatchesPage() {
         </Box>
 
         {/* Main Content Tabs */}
-        <Box sx={{ mb: 3 }}>
+        <Box sx={{ mb: 3, display: liveView ? "none" : "block" }}>
           <Tabs
             value={activeTab}
             onChange={(_, v) => setActiveTab(v)}
@@ -516,6 +699,8 @@ export default function PeladaMatchesPage() {
                 selectMenu={selectMenu}
                 setSelectMenu={setSelectMenu}
                 playersPerTeam={pelada?.players_per_team}
+                standings={standings}
+                matchEvents={matchEvents}
                 onStartMatch={async (mid) => {
                   if (pelada?.timer_status !== "running") {
                     await startPeladaTimer();
@@ -523,7 +708,6 @@ export default function PeladaMatchesPage() {
                   await startMatchTimer(mid);
                 }}
                 onPauseMatch={pauseMatchTimer}
-                onResetMatch={resetMatchTimer}
                 onOpenResetConfirm={handleResetClick}
                 recordEvent={(mid, pid, type, st, mt, assistantId, teamId) =>
                   recordEvent(
@@ -568,9 +752,9 @@ export default function PeladaMatchesPage() {
                 matches={matches}
                 onSelectMatch={setSelectedMatchId}
                 teamNameById={teamNameById}
+                onNavigateToTimeline={() => setActiveTab(2)}
+                onNavigateToStandings={() => setActiveTab(1)}
                 onNavigateToSupportTab={() => setActiveTab(3)}
-                onUpdateSupportLineup={updateSupportLineup}
-                onRerollSupportLineup={rerollSupportLineup}
                 playerTeamMap={orgPlayerIdToTeamId}
               />
             ) : (
@@ -675,32 +859,32 @@ export default function PeladaMatchesPage() {
             />
           )}
         </Box>
+      </Box>
 
-        {justFinishedMatch && (
-          <MatchReportSummary
-            open={!!justFinishedMatch}
-            onClose={() => setJustFinishedMatchId(null)}
-            match={justFinishedMatch}
-            homeTeamName={teamNameById[justFinishedMatch.home_team_id]}
-            awayTeamName={teamNameById[justFinishedMatch.away_team_id]}
-            events={matchEvents.filter(
-              (e) => e.match_id === justFinishedMatch.id,
-            )}
-            userIdToName={userIdToName}
-            orgPlayerIdToUserId={orgPlayerIdToUserId}
-            orgPlayerIdToTeamId={orgPlayerIdToTeamId}
-            lineupsByMatch={lineupsByMatch}
-            teamPlayers={teamPlayers}
-            teamNameById={teamNameById}
-            nextMatch={nextScheduledMatch}
-            onProceedToNext={proceedToNextMatch}
-            onClosePelada={() => setClosePeladaConfirmOpen(true)}
-            isPeladaClosed={isPeladaClosed}
-            isAdmin={isAdmin}
-            closing={closing}
-          />
-        )}
-      </Container>
+      {justFinishedMatch && (
+        <MatchReportSummary
+          open={!!justFinishedMatch}
+          onClose={() => setJustFinishedMatchId(null)}
+          match={justFinishedMatch}
+          homeTeamName={teamNameById[justFinishedMatch.home_team_id]}
+          awayTeamName={teamNameById[justFinishedMatch.away_team_id]}
+          events={matchEvents.filter(
+            (e) => e.match_id === justFinishedMatch.id,
+          )}
+          userIdToName={userIdToName}
+          orgPlayerIdToUserId={orgPlayerIdToUserId}
+          orgPlayerIdToTeamId={orgPlayerIdToTeamId}
+          lineupsByMatch={lineupsByMatch}
+          teamPlayers={teamPlayers}
+          teamNameById={teamNameById}
+          nextMatch={nextScheduledMatch}
+          onProceedToNext={proceedToNextMatch}
+          onClosePelada={() => setClosePeladaConfirmOpen(true)}
+          isPeladaClosed={isPeladaClosed}
+          isAdmin={isAdmin}
+          closing={closing}
+        />
+      )}
       {/* Pretty Confirm Dialogs */}
       <PrettyConfirmDialog
         open={Boolean(resetConfirmOpen)}

@@ -23,6 +23,7 @@ import {
   deleteUser,
   uploadUserAvatar,
   deleteUserAvatar,
+  api,
 } from "../../../shared/api/client";
 import { useAuth } from "../../../app/providers/AuthContext";
 
@@ -710,5 +711,112 @@ describe("UserProfilePage", () => {
         password: "matchingpass",
       });
     });
+  });
+
+  it("toggles between MINHA FICHA view mode and edit form mode when edit button is clicked", async () => {
+    (getUser as Mock).mockResolvedValue(defaultUser);
+
+    render(
+      <MemoryRouter>
+        <UserProfilePage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("MINHA FICHA")).toBeInTheDocument();
+      expect(screen.getByTestId("edit-profile-button")).toHaveTextContent(
+        "common.edit",
+      );
+    });
+
+    // Click edit button to enter edit mode
+    fireEvent.click(screen.getByTestId("edit-profile-button"));
+
+    expect(screen.getByText("EDITAR PERFIL")).toBeInTheDocument();
+    expect(screen.getByTestId("edit-profile-button")).toHaveTextContent(
+      "common.cancel",
+    );
+
+    // Click cancel button to return to view mode
+    fireEvent.click(screen.getByTestId("edit-profile-button"));
+
+    expect(screen.getByText("MINHA FICHA")).toBeInTheDocument();
+    expect(screen.getByTestId("edit-profile-button")).toHaveTextContent(
+      "common.edit",
+    );
+  });
+
+  it("fetches the profile dashboard for the signed-in user", async () => {
+    (getUser as Mock).mockResolvedValue(defaultUser);
+    const dashboard = {
+      year: new Date().getFullYear(),
+      summary: {
+        avg_rating: 7.4,
+        avg_stars: 4.2,
+        matches_played: 21,
+        goals: 18,
+        assists: 32,
+        titles: 4,
+        mvp_count: 2,
+        garcom_count: 2,
+        attendance_rate: 85,
+      },
+      skills: {
+        passing: 4.4,
+        ball_control: 4,
+        velocity: 3.2,
+        shooting: 3.6,
+        dribbling: 3,
+        defending: 3.5,
+        ratings_count: 19,
+      },
+      groups: [],
+      presence: [],
+      recent_peladas: [],
+    };
+    (api.get as Mock).mockResolvedValue(dashboard);
+
+    render(
+      <MemoryRouter>
+        <UserProfilePage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(api.get).toHaveBeenCalledWith(
+        "/api/user/1/profile-dashboard",
+        expect.objectContaining({ year: expect.any(Number) }),
+      );
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("MINHA FICHA")).toBeInTheDocument();
+    });
+  });
+
+  it("falls back gracefully when the profile dashboard fails to load", async () => {
+    (getUser as Mock).mockResolvedValue(defaultUser);
+    (api.get as Mock).mockRejectedValue(new Error("dashboard down"));
+
+    render(
+      <MemoryRouter>
+        <UserProfilePage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(api.get).toHaveBeenCalledWith(
+        "/api/user/1/profile-dashboard",
+        expect.objectContaining({ year: expect.any(Number) }),
+      );
+    });
+
+    // The page still renders in view mode despite the dashboard error.
+    await waitFor(() => {
+      expect(screen.getByText("MINHA FICHA")).toBeInTheDocument();
+    });
+    expect(
+      screen.queryByText("user.profile.error.load_failed"),
+    ).not.toBeInTheDocument();
   });
 });

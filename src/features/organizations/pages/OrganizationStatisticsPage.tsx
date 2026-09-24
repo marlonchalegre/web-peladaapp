@@ -1,29 +1,16 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import {
-  Container,
-  Typography,
-  Alert,
-  Box,
-  Button,
-  useMediaQuery,
-  useTheme,
-  Stack,
-} from "@mui/material";
-import FileUploadIcon from "@mui/icons-material/FileUpload";
-import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import { Container, Alert, Box, useMediaQuery, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import { useOrganizationStatistics } from "../hooks/useOrganizationStatistics";
 import { useAuth } from "../../../app/providers/AuthContext";
-import StatsFilters from "../components/StatsFilters";
-import StatsTable from "../components/StatsTable";
-import TopStatsCards from "../components/TopStatsCards";
 import ImportStatsDialog from "../components/ImportStatsDialog";
 import ExportStatsDialog from "../components/ExportStatsDialog";
+import OrganizationStatisticsDesktopView from "../components/OrganizationStatisticsDesktopView";
+import OrganizationStatisticsMobileView from "../components/OrganizationStatisticsMobileView";
 import { api } from "../../../shared/api/client";
-import { createApi } from "../../../shared/api/endpoints";
-import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
+import { createApi, type WeeklyPresence } from "../../../shared/api/endpoints";
 
 const endpoints = createApi(api);
 
@@ -32,7 +19,7 @@ export default function OrganizationStatisticsPage() {
   const { id } = useParams();
   const orgId = id!;
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const { user } = useAuth();
 
   const {
@@ -40,26 +27,32 @@ export default function OrganizationStatisticsPage() {
     year,
     setYear,
     error,
-    orderBy,
-    order,
     stats,
     sortedStats,
-    handleRequestSort,
     players,
     handleImport,
-    nameFilter,
-    setNameFilter,
-    minPeladas,
-    setMinPeladas,
-    minGoals,
-    setMinGoals,
-    minAssists,
-    setMinAssists,
   } = useOrganizationStatistics(orgId);
 
   const [importOpen, setImportOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [weeklyPresence, setWeeklyPresence] = useState<WeeklyPresence[]>([]);
+
+  useEffect(() => {
+    if (!orgId) return;
+    let active = true;
+    endpoints
+      .getWeeklyPresence(orgId, 12)
+      .then((data) => {
+        if (active) setWeeklyPresence(data);
+      })
+      .catch(() => {
+        if (active) setWeeklyPresence([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, [orgId]);
 
   useEffect(() => {
     if (!orgId || !user) return;
@@ -86,109 +79,65 @@ export default function OrganizationStatisticsPage() {
     );
   if (!org) return <Loading message={t("common.loading")} />;
 
-  return (
-    <Container
-      maxWidth="lg"
-      sx={{ py: { xs: 2, sm: 4 }, px: { xs: 1, sm: 2 } }}
-      disableGutters
-    >
-      <Box sx={{ px: { xs: 1, sm: 0 } }}>
-        <BreadcrumbNav
-          items={[
-            { label: org.name, path: `/organizations/${orgId}` },
-            { label: t("organizations.detail.button.statistics") },
-          ]}
+  const totalGoals = stats.reduce((acc, curr) => acc + (curr.goal || 0), 0);
+  const totalPeladas = stats.reduce(
+    (acc, curr) => Math.max(acc, curr.peladas_played || 0),
+    0,
+  );
+  const avgGoals =
+    totalPeladas > 0 ? (totalGoals / totalPeladas).toFixed(1) : "0";
+
+  if (isDesktop) {
+    return (
+      <Box sx={{ width: "100%", bgcolor: "#f6f4ee", minHeight: "100vh" }}>
+        <OrganizationStatisticsDesktopView
+          org={org}
+          stats={stats}
+          totalPeladas={totalPeladas}
+          totalGoals={totalGoals}
+          avgGoals={avgGoals}
+          year={year}
+          years={years}
+          onYearChange={setYear}
+          currentUser={user}
+          isAdmin={isAdmin}
+          onOpenImport={() => setImportOpen(true)}
+          onOpenExport={() => setExportOpen(true)}
+          weeklyPresence={weeklyPresence}
+        />
+        <ImportStatsDialog
+          open={importOpen}
+          onClose={() => setImportOpen(false)}
+          onImport={handleImport}
+          players={players}
+          defaultYear={year}
+        />
+        <ExportStatsDialog
+          open={exportOpen}
+          onClose={() => setExportOpen(false)}
+          stats={sortedStats}
+          year={year}
         />
       </Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: isMobile ? "column" : "row",
-          justifyContent: "space-between",
-          alignItems: isMobile ? "flex-start" : "center",
-          gap: 2,
-          mb: 4,
-          px: { xs: 1, sm: 0 },
-        }}
-      >
-        <Typography
-          variant={isMobile ? "h5" : "h4"}
-          sx={{
-            fontWeight: "bold",
-          }}
-        >
-          {t("organizations.stats.title", { name: org.name })}
-        </Typography>
+    );
+  }
 
-        <Stack direction="row" spacing={1}>
-          {isAdmin && (
-            <Button
-              variant="outlined"
-              onClick={() => setImportOpen(true)}
-              size="small"
-              data-testid="import-stats-button"
-              sx={{
-                borderRadius: 2,
-                textTransform: "none",
-                minWidth: { xs: "40px", sm: "auto" },
-                px: { xs: 0, sm: 2 },
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <FileUploadIcon sx={{ mr: { xs: 0, sm: 1 } }} />
-              <Box
-                component="span"
-                sx={{ display: { xs: "none", sm: "inline" } }}
-              >
-                {t("common.import")}
-              </Box>
-            </Button>
-          )}
-          <Button
-            variant="outlined"
-            onClick={() => setExportOpen(true)}
-            size="small"
-            sx={{
-              borderRadius: 2,
-              textTransform: "none",
-              minWidth: { xs: "40px", sm: "auto" },
-              px: { xs: 0, sm: 2 },
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <FileDownloadIcon sx={{ mr: { xs: 0, sm: 1 } }} />
-            <Box
-              component="span"
-              sx={{ display: { xs: "none", sm: "inline" } }}
-            >
-              {t("common.export")}
-            </Box>
-          </Button>
-        </Stack>
-      </Box>
-      <TopStatsCards stats={stats} />
-      <StatsFilters
-        nameFilter={nameFilter}
-        onNameFilterChange={setNameFilter}
-        minPeladas={minPeladas}
-        onMinPeladasChange={setMinPeladas}
-        minGoals={minGoals}
-        onMinGoalsChange={setMinGoals}
-        minAssists={minAssists}
-        onMinAssistsChange={setMinAssists}
+  return (
+    <Box sx={{ width: "100%", bgcolor: "#f6f4ee", minHeight: "100vh" }}>
+      <OrganizationStatisticsMobileView
+        org={org}
+        stats={stats}
+        totalPeladas={totalPeladas}
+        totalGoals={totalGoals}
+        avgGoals={avgGoals}
         year={year}
-        onYearChange={setYear}
         years={years}
-      />
-      <StatsTable
-        stats={sortedStats}
-        orderBy={orderBy}
-        order={order}
-        onSort={handleRequestSort}
+        onYearChange={setYear}
+        currentUser={user}
+        isAdmin={isAdmin}
+        onOpenImport={() => setImportOpen(true)}
+        onOpenExport={() => setExportOpen(true)}
+        weeklyPresence={weeklyPresence}
       />
       <ImportStatsDialog
         open={importOpen}
@@ -203,6 +152,6 @@ export default function OrganizationStatisticsPage() {
         stats={sortedStats}
         year={year}
       />
-    </Container>
+    </Box>
   );
 }

@@ -1,12 +1,12 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect, useMemo, type DragEvent } from "react";
-import { Container, Alert, Box, Grid } from "@mui/material";
+import { Container, Alert, useTheme, useMediaQuery } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
-import TeamsSection from "../components/TeamsSection";
-import AvailablePlayersPanel from "../components/AvailablePlayersPanel";
-import FixedGoalkeepersSection from "../components/FixedGoalkeepersSection";
+import { type PlayerWithUser } from "../components/TeamsSection";
 import DrawJustificationDialog from "../components/DrawJustificationDialog";
+import PeladaTeamsDesktopView from "../components/PeladaTeamsDesktopView";
+import PeladaTeamsMobileView from "../components/PeladaTeamsMobileView";
 import { usePeladaDetail } from "../hooks/usePeladaDetail";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { api } from "../../../shared/api/client";
@@ -15,19 +15,18 @@ import {
   type Player,
   type User,
 } from "../../../shared/api/endpoints";
-import PeladaDetailHeader from "../components/PeladaDetailHeader";
 import StartPeladaDialog from "../components/StartPeladaDialog";
 import SwapPlayerDialog from "../components/SwapPlayerDialog";
-import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
 import {
-  generateExportText,
   generateAnnouncementText,
   copyToClipboard,
 } from "../utils/exportUtils";
 
 export default function PeladaDetailPage() {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const { id } = useParams();
   const peladaId = id!;
   const { user } = useAuth();
@@ -43,11 +42,9 @@ export default function PeladaDetailPage() {
     benchPlayers,
     homeGk,
     awayGk,
-    votingInfo,
     scores,
     error,
     processing,
-    changingStatus,
     live,
     startDialogOpen,
     setStartDialogOpen,
@@ -60,22 +57,28 @@ export default function PeladaDetailPage() {
     removeFixedGk,
     handleRandomizeTeams,
     drawJustification,
-    dismissDrawJustification,
     handleBeginPelada,
     handleCreateTeam,
     handleDeleteTeam,
     handlePerformSwap: handlePerformSwapHook,
     handleToggleFixedGoalkeepers,
     handleUpdatePlayersPerTeam,
-    handleAddPlayersFromOrg,
+    handleUpdateNumTeams,
     handleMarkPaid,
     handleReversePayment,
-    allPlayerIdsInPelada,
     peladaTransactions,
   } = usePeladaDetail(peladaId);
 
+  const [justificationDialogOpen, setJustificationDialogOpen] = useState(false);
+
+  useEffect(() => {
+    if (drawJustification) {
+      setJustificationDialogOpen(true);
+    }
+  }, [drawJustification]);
+
   const [pendingSwap, setPendingSwap] = useState<{
-    incomingPlayer: Player & { user: User };
+    incomingPlayer: PlayerWithUser;
     targetTeamId: string;
     sourceTeamId: string | null;
   } | null>(null);
@@ -268,14 +271,6 @@ export default function PeladaDetailPage() {
     );
   if (!pelada) return <Loading message={t("common.loading")} />;
 
-  const handleCopyClipboard = async () => {
-    const text = generateExportText(teams, teamPlayers, scores);
-    const success = await copyToClipboard(text);
-    if (success) {
-      // alert(t("common.actions.copy_success", "Copied to clipboard!"));
-    }
-  };
-
   const handleCopyAnnouncement = async () => {
     const text = generateAnnouncementText(teams, teamPlayers);
     const success = await copyToClipboard(text);
@@ -284,50 +279,16 @@ export default function PeladaDetailPage() {
     }
   };
 
+  const handleStartPeladaClick = () => {
+    if (pelada.has_schedule_plan) {
+      setConfirmStartWithScheduleOpen(true);
+    } else {
+      setStartDialogOpen(true);
+    }
+  };
+
   return (
-    <Container
-      maxWidth="xl"
-      sx={{ pt: 2, pb: 4, px: { xs: 1, sm: 2 } }}
-      disableGutters
-    >
-      <Box sx={{ px: { xs: 1, sm: 0 }, mb: 1 }}>
-        <BreadcrumbNav
-          items={[
-            {
-              label: pelada.organization_name || t("common.organization"),
-              path: `/organizations/${pelada.organization_id}`,
-            },
-            { label: t("peladas.detail.title") },
-          ]}
-        />
-      </Box>
-      <PeladaDetailHeader
-        pelada={pelada}
-        votingInfo={votingInfo}
-        onStartClick={() => {
-          if (pelada.has_schedule_plan) {
-            setConfirmStartWithScheduleOpen(true);
-          } else {
-            setStartDialogOpen(true);
-          }
-        }}
-        onCopyClipboard={handleCopyClipboard}
-        onCopyAnnouncement={handleCopyAnnouncement}
-        onToggleFixedGk={handleToggleFixedGoalkeepers}
-        onUpdatePlayersPerTeam={handleUpdatePlayersPerTeam}
-        onRandomizeTeams={handleRandomizeTeams}
-        playersPerTeam={pelada.players_per_team || 5}
-        changingStatus={changingStatus}
-        processing={processing}
-        isAdminOverride={isAdmin}
-      />
-
-      <DrawJustificationDialog
-        open={Boolean(drawJustification)}
-        onClose={dismissDrawJustification}
-        justification={drawJustification}
-      />
-
+    <>
       <div
         className="sr-only"
         role="status"
@@ -337,76 +298,82 @@ export default function PeladaDetailPage() {
         {live}
       </div>
 
-      {pelada.status === "closed" &&
-        votingInfo &&
-        !votingInfo.can_vote &&
-        votingInfo.message && (
-          <Alert severity="info" sx={{ mb: 2 }}>
-            {votingInfo.message}
-          </Alert>
-        )}
+      {isDesktop ? (
+        <PeladaTeamsDesktopView
+          pelada={pelada}
+          teams={teams}
+          teamPlayers={teamPlayers}
+          benchPlayers={benchPlayers}
+          homeGk={homeGk}
+          awayGk={awayGk}
+          scores={scores}
+          isAdmin={isAdmin}
+          processing={processing}
+          onDragStartPlayer={onDragStartPlayer}
+          dropToTeam={handleDropToTeam}
+          dropToBench={dropToBench}
+          dropToFixedGk={dropToFixedGk}
+          removeFixedGk={removeFixedGk}
+          onMoveToTeam={handleMoveToTeam}
+          onSendToBench={handleSendToBench}
+          onMoveToFixedGk={handleMoveToFixedGk}
+          onRandomizeTeams={handleRandomizeTeams}
+          onUpdatePlayersPerTeam={handleUpdatePlayersPerTeam}
+          onUpdateNumTeams={handleUpdateNumTeams}
+          drawJustification={drawJustification}
+          onOpenJustificationDialog={() => setJustificationDialogOpen(true)}
+          onCreateTeam={handleCreateTeam}
+          onDeleteTeam={handleDeleteTeam}
+          onStartClick={handleStartPeladaClick}
+          onCopyAnnouncement={handleCopyAnnouncement}
+          onToggleFixedGk={handleToggleFixedGoalkeepers}
+          currentUser={user}
+          peladaTransactions={peladaTransactions}
+          onMarkPaid={handleMarkPaid}
+          onReversePayment={onReverseClick}
+        />
+      ) : (
+        <PeladaTeamsMobileView
+          pelada={pelada}
+          teams={teams}
+          teamPlayers={teamPlayers}
+          benchPlayers={benchPlayers}
+          homeGk={homeGk}
+          awayGk={awayGk}
+          scores={scores}
+          isAdmin={isAdmin}
+          processing={processing}
+          dropToTeam={handleDropToTeam}
+          dropToBench={dropToBench}
+          dropToFixedGk={dropToFixedGk}
+          onMoveToTeam={handleMoveToTeam}
+          onSendToBench={handleSendToBench}
+          onMoveToFixedGk={handleMoveToFixedGk}
+          onRemoveFixedGk={removeFixedGk}
+          onRandomizeTeams={handleRandomizeTeams}
+          onUpdatePlayersPerTeam={handleUpdatePlayersPerTeam}
+          onUpdateNumTeams={handleUpdateNumTeams}
+          drawJustification={drawJustification}
+          onOpenJustificationDialog={() => setJustificationDialogOpen(true)}
+          onCreateTeam={handleCreateTeam}
+          onDeleteTeam={handleDeleteTeam}
+          onStartClick={handleStartPeladaClick}
+          onCopyAnnouncement={handleCopyAnnouncement}
+          onToggleFixedGk={handleToggleFixedGoalkeepers}
+          currentUser={user}
+          peladaTransactions={peladaTransactions}
+          onMarkPaid={handleMarkPaid}
+          onReversePayment={onReverseClick}
+        />
+      )}
 
-      {/* Main Layout */}
-      <Grid container spacing={4}>
-        {/* Teams & GKs Section */}
-        <Grid size={{ xs: 12 }}>
-          {pelada.fixed_goalkeepers && (
-            <FixedGoalkeepersSection
-              homeGk={homeGk}
-              awayGk={awayGk}
-              onDrop={dropToFixedGk}
-              onRemove={removeFixedGk}
-              locked={pelada.status !== "open"}
-              isAdminOverride={isAdmin}
-              onDragStartPlayer={onDragStartPlayer}
-            />
-          )}
-
-          <TeamsSection
-            teams={teams}
-            teamPlayers={teamPlayers}
-            playersPerTeam={pelada.players_per_team ?? undefined}
-            creatingTeam={processing}
-            locked={pelada.status !== "open"}
-            organizationId={pelada.organization_id}
-            onCreateTeam={handleCreateTeam}
-            onDeleteTeam={handleDeleteTeam}
-            onDragStartPlayer={onDragStartPlayer}
-            dropToTeam={handleDropToTeam}
-            onMoveToTeam={handleMoveToTeam}
-            onSendToBench={handleSendToBench}
-            onMoveToFixedGk={handleMoveToFixedGk}
-            scores={scores}
-            isAdminOverride={isAdmin}
-            hasFixedGoalkeepers={!!pelada.fixed_goalkeepers}
-            peladaTransactions={peladaTransactions}
-            onMarkPaid={handleMarkPaid}
-            onReversePayment={onReverseClick}
-          />
-        </Grid>
-
-        {/* Bench Section at the bottom */}
-        <Grid size={{ xs: 12 }}>
-          <AvailablePlayersPanel
-            players={benchPlayers}
-            scores={scores}
-            onDropToBench={dropToBench}
-            onDragStartPlayer={(e, pid) => onDragStartPlayer(e, pid, null)}
-            onAddPlayersFromOrg={handleAddPlayersFromOrg}
-            organizationId={pelada.organization_id}
-            allPlayerIdsInPelada={allPlayerIdsInPelada}
-            locked={(pelada.status !== "open" && !isAdmin) || processing}
-            isAdmin={isAdmin}
-            peladaTransactions={peladaTransactions}
-            onMarkPaid={handleMarkPaid}
-            onReversePayment={onReverseClick}
-            teams={teams}
-            onMoveToTeam={handleMoveToTeam}
-            onMoveToFixedGk={handleMoveToFixedGk}
-            hasFixedGoalkeepers={!!pelada.fixed_goalkeepers}
-          />
-        </Grid>
-      </Grid>
+      <DrawJustificationDialog
+        open={justificationDialogOpen}
+        onClose={() => {
+          setJustificationDialogOpen(false);
+        }}
+        justification={drawJustification}
+      />
 
       <StartPeladaDialog
         open={startDialogOpen}
@@ -450,6 +417,6 @@ export default function PeladaDetailPage() {
         }
         onSwap={handlePerformSwap}
       />
-    </Container>
+    </>
   );
 }

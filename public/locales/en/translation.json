@@ -9,10 +9,23 @@
   },
   "navigation": {
     "home": "Home",
+    "groups": "Groups",
     "organizations": "Organizations",
     "users": "Users",
     "profile": "Profile",
-    "adminPanel": "Admin Panel"
+    "myCard": "My profile",
+    "myGroups": "See all my groups",
+    "adminPanel": "Admin Panel",
+    "navLabel": "Bottom navigation",
+    "home_short": "HOME",
+    "groups_short": "GROUPS",
+    "profile_short": "PROFILE",
+    "selectGroup": "Select group",
+    "switchLanguage": "Switch language",
+    "userMenu": "User menu"
+  },
+  "location": {
+    "open_in_google_maps": "Open \"{{location}}\" in Google Maps"
   },
   "auth": {
     "login": {
@@ -93,6 +106,10 @@
   },
   "common": {
     "locale_code": "en-US",
+    "theme": {
+      "light": "Light Mode",
+      "dark": "Dark Mode"
+    },
     "characteristics": {
       "title": "Player Characteristics",
       "passing": "Passing",
@@ -208,6 +225,9 @@
       "admin": "Administrator",
       "player": "Player"
     },
+    "sports": {
+      "football": "Football"
+    },
     "positions": {
       "goalkeeper": "Goalkeeper",
       "striker": "Striker",
@@ -231,6 +251,7 @@
     }
   },
   "home": {
+    "all_groups": "All groups",
     "blocked_message": "Your account is blocked. You cannot participate in peladas or see statistics, but you can access your profile.",
     "org_creation_disabled": "Organization creation is not allowed for your account.",
     "error": {
@@ -243,12 +264,59 @@
       "prefix": "Welcome, ",
       "subtitle": "Here is a summary of your activities."
     },
+    "filters": {
+      "all": "ALL"
+    },
+    "season": {
+      "title": "SEASON {{year}}",
+      "subtitle": "{{matches}} matches in {{groups}} groups · each sport has its own"
+    },
+    "carousel": {
+      "section_title": "YOUR WEEK",
+      "single_match": "match",
+      "plural_matches": "matches",
+      "pending": "pending",
+      "of_slots": "of",
+      "on_list": "on roster",
+      "on_roster_header": "ON ROSTER",
+      "presence_confirmed": "CONFIRMED",
+      "presence_declined": "Declined",
+      "matches": "matches",
+      "actions": {
+        "confirm_presence": "COUNT ME IN",
+        "cancel_presence": "Can't make it",
+        "view_list": "View list →",
+        "view_attendance": "View Attendance",
+        "confirm": "Confirm Attendance",
+        "vote": "Vote for MVP",
+        "running": "Follow Match",
+        "view": "View Details"
+      }
+    },
+    "needs_you": {
+      "title": "ACTION NEEDED",
+      "confirm_attendance": "Confirm attendance for match",
+      "upcoming_matches": "Upcoming matches soon",
+      "attendance_deadline": "pay attention to roster deadlines",
+      "mvp_vote": "MVP Voting",
+      "mvp_desc": "vote after each match"
+    },
     "stats": {
       "peladas_played": "Matches Played ({{year}})",
       "groups_active": "Active Groups",
-      "goals_assists": "Goals & Assists ({{year}})"
+      "goals_assists": "Goals & Assists ({{year}})",
+      "season_group_title": "Group Season",
+      "sport_mensalista": "FOOTBALL · MONTHLY",
+      "matches_short": "MATCHES",
+      "goals_short": "GOALS",
+      "assists_short": "ASSISTS",
+      "account_summary": "Account Summary",
+      "attendance": "Attendance",
+      "streak": "streak of {{count}} matches",
+      "my_profile": "My profile →"
     },
     "sections": {
+      "my_organizations": "MY GROUPS",
       "pending_invitations": {
         "title": "Pending Invitations",
         "invited_to_join": "You have been invited to join this organization."
@@ -280,6 +348,13 @@
     }
   },
   "organizations": {
+    "tabs": {
+      "agenda": "SCHEDULE",
+      "roster": "ROSTER",
+      "statistics": "STATISTICS",
+      "finance": "FINANCES",
+      "settings": "SETTINGS"
+    },
     "list": {
       "title": "Organizations",
       "loading": "Loading organizations...",
@@ -354,6 +429,9 @@
         "priority_limit_hours_help": "Hours before match. Leave blank or 0 for unlimited priority.",
         "default_max_players": "Default Max Players",
         "default_max_players_help": "Default max player capacity prefilled when creating new matches.",
+        "default_location": "Default Location",
+        "default_location_placeholder": "e.g. Arena Vila Nova · Q2",
+        "default_location_help": "Default venue or address prefilled when creating new matches. Supports OpenStreetMap search.",
         "save_success": "Settings saved successfully!",
         "save_error": "Error saving settings"
       },
@@ -533,6 +611,8 @@
     },
     "stats": {
       "title": "{{name}} - Statistics",
+      "title_short": "Statistics",
+      "season_title": "Season statistics",
       "cards": {
         "top_scorer": "Top Scorer",
         "top_assister": "Top Assister",
@@ -595,6 +675,8 @@
         "fixed_goalkeepers": "Fixed Goalkeepers",
         "max_players": "Max Players",
         "max_players_help": "Max player limit for this match (optional)",
+        "location": "Location",
+        "location_placeholder": "e.g. Arena Vila Nova · Q2",
         "submit": "Create pelada"
       }
     },
@@ -747,7 +829,9 @@
           "Game time soon, are you in?"
         ],
         "confirmed_msg": "You're in! See you on the pitch.",
-        "declined_msg": "Sad to hear you can't make it. Hope to see you next time!"
+        "declined_msg": "Sad to hear you can't make it. Hope to see you next time!",
+        "waitlist_msg": "You are on the waitlist.",
+        "waitlist_button": "Waitlist"
       },
       "status": {
         "confirmed": "Confirmed",
@@ -889,12 +973,12 @@
           "gemini": {
             "name": "Gemini",
             "tag": "Chemistry",
-            "description": "Balances overall, defensive and attacking strength from grades, votes and stats. With chemistry on, it breaks up winning cliques, spreads titles and droughts and rewards brand-new duos."
+            "description": "Balances the teams from grades, votes and stats, breaking up cliques and rewarding brand-new duos."
           },
           "gpt": {
-            "name": "GPT",
+            "name": "ChatGPT",
             "tag": "Tactical Balance",
-            "description": "Applies rules in order: one reference per team, team averages within tolerance, little-observed players spread out, midfield levelled."
+            "description": "Applies rules in order: one reference per team, balanced averages, little-observed players spread out, midfield levelled."
           }
         }
       }
@@ -996,8 +1080,21 @@
         "confirm_notify_desc": "Do you want to send the full support lineup to the WhatsApp group mentioning each designated player per match?",
         "confirm_notify_action": "Send Notification",
         "notify_success": "Notification sent successfully to WhatsApp group!",
-        "notify_error": "Error sending support lineup notification"
-      }
+        "notify_error": "Error sending support lineup notification",
+        "view_escalation": "Lineup"
+      },
+      "match_x_of_y": "MATCH {{n}} OF {{m}}",
+      "who_scored": "Who scored?",
+      "who_scored_own_goal": "Who scored the own goal?",
+      "own_goal_btn": "OWN GOAL",
+      "own_goal_unidentified": "UNIDENTIFIED OWN GOAL",
+      "goal_unidentified": "UNIDENTIFIED GOAL",
+      "defending_team_players": "Player from {{team}}",
+      "goal_sheet_title": "GOAL FOR {{team}} · {{time}}",
+      "event_sheet_title": "LOG EVENT · {{time}}",
+      "event_what": "What was the play?",
+      "event_who": "Who made the play?",
+      "own_goal_skip": "OWN GOAL / UNIDENTIFIED"
     },
     "voting": {
       "title": "Voting for Pelada",
@@ -1084,6 +1181,33 @@
         "go_to_next": "Next Match",
         "all_matches_finished": "All Matches Finished",
         "last_match_desc": "All scheduled matches have been played. Would you like to close the pelada?"
+      },
+      "live_state": {
+        "session": "SESSION",
+        "running": "IN PROGRESS",
+        "paused": "PAUSED",
+        "pause": "PAUSE",
+        "resume": "RESUME",
+        "reset": "RESET",
+        "reset_match_timer": "Reset match timer",
+        "options": "Options",
+        "players_on_field": "ON THE FIELD",
+        "other_event": "OTHER EVENT",
+        "other_event_hint": "DRIBBLE · SHOT · FOUL · SAVE",
+        "live_standings": "LIVE STANDINGS",
+        "table_button": "TABLE",
+        "sumula_button": "REPORT",
+        "end_match": "END",
+        "swap_button": "SWAP",
+        "swap_hint": "tap ⇄ to substitute",
+        "on_field": "ON THE FIELD",
+        "view_timeline": "VIEW FULL TIMELINE",
+        "records_count": "{{count}} records",
+        "no_events": "No events recorded yet",
+        "support_label": "SUPORTE",
+        "end_match_full": "END MATCH",
+        "reset_session_timer": "Reset session timer",
+        "other_event_short": "DRIBBLE, SHOT, FOUL…"
       }
     },
     "panel": {

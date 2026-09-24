@@ -62,6 +62,30 @@ describe("UserAttendanceStatus", () => {
 
     fireEvent.click(screen.getByTestId("attendance-decline-button"));
     expect(onUpdate).toHaveBeenCalledWith("declined");
+
+    fireEvent.click(screen.getByTestId("attendance-waitlist-button"));
+    expect(onUpdate).toHaveBeenCalledWith("waitlist");
+  });
+
+  it("shows active state when on the waitlist", () => {
+    const waitlistPlayer = {
+      ...mockPlayer,
+      attendance_status: "waitlist" as const,
+    };
+    render(
+      <ThemeContextProvider>
+        <UserAttendanceStatus
+          player={waitlistPlayer as PlayerWithUser}
+          isUpdating={false}
+          onUpdate={() => {}}
+        />
+      </ThemeContextProvider>,
+    );
+
+    const waitlistButton = screen.getByTestId("attendance-waitlist-button");
+    expect(waitlistButton).toHaveStyle({
+      backgroundColor: "rgb(168, 69, 42)",
+    });
   });
 
   it("shows active state when confirmed", () => {
@@ -83,9 +107,9 @@ describe("UserAttendanceStatus", () => {
       screen.getByText("peladas.attendance.user_status.confirmed_msg"),
     ).toBeInTheDocument();
     const confirmButton = screen.getByTestId("attendance-confirm-button");
-    // Check if it has the white background style (active)
+    // Check if it has the active green style
     expect(confirmButton).toHaveStyle({
-      backgroundColor: "rgb(255, 255, 255)",
+      backgroundColor: "rgb(20, 107, 58)",
     });
   });
 
@@ -108,9 +132,9 @@ describe("UserAttendanceStatus", () => {
       screen.getByText("peladas.attendance.user_status.declined_msg"),
     ).toBeInTheDocument();
     const declineButton = screen.getByTestId("attendance-decline-button");
-    // Check if it has the white background style (active)
+    // Check if it has the active terracotta style
     expect(declineButton).toHaveStyle({
-      backgroundColor: "rgb(255, 255, 255)",
+      backgroundColor: "rgb(168, 69, 42)",
     });
   });
 
@@ -128,12 +152,12 @@ describe("UserAttendanceStatus", () => {
     const confirmButton = screen.getByTestId("attendance-confirm-button");
     const declineButton = screen.getByTestId("attendance-decline-button");
 
-    // Neither button should have a white background
+    // Neither button should be active
     expect(confirmButton).not.toHaveStyle({
-      backgroundColor: "rgb(255, 255, 255)",
+      backgroundColor: "rgb(20, 107, 58)",
     });
     expect(declineButton).not.toHaveStyle({
-      backgroundColor: "rgb(255, 255, 255)",
+      backgroundColor: "rgb(168, 69, 42)",
     });
   });
 

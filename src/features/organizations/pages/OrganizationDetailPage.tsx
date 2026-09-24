@@ -1,57 +1,55 @@
 import { useEffect, useState, useCallback } from "react";
-import { Link as RouterLink, useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Container,
-  Typography,
   Alert,
-  TablePagination,
   Box,
   Button,
-  Paper,
-  Stack,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogContentText,
   DialogActions,
+  useTheme,
+  useMediaQuery,
 } from "@mui/material";
-import AssessmentIcon from "@mui/icons-material/Assessment";
-import SettingsIcon from "@mui/icons-material/Settings";
-import ExitToAppIcon from "@mui/icons-material/ExitToApp";
-import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
-import HourglassTopIcon from "@mui/icons-material/HourglassTop";
-import Chip from "@mui/material/Chip";
 import { api } from "../../../shared/api/client";
 import {
   createApi,
   type Pelada,
   type Organization,
   type OrganizationFeatureFlags,
+  type OrganizationPlayerStats,
   type Player,
   type MonthlyWaitlistStatus,
+  type PeladaHistoryEntry,
 } from "../../../shared/api/endpoints";
 import { useAuth } from "../../../app/providers/AuthContext";
-import CreatePeladaForm from "../components/CreatePeladaForm";
-import PeladasTable from "../components/PeladasTable";
+import OrganizationDetailDesktopView from "../components/OrganizationDetailDesktopView";
+import OrganizationDetailMobileView from "../components/OrganizationDetailMobileView";
 import { ConfirmDeletePeladaDialog } from "../../admin/components/ConfirmDeletePeladaDialog";
 import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
-import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 import { getLocalizedErrorMessage } from "../../../shared/utils/error-handler";
 
 const endpoints = createApi(api);
 
 export default function OrganizationDetailPage() {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const { id } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
   const orgId = id!;
   const [org, setOrg] = useState<Organization | null>(null);
   const [peladas, setPeladas] = useState<Pelada[]>([]);
+  const [historyByPelada, setHistoryByPelada] = useState<
+    Record<string, PeladaHistoryEntry>
+  >({});
   const [totalPeladas, setTotalPeladas] = useState(0);
-  const [page, setPage] = useState(0);
+  const [playersCount, setPlayersCount] = useState(24);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -63,8 +61,11 @@ export default function OrganizationDetailPage() {
   const [featureFlags, setFeatureFlags] =
     useState<OrganizationFeatureFlags | null>(null);
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [memberStats, setMemberStats] = useState<OrganizationPlayerStats[]>([]);
   const [waitlistStatus, setWaitlistStatus] =
     useState<MonthlyWaitlistStatus | null>(null);
+  const [orgWaitlistCount, setOrgWaitlistCount] = useState(0);
   const [waitlistLoading, setWaitlistLoading] = useState(false);
   const [leaveWaitlistConfirmOpen, setLeaveWaitlistConfirmOpen] =
     useState(false);
@@ -119,8 +120,12 @@ export default function OrganizationDetailPage() {
     // Load player and waitlist status
     endpoints
       .listPlayersByOrg(orgId)
-      .then((players) => {
-        const me = players.find((p) => String(p.user_id) === String(user.id));
+      .then((orgPlayers) => {
+        setPlayers(orgPlayers);
+        setPlayersCount(orgPlayers.length);
+        const me = orgPlayers.find(
+          (p) => String(p.user_id) === String(user.id),
+        );
         setCurrentPlayer(me || null);
         if (
           me &&
@@ -143,12 +148,8 @@ export default function OrganizationDetailPage() {
   const fetchPeladas = useCallback(async () => {
     if (!orgId) return;
     try {
-      // API uses 1-based page index, MUI uses 0-based
-      const response = await endpoints.listPeladasByOrg(
-        orgId,
-        page + 1,
-        rowsPerPage,
-      );
+      // The agenda always loads from the first page and grows via "ver mais".
+      const response = await endpoints.listPeladasByOrg(orgId, 1, rowsPerPage);
       setPeladas(response.data);
       setTotalPeladas(response.total);
     } catch (error: unknown) {
@@ -160,7 +161,7 @@ export default function OrganizationDetailPage() {
         ),
       );
     }
-  }, [orgId, page, rowsPerPage, t]);
+  }, [orgId, rowsPerPage, t]);
 
   useEffect(() => {
     const load = async () => {
@@ -169,15 +170,65 @@ export default function OrganizationDetailPage() {
     load();
   }, [fetchPeladas]);
 
-  const handleChangePage = (_event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
+  useEffect(() => {
+    if (!orgId) return;
+    let active = true;
+    endpoints
+      .getOrganizationHistory(orgId)
+      .then((entries) => {
+        if (!active) return;
+        setHistoryByPelada(
+          Object.fromEntries(entries.map((entry) => [entry.id, entry])),
+        );
+      })
+      .catch(() => {
+        if (active) setHistoryByPelada({});
+      });
+    return () => {
+      active = false;
+    };
+  }, [orgId, peladas.length]);
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+  useEffect(() => {
+    if (!orgId || isAdmin || featureFlags?.org_statistics === false) {
+      setMemberStats([]);
+      return;
+    }
+    let active = true;
+    endpoints
+      .getOrganizationStatistics(orgId, new Date().getFullYear())
+      .then((data) => {
+        if (active) setMemberStats(Array.isArray(data) ? data : []);
+      })
+      .catch(() => {
+        if (active) setMemberStats([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, [orgId, isAdmin, featureFlags?.org_statistics]);
+
+  useEffect(() => {
+    if (!orgId || !isAdmin) {
+      setOrgWaitlistCount(0);
+      return;
+    }
+    let active = true;
+    endpoints
+      .listMonthlyWaitlist(orgId)
+      .then((list) => {
+        if (active) setOrgWaitlistCount(list.length);
+      })
+      .catch(() => {
+        if (active) setOrgWaitlistCount(0);
+      });
+    return () => {
+      active = false;
+    };
+  }, [orgId, isAdmin]);
+
+  const handleLoadMore = () => {
+    setRowsPerPage((prev) => prev + 10);
   };
 
   const confirmLeave = async () => {
@@ -247,233 +298,86 @@ export default function OrganizationDetailPage() {
     );
   if (!org) return <Loading message={t("common.loading")} />;
 
+  if (isDesktop) {
+    return (
+      <Box sx={{ width: "100%", bgcolor: "#f6f4ee", minHeight: "100vh" }}>
+        <OrganizationDetailDesktopView
+          org={org}
+          peladas={peladas}
+          totalPeladas={totalPeladas}
+          isAdmin={isAdmin}
+          playersCount={playersCount}
+          waitlistCount={orgWaitlistCount}
+          historyByPelada={historyByPelada}
+          onCreatePeladaSuccess={fetchPeladas}
+          onCreatePeladaQuick={async (data) => {
+            const scheduledAt = new Date(
+              `${data.date}T${data.time}:00`,
+            ).toISOString();
+            await endpoints.createPelada({
+              organization_id: orgId,
+              scheduled_at: scheduledAt,
+              max_players: data.maxPlayers,
+              location: data.location || undefined,
+              notify_casual_players: true,
+            });
+            await fetchPeladas();
+          }}
+        />
+      </Box>
+    );
+  }
+
   return (
-    <Container
-      maxWidth="lg"
-      sx={{ py: { xs: 2, sm: 4 }, px: { xs: 1, sm: 2 } }}
-      disableGutters
-    >
-      <Box sx={{ px: { xs: 1, sm: 0 } }}>
-        <BreadcrumbNav items={[{ label: org.name }]} />
-      </Box>
-      {/* Header */}
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          mb: 4,
-          flexDirection: { xs: "column", sm: "row" },
-          gap: 2,
-          px: { xs: 1, sm: 0 },
+    <Box sx={{ width: "100%", bgcolor: "#f6f4ee", minHeight: "100vh" }}>
+      {org.is_blocked && (
+        <Alert
+          severity="warning"
+          data-testid="org-blocked-banner"
+          sx={{ mx: 2, mt: 2 }}
+        >
+          {t(
+            "organizations.detail.blocked_warning",
+            "Esta organização está bloqueada pelo administrador do sistema e não pode realizar novas peladas.",
+          )}
+        </Alert>
+      )}
+
+      <OrganizationDetailMobileView
+        org={org}
+        peladas={peladas}
+        totalPeladas={totalPeladas}
+        historyByPelada={historyByPelada}
+        players={players}
+        isAdmin={isAdmin}
+        featureFlags={featureFlags}
+        waitlistStatus={waitlistStatus}
+        waitlistLoading={waitlistLoading}
+        currentPlayer={currentPlayer}
+        currentUser={user}
+        memberStats={memberStats}
+        onJoinWaitlist={handleJoinWaitlist}
+        onLeaveWaitlist={() => setLeaveWaitlistConfirmOpen(true)}
+        onCreatePelada={async (payload) => {
+          try {
+            const newPelada = await endpoints.createPelada(payload);
+            navigate(`/peladas/${newPelada.id}/attendance`);
+          } catch (error: unknown) {
+            const message =
+              error instanceof Error
+                ? error.message
+                : t("organizations.detail.error.create_pelada_failed");
+            setError(message);
+          }
         }}
-      >
-        <Box>
-          <Typography
-            variant="h4"
-            component="h1"
-            sx={{
-              color: "primary.main",
-              fontWeight: "bold",
-            }}
-          >
-            {org.name}
-          </Typography>
-          {currentPlayer &&
-            currentPlayer.member_type !== "mensalista" &&
-            currentPlayer.member_type !== "mensalista_temporario" &&
-            waitlistStatus !== null && (
-              <Box
-                sx={{
-                  mt: 1,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1,
-                  flexWrap: "wrap",
-                }}
-              >
-                {waitlistStatus.in_queue ? (
-                  <>
-                    <Chip
-                      icon={<HourglassTopIcon />}
-                      label={t("organizations.detail.waitlist.in_queue_badge")}
-                      color="primary"
-                      variant="outlined"
-                      size="small"
-                      data-testid="waitlist-in-queue-badge"
-                    />
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      size="small"
-                      onClick={() => setLeaveWaitlistConfirmOpen(true)}
-                      disabled={waitlistLoading}
-                      data-testid="leave-waitlist-button"
-                      sx={{ textTransform: "none", py: 0.25 }}
-                    >
-                      {t("organizations.detail.waitlist.leave_button")}
-                    </Button>
-                  </>
-                ) : (
-                  <Button
-                    variant="outlined"
-                    color="primary"
-                    size="small"
-                    startIcon={<FormatListNumberedIcon />}
-                    onClick={handleJoinWaitlist}
-                    disabled={waitlistLoading}
-                    data-testid="join-waitlist-button"
-                    sx={{ textTransform: "none" }}
-                  >
-                    {t("organizations.detail.waitlist.candidate_button")}
-                  </Button>
-                )}
-              </Box>
-            )}
-        </Box>
-        <Stack direction="row" spacing={1}>
-          <Button
-            {...(featureFlags?.org_statistics !== false
-              ? {
-                  component: RouterLink,
-                  to: `/organizations/${orgId}/statistics`,
-                }
-              : { disabled: true })}
-            variant="outlined"
-            data-testid="org-statistics-button"
-            data-analytics-id="view-org-statistics-btn"
-            sx={{
-              minWidth: { xs: "40px", sm: "auto" },
-              px: { xs: 0, sm: 2 },
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              textTransform: "none",
-            }}
-          >
-            <AssessmentIcon sx={{ mr: { xs: 0, sm: 1 } }} />
-            <Box
-              component="span"
-              sx={{ display: { xs: "none", sm: "inline" } }}
-            >
-              {t("organizations.detail.button.statistics")}
-            </Box>
-          </Button>
-          {!isAdmin && (
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={() => setLeaveDialogOpen(true)}
-              data-testid="leave-org-button"
-              data-analytics-id="leave-org-btn"
-              sx={{
-                minWidth: { xs: "40px", sm: "auto" },
-                px: { xs: 0, sm: 2 },
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                textTransform: "none",
-              }}
-            >
-              <ExitToAppIcon sx={{ mr: { xs: 0, sm: 1 } }} />
-              <Box
-                component="span"
-                sx={{ display: { xs: "none", sm: "inline" } }}
-              >
-                {t("organizations.detail.button.leave", "Sair da Organização")}
-              </Box>
-            </Button>
-          )}
-          {isAdmin && (
-            <Button
-              component={RouterLink}
-              to={`/organizations/${orgId}/management`}
-              variant="outlined"
-              color="primary"
-              data-testid="org-management-button"
-              data-analytics-id="manage-org-btn"
-              sx={{
-                minWidth: { xs: "40px", sm: "auto" },
-                px: { xs: 0, sm: 2 },
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                textTransform: "none",
-              }}
-            >
-              <SettingsIcon sx={{ mr: { xs: 0, sm: 1 } }} />
-              <Box
-                component="span"
-                sx={{ display: { xs: "none", sm: "inline" } }}
-              >
-                {t("organizations.detail.button.management")}
-              </Box>
-            </Button>
-          )}
-        </Stack>
-      </Box>
-      <Stack spacing={4}>
-        {org.is_blocked && (
-          <Alert severity="warning" data-testid="org-blocked-banner">
-            {t(
-              "organizations.detail.blocked_warning",
-              "Esta organização está bloqueada pelo administrador do sistema e não pode realizar novas peladas.",
-            )}
-          </Alert>
-        )}
+        onDeletePelada={(pelada) => {
+          setPeladaToDelete(pelada);
+          setDeleteDialogOpen(true);
+        }}
+        onLeaveOrg={() => setLeaveDialogOpen(true)}
+        onLoadMore={handleLoadMore}
+      />
 
-        {/* Create Pelada Section */}
-        {isAdmin && !org.is_blocked && (
-          <Paper variant="outlined" sx={{ p: 3 }}>
-            <Typography variant="h5" gutterBottom>
-              {t("organizations.detail.section.new_pelada")}
-            </Typography>
-            <CreatePeladaForm
-              organizationId={orgId}
-              defaultMaxPlayers={org.default_max_players}
-              onCreate={async (payload) => {
-                try {
-                  const newPelada = await endpoints.createPelada(payload);
-                  // Navigate directly to the attendance list for the new pelada
-                  navigate(`/peladas/${newPelada.id}/attendance`);
-                } catch (error: unknown) {
-                  const message =
-                    error instanceof Error
-                      ? error.message
-                      : t("organizations.detail.error.create_pelada_failed");
-                  setError(message);
-                }
-              }}
-            />
-          </Paper>
-        )}
-
-        {/* Pelada List Section */}
-        <Paper variant="outlined">
-          <PeladasTable
-            peladas={peladas}
-            onDelete={
-              isAdmin
-                ? async (id) => {
-                    const p = peladas.find((item) => item.id === id) || null;
-                    setPeladaToDelete(p);
-                    setDeleteDialogOpen(true);
-                  }
-                : undefined
-            }
-          />
-          <TablePagination
-            component="div"
-            count={totalPeladas}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            labelRowsPerPage={t("common.pagination.rows_per_page")}
-            sx={{ borderTop: 1, borderColor: "divider" }}
-          />
-        </Paper>
-      </Stack>
       {/* Confirmation Dialog */}
       <Dialog
         open={leaveDialogOpen}
@@ -549,6 +453,6 @@ export default function OrganizationDetailPage() {
         onConfirm={handleLeaveWaitlist}
         onClose={() => setLeaveWaitlistConfirmOpen(false)}
       />
-    </Container>
+    </Box>
   );
 }

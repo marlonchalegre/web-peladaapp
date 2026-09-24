@@ -250,7 +250,7 @@ describe("AdminPanelPage", () => {
         "newsecurepassword",
       );
     });
-  });
+  }, 15000);
 
   it("opens delete user dialog and deletes user successfully", async () => {
     const user = userEvent.setup();

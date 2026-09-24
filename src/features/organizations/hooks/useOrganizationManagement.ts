@@ -62,11 +62,13 @@ export function useOrganizationManagement(orgId: string) {
         const { token } = await endpoints.getInviteLink(orgId);
         setPublicInviteLink(`${window.location.origin}/join/${token}`);
       } catch (err) {
-        const message =
-          err instanceof Error
-            ? err.message
-            : t("organizations.error.fetch_invite_link_failed");
-        setError(message);
+        if (!silent) {
+          const message =
+            err instanceof Error
+              ? err.message
+              : t("organizations.error.fetch_invite_link_failed");
+          setError(message);
+        }
       } finally {
         if (!silent) setActionLoading(false);
       }
@@ -103,7 +105,10 @@ export function useOrganizationManagement(orgId: string) {
           endpoints.getOrganization(orgId),
           endpoints.listPlayersByOrg(orgId),
           endpoints.listAdminsByOrganization(orgId),
-          endpoints.listOrganizationInvitations(orgId),
+          endpoints.listOrganizationInvitations(orgId).catch((err) => {
+            console.warn("Non-admin or failed to fetch invitations", err);
+            return [] as OrganizationInvitation[];
+          }),
           (endpoints.listSubstitutions?.(orgId) ?? Promise.resolve([])).catch(
             (err) => {
               console.error("Failed to fetch substitutions", err);

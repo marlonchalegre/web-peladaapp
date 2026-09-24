@@ -52,7 +52,8 @@ export function isMatchActive(m: Match): boolean {
     status === "finished" ||
     status === "running" ||
     timerStatus === "running" ||
-    (timerStatus === "paused" && (m.timer_accumulated_ms ?? 0) > 0)
+    (timerStatus === "paused" && (m.timer_accumulated_ms ?? 0) > 0) ||
+    (m.home_score ?? 0) + (m.away_score ?? 0) > 0
   );
 }
 

@@ -6,10 +6,7 @@ import {
   Typography,
   Button,
   CircularProgress,
-  useTheme,
 } from "@mui/material";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CancelIcon from "@mui/icons-material/Cancel";
 import { useTranslation } from "react-i18next";
 import type { AttendanceStatus } from "../../../shared/api/endpoints";
 import type { PlayerWithUser } from "../hooks/useAttendance";
@@ -26,89 +23,8 @@ export default function UserAttendanceStatus({
   onUpdate,
 }: UserAttendanceStatusProps) {
   const { t } = useTranslation();
-  const theme = useTheme();
   const firstName = (player.user?.name || "").split(" ")[0];
   const [promptSeed] = useState(() => Math.floor(Math.random() * 1000));
-
-  const getYesButtonStyles = () => {
-    const status = player.attendance_status;
-    const attendance = theme.palette.attendance || {
-      button: {
-        confirmed: {
-          bg: "#ffffff",
-          text: theme.palette.success?.main || "#2e7d32",
-          border: "none",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-          icon: theme.palette.success?.main || "#2e7d32",
-          hoverBg: "rgba(255, 255, 255, 0.9)",
-        },
-        dimmed: {
-          bg: "rgba(255, 255, 255, 0.1)",
-          text: "rgba(255, 255, 255, 0.6)",
-          border: "1px solid rgba(255, 255, 255, 0.2)",
-          boxShadow: "none",
-          icon: "rgba(255, 255, 255, 0.6)",
-          hoverBg: "rgba(255, 255, 255, 0.2)",
-        },
-        pending: {
-          bg: "rgba(255, 255, 255, 0.15)",
-          text: "#ffffff",
-          border: "1px solid rgba(255, 255, 255, 0.3)",
-          boxShadow: "none",
-          icon: "#ffffff",
-          hoverBg: "rgba(255, 255, 255, 0.25)",
-        },
-      },
-    };
-
-    if (status === "confirmed") {
-      return attendance.button.confirmed;
-    } else if (status === "declined" || status === "waitlist") {
-      return attendance.button.dimmed;
-    } else {
-      return attendance.button.pending;
-    }
-  };
-
-  const getNoButtonStyles = () => {
-    const status = player.attendance_status;
-    const attendance = theme.palette.attendance || {
-      button: {
-        declined: {
-          bg: "#ffffff",
-          text: theme.palette.error?.main || "#d32f2f",
-          border: "none",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-          icon: theme.palette.error?.main || "#d32f2f",
-          hoverBg: "rgba(255, 255, 255, 0.9)",
-        },
-        dimmed: {
-          bg: "rgba(255, 255, 255, 0.1)",
-          text: "rgba(255, 255, 255, 0.6)",
-          border: "1px solid rgba(255, 255, 255, 0.2)",
-          boxShadow: "none",
-          icon: "rgba(255, 255, 255, 0.6)",
-          hoverBg: "rgba(255, 255, 255, 0.2)",
-        },
-        pending: {
-          bg: "rgba(255, 255, 255, 0.15)",
-          text: "#ffffff",
-          border: "1px solid rgba(255, 255, 255, 0.3)",
-          boxShadow: "none",
-          icon: "#ffffff",
-          hoverBg: "rgba(255, 255, 255, 0.25)",
-        },
-      },
-    };
-
-    if (status === "declined") {
-      return attendance.button.declined;
-    } else if (status === "confirmed" || status === "waitlist") {
-      return attendance.button.dimmed;
-    } else {
-      return attendance.button.pending;
-    }
-  };
 
   const getStatusMessage = () => {
     switch (player.attendance_status) {
@@ -138,122 +54,184 @@ export default function UserAttendanceStatus({
     <Paper
       elevation={0}
       sx={{
-        p: { xs: 2, sm: 4 },
-        mb: 4,
-        borderRadius: 4,
-        bgcolor:
-          player.attendance_status === "declined"
-            ? "grey.800"
-            : player.attendance_status === "waitlist"
-              ? "warning.main"
-              : "primary.main",
-        color: "white",
-        backgroundImage:
-          "linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%)",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
-        transition: "all 0.3s ease",
+        p: { xs: 2.5, sm: 3 },
+        mb: 3,
+        borderRadius: "18px",
+        bgcolor: "#ffffff",
+        border: "2px solid #17181a",
+        boxShadow: "5px 5px 0 #17181a",
+        color: "#17181a",
       }}
     >
-      <Stack
-        direction={{ xs: "column", md: "row" }}
+      <Typography
         sx={{
-          justifyContent: "space-between",
-          alignItems: { xs: "flex-start", md: "center" },
-          gap: 3,
+          font: "700 9.5px/1 Archivo,sans-serif",
+          letterSpacing: ".18em",
+          color: "#6b675c",
+          mb: 1,
+          textTransform: "uppercase",
         }}
       >
-        <Box>
-          <Typography
-            variant="h4"
-            sx={{
-              fontWeight: 800,
-              mb: 0.5,
-              letterSpacing: -0.5,
-            }}
-          >
-            {t("common.hello")}, {firstName}! 👋
-          </Typography>
-          <Typography variant="body1" sx={{ opacity: 0.9, fontWeight: 500 }}>
-            {getStatusMessage()}
-          </Typography>
-        </Box>
-        <Stack
-          direction="row"
-          spacing={2}
-          sx={{ width: { xs: "100%", md: "auto" } }}
+        SUA PRESENÇA
+      </Typography>
+
+      <Box sx={{ mb: 2 }}>
+        <Typography
+          variant="h5"
+          sx={{
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 800,
+            fontSize: { xs: "20px", sm: "22px" },
+            lineHeight: 1.15,
+            mb: 0.5,
+            letterSpacing: -0.5,
+            color: "#17181a",
+          }}
         >
-          <Button
-            fullWidth
-            variant="contained"
-            color="inherit"
-            startIcon={
-              isUpdating && player.attendance_status !== "confirmed" ? (
-                <CircularProgress size={20} color="primary" />
-              ) : (
-                <CheckCircleIcon />
-              )
-            }
-            onClick={() => onUpdate("confirmed")}
-            disabled={isUpdating}
-            data-testid="attendance-confirm-button"
-            sx={{
-              borderRadius: 3,
-              py: 1.5,
-              px: 3,
-              textTransform: "none",
-              fontWeight: 800,
-              bgcolor: getYesButtonStyles().bg,
-              color: getYesButtonStyles().text,
-              border: getYesButtonStyles().border,
-              boxShadow: getYesButtonStyles().boxShadow,
-              "& .MuiButton-startIcon": {
-                color: getYesButtonStyles().icon,
-              },
-              "&:hover": {
-                bgcolor: getYesButtonStyles().hoverBg,
-              },
-              transition: "all 0.2s ease",
-            }}
-          >
-            {t("peladas.attendance.button.confirm")}
-          </Button>
-          <Button
-            fullWidth
-            variant="contained"
-            color="inherit"
-            startIcon={
-              isUpdating && player.attendance_status !== "declined" ? (
-                <CircularProgress size={20} color="inherit" />
-              ) : (
-                <CancelIcon />
-              )
-            }
-            onClick={() => onUpdate("declined")}
-            disabled={isUpdating}
-            data-testid="attendance-decline-button"
-            sx={{
-              borderRadius: 3,
-              py: 1.5,
-              px: 3,
-              textTransform: "none",
-              fontWeight: 800,
-              bgcolor: getNoButtonStyles().bg,
-              color: getNoButtonStyles().text,
-              border: getNoButtonStyles().border,
-              boxShadow: getNoButtonStyles().boxShadow,
-              "& .MuiButton-startIcon": {
-                color: getNoButtonStyles().icon,
-              },
-              "&:hover": {
-                bgcolor: getNoButtonStyles().hoverBg,
-              },
-              transition: "all 0.2s ease",
-            }}
-          >
-            {t("peladas.attendance.button.decline")}
-          </Button>
-        </Stack>
+          Bora pro jogo?
+        </Typography>
+        <Typography
+          variant="body2"
+          sx={{
+            fontFamily: "Archivo, sans-serif",
+            color: "#6b675c",
+            fontWeight: 600,
+            lineHeight: 1.4,
+            fontSize: "12px",
+          }}
+        >
+          <span style={{ display: "none" }}>
+            {t("common.hello")}, {firstName}!
+          </span>
+          {player.member_type === "mensalista" ? (
+            <>
+              Você é mensalista: sua vaga fica garantida até{" "}
+              <strong style={{ color: "#17181a" }}>terça, 22h</strong>.
+            </>
+          ) : (
+            getStatusMessage()
+          )}
+        </Typography>
+      </Box>
+
+      <Stack direction="row" spacing={1.5} sx={{ width: "100%", mt: 1 }}>
+        <Button
+          fullWidth
+          variant="contained"
+          startIcon={
+            isUpdating && player.attendance_status !== "confirmed" ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : null
+          }
+          onClick={() => onUpdate("confirmed")}
+          disabled={isUpdating}
+          data-testid="attendance-confirm-button"
+          sx={{
+            borderRadius: "14px",
+            py: 1.75,
+            textTransform: "uppercase",
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 800,
+            fontSize: "17px",
+            letterSpacing: ".06em",
+            bgcolor:
+              player.attendance_status === "confirmed" ? "#146b3a" : "#ffffff",
+            color:
+              player.attendance_status === "confirmed" ? "#ffffff" : "#146b3a",
+            border:
+              player.attendance_status === "confirmed"
+                ? 0
+                : "2px solid #146b3a",
+            boxShadow:
+              player.attendance_status === "confirmed"
+                ? "0 3px 0 #0d4526"
+                : "none",
+            "&:hover": {
+              bgcolor:
+                player.attendance_status === "confirmed"
+                  ? "#0e5c31"
+                  : "#f6f4ee",
+            },
+            transition: "all 0.15s ease",
+          }}
+        >
+          SIM
+        </Button>
+        <Button
+          fullWidth
+          variant="contained"
+          startIcon={
+            isUpdating && player.attendance_status !== "declined" ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : null
+          }
+          onClick={() => onUpdate("declined")}
+          disabled={isUpdating}
+          data-testid="attendance-decline-button"
+          sx={{
+            borderRadius: "14px",
+            py: 1.75,
+            textTransform: "uppercase",
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 800,
+            fontSize: "17px",
+            letterSpacing: ".06em",
+            bgcolor:
+              player.attendance_status === "declined" ? "#a8452a" : "#ffffff",
+            color:
+              player.attendance_status === "declined" ? "#ffffff" : "#6b675c",
+            border:
+              player.attendance_status === "declined" ? 0 : "2px solid #ddd8cc",
+            boxShadow:
+              player.attendance_status === "declined"
+                ? "0 3px 0 #732a17"
+                : "none",
+            "&:hover": {
+              borderColor: "#17181a",
+              color:
+                player.attendance_status === "declined" ? "#ffffff" : "#17181a",
+              bgcolor:
+                player.attendance_status === "declined" ? "#8a351e" : "#f6f4ee",
+            },
+            transition: "all 0.15s ease",
+          }}
+        >
+          NÃO
+        </Button>
       </Stack>
+
+      <Button
+        fullWidth
+        variant="outlined"
+        onClick={() => onUpdate("waitlist")}
+        disabled={isUpdating}
+        data-testid="attendance-waitlist-button"
+        sx={{
+          mt: 1.25,
+          borderRadius: "14px",
+          py: 1.25,
+          textTransform: "uppercase",
+          fontFamily: "Archivo, sans-serif",
+          fontWeight: 800,
+          fontSize: "13px",
+          letterSpacing: ".06em",
+          bgcolor:
+            player.attendance_status === "waitlist" ? "#a8452a" : "#ffffff",
+          color:
+            player.attendance_status === "waitlist" ? "#ffffff" : "#a8452a",
+          border:
+            player.attendance_status === "waitlist"
+              ? "2px solid #a8452a"
+              : "2px solid #e2c9bd",
+          "&:hover": {
+            bgcolor:
+              player.attendance_status === "waitlist" ? "#8a351e" : "#fdf6f3",
+            borderColor: "#a8452a",
+          },
+        }}
+      >
+        {t("peladas.attendance.user_status.waitlist_button", "Fila de espera")}
+      </Button>
     </Paper>
   );
 }

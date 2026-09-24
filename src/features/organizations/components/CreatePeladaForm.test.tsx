@@ -156,4 +156,60 @@ describe("CreatePeladaForm", () => {
       );
     });
   });
+
+  it("submits location when entered", async () => {
+    const handleCreate = vi.fn().mockResolvedValue(undefined);
+
+    render(
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <CreatePeladaForm organizationId="org-123" onCreate={handleCreate} />
+      </LocalizationProvider>,
+    );
+
+    const locInput = screen.getByTestId("create-pelada-location-input");
+    fireEvent.change(locInput, { target: { value: "Arena do Fut" } });
+
+    const submitBtn = screen.getByTestId("create-pelada-submit");
+    fireEvent.click(submitBtn);
+
+    await waitFor(() => {
+      expect(handleCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          organization_id: "org-123",
+          location: "Arena do Fut",
+        }),
+      );
+    });
+  });
+
+  it("pre-fills location input when defaultLocation prop is provided", async () => {
+    const handleCreate = vi.fn().mockResolvedValue(undefined);
+
+    render(
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <CreatePeladaForm
+          organizationId="org-123"
+          defaultLocation="Arena Vila Nova"
+          onCreate={handleCreate}
+        />
+      </LocalizationProvider>,
+    );
+
+    const locInput = screen.getByTestId(
+      "create-pelada-location-input",
+    ) as HTMLInputElement;
+    expect(locInput.value).toBe("Arena Vila Nova");
+
+    const submitBtn = screen.getByTestId("create-pelada-submit");
+    fireEvent.click(submitBtn);
+
+    await waitFor(() => {
+      expect(handleCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          organization_id: "org-123",
+          location: "Arena Vila Nova",
+        }),
+      );
+    });
+  });
 });
