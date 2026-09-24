@@ -13,7 +13,10 @@ export const ThemeContext = createContext<ThemeContextType | undefined>(
 export const useAppTheme = () => {
   const context = useContext(ThemeContext);
   if (!context) {
-    throw new Error("useAppTheme must be used within a ThemeContextProvider");
+    return {
+      mode: "light" as PaletteMode,
+      toggleTheme: () => {},
+    };
   }
   return context;
 };

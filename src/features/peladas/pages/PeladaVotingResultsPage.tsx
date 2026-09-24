@@ -214,7 +214,7 @@ export default function PeladaVotingResultsPage() {
   );
 
   return (
-    <Box sx={{ bgcolor: "#f6f4ee", minHeight: "100vh" }}>
+    <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
       <PeladaTabsBar peladaId={peladaId} status="closed" active="results" />
       <Container
         maxWidth="lg"

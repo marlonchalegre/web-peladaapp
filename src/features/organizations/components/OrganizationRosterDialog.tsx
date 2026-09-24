@@ -84,9 +84,12 @@ export default function OrganizationRosterDialog({
       slotProps={{
         paper: {
           sx: {
-            bgcolor: "#f6f4ee",
+            bgcolor: "background.paper",
             borderRadius: "18px",
-            border: "2px solid #17181a",
+            border: (theme) =>
+              theme.palette.mode === "dark"
+                ? "1px solid rgba(255,255,255,0.12)"
+                : "2px solid #17181a",
           },
         },
       }}
@@ -99,7 +102,7 @@ export default function OrganizationRosterDialog({
           fontFamily: "Archivo, sans-serif",
           fontWeight: 800,
           fontSize: "15px",
-          color: "#17181a",
+          color: "text.primary",
         }}
       >
         ELENCO · {players.length}
@@ -126,8 +129,12 @@ export default function OrganizationRosterDialog({
         </Typography>
         <Box
           sx={{
-            bgcolor: "#ffffff",
-            border: "1.5px solid #eae6db",
+            bgcolor: (theme) =>
+              theme.palette.mode === "dark"
+                ? "rgba(255,255,255,0.03)"
+                : "#ffffff",
+            border: 1,
+            borderColor: "divider",
             borderRadius: "16px",
             overflow: "hidden",
           }}
@@ -144,7 +151,7 @@ export default function OrganizationRosterDialog({
                 borderBottom:
                   idx === sortedPlayers.length - 1
                     ? "none"
-                    : "1.5px solid #f2efe7",
+                    : (theme) => `1.5px solid ${theme.palette.divider}`,
               }}
             >
               <SecureAvatar
@@ -164,7 +171,7 @@ export default function OrganizationRosterDialog({
                   noWrap
                   sx={{
                     font: "700 12.5px/1.2 Archivo,sans-serif",
-                    color: "#17181a",
+                    color: "text.primary",
                   }}
                 >
                   {player.user_name || "Jogador"}

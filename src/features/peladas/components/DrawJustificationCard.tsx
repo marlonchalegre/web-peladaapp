@@ -80,8 +80,9 @@ export default function DrawJustificationCard({
   return (
     <Box
       sx={{
-        bgcolor: "#ffffff",
-        border: "1.5px solid #eae6db",
+        bgcolor: "background.paper",
+        border: "1.5px solid",
+        borderColor: "divider",
         borderRadius: "16px",
         p: 2,
         mt: 2,
@@ -121,7 +122,10 @@ export default function DrawJustificationCard({
             }
             label="EQUILÍBRIO TÁTICO · GEMINI"
             sx={{
-              bgcolor: "#f4f8f5",
+              bgcolor: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "rgba(20, 107, 58, 0.15)"
+                  : "#f4f8f5",
               border: "1px solid #146b3a",
               fontFamily: "Archivo, sans-serif",
               fontWeight: 800,
@@ -142,7 +146,10 @@ export default function DrawJustificationCard({
             }
             label="POR REGRAS · GPT"
             sx={{
-              bgcolor: "#fff8eb",
+              bgcolor: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "rgba(242, 161, 0, 0.15)"
+                  : "#fff8eb",
               border: "1px solid #f2a100",
               fontFamily: "Archivo, sans-serif",
               fontWeight: 800,
@@ -158,13 +165,17 @@ export default function DrawJustificationCard({
             size="small"
             label="CLÁSSICO"
             sx={{
-              bgcolor: "#f6f4ee",
-              border: "1px solid #ddd8cc",
+              bgcolor: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "rgba(255,255,255,0.05)"
+                  : "#f6f4ee",
+              border: "1px solid",
+              borderColor: "divider",
               fontFamily: "Archivo, sans-serif",
               fontWeight: 800,
               fontSize: "9px",
               letterSpacing: ".06em",
-              color: "#6b675c",
+              color: "text.secondary",
               height: 22,
             }}
           />
@@ -180,9 +191,11 @@ export default function DrawJustificationCard({
             gap: 1,
             mb: 1.75,
             p: 1.25,
-            bgcolor: "#f6f4ee",
+            bgcolor: (theme) =>
+              theme.palette.mode === "dark" ? "background.default" : "#f6f4ee",
             borderRadius: "10px",
-            border: "1px solid #eae6db",
+            border: "1px solid",
+            borderColor: "divider",
           }}
         >
           <Box>
@@ -203,7 +216,7 @@ export default function DrawJustificationCard({
                 fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                 fontWeight: 700,
                 fontSize: "16px",
-                color: "#17181a",
+                color: "text.primary",
               }}
             >
               {formatDecimal(justification.metrics.squad_mean)}
@@ -257,7 +270,7 @@ export default function DrawJustificationCard({
                     fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                     fontWeight: 700,
                     fontSize: "16px",
-                    color: "#17181a",
+                    color: "text.primary",
                   }}
                 >
                   {formatDecimal(justification.metrics.defense_gap, 3)}
@@ -281,7 +294,7 @@ export default function DrawJustificationCard({
                     fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                     fontWeight: 700,
                     fontSize: "16px",
-                    color: "#17181a",
+                    color: "text.primary",
                   }}
                 >
                   {formatDecimal(justification.metrics.offense_gap, 3)}
@@ -309,7 +322,7 @@ export default function DrawJustificationCard({
                   fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                   fontWeight: 700,
                   fontSize: "16px",
-                  color: "#17181a",
+                  color: "text.primary",
                 }}
               >
                 {formatDecimal(justification.metrics.sector_gap, 3)}
@@ -340,7 +353,7 @@ export default function DrawJustificationCard({
                 fontWeight: 600,
                 fontSize: "11.5px",
                 lineHeight: 1.4,
-                color: "#4a4740",
+                color: "text.secondary",
               }}
             >
               Média por time entre {minAvg} e {maxAvg} — diferença de {diffAvg}.
@@ -367,7 +380,7 @@ export default function DrawJustificationCard({
                 fontWeight: 600,
                 fontSize: "11.5px",
                 lineHeight: 1.4,
-                color: "#4a4740",
+                color: "text.secondary",
               }}
             >
               {justification.algorithm === "gpt"
@@ -396,7 +409,7 @@ export default function DrawJustificationCard({
                 fontWeight: 600,
                 fontSize: "11.5px",
                 lineHeight: 1.4,
-                color: "#4a4740",
+                color: "text.secondary",
               }}
             >
               Dupla campeã {topChampionPair.players.join(" e ")} (
@@ -425,7 +438,7 @@ export default function DrawJustificationCard({
                   fontWeight: 600,
                   fontSize: "11.5px",
                   lineHeight: 1.4,
-                  color: "#4a4740",
+                  color: "text.secondary",
                 }}
               >
                 Duplas frequentes e campeãs balanceadas entre os times para
@@ -454,7 +467,7 @@ export default function DrawJustificationCard({
                 fontWeight: 600,
                 fontSize: "11.5px",
                 lineHeight: 1.4,
-                color: "#4a4740",
+                color: "text.secondary",
               }}
             >
               Conexão: {topAssistLink.from} → {topAssistLink.to} (
@@ -482,7 +495,7 @@ export default function DrawJustificationCard({
                 fontWeight: 600,
                 fontSize: "11.5px",
                 lineHeight: 1.4,
-                color: "#4a4740",
+                color: "text.secondary",
               }}
             >
               Maior vencedor recente: {topWinner.name.trim()} (
@@ -510,7 +523,7 @@ export default function DrawJustificationCard({
                 fontWeight: 600,
                 fontSize: "11.5px",
                 lineHeight: 1.4,
-                color: "#4a4740",
+                color: "text.secondary",
               }}
             >
               Parceria inédita: {firstTimePair.players.join(" e ")}.
@@ -538,7 +551,7 @@ export default function DrawJustificationCard({
                   fontWeight: 600,
                   fontSize: "11.5px",
                   lineHeight: 1.4,
-                  color: "#4a4740",
+                  color: "text.secondary",
                 }}
               >
                 {justification.history.moves.length} jogador(es) trocado(s) de
@@ -566,7 +579,7 @@ export default function DrawJustificationCard({
                 fontWeight: 600,
                 fontSize: "11.5px",
                 lineHeight: 1.4,
-                color: "#4a4740",
+                color: "text.secondary",
               }}
             >
               Goleiros fixos {homeGkName} e {awayGkName} divididos entre Time 1
@@ -594,7 +607,7 @@ export default function DrawJustificationCard({
                 fontWeight: 600,
                 fontSize: "11.5px",
                 lineHeight: 1.4,
-                color: "#4a4740",
+                color: "text.secondary",
               }}
             >
               {justification.benched.length} jogador(es) no banco aguardando
@@ -622,7 +635,7 @@ export default function DrawJustificationCard({
                 fontWeight: 600,
                 fontSize: "11.5px",
                 lineHeight: 1.4,
-                color: "#4a4740",
+                color: "text.secondary",
               }}
             >
               Há times incompletos: arraste jogadores do banco para preencher as
@@ -642,7 +655,10 @@ export default function DrawJustificationCard({
           color: "#6b675c",
           mt: 1.5,
           pt: 1.25,
-          borderTop: "1.5px dashed #ddd8cc",
+          borderTop: (theme) =>
+            theme.palette.mode === "dark"
+              ? "1.5px dashed rgba(255,255,255,0.12)"
+              : "1.5px dashed #ddd8cc",
         }}
       >
         Isso é preferência heurística, não previsão: nota equilibrada não
@@ -658,8 +674,11 @@ export default function DrawJustificationCard({
           onClick={onOpenDialog}
           sx={{
             mt: 1.75,
-            borderColor: "#17181a",
-            color: "#17181a",
+            borderColor: (theme) =>
+              theme.palette.mode === "dark"
+                ? "rgba(255,255,255,0.2)"
+                : "#17181a",
+            color: "text.primary",
             fontFamily: "Archivo, sans-serif",
             fontWeight: 800,
             fontSize: "11px",
@@ -668,9 +687,16 @@ export default function DrawJustificationCard({
             py: 0.75,
             textTransform: "uppercase",
             "&:hover": {
-              bgcolor: "#17181a",
-              color: "#ffffff",
-              borderColor: "#17181a",
+              bgcolor: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "rgba(255,255,255,0.08)"
+                  : "#17181a",
+              color: (theme) =>
+                theme.palette.mode === "dark" ? "text.primary" : "#ffffff",
+              borderColor: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "rgba(255,255,255,0.3)"
+                  : "#17181a",
             },
           }}
         >

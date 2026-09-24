@@ -368,7 +368,7 @@ export default function OrganizationStatisticsMobileView({
   };
 
   return (
-    <Box sx={{ bgcolor: "#f6f4ee", minHeight: "100vh", pb: 3 }}>
+    <Box sx={{ bgcolor: "background.default", minHeight: "100vh", pb: 3 }}>
       {/* Dark header */}
       <Box sx={{ bgcolor: "#17181a", px: 2.5, pt: 1, pb: 2.5 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.4 }}>
@@ -602,11 +602,17 @@ export default function OrganizationStatisticsMobileView({
         <Box sx={{ px: 2.5, pt: 2 }}>
           <Box
             sx={{
-              bgcolor: "#ffffff",
-              border: "2px solid #17181a",
+              bgcolor: "background.paper",
+              border: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "1px solid rgba(255,255,255,0.12)"
+                  : "2px solid #17181a",
               borderRadius: "18px",
               p: 2,
-              boxShadow: "5px 5px 0 #17181a",
+              boxShadow: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "0 4px 20px rgba(0,0,0,0.5)"
+                  : "5px 5px 0 #17181a",
             }}
           >
             <Typography
@@ -668,8 +674,9 @@ export default function OrganizationStatisticsMobileView({
 
         <Box
           sx={{
-            bgcolor: "#ffffff",
-            border: "1.5px solid #eae6db",
+            bgcolor: "background.paper",
+            border: 1,
+            borderColor: "divider",
             borderRadius: "16px",
             px: 1.75,
             py: 0.5,
@@ -704,11 +711,18 @@ export default function OrganizationStatisticsMobileView({
                   my: me ? 0.5 : 0,
                   px: me ? 1.25 : 0,
                   mx: me ? -1.25 : 0,
-                  bgcolor: me ? "#f4f8f5" : "transparent",
+                  bgcolor: (theme) =>
+                    me
+                      ? theme.palette.mode === "dark"
+                        ? "rgba(20, 107, 58, 0.2)"
+                        : "#f4f8f5"
+                      : "transparent",
                   border: me ? "2px solid #146b3a" : "none",
                   borderRadius: me ? "13px" : 0,
                   borderBottom:
-                    !me && !isLast ? "1.5px solid #f2efe7" : undefined,
+                    !me && !isLast
+                      ? (theme) => `1.5px solid ${theme.palette.divider}`
+                      : undefined,
                 }}
               >
                 <Typography
@@ -716,7 +730,7 @@ export default function OrganizationStatisticsMobileView({
                     width: 17,
                     flexShrink: 0,
                     font: "700 13px/1 'Archivo Narrow',Archivo,sans-serif",
-                    color: me ? "#146b3a" : "#6b675c",
+                    color: me ? "#146b3a" : "text.secondary",
                   }}
                 >
                   {position}
@@ -739,7 +753,7 @@ export default function OrganizationStatisticsMobileView({
                     noWrap
                     sx={{
                       font: "800 12.5px/1.2 Archivo,sans-serif",
-                      color: "#17181a",
+                      color: "text.primary",
                     }}
                   >
                     {item.player_name}
@@ -823,8 +837,9 @@ export default function OrganizationStatisticsMobileView({
         </Typography>
         <Box
           sx={{
-            bgcolor: "#ffffff",
-            border: "1.5px solid #eae6db",
+            bgcolor: "background.paper",
+            border: 1,
+            borderColor: "divider",
             borderRadius: "16px",
             p: 1.75,
           }}
@@ -862,7 +877,7 @@ export default function OrganizationStatisticsMobileView({
                   justifyContent: "space-between",
                   mt: 1,
                   font: "600 10px/1 Archivo,sans-serif",
-                  color: "#6b675c",
+                  color: "text.secondary",
                 }}
               >
                 <span>{monthLabel(weeklyPresence[0].week_start)}</span>
@@ -877,15 +892,17 @@ export default function OrganizationStatisticsMobileView({
                 sx={{
                   mt: 1.5,
                   pt: 1.5,
-                  borderTop: "1.5px dashed #ddd8cc",
+                  borderTop: 1,
+                  borderTopStyle: "dashed",
+                  borderColor: "divider",
                   font: "600 11.5px/1.4 Archivo,sans-serif",
-                  color: "#6b675c",
+                  color: "text.secondary",
                 }}
               >
                 Média de{" "}
                 <Box
                   component="strong"
-                  sx={{ color: "#17181a", fontWeight: 700 }}
+                  sx={{ color: "text.primary", fontWeight: 700 }}
                 >
                   {presenceWeeksAvg} jogadores
                 </Box>{" "}
@@ -915,8 +932,9 @@ export default function OrganizationStatisticsMobileView({
         <Box sx={{ px: 2.5, pt: 2.5 }}>
           <Box
             sx={{
-              bgcolor: "#ffffff",
-              border: "1.5px solid #eae6db",
+              bgcolor: "background.paper",
+              border: 1,
+              borderColor: "divider",
               borderRadius: "16px",
               overflow: "hidden",
             }}
@@ -924,10 +942,11 @@ export default function OrganizationStatisticsMobileView({
             <Typography
               sx={{
                 p: "12px 14px",
-                borderBottom: "1.5px solid #f2efe7",
+                borderBottom: 1,
+                borderColor: "divider",
                 font: "700 9.5px/1 Archivo,sans-serif",
                 letterSpacing: ".16em",
-                color: "#6b675c",
+                color: "text.secondary",
               }}
             >
               DESTAQUES DA TEMPORADA
@@ -944,7 +963,7 @@ export default function OrganizationStatisticsMobileView({
                   borderBottom:
                     idx === highlights.length - 1
                       ? "none"
-                      : "1.5px solid #f2efe7",
+                      : (theme) => `1.5px solid ${theme.palette.divider}`,
                 }}
               >
                 <SecureAvatar
@@ -965,7 +984,7 @@ export default function OrganizationStatisticsMobileView({
                     noWrap
                     sx={{
                       font: "700 12px/1.2 Archivo,sans-serif",
-                      color: "#17181a",
+                      color: "text.primary",
                     }}
                   >
                     {highlight.player?.player_name || "—"}

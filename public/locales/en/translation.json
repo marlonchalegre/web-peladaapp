@@ -1288,7 +1288,9 @@
       },
       "field": {
         "new_password": "New Password",
-        "confirm_password": "Confirm New Password"
+        "confirm_password": "Confirm New Password",
+        "dark_mode": "Dark Mode",
+        "dark_mode_description": "Toggle between light and dark theme"
       },
       "hint": {
         "password": "Leave blank if you don't want to change password"

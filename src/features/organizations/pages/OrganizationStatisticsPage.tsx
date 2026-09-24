@@ -89,7 +89,13 @@ export default function OrganizationStatisticsPage() {
 
   if (isDesktop) {
     return (
-      <Box sx={{ width: "100%", bgcolor: "#f6f4ee", minHeight: "100vh" }}>
+      <Box
+        sx={{
+          width: "100%",
+          bgcolor: "background.default",
+          minHeight: "100vh",
+        }}
+      >
         <OrganizationStatisticsDesktopView
           org={org}
           stats={stats}
@@ -123,7 +129,9 @@ export default function OrganizationStatisticsPage() {
   }
 
   return (
-    <Box sx={{ width: "100%", bgcolor: "#f6f4ee", minHeight: "100vh" }}>
+    <Box
+      sx={{ width: "100%", bgcolor: "background.default", minHeight: "100vh" }}
+    >
       <OrganizationStatisticsMobileView
         org={org}
         stats={stats}

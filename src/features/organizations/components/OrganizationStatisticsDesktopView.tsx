@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Box, Typography, Menu, MenuItem } from "@mui/material";
+import { Box, Typography, Menu, MenuItem, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import type {
   Organization,
@@ -43,12 +43,47 @@ export default function OrganizationStatisticsDesktopView({
   weeklyPresence = [],
 }: OrganizationStatisticsDesktopViewProps) {
   const { t } = useTranslation();
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
 
   const [activeMetric, setActiveMetric] = useState<MetricType>("goals");
   const [showAll, setShowAll] = useState(false);
   const [yearMenuAnchor, setYearMenuAnchor] = useState<null | HTMLElement>(
     null,
   );
+
+  const getTabButtonSx = (metric: MetricType) => {
+    const active = activeMetric === metric;
+    return {
+      bgcolor: active
+        ? isDark
+          ? "primary.main"
+          : "#17181a"
+        : isDark
+          ? "background.paper"
+          : "#ffffff",
+      color: active
+        ? isDark
+          ? "#17181a"
+          : "#ffffff"
+        : isDark
+          ? "text.primary"
+          : "#17181a",
+      border: active
+        ? "none"
+        : isDark
+          ? "1.5px solid rgba(255,255,255,0.12)"
+          : "1.5px solid #ddd8cc",
+      borderRadius: "9px",
+      px: 1.6,
+      py: 1,
+      fontFamily: "Archivo, sans-serif",
+      fontWeight: active ? 800 : 700,
+      fontSize: "11px",
+      letterSpacing: ".06em",
+      cursor: "pointer",
+    };
+  };
 
   const avatarColors = [
     "#cdd6e0",
@@ -442,102 +477,35 @@ export default function OrganizationStatisticsDesktopView({
               <Box
                 component="button"
                 onClick={() => setActiveMetric("goals")}
-                sx={{
-                  bgcolor: activeMetric === "goals" ? "#17181a" : "#ffffff",
-                  color: activeMetric === "goals" ? "#ffffff" : "#17181a",
-                  border:
-                    activeMetric === "goals" ? "none" : "1.5px solid #ddd8cc",
-                  borderRadius: "9px",
-                  px: 1.6,
-                  py: 1,
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: activeMetric === "goals" ? 800 : 700,
-                  fontSize: "11px",
-                  letterSpacing: ".06em",
-                  cursor: "pointer",
-                }}
+                sx={getTabButtonSx("goals")}
               >
                 GOLS
               </Box>
               <Box
                 component="button"
                 onClick={() => setActiveMetric("assists")}
-                sx={{
-                  bgcolor: activeMetric === "assists" ? "#17181a" : "#ffffff",
-                  color: activeMetric === "assists" ? "#ffffff" : "#17181a",
-                  border:
-                    activeMetric === "assists" ? "none" : "1.5px solid #ddd8cc",
-                  borderRadius: "9px",
-                  px: 1.6,
-                  py: 1,
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: activeMetric === "assists" ? 800 : 700,
-                  fontSize: "11px",
-                  letterSpacing: ".06em",
-                  cursor: "pointer",
-                }}
+                sx={getTabButtonSx("assists")}
               >
                 ASSISTÊNCIAS
               </Box>
               <Box
                 component="button"
                 onClick={() => setActiveMetric("presence")}
-                sx={{
-                  bgcolor: activeMetric === "presence" ? "#17181a" : "#ffffff",
-                  color: activeMetric === "presence" ? "#ffffff" : "#17181a",
-                  border:
-                    activeMetric === "presence"
-                      ? "none"
-                      : "1.5px solid #ddd8cc",
-                  borderRadius: "9px",
-                  px: 1.6,
-                  py: 1,
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: activeMetric === "presence" ? 800 : 700,
-                  fontSize: "11px",
-                  letterSpacing: ".06em",
-                  cursor: "pointer",
-                }}
+                sx={getTabButtonSx("presence")}
               >
                 PRESENÇA
               </Box>
               <Box
                 component="button"
                 onClick={() => setActiveMetric("titles")}
-                sx={{
-                  bgcolor: activeMetric === "titles" ? "#17181a" : "#ffffff",
-                  color: activeMetric === "titles" ? "#ffffff" : "#17181a",
-                  border:
-                    activeMetric === "titles" ? "none" : "1.5px solid #ddd8cc",
-                  borderRadius: "9px",
-                  px: 1.6,
-                  py: 1,
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: activeMetric === "titles" ? 800 : 700,
-                  fontSize: "11px",
-                  letterSpacing: ".06em",
-                  cursor: "pointer",
-                }}
+                sx={getTabButtonSx("titles")}
               >
                 TÍTULOS
               </Box>
               <Box
                 component="button"
                 onClick={() => setActiveMetric("rating")}
-                sx={{
-                  bgcolor: activeMetric === "rating" ? "#17181a" : "#ffffff",
-                  color: activeMetric === "rating" ? "#ffffff" : "#17181a",
-                  border:
-                    activeMetric === "rating" ? "none" : "1.5px solid #ddd8cc",
-                  borderRadius: "9px",
-                  px: 1.6,
-                  py: 1,
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: activeMetric === "rating" ? 800 : 700,
-                  fontSize: "11px",
-                  letterSpacing: ".06em",
-                  cursor: "pointer",
-                }}
+                sx={getTabButtonSx("rating")}
               >
                 NOTA
               </Box>
@@ -546,11 +514,15 @@ export default function OrganizationStatisticsDesktopView({
             {/* Podium Card (Desktop 4c) */}
             <Box
               sx={{
-                bgcolor: "#ffffff",
-                border: "2px solid #17181a",
+                bgcolor: isDark ? "background.paper" : "#ffffff",
+                border: isDark
+                  ? "1px solid rgba(255,255,255,0.12)"
+                  : "2px solid #17181a",
                 borderRadius: "20px",
                 p: "20px",
-                boxShadow: "6px 6px 0 #17181a",
+                boxShadow: isDark
+                  ? "0 4px 20px rgba(0,0,0,0.5)"
+                  : "6px 6px 0 #17181a",
                 mb: 2,
               }}
             >
@@ -767,8 +739,9 @@ export default function OrganizationStatisticsDesktopView({
             {/* Full Ranking Table (Desktop 4c) */}
             <Box
               sx={{
-                bgcolor: "#ffffff",
-                border: "1.5px solid #eae6db",
+                bgcolor: isDark ? "background.paper" : "#ffffff",
+                border: "1.5px solid",
+                borderColor: isDark ? "divider" : "#eae6db",
                 borderRadius: "16px",
                 overflow: "hidden",
               }}
@@ -780,13 +753,14 @@ export default function OrganizationStatisticsDesktopView({
                   alignItems: "center",
                   gap: 1.8,
                   p: "10px 18px",
-                  bgcolor: "#f6f4ee",
-                  borderBottom: "1.5px solid #eae6db",
+                  bgcolor: isDark ? "rgba(255,255,255,0.03)" : "#f6f4ee",
+                  borderBottom: "1.5px solid",
+                  borderColor: isDark ? "divider" : "#eae6db",
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 700,
                   fontSize: "8.5px",
                   letterSpacing: ".14em",
-                  color: "#6b675c",
+                  color: isDark ? "text.secondary" : "#6b675c",
                 }}
               >
                 <Box sx={{ width: 24, flexShrink: 0 }}>#</Box>
@@ -829,12 +803,20 @@ export default function OrganizationStatisticsDesktopView({
                       gap: 1.8,
                       p: isUser ? "13px 16px" : "12px 18px",
                       m: isUser ? "3px 2px" : 0,
-                      bgcolor: isUser ? "#f4f8f5" : "#ffffff",
+                      bgcolor: isUser
+                        ? isDark
+                          ? "rgba(20, 107, 58, 0.15)"
+                          : "#f4f8f5"
+                        : isDark
+                          ? "background.paper"
+                          : "#ffffff",
                       border: isUser ? "2px solid #146b3a" : "none",
                       borderRadius: isUser ? "13px" : 0,
                       borderBottom: isUser
                         ? "2px solid #146b3a"
-                        : "1.5px solid #f2efe7",
+                        : isDark
+                          ? "1.5px solid rgba(255,255,255,0.08)"
+                          : "1.5px solid #f2efe7",
                     }}
                   >
                     <Box
@@ -844,7 +826,11 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                         fontWeight: 700,
                         fontSize: "14px",
-                        color: isUser ? "#146b3a" : "#6b675c",
+                        color: isUser
+                          ? "#146b3a"
+                          : isDark
+                            ? "text.secondary"
+                            : "#6b675c",
                       }}
                     >
                       {idx + 1}
@@ -883,7 +869,7 @@ export default function OrganizationStatisticsDesktopView({
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: 800,
                             fontSize: "13px",
-                            color: "#17181a",
+                            color: isDark ? "text.primary" : "#17181a",
                             display: "flex",
                             alignItems: "center",
                             gap: 0.5,
@@ -930,7 +916,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 600,
                         fontSize: "12px",
-                        color: "#6b675c",
+                        color: isDark ? "text.secondary" : "#6b675c",
                       }}
                     >
                       {games}
@@ -944,7 +930,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 600,
                         fontSize: "12px",
-                        color: "#6b675c",
+                        color: isDark ? "text.secondary" : "#6b675c",
                       }}
                     >
                       {avg}
@@ -958,7 +944,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 600,
                         fontSize: "12px",
-                        color: "#6b675c",
+                        color: isDark ? "text.secondary" : "#6b675c",
                       }}
                     >
                       {rating}
@@ -972,7 +958,11 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                         fontWeight: 700,
                         fontSize: "20px",
-                        color: isUser ? "#146b3a" : "#17181a",
+                        color: isUser
+                          ? "#146b3a"
+                          : isDark
+                            ? "text.primary"
+                            : "#17181a",
                       }}
                     >
                       {val}
@@ -989,8 +979,9 @@ export default function OrganizationStatisticsDesktopView({
                     alignItems: "center",
                     justifyContent: "space-between",
                     p: "13px 18px",
-                    bgcolor: "#f6f4ee",
-                    borderTop: "1.5px solid #eae6db",
+                    bgcolor: isDark ? "rgba(255,255,255,0.03)" : "#f6f4ee",
+                    borderTop: "1.5px solid",
+                    borderColor: isDark ? "divider" : "#eae6db",
                   }}
                 >
                   <Typography
@@ -1032,8 +1023,9 @@ export default function OrganizationStatisticsDesktopView({
             {/* Card: Presença · 12 semanas */}
             <Box
               sx={{
-                bgcolor: "#ffffff",
-                border: "1.5px solid #eae6db",
+                bgcolor: isDark ? "background.paper" : "#ffffff",
+                border: "1.5px solid",
+                borderColor: isDark ? "divider" : "#eae6db",
                 borderRadius: "16px",
                 p: 2,
               }}
@@ -1099,7 +1091,9 @@ export default function OrganizationStatisticsDesktopView({
                 sx={{
                   mt: 1.6,
                   pt: 1.6,
-                  borderTop: "1.5px dashed #ddd8cc",
+                  borderTop: isDark
+                    ? "1.5px dashed rgba(255,255,255,0.12)"
+                    : "1.5px dashed #ddd8cc",
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 600,
                   fontSize: "11.5px",
@@ -1110,7 +1104,10 @@ export default function OrganizationStatisticsDesktopView({
                 {weeklyPresence.length > 0 ? (
                   <>
                     Média de{" "}
-                    <Box component="strong" sx={{ color: "#17181a" }}>
+                    <Box
+                      component="strong"
+                      sx={{ color: isDark ? "text.primary" : "#17181a" }}
+                    >
                       {presenceWeeksAvg} jogadores
                     </Box>{" "}
                     por pelada
@@ -1127,8 +1124,9 @@ export default function OrganizationStatisticsDesktopView({
             {/* Card: Destaques da Temporada */}
             <Box
               sx={{
-                bgcolor: "#ffffff",
-                border: "1.5px solid #eae6db",
+                bgcolor: isDark ? "background.paper" : "#ffffff",
+                border: "1.5px solid",
+                borderColor: isDark ? "divider" : "#eae6db",
                 borderRadius: "16px",
                 overflow: "hidden",
                 mt: 1.8,
@@ -1137,7 +1135,8 @@ export default function OrganizationStatisticsDesktopView({
               <Box
                 sx={{
                   p: "13px 16px",
-                  borderBottom: "1.5px solid #f2efe7",
+                  borderBottom: "1.5px solid",
+                  borderColor: isDark ? "divider" : "#f2efe7",
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 700,
                   fontSize: "9.5px",
@@ -1157,9 +1156,8 @@ export default function OrganizationStatisticsDesktopView({
                     gap: 1.4,
                     p: "13px 16px",
                     borderBottom:
-                      i < highlights.length - 1
-                        ? "1.5px solid #f2efe7"
-                        : "none",
+                      i < highlights.length - 1 ? "1.5px solid" : "none",
+                    borderColor: isDark ? "divider" : "#f2efe7",
                   }}
                 >
                   <SecureAvatar
@@ -1183,7 +1181,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 700,
                         fontSize: "12.5px",
-                        color: "#17181a",
+                        color: isDark ? "text.primary" : "#17181a",
                       }}
                     >
                       {h.item?.player_name || "—"}
@@ -1208,7 +1206,8 @@ export default function OrganizationStatisticsDesktopView({
             {myStat && (
               <Box
                 sx={{
-                  bgcolor: "#17181a",
+                  bgcolor: isDark ? "#222428" : "#17181a",
+                  border: isDark ? "1px solid rgba(255,255,255,0.12)" : "none",
                   borderRadius: "16px",
                   p: 2,
                   mt: 1.8,

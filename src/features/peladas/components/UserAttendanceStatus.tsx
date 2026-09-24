@@ -57,17 +57,23 @@ export default function UserAttendanceStatus({
         p: { xs: 2.5, sm: 3 },
         mb: 3,
         borderRadius: "18px",
-        bgcolor: "#ffffff",
-        border: "2px solid #17181a",
-        boxShadow: "5px 5px 0 #17181a",
-        color: "#17181a",
+        bgcolor: "background.paper",
+        border: (theme) =>
+          theme.palette.mode === "dark"
+            ? "1px solid rgba(255,255,255,0.12)"
+            : "2px solid #17181a",
+        boxShadow: (theme) =>
+          theme.palette.mode === "dark"
+            ? "0 4px 20px rgba(0,0,0,0.5)"
+            : "5px 5px 0 #17181a",
+        color: "text.primary",
       }}
     >
       <Typography
         sx={{
           font: "700 9.5px/1 Archivo,sans-serif",
           letterSpacing: ".18em",
-          color: "#6b675c",
+          color: "text.secondary",
           mb: 1,
           textTransform: "uppercase",
         }}
@@ -85,7 +91,7 @@ export default function UserAttendanceStatus({
             lineHeight: 1.15,
             mb: 0.5,
             letterSpacing: -0.5,
-            color: "#17181a",
+            color: "text.primary",
           }}
         >
           Bora pro jogo?
@@ -94,7 +100,7 @@ export default function UserAttendanceStatus({
           variant="body2"
           sx={{
             fontFamily: "Archivo, sans-serif",
-            color: "#6b675c",
+            color: "text.secondary",
             fontWeight: 600,
             lineHeight: 1.4,
             fontSize: "12px",
@@ -106,7 +112,7 @@ export default function UserAttendanceStatus({
           {player.member_type === "mensalista" ? (
             <>
               Você é mensalista: sua vaga fica garantida até{" "}
-              <strong style={{ color: "#17181a" }}>terça, 22h</strong>.
+              <strong style={{ color: "inherit" }}>terça, 22h</strong>.
             </>
           ) : (
             getStatusMessage()
@@ -134,8 +140,12 @@ export default function UserAttendanceStatus({
             fontWeight: 800,
             fontSize: "17px",
             letterSpacing: ".06em",
-            bgcolor:
-              player.attendance_status === "confirmed" ? "#146b3a" : "#ffffff",
+            bgcolor: (theme) =>
+              player.attendance_status === "confirmed"
+                ? "#146b3a"
+                : theme.palette.mode === "dark"
+                  ? "background.paper"
+                  : "#ffffff",
             color:
               player.attendance_status === "confirmed" ? "#ffffff" : "#146b3a",
             border:
@@ -147,10 +157,12 @@ export default function UserAttendanceStatus({
                 ? "0 3px 0 #0d4526"
                 : "none",
             "&:hover": {
-              bgcolor:
+              bgcolor: (theme) =>
                 player.attendance_status === "confirmed"
                   ? "#0e5c31"
-                  : "#f6f4ee",
+                  : theme.palette.mode === "dark"
+                    ? "rgba(20, 107, 58, 0.15)"
+                    : "#f6f4ee",
             },
             transition: "all 0.15s ease",
           }}
@@ -176,22 +188,43 @@ export default function UserAttendanceStatus({
             fontWeight: 800,
             fontSize: "17px",
             letterSpacing: ".06em",
-            bgcolor:
-              player.attendance_status === "declined" ? "#a8452a" : "#ffffff",
-            color:
-              player.attendance_status === "declined" ? "#ffffff" : "#6b675c",
-            border:
-              player.attendance_status === "declined" ? 0 : "2px solid #ddd8cc",
+            bgcolor: (theme) =>
+              player.attendance_status === "declined"
+                ? "#a8452a"
+                : theme.palette.mode === "dark"
+                  ? "background.paper"
+                  : "#ffffff",
+            color: (theme) =>
+              player.attendance_status === "declined"
+                ? "#ffffff"
+                : theme.palette.mode === "dark"
+                  ? "text.primary"
+                  : "#6b675c",
+            border: (theme) =>
+              player.attendance_status === "declined"
+                ? 0
+                : theme.palette.mode === "dark"
+                  ? "1px solid rgba(255,255,255,0.2)"
+                  : "2px solid #ddd8cc",
             boxShadow:
               player.attendance_status === "declined"
                 ? "0 3px 0 #732a17"
                 : "none",
             "&:hover": {
-              borderColor: "#17181a",
-              color:
-                player.attendance_status === "declined" ? "#ffffff" : "#17181a",
-              bgcolor:
-                player.attendance_status === "declined" ? "#8a351e" : "#f6f4ee",
+              borderColor: (theme) =>
+                theme.palette.mode === "dark" ? "text.primary" : "#17181a",
+              color: (theme) =>
+                player.attendance_status === "declined"
+                  ? "#ffffff"
+                  : theme.palette.mode === "dark"
+                    ? "text.primary"
+                    : "#17181a",
+              bgcolor: (theme) =>
+                player.attendance_status === "declined"
+                  ? "#8a351e"
+                  : theme.palette.mode === "dark"
+                    ? "rgba(255,255,255,0.06)"
+                    : "#f6f4ee",
             },
             transition: "all 0.15s ease",
           }}
@@ -215,17 +248,27 @@ export default function UserAttendanceStatus({
           fontWeight: 800,
           fontSize: "13px",
           letterSpacing: ".06em",
-          bgcolor:
-            player.attendance_status === "waitlist" ? "#a8452a" : "#ffffff",
+          bgcolor: (theme) =>
+            player.attendance_status === "waitlist"
+              ? "#a8452a"
+              : theme.palette.mode === "dark"
+                ? "background.paper"
+                : "#ffffff",
           color:
             player.attendance_status === "waitlist" ? "#ffffff" : "#a8452a",
-          border:
+          border: (theme) =>
             player.attendance_status === "waitlist"
               ? "2px solid #a8452a"
-              : "2px solid #e2c9bd",
+              : theme.palette.mode === "dark"
+                ? "1px solid rgba(168, 69, 42, 0.4)"
+                : "2px solid #e2c9bd",
           "&:hover": {
-            bgcolor:
-              player.attendance_status === "waitlist" ? "#8a351e" : "#fdf6f3",
+            bgcolor: (theme) =>
+              player.attendance_status === "waitlist"
+                ? "#8a351e"
+                : theme.palette.mode === "dark"
+                  ? "rgba(168, 69, 42, 0.15)"
+                  : "#fdf6f3",
             borderColor: "#a8452a",
           },
         }}

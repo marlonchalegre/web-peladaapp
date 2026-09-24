@@ -26,6 +26,7 @@ import {
   api,
 } from "../../../shared/api/client";
 import { useAuth } from "../../../app/providers/AuthContext";
+import { ThemeContext } from "../../../app/providers/ThemeContext";
 
 // Mock API
 vi.mock("../../../shared/api/client", () => ({
@@ -839,5 +840,57 @@ describe("UserProfilePage", () => {
     const secureAvatars = screen.getAllByTestId("secure-avatar");
     expect(secureAvatars.length).toBeGreaterThan(0);
     expect(secureAvatars[0]).toBeInTheDocument();
+  });
+
+  it("renders theme toggle button in mobile view and triggers toggleTheme on click", async () => {
+    const mockToggleTheme = vi.fn();
+    (getUser as Mock).mockResolvedValue(defaultUser);
+
+    render(
+      <MemoryRouter>
+        <ThemeContext.Provider
+          value={{ mode: "light", toggleTheme: mockToggleTheme }}
+        >
+          <UserProfilePage />
+        </ThemeContext.Provider>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("MINHA FICHA")).toBeInTheDocument();
+    });
+
+    const toggleBtn = screen.getByTestId("profile-theme-toggle");
+    expect(toggleBtn).toBeInTheDocument();
+    fireEvent.click(toggleBtn);
+    expect(mockToggleTheme).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders dark mode switch in edit mode and toggles theme", async () => {
+    const mockToggleTheme = vi.fn();
+    (getUser as Mock).mockResolvedValue(defaultUser);
+
+    render(
+      <MemoryRouter>
+        <ThemeContext.Provider
+          value={{ mode: "dark", toggleTheme: mockToggleTheme }}
+        >
+          <UserProfilePage />
+        </ThemeContext.Provider>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("edit-profile-button")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByTestId("edit-profile-button"));
+
+    const darkModeSwitch = screen.getByTestId("dark-mode-switch");
+    expect(darkModeSwitch).toBeInTheDocument();
+    expect(darkModeSwitch).toBeChecked();
+
+    fireEvent.click(darkModeSwitch);
+    expect(mockToggleTheme).toHaveBeenCalledTimes(1);
   });
 });

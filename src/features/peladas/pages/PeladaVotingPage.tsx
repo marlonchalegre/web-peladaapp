@@ -303,7 +303,7 @@ export default function PeladaVotingPage() {
   }
 
   return (
-    <Box sx={{ bgcolor: "#f6f4ee", minHeight: "100vh" }}>
+    <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
       <PeladaTabsBar peladaId={peladaId} status="closed" active="voting" />
       <Container
         maxWidth="lg"

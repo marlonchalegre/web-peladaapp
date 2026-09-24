@@ -331,7 +331,7 @@ export default function PeladaMatchesPage() {
   return (
     <Box
       sx={{
-        bgcolor: "#f6f4ee",
+        bgcolor: "background.default",
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",

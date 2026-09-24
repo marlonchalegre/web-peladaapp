@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { ThemeProvider } from "@mui/material";
+import { getTheme } from "../../../lib/theme";
 import UserProfileDesktopView, {
   type UserProfileDesktopViewProps,
 } from "./UserProfileDesktopView";
@@ -174,5 +176,18 @@ describe("UserProfileDesktopView", () => {
     const avatar = screen.getByTestId("secure-avatar");
     expect(avatar).toBeInTheDocument();
     expect(avatar).toHaveTextContent("IM");
+  });
+
+  it("renders correctly under dark theme mode", () => {
+    const darkTheme = getTheme("dark");
+    render(
+      <ThemeProvider theme={darkTheme}>
+        <UserProfileDesktopView {...defaultProps} />
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByText("FICHA DE HABILIDADES")).toBeInTheDocument();
+    expect(screen.getByText("VISÃO GERAL")).toBeInTheDocument();
+    expect(screen.getByText("HISTÓRICO DE JOGOS")).toBeInTheDocument();
   });
 });

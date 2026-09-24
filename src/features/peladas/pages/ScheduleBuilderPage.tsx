@@ -211,7 +211,7 @@ export default function ScheduleBuilderPage() {
   if (loading && teams.length === 0) return <Loading />;
 
   return (
-    <Box sx={{ bgcolor: "#f6f4ee", minHeight: "100vh" }}>
+    <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
       <PeladaTabsBar peladaId={peladaId} status="open" active="matches" />
       <Container maxWidth="md" sx={{ py: 4 }}>
         <Box sx={{ mb: 4 }}>

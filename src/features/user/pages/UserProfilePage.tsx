@@ -23,6 +23,7 @@ import {
   Switch,
   useTheme,
   useMediaQuery,
+  alpha,
 } from "@mui/material";
 import { PhotoCamera, Delete as DeleteIcon } from "@mui/icons-material";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
@@ -41,19 +42,27 @@ import {
 } from "../../../shared/api/endpoints";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import { useAuth } from "../../../app/providers/AuthContext";
+import { useAppTheme } from "../../../app/providers/ThemeContext";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import { getLocalizedErrorMessage } from "../../../shared/utils/error-handler";
 import { PhoneInput } from "../../../shared/components/PhoneInput";
+import { ThemeSwitcher } from "../../../shared/components/ThemeSwitcher";
+import { UserGroupStatsGrid } from "../components/UserGroupStatsGrid";
 import UserProfileDesktopView from "../components/UserProfileDesktopView";
-import { toRecentMatchRows } from "../utils/profileFormat";
+import {
+  toRecentMatchRows,
+  formatRating,
+  formatSkill,
+} from "../utils/profileFormat";
 
 const endpoints = createApi(api);
 
 export default function UserProfilePage() {
   const { t } = useTranslation();
   const theme = useTheme();
+  const { mode, toggleTheme } = useAppTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const navigate = useNavigate();
   const { user: authUser, signIn, signOut, token } = useAuth();
@@ -298,6 +307,8 @@ export default function UserProfilePage() {
     ? skillValues.reduce((a, b) => a + b, 0) / skillValues.length
     : null;
   const presenceWeeks = dashboard?.presence ?? [];
+  const inactivePresenceBarColor =
+    theme.palette.mode === "dark" ? "#2d3035" : "#eae6db";
   const recentMatches = toRecentMatchRows(dashboard?.recent_peladas);
 
   return (
@@ -352,7 +363,10 @@ export default function UserProfilePage() {
           {/* Template 2d: MINHA FICHA Dark Card */}
           <Box
             sx={{
-              bgcolor: "#17181a",
+              bgcolor: (theme) =>
+                theme.palette.mode === "dark" ? "background.paper" : "#17181a",
+              border: (theme) =>
+                theme.palette.mode === "dark" ? "1.5px solid #2d3035" : "none",
               borderRadius: { xs: 0, sm: "18px" },
               p: { xs: 2.5, sm: 3.5 },
               mx: { xs: -1, sm: -2 },
@@ -361,7 +375,6 @@ export default function UserProfilePage() {
               color: "#f6f4ee",
             }}
           >
-            {/* Top Header Bar: ‹ | MINHA FICHA / EDITAR | Editar/Cancelar */}
             <Box
               sx={{
                 display: "flex",
@@ -400,24 +413,38 @@ export default function UserProfilePage() {
               >
                 {isEditing ? "EDITAR PERFIL" : "MINHA FICHA"}
               </Typography>
-              <Button
-                onClick={() => setIsEditing(!isEditing)}
-                data-testid="edit-profile-button"
-                sx={{
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: 700,
-                  fontSize: "11px",
-                  color: "#9a958a",
-                  textTransform: "none",
-                  p: 0,
-                  minWidth: "auto",
-                  "&:hover": { color: "#f6f4ee", bgcolor: "transparent" },
-                }}
-              >
-                {isEditing
-                  ? t("common.cancel", "Cancelar")
-                  : t("common.edit", "Editar")}
-              </Button>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <ThemeSwitcher
+                  data-testid="profile-theme-toggle"
+                  iconSize={18}
+                  sx={{
+                    border: "none",
+                    width: "auto",
+                    height: "auto",
+                    color: "#9a958a",
+                    p: 0.5,
+                    "&:hover": { color: "#f6f4ee" },
+                  }}
+                />
+                <Button
+                  onClick={() => setIsEditing(!isEditing)}
+                  data-testid="edit-profile-button"
+                  sx={{
+                    fontFamily: "Archivo, sans-serif",
+                    fontWeight: 700,
+                    fontSize: "11px",
+                    color: "#9a958a",
+                    textTransform: "none",
+                    p: 0,
+                    minWidth: "auto",
+                    "&:hover": { color: "#f6f4ee", bgcolor: "transparent" },
+                  }}
+                >
+                  {isEditing
+                    ? t("common.cancel", "Cancelar")
+                    : t("common.edit", "Editar")}
+                </Button>
+              </Box>
             </Box>
 
             <Box sx={{ display: isEditing ? "none" : "block" }}>
@@ -438,7 +465,10 @@ export default function UserProfilePage() {
                       width: 64,
                       height: 64,
                       bgcolor: "#d8d2c4",
-                      border: "3px solid #f6f4ee",
+                      border: (theme) =>
+                        theme.palette.mode === "dark"
+                          ? "3px solid #2d3035"
+                          : "3px solid #f6f4ee",
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 800,
                       fontSize: "20px",
@@ -480,11 +510,7 @@ export default function UserProfilePage() {
                       color: "#f6f4ee",
                     }}
                   >
-                    {dashboard?.summary.avg_rating == null
-                      ? "—"
-                      : dashboard.summary.avg_rating
-                          .toFixed(1)
-                          .replace(".", ",")}
+                    {formatRating(dashboard?.summary.avg_rating)}
                   </Typography>
                   <Typography
                     sx={{
@@ -557,11 +583,17 @@ export default function UserProfilePage() {
           {skillValues.length > 0 && (
             <Box
               sx={{
-                bgcolor: "#ffffff",
-                border: "2px solid #17181a",
+                bgcolor: "background.paper",
+                border: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "2px solid #2d3035"
+                    : "2px solid #17181a",
                 borderRadius: "18px",
                 p: 2.5,
-                boxShadow: "5px 5px 0 #17181a",
+                boxShadow: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "5px 5px 0 #000000"
+                    : "5px 5px 0 #17181a",
                 mb: 3,
               }}
             >
@@ -577,7 +609,7 @@ export default function UserProfilePage() {
                   sx={{
                     font: "700 9.5px/1 Archivo,sans-serif",
                     letterSpacing: ".18em",
-                    color: "#6b675c",
+                    color: "text.secondary",
                     textTransform: "uppercase",
                   }}
                 >
@@ -586,12 +618,12 @@ export default function UserProfilePage() {
                 <Typography
                   sx={{
                     font: "700 10.5px/1 Archivo,sans-serif",
-                    color: "#6b675c",
+                    color: "text.secondary",
                   }}
                 >
                   {skillAverage == null
                     ? "sem avaliações"
-                    : `média ${skillAverage.toFixed(1).replace(".", ",")}`}
+                    : `média ${formatSkill(skillAverage)}`}
                 </Typography>
               </Box>
 
@@ -608,7 +640,7 @@ export default function UserProfilePage() {
                           width: 80,
                           font: "700 10.5px/1 Archivo,sans-serif",
                           letterSpacing: ".04em",
-                          color: "#17181a",
+                          color: "text.primary",
                         }}
                       >
                         {skill.label}
@@ -618,7 +650,7 @@ export default function UserProfilePage() {
                           flex: 1,
                           height: 9,
                           borderRadius: 5,
-                          bgcolor: "#eae6db",
+                          bgcolor: "divider",
                           overflow: "hidden",
                           display: "flex",
                         }}
@@ -636,12 +668,10 @@ export default function UserProfilePage() {
                           width: 24,
                           textAlign: "right",
                           font: "700 11px/1 'Archivo Narrow',Archivo,sans-serif",
-                          color: "#17181a",
+                          color: "text.primary",
                         }}
                       >
-                        {skill.value == null
-                          ? "—"
-                          : skill.value.toFixed(1).replace(".", ",")}
+                        {formatSkill(skill.value)}
                       </Typography>
                     </Box>
                   );
@@ -657,7 +687,7 @@ export default function UserProfilePage() {
                 sx={{
                   font: "700 9.5px/1 Archivo,sans-serif",
                   letterSpacing: ".18em",
-                  color: "#6b675c",
+                  color: "text.secondary",
                   textTransform: "uppercase",
                   mb: 1.5,
                 }}
@@ -669,10 +699,11 @@ export default function UserProfilePage() {
                 <Box
                   key={group.organization_id}
                   sx={{
-                    border: "1.5px solid #eae6db",
+                    border: "1.5px solid",
+                    borderColor: "divider",
                     borderRadius: "16px",
                     overflow: "hidden",
-                    bgcolor: "#ffffff",
+                    bgcolor: "background.paper",
                     mb: 1.5,
                   }}
                 >
@@ -682,8 +713,12 @@ export default function UserProfilePage() {
                       alignItems: "center",
                       gap: 1,
                       p: "11px 14px",
-                      bgcolor: "#f4f8f5",
-                      borderBottom: "1.5px solid #eae6db",
+                      bgcolor: (theme) =>
+                        theme.palette.mode === "dark"
+                          ? alpha(theme.palette.primary.main, 0.12)
+                          : "#f4f8f5",
+                      borderBottom: "1.5px solid",
+                      borderColor: "divider",
                     }}
                   >
                     <Box
@@ -697,7 +732,7 @@ export default function UserProfilePage() {
                     <Typography
                       sx={{
                         font: "800 11px/1 Archivo,sans-serif",
-                        color: "#17181a",
+                        color: "text.primary",
                       }}
                     >
                       {group.organization_name}
@@ -706,7 +741,7 @@ export default function UserProfilePage() {
                       sx={{
                         font: "700 9.5px/1 Archivo,sans-serif",
                         letterSpacing: ".1em",
-                        color: "#6b675c",
+                        color: "text.secondary",
                         textTransform: "uppercase",
                       }}
                     >
@@ -714,53 +749,12 @@ export default function UserProfilePage() {
                     </Typography>
                   </Box>
 
-                  <Box
-                    sx={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(4, 1fr)",
-                      gap: "1px",
-                      bgcolor: "#eae6db",
-                    }}
-                  >
-                    {[
-                      {
-                        label: "JOGOS",
-                        val: group.peladas_played,
-                        color: "#17181a",
-                      },
-                      { label: "GOLS", val: group.goals, color: "#17181a" },
-                      {
-                        label: "ASSIST.",
-                        val: group.assists,
-                        color: "#146b3a",
-                      },
-                      { label: "TÍTULOS", val: group.titles, color: "#17181a" },
-                    ].map((item) => (
-                      <Box
-                        key={item.label}
-                        sx={{ bgcolor: "#ffffff", p: "12px 9px" }}
-                      >
-                        <Typography
-                          sx={{
-                            font: "700 23px/1 'Archivo Narrow',Archivo,sans-serif",
-                            color: item.color,
-                          }}
-                        >
-                          {item.val}
-                        </Typography>
-                        <Typography
-                          sx={{
-                            font: "700 8px/1.2 Archivo,sans-serif",
-                            letterSpacing: ".08em",
-                            color: "#6b675c",
-                            mt: 0.5,
-                          }}
-                        >
-                          {item.label}
-                        </Typography>
-                      </Box>
-                    ))}
-                  </Box>
+                  <UserGroupStatsGrid
+                    peladasPlayed={group.peladas_played}
+                    goals={group.goals}
+                    assists={group.assists}
+                    titles={group.titles}
+                  />
                 </Box>
               ))}
             </Box>
@@ -769,8 +763,9 @@ export default function UserProfilePage() {
           {/* Template 2d: PRESENÇA ÚLTIMAS 12 SEMANAS */}
           <Box
             sx={{
-              bgcolor: "#ffffff",
-              border: "1.5px solid #eae6db",
+              bgcolor: "background.paper",
+              border: "1.5px solid",
+              borderColor: "divider",
               borderRadius: "16px",
               p: 2.5,
               mb: 3,
@@ -780,7 +775,7 @@ export default function UserProfilePage() {
               sx={{
                 font: "700 9.5px/1 Archivo,sans-serif",
                 letterSpacing: ".18em",
-                color: "#6b675c",
+                color: "text.secondary",
                 textTransform: "uppercase",
                 mb: 2,
               }}
@@ -802,7 +797,7 @@ export default function UserProfilePage() {
                     ? "#146b3a"
                     : week.status === "absent"
                       ? "#a8452a"
-                      : "#eae6db";
+                      : inactivePresenceBarColor;
                 return (
                   <Box
                     key={i}
@@ -830,7 +825,7 @@ export default function UserProfilePage() {
                 <Typography
                   sx={{
                     font: "600 10.5px/1 Archivo,sans-serif",
-                    color: "#6b675c",
+                    color: "text.secondary",
                   }}
                 >
                   presente
@@ -848,7 +843,7 @@ export default function UserProfilePage() {
                 <Typography
                   sx={{
                     font: "600 10.5px/1 Archivo,sans-serif",
-                    color: "#6b675c",
+                    color: "text.secondary",
                   }}
                 >
                   faltou
@@ -860,13 +855,14 @@ export default function UserProfilePage() {
                     width: 8,
                     height: 8,
                     borderRadius: "2px",
-                    bgcolor: "#eae6db",
+                    bgcolor: (theme) =>
+                      theme.palette.mode === "dark" ? "#2d3035" : "#eae6db",
                   }}
                 />
                 <Typography
                   sx={{
                     font: "600 10.5px/1 Archivo,sans-serif",
-                    color: "#6b675c",
+                    color: "text.secondary",
                   }}
                 >
                   sem jogo
@@ -879,8 +875,9 @@ export default function UserProfilePage() {
           {recentMatches.length > 0 && (
             <Box
               sx={{
-                bgcolor: "#ffffff",
-                border: "1.5px solid #eae6db",
+                bgcolor: "background.paper",
+                border: "1.5px solid",
+                borderColor: "divider",
                 borderRadius: "16px",
                 overflow: "hidden",
                 mb: 3,
@@ -890,7 +887,7 @@ export default function UserProfilePage() {
                 sx={{
                   font: "700 9.5px/1 Archivo,sans-serif",
                   letterSpacing: ".16em",
-                  color: "#6b675c",
+                  color: "text.secondary",
                   textTransform: "uppercase",
                   p: "14px 16px 10px",
                 }}
@@ -906,14 +903,15 @@ export default function UserProfilePage() {
                       alignItems: "center",
                       gap: 1.5,
                       p: "12px 16px",
-                      borderTop: "1.5px solid #f2efe7",
+                      borderTop: "1.5px solid",
+                      borderColor: "divider",
                     }}
                   >
                     <Box sx={{ width: 56, flexShrink: 0 }}>
                       <Typography
                         sx={{
                           font: "700 13px/1 'Archivo Narrow',Archivo,sans-serif",
-                          color: "#17181a",
+                          color: "text.primary",
                         }}
                       >
                         {match.date}
@@ -921,7 +919,7 @@ export default function UserProfilePage() {
                       <Typography
                         sx={{
                           font: "600 9px/1 Archivo,sans-serif",
-                          color: "#6b675c",
+                          color: "text.secondary",
                           mt: 0.5,
                         }}
                       >
@@ -932,7 +930,7 @@ export default function UserProfilePage() {
                       <Typography
                         sx={{
                           font: "700 11.5px/1.3 Archivo,sans-serif",
-                          color: "#17181a",
+                          color: "text.primary",
                         }}
                       >
                         {match.desc}
@@ -941,7 +939,7 @@ export default function UserProfilePage() {
                         <Typography
                           sx={{
                             font: "600 10px/1.3 Archivo,sans-serif",
-                            color: "#6b675c",
+                            color: "text.secondary",
                             mt: 0.25,
                           }}
                         >
@@ -971,7 +969,7 @@ export default function UserProfilePage() {
                         flexShrink: 0,
                         textAlign: "right",
                         font: "700 16px/1 'Archivo Narrow',Archivo,sans-serif",
-                        color: "#17181a",
+                        color: "text.primary",
                       }}
                     >
                       {match.score}
@@ -990,7 +988,8 @@ export default function UserProfilePage() {
           sx={{
             p: { xs: 2.5, sm: 4 },
             borderRadius: "18px",
-            border: "1.5px solid #eae6db",
+            border: "1.5px solid",
+            borderColor: "divider",
           }}
         >
           <Box sx={{ px: { xs: 0.5, sm: 0 } }}>
@@ -1219,6 +1218,34 @@ export default function UserProfilePage() {
                 >
                   {t(
                     "user.profile.field.receive_non_mensalista_updates_description",
+                  )}
+                </Typography>
+              </Box>
+
+              <Box sx={{ mt: 1, mb: 1 }}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={mode === "dark"}
+                      onChange={toggleTheme}
+                      name="darkMode"
+                      slotProps={{
+                        input: {
+                          "data-testid": "dark-mode-switch",
+                        } as React.InputHTMLAttributes<HTMLInputElement>,
+                      }}
+                    />
+                  }
+                  label={t("user.profile.field.dark_mode", "Modo Escuro")}
+                />
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: "block", ml: 4, mt: -0.5 }}
+                >
+                  {t(
+                    "user.profile.field.dark_mode_description",
+                    "Alternar entre o tema claro e o tema escuro",
                   )}
                 </Typography>
               </Box>

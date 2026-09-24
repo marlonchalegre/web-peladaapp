@@ -1289,6 +1289,8 @@
       "field": {
         "new_password": "Nova Senha",
         "confirm_password": "Confirmar Nova Senha",
+        "dark_mode": "Modo Escuro",
+        "dark_mode_description": "Alternar entre o tema claro e o tema escuro",
         "receive_non_mensalista_updates": "Notificações para Diaristas e Convidados",
         "receive_non_mensalista_updates_description": "Receber notificações privadas no WhatsApp quando a lista de presença for aberta e quando a prioridade dos mensalistas encerrar (máximo de 2 mensagens por pelada)."
       },

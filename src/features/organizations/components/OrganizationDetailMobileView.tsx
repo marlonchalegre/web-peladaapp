@@ -630,7 +630,7 @@ export default function OrganizationDetailMobileView({
   };
 
   return (
-    <Box sx={{ bgcolor: "#f6f4ee", minHeight: "100vh", pb: 3 }}>
+    <Box sx={{ bgcolor: "background.default", minHeight: "100vh", pb: 3 }}>
       {/* Header */}
       <Box sx={{ px: 2.5, pt: 1, pb: 2 }}>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.4 }}>

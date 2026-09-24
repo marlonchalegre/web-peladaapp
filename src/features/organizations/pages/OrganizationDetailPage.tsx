@@ -300,7 +300,13 @@ export default function OrganizationDetailPage() {
 
   if (isDesktop) {
     return (
-      <Box sx={{ width: "100%", bgcolor: "#f6f4ee", minHeight: "100vh" }}>
+      <Box
+        sx={{
+          width: "100%",
+          bgcolor: "background.default",
+          minHeight: "100vh",
+        }}
+      >
         <OrganizationDetailDesktopView
           org={org}
           peladas={peladas}
@@ -329,7 +335,9 @@ export default function OrganizationDetailPage() {
   }
 
   return (
-    <Box sx={{ width: "100%", bgcolor: "#f6f4ee", minHeight: "100vh" }}>
+    <Box
+      sx={{ width: "100%", bgcolor: "background.default", minHeight: "100vh" }}
+    >
       {org.is_blocked && (
         <Alert
           severity="warning"

@@ -216,7 +216,7 @@ export default function OrganizationManagementPage() {
     <Box
       sx={{
         width: "100%",
-        bgcolor: "#f6f4ee",
+        bgcolor: "background.default",
         minHeight: "100vh",
         pb: { xs: 2, sm: 4 },
       }}

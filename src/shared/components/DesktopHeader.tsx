@@ -5,17 +5,14 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  Tooltip,
   Divider,
 } from "@mui/material";
 import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../app/providers/AuthContext";
-import { useAppTheme } from "../../app/providers/ThemeContext";
 import { api } from "../../shared/api/client";
 import { createApi, type Organization } from "../../shared/api/endpoints";
-import Brightness4Icon from "@mui/icons-material/Brightness4";
-import Brightness7Icon from "@mui/icons-material/Brightness7";
+import { ThemeSwitcher } from "./ThemeSwitcher";
 import { SecureAvatar } from "./SecureAvatar";
 
 const endpoints = createApi(api);
@@ -29,7 +26,6 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { t, i18n } = useTranslation();
-  const { mode, toggleTheme } = useAppTheme();
 
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
   const [anchorElOrg, setAnchorElOrg] = useState<null | HTMLElement>(null);
@@ -444,35 +440,7 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
           </Box>
 
           {/* Theme Switcher */}
-          <Tooltip
-            title={
-              mode === "dark"
-                ? t("common.theme.light", "Modo Claro")
-                : t("common.theme.dark", "Modo Escuro")
-            }
-          >
-            <IconButton
-              onClick={toggleTheme}
-              sx={{
-                width: 32,
-                height: 32,
-                borderRadius: "10px",
-                border: "1.5px solid #3a3b3e",
-                color: "#9a958a",
-                p: 0,
-                "&:hover": {
-                  color: "#f6f4ee",
-                  borderColor: "#6b675c",
-                },
-              }}
-            >
-              {mode === "dark" ? (
-                <Brightness7Icon sx={{ fontSize: 16 }} />
-              ) : (
-                <Brightness4Icon sx={{ fontSize: 16 }} />
-              )}
-            </IconButton>
-          </Tooltip>
+          <ThemeSwitcher />
 
           <IconButton
             onClick={handleOpenUserMenu}

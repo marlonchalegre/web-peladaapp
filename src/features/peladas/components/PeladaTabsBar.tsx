@@ -47,13 +47,14 @@ export default function PeladaTabsBar({
     return {
       py: 1.75,
       px: 2,
-      borderBottom: isActive ? "3px solid #17181a" : "3px solid transparent",
+      borderBottom: isActive ? "3px solid" : "3px solid transparent",
+      borderBottomColor: isActive ? "text.primary" : "transparent",
       mb: "-1.5px",
       fontFamily: "Archivo, sans-serif",
       fontWeight: isActive ? 800 : 700,
       fontSize: "11.5px",
       letterSpacing: ".04em",
-      color: isActive ? "#17181a" : "#6b675c",
+      color: isActive ? "text.primary" : "text.secondary",
       textTransform: "uppercase" as const,
       borderRadius: 0,
       lineHeight: 1,
@@ -64,7 +65,7 @@ export default function PeladaTabsBar({
       cursor: "pointer",
       whiteSpace: "nowrap" as const,
       "&:hover": {
-        color: "#17181a",
+        color: "text.primary",
         bgcolor: "transparent",
       },
     };
@@ -82,8 +83,10 @@ export default function PeladaTabsBar({
       aria-label="Pelada sub-navigation"
       sx={{
         width: "100%",
-        bgcolor: "#ffffff",
-        borderBottom: "1.5px solid #eae6db",
+        bgcolor: (theme) =>
+          theme.palette.mode === "dark" ? "background.paper" : "#ffffff",
+        borderBottom: "1.5px solid",
+        borderColor: "divider",
         px: { xs: 2, md: 4, lg: 5 },
         display: { xs: "none", md: "block" },
       }}
@@ -106,10 +109,11 @@ export default function PeladaTabsBar({
             fontWeight: 700,
             fontSize: "9px",
             letterSpacing: ".14em",
-            color: "#6b675c",
+            color: "text.secondary",
             pr: 2.25,
             mr: 1,
-            borderRight: "1.5px solid #eae6db",
+            borderRight: "1.5px solid",
+            borderColor: "divider",
             textTransform: "uppercase",
             lineHeight: 1,
             whiteSpace: "nowrap",

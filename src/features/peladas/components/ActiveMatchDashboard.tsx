@@ -17,6 +17,7 @@ import {
   Typography,
   useMediaQuery,
   useTheme,
+  alpha,
 } from "@mui/material";
 import VideocamOutlinedIcon from "@mui/icons-material/VideocamOutlined";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
@@ -120,7 +121,7 @@ type Props = {
 
 const bottomSheetPaperSx = {
   borderRadius: { xs: "24px 24px 0 0", sm: "20px" },
-  bgcolor: "#f6f4ee",
+  bgcolor: "background.paper",
   m: 0,
   width: "100%",
   maxWidth: { xs: "100%", sm: "460px" },
@@ -1301,7 +1302,7 @@ export default function ActiveMatchDashboard(props: Props) {
   );
 
   return (
-    <Box sx={{ bgcolor: "#f6f4ee" }}>
+    <Box sx={{ bgcolor: "background.default" }}>
       {isDesktop ? (
         /* ---------- Desktop / tablet largo (referência 1b) ---------- */
         <Box
@@ -1674,8 +1675,8 @@ export default function ActiveMatchDashboard(props: Props) {
                   bottom: 0,
                   zIndex: 1100,
                   p: "14px 16px 26px",
-                  background:
-                    "linear-gradient(180deg, rgba(246,244,238,0) 0%, #f6f4ee 34%)",
+                  background: (theme) =>
+                    `linear-gradient(180deg, ${alpha(theme.palette.background.default, 0)} 0%, ${theme.palette.background.default} 34%)`,
                 }}
                 data-testid="live-action-bar"
               >

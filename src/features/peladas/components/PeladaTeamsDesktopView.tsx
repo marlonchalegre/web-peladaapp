@@ -176,7 +176,7 @@ export default function PeladaTeamsDesktopView({
   };
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#f6f4ee", pb: 6 }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: "background.default", pb: 6 }}>
       {/* Sub-nav tabs bar */}
       <PeladaTabsBar
         peladaId={pelada.id}
@@ -347,11 +347,17 @@ export default function PeladaTeamsDesktopView({
             {/* Como Sortear Card */}
             <Box
               sx={{
-                bgcolor: "#fff",
-                border: "2px solid #17181a",
+                bgcolor: "background.paper",
+                border: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "1px solid rgba(255,255,255,0.12)"
+                    : "2px solid #17181a",
                 borderRadius: "18px",
                 overflow: "hidden",
-                boxShadow: "5px 5px 0 #17181a",
+                boxShadow: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "0 4px 20px rgba(0,0,0,0.5)"
+                    : "5px 5px 0 #17181a",
               }}
             >
               <Box
@@ -1159,15 +1165,18 @@ export default function PeladaTeamsDesktopView({
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      border: "1.5px dashed #c9c4b6",
-                      bgcolor: "#ffffff",
+                      border: (theme) =>
+                        theme.palette.mode === "dark"
+                          ? "1.5px dashed rgba(255,255,255,0.15)"
+                          : "1.5px dashed #c9c4b6",
+                      bgcolor: "background.paper",
                       borderRadius: "10px",
                       p: "7px 12px",
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 800,
                       fontSize: "10.5px",
                       letterSpacing: ".04em",
-                      color: "#6b675c",
+                      color: "text.secondary",
                       cursor: "pointer",
                       "&:hover": {
                         borderColor: "#146b3a",
@@ -1216,10 +1225,15 @@ export default function PeladaTeamsDesktopView({
                     onDrop={(e) => dropToTeam(e, team.id)}
                     data-testid={`team-card-${team.id}`}
                     sx={{
-                      bgcolor: "#fff",
-                      border: isUnderfilled
-                        ? "2px dashed #c9c4b6"
-                        : "2px solid #17181a",
+                      bgcolor: "background.paper",
+                      border: (theme) =>
+                        isUnderfilled
+                          ? theme.palette.mode === "dark"
+                            ? "2px dashed rgba(255,255,255,0.2)"
+                            : "2px dashed #c9c4b6"
+                          : theme.palette.mode === "dark"
+                            ? "1px solid rgba(255,255,255,0.12)"
+                            : "2px solid #17181a",
                       borderRadius: "18px",
                       overflow: "hidden",
                     }}
@@ -1423,7 +1437,10 @@ export default function PeladaTeamsDesktopView({
                           onDrop={(e) => dropToTeam(e, team.id)}
                           sx={{
                             height: 42,
-                            border: "1.5px dashed #c9c4b6",
+                            border: (theme) =>
+                              theme.palette.mode === "dark"
+                                ? "1.5px dashed rgba(255,255,255,0.15)"
+                                : "1.5px dashed #c9c4b6",
                             borderRadius: "11px",
                             display: "flex",
                             alignItems: "center",
@@ -1432,8 +1449,11 @@ export default function PeladaTeamsDesktopView({
                             fontWeight: 700,
                             fontSize: "10.5px",
                             letterSpacing: ".06em",
-                            color: "#6b675c",
-                            bgcolor: "#f6f4ee",
+                            color: "text.secondary",
+                            bgcolor: (theme) =>
+                              theme.palette.mode === "dark"
+                                ? "rgba(255,255,255,0.03)"
+                                : "#f6f4ee",
                           }}
                         >
                           VAGA LIVRE
@@ -1450,8 +1470,9 @@ export default function PeladaTeamsDesktopView({
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => dropToBench(e)}
               sx={{
-                bgcolor: "#fff",
-                border: "1.5px solid #eae6db",
+                bgcolor: "background.paper",
+                border: 1,
+                borderColor: "divider",
                 borderRadius: "16px",
                 p: "14px 16px",
                 mt: 1.75,
@@ -1506,10 +1527,14 @@ export default function PeladaTeamsDesktopView({
                       display: "flex",
                       alignItems: "center",
                       gap: 1.2,
-                      border: "1.5px solid #ddd8cc",
+                      border: 1,
+                      borderColor: "divider",
                       borderRadius: "12px",
                       p: "8px 12px 8px 9px",
-                      bgcolor: "#f6f4ee",
+                      bgcolor: (theme) =>
+                        theme.palette.mode === "dark"
+                          ? "rgba(255,255,255,0.03)"
+                          : "#f6f4ee",
                       cursor: "grab",
                       "&:active": { cursor: "grabbing" },
                     }}
@@ -1537,7 +1562,7 @@ export default function PeladaTeamsDesktopView({
                           fontWeight: 700,
                           fontSize: "11.5px",
                           lineHeight: 1.2,
-                          color: "#17181a",
+                          color: "text.primary",
                         }}
                       >
                         {bp.user?.name}
@@ -1548,7 +1573,7 @@ export default function PeladaTeamsDesktopView({
                           fontWeight: 600,
                           fontSize: "9.5px",
                           lineHeight: 1.2,
-                          color: "#6b675c",
+                          color: "text.secondary",
                           mt: 0.25,
                         }}
                       >

@@ -186,7 +186,13 @@ export default function AttendanceListPage() {
 
   if (isDesktop) {
     return (
-      <Box sx={{ width: "100%", bgcolor: "#f6f4ee", minHeight: "100vh" }}>
+      <Box
+        sx={{
+          width: "100%",
+          bgcolor: "background.default",
+          minHeight: "100vh",
+        }}
+      >
         <AttendanceListDesktopView
           pelada={pelada}
           confirmed={confirmed}
@@ -449,14 +455,21 @@ export default function AttendanceListPage() {
                 display: "grid",
                 gridTemplateColumns: "repeat(4, 1fr)",
                 gap: "1px",
-                bgcolor: "#eae6db",
-                border: "1.5px solid #eae6db",
+                bgcolor: "divider",
+                border: 1,
+                borderColor: "divider",
                 borderRadius: "14px",
                 overflow: "hidden",
               }}
             >
               {/* CONFIRMADOS */}
-              <Box sx={{ bgcolor: "#ffffff", p: 1.5, textAlign: "center" }}>
+              <Box
+                sx={{
+                  bgcolor: "background.paper",
+                  p: 1.5,
+                  textAlign: "center",
+                }}
+              >
                 <span style={{ display: "none" }}>
                   {t("peladas.attendance.status.confirmed")}
                 </span>
@@ -477,7 +490,7 @@ export default function AttendanceListPage() {
                     fontWeight: 700,
                     fontSize: "8px",
                     letterSpacing: ".08em",
-                    color: "#6b675c",
+                    color: "text.secondary",
                     mt: 0.5,
                   }}
                 >
@@ -486,7 +499,13 @@ export default function AttendanceListPage() {
               </Box>
 
               {/* RECUSAS */}
-              <Box sx={{ bgcolor: "#ffffff", p: 1.5, textAlign: "center" }}>
+              <Box
+                sx={{
+                  bgcolor: "background.paper",
+                  p: 1.5,
+                  textAlign: "center",
+                }}
+              >
                 <span style={{ display: "none" }}>
                   {t("peladas.attendance.status.declined")}
                 </span>
@@ -496,7 +515,7 @@ export default function AttendanceListPage() {
                     fontWeight: 700,
                     fontSize: "22px",
                     lineHeight: 1,
-                    color: "#17181a",
+                    color: "text.primary",
                   }}
                 >
                   {declined.length}
@@ -507,7 +526,7 @@ export default function AttendanceListPage() {
                     fontWeight: 700,
                     fontSize: "8px",
                     letterSpacing: ".08em",
-                    color: "#6b675c",
+                    color: "text.secondary",
                     mt: 0.5,
                   }}
                 >
@@ -516,7 +535,13 @@ export default function AttendanceListPage() {
               </Box>
 
               {/* PENDENTES */}
-              <Box sx={{ bgcolor: "#ffffff", p: 1.5, textAlign: "center" }}>
+              <Box
+                sx={{
+                  bgcolor: "background.paper",
+                  p: 1.5,
+                  textAlign: "center",
+                }}
+              >
                 <span style={{ display: "none" }}>
                   {t("peladas.attendance.status.pending")}
                 </span>
@@ -526,7 +551,7 @@ export default function AttendanceListPage() {
                     fontWeight: 700,
                     fontSize: "22px",
                     lineHeight: 1,
-                    color: "#17181a",
+                    color: "text.primary",
                   }}
                 >
                   {pending.length}
@@ -537,7 +562,7 @@ export default function AttendanceListPage() {
                     fontWeight: 700,
                     fontSize: "8px",
                     letterSpacing: ".08em",
-                    color: "#6b675c",
+                    color: "text.secondary",
                     mt: 0.5,
                   }}
                 >
@@ -546,7 +571,13 @@ export default function AttendanceListPage() {
               </Box>
 
               {/* ESPERA */}
-              <Box sx={{ bgcolor: "#ffffff", p: 1.5, textAlign: "center" }}>
+              <Box
+                sx={{
+                  bgcolor: "background.paper",
+                  p: 1.5,
+                  textAlign: "center",
+                }}
+              >
                 <span style={{ display: "none" }}>
                   {t("peladas.attendance.status.waitlist", "Lista de Espera")}
                 </span>
@@ -567,7 +598,7 @@ export default function AttendanceListPage() {
                     fontWeight: 700,
                     fontSize: "8px",
                     letterSpacing: ".08em",
-                    color: "#6b675c",
+                    color: "text.secondary",
                     mt: 0.5,
                   }}
                 >
@@ -580,10 +611,11 @@ export default function AttendanceListPage() {
           {/* Confirmed List Section */}
           <Box
             sx={{
-              bgcolor: "#ffffff",
+              bgcolor: "background.paper",
               p: { xs: 2, sm: 2.5 },
               borderRadius: "18px",
-              border: "1.5px solid #eae6db",
+              border: 1,
+              borderColor: "divider",
               mb: 2.5,
             }}
           >
@@ -600,7 +632,7 @@ export default function AttendanceListPage() {
                   fontWeight: 700,
                   fontSize: "9.5px",
                   letterSpacing: ".18em",
-                  color: "#6b675c",
+                  color: "text.secondary",
                   textTransform: "uppercase",
                 }}
               >
@@ -633,7 +665,10 @@ export default function AttendanceListPage() {
               sx={{
                 height: 7,
                 borderRadius: 4,
-                bgcolor: "#eae6db",
+                bgcolor: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "rgba(255,255,255,0.1)"
+                    : "#eae6db",
                 overflow: "hidden",
                 display: "flex",
                 mt: 1.2,
@@ -663,7 +698,7 @@ export default function AttendanceListPage() {
                   sx={{
                     py: 3,
                     textAlign: "center",
-                    color: "#6b675c",
+                    color: "text.secondary",
                     fontFamily: "Archivo, sans-serif",
                     fontSize: "13px",
                   }}
@@ -694,7 +729,7 @@ export default function AttendanceListPage() {
                           idx === displayedConfirmed.length - 1 &&
                           (!showAllConfirmed || confirmed.length <= 5)
                             ? "none"
-                            : "1.5px solid #f2efe7",
+                            : (theme) => `1.5px solid ${theme.palette.divider}`,
                       }}
                     >
                       {/* Rank Number */}
@@ -704,7 +739,7 @@ export default function AttendanceListPage() {
                           fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                           fontWeight: 700,
                           fontSize: "12px",
-                          color: "#6b675c",
+                          color: "text.secondary",
                           textAlign: "center",
                           flexShrink: 0,
                         }}
@@ -738,7 +773,7 @@ export default function AttendanceListPage() {
                             fontWeight: 800,
                             fontSize: "12.5px",
                             lineHeight: 1.2,
-                            color: "#17181a",
+                            color: "text.primary",
                             display: "flex",
                             alignItems: "center",
                             gap: 0.5,
@@ -770,7 +805,7 @@ export default function AttendanceListPage() {
                             fontWeight: 600,
                             fontSize: "10.5px",
                             lineHeight: 1.3,
-                            color: "#6b675c",
+                            color: "text.secondary",
                           }}
                         >
                           {pos}
@@ -785,8 +820,11 @@ export default function AttendanceListPage() {
                           fontSize: "9px",
                           letterSpacing: ".06em",
                           color:
-                            memberTag === "MENSALISTA" ? "#17181a" : "#6b675c",
-                          border: "1.5px solid #ddd8cc",
+                            memberTag === "MENSALISTA"
+                              ? "text.primary"
+                              : "text.secondary",
+                          border: 1,
+                          borderColor: "divider",
                           borderRadius: "6px",
                           px: 0.8,
                           py: 0.4,
@@ -796,7 +834,6 @@ export default function AttendanceListPage() {
                         {memberTag}
                       </Box>
 
-                      {/* Admin Actions (subtle payment/reversal/removal) */}
                       {isAnyAdmin && (
                         <Box
                           sx={{
@@ -845,11 +882,18 @@ export default function AttendanceListPage() {
             </Box>
           </Box>
 
-          {/* Fila de Espera Box (Template 2b new format) */}
+          {/* Fila de Espera Box */}
           <Box
             sx={{
-              border: "1.5px solid #f0dbd2",
-              bgcolor: "#fdf6f3",
+              border: 1,
+              borderColor: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "rgba(235, 87, 87, 0.3)"
+                  : "#f0dbd2",
+              bgcolor: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "rgba(235, 87, 87, 0.08)"
+                  : "#fdf6f3",
               borderRadius: "16px",
               p: 2,
               mb: 3,
@@ -879,7 +923,7 @@ export default function AttendanceListPage() {
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 600,
                   fontSize: "10.5px",
-                  color: "#6b675c",
+                  color: "text.secondary",
                 }}
               >
                 entram se abrir vaga
@@ -900,7 +944,7 @@ export default function AttendanceListPage() {
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 600,
                     fontSize: "11px",
-                    color: "#6b675c",
+                    color: "text.secondary",
                   }}
                 >
                   Nenhum jogador na fila de espera.
@@ -914,7 +958,7 @@ export default function AttendanceListPage() {
                       alignItems: "center",
                       gap: 1,
                       fontFamily: "Archivo, sans-serif",
-                      color: "#17181a",
+                      color: "text.primary",
                     }}
                   >
                     <Typography
@@ -923,7 +967,7 @@ export default function AttendanceListPage() {
                         fontWeight: 700,
                         fontSize: "11.5px",
                         lineHeight: 1.4,
-                        color: "#17181a",
+                        color: "text.primary",
                       }}
                     >
                       {idx + 1}. {p.user?.name || "Jogador"}
@@ -933,7 +977,7 @@ export default function AttendanceListPage() {
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 600,
                         fontSize: "10.5px",
-                        color: "#6b675c",
+                        color: "text.secondary",
                       }}
                     >
                       ·{" "}
@@ -964,8 +1008,9 @@ export default function AttendanceListPage() {
           {isAnyAdmin && (
             <Box
               sx={{
-                bgcolor: "#f6f4ee",
-                borderTop: "1.5px solid #eae6db",
+                bgcolor: "background.default",
+                borderTop: 1,
+                borderColor: "divider",
                 pt: 2.5,
                 pb: 3,
               }}
@@ -976,7 +1021,7 @@ export default function AttendanceListPage() {
                   fontWeight: 700,
                   fontSize: "9px",
                   letterSpacing: ".16em",
-                  color: "#6b675c",
+                  color: "text.secondary",
                   mb: 1.5,
                   textTransform: "uppercase",
                 }}
@@ -989,9 +1034,13 @@ export default function AttendanceListPage() {
                 onClick={() => setIsConfirmDialogOpen(true)}
                 data-testid="close-attendance-button"
                 sx={{
-                  bgcolor: "#17181a",
-                  color: "#ffffff",
-                  border: "2px solid #17181a",
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark" ? "primary.main" : "#17181a",
+                  color: (theme) =>
+                    theme.palette.mode === "dark" ? "#17181a" : "#ffffff",
+                  border: 1,
+                  borderColor: (theme) =>
+                    theme.palette.mode === "dark" ? "primary.main" : "#17181a",
                   borderRadius: "14px",
                   py: 2,
                   fontFamily: "Archivo, sans-serif",
@@ -1000,8 +1049,14 @@ export default function AttendanceListPage() {
                   letterSpacing: ".04em",
                   textTransform: "uppercase",
                   "&:hover": {
-                    bgcolor: "#000000",
-                    borderColor: "#000000",
+                    bgcolor: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? "primary.light"
+                        : "#000000",
+                    borderColor: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? "primary.light"
+                        : "#000000",
                   },
                   transition: "all 0.15s ease",
                 }}
@@ -1033,7 +1088,7 @@ export default function AttendanceListPage() {
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 700,
                     fontSize: "11.5px",
-                    color: "#6b675c",
+                    color: "text.secondary",
                     cursor: "pointer",
                     "&:hover": {
                       color: "#146b3a",

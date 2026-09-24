@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Typography, Button } from "@mui/material";
+import { Box, Typography, Button, useTheme, alpha } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import type { User, UserProfileDashboard } from "../../../shared/api/endpoints";
 import {
@@ -8,6 +8,7 @@ import {
   toRecentMatchRows,
 } from "../utils/profileFormat";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
+import { UserGroupStatsGrid } from "./UserGroupStatsGrid";
 
 export interface UserProfileDesktopViewProps {
   user: User | null;
@@ -31,6 +32,7 @@ export default function UserProfileDesktopView({
   onEditClick,
 }: UserProfileDesktopViewProps) {
   const { t } = useTranslation();
+  const theme = useTheme();
   const [activeTab, setActiveTab] = useState<"overview" | "history">(
     "overview",
   );
@@ -65,6 +67,8 @@ export default function UserProfileDesktopView({
   const absentCount = presenceWeeks.filter(
     (week) => week.status === "absent",
   ).length;
+  const inactivePresenceColor =
+    theme.palette.mode === "dark" ? "#2d3035" : "#eae6db";
 
   const recentMatches = toRecentMatchRows(dashboard?.recent_peladas);
 
@@ -75,10 +79,19 @@ export default function UserProfileDesktopView({
     : "MEIO-CAMPO";
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#f6f4ee", pb: 6 }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: "background.default", pb: 6 }}>
       {/* Top Dark Banner */}
       <Box
-        sx={{ bgcolor: "#17181a", px: { xs: 2, md: 4, lg: 5 }, pt: 1, pb: 3.5 }}
+        sx={{
+          bgcolor: (theme) =>
+            theme.palette.mode === "dark" ? "background.paper" : "#17181a",
+          borderBottom: (theme) =>
+            theme.palette.mode === "dark" ? "1px solid" : "none",
+          borderColor: "divider",
+          px: { xs: 2, md: 4, lg: 5 },
+          pt: 1,
+          pb: 3.5,
+        }}
       >
         <Box
           sx={{
@@ -97,7 +110,10 @@ export default function UserProfileDesktopView({
               width: 88,
               height: 88,
               bgcolor: "#d8d2c4",
-              border: "3px solid #f6f4ee",
+              border: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "3px solid #2d3035"
+                  : "3px solid #f6f4ee",
               flexShrink: 0,
               fontFamily: "Archivo, sans-serif",
               fontWeight: 800,
@@ -343,7 +359,10 @@ export default function UserProfileDesktopView({
               letterSpacing: ".04em",
               color: "#f6f4ee",
               textTransform: "uppercase",
-              "&:hover": { bgcolor: "#242628" },
+              "&:hover": {
+                bgcolor: (theme) =>
+                  theme.palette.mode === "dark" ? "action.hover" : "#242628",
+              },
             }}
           >
             EDITAR
@@ -355,8 +374,10 @@ export default function UserProfileDesktopView({
       <Box
         sx={{
           width: "100%",
-          bgcolor: "#fff",
-          borderBottom: "1.5px solid #eae6db",
+          bgcolor: (theme) =>
+            theme.palette.mode === "dark" ? "background.paper" : "#fff",
+          borderBottom: "1.5px solid",
+          borderColor: "divider",
           px: { xs: 2, md: 4, lg: 5 },
         }}
       >
@@ -373,12 +394,14 @@ export default function UserProfileDesktopView({
                 px: 2,
                 cursor: "pointer",
                 borderBottom:
-                  activeTab === tab.id ? "3px solid #17181a" : "none",
+                  activeTab === tab.id
+                    ? (theme) => `3px solid ${theme.palette.text.primary}`
+                    : "none",
                 fontFamily: "Archivo, sans-serif",
                 fontWeight: activeTab === tab.id ? 800 : 700,
                 fontSize: "12px",
                 letterSpacing: ".04em",
-                color: activeTab === tab.id ? "#17181a" : "#6b675c",
+                color: activeTab === tab.id ? "text.primary" : "text.secondary",
                 lineHeight: 1,
                 mb: activeTab === tab.id ? "-1.5px" : 0,
               }}
@@ -406,11 +429,17 @@ export default function UserProfileDesktopView({
             {skillValues.length > 0 && (
               <Box
                 sx={{
-                  bgcolor: "#fff",
-                  border: "2px solid #17181a",
+                  bgcolor: "background.paper",
+                  border: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "2px solid #2d3035"
+                      : "2px solid #17181a",
                   borderRadius: "20px",
                   p: 2.5,
-                  boxShadow: "6px 6px 0 #17181a",
+                  boxShadow: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "6px 6px 0 #000000"
+                      : "6px 6px 0 #17181a",
                 }}
               >
                 <Box
@@ -426,7 +455,7 @@ export default function UserProfileDesktopView({
                       fontWeight: 700,
                       fontSize: "9.5px",
                       letterSpacing: ".18em",
-                      color: "#6b675c",
+                      color: "text.secondary",
                       textTransform: "uppercase",
                     }}
                   >
@@ -437,7 +466,7 @@ export default function UserProfileDesktopView({
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 700,
                       fontSize: "11px",
-                      color: "#6b675c",
+                      color: "text.secondary",
                     }}
                   >
                     {skillAverage == null
@@ -469,7 +498,7 @@ export default function UserProfileDesktopView({
                             fontWeight: 700,
                             fontSize: "11px",
                             letterSpacing: ".04em",
-                            color: "#17181a",
+                            color: "text.primary",
                           }}
                         >
                           {skill.label}
@@ -479,7 +508,10 @@ export default function UserProfileDesktopView({
                             flex: 1,
                             height: 10,
                             borderRadius: "5px",
-                            bgcolor: "#eae6db",
+                            bgcolor: (theme) =>
+                              theme.palette.mode === "dark"
+                                ? "#2d3035"
+                                : "#eae6db",
                             display: "flex",
                             overflow: "hidden",
                           }}
@@ -499,7 +531,7 @@ export default function UserProfileDesktopView({
                             fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                             fontWeight: 700,
                             fontSize: "13px",
-                            color: "#17181a",
+                            color: "text.primary",
                             lineHeight: 1,
                           }}
                         >
@@ -516,10 +548,11 @@ export default function UserProfileDesktopView({
                     fontWeight: 600,
                     fontSize: "11.5px",
                     lineHeight: 1.45,
-                    color: "#6b675c",
+                    color: "text.secondary",
                     mt: 2,
                     pt: 1.75,
-                    borderTop: "1.5px dashed #ddd8cc",
+                    borderTop: (theme) =>
+                      `1.5px dashed ${theme.palette.divider}`,
                   }}
                 >
                   Notas dadas pelos companheiros depois das peladas.
@@ -530,8 +563,9 @@ export default function UserProfileDesktopView({
             {/* Últimas Peladas Card */}
             <Box
               sx={{
-                bgcolor: "#fff",
-                border: "1.5px solid #eae6db",
+                bgcolor: "background.paper",
+                border: "1.5px solid",
+                borderColor: "divider",
                 borderRadius: "16px",
                 overflow: "hidden",
                 mt: 2,
@@ -543,7 +577,8 @@ export default function UserProfileDesktopView({
                   justifyContent: "space-between",
                   alignItems: "center",
                   p: "13px 16px",
-                  borderBottom: "1.5px solid #f2efe7",
+                  borderBottom: "1.5px solid",
+                  borderColor: "divider",
                 }}
               >
                 <Typography
@@ -552,7 +587,7 @@ export default function UserProfileDesktopView({
                     fontWeight: 700,
                     fontSize: "9.5px",
                     letterSpacing: ".16em",
-                    color: "#6b675c",
+                    color: "text.secondary",
                     textTransform: "uppercase",
                   }}
                 >
@@ -563,7 +598,8 @@ export default function UserProfileDesktopView({
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 700,
                     fontSize: "11px",
-                    color: "#146b3a",
+                    color: (theme) =>
+                      theme.palette.mode === "dark" ? "#4caf50" : "#146b3a",
                     cursor: "pointer",
                   }}
                 >
@@ -583,7 +619,7 @@ export default function UserProfileDesktopView({
                       p: "13px 16px",
                       borderBottom:
                         mIdx < recentMatches.length - 1
-                          ? "1.5px solid #f2efe7"
+                          ? (theme) => `1.5px solid ${theme.palette.divider}`
                           : "none",
                     }}
                   >
@@ -593,7 +629,7 @@ export default function UserProfileDesktopView({
                           fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                           fontWeight: 700,
                           fontSize: "14px",
-                          color: "#17181a",
+                          color: "text.primary",
                           lineHeight: 1,
                         }}
                       >
@@ -604,7 +640,7 @@ export default function UserProfileDesktopView({
                           fontFamily: "Archivo, sans-serif",
                           fontWeight: 600,
                           fontSize: "10px",
-                          color: "#6b675c",
+                          color: "text.secondary",
                           mt: 0.5,
                           lineHeight: 1,
                         }}
@@ -620,7 +656,7 @@ export default function UserProfileDesktopView({
                           fontWeight: 700,
                           fontSize: "12px",
                           lineHeight: 1.3,
-                          color: "#17181a",
+                          color: "text.primary",
                         }}
                       >
                         {match.desc}
@@ -631,7 +667,7 @@ export default function UserProfileDesktopView({
                           fontWeight: 600,
                           fontSize: "10.5px",
                           lineHeight: 1.3,
-                          color: "#6b675c",
+                          color: "text.secondary",
                           mt: 0.3,
                         }}
                       >
@@ -668,7 +704,7 @@ export default function UserProfileDesktopView({
                         fontWeight: 700,
                         fontSize: "18px",
                         lineHeight: 1,
-                        color: "#17181a",
+                        color: "text.primary",
                       }}
                     >
                       {match.score}
@@ -684,8 +720,9 @@ export default function UserProfileDesktopView({
             {/* Presença · 12 Semanas Card */}
             <Box
               sx={{
-                bgcolor: "#fff",
-                border: "1.5px solid #eae6db",
+                bgcolor: "background.paper",
+                border: "1.5px solid",
+                borderColor: "divider",
                 borderRadius: "16px",
                 p: 2.25,
               }}
@@ -696,7 +733,7 @@ export default function UserProfileDesktopView({
                   fontWeight: 700,
                   fontSize: "9.5px",
                   letterSpacing: ".18em",
-                  color: "#6b675c",
+                  color: "text.secondary",
                   textTransform: "uppercase",
                 }}
               >
@@ -719,7 +756,7 @@ export default function UserProfileDesktopView({
                       ? "#146b3a"
                       : week.status === "absent"
                         ? "#a8452a"
-                        : "#eae6db";
+                        : inactivePresenceColor;
                   return (
                     <Box
                       key={idx}
@@ -752,7 +789,7 @@ export default function UserProfileDesktopView({
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 600,
                       fontSize: "11px",
-                      color: "#6b675c",
+                      color: "text.secondary",
                     }}
                   >
                     presente
@@ -772,7 +809,7 @@ export default function UserProfileDesktopView({
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 600,
                       fontSize: "11px",
-                      color: "#6b675c",
+                      color: "text.secondary",
                     }}
                   >
                     faltou
@@ -784,7 +821,8 @@ export default function UserProfileDesktopView({
                       width: 9,
                       height: 9,
                       borderRadius: "2px",
-                      bgcolor: "#eae6db",
+                      bgcolor: (theme) =>
+                        theme.palette.mode === "dark" ? "#2d3035" : "#eae6db",
                     }}
                   />
                   <Typography
@@ -792,7 +830,7 @@ export default function UserProfileDesktopView({
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 600,
                       fontSize: "11px",
-                      color: "#6b675c",
+                      color: "text.secondary",
                     }}
                   >
                     sem jogo
@@ -806,16 +844,16 @@ export default function UserProfileDesktopView({
                   fontWeight: 600,
                   fontSize: "11.5px",
                   lineHeight: 1.4,
-                  color: "#6b675c",
+                  color: "text.secondary",
                   mt: 1.6,
                   pt: 1.5,
-                  borderTop: "1.5px dashed #ddd8cc",
+                  borderTop: (theme) => `1.5px dashed ${theme.palette.divider}`,
                 }}
               >
                 Maior sequência:{" "}
                 <Box
                   component="strong"
-                  sx={{ color: "#17181a", fontWeight: 800 }}
+                  sx={{ color: "text.primary", fontWeight: 800 }}
                 >
                   {streak} {streak === 1 ? "jogo" : "jogos"}
                 </Box>
@@ -828,10 +866,11 @@ export default function UserProfileDesktopView({
               <Box
                 key={group.organization_id}
                 sx={{
-                  border: "1.5px solid #eae6db",
+                  border: "1.5px solid",
+                  borderColor: "divider",
                   borderRadius: "16px",
                   overflow: "hidden",
-                  bgcolor: "#fff",
+                  bgcolor: "background.paper",
                   mt: 1.75,
                 }}
               >
@@ -841,8 +880,12 @@ export default function UserProfileDesktopView({
                     alignItems: "center",
                     gap: 1,
                     p: "11px 14px",
-                    bgcolor: "#f4f8f5",
-                    borderBottom: "1.5px solid #eae6db",
+                    bgcolor: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? alpha(theme.palette.primary.main, 0.12)
+                        : "#f4f8f5",
+                    borderBottom: "1.5px solid",
+                    borderColor: "divider",
                   }}
                 >
                   <Box
@@ -858,7 +901,7 @@ export default function UserProfileDesktopView({
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 800,
                       fontSize: "11px",
-                      color: "#17181a",
+                      color: "text.primary",
                     }}
                   >
                     {group.organization_name}
@@ -869,7 +912,7 @@ export default function UserProfileDesktopView({
                       fontWeight: 700,
                       fontSize: "9.5px",
                       letterSpacing: ".1em",
-                      color: "#6b675c",
+                      color: "text.secondary",
                       textTransform: "uppercase",
                     }}
                   >
@@ -877,66 +920,26 @@ export default function UserProfileDesktopView({
                   </Typography>
                 </Box>
 
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(4, 1fr)",
-                    gap: "1px",
-                    bgcolor: "#eae6db",
-                  }}
-                >
-                  {[
-                    {
-                      label: "JOGOS",
-                      val: group.peladas_played,
-                      color: "#17181a",
-                    },
-                    { label: "GOLS", val: group.goals, color: "#17181a" },
-                    {
-                      label: "ASSIST.",
-                      val: group.assists,
-                      color: "#146b3a",
-                    },
-                    { label: "TÍTULOS", val: group.titles, color: "#17181a" },
-                  ].map((item) => (
-                    <Box
-                      key={item.label}
-                      sx={{ bgcolor: "#fff", p: "12px 9px" }}
-                    >
-                      <Typography
-                        sx={{
-                          fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                          fontWeight: 700,
-                          fontSize: "23px",
-                          lineHeight: 1,
-                          color: item.color,
-                        }}
-                      >
-                        {item.val}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontFamily: "Archivo, sans-serif",
-                          fontWeight: 700,
-                          fontSize: "8px",
-                          lineHeight: 1.2,
-                          letterSpacing: ".08em",
-                          color: "#6b675c",
-                          mt: 0.5,
-                        }}
-                      >
-                        {item.label}
-                      </Typography>
-                    </Box>
-                  ))}
-                </Box>
+                <UserGroupStatsGrid
+                  peladasPlayed={group.peladas_played}
+                  goals={group.goals}
+                  assists={group.assists}
+                  titles={group.titles}
+                />
               </Box>
             ))}
 
             {/* Pagamentos Dark Card */}
             <Box
               sx={{
-                bgcolor: "#17181a",
+                bgcolor: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "background.paper"
+                    : "#17181a",
+                border: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "1.5px solid #2d3035"
+                    : "none",
                 borderRadius: "16px",
                 p: 2,
                 mt: 1.5,
