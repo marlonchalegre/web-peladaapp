@@ -342,6 +342,7 @@ export default function UserProfilePage() {
           username={username}
           position={position}
           userInitials={userInitials}
+          avatarFilename={avatarFilename || authUser?.avatar_filename}
           dashboard={dashboard}
           onEditClick={() => setIsEditing(true)}
         />
@@ -429,25 +430,22 @@ export default function UserProfilePage() {
                 }}
               >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  <Box
+                  <SecureAvatar
+                    userId={authUser?.id}
+                    filename={avatarFilename || authUser?.avatar_filename}
+                    fallbackText={userInitials}
                     sx={{
                       width: 64,
                       height: 64,
-                      borderRadius: "50%",
                       bgcolor: "#d8d2c4",
                       border: "3px solid #f6f4ee",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 800,
                       fontSize: "20px",
                       color: "#17181a",
                       flexShrink: 0,
                     }}
-                  >
-                    {userInitials}
-                  </Box>
+                  />
                   <Box>
                     <Typography
                       sx={{

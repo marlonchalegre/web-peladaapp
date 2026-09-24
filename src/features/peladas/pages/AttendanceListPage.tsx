@@ -27,6 +27,8 @@ import { createApi } from "../../../shared/api/endpoints";
 import UserAttendanceStatus from "../components/UserAttendanceStatus";
 import AttendanceListDesktopView from "../components/AttendanceListDesktopView";
 import LocationDisplay from "../../../shared/components/LocationDisplay";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
+import { getInitials } from "../../../shared/utils/initials";
 
 export default function AttendanceListPage() {
   const { t } = useTranslation();
@@ -160,17 +162,6 @@ export default function AttendanceListPage() {
       default:
         return "DIARISTA";
     }
-  };
-
-  const getInitials = (name?: string) => {
-    if (!name) return "JG";
-    return name
-      .split(" ")
-      .filter(Boolean)
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
   };
 
   const getPositionLabel = (pos?: string) => {
@@ -721,27 +712,24 @@ export default function AttendanceListPage() {
                         {idx + 1}
                       </Typography>
 
-                      {/* Circle Avatar */}
-                      <Box
+                      <SecureAvatar
+                        userId={p.user_id}
+                        filename={
+                          p.user?.avatar_filename || p.user_avatar_filename
+                        }
+                        fallbackText={pInitials}
                         sx={{
                           width: 30,
                           height: 30,
-                          borderRadius: "50%",
                           bgcolor: isCurrent ? "#c9d9cd" : "#dcd3bd",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
                           fontFamily: "Archivo, sans-serif",
                           fontWeight: 800,
                           fontSize: "10px",
                           color: "#17181a",
                           flexShrink: 0,
                         }}
-                      >
-                        {pInitials}
-                      </Box>
+                      />
 
-                      {/* Name & Position */}
                       <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Typography
                           data-testid="attendance-card-name"

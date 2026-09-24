@@ -819,4 +819,25 @@ describe("UserProfilePage", () => {
       screen.queryByText("user.profile.error.load_failed"),
     ).not.toBeInTheDocument();
   });
+
+  it("renders SecureAvatar in the profile card header", async () => {
+    (getUser as Mock).mockResolvedValue({
+      ...defaultUser,
+      avatar_filename: "avatar123.jpg",
+    });
+
+    render(
+      <MemoryRouter>
+        <UserProfilePage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("MINHA FICHA")).toBeInTheDocument();
+    });
+
+    const secureAvatars = screen.getAllByTestId("secure-avatar");
+    expect(secureAvatars.length).toBeGreaterThan(0);
+    expect(secureAvatars[0]).toBeInTheDocument();
+  });
 });

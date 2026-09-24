@@ -11,6 +11,8 @@ import type { PlayerWithUser } from "../hooks/useAttendance";
 import PeladaTabsBar from "./PeladaTabsBar";
 import LocationDisplay from "../../../shared/components/LocationDisplay";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
+import { getInitials } from "../../../shared/utils/initials";
 
 interface AttendanceListDesktopViewProps {
   pelada: Pelada;
@@ -82,17 +84,6 @@ export default function AttendanceListDesktopView({
       setCopiedList(true);
       setTimeout(() => setCopiedList(false), 2000);
     }
-  };
-
-  const getInitials = (name?: string) => {
-    if (!name) return "JG";
-    return name
-      .split(" ")
-      .filter(Boolean)
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
   };
 
   const getPositionLabel = (pos?: string) => {
@@ -345,24 +336,21 @@ export default function AttendanceListDesktopView({
               gap: 2.2,
             }}
           >
-            <Box
+            <SecureAvatar
+              userId={currentUser?.id}
+              filename={currentUser?.avatar_filename}
+              fallbackText={getInitials(currentUser?.name)}
               sx={{
                 width: 44,
                 height: 44,
-                borderRadius: "50%",
                 bgcolor: "#146b3a",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
                 fontFamily: "Archivo, sans-serif",
                 fontWeight: 800,
                 fontSize: "13px",
                 color: "#ffffff",
                 flexShrink: 0,
               }}
-            >
-              {getInitials(currentUser?.name)}
-            </Box>
+            />
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <Typography
                 sx={{
@@ -712,24 +700,24 @@ export default function AttendanceListDesktopView({
                           minWidth: 0,
                         }}
                       >
-                        <Box
+                        <SecureAvatar
+                          userId={player.user_id}
+                          filename={
+                            player.user?.avatar_filename ||
+                            player.user_avatar_filename
+                          }
+                          fallbackText={pInitials}
                           sx={{
                             width: 30,
                             height: 30,
-                            borderRadius: "50%",
                             bgcolor: avatarBg,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: 800,
                             fontSize: "10px",
                             color: avatarBg === "#146b3a" ? "#fff" : "#17181a",
                             flexShrink: 0,
                           }}
-                        >
-                          {pInitials}
-                        </Box>
+                        />
                         <Box sx={{ minWidth: 0 }}>
                           <Typography
                             sx={{
@@ -1247,24 +1235,24 @@ export default function AttendanceListDesktopView({
                       >
                         {wIdx + 1}
                       </Box>
-                      <Box
+                      <SecureAvatar
+                        userId={wPlayer.user_id}
+                        filename={
+                          wPlayer.user?.avatar_filename ||
+                          wPlayer.user_avatar_filename
+                        }
+                        fallbackText={wInitials}
                         sx={{
                           width: 28,
                           height: 28,
-                          borderRadius: "50%",
                           bgcolor: "#e2cfc7",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
                           fontFamily: "Archivo, sans-serif",
                           fontWeight: 800,
                           fontSize: "9.5px",
                           color: "#17181a",
                           flexShrink: 0,
                         }}
-                      >
-                        {wInitials}
-                      </Box>
+                      />
                       <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Typography
                           sx={{

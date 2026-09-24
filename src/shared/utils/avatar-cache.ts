@@ -6,6 +6,7 @@ export interface CacheEntry {
 }
 
 export const avatarCache: Record<string, CacheEntry> = {};
+export const inflightAvatarPromises = new Map<string, Promise<string>>();
 
 /**
  * Clears the avatar cache. Internal use only (primarily for tests).
@@ -15,4 +16,5 @@ export const clearAvatarCache = () => {
     URL.revokeObjectURL(avatarCache[key].blobUrl);
     delete avatarCache[key];
   });
+  inflightAvatarPromises.clear();
 };

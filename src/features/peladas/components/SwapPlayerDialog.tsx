@@ -8,7 +8,6 @@ import {
   ListItem,
   ListItemAvatar,
   ListItemText,
-  Avatar,
   Typography,
   Box,
   ListItemButton,
@@ -17,6 +16,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useTranslation } from "react-i18next";
 import { type Player, type User } from "../../../shared/api/endpoints";
 import { sortPlayersByPosition, getPlayerInitials } from "../utils/playerUtils";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 
 type PlayerWithUser = Player & { user: User };
 
@@ -82,16 +82,17 @@ export default function SwapPlayerDialog({
                   }}
                 >
                   <ListItemAvatar>
-                    <Avatar
+                    <SecureAvatar
+                      userId={player.user?.id}
+                      filename={player.user?.avatar_filename}
+                      fallbackText={getPlayerInitials(player.user?.name)}
                       sx={{
                         bgcolor: isSamePosition ? "primary.main" : "grey.400",
                         width: 32,
                         height: 32,
                         fontSize: "0.85rem",
                       }}
-                    >
-                      {getPlayerInitials(player.user?.name)}
-                    </Avatar>
+                    />
                   </ListItemAvatar>
                   <ListItemText
                     primary={

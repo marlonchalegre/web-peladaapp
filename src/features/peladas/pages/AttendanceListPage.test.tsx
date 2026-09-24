@@ -337,4 +337,62 @@ describe("AttendanceListPage", () => {
 
     expect(writeTextMock).toHaveBeenCalled();
   });
+
+  it("renders SecureAvatar for confirmed player in attendance list", async () => {
+    const mockFullDetails = {
+      pelada: {
+        id: "1",
+        organization_id: "101",
+        organization_name: "Test Org",
+        status: "attendance",
+      },
+      available_players: [
+        {
+          id: "10",
+          user_id: "1",
+          attendance_status: "confirmed",
+          member_type: "mensalista",
+          user_avatar_filename: "player-avatar.png",
+          user: {
+            id: "1",
+            name: "Confirmed Player",
+            position: "Striker",
+            avatar_filename: "player-avatar.png",
+          },
+        },
+      ],
+      teams: [],
+      scores: {},
+      attendance: [],
+      users_map: {},
+      org_players_map: {},
+      voting_info: null,
+    };
+
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/peladas/1/full-details")
+        return Promise.resolve(mockFullDetails);
+      if (path === "/api/organizations/101/admins") return Promise.resolve([]);
+      return Promise.reject(new Error(`Not found: ${path}`));
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/peladas/1/attendance"]}>
+        <Routes>
+          <Route
+            path="/peladas/:id/attendance"
+            element={<AttendanceListPage />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Confirmed Player")).toBeInTheDocument();
+    });
+
+    const avatars = screen.getAllByTestId("secure-avatar");
+    expect(avatars.length).toBeGreaterThan(0);
+    expect(avatars.some((a) => a.textContent === "CP")).toBe(true);
+  });
 });

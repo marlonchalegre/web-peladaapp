@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Avatar, type AvatarProps } from "@mui/material";
 import { api } from "../api/client";
-import { avatarCache } from "../utils/avatar-cache";
+import { avatarCache, inflightAvatarPromises } from "../utils/avatar-cache";
 
 interface SecureAvatarProps extends AvatarProps {
   userId?: string;
@@ -44,8 +44,28 @@ export const SecureAvatar = React.memo<SecureAvatarProps>(
           return;
         }
 
+        // 2. Check in-flight promise from another concurrent SecureAvatar
+        const inflightPromise = inflightAvatarPromises.get(cacheKey);
+        if (inflightPromise) {
+          setLoading(true);
+          try {
+            const blobUrl = await inflightPromise;
+            if (active) {
+              if (avatarCache[cacheKey]) {
+                avatarCache[cacheKey].refCount++;
+              }
+              setImageUrl(blobUrl);
+            }
+          } catch {
+            if (active) setImageUrl(undefined);
+          } finally {
+            if (active) setLoading(false);
+          }
+          return;
+        }
+
         setLoading(true);
-        try {
+        const fetchPromise = (async () => {
           const response = await fetch(cacheKey, {
             credentials: "same-origin",
           });
@@ -55,22 +75,26 @@ export const SecureAvatar = React.memo<SecureAvatarProps>(
           }
 
           const blob = await response.blob();
+          const objectUrl = URL.createObjectURL(blob);
+          avatarCache[cacheKey] = { blobUrl: objectUrl, refCount: 0 };
+          return objectUrl;
+        })();
+
+        inflightAvatarPromises.set(cacheKey, fetchPromise);
+
+        try {
+          const objectUrl = await fetchPromise;
           if (active) {
-            // Double check cache after async fetch
-            const existingAfterFetch = avatarCache[cacheKey];
-            if (existingAfterFetch) {
-              existingAfterFetch.refCount++;
-              setImageUrl(existingAfterFetch.blobUrl);
-            } else {
-              const objectUrl = URL.createObjectURL(blob);
-              avatarCache[cacheKey] = { blobUrl: objectUrl, refCount: 1 };
-              setImageUrl(objectUrl);
+            if (avatarCache[cacheKey]) {
+              avatarCache[cacheKey].refCount++;
             }
+            setImageUrl(objectUrl);
           }
         } catch (error) {
           console.error("Error loading secure avatar:", error);
           if (active) setImageUrl(undefined);
         } finally {
+          inflightAvatarPromises.delete(cacheKey);
           if (active) setLoading(false);
         }
       };

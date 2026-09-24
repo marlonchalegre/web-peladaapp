@@ -1,12 +1,5 @@
 import { useMemo, useState } from "react";
-import {
-  Avatar,
-  Box,
-  IconButton,
-  Menu,
-  MenuItem,
-  Typography,
-} from "@mui/material";
+import { Box, IconButton, Menu, MenuItem, Typography } from "@mui/material";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import { useNavigate } from "react-router-dom";
@@ -17,6 +10,8 @@ import type {
   User,
   WeeklyPresence,
 } from "../../../shared/api/endpoints";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
+import { getInitials } from "../../../shared/utils/initials";
 
 type MetricType = "goals" | "assists" | "presence" | "titles" | "rating";
 
@@ -60,17 +55,6 @@ const PODIUM_TITLES: Record<MetricType, string> = {
   presence: "PRESENÇA",
   titles: "TÍTULOS",
   rating: "NOTA MÉDIA",
-};
-
-const getInitials = (name?: string) => {
-  if (!name) return "JG";
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
 };
 
 const getMetricValue = (
@@ -320,7 +304,10 @@ export default function OrganizationStatisticsMobileView({
 
     return (
       <Box sx={{ flex: 1, textAlign: "center" }}>
-        <Avatar
+        <SecureAvatar
+          userId={player?.user_id}
+          filename={player?.avatar_filename}
+          fallbackText={getInitials(player?.player_name)}
           sx={{
             width: isFirst ? 48 : 40,
             height: isFirst ? 48 : 40,
@@ -332,9 +319,7 @@ export default function OrganizationStatisticsMobileView({
               ? "800 14px Archivo,sans-serif"
               : "800 12px Archivo,sans-serif",
           }}
-        >
-          {getInitials(player?.player_name)}
-        </Avatar>
+        />
         <Box
           sx={{
             bgcolor: baseColor,
@@ -736,7 +721,10 @@ export default function OrganizationStatisticsMobileView({
                 >
                   {position}
                 </Typography>
-                <Avatar
+                <SecureAvatar
+                  userId={item.user_id}
+                  filename={item.avatar_filename}
+                  fallbackText={getInitials(item.player_name)}
                   sx={{
                     width: 30,
                     height: 30,
@@ -745,9 +733,7 @@ export default function OrganizationStatisticsMobileView({
                     font: "800 10px Archivo,sans-serif",
                     flexShrink: 0,
                   }}
-                >
-                  {getInitials(item.player_name)}
-                </Avatar>
+                />
                 <Box sx={{ flex: 1, minWidth: 0 }}>
                   <Typography
                     noWrap
@@ -961,7 +947,10 @@ export default function OrganizationStatisticsMobileView({
                       : "1.5px solid #f2efe7",
                 }}
               >
-                <Avatar
+                <SecureAvatar
+                  userId={highlight.player?.user_id}
+                  filename={highlight.player?.avatar_filename}
+                  fallbackText={getInitials(highlight.player?.player_name)}
                   sx={{
                     width: 30,
                     height: 30,
@@ -970,9 +959,7 @@ export default function OrganizationStatisticsMobileView({
                     font: "800 10px Archivo,sans-serif",
                     flexShrink: 0,
                   }}
-                >
-                  {getInitials(highlight.player?.player_name)}
-                </Avatar>
+                />
                 <Box sx={{ flex: 1, minWidth: 0 }}>
                   <Typography
                     noWrap

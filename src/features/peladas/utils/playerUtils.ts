@@ -1,4 +1,5 @@
 import type { MatchEvent } from "../../../shared/api/endpoints";
+import { getInitials as getSharedInitials } from "../../../shared/utils/initials";
 
 export const POSITION_ORDER: Record<string, number> = {
   goalkeeper: 0,
@@ -236,15 +237,7 @@ export const AVATAR_BG_COLORS = [
  * Returns first two initials for a given name.
  */
 export function getInitials(name?: string | null, fallback = "JG"): string {
-  if (!name) return fallback;
-  const initials = name
-    .split(" ")
-    .filter(Boolean)
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-  return initials || fallback;
+  return getSharedInitials(name, fallback);
 }
 
 /**

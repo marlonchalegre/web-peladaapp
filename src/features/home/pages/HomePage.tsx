@@ -20,6 +20,8 @@ import ActiveMatchesCarousel from "../components/ActiveMatchesCarousel";
 import ConsolidatedOrganizationsList from "../components/ConsolidatedOrganizationsList";
 import CreateOrganizationDialog from "../components/CreateOrganizationDialog";
 import PendingInvitations from "../components/PendingInvitations";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
+import { getInitials } from "../../../shared/utils/initials";
 
 export default function HomePage() {
   const { user, refreshUser, signOut } = useAuth();
@@ -217,29 +219,23 @@ export default function HomePage() {
                     <IconButton
                       onClick={handleOpenUserMenu}
                       data-testid="user-settings-button"
-                      sx={{
-                        p: 0,
-                        width: 32,
-                        height: 32,
-                        borderRadius: "50%",
-                        bgcolor: "#d8d2c4",
-                        border: "1.5px solid #ddd8cc",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontFamily: "Archivo, sans-serif",
-                        fontWeight: 800,
-                        fontSize: "11px",
-                        color: "#17181a",
-                      }}
+                      sx={{ p: 0 }}
                     >
-                      {user.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .filter(Boolean)
-                        .slice(0, 2)
-                        .join("")
-                        .toUpperCase()}
+                      <SecureAvatar
+                        userId={user.id}
+                        filename={user.avatar_filename}
+                        fallbackText={getInitials(user.name)}
+                        sx={{
+                          width: 32,
+                          height: 32,
+                          bgcolor: "#d8d2c4",
+                          border: "1.5px solid #ddd8cc",
+                          fontFamily: "Archivo, sans-serif",
+                          fontWeight: 800,
+                          fontSize: "11px",
+                          color: "#17181a",
+                        }}
+                      />
                     </IconButton>
 
                     <Menu

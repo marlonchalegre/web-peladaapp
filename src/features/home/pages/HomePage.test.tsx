@@ -273,4 +273,21 @@ describe("HomePage", () => {
       expect(goalsCard).toHaveTextContent("3");
     });
   });
+
+  it("renders SecureAvatar in user settings button with user initials", async () => {
+    (api.get as Mock).mockResolvedValue([]);
+
+    render(
+      <MemoryRouter>
+        <HomePage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("user-settings-button")).toBeInTheDocument();
+    });
+    const avatar = screen.getByTestId("secure-avatar");
+    expect(avatar).toBeInTheDocument();
+    expect(avatar).toHaveTextContent("TU");
+  });
 });

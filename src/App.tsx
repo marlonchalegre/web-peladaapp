@@ -156,6 +156,7 @@ function AnalyticsTracker() {
   }, [location.pathname]);
 
   useEffect(() => {
+    if (!getMeasurementId()) return;
     initGA();
 
     if (!versionLoggedRef.current) {

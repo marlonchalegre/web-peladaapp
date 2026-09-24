@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Box,
   Dialog,
   DialogContent,
@@ -9,6 +8,8 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import type { Player } from "../../../shared/api/endpoints";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
+import { getInitials } from "../../../shared/utils/initials";
 
 interface OrganizationRosterDialogProps {
   open: boolean;
@@ -26,17 +27,6 @@ const AVATAR_BG_COLORS = [
   "#d8d2c4",
   "#cfd8cd",
 ];
-
-const getInitials = (name?: string) => {
-  if (!name) return "JG";
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-};
 
 const formatPosition = (pos?: string) => {
   if (!pos) return "jogador";
@@ -157,7 +147,10 @@ export default function OrganizationRosterDialog({
                     : "1.5px solid #f2efe7",
               }}
             >
-              <Avatar
+              <SecureAvatar
+                userId={player.user_id}
+                filename={player.user_avatar_filename}
+                fallbackText={getInitials(player.user_name)}
                 sx={{
                   width: 32,
                   height: 32,
@@ -165,9 +158,7 @@ export default function OrganizationRosterDialog({
                   color: "#17181a",
                   font: "800 10px Archivo,sans-serif",
                 }}
-              >
-                {getInitials(player.user_name)}
-              </Avatar>
+              />
               <Box sx={{ flex: 1, minWidth: 0 }}>
                 <Typography
                   noWrap

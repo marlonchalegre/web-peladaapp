@@ -28,6 +28,8 @@ import type {
 } from "../../../shared/api/endpoints";
 import CreatePeladaForm, { type CreatePeladaPayload } from "./CreatePeladaForm";
 import OrganizationRosterDialog from "./OrganizationRosterDialog";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
+import { getInitials } from "../../../shared/utils/initials";
 
 interface OrganizationDetailMobileViewProps {
   org: Organization;
@@ -59,17 +61,6 @@ const AVATAR_BG_COLORS = [
   "#d8d2c4",
   "#cfd8cd",
 ];
-
-const getInitials = (name?: string) => {
-  if (!name) return "JG";
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-};
 
 const formatMemberType = (memberType?: string) => {
   switch (memberType) {
@@ -1228,7 +1219,10 @@ export default function OrganizationDetailMobileView({
                     mt: 1.25,
                   }}
                 >
-                  <Avatar
+                  <SecureAvatar
+                    userId={topScorer.user_id}
+                    filename={topScorer.avatar_filename}
+                    fallbackText={getInitials(topScorer.player_name)}
                     sx={{
                       width: 28,
                       height: 28,
@@ -1236,9 +1230,7 @@ export default function OrganizationDetailMobileView({
                       color: "#17181a",
                       font: "800 9.5px Archivo,sans-serif",
                     }}
-                  >
-                    {getInitials(topScorer.player_name)}
-                  </Avatar>
+                  />
                   <Typography
                     sx={{
                       font: "700 25px/1 'Archivo Narrow',Archivo,sans-serif",
@@ -1288,7 +1280,10 @@ export default function OrganizationDetailMobileView({
                     mt: 1.25,
                   }}
                 >
-                  <Avatar
+                  <SecureAvatar
+                    userId={topAssister.user_id}
+                    filename={topAssister.avatar_filename}
+                    fallbackText={getInitials(topAssister.player_name)}
                     sx={{
                       width: 28,
                       height: 28,
@@ -1296,9 +1291,7 @@ export default function OrganizationDetailMobileView({
                       color: "#17181a",
                       font: "800 9.5px Archivo,sans-serif",
                     }}
-                  >
-                    {getInitials(topAssister.player_name)}
-                  </Avatar>
+                  />
                   <Typography
                     sx={{
                       font: "700 25px/1 'Archivo Narrow',Archivo,sans-serif",
@@ -1349,7 +1342,10 @@ export default function OrganizationDetailMobileView({
                     mt: 1.25,
                   }}
                 >
-                  <Avatar
+                  <SecureAvatar
+                    userId={myStat.user_id}
+                    filename={myStat.avatar_filename}
+                    fallbackText={getInitials(myStat.player_name)}
                     sx={{
                       width: 28,
                       height: 28,
@@ -1357,9 +1353,7 @@ export default function OrganizationDetailMobileView({
                       color: "#ffffff",
                       font: "800 9.5px Archivo,sans-serif",
                     }}
-                  >
-                    {getInitials(myStat.player_name)}
-                  </Avatar>
+                  />
                   <Typography
                     sx={{
                       font: "700 25px/1 'Archivo Narrow',Archivo,sans-serif",
@@ -1439,8 +1433,11 @@ export default function OrganizationDetailMobileView({
               }}
             >
               {rosterPreview.map((player, idx) => (
-                <Avatar
+                <SecureAvatar
                   key={player.id}
+                  userId={player.user_id}
+                  filename={player.user_avatar_filename}
+                  fallbackText={getInitials(player.user_name)}
                   sx={{
                     width: 34,
                     height: 34,
@@ -1448,9 +1445,7 @@ export default function OrganizationDetailMobileView({
                     color: "#17181a",
                     font: "800 10px Archivo,sans-serif",
                   }}
-                >
-                  {getInitials(player.user_name)}
-                </Avatar>
+                />
               ))}
               {rosterOverflow > 0 && (
                 <Avatar

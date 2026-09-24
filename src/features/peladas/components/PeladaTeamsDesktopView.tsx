@@ -21,6 +21,7 @@ import {
   getInitials,
   formatPosition,
 } from "../utils/playerUtils";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 
 export interface PeladaTeamsDesktopViewProps {
   pelada: Pelada;
@@ -907,24 +908,21 @@ export default function PeladaTeamsDesktopView({
                     >
                       {homeGk ? (
                         <>
-                          <Box
+                          <SecureAvatar
+                            userId={homeGk.user?.id}
+                            filename={homeGk.user?.avatar_filename}
+                            fallbackText={getInitials(homeGk.user?.name)}
                             sx={{
                               width: 28,
                               height: 28,
-                              borderRadius: "50%",
                               bgcolor: "#dcd3bd",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
                               fontFamily: "Archivo, sans-serif",
                               fontWeight: 800,
                               fontSize: "9.5px",
                               color: "#17181a",
                               flexShrink: 0,
                             }}
-                          >
-                            {getInitials(homeGk.user?.name)}
-                          </Box>
+                          />
                           <Box sx={{ minWidth: 0, flex: 1 }}>
                             <Typography
                               sx={{
@@ -997,24 +995,21 @@ export default function PeladaTeamsDesktopView({
                     >
                       {awayGk ? (
                         <>
-                          <Box
+                          <SecureAvatar
+                            userId={awayGk.user?.id}
+                            filename={awayGk.user?.avatar_filename}
+                            fallbackText={getInitials(awayGk.user?.name)}
                             sx={{
                               width: 28,
                               height: 28,
-                              borderRadius: "50%",
                               bgcolor: "#cdd6e0",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
                               fontFamily: "Archivo, sans-serif",
                               fontWeight: 800,
                               fontSize: "9.5px",
                               color: "#17181a",
                               flexShrink: 0,
                             }}
-                          >
-                            {getInitials(awayGk.user?.name)}
-                          </Box>
+                          />
                           <Box sx={{ minWidth: 0, flex: 1 }}>
                             <Typography
                               sx={{
@@ -1351,24 +1346,21 @@ export default function PeladaTeamsDesktopView({
                               "&:active": { cursor: "grabbing" },
                             }}
                           >
-                            <Box
+                            <SecureAvatar
+                              userId={p.user?.id}
+                              filename={p.user?.avatar_filename}
+                              fallbackText={getInitials(p.user?.name)}
                               sx={{
                                 width: 26,
                                 height: 26,
-                                borderRadius: "50%",
                                 bgcolor: isYou ? "#146b3a" : avatarBg,
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
                                 fontFamily: "Archivo, sans-serif",
                                 fontWeight: 800,
                                 fontSize: "9px",
                                 color: isYou ? "#fff" : "#17181a",
                                 flexShrink: 0,
                               }}
-                            >
-                              {getInitials(p.user?.name)}
-                            </Box>
+                            />
 
                             <Box sx={{ flex: 1, minWidth: 0 }}>
                               <Typography
@@ -1522,25 +1514,22 @@ export default function PeladaTeamsDesktopView({
                       "&:active": { cursor: "grabbing" },
                     }}
                   >
-                    <Box
+                    <SecureAvatar
+                      userId={bp.user?.id}
+                      filename={bp.user?.avatar_filename}
+                      fallbackText={getInitials(bp.user?.name)}
                       sx={{
                         width: 26,
                         height: 26,
-                        borderRadius: "50%",
                         bgcolor:
                           AVATAR_BG_COLORS[bIdx % AVATAR_BG_COLORS.length],
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 800,
                         fontSize: "9px",
                         color: "#17181a",
                         flexShrink: 0,
                       }}
-                    >
-                      {getInitials(bp.user?.name)}
-                    </Box>
+                    />
                     <Box>
                       <Typography
                         sx={{

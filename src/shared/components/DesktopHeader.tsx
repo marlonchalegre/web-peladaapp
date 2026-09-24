@@ -16,6 +16,7 @@ import { api } from "../../shared/api/client";
 import { createApi, type Organization } from "../../shared/api/endpoints";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
+import { SecureAvatar } from "./SecureAvatar";
 
 const endpoints = createApi(api);
 
@@ -473,42 +474,39 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
             </IconButton>
           </Tooltip>
 
-          {/* User Avatar */}
-          <Box
-            component="button"
-            type="button"
+          <IconButton
             onClick={handleOpenUserMenu}
             aria-haspopup="true"
             aria-expanded={Boolean(anchorElUser)}
             aria-label={t("navigation.userMenu", "Menu do usuário")}
             data-testid="user-settings-button"
             sx={{
-              width: 32,
-              height: 32,
-              borderRadius: "50%",
-              bgcolor: "#146b3a",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: "Archivo, sans-serif",
-              fontWeight: 800,
-              fontSize: "10.5px",
-              color: "#ffffff",
-              cursor: "pointer",
-              border: "2px solid rgba(255, 255, 255, 0.2)",
-              outline: "none",
+              p: 0,
               transition: "transform 0.15s ease",
               "&:hover": {
                 transform: "scale(1.05)",
               },
               "&:focus-visible": {
-                borderColor: "#ffffff",
                 boxShadow: "0 0 0 2px rgba(255, 255, 255, 0.5)",
               },
             }}
           >
-            {userInitials}
-          </Box>
+            <SecureAvatar
+              userId={user?.id}
+              filename={user?.avatar_filename}
+              fallbackText={userInitials}
+              sx={{
+                width: 32,
+                height: 32,
+                bgcolor: "#146b3a",
+                border: "2px solid rgba(255, 255, 255, 0.2)",
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 800,
+                fontSize: "10.5px",
+                color: "#ffffff",
+              }}
+            />
+          </IconButton>
 
           <Menu
             anchorEl={anchorElUser}

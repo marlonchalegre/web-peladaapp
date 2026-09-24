@@ -7,6 +7,7 @@ import {
   formatSkill,
   toRecentMatchRows,
 } from "../utils/profileFormat";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 
 export interface UserProfileDesktopViewProps {
   user: User | null;
@@ -14,6 +15,7 @@ export interface UserProfileDesktopViewProps {
   username: string;
   position: string;
   userInitials: string;
+  avatarFilename?: string | null;
   dashboard?: UserProfileDashboard | null;
   onEditClick: () => void;
 }
@@ -24,6 +26,7 @@ export default function UserProfileDesktopView({
   username,
   position,
   userInitials,
+  avatarFilename,
   dashboard,
   onEditClick,
 }: UserProfileDesktopViewProps) {
@@ -86,26 +89,22 @@ export default function UserProfileDesktopView({
             gap: 2.75,
           }}
         >
-          {/* Avatar */}
-          <Box
+          <SecureAvatar
+            userId={user?.id}
+            filename={avatarFilename ?? user?.avatar_filename}
+            fallbackText={userInitials}
             sx={{
               width: 88,
               height: 88,
-              borderRadius: "50%",
               bgcolor: "#d8d2c4",
               border: "3px solid #f6f4ee",
               flexShrink: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
               fontFamily: "Archivo, sans-serif",
               fontWeight: 800,
               fontSize: "28px",
               color: "#17181a",
             }}
-          >
-            {userInitials}
-          </Box>
+          />
 
           {/* User Info & Badges */}
           <Box sx={{ flex: 1, minWidth: 0 }}>

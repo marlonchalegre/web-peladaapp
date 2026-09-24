@@ -153,7 +153,8 @@ describe("SecureAvatar", () => {
     render(<SecureAvatar userId={userId.toString()} filename={filename} />);
     render(<SecureAvatar userId={userId.toString()} filename={filename} />);
 
-    expect(global.fetch).toHaveBeenCalledTimes(2);
+    // With in-flight promise deduplication, concurrent renders only fire 1 network fetch
+    expect(global.fetch).toHaveBeenCalledTimes(1);
 
     // Resolve the fetches
     await act(async () => {

@@ -168,4 +168,11 @@ describe("UserProfileDesktopView", () => {
     fireEvent.click(screen.getByTestId("edit-profile-button"));
     expect(onEditClick).toHaveBeenCalledTimes(1);
   });
+
+  it("renders SecureAvatar with user initials as fallback", () => {
+    render(<UserProfileDesktopView {...defaultProps} />);
+    const avatar = screen.getByTestId("secure-avatar");
+    expect(avatar).toBeInTheDocument();
+    expect(avatar).toHaveTextContent("IM");
+  });
 });

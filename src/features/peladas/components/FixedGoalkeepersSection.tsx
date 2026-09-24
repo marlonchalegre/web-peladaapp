@@ -3,7 +3,6 @@ import {
   Typography,
   Grid,
   Paper,
-  Avatar,
   Stack,
   Chip,
   IconButton,
@@ -15,6 +14,7 @@ import SecurityIcon from "@mui/icons-material/Security";
 import { useTranslation } from "react-i18next";
 import type { Player, User } from "../../../shared/api/endpoints";
 import type { DragEvent } from "react";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 
 type PlayerWithUser = Player & { user: User };
 
@@ -126,7 +126,10 @@ export default function FixedGoalkeepersSection({
             cursor: locked ? "default" : "grab",
           }}
         >
-          <Avatar
+          <SecureAvatar
+            userId={player.user?.id}
+            filename={player.user?.avatar_filename}
+            fallbackText={player.user?.name?.[0]?.toUpperCase() || "G"}
             sx={{
               bgcolor: "primary.main",
               width: 48,
@@ -135,9 +138,7 @@ export default function FixedGoalkeepersSection({
               fontSize: "1.2rem",
               boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
             }}
-          >
-            {player.user?.name?.[0].toUpperCase() || "G"}
-          </Avatar>
+          />
           <Box sx={{ flexGrow: 1 }}>
             <Typography
               variant="h6"

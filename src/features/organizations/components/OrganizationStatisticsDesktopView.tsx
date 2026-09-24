@@ -8,6 +8,8 @@ import type {
   WeeklyPresence,
 } from "../../../shared/api/endpoints";
 import GroupTabsBar from "./GroupTabsBar";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
+import { getInitials } from "../../../shared/utils/initials";
 
 interface OrganizationStatisticsDesktopViewProps {
   org: Organization;
@@ -47,17 +49,6 @@ export default function OrganizationStatisticsDesktopView({
   const [yearMenuAnchor, setYearMenuAnchor] = useState<null | HTMLElement>(
     null,
   );
-
-  const getInitials = (name?: string) => {
-    if (!name) return "";
-    return name
-      .split(" ")
-      .filter(Boolean)
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase();
-  };
 
   const avatarColors = [
     "#cdd6e0",
@@ -586,24 +577,21 @@ export default function OrganizationStatisticsDesktopView({
               >
                 {/* 2nd Place */}
                 <Box sx={{ flex: 1, textAlign: "center" }}>
-                  <Box
+                  <SecureAvatar
+                    userId={second?.user_id}
+                    filename={second?.avatar_filename}
+                    fallbackText={getInitials(second?.player_name || "")}
                     sx={{
                       width: 48,
                       height: 48,
-                      borderRadius: "50%",
                       bgcolor: "#cdd6e0",
                       mx: "auto",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 800,
                       fontSize: "14px",
                       color: "#17181a",
                     }}
-                  >
-                    {getInitials(second?.player_name || "")}
-                  </Box>
+                  />
                   <Box
                     sx={{
                       bgcolor: "#eae6db",
@@ -651,25 +639,22 @@ export default function OrganizationStatisticsDesktopView({
 
                 {/* 1st Place */}
                 <Box sx={{ flex: 1, textAlign: "center" }}>
-                  <Box
+                  <SecureAvatar
+                    userId={first?.user_id}
+                    filename={first?.avatar_filename}
+                    fallbackText={getInitials(first?.player_name || "")}
                     sx={{
                       width: 58,
                       height: 58,
-                      borderRadius: "50%",
                       bgcolor: "#dcd3bd",
                       border: "3px solid #f2a100",
                       mx: "auto",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 800,
                       fontSize: "17px",
                       color: "#17181a",
                     }}
-                  >
-                    {getInitials(first?.player_name || "")}
-                  </Box>
+                  />
                   <Box
                     sx={{
                       bgcolor: "#f2a100",
@@ -717,24 +702,21 @@ export default function OrganizationStatisticsDesktopView({
 
                 {/* 3rd Place */}
                 <Box sx={{ flex: 1, textAlign: "center" }}>
-                  <Box
+                  <SecureAvatar
+                    userId={third?.user_id}
+                    filename={third?.avatar_filename}
+                    fallbackText={getInitials(third?.player_name || "")}
                     sx={{
                       width: 48,
                       height: 48,
-                      borderRadius: "50%",
                       bgcolor: "#e2cfc7",
                       mx: "auto",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 800,
                       fontSize: "14px",
                       color: "#17181a",
                     }}
-                  >
-                    {getInitials(third?.player_name || "")}
-                  </Box>
+                  />
                   <Box
                     sx={{
                       bgcolor: "#eae6db",
@@ -877,15 +859,14 @@ export default function OrganizationStatisticsDesktopView({
                         minWidth: 0,
                       }}
                     >
-                      <Box
+                      <SecureAvatar
+                        userId={item.user_id}
+                        filename={item.avatar_filename}
+                        fallbackText={pInitials}
                         sx={{
                           width: 30,
                           height: 30,
-                          borderRadius: "50%",
                           bgcolor: isUser ? "#146b3a" : avatarBg,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
                           fontFamily: "Archivo, sans-serif",
                           fontWeight: 800,
                           fontSize: "10px",
@@ -895,9 +876,7 @@ export default function OrganizationStatisticsDesktopView({
                               : "#17181a",
                           flexShrink: 0,
                         }}
-                      >
-                        {pInitials}
-                      </Box>
+                      />
                       <Box>
                         <Typography
                           sx={{
@@ -1183,24 +1162,21 @@ export default function OrganizationStatisticsDesktopView({
                         : "none",
                   }}
                 >
-                  <Box
+                  <SecureAvatar
+                    userId={h.item?.user_id}
+                    filename={h.item?.avatar_filename}
+                    fallbackText={getInitials(h.item?.player_name)}
                     sx={{
                       width: 32,
                       height: 32,
-                      borderRadius: "50%",
                       bgcolor: h.color,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 800,
                       fontSize: "10px",
                       color: "#17181a",
                       flexShrink: 0,
                     }}
-                  >
-                    {getInitials(h.item?.player_name)}
-                  </Box>
+                  />
                   <Box>
                     <Typography
                       sx={{

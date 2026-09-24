@@ -30,6 +30,7 @@ import type { PlayerWithUser } from "./TeamsSection";
 import DrawJustificationCard from "./DrawJustificationCard";
 import LocationDisplay from "../../../shared/components/LocationDisplay";
 import { getInitials, formatPosition } from "../utils/playerUtils";
+import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 
 export interface PeladaTeamsMobileViewProps {
   pelada: Pelada;
@@ -1134,24 +1135,21 @@ export default function PeladaTeamsMobileView({
                           p: 1,
                         }}
                       >
-                        <Box
+                        <SecureAvatar
+                          userId={player.user?.id}
+                          filename={player.user?.avatar_filename}
+                          fallbackText={getInitials(player.user?.name)}
                           sx={{
                             width: 28,
                             height: 28,
-                            borderRadius: "50%",
                             bgcolor: isYou ? "#146b3a" : color,
                             color: isYou ? "#ffffff" : "#17181a",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: 800,
                             fontSize: "9.5px",
                             flexShrink: 0,
                           }}
-                        >
-                          {getInitials(player.user?.name)}
-                        </Box>
+                        />
 
                         <Box sx={{ flex: 1, minWidth: 0 }}>
                           <Typography
@@ -1380,24 +1378,21 @@ export default function PeladaTeamsMobileView({
                     p: 1,
                   }}
                 >
-                  <Box
+                  <SecureAvatar
+                    userId={player.user?.id}
+                    filename={player.user?.avatar_filename}
+                    fallbackText={getInitials(player.user?.name)}
                     sx={{
                       width: 28,
                       height: 28,
-                      borderRadius: "50%",
                       bgcolor: color,
                       color: "#17181a",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 800,
                       fontSize: "9.5px",
                       flexShrink: 0,
                     }}
-                  >
-                    {getInitials(player.user?.name)}
-                  </Box>
+                  />
 
                   <Box sx={{ flex: 1, minWidth: 0 }}>
                     <Typography

@@ -21,7 +21,7 @@ export const fetchVersionInfo = async (
   if (cachedVersionInfo && !force) {
     return cachedVersionInfo;
   }
-  if (inflightVersionPromise && !force) {
+  if (inflightVersionPromise) {
     return inflightVersionPromise;
   }
 
