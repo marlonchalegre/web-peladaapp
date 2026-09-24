@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRegisterSW } from "virtual:pwa-register/react";
 import {
   Snackbar,
@@ -12,12 +12,24 @@ import CloseIcon from "@mui/icons-material/Close";
 import DownloadIcon from "@mui/icons-material/Download";
 import { useTranslation } from "react-i18next";
 import { usePWA } from "../../app/providers/PWAContext";
+import { getClientVersion, fetchVersionInfo } from "../../lib/version";
+import {
+  logAppVersionMismatch,
+  logAppVersionUpdateAvailable,
+  logAppVersionUpdateAccepted,
+  logAppVersionUpdated,
+} from "../../lib/analytics";
 
 let hasLoggedVersion = false;
+const FOCUS_CHECK_COOLDOWN_MS = 60_000;
 
 export function PWAInstallPrompt() {
   const { t } = useTranslation();
   const { showIOSInstructions, setShowIOSInstructions } = usePWA();
+  const [serverVersion, setServerVersion] = useState<string>("unknown");
+  const serverVersionRef = useRef<string>("unknown");
+  const hasLoggedUpdateAvailableRef = useRef(false);
+  const lastFocusCheckRef = useRef<number>(0);
 
   const {
     needRefresh: [needRefresh, setNeedRefresh],
@@ -25,7 +37,6 @@ export function PWAInstallPrompt() {
   } = useRegisterSW({
     onRegisteredSW(_swUrl, r) {
       if (r) {
-        // Check for updates every hour
         setInterval(
           () => {
             r.update();
@@ -39,18 +50,16 @@ export function PWAInstallPrompt() {
     },
   });
 
-  // Manual version check to ensure we're not running a stale version
   useEffect(() => {
     const checkVersion = async () => {
       try {
-        const response = await fetch("/version.json?t=" + Date.now(), {
-          cache: "no-store",
-        });
-        if (!response.ok) return;
+        const data = await fetchVersionInfo(true);
+        if (!data) return;
 
-        const data = await response.json();
-        const currentVersion = import.meta.env.VITE_APP_VERSION || "dev";
-        const serverVersion = data.version || "unknown";
+        const currentVersion = getClientVersion();
+        const serverVer = data.version || "unknown";
+        serverVersionRef.current = serverVer;
+        setServerVersion((prev) => (prev !== serverVer ? serverVer : prev));
 
         if (!hasLoggedVersion) {
           hasLoggedVersion = true;
@@ -65,14 +74,12 @@ export function PWAInstallPrompt() {
           const serverGitHash = data.gitHash || "unknown";
           const serverBuildTime = data.buildTime || "unknown";
 
-          // Get Service Worker controller info
           const hasController = !!navigator.serviceWorker?.controller;
           const controllerState =
             navigator.serviceWorker?.controller?.state || "none";
           const controllerScript =
             navigator.serviceWorker?.controller?.scriptURL || "none";
 
-          // Get Cache Storage names
           let cacheKeys: string[] = [];
           try {
             if ("caches" in window) {
@@ -82,23 +89,22 @@ export function PWAInstallPrompt() {
             // ignore cache access issues
           }
 
-          // Online status
           const isOnline = navigator.onLine;
 
           console.log(
             `%c${asciiArt}\n%c⚽ Minha Pelada ⚽\n` +
               `%c[App Status]\n` +
               `• Client Version:  ${currentVersion}\n` +
-              `• Server Version:  ${serverVersion} (Build: ${serverBuildTime}, Hash: ${serverGitHash})\n` +
+              `• Server Version:  ${serverVer} (Build: ${serverBuildTime}, Hash: ${serverGitHash})\n` +
               `• Network Status:  ${isOnline ? "🟢 Online" : "🔴 Offline"}\n\n` +
               `%c[Service Worker & Cache]\n` +
               `• Controlled:      ${hasController ? `🟢 Yes (${controllerState})` : "🔴 No"}\n` +
               `• Controller URL:  ${controllerScript}\n` +
               `• Active Caches:   [${cacheKeys.join(", ") || "none"}]`,
-            "color: #4caf50; font-weight: bold;", // Green for ASCII
-            "color: #2196f3; font-weight: bold; font-size: 14px;", // Blue for title
-            "color: #ff9800; font-weight: bold; font-size: 12px;", // Orange for status header
-            "color: #00bcd4; font-weight: bold; font-size: 12px;", // Cyan for SW/Cache header
+            "color: #4caf50; font-weight: bold;",
+            "color: #2196f3; font-weight: bold; font-size: 14px;",
+            "color: #ff9800; font-weight: bold; font-size: 12px;",
+            "color: #00bcd4; font-weight: bold; font-size: 12px;",
           );
         }
 
@@ -111,11 +117,9 @@ export function PWAInstallPrompt() {
           currentVersion !== "dev" &&
           data.version !== currentVersion;
 
-        // Force cache clearing on production if the client has a "dev" version cached
         const isStuckOnProdDev =
           !isLocalhost && currentVersion === "dev" && data.version !== "dev";
 
-        // Check local storage for version changes (crucial to catch version updates immediately on next load)
         const lastLocalVersion = localStorage.getItem("pwa_app_version");
         const hasLocalMismatch =
           !isLocalhost &&
@@ -127,28 +131,33 @@ export function PWAInstallPrompt() {
             `Clearing service worker and caches due to: ${reason}. client=${currentVersion}, server=${data.version}`,
           );
 
+          const cleanupTasks: Promise<unknown>[] = [];
+
           if ("serviceWorker" in navigator) {
-            try {
-              const registrations =
-                await navigator.serviceWorker.getRegistrations();
-              for (const r of registrations) {
-                await r.unregister();
-              }
-            } catch (err) {
-              console.warn("Failed to unregister service worker:", err);
-            }
+            cleanupTasks.push(
+              navigator.serviceWorker
+                .getRegistrations()
+                .then((registrations) =>
+                  Promise.all(registrations.map((r) => r.unregister())),
+                )
+                .catch((err) =>
+                  console.warn("Failed to unregister service worker:", err),
+                ),
+            );
           }
 
           if ("caches" in window) {
-            try {
-              const cacheNames = await caches.keys();
-              for (const cacheName of cacheNames) {
-                await caches.delete(cacheName);
-              }
-            } catch (err) {
-              console.warn("Failed to clear caches:", err);
-            }
+            cleanupTasks.push(
+              caches
+                .keys()
+                .then((cacheNames) =>
+                  Promise.all(cacheNames.map((name) => caches.delete(name))),
+                )
+                .catch((err) => console.warn("Failed to clear caches:", err)),
+            );
           }
+
+          await Promise.all(cleanupTasks);
 
           localStorage.setItem("pwa_app_version", currentVersion);
           console.log("Cleanup complete. Reloading page...");
@@ -160,8 +169,13 @@ export function PWAInstallPrompt() {
           if (isStuckOnProdDev) reason = "Stuck on Prod Dev Build";
           if (hasLocalMismatch)
             reason = `Local Storage Version Mismatch (local=${lastLocalVersion})`;
+          logAppVersionMismatch({
+            currentVersion,
+            serverVersion: serverVer,
+            reason,
+          });
           await performCleanupAndReload(reason);
-        } else {
+        } else if (lastLocalVersion !== currentVersion) {
           localStorage.setItem("pwa_app_version", currentVersion);
         }
       } catch (err) {
@@ -179,29 +193,40 @@ export function PWAInstallPrompt() {
     };
 
     checkVersion();
+    lastFocusCheckRef.current = Date.now();
     const interval = setInterval(checkVersion, 30 * 60 * 1000);
 
-    // Check for updates when the user returns to the app tab
-    window.addEventListener("focus", checkVersion);
-    window.addEventListener("focus", checkServiceWorkerUpdate);
+    const onFocusThrottled = () => {
+      const now = Date.now();
+      if (now - lastFocusCheckRef.current >= FOCUS_CHECK_COOLDOWN_MS) {
+        lastFocusCheckRef.current = now;
+        checkVersion();
+        checkServiceWorkerUpdate();
+      }
+    };
+
+    window.addEventListener("focus", onFocusThrottled);
 
     return () => {
       clearInterval(interval);
-      window.removeEventListener("focus", checkVersion);
-      window.removeEventListener("focus", checkServiceWorkerUpdate);
+      window.removeEventListener("focus", onFocusThrottled);
     };
   }, []);
 
-  // Automatically reload the page when the service worker is updated and takes control
   useEffect(() => {
     if ("serviceWorker" in navigator) {
-      const hasController = !!navigator.serviceWorker.controller;
       let refreshing = false;
 
       const handleControllerChange = () => {
         if (refreshing) return;
-        if (hasController) {
+        if (navigator.serviceWorker.controller) {
           refreshing = true;
+          const activeServerVersion = serverVersionRef.current;
+          logAppVersionUpdated(
+            activeServerVersion !== "unknown"
+              ? activeServerVersion
+              : getClientVersion(),
+          );
           console.log("Service worker updated. Reloading page...");
           window.location.reload();
         }
@@ -220,6 +245,20 @@ export function PWAInstallPrompt() {
     }
   }, []);
 
+  useEffect(() => {
+    if (
+      needRefresh &&
+      !hasLoggedUpdateAvailableRef.current &&
+      serverVersion !== "unknown"
+    ) {
+      hasLoggedUpdateAvailableRef.current = true;
+      logAppVersionUpdateAvailable({
+        currentVersion: getClientVersion(),
+        newVersion: serverVersion,
+      });
+    }
+  }, [needRefresh, serverVersion]);
+
   const handleClose = () => {
     setNeedRefresh(false);
     setShowIOSInstructions(false);
@@ -227,7 +266,6 @@ export function PWAInstallPrompt() {
 
   return (
     <>
-      {/* Prompt for update */}
       <Snackbar
         open={needRefresh}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
@@ -240,7 +278,16 @@ export function PWAInstallPrompt() {
               <Button
                 color="inherit"
                 size="small"
-                onClick={() => updateServiceWorker(true)}
+                onClick={() => {
+                  logAppVersionUpdateAccepted({
+                    currentVersion: getClientVersion(),
+                    newVersion:
+                      serverVersionRef.current !== "unknown"
+                        ? serverVersionRef.current
+                        : serverVersion,
+                  });
+                  updateServiceWorker(true);
+                }}
               >
                 {t("common.update")}
               </Button>
@@ -259,7 +306,6 @@ export function PWAInstallPrompt() {
         </Alert>
       </Snackbar>
 
-      {/* Prompt for manual install (iOS) - Only shown when user clicks "Install" in menu */}
       <Snackbar
         open={showIOSInstructions}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}

@@ -33,11 +33,17 @@ import ProtectedRoute from "./app/routing/ProtectedRoute";
 import { SecureAvatar } from "./shared/components/SecureAvatar";
 import {
   initGA,
+  logAppVersion,
   logPageView,
   logClickEvent,
   extractClickDetails,
   getMeasurementId,
 } from "./lib/analytics";
+import {
+  getClientVersion,
+  isDevVersion,
+  fetchVersionInfo,
+} from "./lib/version";
 import { getPageTitle } from "./lib/pageTitles";
 import { PWAInstallPrompt } from "./shared/components/PWAInstallPrompt";
 import { PullToRefresh } from "./shared/components/PullToRefresh";
@@ -143,6 +149,7 @@ function PageLoading() {
 function AnalyticsTracker() {
   const location = useLocation();
   const currentPathRef = useRef(location.pathname);
+  const versionLoggedRef = useRef(false);
 
   useEffect(() => {
     currentPathRef.current = location.pathname;
@@ -150,6 +157,20 @@ function AnalyticsTracker() {
 
   useEffect(() => {
     initGA();
+
+    if (!versionLoggedRef.current) {
+      versionLoggedRef.current = true;
+      fetchVersionInfo().then((info) => {
+        const clientVersion = getClientVersion();
+        const activeVersion =
+          isDevVersion() && info?.version ? info.version : clientVersion;
+        logAppVersion({
+          version: activeVersion,
+          gitHash: info?.gitHash,
+          buildTime: info?.buildTime,
+        });
+      });
+    }
   }, []);
 
   useEffect(() => {
@@ -184,32 +205,16 @@ function AnalyticsTracker() {
 
 function Footer() {
   const { t } = useTranslation();
-  const [version, setVersion] = useState(
-    import.meta.env.VITE_APP_VERSION || "dev",
-  );
+  const [version, setVersion] = useState(getClientVersion());
 
   useEffect(() => {
-    // If it's a dev build, try to get more info from version.json
-    const fetchVersion = async () => {
-      try {
-        const response = await fetch("/version.json?t=" + Date.now(), {
-          cache: "no-store",
-        });
-        if (response.ok) {
-          const data = await response.json();
-          // Use the generated version if env is 'dev' or missing
-          if (
-            import.meta.env.VITE_APP_VERSION === "dev" ||
-            !import.meta.env.VITE_APP_VERSION
-          ) {
-            setVersion(data.version);
-          }
+    if (isDevVersion()) {
+      fetchVersionInfo().then((data) => {
+        if (data?.version) {
+          setVersion(data.version);
         }
-      } catch (e) {
-        console.warn("Could not fetch version.json", e);
-      }
-    };
-    fetchVersion();
+      });
+    }
   }, []);
 
   return (

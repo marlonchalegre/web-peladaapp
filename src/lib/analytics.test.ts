@@ -6,6 +6,7 @@ vi.mock("react-ga4", () => ({
     initialize: vi.fn(),
     send: vi.fn(),
     event: vi.fn(),
+    set: vi.fn(),
   },
 }));
 
@@ -13,6 +14,12 @@ vi.stubEnv("VITE_GOOGLE_ANALYTICS_ID", "G-TEST12345");
 
 import {
   initGA,
+  setAppVersion,
+  logAppVersion,
+  logAppVersionMismatch,
+  logAppVersionUpdateAvailable,
+  logAppVersionUpdateAccepted,
+  logAppVersionUpdated,
   logPageView,
   logClickEvent,
   logCustomEvent,
@@ -25,9 +32,93 @@ describe("analytics", () => {
     vi.clearAllMocks();
   });
 
-  it("initializes GA with measurement ID", () => {
-    initGA();
+  it("initializes GA with measurement ID and sets app version", () => {
+    initGA("20260924-1000");
     expect(ReactGA.initialize).toHaveBeenCalledWith("G-TEST12345");
+    expect(ReactGA.set).toHaveBeenCalledWith({ app_version: "20260924-1000" });
+  });
+
+  it("sets app version globally on ReactGA", () => {
+    setAppVersion("20260924-2000");
+    expect(ReactGA.set).toHaveBeenCalledWith({ app_version: "20260924-2000" });
+  });
+
+  it("logs app_version event with details and sets global app_version", () => {
+    logAppVersion({
+      version: "20260924-1000",
+      gitHash: "abcdef1",
+      buildTime: "2026-09-24T10:00:00Z",
+    });
+
+    expect(ReactGA.set).toHaveBeenCalledWith({ app_version: "20260924-1000" });
+    expect(ReactGA.event).toHaveBeenCalledWith("app_version", {
+      app_version: "20260924-1000",
+      version: "20260924-1000",
+      git_hash: "abcdef1",
+      build_time: "2026-09-24T10:00:00Z",
+      category: "App",
+      label: "20260924-1000",
+      non_interaction: true,
+    });
+  });
+
+  it("logs app_version_mismatch event", () => {
+    logAppVersionMismatch({
+      currentVersion: "20260923-1000",
+      serverVersion: "20260924-1000",
+      reason: "Version Mismatch",
+    });
+
+    expect(ReactGA.event).toHaveBeenCalledWith("app_version_mismatch", {
+      current_version: "20260923-1000",
+      server_version: "20260924-1000",
+      reason: "Version Mismatch",
+      category: "App",
+      label: "20260923-1000 -> 20260924-1000 (Version Mismatch)",
+      non_interaction: true,
+    });
+  });
+
+  it("logs app_version_update_available event", () => {
+    logAppVersionUpdateAvailable({
+      currentVersion: "20260923-1000",
+      newVersion: "20260924-1000",
+    });
+
+    expect(ReactGA.event).toHaveBeenCalledWith("app_version_update_available", {
+      current_version: "20260923-1000",
+      new_version: "20260924-1000",
+      category: "App",
+      label: "20260923-1000 -> 20260924-1000",
+      non_interaction: true,
+    });
+  });
+
+  it("logs app_version_update_accepted event", () => {
+    logAppVersionUpdateAccepted({
+      currentVersion: "20260923-1000",
+      newVersion: "20260924-1000",
+    });
+
+    expect(ReactGA.event).toHaveBeenCalledWith("app_version_update_accepted", {
+      current_version: "20260923-1000",
+      new_version: "20260924-1000",
+      category: "App",
+      label: "20260923-1000 -> 20260924-1000",
+    });
+  });
+
+  it("logs app_version_updated event", () => {
+    logAppVersionUpdated("20260924-1000");
+
+    expect(ReactGA.set).toHaveBeenCalledWith({ app_version: "20260924-1000" });
+    expect(ReactGA.event).toHaveBeenCalledWith("app_version_updated", {
+      version: "20260924-1000",
+      app_version: "20260924-1000",
+      category: "App",
+      label: "20260924-1000",
+      non_interaction: true,
+    });
   });
 
   it("sends pageview with path and page title", () => {
