@@ -10,6 +10,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import type { Player } from "../../../shared/api/endpoints";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import { getInitials } from "../../../shared/utils/initials";
+import { AVATAR_BG_COLORS } from "../../peladas/utils/playerUtils";
 
 interface OrganizationRosterDialogProps {
   open: boolean;
@@ -17,16 +18,6 @@ interface OrganizationRosterDialogProps {
   orgName: string;
   players: Player[];
 }
-
-const AVATAR_BG_COLORS = [
-  "#c9d9cd",
-  "#dcd3bd",
-  "#cdd6e0",
-  "#e2cfc7",
-  "#d3cfc4",
-  "#d8d2c4",
-  "#cfd8cd",
-];
 
 const formatPosition = (pos?: string) => {
   if (!pos) return "jogador";
@@ -88,8 +79,9 @@ export default function OrganizationRosterDialog({
             borderRadius: "18px",
             border: (theme) =>
               theme.palette.mode === "dark"
-                ? "1px solid rgba(255,255,255,0.12)"
-                : "2px solid #17181a",
+                ? `1px solid ${theme.palette.divider}`
+                : theme.palette.brutalist?.border ||
+                  `2px solid ${theme.palette.divider}`,
           },
         },
       }}
@@ -110,7 +102,7 @@ export default function OrganizationRosterDialog({
           onClick={onClose}
           aria-label="Fechar"
           data-testid="roster-close-button"
-          sx={{ color: "#6b675c" }}
+          sx={{ color: "text.secondary" }}
         >
           <CloseIcon />
         </IconButton>
@@ -120,7 +112,7 @@ export default function OrganizationRosterDialog({
           sx={{
             font: "700 9.5px/1 Archivo,sans-serif",
             letterSpacing: ".14em",
-            color: "#6b675c",
+            color: "text.secondary",
             textTransform: "uppercase",
             mb: 1.5,
           }}
@@ -129,10 +121,7 @@ export default function OrganizationRosterDialog({
         </Typography>
         <Box
           sx={{
-            bgcolor: (theme) =>
-              theme.palette.mode === "dark"
-                ? "rgba(255,255,255,0.03)"
-                : "#ffffff",
+            bgcolor: "background.paper",
             border: 1,
             borderColor: "divider",
             borderRadius: "16px",
@@ -162,7 +151,7 @@ export default function OrganizationRosterDialog({
                   width: 32,
                   height: 32,
                   bgcolor: AVATAR_BG_COLORS[idx % AVATAR_BG_COLORS.length],
-                  color: "#17181a",
+                  color: "text.primary",
                   font: "800 10px Archivo,sans-serif",
                 }}
               />
@@ -179,7 +168,7 @@ export default function OrganizationRosterDialog({
                 <Typography
                   sx={{
                     font: "600 10.5px/1.3 Archivo,sans-serif",
-                    color: "#6b675c",
+                    color: "text.secondary",
                     mt: 0.25,
                   }}
                 >
@@ -196,7 +185,7 @@ export default function OrganizationRosterDialog({
               <Typography
                 sx={{
                   font: "600 12px/1.4 Archivo,sans-serif",
-                  color: "#6b675c",
+                  color: "text.secondary",
                 }}
               >
                 Nenhum jogador no elenco.

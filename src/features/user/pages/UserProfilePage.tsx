@@ -307,8 +307,7 @@ export default function UserProfilePage() {
     ? skillValues.reduce((a, b) => a + b, 0) / skillValues.length
     : null;
   const presenceWeeks = dashboard?.presence ?? [];
-  const inactivePresenceBarColor =
-    theme.palette.mode === "dark" ? "#2d3035" : "#eae6db";
+  const inactivePresenceBarColor = theme.palette.divider;
   const recentMatches = toRecentMatchRows(dashboard?.recent_peladas);
 
   return (
@@ -364,15 +363,20 @@ export default function UserProfilePage() {
           <Box
             sx={{
               bgcolor: (theme) =>
-                theme.palette.mode === "dark" ? "background.paper" : "#17181a",
+                theme.palette.mode === "dark" ? "background.paper" : "grey.900",
               border: (theme) =>
-                theme.palette.mode === "dark" ? "1.5px solid #2d3035" : "none",
+                theme.palette.mode === "dark"
+                  ? `1.5px solid ${theme.palette.divider}`
+                  : "none",
               borderRadius: { xs: 0, sm: "18px" },
               p: { xs: 2.5, sm: 3.5 },
               mx: { xs: -1, sm: -2 },
               mt: { xs: -2, sm: -4 },
               mb: 3,
-              color: "#f6f4ee",
+              color: (theme) =>
+                theme.palette.mode === "dark"
+                  ? theme.palette.text.primary
+                  : theme.palette.grey[100],
             }}
           >
             <Box
@@ -392,10 +396,18 @@ export default function UserProfilePage() {
                   }
                 }}
                 sx={{
-                  color: "#9a958a",
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? theme.palette.text.secondary
+                      : theme.palette.grey[500],
                   p: 0.5,
                   ml: -0.5,
-                  "&:hover": { color: "#f6f4ee" },
+                  "&:hover": {
+                    color: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? theme.palette.text.primary
+                        : theme.palette.grey[100],
+                  },
                 }}
                 aria-label="Voltar"
               >
@@ -407,7 +419,10 @@ export default function UserProfilePage() {
                   fontWeight: 700,
                   fontSize: "9.5px",
                   letterSpacing: ".18em",
-                  color: "#9a958a",
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? theme.palette.text.secondary
+                      : theme.palette.grey[500],
                   textTransform: "uppercase",
                 }}
               >
@@ -421,9 +436,17 @@ export default function UserProfilePage() {
                     border: "none",
                     width: "auto",
                     height: "auto",
-                    color: "#9a958a",
+                    color: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? theme.palette.text.secondary
+                        : theme.palette.grey[500],
                     p: 0.5,
-                    "&:hover": { color: "#f6f4ee" },
+                    "&:hover": {
+                      color: (theme) =>
+                        theme.palette.mode === "dark"
+                          ? theme.palette.text.primary
+                          : theme.palette.grey[100],
+                    },
                   }}
                 />
                 <Button
@@ -433,11 +456,20 @@ export default function UserProfilePage() {
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 700,
                     fontSize: "11px",
-                    color: "#9a958a",
+                    color: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? theme.palette.text.secondary
+                        : theme.palette.grey[500],
                     textTransform: "none",
                     p: 0,
                     minWidth: "auto",
-                    "&:hover": { color: "#f6f4ee", bgcolor: "transparent" },
+                    "&:hover": {
+                      color: (theme) =>
+                        theme.palette.mode === "dark"
+                          ? theme.palette.text.primary
+                          : theme.palette.grey[100],
+                      bgcolor: "transparent",
+                    },
                   }}
                 >
                   {isEditing
@@ -464,15 +496,13 @@ export default function UserProfilePage() {
                     sx={{
                       width: 64,
                       height: 64,
-                      bgcolor: "#d8d2c4",
+                      bgcolor: "grey.300",
                       border: (theme) =>
-                        theme.palette.mode === "dark"
-                          ? "3px solid #2d3035"
-                          : "3px solid #f6f4ee",
+                        `3px solid ${theme.palette.mode === "dark" ? theme.palette.divider : theme.palette.grey[100]}`,
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 800,
                       fontSize: "20px",
-                      color: "#17181a",
+                      color: "grey.900",
                       flexShrink: 0,
                     }}
                   />
@@ -480,7 +510,10 @@ export default function UserProfilePage() {
                     <Typography
                       sx={{
                         font: "800 21px/1.1 Archivo,sans-serif",
-                        color: "#f6f4ee",
+                        color: (theme) =>
+                          theme.palette.mode === "dark"
+                            ? theme.palette.text.primary
+                            : theme.palette.grey[100],
                       }}
                     >
                       {name || authUser?.name}
@@ -489,7 +522,10 @@ export default function UserProfilePage() {
                       sx={{
                         font: "700 10px/1 Archivo,sans-serif",
                         letterSpacing: ".14em",
-                        color: "#9a958a",
+                        color: (theme) =>
+                          theme.palette.mode === "dark"
+                            ? theme.palette.text.secondary
+                            : theme.palette.grey[500],
                         mt: 0.75,
                       }}
                     >
@@ -507,7 +543,10 @@ export default function UserProfilePage() {
                   <Typography
                     sx={{
                       font: "700 32px/1 'Archivo Narrow',Archivo,sans-serif",
-                      color: "#f6f4ee",
+                      color: (theme) =>
+                        theme.palette.mode === "dark"
+                          ? theme.palette.text.primary
+                          : theme.palette.grey[100],
                     }}
                   >
                     {formatRating(dashboard?.summary.avg_rating)}
@@ -516,7 +555,10 @@ export default function UserProfilePage() {
                     sx={{
                       font: "700 8.5px/1 Archivo,sans-serif",
                       letterSpacing: ".1em",
-                      color: "#9a958a",
+                      color: (theme) =>
+                        theme.palette.mode === "dark"
+                          ? theme.palette.text.secondary
+                          : theme.palette.grey[500],
                       mt: 0.5,
                       textTransform: "uppercase",
                     }}
@@ -530,8 +572,8 @@ export default function UserProfilePage() {
                 {(dashboard?.summary.titles ?? 0) > 0 && (
                   <Box
                     sx={{
-                      bgcolor: "#f2a100",
-                      color: "#17181a",
+                      bgcolor: "gold.main",
+                      color: "gold.contrastText",
                       borderRadius: "7px",
                       px: 1.25,
                       py: 0.75,
@@ -546,8 +588,12 @@ export default function UserProfilePage() {
                 {(dashboard?.summary.mvp_count ?? 0) > 0 && (
                   <Box
                     sx={{
-                      border: "1.5px solid #3a3b3e",
-                      color: "#f6f4ee",
+                      border: (theme) =>
+                        `1.5px solid ${theme.palette.mode === "dark" ? theme.palette.divider : theme.palette.grey[800]}`,
+                      color: (theme) =>
+                        theme.palette.mode === "dark"
+                          ? theme.palette.text.primary
+                          : theme.palette.grey[100],
                       borderRadius: "7px",
                       px: 1.25,
                       py: 0.75,
@@ -562,8 +608,12 @@ export default function UserProfilePage() {
                 {(dashboard?.summary.garcom_count ?? 0) > 0 && (
                   <Box
                     sx={{
-                      border: "1.5px solid #3a3b3e",
-                      color: "#f6f4ee",
+                      border: (theme) =>
+                        `1.5px solid ${theme.palette.mode === "dark" ? theme.palette.divider : theme.palette.grey[800]}`,
+                      color: (theme) =>
+                        theme.palette.mode === "dark"
+                          ? theme.palette.text.primary
+                          : theme.palette.grey[100],
                       borderRadius: "7px",
                       px: 1.25,
                       py: 0.75,
@@ -585,15 +635,11 @@ export default function UserProfilePage() {
               sx={{
                 bgcolor: "background.paper",
                 border: (theme) =>
-                  theme.palette.mode === "dark"
-                    ? "2px solid #2d3035"
-                    : "2px solid #17181a",
+                  `2px solid ${theme.palette.mode === "dark" ? theme.palette.divider : theme.palette.grey[900]}`,
                 borderRadius: "18px",
                 p: 2.5,
                 boxShadow: (theme) =>
-                  theme.palette.mode === "dark"
-                    ? "5px 5px 0 #000000"
-                    : "5px 5px 0 #17181a",
+                  `5px 5px 0 ${theme.palette.mode === "dark" ? theme.palette.common.black : theme.palette.grey[900]}`,
                 mb: 3,
               }}
             >
@@ -659,7 +705,9 @@ export default function UserProfilePage() {
                           sx={{
                             width: `${pct}%`,
                             bgcolor:
-                              (skill.value ?? 0) < 3 ? "#a8452a" : "#146b3a",
+                              (skill.value ?? 0) < 3
+                                ? "secondary.main"
+                                : "primary.main",
                           }}
                         />
                       </Box>
@@ -714,9 +762,10 @@ export default function UserProfilePage() {
                       gap: 1,
                       p: "11px 14px",
                       bgcolor: (theme) =>
-                        theme.palette.mode === "dark"
-                          ? alpha(theme.palette.primary.main, 0.12)
-                          : "#f4f8f5",
+                        alpha(
+                          theme.palette.primary.main,
+                          theme.palette.mode === "dark" ? 0.12 : 0.08,
+                        ),
                       borderBottom: "1.5px solid",
                       borderColor: "divider",
                     }}
@@ -726,7 +775,7 @@ export default function UserProfilePage() {
                         width: 9,
                         height: 9,
                         borderRadius: "2px",
-                        bgcolor: "#146b3a",
+                        bgcolor: "primary.main",
                       }}
                     />
                     <Typography
@@ -794,9 +843,9 @@ export default function UserProfilePage() {
               {presenceWeeks.map((week, i) => {
                 const barColor =
                   week.status === "present"
-                    ? "#146b3a"
+                    ? "primary.main"
                     : week.status === "absent"
-                      ? "#a8452a"
+                      ? "secondary.main"
                       : inactivePresenceBarColor;
                 return (
                   <Box
@@ -819,7 +868,7 @@ export default function UserProfilePage() {
                     width: 8,
                     height: 8,
                     borderRadius: "2px",
-                    bgcolor: "#146b3a",
+                    bgcolor: "primary.main",
                   }}
                 />
                 <Typography
@@ -837,7 +886,7 @@ export default function UserProfilePage() {
                     width: 8,
                     height: 8,
                     borderRadius: "2px",
-                    bgcolor: "#a8452a",
+                    bgcolor: "secondary.main",
                   }}
                 />
                 <Typography
@@ -855,8 +904,7 @@ export default function UserProfilePage() {
                     width: 8,
                     height: 8,
                     borderRadius: "2px",
-                    bgcolor: (theme) =>
-                      theme.palette.mode === "dark" ? "#2d3035" : "#eae6db",
+                    bgcolor: "divider",
                   }}
                 />
                 <Typography
@@ -952,8 +1000,8 @@ export default function UserProfilePage() {
                         sx={{
                           font: "800 8.5px/1 Archivo,sans-serif",
                           letterSpacing: ".06em",
-                          color: "#17181a",
-                          bgcolor: "#f2a100",
+                          color: "gold.contrastText",
+                          bgcolor: "gold.main",
                           borderRadius: "6px",
                           px: 0.8,
                           py: 0.5,

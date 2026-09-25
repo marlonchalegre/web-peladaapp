@@ -1,5 +1,12 @@
 import { useMemo, useState } from "react";
-import { Box, IconButton, Menu, MenuItem, Typography } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Menu,
+  MenuItem,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +19,7 @@ import type {
 } from "../../../shared/api/endpoints";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import { getInitials } from "../../../shared/utils/initials";
+import { AVATAR_BG_COLORS } from "../../peladas/utils/playerUtils";
 
 type MetricType = "goals" | "assists" | "presence" | "titles" | "rating";
 
@@ -30,16 +38,6 @@ interface OrganizationStatisticsMobileViewProps {
   onOpenExport: () => void;
   weeklyPresence?: WeeklyPresence[];
 }
-
-const AVATAR_BG_COLORS = [
-  "#cdd6e0",
-  "#dcd3bd",
-  "#e2cfc7",
-  "#d3cfc4",
-  "#d8d2c4",
-  "#cfd8cd",
-  "#c9d9cd",
-];
 
 const METRIC_TABS: { key: MetricType; label: string }[] = [
   { key: "goals", label: "GOLS" },
@@ -126,6 +124,7 @@ export default function OrganizationStatisticsMobileView({
 }: OrganizationStatisticsMobileViewProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const theme = useTheme();
   const [activeMetric, setActiveMetric] = useState<MetricType>("goals");
   const [showAll, setShowAll] = useState(false);
   const [yearAnchor, setYearAnchor] = useState<null | HTMLElement>(null);
@@ -221,6 +220,7 @@ export default function OrganizationStatisticsMobileView({
     );
 
     const first = byTitles || byGames;
+    const goldColor = theme.palette.gold?.main || theme.palette.primary.main;
     if (first) {
       used.add(first.player_id);
       list.push(
@@ -228,7 +228,7 @@ export default function OrganizationStatisticsMobileView({
           ? {
               key: "titles",
               player: first,
-              color: "#f2a100",
+              color: goldColor,
               label: `Mais títulos · ${first.titles} noite${
                 first.titles === 1 ? "" : "s"
               }`,
@@ -236,7 +236,7 @@ export default function OrganizationStatisticsMobileView({
           : {
               key: "games",
               player: first,
-              color: "#f2a100",
+              color: goldColor,
               label: `Mais jogos · ${first.peladas_played}`,
             },
       );
@@ -258,7 +258,7 @@ export default function OrganizationStatisticsMobileView({
           ? {
               key: "perfect",
               player: second,
-              color: "#c9d9cd",
+              color: AVATAR_BG_COLORS[1] || "primary.light",
               label: `Presença perfeita · ${second.peladas_played} de ${
                 second.total_peladas || totalPeladas
               }`,
@@ -266,7 +266,7 @@ export default function OrganizationStatisticsMobileView({
           : {
               key: "games",
               player: second,
-              color: "#c9d9cd",
+              color: AVATAR_BG_COLORS[1] || "primary.light",
               label: `Mais jogos · ${second.peladas_played}`,
             },
       );
@@ -282,7 +282,7 @@ export default function OrganizationStatisticsMobileView({
       list.push({
         key: "rating",
         player: byRating,
-        color: "#d3cfc4",
+        color: AVATAR_BG_COLORS[3] || "info.light",
         label: `Maior nota média · ${byRating.avg_rating
           .toFixed(1)
           .replace(".", ",")}`,
@@ -290,7 +290,7 @@ export default function OrganizationStatisticsMobileView({
     }
 
     return list;
-  }, [stats, totalPeladas]);
+  }, [stats, totalPeladas, theme]);
 
   const renderPodiumColumn = (
     player: OrganizationPlayerStats | undefined,
@@ -298,7 +298,11 @@ export default function OrganizationStatisticsMobileView({
   ) => {
     const isFirst = position === 1;
     const bg =
-      position === 1 ? "#dcd3bd" : position === 2 ? "#cdd6e0" : "#e2cfc7";
+      position === 1
+        ? AVATAR_BG_COLORS[0] || "warning.light"
+        : position === 2
+          ? AVATAR_BG_COLORS[4] || "secondary.light"
+          : AVATAR_BG_COLORS[6] || "info.light";
     const value = getMetricValue(player, activeMetric);
 
     return (
@@ -312,8 +316,11 @@ export default function OrganizationStatisticsMobileView({
             height: isFirst ? 48 : 40,
             mx: "auto",
             bgcolor: bg,
-            border: isFirst ? "2.5px solid #f2a100" : "none",
-            color: "#17181a",
+            border: isFirst
+              ? (theme) =>
+                  `2.5px solid ${theme.palette.gold?.main || theme.palette.primary.main}`
+              : "none",
+            color: "text.primary",
             font: isFirst
               ? "800 14px Archivo,sans-serif"
               : "800 12px Archivo,sans-serif",
@@ -322,11 +329,9 @@ export default function OrganizationStatisticsMobileView({
         <Box
           sx={{
             bgcolor: isFirst
-              ? "#f2a100"
-              : (theme) =>
-                  theme.palette.mode === "dark"
-                    ? "rgba(255,255,255,0.08)"
-                    : "#eae6db",
+              ? (theme) =>
+                  theme.palette.gold?.main || theme.palette.primary.main
+              : "action.hover",
             borderRadius: "9px 9px 0 0",
             mt: 1.1,
             py: isFirst ? 1.6 : 1.1,
@@ -337,7 +342,7 @@ export default function OrganizationStatisticsMobileView({
               font: isFirst
                 ? "700 30px/1 'Archivo Narrow',Archivo,sans-serif"
                 : "700 22px/1 'Archivo Narrow',Archivo,sans-serif",
-              color: isFirst ? "#17181a" : "text.primary",
+              color: isFirst ? "primary.contrastText" : "text.primary",
             }}
           >
             {formatMetricValue(value, activeMetric)}
@@ -348,7 +353,7 @@ export default function OrganizationStatisticsMobileView({
               font: isFirst
                 ? "700 9.5px/1.2 Archivo,sans-serif"
                 : "700 9px/1.2 Archivo,sans-serif",
-              color: isFirst ? "#17181a" : "text.secondary",
+              color: isFirst ? "primary.contrastText" : "text.secondary",
               mt: 0.5,
               px: 0.5,
             }}
@@ -360,7 +365,7 @@ export default function OrganizationStatisticsMobileView({
               font: isFirst
                 ? "800 13px/1 Archivo,sans-serif"
                 : "800 12px/1 Archivo,sans-serif",
-              color: isFirst ? "#17181a" : "text.secondary",
+              color: isFirst ? "primary.contrastText" : "text.secondary",
               mt: 0.75,
             }}
           >
@@ -377,7 +382,7 @@ export default function OrganizationStatisticsMobileView({
       <Box
         sx={{
           bgcolor: (theme) =>
-            theme.palette.mode === "dark" ? "#242628" : "#17181a",
+            theme.palette.mode === "dark" ? "action.hover" : "text.primary",
           borderBottom: (theme) =>
             theme.palette.mode === "dark"
               ? "1px solid rgba(255,255,255,0.12)"
@@ -398,7 +403,9 @@ export default function OrganizationStatisticsMobileView({
               p: 0,
               font: "700 18px/1 Archivo,sans-serif",
               color: (theme) =>
-                theme.palette.mode === "dark" ? "text.secondary" : "#9a958a",
+                theme.palette.mode === "dark"
+                  ? "text.secondary"
+                  : "background.default",
               cursor: "pointer",
             }}
           >
@@ -411,7 +418,9 @@ export default function OrganizationStatisticsMobileView({
                 font: "700 9.5px/1 Archivo,sans-serif",
                 letterSpacing: ".16em",
                 color: (theme) =>
-                  theme.palette.mode === "dark" ? "text.secondary" : "#9a958a",
+                  theme.palette.mode === "dark"
+                    ? "text.secondary"
+                    : "background.default",
               }}
             >
               {org.name.toUpperCase()} · FUTEBOL
@@ -420,7 +429,9 @@ export default function OrganizationStatisticsMobileView({
               sx={{
                 font: "800 18px/1.15 Archivo,sans-serif",
                 color: (theme) =>
-                  theme.palette.mode === "dark" ? "text.primary" : "#f6f4ee",
+                  theme.palette.mode === "dark"
+                    ? "text.primary"
+                    : "background.paper",
                 mt: 0.5,
               }}
             >
@@ -437,10 +448,15 @@ export default function OrganizationStatisticsMobileView({
                   width: 32,
                   height: 32,
                   borderRadius: "9px",
-                  border: (theme) =>
-                    `1.5px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.2)" : "#3a3b3e"}`,
+                  border: "1.5px solid",
+                  borderColor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "divider"
+                      : "rgba(255,255,255,0.3)",
                   color: (theme) =>
-                    theme.palette.mode === "dark" ? "text.primary" : "#f6f4ee",
+                    theme.palette.mode === "dark"
+                      ? "text.primary"
+                      : "background.paper",
                 }}
               >
                 <FileUploadIcon sx={{ fontSize: 16 }} />
@@ -452,10 +468,15 @@ export default function OrganizationStatisticsMobileView({
                   width: 32,
                   height: 32,
                   borderRadius: "9px",
-                  border: (theme) =>
-                    `1.5px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.2)" : "#3a3b3e"}`,
+                  border: "1.5px solid",
+                  borderColor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "divider"
+                      : "rgba(255,255,255,0.3)",
                   color: (theme) =>
-                    theme.palette.mode === "dark" ? "text.primary" : "#f6f4ee",
+                    theme.palette.mode === "dark"
+                      ? "text.primary"
+                      : "background.paper",
                 }}
               >
                 <FileDownloadIcon sx={{ fontSize: 16 }} />
@@ -467,8 +488,11 @@ export default function OrganizationStatisticsMobileView({
             onClick={(e) => setYearAnchor(e.currentTarget)}
             data-testid="stats-year-button"
             sx={{
-              border: (theme) =>
-                `1.5px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.2)" : "#3a3b3e"}`,
+              border: "1.5px solid",
+              borderColor: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "divider"
+                  : "rgba(255,255,255,0.3)",
               borderRadius: "9px",
               bgcolor: "transparent",
               px: 1.1,
@@ -476,7 +500,9 @@ export default function OrganizationStatisticsMobileView({
               font: "800 10px/1 Archivo,sans-serif",
               letterSpacing: ".06em",
               color: (theme) =>
-                theme.palette.mode === "dark" ? "text.primary" : "#f6f4ee",
+                theme.palette.mode === "dark"
+                  ? "text.primary"
+                  : "background.paper",
               cursor: "pointer",
             }}
           >
@@ -490,10 +516,8 @@ export default function OrganizationStatisticsMobileView({
               paper: {
                 sx: {
                   borderRadius: "12px",
-                  bgcolor: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "#242628"
-                      : "background.paper",
+                  bgcolor: "background.paper",
+                  color: "text.primary",
                 },
               },
             }}
@@ -521,7 +545,9 @@ export default function OrganizationStatisticsMobileView({
               sx={{
                 font: "700 28px/1 'Archivo Narrow',Archivo,sans-serif",
                 color: (theme) =>
-                  theme.palette.mode === "dark" ? "text.primary" : "#f6f4ee",
+                  theme.palette.mode === "dark"
+                    ? "text.primary"
+                    : "background.paper",
               }}
             >
               {totalPeladas}
@@ -531,7 +557,9 @@ export default function OrganizationStatisticsMobileView({
                 font: "700 8.5px/1.2 Archivo,sans-serif",
                 letterSpacing: ".1em",
                 color: (theme) =>
-                  theme.palette.mode === "dark" ? "text.secondary" : "#9a958a",
+                  theme.palette.mode === "dark"
+                    ? "text.secondary"
+                    : "background.default",
                 mt: 0.5,
               }}
             >
@@ -542,7 +570,8 @@ export default function OrganizationStatisticsMobileView({
             <Typography
               sx={{
                 font: "700 28px/1 'Archivo Narrow',Archivo,sans-serif",
-                color: "#f2a100",
+                color: (theme) =>
+                  theme.palette.gold?.main || theme.palette.primary.main,
               }}
             >
               {totalGoals}
@@ -552,7 +581,9 @@ export default function OrganizationStatisticsMobileView({
                 font: "700 8.5px/1.2 Archivo,sans-serif",
                 letterSpacing: ".1em",
                 color: (theme) =>
-                  theme.palette.mode === "dark" ? "text.secondary" : "#9a958a",
+                  theme.palette.mode === "dark"
+                    ? "text.secondary"
+                    : "background.default",
                 mt: 0.5,
               }}
             >
@@ -564,7 +595,9 @@ export default function OrganizationStatisticsMobileView({
               sx={{
                 font: "700 28px/1 'Archivo Narrow',Archivo,sans-serif",
                 color: (theme) =>
-                  theme.palette.mode === "dark" ? "text.primary" : "#f6f4ee",
+                  theme.palette.mode === "dark"
+                    ? "text.primary"
+                    : "background.paper",
               }}
             >
               {avgGoals}
@@ -574,7 +607,9 @@ export default function OrganizationStatisticsMobileView({
                 font: "700 8.5px/1.2 Archivo,sans-serif",
                 letterSpacing: ".1em",
                 color: (theme) =>
-                  theme.palette.mode === "dark" ? "text.secondary" : "#9a958a",
+                  theme.palette.mode === "dark"
+                    ? "text.secondary"
+                    : "background.default",
                 mt: 0.5,
               }}
             >
@@ -586,7 +621,9 @@ export default function OrganizationStatisticsMobileView({
               sx={{
                 font: "700 28px/1 'Archivo Narrow',Archivo,sans-serif",
                 color: (theme) =>
-                  theme.palette.mode === "dark" ? "text.primary" : "#f6f4ee",
+                  theme.palette.mode === "dark"
+                    ? "text.primary"
+                    : "background.paper",
               }}
             >
               {stats.length}
@@ -596,7 +633,9 @@ export default function OrganizationStatisticsMobileView({
                 font: "700 8.5px/1.2 Archivo,sans-serif",
                 letterSpacing: ".1em",
                 color: (theme) =>
-                  theme.palette.mode === "dark" ? "text.secondary" : "#9a958a",
+                  theme.palette.mode === "dark"
+                    ? "text.secondary"
+                    : "background.default",
                 mt: 0.5,
               }}
             >
@@ -620,20 +659,19 @@ export default function OrganizationStatisticsMobileView({
               }}
               data-testid={`stats-metric-${tab.key}`}
               sx={{
-                border: active
-                  ? "none"
-                  : (theme) =>
-                      `1.5px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.12)" : "#ddd8cc"}`,
+                border: active ? "none" : "1.5px solid",
+                borderColor: "divider",
                 bgcolor: active
                   ? (theme) =>
-                      theme.palette.mode === "dark" ? "primary.main" : "#17181a"
-                  : (theme) =>
                       theme.palette.mode === "dark"
-                        ? "background.paper"
-                        : "#ffffff",
+                        ? "primary.main"
+                        : "text.primary"
+                  : "background.paper",
                 color: active
                   ? (theme) =>
-                      theme.palette.mode === "dark" ? "#17181a" : "#ffffff"
+                      theme.palette.mode === "dark"
+                        ? "text.primary"
+                        : "background.paper"
                   : "text.primary",
                 borderRadius: "9px",
                 px: 1.5,
@@ -658,15 +696,15 @@ export default function OrganizationStatisticsMobileView({
             sx={{
               bgcolor: "background.paper",
               border: (theme) =>
-                theme.palette.mode === "dark"
-                  ? "1px solid rgba(255,255,255,0.12)"
-                  : "2px solid #17181a",
+                theme.palette.brutalist?.border ||
+                `2px solid ${theme.palette.divider}`,
               borderRadius: "18px",
               p: 2,
               boxShadow: (theme) =>
-                theme.palette.mode === "dark"
+                theme.palette.brutalist?.shadow ||
+                (theme.palette.mode === "dark"
                   ? "0 4px 20px rgba(0,0,0,0.5)"
-                  : "5px 5px 0 #17181a",
+                  : `5px 5px 0 ${theme.palette.divider}`),
             }}
           >
             <Typography
@@ -750,7 +788,7 @@ export default function OrganizationStatisticsMobileView({
                 : 0;
             const isLast = idx === displayedStats.length - 1;
             const avatarBg = me
-              ? "#146b3a"
+              ? theme.palette.primary.main
               : AVATAR_BG_COLORS[position % AVATAR_BG_COLORS.length];
 
             return (
@@ -765,16 +803,9 @@ export default function OrganizationStatisticsMobileView({
                   my: me ? 0.5 : 0,
                   px: me ? 1.25 : 0,
                   mx: me ? -1.25 : 0,
-                  bgcolor: (theme) =>
-                    me
-                      ? theme.palette.mode === "dark"
-                        ? "rgba(20, 107, 58, 0.2)"
-                        : "#f4f8f5"
-                      : "transparent",
-                  border: me
-                    ? (theme) =>
-                        `2px solid ${theme.palette.mode === "dark" ? "#34a853" : "#146b3a"}`
-                    : "none",
+                  bgcolor: me ? "action.selected" : "transparent",
+                  border: me ? "2px solid" : "none",
+                  borderColor: me ? "primary.main" : "transparent",
                   borderRadius: me ? "13px" : 0,
                   borderBottom:
                     !me && !isLast
@@ -787,10 +818,7 @@ export default function OrganizationStatisticsMobileView({
                     width: 17,
                     flexShrink: 0,
                     font: "700 13px/1 'Archivo Narrow',Archivo,sans-serif",
-                    color: me
-                      ? (theme) =>
-                          theme.palette.mode === "dark" ? "#34a853" : "#146b3a"
-                      : "text.secondary",
+                    color: me ? "primary.main" : "text.secondary",
                   }}
                 >
                   {position}
@@ -802,11 +830,8 @@ export default function OrganizationStatisticsMobileView({
                   sx={{
                     width: 30,
                     height: 30,
-                    bgcolor: me
-                      ? (theme) =>
-                          theme.palette.mode === "dark" ? "#34a853" : "#146b3a"
-                      : avatarBg,
-                    color: me || avatarBg === "#146b3a" ? "#ffffff" : "#17181a",
+                    bgcolor: avatarBg,
+                    color: me ? "primary.contrastText" : "text.primary",
                     font: "800 10px Archivo,sans-serif",
                     flexShrink: 0,
                   }}
@@ -826,10 +851,7 @@ export default function OrganizationStatisticsMobileView({
                         sx={{
                           font: "700 9px Archivo,sans-serif",
                           letterSpacing: ".08em",
-                          color: (theme) =>
-                            theme.palette.mode === "dark"
-                              ? "#34a853"
-                              : "#146b3a",
+                          color: "primary.main",
                         }}
                       >
                         {" "}
@@ -840,12 +862,7 @@ export default function OrganizationStatisticsMobileView({
                   <Typography
                     sx={{
                       font: "600 10.5px/1.3 Archivo,sans-serif",
-                      color: me
-                        ? (theme) =>
-                            theme.palette.mode === "dark"
-                              ? "#34a853"
-                              : "#146b3a"
-                        : "text.secondary",
+                      color: me ? "primary.main" : "text.secondary",
                       mt: 0.25,
                     }}
                   >
@@ -861,10 +878,7 @@ export default function OrganizationStatisticsMobileView({
                 <Typography
                   sx={{
                     font: "700 19px/1 'Archivo Narrow',Archivo,sans-serif",
-                    color: me
-                      ? (theme) =>
-                          theme.palette.mode === "dark" ? "#34a853" : "#146b3a"
-                      : "text.primary",
+                    color: me ? "primary.main" : "text.primary",
                     flexShrink: 0,
                   }}
                 >
@@ -887,8 +901,7 @@ export default function OrganizationStatisticsMobileView({
                 textAlign: "center",
                 p: "12px 0 8px",
                 font: "800 11.5px/1 Archivo,sans-serif",
-                color: (theme) =>
-                  theme.palette.mode === "dark" ? "#34a853" : "#146b3a",
+                color: "primary.main",
                 cursor: "pointer",
               }}
             >
@@ -937,14 +950,10 @@ export default function OrganizationStatisticsMobileView({
                       height: `${Math.round(
                         (week.confirmed / presenceMax) * 100,
                       )}%`,
-                      bgcolor: (theme) =>
+                      bgcolor:
                         week.confirmed < presenceWeeksAvg
-                          ? theme.palette.mode === "dark"
-                            ? "#e06c50"
-                            : "#a8452a"
-                          : theme.palette.mode === "dark"
-                            ? "#34a853"
-                            : "#146b3a",
+                          ? "secondary.main"
+                          : "primary.main",
                       borderRadius: "3px",
                     }}
                   />
@@ -1053,7 +1062,7 @@ export default function OrganizationStatisticsMobileView({
                     width: 30,
                     height: 30,
                     bgcolor: highlight.color,
-                    color: "#17181a",
+                    color: "text.primary",
                     font: "800 10px Archivo,sans-serif",
                     flexShrink: 0,
                   }}

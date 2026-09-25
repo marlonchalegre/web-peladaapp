@@ -3,8 +3,39 @@ import type { PaletteMode } from "@mui/material";
 
 declare module "@mui/material/styles" {
   interface Palette {
-    home: Palette["primary"];
-    away: Palette["primary"];
+    home: Palette["primary"] & { subtleBg: string; subtleText: string };
+    away: Palette["primary"] & { subtleBg: string; subtleText: string };
+    pitch: Palette["primary"] & { subtle: string };
+    gold: Palette["primary"] & { subtleText: string };
+    brutalist: {
+      border: string;
+      borderThick: string;
+      shadow: string;
+      shadowSmall: string;
+    };
+    status: {
+      paid: {
+        bg: string;
+        text: string;
+        color?: string;
+        border: string;
+      };
+      unpaid: {
+        bg: string;
+        text: string;
+        color?: string;
+        border: string;
+      };
+    };
+    matchEvents: {
+      drible: string;
+      chute: string;
+      falta: string;
+      furada: string;
+      defesa: string;
+      vish: string;
+      [key: string]: string;
+    };
     attendance: {
       button: {
         confirmed: {
@@ -43,8 +74,37 @@ declare module "@mui/material/styles" {
     };
   }
   interface PaletteOptions {
-    home?: PaletteOptions["primary"];
-    away?: PaletteOptions["primary"];
+    home?: PaletteOptions["primary"] & {
+      subtleBg?: string;
+      subtleText?: string;
+    };
+    away?: PaletteOptions["primary"] & {
+      subtleBg?: string;
+      subtleText?: string;
+    };
+    pitch?: PaletteOptions["primary"] & { subtle?: string };
+    gold?: PaletteOptions["primary"] & { subtleText?: string };
+    brutalist?: {
+      border?: string;
+      borderThick?: string;
+      shadow?: string;
+      shadowSmall?: string;
+    };
+    status?: {
+      paid?: {
+        bg?: string;
+        text?: string;
+        color?: string;
+        border?: string;
+      };
+      unpaid?: {
+        bg?: string;
+        text?: string;
+        color?: string;
+        border?: string;
+      };
+    };
+    matchEvents?: Record<string, string>;
     attendance?: {
       button?: {
         confirmed?: {
@@ -89,22 +149,54 @@ export const getTheme = (mode: PaletteMode) => {
     palette: {
       mode,
       primary: {
-        main: "#146b3a", // Pitch green
-        dark: "#0f5c33",
-        light: "#bfe6ce",
+        main: mode === "light" ? "#146b3a" : "#2e7d32", // Pitch green
+        dark: mode === "light" ? "#0f5c33" : "#1b5e20",
+        light: mode === "light" ? "#bfe6ce" : "#81c784",
         contrastText: "#ffffff",
       },
       secondary: {
-        main: "#a8452a", // Terracotta / warm red
-        dark: "#8a351f",
-        light: "#f6ece8",
+        main: mode === "light" ? "#a8452a" : "#e06c50", // Terracotta / warm red
+        dark: mode === "light" ? "#8a351f" : "#c0392b",
+        light: mode === "light" ? "#f6ece8" : "rgba(224, 108, 80, 0.15)",
         contrastText: "#ffffff",
       },
       home: {
-        main: "#146b3a",
+        main: mode === "light" ? "#c9591c" : "#f6a45c",
+        dark: mode === "light" ? "#8f3d12" : "#b84a14",
+        light: mode === "light" ? "#f3c19c" : "#ffcaa6",
+        subtleBg: mode === "light" ? "#fdead7" : "rgba(201, 89, 28, 0.25)",
+        subtleText: mode === "light" ? "#923b0d" : "#ffb787",
+        contrastText: "#ffffff",
       },
       away: {
-        main: "#a8452a",
+        main: mode === "light" ? "#1f5f9c" : "#8fbde8",
+        dark: mode === "light" ? "#164674" : "#184f82",
+        light: mode === "light" ? "#a9caea" : "#c2ddf8",
+        subtleBg: mode === "light" ? "#dbe8f6" : "rgba(31, 95, 156, 0.25)",
+        subtleText: mode === "light" ? "#164674" : "#a9caea",
+        contrastText: "#ffffff",
+      },
+      pitch: {
+        main: mode === "light" ? "#123c26" : "#16251d",
+        dark: mode === "light" ? "#0d2e1d" : "#0f1a14",
+        light: mode === "light" ? "#8fbfa3" : "#5d8f73",
+        subtle: "#9ecfb2",
+        contrastText: "#ffffff",
+      },
+      gold: {
+        main: mode === "light" ? "#f2a100" : "#ffc107",
+        dark: mode === "light" ? "#b27700" : "#c79100",
+        light: mode === "light" ? "#fef3d6" : "#ffe082",
+        subtleText: mode === "light" ? "#8a5800" : "#ffe082",
+        contrastText: mode === "light" ? "#17181a" : "#000000",
+      },
+      matchEvents: {
+        drible: mode === "light" ? "#c9591c" : "#f6a45c",
+        chute: mode === "light" ? "#1f5f9c" : "#8fbde8",
+        falta: mode === "light" ? "#a8452a" : "#e06c50",
+        furada: mode === "light" ? "#6b675c" : "#9a958a",
+        defesa: mode === "light" ? "#146b3a" : "#2e7d32",
+        vish: mode === "light" ? "#6b4b9c" : "#a78bfa",
       },
       success: {
         main: "#146b3a",
@@ -359,6 +451,32 @@ export const getTheme = (mode: PaletteMode) => {
           icon: mode === "dark" ? "#f6f4ee" : "#17181a",
           hoverBg: mode === "dark" ? "#2d3035" : "#eae6db",
         },
+      },
+    },
+    brutalist: {
+      border:
+        mode === "dark"
+          ? "1px solid rgba(255,255,255,0.12)"
+          : "2px solid #17181a",
+      borderThick:
+        mode === "dark"
+          ? "2px solid rgba(255,255,255,0.2)"
+          : "2px solid #17181a",
+      shadow:
+        mode === "dark" ? "0 4px 20px rgba(0,0,0,0.5)" : "5px 5px 0 #17181a",
+      shadowSmall:
+        mode === "dark" ? "0 2px 10px rgba(0,0,0,0.3)" : "3px 3px 0 #17181a",
+    },
+    status: {
+      paid: {
+        bg: mode === "dark" ? "rgba(46, 125, 50, 0.2)" : "#f4f8f5",
+        text: mode === "dark" ? "#81c784" : "#146b3a",
+        border: mode === "dark" ? "1px solid #2e7d32" : "1px solid #146b3a",
+      },
+      unpaid: {
+        bg: mode === "dark" ? "rgba(224, 108, 80, 0.2)" : "#fff5f2",
+        text: mode === "dark" ? "#e06c50" : "#a8452a",
+        border: mode === "dark" ? "1px solid #c0392b" : "1px solid #a8452a",
       },
     },
   });

@@ -28,8 +28,8 @@ export default function LocationDisplay({
   location,
   showDot = false,
   showIcon = false,
-  iconColor = "#146b3a",
-  dotColor = "#146b3a",
+  iconColor = "primary.main",
+  dotColor = "primary.main",
   sx,
   textSx,
   dataTestId = "location-display",
@@ -103,7 +103,7 @@ export default function LocationDisplay({
             fontFamily: "Archivo, sans-serif",
             fontWeight: 600,
             fontSize: "12.5px",
-            color: "#4a4740",
+            color: "text.secondary",
             ...textSx,
           }}
         >

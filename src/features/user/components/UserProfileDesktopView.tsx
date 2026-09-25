@@ -67,8 +67,7 @@ export default function UserProfileDesktopView({
   const absentCount = presenceWeeks.filter(
     (week) => week.status === "absent",
   ).length;
-  const inactivePresenceColor =
-    theme.palette.mode === "dark" ? "#2d3035" : "#eae6db";
+  const inactivePresenceColor = theme.palette.divider;
 
   const recentMatches = toRecentMatchRows(dashboard?.recent_peladas);
 
@@ -84,7 +83,7 @@ export default function UserProfileDesktopView({
       <Box
         sx={{
           bgcolor: (theme) =>
-            theme.palette.mode === "dark" ? "background.paper" : "#17181a",
+            theme.palette.mode === "dark" ? "background.paper" : "grey.900",
           borderBottom: (theme) =>
             theme.palette.mode === "dark" ? "1px solid" : "none",
           borderColor: "divider",
@@ -109,16 +108,14 @@ export default function UserProfileDesktopView({
             sx={{
               width: 88,
               height: 88,
-              bgcolor: "#d8d2c4",
+              bgcolor: "grey.300",
               border: (theme) =>
-                theme.palette.mode === "dark"
-                  ? "3px solid #2d3035"
-                  : "3px solid #f6f4ee",
+                `3px solid ${theme.palette.mode === "dark" ? theme.palette.divider : theme.palette.grey[100]}`,
               flexShrink: 0,
               fontFamily: "Archivo, sans-serif",
               fontWeight: 800,
               fontSize: "28px",
-              color: "#17181a",
+              color: "grey.900",
             }}
           />
 
@@ -131,7 +128,10 @@ export default function UserProfileDesktopView({
                 fontWeight: 800,
                 fontSize: "32px",
                 lineHeight: 1.1,
-                color: "#f6f4ee",
+                color: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? theme.palette.text.primary
+                    : theme.palette.grey[100],
               }}
             >
               {displayName}
@@ -142,7 +142,10 @@ export default function UserProfileDesktopView({
                 fontWeight: 700,
                 fontSize: "10px",
                 letterSpacing: ".14em",
-                color: "#9a958a",
+                color: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? theme.palette.text.secondary
+                    : theme.palette.grey[500],
                 mt: 1,
                 textTransform: "uppercase",
               }}
@@ -154,8 +157,8 @@ export default function UserProfileDesktopView({
               {(summary?.titles ?? 0) > 0 && (
                 <Box
                   sx={{
-                    bgcolor: "#f2a100",
-                    color: "#17181a",
+                    bgcolor: "gold.main",
+                    color: "gold.contrastText",
                     borderRadius: "7px",
                     px: 1.1,
                     py: 0.75,
@@ -171,8 +174,12 @@ export default function UserProfileDesktopView({
               {(summary?.mvp_count ?? 0) > 0 && (
                 <Box
                   sx={{
-                    border: "1.5px solid #3a3b3e",
-                    color: "#f6f4ee",
+                    border: (theme) =>
+                      `1.5px solid ${theme.palette.mode === "dark" ? theme.palette.divider : theme.palette.grey[800]}`,
+                    color: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? theme.palette.text.primary
+                        : theme.palette.grey[100],
                     borderRadius: "7px",
                     px: 1.1,
                     py: 0.6,
@@ -188,8 +195,12 @@ export default function UserProfileDesktopView({
               {(summary?.garcom_count ?? 0) > 0 && (
                 <Box
                   sx={{
-                    border: "1.5px solid #3a3b3e",
-                    color: "#f6f4ee",
+                    border: (theme) =>
+                      `1.5px solid ${theme.palette.mode === "dark" ? theme.palette.divider : theme.palette.grey[800]}`,
+                    color: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? theme.palette.text.primary
+                        : theme.palette.grey[100],
                     borderRadius: "7px",
                     px: 1.1,
                     py: 0.6,
@@ -205,8 +216,12 @@ export default function UserProfileDesktopView({
               {streak > 1 && (
                 <Box
                   sx={{
-                    border: "1.5px solid #3a3b3e",
-                    color: "#f6f4ee",
+                    border: (theme) =>
+                      `1.5px solid ${theme.palette.mode === "dark" ? theme.palette.divider : theme.palette.grey[800]}`,
+                    color: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? theme.palette.text.primary
+                        : theme.palette.grey[100],
                     borderRadius: "7px",
                     px: 1.1,
                     py: 0.6,
@@ -229,7 +244,8 @@ export default function UserProfileDesktopView({
               gap: 4,
               flexShrink: 0,
               pl: 3.25,
-              borderLeft: "1px solid #2e2f31",
+              borderLeft: (theme) =>
+                `1px solid ${theme.palette.mode === "dark" ? theme.palette.divider : theme.palette.grey[800]}`,
             }}
           >
             <Box>
@@ -239,7 +255,10 @@ export default function UserProfileDesktopView({
                   fontWeight: 700,
                   fontSize: "40px",
                   lineHeight: 1,
-                  color: "#f6f4ee",
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? theme.palette.text.primary
+                      : theme.palette.grey[100],
                 }}
               >
                 {formatRating(summary?.avg_rating)}
@@ -251,7 +270,10 @@ export default function UserProfileDesktopView({
                   fontSize: "8.5px",
                   lineHeight: 1.2,
                   letterSpacing: ".1em",
-                  color: "#9a958a",
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? theme.palette.text.secondary
+                      : theme.palette.grey[500],
                   mt: 0.6,
                 }}
               >
@@ -266,7 +288,10 @@ export default function UserProfileDesktopView({
                   fontWeight: 700,
                   fontSize: "40px",
                   lineHeight: 1,
-                  color: "#f6f4ee",
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? theme.palette.text.primary
+                      : theme.palette.grey[100],
                 }}
               >
                 {summary?.matches_played ?? 0}
@@ -278,7 +303,10 @@ export default function UserProfileDesktopView({
                   fontSize: "8.5px",
                   lineHeight: 1.2,
                   letterSpacing: ".1em",
-                  color: "#9a958a",
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? theme.palette.text.secondary
+                      : theme.palette.grey[500],
                   mt: 0.6,
                 }}
               >
@@ -293,7 +321,7 @@ export default function UserProfileDesktopView({
                   fontWeight: 700,
                   fontSize: "40px",
                   lineHeight: 1,
-                  color: "#f2a100",
+                  color: "gold.main",
                 }}
               >
                 {summary?.attendance_rate == null
@@ -307,7 +335,10 @@ export default function UserProfileDesktopView({
                   fontSize: "8.5px",
                   lineHeight: 1.2,
                   letterSpacing: ".1em",
-                  color: "#9a958a",
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? theme.palette.text.secondary
+                      : theme.palette.grey[500],
                   mt: 0.6,
                 }}
               >
@@ -322,7 +353,10 @@ export default function UserProfileDesktopView({
                   fontWeight: 700,
                   fontSize: "40px",
                   lineHeight: 1,
-                  color: "#f6f4ee",
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? theme.palette.text.primary
+                      : theme.palette.grey[100],
                 }}
               >
                 {summary?.titles ?? 0}
@@ -334,7 +368,10 @@ export default function UserProfileDesktopView({
                   fontSize: "8.5px",
                   lineHeight: 1.2,
                   letterSpacing: ".1em",
-                  color: "#9a958a",
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? theme.palette.text.secondary
+                      : theme.palette.grey[500],
                   mt: 0.6,
                 }}
               >
@@ -349,7 +386,8 @@ export default function UserProfileDesktopView({
             data-testid="edit-profile-button"
             sx={{
               flexShrink: 0,
-              border: "1.5px solid #3a3b3e",
+              border: (theme) =>
+                `1.5px solid ${theme.palette.mode === "dark" ? theme.palette.divider : theme.palette.grey[800]}`,
               borderRadius: "11px",
               py: 1.25,
               px: 1.75,
@@ -357,11 +395,13 @@ export default function UserProfileDesktopView({
               fontWeight: 800,
               fontSize: "11px",
               letterSpacing: ".04em",
-              color: "#f6f4ee",
+              color: (theme) =>
+                theme.palette.mode === "dark"
+                  ? theme.palette.text.primary
+                  : theme.palette.grey[100],
               textTransform: "uppercase",
               "&:hover": {
-                bgcolor: (theme) =>
-                  theme.palette.mode === "dark" ? "action.hover" : "#242628",
+                bgcolor: "action.hover",
               },
             }}
           >
@@ -374,8 +414,7 @@ export default function UserProfileDesktopView({
       <Box
         sx={{
           width: "100%",
-          bgcolor: (theme) =>
-            theme.palette.mode === "dark" ? "background.paper" : "#fff",
+          bgcolor: "background.paper",
           borderBottom: "1.5px solid",
           borderColor: "divider",
           px: { xs: 2, md: 4, lg: 5 },
@@ -431,15 +470,11 @@ export default function UserProfileDesktopView({
                 sx={{
                   bgcolor: "background.paper",
                   border: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "2px solid #2d3035"
-                      : "2px solid #17181a",
+                    `2px solid ${theme.palette.mode === "dark" ? theme.palette.divider : theme.palette.grey[900]}`,
                   borderRadius: "20px",
                   p: 2.5,
                   boxShadow: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "6px 6px 0 #000000"
-                      : "6px 6px 0 #17181a",
+                    `6px 6px 0 ${theme.palette.mode === "dark" ? theme.palette.common.black : theme.palette.grey[900]}`,
                 }}
               >
                 <Box
@@ -508,10 +543,7 @@ export default function UserProfileDesktopView({
                             flex: 1,
                             height: 10,
                             borderRadius: "5px",
-                            bgcolor: (theme) =>
-                              theme.palette.mode === "dark"
-                                ? "#2d3035"
-                                : "#eae6db",
+                            bgcolor: "divider",
                             display: "flex",
                             overflow: "hidden",
                           }}
@@ -520,7 +552,9 @@ export default function UserProfileDesktopView({
                             sx={{
                               width: `${pct}%`,
                               bgcolor:
-                                (skill.value ?? 0) < 3 ? "#a8452a" : "#146b3a",
+                                (skill.value ?? 0) < 3
+                                  ? "secondary.main"
+                                  : "primary.main",
                             }}
                           />
                         </Box>
@@ -598,8 +632,7 @@ export default function UserProfileDesktopView({
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 700,
                     fontSize: "11px",
-                    color: (theme) =>
-                      theme.palette.mode === "dark" ? "#4caf50" : "#146b3a",
+                    color: "primary.main",
                     cursor: "pointer",
                   }}
                 >
@@ -682,8 +715,8 @@ export default function UserProfileDesktopView({
                           fontWeight: 800,
                           fontSize: "9px",
                           letterSpacing: ".08em",
-                          color: "#17181a",
-                          bgcolor: "#f2a100",
+                          color: "gold.contrastText",
+                          bgcolor: "gold.main",
                           borderRadius: "6px",
                           px: 0.9,
                           py: 0.6,
@@ -753,9 +786,9 @@ export default function UserProfileDesktopView({
                 {presenceWeeks.map((week, idx) => {
                   const color =
                     week.status === "present"
-                      ? "#146b3a"
+                      ? "primary.main"
                       : week.status === "absent"
-                        ? "#a8452a"
+                        ? "secondary.main"
                         : inactivePresenceColor;
                   return (
                     <Box
@@ -781,7 +814,7 @@ export default function UserProfileDesktopView({
                       width: 9,
                       height: 9,
                       borderRadius: "2px",
-                      bgcolor: "#146b3a",
+                      bgcolor: "primary.main",
                     }}
                   />
                   <Typography
@@ -801,7 +834,7 @@ export default function UserProfileDesktopView({
                       width: 9,
                       height: 9,
                       borderRadius: "2px",
-                      bgcolor: "#a8452a",
+                      bgcolor: "secondary.main",
                     }}
                   />
                   <Typography
@@ -821,8 +854,7 @@ export default function UserProfileDesktopView({
                       width: 9,
                       height: 9,
                       borderRadius: "2px",
-                      bgcolor: (theme) =>
-                        theme.palette.mode === "dark" ? "#2d3035" : "#eae6db",
+                      bgcolor: "divider",
                     }}
                   />
                   <Typography
@@ -881,9 +913,10 @@ export default function UserProfileDesktopView({
                     gap: 1,
                     p: "11px 14px",
                     bgcolor: (theme) =>
-                      theme.palette.mode === "dark"
-                        ? alpha(theme.palette.primary.main, 0.12)
-                        : "#f4f8f5",
+                      alpha(
+                        theme.palette.primary.main,
+                        theme.palette.mode === "dark" ? 0.12 : 0.08,
+                      ),
                     borderBottom: "1.5px solid",
                     borderColor: "divider",
                   }}
@@ -893,7 +926,7 @@ export default function UserProfileDesktopView({
                       width: 9,
                       height: 9,
                       borderRadius: "2px",
-                      bgcolor: "#146b3a",
+                      bgcolor: "primary.main",
                     }}
                   />
                   <Typography
@@ -935,10 +968,10 @@ export default function UserProfileDesktopView({
                 bgcolor: (theme) =>
                   theme.palette.mode === "dark"
                     ? "background.paper"
-                    : "#17181a",
+                    : "grey.900",
                 border: (theme) =>
                   theme.palette.mode === "dark"
-                    ? "1.5px solid #2d3035"
+                    ? `1.5px solid ${theme.palette.divider}`
                     : "none",
                 borderRadius: "16px",
                 p: 2,
@@ -951,7 +984,10 @@ export default function UserProfileDesktopView({
                   fontWeight: 700,
                   fontSize: "9.5px",
                   letterSpacing: ".16em",
-                  color: "#9a958a",
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? theme.palette.text.secondary
+                      : theme.palette.grey[500],
                   textTransform: "uppercase",
                 }}
               >
@@ -963,7 +999,10 @@ export default function UserProfileDesktopView({
                   fontWeight: 600,
                   fontSize: "12px",
                   lineHeight: 1.5,
-                  color: "#f6f4ee",
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? theme.palette.text.primary
+                      : theme.palette.grey[100],
                   mt: 1.4,
                 }}
               >
@@ -974,7 +1013,7 @@ export default function UserProfileDesktopView({
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 700,
                   fontSize: "11.5px",
-                  color: "#f2a100",
+                  color: "gold.main",
                   mt: 1.6,
                   cursor: "pointer",
                 }}

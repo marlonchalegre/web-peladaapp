@@ -175,9 +175,11 @@ export default function CreatePeladaForm({
                 onChange={(e) => setNotifyCasualPlayers(e.target.checked)}
                 name="notifyCasualPlayers"
                 sx={{
-                  "& .MuiSwitch-switchBase.Mui-checked": { color: "#146b3a" },
+                  "& .MuiSwitch-switchBase.Mui-checked": {
+                    color: "primary.main",
+                  },
                   "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                    backgroundColor: "#146b3a",
+                    backgroundColor: "primary.main",
                   },
                 }}
               />
@@ -210,16 +212,16 @@ export default function CreatePeladaForm({
             data-testid="create-pelada-submit"
             data-analytics-id="create-pelada-submit-btn"
             sx={{
-              bgcolor: "#146b3a",
-              color: "#ffffff",
+              bgcolor: "primary.main",
+              color: "primary.contrastText",
               borderRadius: "13px",
               py: 1.5,
               fontFamily: "Archivo, sans-serif",
               fontWeight: 800,
               fontSize: "15px",
               letterSpacing: ".06em",
-              boxShadow: "0 3px 0 #0d4526",
-              "&:hover": { bgcolor: "#0e5c31" },
+              boxShadow: (theme) => `0 3px 0 ${theme.palette.primary.dark}`,
+              "&:hover": { bgcolor: "primary.dark" },
             }}
           >
             {t("organizations.form.pelada.submit")}

@@ -120,7 +120,7 @@ export default function AdminPanelPage() {
           p: { xs: 3, md: 5 },
           mb: 4,
           boxShadow: `0 4px 20px 0 ${alpha(theme.palette.primary.main, 0.25)}`,
-          color: "#fff",
+          color: "primary.contrastText",
         }}
       >
         <Typography

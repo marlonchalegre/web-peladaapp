@@ -245,7 +245,7 @@ export default function OrganizationManagementPage() {
               fontFamily: "Archivo, sans-serif",
               fontWeight: 800,
               fontSize: "24px",
-              color: "#17181a",
+              color: "text.primary",
             }}
           >
             {t("organizations.management.title", { name: org.name })}
@@ -265,7 +265,8 @@ export default function OrganizationManagementPage() {
         <Paper
           elevation={0}
           sx={{
-            borderBottom: "1.5px solid #eae6db",
+            borderBottom: "1.5px solid",
+            borderColor: "divider",
             bgcolor: "background.paper",
           }}
         >
@@ -284,12 +285,12 @@ export default function OrganizationManagementPage() {
                 fontSize: "11.5px",
                 letterSpacing: ".04em",
                 textTransform: "uppercase",
-                color: "#6b675c",
+                color: "text.secondary",
                 minHeight: 46,
               },
-              "& .MuiTab-root.Mui-selected": { color: "#17181a" },
+              "& .MuiTab-root.Mui-selected": { color: "text.primary" },
               "& .MuiTabs-indicator": {
-                backgroundColor: "#17181a",
+                backgroundColor: "text.primary",
                 height: 3,
               },
             }}

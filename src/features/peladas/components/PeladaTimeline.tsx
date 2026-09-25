@@ -104,7 +104,9 @@ function TimelineCard({
         };
       case "drible":
         return {
-          icon: <BoltIcon fontSize="small" sx={{ color: "#d97706" }} />,
+          icon: (
+            <BoltIcon fontSize="small" sx={{ color: "matchEvents.drible" }} />
+          ),
           title: t("common.drible"),
         };
       case "chute":
@@ -112,14 +114,16 @@ function TimelineCard({
           icon: (
             <LocalFireDepartmentIcon
               fontSize="small"
-              sx={{ color: "#e11d48" }}
+              sx={{ color: "matchEvents.chute" }}
             />
           ),
           title: t("common.chute"),
         };
       case "falta":
         return {
-          icon: <WarningIcon fontSize="small" sx={{ color: "#ea580c" }} />,
+          icon: (
+            <WarningIcon fontSize="small" sx={{ color: "matchEvents.falta" }} />
+          ),
           title: t("common.falta"),
         };
       case "furada":
@@ -127,14 +131,16 @@ function TimelineCard({
           icon: (
             <SentimentVeryDissatisfiedIcon
               fontSize="small"
-              sx={{ color: "#6b7280" }}
+              sx={{ color: "matchEvents.furada" }}
             />
           ),
           title: t("common.furada"),
         };
       case "defesa":
         return {
-          icon: <ShieldIcon fontSize="small" sx={{ color: "#0d9488" }} />,
+          icon: (
+            <ShieldIcon fontSize="small" sx={{ color: "matchEvents.defesa" }} />
+          ),
           title: t("common.defesa"),
         };
       case "vish":
@@ -142,7 +148,7 @@ function TimelineCard({
           icon: (
             <SentimentVerySatisfiedIcon
               fontSize="small"
-              sx={{ color: "#7c3aed" }}
+              sx={{ color: "matchEvents.vish" }}
             />
           ),
           title: t("common.vish"),
@@ -303,8 +309,8 @@ export default function PeladaTimeline({
   const { t } = useTranslation();
   const theme = useTheme();
 
-  const homeColor = theme.palette.home?.main || "#2563eb";
-  const awayColor = theme.palette.away?.main || "#f97316";
+  const homeColor = theme.palette.home?.main || theme.palette.secondary.main;
+  const awayColor = theme.palette.away?.main || theme.palette.primary.main;
 
   const getPlayerName = (playerId: string) => {
     const userId = orgPlayerIdToUserId[playerId];

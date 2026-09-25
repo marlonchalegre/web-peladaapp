@@ -139,12 +139,13 @@ export default function MatchScoreHero({
     return (
       <Box
         sx={{
-          bgcolor: "#fff",
-          border: "1.5px solid #e4e0d6",
+          bgcolor: "background.paper",
+          border: "1.5px solid",
+          borderColor: "divider",
           borderRadius: "18px",
           px: "22px",
           py: "18px",
-          boxShadow: "0 3px 0 #e4e0d6",
+          boxShadow: (theme) => `0 3px 0 ${theme.palette.divider}`,
         }}
         data-testid="match-score-hero"
       >
@@ -174,8 +175,8 @@ export default function MatchScoreHero({
                     fontSize: "9.5px",
                     lineHeight: 1,
                     letterSpacing: "0.06em",
-                    color: "#923b0d",
-                    bgcolor: "#fdead7",
+                    color: "home.subtleText",
+                    bgcolor: "home.subtleBg",
                     borderRadius: "5px",
                     px: "5px",
                     py: "3px",
@@ -193,7 +194,7 @@ export default function MatchScoreHero({
                   fontSize: "17px",
                   lineHeight: 1.1,
                   letterSpacing: "0.04em",
-                  color: "#c9591c",
+                  color: "home.main",
                 }}
               >
                 {homeTeamName.toUpperCase()}
@@ -206,7 +207,7 @@ export default function MatchScoreHero({
                 fontSize: "10px",
                 lineHeight: 1,
                 letterSpacing: "0.12em",
-                color: "#8a857a",
+                color: "text.secondary",
                 mt: "6px",
               }}
             >
@@ -226,7 +227,7 @@ export default function MatchScoreHero({
                 fontFamily: "'Anton', sans-serif",
                 fontSize: "60px",
                 lineHeight: 1,
-                color: "#c9591c",
+                color: "home.main",
                 minWidth: 52,
                 textAlign: "center",
               }}
@@ -242,7 +243,7 @@ export default function MatchScoreHero({
                   fontWeight: 700,
                   fontSize: "21px",
                   lineHeight: 1,
-                  color: "#1a1a1a",
+                  color: "text.primary",
                 }}
               >
                 {clockLabel}
@@ -255,7 +256,7 @@ export default function MatchScoreHero({
                   fontSize: "9px",
                   lineHeight: 1,
                   letterSpacing: "0.14em",
-                  color: "#8a857a",
+                  color: "text.secondary",
                   mt: "6px",
                   textTransform: "uppercase",
                 }}
@@ -269,7 +270,7 @@ export default function MatchScoreHero({
                 fontFamily: "'Anton', sans-serif",
                 fontSize: "60px",
                 lineHeight: 1,
-                color: "#1f5f9c",
+                color: "away.main",
                 minWidth: 52,
                 textAlign: "center",
               }}
@@ -296,7 +297,7 @@ export default function MatchScoreHero({
                   fontSize: "17px",
                   lineHeight: 1.1,
                   letterSpacing: "0.04em",
-                  color: "#1f5f9c",
+                  color: "away.main",
                 }}
               >
                 {awayTeamName.toUpperCase()}
@@ -309,8 +310,8 @@ export default function MatchScoreHero({
                     fontSize: "9.5px",
                     lineHeight: 1,
                     letterSpacing: "0.06em",
-                    color: "#164674",
-                    bgcolor: "#dbe8f6",
+                    color: "away.subtleText",
+                    bgcolor: "away.subtleBg",
                     borderRadius: "5px",
                     px: "5px",
                     py: "3px",
@@ -327,7 +328,7 @@ export default function MatchScoreHero({
                 fontSize: "10px",
                 lineHeight: 1,
                 letterSpacing: "0.12em",
-                color: "#8a857a",
+                color: "text.secondary",
                 mt: "6px",
               }}
             >
@@ -344,7 +345,8 @@ export default function MatchScoreHero({
             gap: "10px",
             mt: "16px",
             pt: "15px",
-            borderTop: "1px solid #efece4",
+            borderTop: "1px solid",
+            borderColor: "divider",
           }}
         >
           {isAdmin && !finished && (
@@ -358,8 +360,8 @@ export default function MatchScoreHero({
               sx={{
                 border: 0,
                 borderRadius: "11px",
-                bgcolor: "#123c26",
-                color: "#fff",
+                bgcolor: "primary.main",
+                color: "primary.contrastText",
                 px: "20px",
                 py: "12px",
                 fontFamily: "Archivo, sans-serif",
@@ -368,7 +370,9 @@ export default function MatchScoreHero({
                 lineHeight: 1,
                 letterSpacing: "0.06em",
                 textTransform: "uppercase",
-                "&:hover": { bgcolor: "#0d2e1d" },
+                "&:hover": {
+                  bgcolor: "primary.dark",
+                },
               }}
             >
               {running
@@ -382,10 +386,11 @@ export default function MatchScoreHero({
               onClick={() => onOpenResetConfirm("match")}
               data-testid="reset-match-timer-button"
               sx={{
-                border: "1.5px solid #ddd8cc",
+                border: "1.5px solid",
+                borderColor: "divider",
                 borderRadius: "11px",
-                bgcolor: "#faf8f3",
-                color: "#6b675c",
+                bgcolor: "action.hover",
+                color: "text.secondary",
                 px: "16px",
                 py: "11px",
                 fontFamily: "Archivo, sans-serif",
@@ -394,7 +399,10 @@ export default function MatchScoreHero({
                 lineHeight: 1,
                 letterSpacing: "0.05em",
                 textTransform: "uppercase",
-                "&:hover": { borderColor: "#6b675c" },
+                "&:hover": {
+                  borderColor: "text.primary",
+                  color: "text.primary",
+                },
               }}
             >
               {t("peladas.dashboard.live_state.reset", "ZERAR")}
@@ -447,10 +455,11 @@ export default function MatchScoreHero({
                   ) : undefined
                 }
                 sx={{
-                  border: "1.5px solid #e2c3bb",
+                  border: (theme) =>
+                    `1.5px solid ${theme.palette.secondary.light}`,
                   borderRadius: "11px",
-                  bgcolor: "#fff",
-                  color: "#a8452a",
+                  bgcolor: "background.paper",
+                  color: "secondary.main",
                   px: "18px",
                   py: "11px",
                   fontFamily: "Archivo, sans-serif",
@@ -460,8 +469,8 @@ export default function MatchScoreHero({
                   letterSpacing: "0.05em",
                   textTransform: "uppercase",
                   "&:hover": {
-                    borderColor: "#a8452a",
-                    bgcolor: "#fbf3f0",
+                    borderColor: "secondary.main",
+                    bgcolor: "secondary.light",
                   },
                 }}
               >
@@ -482,8 +491,8 @@ export default function MatchScoreHero({
     <Box
       sx={{
         flexShrink: 0,
-        bgcolor: "#123c26",
-        color: "#fff",
+        bgcolor: "pitch.main",
+        color: "pitch.contrastText",
         p: "14px 16px 12px",
       }}
       data-testid="match-score-hero"
@@ -497,7 +506,7 @@ export default function MatchScoreHero({
           sx={{
             border: 0,
             bgcolor: "rgba(255,255,255,0.12)",
-            color: "#fff",
+            color: "pitch.contrastText",
             width: 34,
             height: 34,
             borderRadius: "10px",
@@ -516,7 +525,7 @@ export default function MatchScoreHero({
               fontSize: "10px",
               lineHeight: 1,
               letterSpacing: "0.16em",
-              color: "#8fbfa3",
+              color: "pitch.light",
             }}
           >
             {(pelada.organization_name || "100FÔLEGO").toUpperCase()} ·{" "}
@@ -529,7 +538,7 @@ export default function MatchScoreHero({
               fontSize: "14px",
               lineHeight: 1.3,
               letterSpacing: "0.02em",
-              color: "#fff",
+              color: "pitch.contrastText",
               mt: "4px",
             }}
           >
@@ -543,7 +552,7 @@ export default function MatchScoreHero({
           sx={{
             border: 0,
             bgcolor: "rgba(255,255,255,0.12)",
-            color: "#fff",
+            color: "pitch.contrastText",
             width: 34,
             height: 34,
             borderRadius: "10px",
@@ -584,8 +593,8 @@ export default function MatchScoreHero({
                   fontSize: "9.5px",
                   lineHeight: 1,
                   letterSpacing: "0.06em",
-                  color: "#123c26",
-                  bgcolor: "#f3b98c",
+                  color: "pitch.main",
+                  bgcolor: "home.light",
                   borderRadius: "5px",
                   px: "5px",
                   py: "3px",
@@ -603,7 +612,7 @@ export default function MatchScoreHero({
                 fontSize: "15px",
                 lineHeight: 1.2,
                 letterSpacing: "0.04em",
-                color: "#fff",
+                color: "pitch.contrastText",
               }}
             >
               {homeTeamName.toUpperCase()}
@@ -616,7 +625,7 @@ export default function MatchScoreHero({
               fontSize: "10px",
               lineHeight: 1,
               letterSpacing: "0.1em",
-              color: "#f3b98c",
+              color: "home.light",
               mt: "6px",
             }}
           >
@@ -638,7 +647,7 @@ export default function MatchScoreHero({
               fontFamily: "'Anton', sans-serif",
               fontSize: "54px",
               lineHeight: 1,
-              color: "#f6a45c",
+              color: "home.main",
               minWidth: 44,
               textAlign: "center",
             }}
@@ -650,7 +659,7 @@ export default function MatchScoreHero({
               fontFamily: "'Anton', sans-serif",
               fontSize: "24px",
               lineHeight: 1,
-              color: "#5d8f73",
+              color: "pitch.light",
             }}
           >
             –
@@ -660,7 +669,7 @@ export default function MatchScoreHero({
               fontFamily: "'Anton', sans-serif",
               fontSize: "54px",
               lineHeight: 1,
-              color: "#8fbde8",
+              color: "away.main",
               minWidth: 44,
               textAlign: "center",
             }}
@@ -687,7 +696,7 @@ export default function MatchScoreHero({
                 fontSize: "15px",
                 lineHeight: 1.2,
                 letterSpacing: "0.04em",
-                color: "#fff",
+                color: "pitch.contrastText",
               }}
             >
               {awayTeamName.toUpperCase()}
@@ -700,8 +709,8 @@ export default function MatchScoreHero({
                   fontSize: "9.5px",
                   lineHeight: 1,
                   letterSpacing: "0.06em",
-                  color: "#123c26",
-                  bgcolor: "#a9caea",
+                  color: "pitch.main",
+                  bgcolor: "away.light",
                   borderRadius: "5px",
                   px: "5px",
                   py: "3px",
@@ -718,7 +727,7 @@ export default function MatchScoreHero({
               fontSize: "10px",
               lineHeight: 1,
               letterSpacing: "0.1em",
-              color: "#a9caea",
+              color: "away.light",
               mt: "6px",
             }}
           >
@@ -757,7 +766,7 @@ export default function MatchScoreHero({
               fontSize: { xs: "20px", sm: "22px" },
               lineHeight: 1,
               letterSpacing: "0.04em",
-              color: "#fff",
+              color: "pitch.contrastText",
             }}
           >
             {clockLabel}
@@ -770,7 +779,7 @@ export default function MatchScoreHero({
               fontSize: "9.5px",
               lineHeight: 1,
               letterSpacing: "0.12em",
-              color: "#8fbfa3",
+              color: "pitch.light",
               textTransform: "uppercase",
               whiteSpace: "nowrap",
             }}
@@ -798,8 +807,8 @@ export default function MatchScoreHero({
               sx={{
                 border: 0,
                 borderRadius: "11px",
-                bgcolor: "#fff",
-                color: "#123c26",
+                bgcolor: "background.paper",
+                color: "pitch.main",
                 px: { xs: "12px", sm: "16px" },
                 py: "8px",
                 fontFamily: "Archivo, sans-serif",
@@ -809,7 +818,9 @@ export default function MatchScoreHero({
                 letterSpacing: "0.05em",
                 textTransform: "uppercase",
                 whiteSpace: "nowrap",
-                "&:hover": { bgcolor: "#e6f0e9" },
+                "&:hover": {
+                  bgcolor: "action.hover",
+                },
               }}
             >
               {running
@@ -828,10 +839,11 @@ export default function MatchScoreHero({
                 ) : undefined
               }
               sx={{
-                border: "1.5px solid #e2c3bb",
+                border: (theme) =>
+                  `1.5px solid ${theme.palette.secondary.main}`,
                 borderRadius: "11px",
-                bgcolor: "#fff",
-                color: "#a8452a",
+                bgcolor: "background.paper",
+                color: "secondary.main",
                 px: { xs: "11px", sm: "14px" },
                 py: "8px",
                 fontFamily: "Archivo, sans-serif",
@@ -842,8 +854,8 @@ export default function MatchScoreHero({
                 textTransform: "uppercase",
                 whiteSpace: "nowrap",
                 "&:hover": {
-                  borderColor: "#a8452a",
-                  bgcolor: "#fbf3f0",
+                  borderColor: "secondary.dark",
+                  bgcolor: "secondary.light",
                 },
               }}
             >
@@ -865,8 +877,8 @@ export default function MatchScoreHero({
               sx={{
                 border: 0,
                 borderRadius: "11px",
-                bgcolor: isEditing ? "#146b3a" : "rgba(255,255,255,0.15)",
-                color: "#fff",
+                bgcolor: isEditing ? "primary.main" : "rgba(255,255,255,0.15)",
+                color: "pitch.contrastText",
                 px: "14px",
                 py: "8px",
                 fontFamily: "Archivo, sans-serif",

@@ -25,20 +25,35 @@ body {
   font-family: "Archivo Narrow", Archivo, sans-serif;
 }
 
+:root {
+  --tactile-bg: #ffffff;
+  --tactile-border: #17181a;
+  --tactile-shadow: #17181a;
+  --dashed-border: #ddd8cc;
+}
+
+[data-theme="dark"],
+.dark {
+  --tactile-bg: #222428;
+  --tactile-border: rgba(255, 255, 255, 0.12);
+  --tactile-shadow: #000000;
+  --dashed-border: #2d3035;
+}
+
 .tactile-card {
-  background: #ffffff;
-  border: 2px solid #17181a;
+  background: var(--tactile-bg);
+  border: 2px solid var(--tactile-border);
   border-radius: 18px;
-  box-shadow: 5px 5px 0 #17181a;
+  box-shadow: 5px 5px 0 var(--tactile-shadow);
 }
 
 .tactile-card-sm {
-  background: #ffffff;
-  border: 1.5px solid #17181a;
+  background: var(--tactile-bg);
+  border: 1.5px solid var(--tactile-border);
   border-radius: 14px;
-  box-shadow: 3px 3px 0 #17181a;
+  box-shadow: 3px 3px 0 var(--tactile-shadow);
 }
 
 .dashed-divider {
-  border-top: 1.5px dashed #ddd8cc;
+  border-top: 1.5px dashed var(--dashed-border);
 }

@@ -5,6 +5,7 @@ import {
   Chip,
   IconButton,
   Tooltip,
+  alpha,
 } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import InfoIcon from "@mui/icons-material/Info";
@@ -85,8 +86,7 @@ export default function ConsolidatedOrganizationsList({
         >
           <Avatar
             sx={{
-              bgcolor: (theme) =>
-                theme.palette.mode === "dark" ? "#2d3035" : "#f6f4ee",
+              bgcolor: "divider",
               color: "text.secondary",
               border: "1.5px solid",
               borderColor: "divider",
@@ -164,18 +164,18 @@ export default function ConsolidatedOrganizationsList({
                   bgcolor: (theme) =>
                     theme.palette.mode === "dark"
                       ? theme.palette.background.default
-                      : "#ffffff",
+                      : "background.paper",
                   cursor: "pointer",
                   outline: "none",
                   transition: "all 0.15s ease",
                   "&:hover": {
                     borderColor: "text.primary",
-                    bgcolor: (theme) =>
-                      theme.palette.mode === "dark" ? "#2a2d32" : "#fbfaf7",
+                    bgcolor: "action.hover",
                   },
                   "&:focus-visible": {
                     borderColor: "text.primary",
-                    boxShadow: "0 0 0 2px rgba(23, 24, 26, 0.2)",
+                    boxShadow: (theme) =>
+                      `0 0 0 2px ${alpha(theme.palette.primary.main, 0.4)}`,
                   },
                 }}
               >
@@ -185,18 +185,16 @@ export default function ConsolidatedOrganizationsList({
                     width: 32,
                     height: 32,
                     borderRadius: "50%",
-                    bgcolor: isAdmin ? "#146b3a" : "#a8452a",
+                    bgcolor: isAdmin ? "primary.main" : "secondary.main",
                     border: (theme) =>
-                      theme.palette.mode === "dark"
-                        ? "2px solid #2d3035"
-                        : "2px solid #17181a",
+                      `2px solid ${theme.palette.mode === "dark" ? theme.palette.divider : theme.palette.grey[900]}`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 800,
                     fontSize: "10px",
-                    color: "#ffffff",
+                    color: "primary.contrastText",
                     flexShrink: 0,
                   }}
                 >
@@ -251,18 +249,19 @@ export default function ConsolidatedOrganizationsList({
                         letterSpacing: "0.04em",
                         borderRadius: "5px",
                         borderColor: (theme) =>
-                          isAdmin ? "#146b3a" : theme.palette.divider,
+                          isAdmin
+                            ? theme.palette.primary.main
+                            : theme.palette.divider,
                         color: (theme) =>
                           isAdmin
-                            ? theme.palette.mode === "dark"
-                              ? "#bfe6ce"
-                              : "#146b3a"
+                            ? theme.palette.primary.main
                             : theme.palette.text.secondary,
                         bgcolor: (theme) =>
                           isAdmin
-                            ? theme.palette.mode === "dark"
-                              ? "rgba(20, 107, 58, 0.2)"
-                              : "#f4f8f5"
+                            ? alpha(
+                                theme.palette.primary.main,
+                                theme.palette.mode === "dark" ? 0.2 : 0.08,
+                              )
                             : "transparent",
                         "& .MuiChip-label": { px: 0.6 },
                       }}
@@ -284,7 +283,7 @@ export default function ConsolidatedOrganizationsList({
                         color: "text.secondary",
                         p: 0.5,
                         "&:hover": {
-                          color: "#146b3a",
+                          color: "primary.main",
                           bgcolor: "transparent",
                         },
                       }}

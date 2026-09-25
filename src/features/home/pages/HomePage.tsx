@@ -202,10 +202,7 @@ export default function HomePage() {
                         color: "text.secondary",
                         "&:hover": {
                           borderColor: "text.primary",
-                          bgcolor: (theme) =>
-                            theme.palette.mode === "dark"
-                              ? "rgba(255, 255, 255, 0.08)"
-                              : "#f6f4ee",
+                          bgcolor: "action.hover",
                         },
                       }}
                     />
@@ -233,10 +230,7 @@ export default function HomePage() {
                         cursor: "pointer",
                         "&:hover": {
                           borderColor: "text.primary",
-                          bgcolor: (theme) =>
-                            theme.palette.mode === "dark"
-                              ? "rgba(255, 255, 255, 0.08)"
-                              : "#f6f4ee",
+                          bgcolor: "action.hover",
                         },
                       }}
                     >
@@ -255,14 +249,9 @@ export default function HomePage() {
                         sx={{
                           width: 32,
                           height: 32,
-                          bgcolor: (theme) =>
-                            theme.palette.mode === "dark"
-                              ? "#2d3035"
-                              : "#d8d2c4",
+                          bgcolor: "background.paper",
                           border: (theme) =>
-                            theme.palette.mode === "dark"
-                              ? "1.5px solid #3d424a"
-                              : "1.5px solid #ddd8cc",
+                            `1.5px solid ${theme.palette.divider}`,
                           fontFamily: "Archivo, sans-serif",
                           fontWeight: 800,
                           fontSize: "11px",
@@ -349,9 +338,8 @@ export default function HomePage() {
                   >
                     <Box
                       sx={{
-                        bgcolor: (theme) =>
-                          theme.palette.mode === "dark" ? "#2d3035" : "#17181a",
-                        color: "#ffffff",
+                        bgcolor: "primary.main",
+                        color: "primary.contrastText",
                         borderRadius: "9px",
                         px: 1.5,
                         py: 0.8,
@@ -381,10 +369,7 @@ export default function HomePage() {
                           cursor: "pointer",
                           "&:hover": {
                             borderColor: "text.primary",
-                            bgcolor: (theme) =>
-                              theme.palette.mode === "dark"
-                                ? "#2d3035"
-                                : "#f6f4ee",
+                            bgcolor: "action.hover",
                           },
                         }}
                       >
@@ -393,7 +378,8 @@ export default function HomePage() {
                             width: 8,
                             height: 8,
                             borderRadius: "2px",
-                            bgcolor: i % 2 === 0 ? "#146b3a" : "#a8452a",
+                            bgcolor:
+                              i % 2 === 0 ? "primary.main" : "secondary.main",
                           }}
                         />
                         <Typography
@@ -422,9 +408,8 @@ export default function HomePage() {
                 >
                   <Box
                     sx={{
-                      bgcolor: (theme) =>
-                        theme.palette.mode === "dark" ? "#2d3035" : "#17181a",
-                      color: "#ffffff",
+                      bgcolor: "primary.main",
+                      color: "primary.contrastText",
                       borderRadius: "9px",
                       px: 1.5,
                       py: 0.8,
@@ -454,10 +439,7 @@ export default function HomePage() {
                         cursor: "pointer",
                         "&:hover": {
                           borderColor: "text.primary",
-                          bgcolor: (theme) =>
-                            theme.palette.mode === "dark"
-                              ? "#2d3035"
-                              : "#f6f4ee",
+                          bgcolor: "action.hover",
                         },
                       }}
                     >
@@ -466,7 +448,8 @@ export default function HomePage() {
                           width: 8,
                           height: 8,
                           borderRadius: "2px",
-                          bgcolor: i % 2 === 0 ? "#146b3a" : "#a8452a",
+                          bgcolor:
+                            i % 2 === 0 ? "primary.main" : "secondary.main",
                         }}
                       />
                       <Typography
@@ -610,9 +593,7 @@ export default function HomePage() {
                           gap: 1,
                           p: "10px 14px",
                           bgcolor: (theme) =>
-                            theme.palette.mode === "dark"
-                              ? "rgba(20, 107, 58, 0.15)"
-                              : "#f4f8f5",
+                            theme.palette.status?.paid?.bg || "action.hover",
                           borderBottom: "1.5px solid",
                           borderColor: "divider",
                         }}
@@ -622,7 +603,7 @@ export default function HomePage() {
                             width: 9,
                             height: 9,
                             borderRadius: "2px",
-                            bgcolor: "#146b3a",
+                            bgcolor: "primary.main",
                           }}
                         />
                         <Typography
@@ -760,7 +741,7 @@ export default function HomePage() {
                               fontWeight: 700,
                               fontSize: "26px",
                               lineHeight: 1,
-                              color: "#146b3a",
+                              color: "primary.main",
                             }}
                           >
                             {user.stats?.assists ?? 0}
@@ -790,10 +771,7 @@ export default function HomePage() {
                         border: "1.5px solid",
                         borderColor: "divider",
                         borderRadius: "16px",
-                        bgcolor: (theme) =>
-                          theme.palette.mode === "dark"
-                            ? "background.default"
-                            : "#fbfaf7",
+                        bgcolor: "background.default",
                         display: "flex",
                         flexDirection: "column",
                         justifyContent: "space-between",
@@ -886,7 +864,7 @@ export default function HomePage() {
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: 700,
                             fontSize: "11.5px",
-                            color: "#146b3a",
+                            color: "primary.main",
                             p: 0,
                             minWidth: 0,
                             textTransform: "none",
@@ -938,14 +916,9 @@ export default function HomePage() {
                     textTransform: "uppercase",
                     bgcolor: "transparent",
                     color: "text.primary",
-                    border: "1.5px dashed",
-                    borderColor: (theme) =>
-                      theme.palette.mode === "dark" ? "#4a4d55" : "#c9c4b6",
+                    border: (theme) => `1.5px dashed ${theme.palette.divider}`,
                     "&:hover": {
-                      bgcolor: (theme) =>
-                        theme.palette.mode === "dark"
-                          ? "rgba(255, 255, 255, 0.08)"
-                          : "background.paper",
+                      bgcolor: "action.hover",
                       borderColor: "text.primary",
                     },
                   }}
@@ -993,10 +966,7 @@ export default function HomePage() {
                       borderColor: "divider",
                       borderRadius: "14px",
                       p: "12px 13px",
-                      bgcolor: (theme) =>
-                        theme.palette.mode === "dark"
-                          ? "background.default"
-                          : "#fbfaf7",
+                      bgcolor: "background.default",
                     }}
                   >
                     <Box
@@ -1004,7 +974,7 @@ export default function HomePage() {
                         width: 8,
                         height: 8,
                         borderRadius: "50%",
-                        bgcolor: "#f2a100",
+                        bgcolor: "gold.main",
                         flexShrink: 0,
                       }}
                     />
@@ -1054,10 +1024,7 @@ export default function HomePage() {
                       borderColor: "divider",
                       borderRadius: "14px",
                       p: "12px 13px",
-                      bgcolor: (theme) =>
-                        theme.palette.mode === "dark"
-                          ? "background.default"
-                          : "#fbfaf7",
+                      bgcolor: "background.default",
                     }}
                   >
                     <Box
@@ -1065,7 +1032,7 @@ export default function HomePage() {
                         width: 8,
                         height: 8,
                         borderRadius: "50%",
-                        bgcolor: "#146b3a",
+                        bgcolor: "primary.main",
                         flexShrink: 0,
                       }}
                     />

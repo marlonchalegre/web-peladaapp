@@ -196,7 +196,7 @@ export function ManageFeatureFlagsDialog({
         "admin.dialogs.feature_flags.voting_desc",
         "Permitir votação de notas/estrelas entre membros após a pelada.",
       ),
-      icon: <RateReviewIcon sx={{ color: "#9c27b0" }} />,
+      icon: <RateReviewIcon sx={{ color: "matchEvents.vish" }} />,
     },
     {
       key: "unlimited_members" as const,

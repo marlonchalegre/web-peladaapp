@@ -97,13 +97,8 @@ export default function PlayerAttendanceCard({
               width: 34,
               height: 34,
               mr: 1.5,
-              bgcolor: isCurrentUser
-                ? "#146b3a"
-                : (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "rgba(234, 230, 219, 0.15)"
-                      : "#eae6db",
-              color: isCurrentUser ? "#ffffff" : "text.primary",
+              bgcolor: isCurrentUser ? "primary.main" : "action.hover",
+              color: isCurrentUser ? "primary.contrastText" : "text.primary",
               fontSize: "0.75rem",
               fontWeight: 800,
               border: isCurrentUser ? "none" : "1.5px solid",

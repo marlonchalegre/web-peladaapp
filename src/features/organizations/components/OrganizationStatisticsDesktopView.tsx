@@ -10,6 +10,7 @@ import type {
 import GroupTabsBar from "./GroupTabsBar";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import { getInitials } from "../../../shared/utils/initials";
+import { AVATAR_BG_COLORS } from "../../peladas/utils/playerUtils";
 
 interface OrganizationStatisticsDesktopViewProps {
   org: Organization;
@@ -58,13 +59,17 @@ export default function OrganizationStatisticsDesktopView({
       bgcolor: active
         ? isDark
           ? "primary.main"
-          : "#17181a"
+          : "text.primary"
         : isDark
           ? "background.paper"
-          : "#ffffff",
-      color: active ? (isDark ? "#17181a" : "#ffffff") : "text.primary",
+          : "background.paper",
+      color: active
+        ? isDark
+          ? "text.primary"
+          : "background.paper"
+        : "text.primary",
       border: active ? "none" : "1.5px solid",
-      borderColor: isDark ? "divider" : "#ddd8cc",
+      borderColor: "divider",
       borderRadius: "9px",
       px: 1.6,
       py: 1,
@@ -76,16 +81,7 @@ export default function OrganizationStatisticsDesktopView({
     };
   };
 
-  const avatarColors = [
-    "#cdd6e0",
-    "#dcd3bd",
-    "#e2cfc7",
-    "#d3cfc4",
-    "#146b3a",
-    "#d8d2c4",
-    "#cfd8cd",
-    "#c9d9cd",
-  ];
+  const avatarColors = AVATAR_BG_COLORS;
 
   // Sort stats according to selected metric
   const sortedByMetric = useMemo(() => {
@@ -133,14 +129,14 @@ export default function OrganizationStatisticsDesktopView({
     {
       key: "top-scorer",
       item: [...stats].sort((a, b) => (b.goal || 0) - (a.goal || 0))[0],
-      color: "#f2a100",
+      color: theme.palette.gold?.main || theme.palette.primary.main,
       label: (p: OrganizationPlayerStats) => `Artilheiro · ${p.goal} gols`,
       eligible: (p: OrganizationPlayerStats) => (p.goal || 0) > 0,
     },
     {
       key: "top-assist",
       item: [...stats].sort((a, b) => (b.assist || 0) - (a.assist || 0))[0],
-      color: "#c9d9cd",
+      color: AVATAR_BG_COLORS[1] || "primary.light",
       label: (p: OrganizationPlayerStats) => `Garçom · ${p.assist} assist.`,
       eligible: (p: OrganizationPlayerStats) => (p.assist || 0) > 0,
     },
@@ -149,7 +145,7 @@ export default function OrganizationStatisticsDesktopView({
       item: [...stats].sort(
         (a, b) => (b.peladas_played || 0) - (a.peladas_played || 0),
       )[0],
-      color: "#cdd6e0",
+      color: AVATAR_BG_COLORS[4] || "secondary.light",
       label: (p: OrganizationPlayerStats) =>
         `Presença · ${p.peladas_played} jogos`,
       eligible: (p: OrganizationPlayerStats) => (p.peladas_played || 0) > 0,
@@ -159,7 +155,7 @@ export default function OrganizationStatisticsDesktopView({
       item: [...stats]
         .filter((p) => (p.avg_rating || 0) > 0)
         .sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0))[0],
-      color: "#e2cfc7",
+      color: AVATAR_BG_COLORS[6] || "info.light",
       label: (p: OrganizationPlayerStats) =>
         `Nota média · ${(p.avg_rating || 0).toFixed(1)}`,
       eligible: (p: OrganizationPlayerStats) => (p.avg_rating || 0) > 0,
@@ -236,7 +232,7 @@ export default function OrganizationStatisticsDesktopView({
         {/* 2. Dark Header Banner (Desktop 4c) */}
         <Box
           sx={{
-            bgcolor: isDark ? "#242628" : "#17181a",
+            bgcolor: isDark ? "action.hover" : "text.primary",
             border: isDark ? "1px solid rgba(255,255,255,0.12)" : "none",
             borderRadius: "18px",
             p: "24px 26px",
@@ -257,7 +253,7 @@ export default function OrganizationStatisticsDesktopView({
                   fontWeight: 700,
                   fontSize: "9.5px",
                   letterSpacing: ".16em",
-                  color: isDark ? "text.secondary" : "#9a958a",
+                  color: isDark ? "text.secondary" : "background.default",
                   textTransform: "uppercase",
                 }}
               >
@@ -269,7 +265,7 @@ export default function OrganizationStatisticsDesktopView({
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 800,
                   fontSize: "26px",
-                  color: isDark ? "text.primary" : "#f6f4ee",
+                  color: isDark ? "text.primary" : "background.paper",
                   mt: 0.8,
                 }}
               >
@@ -284,9 +280,8 @@ export default function OrganizationStatisticsDesktopView({
               component="button"
               onClick={(e) => setYearMenuAnchor(e.currentTarget)}
               sx={{
-                border: isDark
-                  ? "1.5px solid rgba(255,255,255,0.2)"
-                  : "1.5px solid #3a3b3e",
+                border: "1.5px solid",
+                borderColor: isDark ? "divider" : "rgba(255,255,255,0.3)",
                 borderRadius: "10px",
                 px: 1.5,
                 py: 1,
@@ -294,17 +289,15 @@ export default function OrganizationStatisticsDesktopView({
                 fontWeight: 800,
                 fontSize: "11px",
                 letterSpacing: ".06em",
-                color: isDark ? "text.primary" : "#f6f4ee",
+                color: isDark ? "text.primary" : "background.paper",
                 bgcolor: "transparent",
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 gap: 0.6,
                 "&:hover": {
-                  borderColor: isDark ? "text.primary" : "#f6f4ee",
-                  bgcolor: isDark
-                    ? "rgba(255,255,255,0.06)"
-                    : "rgba(255,255,255,0.1)",
+                  borderColor: isDark ? "text.primary" : "background.paper",
+                  bgcolor: "action.hover",
                 },
               }}
             >
@@ -317,11 +310,10 @@ export default function OrganizationStatisticsDesktopView({
               slotProps={{
                 paper: {
                   sx: {
-                    bgcolor: isDark ? "#242628" : "#17181a",
-                    color: isDark ? "text.primary" : "#f6f4ee",
-                    border: isDark
-                      ? "1px solid rgba(255,255,255,0.12)"
-                      : "none",
+                    bgcolor: "background.paper",
+                    color: "text.primary",
+                    border: "1px solid",
+                    borderColor: "divider",
                   },
                 },
               }}
@@ -349,7 +341,7 @@ export default function OrganizationStatisticsDesktopView({
                   fontWeight: 700,
                   fontSize: "34px",
                   lineHeight: 1,
-                  color: isDark ? "text.primary" : "#f6f4ee",
+                  color: isDark ? "text.primary" : "background.paper",
                 }}
               >
                 {totalPeladas || 28}
@@ -360,7 +352,7 @@ export default function OrganizationStatisticsDesktopView({
                   fontWeight: 700,
                   fontSize: "8.5px",
                   letterSpacing: ".1em",
-                  color: isDark ? "text.secondary" : "#9a958a",
+                  color: isDark ? "text.secondary" : "background.default",
                   mt: 0.6,
                   textTransform: "uppercase",
                 }}
@@ -375,7 +367,8 @@ export default function OrganizationStatisticsDesktopView({
                   fontWeight: 700,
                   fontSize: "34px",
                   lineHeight: 1,
-                  color: "#f2a100",
+                  color: (th) =>
+                    th.palette.gold?.main || th.palette.primary.main,
                 }}
               >
                 {totalGoals || 312}
@@ -386,7 +379,7 @@ export default function OrganizationStatisticsDesktopView({
                   fontWeight: 700,
                   fontSize: "8.5px",
                   letterSpacing: ".1em",
-                  color: isDark ? "text.secondary" : "#9a958a",
+                  color: isDark ? "text.secondary" : "background.default",
                   mt: 0.6,
                   textTransform: "uppercase",
                 }}
@@ -401,7 +394,7 @@ export default function OrganizationStatisticsDesktopView({
                   fontWeight: 700,
                   fontSize: "34px",
                   lineHeight: 1,
-                  color: isDark ? "text.primary" : "#f6f4ee",
+                  color: isDark ? "text.primary" : "background.paper",
                 }}
               >
                 {avgGoals || "21"}
@@ -412,7 +405,7 @@ export default function OrganizationStatisticsDesktopView({
                   fontWeight: 700,
                   fontSize: "8.5px",
                   letterSpacing: ".1em",
-                  color: isDark ? "text.secondary" : "#9a958a",
+                  color: isDark ? "text.secondary" : "background.default",
                   mt: 0.6,
                   textTransform: "uppercase",
                 }}
@@ -427,7 +420,7 @@ export default function OrganizationStatisticsDesktopView({
                   fontWeight: 700,
                   fontSize: "34px",
                   lineHeight: 1,
-                  color: isDark ? "text.primary" : "#f6f4ee",
+                  color: isDark ? "text.primary" : "background.paper",
                 }}
               >
                 {stats.length}
@@ -438,7 +431,7 @@ export default function OrganizationStatisticsDesktopView({
                   fontWeight: 700,
                   fontSize: "8.5px",
                   letterSpacing: ".1em",
-                  color: isDark ? "text.secondary" : "#9a958a",
+                  color: isDark ? "text.secondary" : "background.default",
                   mt: 0.6,
                   textTransform: "uppercase",
                 }}
@@ -453,7 +446,7 @@ export default function OrganizationStatisticsDesktopView({
                   fontWeight: 700,
                   fontSize: "34px",
                   lineHeight: 1,
-                  color: isDark ? "text.primary" : "#f6f4ee",
+                  color: isDark ? "text.primary" : "background.paper",
                 }}
               >
                 {presenceAvg == null ? "—" : `${presenceAvg}%`}
@@ -464,7 +457,7 @@ export default function OrganizationStatisticsDesktopView({
                   fontWeight: 700,
                   fontSize: "8.5px",
                   letterSpacing: ".1em",
-                  color: isDark ? "text.secondary" : "#9a958a",
+                  color: isDark ? "text.secondary" : "background.default",
                   mt: 0.6,
                   textTransform: "uppercase",
                 }}
@@ -521,15 +514,17 @@ export default function OrganizationStatisticsDesktopView({
             {/* Podium Card (Desktop 4c) */}
             <Box
               sx={{
-                bgcolor: isDark ? "background.paper" : "#ffffff",
-                border: isDark
-                  ? "1px solid rgba(255,255,255,0.12)"
-                  : "2px solid #17181a",
+                bgcolor: "background.paper",
+                border: (th) =>
+                  th.palette.brutalist?.border ||
+                  `2px solid ${th.palette.divider}`,
                 borderRadius: "20px",
                 p: "20px",
-                boxShadow: isDark
-                  ? "0 4px 20px rgba(0,0,0,0.5)"
-                  : "6px 6px 0 #17181a",
+                boxShadow: (th) =>
+                  th.palette.brutalist?.shadow ||
+                  (isDark
+                    ? "0 4px 20px rgba(0,0,0,0.5)"
+                    : `6px 6px 0 ${th.palette.divider}`),
                 mb: 2,
               }}
             >
@@ -539,7 +534,7 @@ export default function OrganizationStatisticsDesktopView({
                   fontWeight: 700,
                   fontSize: "9.5px",
                   letterSpacing: ".18em",
-                  color: isDark ? "text.secondary" : "#6b675c",
+                  color: "text.secondary",
                   textTransform: "uppercase",
                 }}
               >
@@ -563,17 +558,17 @@ export default function OrganizationStatisticsDesktopView({
                     sx={{
                       width: 48,
                       height: 48,
-                      bgcolor: "#cdd6e0",
+                      bgcolor: AVATAR_BG_COLORS[4] || "secondary.light",
                       mx: "auto",
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 800,
                       fontSize: "14px",
-                      color: "#17181a",
+                      color: "text.primary",
                     }}
                   />
                   <Box
                     sx={{
-                      bgcolor: isDark ? "rgba(255,255,255,0.08)" : "#eae6db",
+                      bgcolor: "action.hover",
                       borderRadius: "11px 11px 0 0",
                       mt: 1.4,
                       pt: 1.6,
@@ -586,7 +581,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontWeight: 700,
                         fontSize: "28px",
                         lineHeight: 1,
-                        color: isDark ? "text.primary" : "#17181a",
+                        color: "text.primary",
                       }}
                     >
                       {second ? getMetricValue(second) : 0}
@@ -596,7 +591,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 700,
                         fontSize: "11px",
-                        color: isDark ? "text.secondary" : "#6b675c",
+                        color: "text.secondary",
                         mt: 0.6,
                       }}
                     >
@@ -607,7 +602,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 800,
                         fontSize: "13px",
-                        color: isDark ? "text.secondary" : "#6b675c",
+                        color: "text.secondary",
                         mt: 1,
                       }}
                     >
@@ -625,18 +620,20 @@ export default function OrganizationStatisticsDesktopView({
                     sx={{
                       width: 58,
                       height: 58,
-                      bgcolor: "#dcd3bd",
-                      border: "3px solid #f2a100",
+                      bgcolor: AVATAR_BG_COLORS[0] || "warning.light",
+                      border: (th) =>
+                        `3px solid ${th.palette.gold?.main || th.palette.primary.main}`,
                       mx: "auto",
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 800,
                       fontSize: "17px",
-                      color: "#17181a",
+                      color: "text.primary",
                     }}
                   />
                   <Box
                     sx={{
-                      bgcolor: "#f2a100",
+                      bgcolor: (th) =>
+                        th.palette.gold?.main || th.palette.primary.main,
                       borderRadius: "11px 11px 0 0",
                       mt: 1.4,
                       pt: 2.2,
@@ -649,7 +646,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontWeight: 700,
                         fontSize: "40px",
                         lineHeight: 1,
-                        color: "#17181a",
+                        color: "primary.contrastText",
                       }}
                     >
                       {first ? getMetricValue(first) : 0}
@@ -659,7 +656,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 700,
                         fontSize: "12px",
-                        color: "#17181a",
+                        color: "primary.contrastText",
                         mt: 0.6,
                       }}
                     >
@@ -670,7 +667,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 800,
                         fontSize: "14px",
-                        color: "#17181a",
+                        color: "primary.contrastText",
                         mt: 1,
                       }}
                     >
@@ -688,17 +685,17 @@ export default function OrganizationStatisticsDesktopView({
                     sx={{
                       width: 48,
                       height: 48,
-                      bgcolor: "#e2cfc7",
+                      bgcolor: AVATAR_BG_COLORS[6] || "info.light",
                       mx: "auto",
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 800,
                       fontSize: "14px",
-                      color: "#17181a",
+                      color: "text.primary",
                     }}
                   />
                   <Box
                     sx={{
-                      bgcolor: isDark ? "rgba(255,255,255,0.08)" : "#eae6db",
+                      bgcolor: "action.hover",
                       borderRadius: "11px 11px 0 0",
                       mt: 1.4,
                       pt: 1.4,
@@ -711,7 +708,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontWeight: 700,
                         fontSize: "26px",
                         lineHeight: 1,
-                        color: isDark ? "text.primary" : "#17181a",
+                        color: "text.primary",
                       }}
                     >
                       {third ? getMetricValue(third) : 0}
@@ -721,7 +718,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 700,
                         fontSize: "11px",
-                        color: isDark ? "text.secondary" : "#6b675c",
+                        color: "text.secondary",
                         mt: 0.6,
                       }}
                     >
@@ -732,7 +729,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 800,
                         fontSize: "13px",
-                        color: isDark ? "text.secondary" : "#6b675c",
+                        color: "text.secondary",
                         mt: 1,
                       }}
                     >
@@ -746,9 +743,9 @@ export default function OrganizationStatisticsDesktopView({
             {/* Full Ranking Table (Desktop 4c) */}
             <Box
               sx={{
-                bgcolor: isDark ? "background.paper" : "#ffffff",
+                bgcolor: "background.paper",
                 border: "1.5px solid",
-                borderColor: isDark ? "divider" : "#eae6db",
+                borderColor: "divider",
                 borderRadius: "16px",
                 overflow: "hidden",
               }}
@@ -760,14 +757,14 @@ export default function OrganizationStatisticsDesktopView({
                   alignItems: "center",
                   gap: 1.8,
                   p: "10px 18px",
-                  bgcolor: isDark ? "rgba(255,255,255,0.03)" : "#f6f4ee",
+                  bgcolor: "action.hover",
                   borderBottom: "1.5px solid",
-                  borderColor: isDark ? "divider" : "#eae6db",
+                  borderColor: "divider",
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 700,
                   fontSize: "8.5px",
                   letterSpacing: ".14em",
-                  color: isDark ? "text.secondary" : "#6b675c",
+                  color: "text.secondary",
                 }}
               >
                 <Box sx={{ width: 24, flexShrink: 0 }}>#</Box>
@@ -810,26 +807,12 @@ export default function OrganizationStatisticsDesktopView({
                       gap: 1.8,
                       p: isUser ? "13px 16px" : "12px 18px",
                       m: isUser ? "3px 2px" : 0,
-                      bgcolor: isUser
-                        ? isDark
-                          ? "rgba(20, 107, 58, 0.15)"
-                          : "#f4f8f5"
-                        : isDark
-                          ? "background.paper"
-                          : "#ffffff",
-                      border: isUser
-                        ? isDark
-                          ? "2px solid #34a853"
-                          : "2px solid #146b3a"
-                        : "none",
+                      bgcolor: isUser ? "action.selected" : "background.paper",
+                      border: isUser ? "2px solid" : "none",
+                      borderColor: isUser ? "primary.main" : "transparent",
                       borderRadius: isUser ? "13px" : 0,
-                      borderBottom: isUser
-                        ? isDark
-                          ? "2px solid #34a853"
-                          : "2px solid #146b3a"
-                        : isDark
-                          ? "1.5px solid rgba(255,255,255,0.08)"
-                          : "1.5px solid #f2efe7",
+                      borderBottom: isUser ? "2px solid" : "1.5px solid",
+                      borderBottomColor: isUser ? "primary.main" : "divider",
                     }}
                   >
                     <Box
@@ -839,13 +822,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                         fontWeight: 700,
                         fontSize: "14px",
-                        color: isUser
-                          ? isDark
-                            ? "#34a853"
-                            : "#146b3a"
-                          : isDark
-                            ? "text.secondary"
-                            : "#6b675c",
+                        color: isUser ? "primary.main" : "text.secondary",
                       }}
                     >
                       {idx + 1}
@@ -867,18 +844,13 @@ export default function OrganizationStatisticsDesktopView({
                         sx={{
                           width: 30,
                           height: 30,
-                          bgcolor: isUser
-                            ? isDark
-                              ? "#34a853"
-                              : "#146b3a"
-                            : avatarBg,
+                          bgcolor: isUser ? "primary.main" : avatarBg,
                           fontFamily: "Archivo, sans-serif",
                           fontWeight: 800,
                           fontSize: "10px",
-                          color:
-                            isUser || avatarBg === "#146b3a"
-                              ? "#ffffff"
-                              : "#17181a",
+                          color: isUser
+                            ? "primary.contrastText"
+                            : "text.primary",
                           flexShrink: 0,
                         }}
                       />
@@ -888,7 +860,7 @@ export default function OrganizationStatisticsDesktopView({
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: 800,
                             fontSize: "13px",
-                            color: isDark ? "text.primary" : "#17181a",
+                            color: "text.primary",
                             display: "flex",
                             alignItems: "center",
                             gap: 0.5,
@@ -903,7 +875,7 @@ export default function OrganizationStatisticsDesktopView({
                                 fontWeight: 700,
                                 fontSize: "9px",
                                 letterSpacing: ".08em",
-                                color: isDark ? "#34a853" : "#146b3a",
+                                color: "primary.main",
                               }}
                             >
                               · VOCÊ
@@ -916,7 +888,7 @@ export default function OrganizationStatisticsDesktopView({
                               fontFamily: "Archivo, sans-serif",
                               fontWeight: 600,
                               fontSize: "10.5px",
-                              color: isDark ? "#34a853" : "#146b3a",
+                              color: "primary.main",
                               mt: 0.3,
                             }}
                           >
@@ -935,7 +907,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 600,
                         fontSize: "12px",
-                        color: isDark ? "text.secondary" : "#6b675c",
+                        color: "text.secondary",
                       }}
                     >
                       {games}
@@ -949,7 +921,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 600,
                         fontSize: "12px",
-                        color: isDark ? "text.secondary" : "#6b675c",
+                        color: "text.secondary",
                       }}
                     >
                       {avg}
@@ -963,7 +935,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 600,
                         fontSize: "12px",
-                        color: isDark ? "text.secondary" : "#6b675c",
+                        color: "text.secondary",
                       }}
                     >
                       {rating}
@@ -977,13 +949,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                         fontWeight: 700,
                         fontSize: "20px",
-                        color: isUser
-                          ? isDark
-                            ? "#34a853"
-                            : "#146b3a"
-                          : isDark
-                            ? "text.primary"
-                            : "#17181a",
+                        color: isUser ? "primary.main" : "text.primary",
                       }}
                     >
                       {val}
@@ -1000,9 +966,9 @@ export default function OrganizationStatisticsDesktopView({
                     alignItems: "center",
                     justifyContent: "space-between",
                     p: "13px 18px",
-                    bgcolor: isDark ? "rgba(255,255,255,0.03)" : "#f6f4ee",
+                    bgcolor: "action.hover",
                     borderTop: "1.5px solid",
-                    borderColor: isDark ? "divider" : "#eae6db",
+                    borderColor: "divider",
                   }}
                 >
                   <Typography
@@ -1010,7 +976,7 @@ export default function OrganizationStatisticsDesktopView({
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 600,
                       fontSize: "11.5px",
-                      color: isDark ? "text.secondary" : "#6b675c",
+                      color: "text.secondary",
                     }}
                   >
                     1–{Math.min(displayedStats.length, sortedByMetric.length)}{" "}
@@ -1023,7 +989,7 @@ export default function OrganizationStatisticsDesktopView({
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 700,
                       fontSize: "11.5px",
-                      color: isDark ? "#34a853" : "#146b3a",
+                      color: "primary.main",
                       border: "none",
                       background: "none",
                       cursor: "pointer",
@@ -1044,9 +1010,9 @@ export default function OrganizationStatisticsDesktopView({
             {/* Card: Presença · 12 semanas */}
             <Box
               sx={{
-                bgcolor: isDark ? "background.paper" : "#ffffff",
+                bgcolor: "background.paper",
                 border: "1.5px solid",
-                borderColor: isDark ? "divider" : "#eae6db",
+                borderColor: "divider",
                 borderRadius: "16px",
                 p: 2,
               }}
@@ -1057,7 +1023,7 @@ export default function OrganizationStatisticsDesktopView({
                   fontWeight: 700,
                   fontSize: "9.5px",
                   letterSpacing: ".18em",
-                  color: isDark ? "text.secondary" : "#6b675c",
+                  color: "text.secondary",
                 }}
               >
                 PRESENÇA · 12 SEMANAS
@@ -1081,12 +1047,8 @@ export default function OrganizationStatisticsDesktopView({
                       height: `${Math.round((w.confirmed / presenceMax) * 100)}%`,
                       bgcolor:
                         w.confirmed < presenceWeeksAvg
-                          ? isDark
-                            ? "#e06c50"
-                            : "#a8452a"
-                          : isDark
-                            ? "#34a853"
-                            : "#146b3a",
+                          ? "secondary.main"
+                          : "primary.main",
                       borderRadius: "3px",
                     }}
                   />
@@ -1101,7 +1063,7 @@ export default function OrganizationStatisticsDesktopView({
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 600,
                     fontSize: "10px",
-                    color: isDark ? "text.secondary" : "#6b675c",
+                    color: "text.secondary",
                   }}
                 >
                   <Box component="span">
@@ -1118,23 +1080,19 @@ export default function OrganizationStatisticsDesktopView({
                 sx={{
                   mt: 1.6,
                   pt: 1.6,
-                  borderTop: isDark
-                    ? "1.5px dashed rgba(255,255,255,0.12)"
-                    : "1.5px dashed #ddd8cc",
+                  borderTop: "1.5px dashed",
+                  borderColor: "divider",
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 600,
                   fontSize: "11.5px",
                   lineHeight: 1.45,
-                  color: isDark ? "text.secondary" : "#6b675c",
+                  color: "text.secondary",
                 }}
               >
                 {weeklyPresence.length > 0 ? (
                   <>
                     Média de{" "}
-                    <Box
-                      component="strong"
-                      sx={{ color: isDark ? "text.primary" : "#17181a" }}
-                    >
+                    <Box component="strong" sx={{ color: "text.primary" }}>
                       {presenceWeeksAvg} jogadores
                     </Box>{" "}
                     por pelada
@@ -1151,9 +1109,9 @@ export default function OrganizationStatisticsDesktopView({
             {/* Card: Destaques da Temporada */}
             <Box
               sx={{
-                bgcolor: isDark ? "background.paper" : "#ffffff",
+                bgcolor: "background.paper",
                 border: "1.5px solid",
-                borderColor: isDark ? "divider" : "#eae6db",
+                borderColor: "divider",
                 borderRadius: "16px",
                 overflow: "hidden",
                 mt: 1.8,
@@ -1163,12 +1121,12 @@ export default function OrganizationStatisticsDesktopView({
                 sx={{
                   p: "13px 16px",
                   borderBottom: "1.5px solid",
-                  borderColor: isDark ? "divider" : "#f2efe7",
+                  borderColor: "divider",
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 700,
                   fontSize: "9.5px",
                   letterSpacing: ".16em",
-                  color: isDark ? "text.secondary" : "#6b675c",
+                  color: "text.secondary",
                 }}
               >
                 DESTAQUES DA TEMPORADA
@@ -1184,7 +1142,7 @@ export default function OrganizationStatisticsDesktopView({
                     p: "13px 16px",
                     borderBottom:
                       i < highlights.length - 1 ? "1.5px solid" : "none",
-                    borderColor: isDark ? "divider" : "#f2efe7",
+                    borderColor: "divider",
                   }}
                 >
                   <SecureAvatar
@@ -1198,7 +1156,7 @@ export default function OrganizationStatisticsDesktopView({
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 800,
                       fontSize: "10px",
-                      color: "#17181a",
+                      color: "text.primary",
                       flexShrink: 0,
                     }}
                   />
@@ -1208,7 +1166,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 700,
                         fontSize: "12.5px",
-                        color: isDark ? "text.primary" : "#17181a",
+                        color: "text.primary",
                       }}
                     >
                       {h.item?.player_name || "—"}
@@ -1218,7 +1176,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 600,
                         fontSize: "11px",
-                        color: isDark ? "text.secondary" : "#6b675c",
+                        color: "text.secondary",
                         mt: 0.3,
                       }}
                     >
@@ -1233,7 +1191,7 @@ export default function OrganizationStatisticsDesktopView({
             {myStat && (
               <Box
                 sx={{
-                  bgcolor: isDark ? "#242628" : "#17181a",
+                  bgcolor: isDark ? "action.hover" : "text.primary",
                   border: isDark ? "1px solid rgba(255,255,255,0.12)" : "none",
                   borderRadius: "16px",
                   p: 2,
@@ -1246,7 +1204,7 @@ export default function OrganizationStatisticsDesktopView({
                     fontWeight: 700,
                     fontSize: "9.5px",
                     letterSpacing: ".16em",
-                    color: isDark ? "text.secondary" : "#9a958a",
+                    color: isDark ? "text.secondary" : "background.default",
                   }}
                 >
                   A SUA TEMPORADA
@@ -1265,7 +1223,8 @@ export default function OrganizationStatisticsDesktopView({
                       fontWeight: 700,
                       fontSize: "40px",
                       lineHeight: 0.9,
-                      color: "#f2a100",
+                      color: (th) =>
+                        th.palette.gold?.main || th.palette.primary.main,
                     }}
                   >
                     {myRank}º
@@ -1277,7 +1236,7 @@ export default function OrganizationStatisticsDesktopView({
                       fontWeight: 600,
                       fontSize: "11.5px",
                       lineHeight: 1.35,
-                      color: isDark ? "text.secondary" : "#9a958a",
+                      color: isDark ? "text.secondary" : "background.default",
                     }}
                   >
                     em gols entre
@@ -1292,9 +1251,8 @@ export default function OrganizationStatisticsDesktopView({
                     gap: 2.8,
                     mt: 2,
                     pt: 1.8,
-                    borderTop: isDark
-                      ? "1.5px solid rgba(255,255,255,0.1)"
-                      : "1px solid #2e2f31",
+                    borderTop: "1.5px solid",
+                    borderColor: isDark ? "divider" : "rgba(255,255,255,0.15)",
                   }}
                 >
                   <Box>
@@ -1303,7 +1261,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                         fontWeight: 700,
                         fontSize: "20px",
-                        color: isDark ? "text.primary" : "#f6f4ee",
+                        color: isDark ? "text.primary" : "background.paper",
                       }}
                     >
                       {myStat.peladas_played}
@@ -1314,7 +1272,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontWeight: 700,
                         fontSize: "8.5px",
                         letterSpacing: ".1em",
-                        color: isDark ? "text.secondary" : "#9a958a",
+                        color: isDark ? "text.secondary" : "background.default",
                         mt: 0.5,
                       }}
                     >
@@ -1327,7 +1285,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                         fontWeight: 700,
                         fontSize: "20px",
-                        color: isDark ? "text.primary" : "#f6f4ee",
+                        color: isDark ? "text.primary" : "background.paper",
                       }}
                     >
                       {myStat.assist}
@@ -1338,7 +1296,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontWeight: 700,
                         fontSize: "8.5px",
                         letterSpacing: ".1em",
-                        color: isDark ? "text.secondary" : "#9a958a",
+                        color: isDark ? "text.secondary" : "background.default",
                         mt: 0.5,
                       }}
                     >
@@ -1351,7 +1309,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                         fontWeight: 700,
                         fontSize: "20px",
-                        color: isDark ? "text.primary" : "#f6f4ee",
+                        color: isDark ? "text.primary" : "background.paper",
                       }}
                     >
                       {(myStat.avg_rating || 0).toFixed(1).replace(".", ",")}
@@ -1362,7 +1320,7 @@ export default function OrganizationStatisticsDesktopView({
                         fontWeight: 700,
                         fontSize: "8.5px",
                         letterSpacing: ".1em",
-                        color: isDark ? "text.secondary" : "#9a958a",
+                        color: isDark ? "text.secondary" : "background.default",
                         mt: 0.5,
                       }}
                     >

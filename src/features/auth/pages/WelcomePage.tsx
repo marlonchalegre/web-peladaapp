@@ -34,10 +34,16 @@ function MockMatchAttendance() {
   const theme = useTheme();
 
   const positionConfig = {
-    GK: { label: "GK", color: "#ED6C02" }, // Goalkeeper (Orange)
-    DF: { label: "DF", color: "#0288D1" }, // Defender (Blue)
-    MF: { label: "MF", color: "#2E7D32" }, // Midfielder (Teal)
-    ST: { label: "ST", color: "#D32F2F" }, // Striker (Red)
+    GK: {
+      label: "GK",
+      color: theme.palette.home?.main || theme.palette.warning.main,
+    },
+    DF: {
+      label: "DF",
+      color: theme.palette.away?.main || theme.palette.info.main,
+    },
+    MF: { label: "MF", color: theme.palette.primary.main },
+    ST: { label: "ST", color: theme.palette.secondary.main },
   };
 
   const players = [
@@ -136,7 +142,7 @@ function MockMatchAttendance() {
                       fontSize: "0.68rem",
                       fontWeight: "bold",
                       bgcolor: pos.color,
-                      color: "#fff",
+                      color: "primary.contrastText",
                       boxShadow: `0 2px 4px ${alpha(pos.color, 0.3)}`,
                     }}
                   >

@@ -30,6 +30,7 @@ import CreatePeladaForm, { type CreatePeladaPayload } from "./CreatePeladaForm";
 import OrganizationRosterDialog from "./OrganizationRosterDialog";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import { getInitials } from "../../../shared/utils/initials";
+import { AVATAR_BG_COLORS } from "../../peladas/utils/playerUtils";
 
 interface OrganizationDetailMobileViewProps {
   org: Organization;
@@ -51,16 +52,6 @@ interface OrganizationDetailMobileViewProps {
   onLeaveOrg: () => void;
   onLoadMore: () => void;
 }
-
-const AVATAR_BG_COLORS = [
-  "#c9d9cd",
-  "#dcd3bd",
-  "#cdd6e0",
-  "#e2cfc7",
-  "#d3cfc4",
-  "#d8d2c4",
-  "#cfd8cd",
-];
 
 const formatMemberType = (memberType?: string) => {
   switch (memberType) {
@@ -292,7 +283,8 @@ export default function OrganizationDetailMobileView({
           alignItems: "center",
           gap: 1.1,
           bgcolor: statsEnabled
-            ? (theme) => (theme.palette.mode === "dark" ? "#242628" : "#17181a")
+            ? (theme) =>
+                theme.palette.mode === "dark" ? "action.hover" : "text.primary"
             : "action.disabledBackground",
           borderRadius: "13px",
           p: "11px 13px",
@@ -314,7 +306,8 @@ export default function OrganizationDetailMobileView({
             sx={{
               width: 3.5,
               height: 8,
-              bgcolor: "#f2a100",
+              bgcolor: (theme) =>
+                theme.palette.gold?.main || theme.palette.primary.main,
               borderRadius: "1px",
             }}
           />
@@ -322,7 +315,8 @@ export default function OrganizationDetailMobileView({
             sx={{
               width: 3.5,
               height: 13,
-              bgcolor: "#f2a100",
+              bgcolor: (theme) =>
+                theme.palette.gold?.main || theme.palette.primary.main,
               borderRadius: "1px",
             }}
           />
@@ -330,7 +324,8 @@ export default function OrganizationDetailMobileView({
             sx={{
               width: 3.5,
               height: 17,
-              bgcolor: "#f2a100",
+              bgcolor: (theme) =>
+                theme.palette.gold?.main || theme.palette.primary.main,
               borderRadius: "1px",
             }}
           />
@@ -340,7 +335,10 @@ export default function OrganizationDetailMobileView({
             sx={{
               font: "800 11px/1 Archivo,sans-serif",
               letterSpacing: ".04em",
-              color: "#ffffff",
+              color: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "text.primary"
+                  : "background.paper",
             }}
           >
             {t("organizations.detail.button.statistics", "ESTATÍSTICAS")}
@@ -348,7 +346,7 @@ export default function OrganizationDetailMobileView({
           <Typography
             sx={{
               font: "600 9.5px/1.2 Archivo,sans-serif",
-              color: "#9a958a",
+              color: "text.secondary",
               mt: 0.35,
             }}
           >
@@ -356,7 +354,10 @@ export default function OrganizationDetailMobileView({
           </Typography>
         </Box>
         <Typography
-          sx={{ font: "700 15px/1 Archivo,sans-serif", color: "#9a958a" }}
+          sx={{
+            font: "700 15px/1 Archivo,sans-serif",
+            color: "text.secondary",
+          }}
         >
           ›
         </Typography>
@@ -386,10 +387,7 @@ export default function OrganizationDetailMobileView({
             width: 15,
             height: 15,
             borderRadius: "50%",
-            border: (theme) =>
-              theme.palette.mode === "dark"
-                ? "2px solid #ffffff"
-                : "2px solid #17181a",
+            border: (theme) => `2px solid ${theme.palette.text.primary}`,
           }}
         />
         <Typography
@@ -415,11 +413,9 @@ export default function OrganizationDetailMobileView({
         key={pelada.id}
         data-testid={`mobile-open-pelada-${pelada.id}`}
         sx={{
-          bgcolor: (theme) =>
-            theme.palette.mode === "dark"
-              ? "rgba(20, 107, 58, 0.15)"
-              : "#f4f8f5",
-          border: "2px solid #146b3a",
+          bgcolor: (theme) => theme.palette.status?.paid?.bg || "action.hover",
+          border: "2px solid",
+          borderColor: "primary.main",
           borderRadius: "16px",
           p: "13px 14px",
           mb: 1.5,
@@ -449,7 +445,7 @@ export default function OrganizationDetailMobileView({
                 aria-label={t("organizations.peladas.aria.delete")}
                 onClick={() => onDeletePelada(pelada)}
                 size="small"
-                sx={{ color: "#a8452a", p: 0.5 }}
+                sx={{ color: "secondary.main", p: 0.5 }}
               >
                 <DeleteOutlinedIcon sx={{ fontSize: 18 }} />
               </IconButton>
@@ -458,8 +454,8 @@ export default function OrganizationDetailMobileView({
               sx={{
                 font: "800 9px/1 Archivo,sans-serif",
                 letterSpacing: ".08em",
-                color: "#ffffff",
-                bgcolor: "#146b3a",
+                color: "primary.contrastText",
+                bgcolor: "primary.main",
                 borderRadius: "6px",
                 p: "5px 7px",
                 flexShrink: 0,
@@ -483,15 +479,12 @@ export default function OrganizationDetailMobileView({
               flex: 1,
               height: 6,
               borderRadius: 4,
-              bgcolor: (theme) =>
-                theme.palette.mode === "dark"
-                  ? "rgba(255, 255, 255, 0.12)"
-                  : "#dfe8e1",
+              bgcolor: "action.hover",
               overflow: "hidden",
               display: "flex",
             }}
           >
-            <Box sx={{ width: `${progress}%`, bgcolor: "#146b3a" }} />
+            <Box sx={{ width: `${progress}%`, bgcolor: "primary.main" }} />
           </Box>
           <Typography
             sx={{
@@ -513,15 +506,18 @@ export default function OrganizationDetailMobileView({
               border: 0,
               borderRadius: "11px",
               bgcolor: (theme) =>
-                theme.palette.mode === "dark" ? "#2d3035" : "#17181a",
-              color: "#ffffff",
+                theme.palette.mode === "dark" ? "action.hover" : "text.primary",
+              color: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "text.primary"
+                  : "background.paper",
               p: "11px 0",
               font: "800 11px/1 Archivo,sans-serif",
               letterSpacing: ".06em",
               cursor: "pointer",
               "&:hover": {
-                bgcolor: (theme) =>
-                  theme.palette.mode === "dark" ? "#3b3f46" : "#000000",
+                bgcolor: "primary.main",
+                color: "primary.contrastText",
               },
             }}
           >
@@ -620,7 +616,7 @@ export default function OrganizationDetailMobileView({
             aria-label={t("organizations.peladas.aria.delete")}
             onClick={() => onDeletePelada(pelada)}
             size="small"
-            sx={{ color: "#a8452a", p: 0.5 }}
+            sx={{ color: "secondary.main", p: 0.5 }}
           >
             <DeleteOutlinedIcon sx={{ fontSize: 18 }} />
           </IconButton>
@@ -672,13 +668,14 @@ export default function OrganizationDetailMobileView({
             sx={{
               width: 34,
               height: 34,
-              bgcolor: "#146b3a",
+              bgcolor: "primary.main",
               border: (theme) =>
                 theme.palette.mode === "dark"
-                  ? "2.5px solid #2d3035"
-                  : "2.5px solid #17181a",
+                  ? `2.5px solid ${theme.palette.divider}`
+                  : theme.palette.brutalist?.border ||
+                    `2.5px solid ${theme.palette.divider}`,
               font: "800 11px Archivo,sans-serif",
-              color: "#ffffff",
+              color: "primary.contrastText",
             }}
           >
             {orgInitials}
@@ -765,8 +762,7 @@ export default function OrganizationDetailMobileView({
               sx={{
                 font: "700 13px Archivo,sans-serif",
                 py: 1.25,
-                color: (theme) =>
-                  theme.palette.mode === "dark" ? "#e06c50" : "#a8452a",
+                color: "secondary.main",
               }}
             >
               <ExitToAppIcon sx={{ fontSize: 18, mr: 1.25 }} />
@@ -885,8 +881,7 @@ export default function OrganizationDetailMobileView({
               <Typography
                 sx={{
                   font: "700 20px/1 'Archivo Narrow',Archivo,sans-serif",
-                  color: (theme) =>
-                    theme.palette.mode === "dark" ? "#e06c50" : "#a8452a",
+                  color: "secondary.main",
                 }}
               >
                 0
@@ -941,15 +936,14 @@ export default function OrganizationDetailMobileView({
             bgcolor: "background.paper",
             borderTop: "2px solid",
             borderBottom: "2px solid",
-            borderColor: (theme) =>
-              theme.palette.mode === "dark" ? "divider" : "#17181a",
+            borderColor: "divider",
             overflow: "hidden",
           }}
         >
           <Box
             sx={{
               bgcolor: (theme) =>
-                theme.palette.mode === "dark" ? "#242628" : "#17181a",
+                theme.palette.mode === "dark" ? "action.hover" : "text.primary",
               px: 2.5,
               py: 1.4,
               display: "flex",
@@ -961,7 +955,10 @@ export default function OrganizationDetailMobileView({
               sx={{
                 font: "800 11px/1 Archivo,sans-serif",
                 letterSpacing: ".1em",
-                color: "#ffffff",
+                color: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "text.primary"
+                    : "background.paper",
                 textTransform: "uppercase",
               }}
             >
@@ -971,7 +968,7 @@ export default function OrganizationDetailMobileView({
               sx={{
                 font: "700 10px/1 Archivo,sans-serif",
                 letterSpacing: ".06em",
-                color: "#9a958a",
+                color: "text.secondary",
               }}
             >
               {scheduleSuggestion}
@@ -1004,20 +1001,23 @@ export default function OrganizationDetailMobileView({
           <Box
             sx={{
               bgcolor: "background.paper",
-              border: "2px solid",
-              borderColor: (theme) =>
-                theme.palette.mode === "dark" ? "divider" : "#17181a",
+              border: (theme) =>
+                theme.palette.mode === "dark"
+                  ? `1px solid ${theme.palette.divider}`
+                  : theme.palette.brutalist?.border ||
+                    `2px solid ${theme.palette.divider}`,
               borderRadius: "18px",
               overflow: "hidden",
               boxShadow: (theme) =>
                 theme.palette.mode === "dark"
-                  ? "5px 5px 0 #000000"
-                  : "5px 5px 0 #17181a",
+                  ? "0 4px 20px rgba(0,0,0,0.5)"
+                  : theme.palette.brutalist?.shadow ||
+                    `5px 5px 0 ${theme.palette.divider}`,
             }}
           >
             <Box
               sx={{
-                bgcolor: "#146b3a",
+                bgcolor: "primary.main",
                 px: 2,
                 py: 1.1,
                 display: "flex",
@@ -1029,7 +1029,7 @@ export default function OrganizationDetailMobileView({
                 sx={{
                   font: "800 11px/1 Archivo,sans-serif",
                   letterSpacing: ".1em",
-                  color: "#ffffff",
+                  color: "primary.contrastText",
                 }}
               >
                 LISTA ABERTA
@@ -1037,7 +1037,7 @@ export default function OrganizationDetailMobileView({
               <Typography
                 sx={{
                   font: "700 11px/1 Archivo,sans-serif",
-                  color: "#bfe6ce",
+                  color: "primary.contrastText",
                 }}
               >
                 {daysUntil(activePelada.scheduled_at, nowTs) === 0
@@ -1115,13 +1115,11 @@ export default function OrganizationDetailMobileView({
                           width: 28,
                           height: 28,
                           border: (theme) =>
-                            theme.palette.mode === "dark"
-                              ? "2px solid #242628"
-                              : "2px solid #ffffff",
+                            `2px solid ${theme.palette.background.paper}`,
                           ml: idx === 0 ? 0 : "-8px",
                           bgcolor:
                             AVATAR_BG_COLORS[idx % AVATAR_BG_COLORS.length],
-                          color: "#17181a",
+                          color: "text.primary",
                           font: "800 9.5px Archivo,sans-serif",
                         }}
                       >
@@ -1141,13 +1139,10 @@ export default function OrganizationDetailMobileView({
                         width: 28,
                         height: 28,
                         border: (theme) =>
-                          theme.palette.mode === "dark"
-                            ? "2px solid #242628"
-                            : "2px solid #ffffff",
+                          `2px solid ${theme.palette.background.paper}`,
                         ml: "-8px",
-                        bgcolor: (theme) =>
-                          theme.palette.mode === "dark" ? "#2d3035" : "#17181a",
-                        color: "#ffffff",
+                        bgcolor: "action.hover",
+                        color: "text.primary",
                         font: "800 9px Archivo,sans-serif",
                       }}
                     >
@@ -1187,13 +1182,13 @@ export default function OrganizationDetailMobileView({
                 sx={{
                   mt: 2,
                   borderRadius: "14px",
-                  bgcolor: "#146b3a",
-                  color: "#ffffff",
+                  bgcolor: "primary.main",
+                  color: "primary.contrastText",
                   py: 2,
                   font: "800 17px/1 Archivo,sans-serif",
                   letterSpacing: ".04em",
-                  boxShadow: "0 3px 0 #0d4526",
-                  "&:hover": { bgcolor: "#0e5c31" },
+                  boxShadow: (theme) => `0 3px 0 ${theme.palette.primary.dark}`,
+                  "&:hover": { bgcolor: "primary.dark" },
                 }}
               >
                 BORA PRO JOGO
@@ -1228,8 +1223,7 @@ export default function OrganizationDetailMobileView({
               to={`/organizations/${org.id}/statistics`}
               sx={{
                 font: "700 11px/1 Archivo,sans-serif",
-                color: (theme) =>
-                  theme.palette.mode === "dark" ? "#34a853" : "#146b3a",
+                color: "primary.main",
                 textDecoration: "none",
               }}
             >
@@ -1273,8 +1267,8 @@ export default function OrganizationDetailMobileView({
                     sx={{
                       width: 28,
                       height: 28,
-                      bgcolor: "#dcd3bd",
-                      color: "#17181a",
+                      bgcolor: AVATAR_BG_COLORS[0],
+                      color: "text.primary",
                       font: "800 9.5px Archivo,sans-serif",
                     }}
                   />
@@ -1335,8 +1329,8 @@ export default function OrganizationDetailMobileView({
                     sx={{
                       width: 28,
                       height: 28,
-                      bgcolor: "#cdd6e0",
-                      color: "#17181a",
+                      bgcolor: AVATAR_BG_COLORS[1 % AVATAR_BG_COLORS.length],
+                      color: "text.primary",
                       font: "800 9.5px Archivo,sans-serif",
                     }}
                   />
@@ -1368,10 +1362,9 @@ export default function OrganizationDetailMobileView({
                 sx={{
                   flex: 1,
                   bgcolor: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "rgba(20, 107, 58, 0.15)"
-                      : "#f4f8f5",
-                  border: "2px solid #146b3a",
+                    theme.palette.status?.paid?.bg || "action.hover",
+                  border: "2px solid",
+                  borderColor: "primary.main",
                   borderRadius: "14px",
                   p: "12px 11px",
                 }}
@@ -1380,7 +1373,7 @@ export default function OrganizationDetailMobileView({
                   sx={{
                     font: "700 8.5px/1 Archivo,sans-serif",
                     letterSpacing: ".12em",
-                    color: "#146b3a",
+                    color: "primary.main",
                   }}
                 >
                   VOCÊ
@@ -1400,8 +1393,8 @@ export default function OrganizationDetailMobileView({
                     sx={{
                       width: 28,
                       height: 28,
-                      bgcolor: "#146b3a",
-                      color: "#ffffff",
+                      bgcolor: "primary.main",
+                      color: "primary.contrastText",
                       font: "800 9.5px Archivo,sans-serif",
                     }}
                   />
@@ -1448,10 +1441,7 @@ export default function OrganizationDetailMobileView({
                 justifyContent: "space-between",
                 alignItems: "center",
                 p: "11px 14px",
-                bgcolor: (theme) =>
-                  theme.palette.mode === "dark"
-                    ? "rgba(255, 255, 255, 0.04)"
-                    : "#f6f4ee",
+                bgcolor: "action.hover",
                 borderBottom: "1.5px solid",
                 borderColor: "divider",
               }}
@@ -1473,8 +1463,7 @@ export default function OrganizationDetailMobileView({
                   bgcolor: "transparent",
                   p: 0,
                   font: "700 10.5px/1 Archivo,sans-serif",
-                  color: (theme) =>
-                    theme.palette.mode === "dark" ? "#34a853" : "#146b3a",
+                  color: "primary.main",
                   cursor: "pointer",
                 }}
               >
@@ -1499,7 +1488,7 @@ export default function OrganizationDetailMobileView({
                     width: 34,
                     height: 34,
                     bgcolor: AVATAR_BG_COLORS[idx % AVATAR_BG_COLORS.length],
-                    color: "#17181a",
+                    color: "text.primary",
                     font: "800 10px Archivo,sans-serif",
                   }}
                 />
@@ -1510,8 +1499,13 @@ export default function OrganizationDetailMobileView({
                     width: 34,
                     height: 34,
                     bgcolor: (theme) =>
-                      theme.palette.mode === "dark" ? "#2d3035" : "#17181a",
-                    color: "#ffffff",
+                      theme.palette.mode === "dark"
+                        ? "action.hover"
+                        : "text.primary",
+                    color: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? "text.primary"
+                        : "background.paper",
                     font: "800 9.5px Archivo,sans-serif",
                   }}
                 >
@@ -1567,7 +1561,7 @@ export default function OrganizationDetailMobileView({
               const badge = !line
                 ? { label: "FALTA", color: "text.secondary", isTitle: false }
                 : line.team_position === 1
-                  ? { label: "TÍTULO", color: "#146b3a", isTitle: true }
+                  ? { label: "TÍTULO", color: "primary.main", isTitle: true }
                   : line.team_position
                     ? {
                         label: `${line.team_position}º`,
@@ -1638,19 +1632,9 @@ export default function OrganizationDetailMobileView({
                         flexShrink: 0,
                         font: "700 9px/1 Archivo,sans-serif",
                         letterSpacing: ".06em",
-                        color: badge.isTitle
-                          ? (theme) =>
-                              theme.palette.mode === "dark"
-                                ? "#34a853"
-                                : "#146b3a"
-                          : badge.color,
+                        color: badge.isTitle ? "primary.main" : badge.color,
                         border: "1.5px solid",
-                        borderColor: badge.isTitle
-                          ? (theme) =>
-                              theme.palette.mode === "dark"
-                                ? "#34a853"
-                                : "#146b3a"
-                          : "divider",
+                        borderColor: badge.isTitle ? "primary.main" : "divider",
                         borderRadius: "6px",
                         p: "4px 6px",
                       }}
@@ -1758,8 +1742,7 @@ export default function OrganizationDetailMobileView({
                     border: 0,
                     bgcolor: "transparent",
                     font: "800 11.5px/1 Archivo,sans-serif",
-                    color: (theme) =>
-                      theme.palette.mode === "dark" ? "#34a853" : "#146b3a",
+                    color: "primary.main",
                     cursor: "pointer",
                   }}
                 >

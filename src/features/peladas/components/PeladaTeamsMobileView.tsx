@@ -29,7 +29,11 @@ import type {
 import type { PlayerWithUser } from "./TeamsSection";
 import DrawJustificationCard from "./DrawJustificationCard";
 import LocationDisplay from "../../../shared/components/LocationDisplay";
-import { getInitials, formatPosition } from "../utils/playerUtils";
+import {
+  getInitials,
+  formatPosition,
+  AVATAR_BG_COLORS,
+} from "../utils/playerUtils";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 
 export interface PeladaTeamsMobileViewProps {
@@ -197,17 +201,6 @@ export default function PeladaTeamsMobileView({
     });
   }, [teams, teamPlayers, getPlayerScore]);
 
-  const avatarColors = [
-    "#146b3a",
-    "#dcd3bd",
-    "#c9d9cd",
-    "#d8d2c4",
-    "#cfd8cd",
-    "#cdd6e0",
-    "#d3cfc4",
-    "#e2cfc7",
-  ];
-
   const isDiarista = (memberType?: string) =>
     memberType === "diarista" ||
     memberType === "diarista_temporario" ||
@@ -306,8 +299,7 @@ export default function PeladaTeamsMobileView({
                     fontWeight: "inherit",
                     fontSize: "inherit",
                     letterSpacing: "inherit",
-                    color: (theme) =>
-                      theme.palette.mode === "dark" ? "#34a853" : "#146b3a",
+                    color: "primary.main",
                     textTransform: "inherit",
                   }}
                 />
@@ -347,12 +339,8 @@ export default function PeladaTeamsMobileView({
             sx={{
               flex: 1,
               minWidth: 130,
-              bgcolor: (theme) =>
-                theme.palette.mode === "dark" ? "background.paper" : "#ffffff",
-              borderColor: (theme) =>
-                theme.palette.mode === "dark"
-                  ? "rgba(255,255,255,0.15)"
-                  : "#ddd8cc",
+              bgcolor: "background.paper",
+              borderColor: "divider",
               color: "text.primary",
               borderRadius: "11px",
               py: 1,
@@ -362,12 +350,8 @@ export default function PeladaTeamsMobileView({
               letterSpacing: ".04em",
               textTransform: "uppercase",
               "&:hover": {
-                borderColor: (theme) =>
-                  theme.palette.mode === "dark" ? "text.primary" : "#17181a",
-                bgcolor: (theme) =>
-                  theme.palette.mode === "dark"
-                    ? "rgba(255,255,255,0.06)"
-                    : "#f6f4ee",
+                borderColor: "text.primary",
+                bgcolor: "action.hover",
               },
             }}
           >
@@ -383,9 +367,13 @@ export default function PeladaTeamsMobileView({
                 flex: 1,
                 minWidth: 130,
                 bgcolor: (theme) =>
-                  theme.palette.mode === "dark" ? "primary.main" : "#17181a",
+                  theme.palette.mode === "dark"
+                    ? "primary.main"
+                    : "text.primary",
                 color: (theme) =>
-                  theme.palette.mode === "dark" ? "#17181a" : "#ffffff",
+                  theme.palette.mode === "dark"
+                    ? "primary.contrastText"
+                    : "background.paper",
                 borderRadius: "11px",
                 py: 1,
                 fontFamily: "Archivo, sans-serif",
@@ -395,7 +383,9 @@ export default function PeladaTeamsMobileView({
                 textTransform: "uppercase",
                 "&:hover": {
                   bgcolor: (theme) =>
-                    theme.palette.mode === "dark" ? "primary.light" : "#2e2f31",
+                    theme.palette.mode === "dark"
+                      ? "primary.light"
+                      : "text.primary",
                 },
               }}
             >
@@ -413,20 +403,18 @@ export default function PeladaTeamsMobileView({
                   showDrawConfig
                     ? theme.palette.mode === "dark"
                       ? "primary.main"
-                      : "#17181a"
-                    : theme.palette.mode === "dark"
-                      ? "background.paper"
-                      : "#ffffff",
+                      : "text.primary"
+                    : "background.paper",
                 color: (theme) =>
                   showDrawConfig
                     ? theme.palette.mode === "dark"
-                      ? "#17181a"
-                      : "#ffffff"
+                      ? "primary.contrastText"
+                      : "background.paper"
                     : "text.primary",
                 borderColor: (theme) =>
                   theme.palette.mode === "dark"
-                    ? "rgba(255,255,255,0.2)"
-                    : "#17181a",
+                    ? "primary.main"
+                    : "text.primary",
                 borderRadius: "11px",
                 py: 1,
                 px: 1.5,
@@ -440,10 +428,8 @@ export default function PeladaTeamsMobileView({
                     showDrawConfig
                       ? theme.palette.mode === "dark"
                         ? "primary.light"
-                        : "#2e2f31"
-                      : theme.palette.mode === "dark"
-                        ? "rgba(255,255,255,0.06)"
-                        : "#f6f4ee",
+                        : "text.primary"
+                      : "action.hover",
                 },
               }}
             >
@@ -459,22 +445,22 @@ export default function PeladaTeamsMobileView({
           sx={{
             bgcolor: "background.paper",
             border: (theme) =>
-              theme.palette.mode === "dark"
-                ? "1px solid rgba(255,255,255,0.12)"
-                : "2px solid #17181a",
+              theme.palette.brutalist?.border ||
+              `2px solid ${theme.palette.divider}`,
             borderRadius: "18px",
             overflow: "hidden",
             boxShadow: (theme) =>
-              theme.palette.mode === "dark"
-                ? "0 4px 20px rgba(0,0,0,0.5)"
-                : "4px 4px 0 #17181a",
+              theme.palette.brutalist?.shadow ||
+              `4px 4px 0 ${theme.palette.divider}`,
             mb: 2.5,
           }}
         >
           <Box
             sx={{
               bgcolor: (theme) =>
-                theme.palette.mode === "dark" ? "#242628" : "#17181a",
+                theme.palette.mode === "dark"
+                  ? "background.paper"
+                  : "text.primary",
               px: 2,
               py: 1.25,
               display: "flex",
@@ -488,7 +474,10 @@ export default function PeladaTeamsMobileView({
                 fontWeight: 800,
                 fontSize: "11px",
                 letterSpacing: ".1em",
-                color: "#ffffff",
+                color: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "text.primary"
+                    : "background.paper",
                 textTransform: "uppercase",
               }}
             >
@@ -500,7 +489,7 @@ export default function PeladaTeamsMobileView({
                 fontWeight: 700,
                 fontSize: "10px",
                 letterSpacing: ".06em",
-                color: "#9a958a",
+                color: "text.secondary",
                 textTransform: "uppercase",
               }}
             >
@@ -529,15 +518,15 @@ export default function PeladaTeamsMobileView({
                 sx={{
                   border:
                     selectedAlgorithm === "classic"
-                      ? "2px solid #146b3a"
+                      ? (theme) => `2px solid ${theme.palette.primary.main}`
                       : "1.5px solid",
                   borderColor:
-                    selectedAlgorithm === "classic" ? "#146b3a" : "divider",
+                    selectedAlgorithm === "classic"
+                      ? "primary.main"
+                      : "divider",
                   bgcolor: (theme) =>
                     selectedAlgorithm === "classic"
-                      ? theme.palette.mode === "dark"
-                        ? "rgba(20, 107, 58, 0.15)"
-                        : "#f4f8f5"
+                      ? theme.palette.status?.paid?.bg || "action.hover"
                       : "background.paper",
                   borderRadius: "12px",
                   p: 1.5,
@@ -552,10 +541,12 @@ export default function PeladaTeamsMobileView({
                       borderRadius: "50%",
                       border:
                         selectedAlgorithm === "classic"
-                          ? "5px solid #146b3a"
+                          ? (theme) => `5px solid ${theme.palette.primary.main}`
                           : "2px solid",
                       borderColor:
-                        selectedAlgorithm === "classic" ? "#146b3a" : "divider",
+                        selectedAlgorithm === "classic"
+                          ? "primary.main"
+                          : "divider",
                       bgcolor: "background.paper",
                     }}
                   />
@@ -576,8 +567,9 @@ export default function PeladaTeamsMobileView({
                       fontWeight: 800,
                       fontSize: "8.5px",
                       letterSpacing: ".08em",
-                      color: "#146b3a",
-                      border: "1.5px solid #146b3a",
+                      color: "primary.main",
+                      border: "1.5px solid",
+                      borderColor: "primary.main",
                       borderRadius: "5px",
                       px: 0.6,
                       py: 0.25,
@@ -606,15 +598,13 @@ export default function PeladaTeamsMobileView({
                 sx={{
                   border:
                     selectedAlgorithm === "gemini"
-                      ? "2px solid #146b3a"
+                      ? (theme) => `2px solid ${theme.palette.primary.main}`
                       : "1.5px solid",
                   borderColor:
-                    selectedAlgorithm === "gemini" ? "#146b3a" : "divider",
+                    selectedAlgorithm === "gemini" ? "primary.main" : "divider",
                   bgcolor: (theme) =>
                     selectedAlgorithm === "gemini"
-                      ? theme.palette.mode === "dark"
-                        ? "rgba(20, 107, 58, 0.15)"
-                        : "#f4f8f5"
+                      ? theme.palette.status?.paid?.bg || "action.hover"
                       : "background.paper",
                   borderRadius: "12px",
                   p: 1.5,
@@ -629,10 +619,12 @@ export default function PeladaTeamsMobileView({
                       borderRadius: "50%",
                       border:
                         selectedAlgorithm === "gemini"
-                          ? "5px solid #146b3a"
+                          ? (theme) => `5px solid ${theme.palette.primary.main}`
                           : "2px solid",
                       borderColor:
-                        selectedAlgorithm === "gemini" ? "#146b3a" : "divider",
+                        selectedAlgorithm === "gemini"
+                          ? "primary.main"
+                          : "divider",
                       bgcolor: "background.paper",
                     }}
                   />
@@ -685,15 +677,13 @@ export default function PeladaTeamsMobileView({
                 sx={{
                   border:
                     selectedAlgorithm === "gpt"
-                      ? "2px solid #146b3a"
+                      ? (theme) => `2px solid ${theme.palette.primary.main}`
                       : "1.5px solid",
                   borderColor:
-                    selectedAlgorithm === "gpt" ? "#146b3a" : "divider",
+                    selectedAlgorithm === "gpt" ? "primary.main" : "divider",
                   bgcolor: (theme) =>
                     selectedAlgorithm === "gpt"
-                      ? theme.palette.mode === "dark"
-                        ? "rgba(20, 107, 58, 0.15)"
-                        : "#f4f8f5"
+                      ? theme.palette.status?.paid?.bg || "action.hover"
                       : "background.paper",
                   borderRadius: "12px",
                   p: 1.5,
@@ -708,10 +698,12 @@ export default function PeladaTeamsMobileView({
                       borderRadius: "50%",
                       border:
                         selectedAlgorithm === "gpt"
-                          ? "5px solid #146b3a"
+                          ? (theme) => `5px solid ${theme.palette.primary.main}`
                           : "2px solid",
                       borderColor:
-                        selectedAlgorithm === "gpt" ? "#146b3a" : "divider",
+                        selectedAlgorithm === "gpt"
+                          ? "primary.main"
+                          : "divider",
                       bgcolor: "background.paper",
                     }}
                   />
@@ -732,8 +724,12 @@ export default function PeladaTeamsMobileView({
                       fontWeight: 800,
                       fontSize: "8.5px",
                       letterSpacing: ".08em",
-                      color: "#8a5800",
-                      border: "1.5px solid #f2a100",
+                      color: (theme) =>
+                        theme.palette.gold?.subtleText ||
+                        theme.palette.primary.main,
+                      border: "1.5px solid",
+                      borderColor: (theme) =>
+                        theme.palette.gold?.main || theme.palette.primary.main,
                       borderRadius: "5px",
                       px: 0.6,
                       py: 0.25,
@@ -1019,15 +1015,15 @@ export default function PeladaTeamsMobileView({
               sx={{
                 mt: 2,
                 py: 1.5,
-                bgcolor: "#146b3a",
-                color: "#ffffff",
+                bgcolor: "primary.main",
+                color: "primary.contrastText",
                 fontFamily: "Archivo, sans-serif",
                 fontWeight: 800,
                 fontSize: "14px",
                 letterSpacing: ".06em",
                 borderRadius: "12px",
-                boxShadow: "0 3px 0 #0d4526",
-                "&:hover": { bgcolor: "#0e5c31" },
+                boxShadow: (theme) => `0 3px 0 ${theme.palette.primary.dark}`,
+                "&:hover": { bgcolor: "primary.dark" },
               }}
             >
               {processing ? (
@@ -1108,14 +1104,16 @@ export default function PeladaTeamsMobileView({
                   bgcolor: "background.paper",
                   border: (theme) =>
                     theme.palette.mode === "dark"
-                      ? "1px solid rgba(255,255,255,0.12)"
-                      : "2px solid #17181a",
+                      ? `1px solid ${theme.palette.divider}`
+                      : theme.palette.brutalist?.border ||
+                        `2px solid ${theme.palette.divider}`,
                   borderRadius: "18px",
                   overflow: "hidden",
                   boxShadow: (theme) =>
                     theme.palette.mode === "dark"
                       ? "0 4px 20px rgba(0,0,0,0.5)"
-                      : "4px 4px 0 #17181a",
+                      : theme.palette.brutalist?.shadow ||
+                        `4px 4px 0 ${theme.palette.divider}`,
                 }}
               >
                 {/* Team Card Header */}
@@ -1148,12 +1146,8 @@ export default function PeladaTeamsMobileView({
                         fontWeight: 700,
                         fontSize: "9px",
                         letterSpacing: ".1em",
-                        color: (theme) =>
-                          openSlots > 0
-                            ? theme.palette.mode === "dark"
-                              ? "#e06c50"
-                              : "#a8452a"
-                            : "text.secondary",
+                        color:
+                          openSlots > 0 ? "secondary.main" : "text.secondary",
                         mt: 0.5,
                         textTransform: "uppercase",
                       }}
@@ -1170,8 +1164,12 @@ export default function PeladaTeamsMobileView({
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 800,
                         fontSize: "10px",
-                        color: "#ffffff",
-                        bgcolor: openSlots > 0 ? "#6b675c" : "#146b3a",
+                        color:
+                          openSlots > 0
+                            ? "text.secondary"
+                            : "primary.contrastText",
+                        bgcolor:
+                          openSlots > 0 ? "action.hover" : "primary.main",
                         borderRadius: "6px",
                         px: 0.9,
                         py: 0.5,
@@ -1187,10 +1185,7 @@ export default function PeladaTeamsMobileView({
                         sx={{
                           minWidth: 28,
                           p: 0.25,
-                          color: (theme) =>
-                            theme.palette.mode === "dark"
-                              ? "#e06c50"
-                              : "#a8452a",
+                          color: "secondary.main",
                           fontSize: "10px",
                           fontWeight: 700,
                         }}
@@ -1215,7 +1210,8 @@ export default function PeladaTeamsMobileView({
                     const pScore = getPlayerScore(player);
                     const isPaid = paidPlayerIds.has(player.id);
                     const diarista = isDiarista(player.member_type);
-                    const color = avatarColors[pIdx % avatarColors.length];
+                    const color =
+                      AVATAR_BG_COLORS[pIdx % AVATAR_BG_COLORS.length];
 
                     return (
                       <Box
@@ -1224,13 +1220,11 @@ export default function PeladaTeamsMobileView({
                           display: "flex",
                           alignItems: "center",
                           gap: 1.2,
-                          border: isYou ? "2px solid #146b3a" : 1,
-                          borderColor: isYou ? "#146b3a" : "divider",
+                          border: isYou ? 2 : 1,
+                          borderColor: isYou ? "primary.main" : "divider",
                           bgcolor: (theme) =>
                             isYou
-                              ? theme.palette.mode === "dark"
-                                ? "rgba(20, 107, 58, 0.2)"
-                                : "#f4f8f5"
+                              ? theme.palette.status?.paid?.bg || "action.hover"
                               : "background.paper",
                           borderRadius: "11px",
                           p: 1,
@@ -1243,8 +1237,10 @@ export default function PeladaTeamsMobileView({
                           sx={{
                             width: 28,
                             height: 28,
-                            bgcolor: isYou ? "#146b3a" : color,
-                            color: isYou ? "#ffffff" : "text.primary",
+                            bgcolor: isYou ? "primary.main" : color,
+                            color: isYou
+                              ? "primary.contrastText"
+                              : "text.primary",
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: 800,
                             fontSize: "9.5px",
@@ -1273,7 +1269,7 @@ export default function PeladaTeamsMobileView({
                               fontWeight: 600,
                               fontSize: "9.5px",
                               lineHeight: 1.2,
-                              color: isYou ? "#146b3a" : "text.secondary",
+                              color: isYou ? "primary.main" : "text.secondary",
                               mt: 0.25,
                             }}
                           >
@@ -1301,15 +1297,17 @@ export default function PeladaTeamsMobileView({
                               borderRadius: "6px",
                               bgcolor: (theme) =>
                                 isPaid
-                                  ? theme.palette.mode === "dark"
-                                    ? "rgba(20, 107, 58, 0.2)"
-                                    : "#f4f8f5"
-                                  : theme.palette.mode === "dark"
-                                    ? "rgba(168, 69, 42, 0.2)"
-                                    : "#fff5f2",
-                              border: isPaid
-                                ? "1px solid #146b3a"
-                                : "1px solid #a8452a",
+                                  ? theme.palette.status?.paid?.bg ||
+                                    "action.hover"
+                                  : theme.palette.status?.unpaid?.bg ||
+                                    "action.hover",
+                              border: "1px solid",
+                              borderColor: (theme) =>
+                                isPaid
+                                  ? theme.palette.status?.paid?.color ||
+                                    "primary.main"
+                                  : theme.palette.status?.unpaid?.color ||
+                                    "secondary.main",
                               display: "flex",
                               alignItems: "center",
                               gap: 0.5,
@@ -1320,7 +1318,12 @@ export default function PeladaTeamsMobileView({
                                 fontFamily: "Archivo, sans-serif",
                                 fontWeight: 800,
                                 fontSize: "8.5px",
-                                color: isPaid ? "#146b3a" : "#a8452a",
+                                color: (theme) =>
+                                  isPaid
+                                    ? theme.palette.status?.paid?.color ||
+                                      "primary.main"
+                                    : theme.palette.status?.unpaid?.color ||
+                                      "secondary.main",
                               }}
                             >
                               {isPaid ? "PAGO" : "PENDENTE"}
@@ -1333,10 +1336,7 @@ export default function PeladaTeamsMobileView({
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: 800,
                             fontSize: "11px",
-                            color: (theme) =>
-                              theme.palette.mode === "dark"
-                                ? "#34a853"
-                                : "#146b3a",
+                            color: "primary.main",
                             pr: 0.5,
                           }}
                         >
@@ -1370,17 +1370,12 @@ export default function PeladaTeamsMobileView({
                       sx={{
                         height: 40,
                         border: (theme) =>
-                          theme.palette.mode === "dark"
-                            ? "1.5px dashed rgba(255,255,255,0.15)"
-                            : "1.5px dashed #c9c4b6",
+                          `1.5px dashed ${theme.palette.divider}`,
                         borderRadius: "11px",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        bgcolor: (theme) =>
-                          theme.palette.mode === "dark"
-                            ? "rgba(255,255,255,0.03)"
-                            : "#f6f4ee",
+                        bgcolor: "action.hover",
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 700,
                         fontSize: "10px",
@@ -1412,10 +1407,7 @@ export default function PeladaTeamsMobileView({
               startIcon={<AddIcon />}
               sx={{
                 py: 1.5,
-                border: (theme) =>
-                  theme.palette.mode === "dark"
-                    ? "1.5px dashed rgba(255,255,255,0.15)"
-                    : "1.5px dashed #c9c4b6",
+                border: (theme) => `1.5px dashed ${theme.palette.divider}`,
                 borderRadius: "14px",
                 color: "text.secondary",
                 fontFamily: "Archivo, sans-serif",
@@ -1424,14 +1416,9 @@ export default function PeladaTeamsMobileView({
                 letterSpacing: ".04em",
                 bgcolor: "background.paper",
                 "&:hover": {
-                  borderColor: (theme) =>
-                    theme.palette.mode === "dark" ? "text.primary" : "#17181a",
-                  color: (theme) =>
-                    theme.palette.mode === "dark" ? "text.primary" : "#17181a",
-                  bgcolor: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "rgba(255,255,255,0.06)"
-                      : "#f6f4ee",
+                  borderColor: "text.primary",
+                  color: "text.primary",
+                  bgcolor: "action.hover",
                 },
               }}
             >
@@ -1489,7 +1476,7 @@ export default function PeladaTeamsMobileView({
           <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
             {benchPlayers.map((player, pIdx) => {
               const pScore = getPlayerScore(player);
-              const color = avatarColors[pIdx % avatarColors.length];
+              const color = AVATAR_BG_COLORS[pIdx % AVATAR_BG_COLORS.length];
 
               return (
                 <Box
@@ -1500,10 +1487,7 @@ export default function PeladaTeamsMobileView({
                     gap: 1.2,
                     border: 1,
                     borderColor: "divider",
-                    bgcolor: (theme) =>
-                      theme.palette.mode === "dark"
-                        ? "rgba(255,255,255,0.03)"
-                        : "#f6f4ee",
+                    bgcolor: "action.hover",
                     borderRadius: "11px",
                     p: 1,
                   }}
@@ -1556,10 +1540,7 @@ export default function PeladaTeamsMobileView({
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 800,
                       fontSize: "11px",
-                      color: (theme) =>
-                        theme.palette.mode === "dark"
-                          ? "#34a853"
-                          : "text.secondary",
+                      color: "text.secondary",
                       pr: 0.5,
                     }}
                   >
@@ -1665,8 +1646,7 @@ export default function PeladaTeamsMobileView({
               fontFamily: "Archivo, sans-serif",
               fontWeight: 700,
               fontSize: "12px",
-              color: (theme) =>
-                theme.palette.mode === "dark" ? "#e06c50" : "#a8452a",
+              color: "secondary.main",
             }}
           >
             Enviar para o banco

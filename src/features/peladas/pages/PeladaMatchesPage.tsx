@@ -357,8 +357,8 @@ export default function PeladaMatchesPage() {
             display: { xs: "none", md: "flex" },
             alignItems: "center",
             gap: "26px",
-            bgcolor: "#123c26",
-            color: "#fff",
+            bgcolor: "pitch.main",
+            color: "pitch.contrastText",
             px: "22px",
             height: "64px",
             width: "100%",
@@ -373,7 +373,7 @@ export default function PeladaMatchesPage() {
               alignItems: "center",
               gap: "9px",
               textDecoration: "none",
-              color: "#fff",
+              color: "pitch.contrastText",
             }}
           >
             <Box
@@ -381,14 +381,14 @@ export default function PeladaMatchesPage() {
                 width: 26,
                 height: 26,
                 borderRadius: "7px",
-                bgcolor: "#146b3a",
+                bgcolor: "primary.main",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 fontFamily: "Archivo, sans-serif",
                 fontWeight: 900,
                 fontSize: "10px",
-                color: "#fff",
+                color: "primary.contrastText",
               }}
             >
               MP
@@ -400,7 +400,7 @@ export default function PeladaMatchesPage() {
                 fontSize: "12.5px",
                 lineHeight: 1,
                 letterSpacing: ".1em",
-                color: "#fff",
+                color: "pitch.contrastText",
               }}
             >
               MINHA PELADA
@@ -414,37 +414,27 @@ export default function PeladaMatchesPage() {
               fontFamily: "Archivo, sans-serif",
               fontWeight: 700,
               fontSize: "12px",
-              color: "#9ecfb2",
+              color: "pitch.subtle",
             }}
           >
             <Box
               component={RouterLink}
               to="/home"
               sx={{
-                color: "#9ecfb2",
+                color: "pitch.subtle",
                 textDecoration: "none",
-                "&:hover": { color: "#fff" },
+                "&:hover": { color: "pitch.contrastText" },
               }}
             >
               Início
             </Box>
             <Box
               component={RouterLink}
-              to="/home#meus-grupos"
-              sx={{
-                color: "#fff",
-                textDecoration: "none",
-              }}
-            >
-              Grupos
-            </Box>
-            <Box
-              component={RouterLink}
               to="/profile"
               sx={{
-                color: "#9ecfb2",
+                color: "pitch.subtle",
                 textDecoration: "none",
-                "&:hover": { color: "#fff" },
+                "&:hover": { color: "pitch.contrastText" },
               }}
             >
               Minha ficha
@@ -459,7 +449,7 @@ export default function PeladaMatchesPage() {
               fontWeight: 700,
               fontSize: "11px",
               lineHeight: 1,
-              color: "#9ecfb2",
+              color: "pitch.subtle",
             }}
           >
             SESSÃO {sessionTimer.formattedTime}
@@ -480,9 +470,9 @@ export default function PeladaMatchesPage() {
               fontWeight: 700,
               fontSize: "11px",
               lineHeight: 1,
-              color: "#fff",
+              color: "pitch.contrastText",
               textDecoration: "none",
-              "&:hover": { borderColor: "#fff" },
+              "&:hover": { borderColor: "pitch.contrastText" },
             }}
           >
             {pelada?.organization_name || "100Fôlego"}

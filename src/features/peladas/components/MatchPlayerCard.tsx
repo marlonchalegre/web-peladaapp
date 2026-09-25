@@ -34,7 +34,7 @@ export default function MatchPlayerCard({
 }: MatchPlayerCardProps) {
   const { t } = useTranslation();
   const isDesktop = variant === "desktop";
-  const teamColor = player.side === "home" ? "#c9591c" : "#1f5f9c";
+  const teamColor = player.side === "home" ? "home.main" : "away.main";
 
   const positionLabel = () => {
     if (player.is_goalkeeper) return POSITION_SHORT.goalkeeper;
@@ -57,7 +57,7 @@ export default function MatchPlayerCard({
           justifyContent: "space-between",
           gap: 1,
           bgcolor: "transparent",
-          border: "1.5px dashed #ddd8cc",
+          border: (theme) => `1.5px dashed ${theme.palette.divider}`,
           borderRadius: "12px",
           px: isDesktop ? "12px" : "12px",
           py: isDesktop ? "10px" : "8px",
@@ -103,9 +103,9 @@ export default function MatchPlayerCard({
         minWidth: 0,
         p: 0,
         borderRadius: "8px",
-        border: "1.5px solid #e4e0d6",
-        bgcolor: "#faf8f3",
-        color: "#6b675c",
+        border: (theme) => `1.5px solid ${theme.palette.divider}`,
+        bgcolor: "action.hover",
+        color: "text.secondary",
         fontFamily: "Archivo, sans-serif",
         fontWeight: 700,
         fontSize: "11px",
@@ -113,7 +113,7 @@ export default function MatchPlayerCard({
         "&:hover": {
           borderColor: teamColor,
           color: teamColor,
-          bgcolor: "#faf8f3",
+          bgcolor: "action.selected",
         },
       }}
     >
@@ -127,9 +127,9 @@ export default function MatchPlayerCard({
         flexShrink: 0,
         minWidth: 0,
         ml: "auto",
-        border: "1.5px solid #ddd8cc",
-        bgcolor: "#fff",
-        color: "#123c26",
+        border: (theme) => `1.5px solid ${theme.palette.divider}`,
+        bgcolor: "background.paper",
+        color: "text.primary",
         borderRadius: "10px",
         px: "11px",
         py: "9px",
@@ -139,7 +139,7 @@ export default function MatchPlayerCard({
         lineHeight: 1,
         letterSpacing: "0.06em",
         "&:hover": {
-          bgcolor: "#fff",
+          bgcolor: "action.hover",
           borderColor: teamColor,
           color: teamColor,
         },
@@ -156,9 +156,9 @@ export default function MatchPlayerCard({
         display: "flex",
         alignItems: "center",
         gap: isDesktop ? "10px" : "9px",
-        bgcolor: isDesktop ? "#fff" : "#faf8f3",
+        bgcolor: isDesktop ? "background.paper" : "background.default",
         border: "1.5px solid",
-        borderColor: isDesktop ? "#e4e0d6" : "#efece4",
+        borderColor: "divider",
         borderRadius: "12px",
         px: isDesktop ? "12px" : "8px",
         pl: isDesktop ? "12px" : "12px",
@@ -183,7 +183,7 @@ export default function MatchPlayerCard({
             fontWeight: 700,
             fontSize: isDesktop ? "13px" : "12.5px",
             lineHeight: 1.2,
-            color: "#1a1a1a",
+            color: "text.primary",
           }}
         >
           {playerName}
@@ -197,7 +197,7 @@ export default function MatchPlayerCard({
             fontWeight: 700,
             fontSize: isDesktop ? "9.5px" : "9px",
             letterSpacing: isDesktop ? "0.08em" : "0.06em",
-            color: "#8a857a",
+            color: "text.secondary",
           }}
         >
           {positionLabel()}
@@ -237,7 +237,7 @@ export default function MatchPlayerCard({
                 fontWeight: 700,
                 fontSize: isDesktop ? "11px" : "10px",
                 lineHeight: 1,
-                color: "#146b3a",
+                color: "primary.main",
               }}
             >
               {stats.assists}A
@@ -251,7 +251,7 @@ export default function MatchPlayerCard({
                 fontWeight: 700,
                 fontSize: isDesktop ? "11px" : "10px",
                 lineHeight: 1,
-                color: "#a8452a",
+                color: "secondary.main",
               }}
             >
               {stats.ownGoals}GC

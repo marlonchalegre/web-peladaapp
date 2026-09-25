@@ -228,8 +228,7 @@ export default function ActiveMatchesCarousel({
                 color: "text.primary",
                 p: 0,
                 "&:hover": {
-                  bgcolor: (theme) =>
-                    theme.palette.mode === "dark" ? "#3a3e46" : "#f6f4ee",
+                  bgcolor: "action.hover",
                 },
               }}
             >
@@ -267,8 +266,7 @@ export default function ActiveMatchesCarousel({
                 color: "text.primary",
                 p: 0,
                 "&:hover": {
-                  bgcolor: (theme) =>
-                    theme.palette.mode === "dark" ? "#3a3e46" : "#f6f4ee",
+                  bgcolor: "action.hover",
                 },
               }}
             >
@@ -283,22 +281,18 @@ export default function ActiveMatchesCarousel({
         sx={{
           bgcolor: "background.paper",
           border: (theme) =>
-            theme.palette.mode === "dark"
-              ? "2px solid #2d3035"
-              : "2px solid #17181a",
+            `2px solid ${theme.palette.mode === "dark" ? theme.palette.divider : theme.palette.grey[900]}`,
           borderRadius: "18px",
           overflow: "hidden",
           boxShadow: (theme) =>
-            theme.palette.mode === "dark"
-              ? "5px 5px 0 #000000"
-              : "5px 5px 0 #17181a",
+            `5px 5px 0 ${theme.palette.mode === "dark" ? theme.palette.common.black : theme.palette.grey[900]}`,
           transition: "all 0.2s ease",
         }}
       >
         {/* Top bar strip */}
         <Box
           sx={{
-            bgcolor: "#146b3a",
+            bgcolor: "primary.main",
             px: 2,
             py: 1.1,
             display: "flex",
@@ -318,7 +312,7 @@ export default function ActiveMatchesCarousel({
                 fontWeight: 800,
                 fontSize: "9px",
                 letterSpacing: "0.1em",
-                color: "#ffffff",
+                color: "primary.contrastText",
               }}
             >
               FUT
@@ -329,7 +323,7 @@ export default function ActiveMatchesCarousel({
                 fontWeight: 800,
                 fontSize: "11px",
                 letterSpacing: "0.06em",
-                color: "#ffffff",
+                color: "primary.contrastText",
                 textTransform: "uppercase",
               }}
             >
@@ -342,7 +336,7 @@ export default function ActiveMatchesCarousel({
               fontFamily: "Archivo, sans-serif",
               fontWeight: 700,
               fontSize: "11px",
-              color: "#bfe6ce",
+              color: "primary.light",
             }}
           >
             {currentPelada.status === "attendance"
@@ -470,8 +464,7 @@ export default function ActiveMatchesCarousel({
                 sx={{
                   height: 7,
                   borderRadius: 4,
-                  bgcolor: (theme) =>
-                    theme.palette.mode === "dark" ? "#33363d" : "#eae6db",
+                  bgcolor: "divider",
                   overflow: "hidden",
                   display: "flex",
                   mt: 1,
@@ -487,7 +480,7 @@ export default function ActiveMatchesCarousel({
                           )
                         : 0
                     }%`,
-                    bgcolor: "#146b3a",
+                    bgcolor: "primary.main",
                   }}
                 />
               </Box>
@@ -510,9 +503,7 @@ export default function ActiveMatchesCarousel({
                       width: 28,
                       height: 28,
                       borderRadius: "50%",
-                      bgcolor: ["#c9d9cd", "#dcd3bd", "#cdd6e0", "#e2cfc7"][
-                        idx % 4
-                      ],
+                      bgcolor: "action.selected",
                       border: (theme) =>
                         `2px solid ${theme.palette.background.paper}`,
                       display: "flex",
@@ -521,7 +512,7 @@ export default function ActiveMatchesCarousel({
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 800,
                       fontSize: "9.5px",
-                      color: "#17181a",
+                      color: "text.primary",
                       ml: idx > 0 ? "-8px" : 0,
                       zIndex: 4 - idx,
                     }}
@@ -536,7 +527,9 @@ export default function ActiveMatchesCarousel({
                       height: 28,
                       borderRadius: "50%",
                       bgcolor: (theme) =>
-                        theme.palette.mode === "dark" ? "#2d3035" : "#17181a",
+                        theme.palette.mode === "dark"
+                          ? theme.palette.divider
+                          : theme.palette.grey[900],
                       border: (theme) =>
                         `2px solid ${theme.palette.background.paper}`,
                       display: "flex",
@@ -545,7 +538,10 @@ export default function ActiveMatchesCarousel({
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 800,
                       fontSize: "9px",
-                      color: "#ffffff",
+                      color: (theme) =>
+                        theme.palette.mode === "dark"
+                          ? theme.palette.text.primary
+                          : theme.palette.grey[100],
                       ml: "-8px",
                     }}
                   >
@@ -591,7 +587,7 @@ export default function ActiveMatchesCarousel({
                 <LocationDisplay
                   location={currentPelada.location}
                   showDot
-                  dotColor="#146b3a"
+                  dotColor="primary.main"
                   textSx={{
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 600,
@@ -611,8 +607,7 @@ export default function ActiveMatchesCarousel({
               width: { xs: "100%", md: 220 },
               bgcolor: {
                 xs: "transparent",
-                md: (theme) =>
-                  theme.palette.mode === "dark" ? "#1c1e22" : "#f6f4ee",
+                md: "action.hover",
               },
               borderLeft: {
                 xs: "none",
@@ -654,18 +649,18 @@ export default function ActiveMatchesCarousel({
                   sx={{
                     py: 2,
                     borderRadius: "14px",
-                    bgcolor: isConfirmed ? "#0d4526" : "#146b3a",
-                    color: "#ffffff",
+                    bgcolor: isConfirmed ? "primary.dark" : "primary.main",
+                    color: "primary.contrastText",
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 800,
                     fontSize: "17px",
                     letterSpacing: "0.04em",
                     textTransform: "uppercase",
-                    boxShadow: "0 3px 0 #0d4526",
+                    boxShadow: (theme) =>
+                      `0 3px 0 ${theme.palette.primary.dark}`,
                     border: "none",
                     "&:hover": {
-                      bgcolor: (theme) =>
-                        theme.palette.mode === "dark" ? "#1a8a4b" : "#0e5c31",
+                      bgcolor: "primary.dark",
                       border: "none",
                     },
                   }}
@@ -705,7 +700,7 @@ export default function ActiveMatchesCarousel({
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 600,
                       fontSize: "12px",
-                      color: isDeclined ? "#a8452a" : "text.secondary",
+                      color: isDeclined ? "secondary.main" : "text.secondary",
                       textDecoration: "underline",
                       textTransform: "none",
                       boxShadow: "none !important",
@@ -735,7 +730,7 @@ export default function ActiveMatchesCarousel({
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 700,
                       fontSize: "12px",
-                      color: "#146b3a",
+                      color: "primary.main",
                       textTransform: "none",
                       boxShadow: "none !important",
                       "&:hover": {
@@ -763,12 +758,16 @@ export default function ActiveMatchesCarousel({
                   fontSize: "15px",
                   letterSpacing: "0.04em",
                   bgcolor: (theme) =>
-                    theme.palette.mode === "dark" ? "#2d3035" : "#17181a",
-                  color: "#ffffff",
-                  boxShadow: "0 3px 0 #000000",
+                    theme.palette.mode === "dark"
+                      ? theme.palette.divider
+                      : theme.palette.grey[900],
+                  color: "primary.contrastText",
+                  boxShadow: (theme) => `0 3px 0 ${theme.palette.common.black}`,
                   "&:hover": {
                     bgcolor: (theme) =>
-                      theme.palette.mode === "dark" ? "#3f434d" : "#000000",
+                      theme.palette.mode === "dark"
+                        ? theme.palette.action.hover
+                        : theme.palette.common.black,
                   },
                 }}
               >

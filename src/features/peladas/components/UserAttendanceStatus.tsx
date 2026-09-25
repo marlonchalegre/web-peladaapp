@@ -59,13 +59,9 @@ export default function UserAttendanceStatus({
         borderRadius: "18px",
         bgcolor: "background.paper",
         border: (theme) =>
-          theme.palette.mode === "dark"
-            ? "1px solid rgba(255,255,255,0.12)"
-            : "2px solid #17181a",
+          `2px solid ${theme.palette.mode === "dark" ? theme.palette.divider : theme.palette.grey[900]}`,
         boxShadow: (theme) =>
-          theme.palette.mode === "dark"
-            ? "0 4px 20px rgba(0,0,0,0.5)"
-            : "5px 5px 0 #17181a",
+          `5px 5px 0 ${theme.palette.mode === "dark" ? theme.palette.common.black : theme.palette.grey[900]}`,
         color: "text.primary",
       }}
     >
@@ -140,29 +136,27 @@ export default function UserAttendanceStatus({
             fontWeight: 800,
             fontSize: "17px",
             letterSpacing: ".06em",
-            bgcolor: (theme) =>
+            bgcolor:
               player.attendance_status === "confirmed"
-                ? "#146b3a"
-                : theme.palette.mode === "dark"
-                  ? "background.paper"
-                  : "#ffffff",
+                ? "primary.main"
+                : "background.paper",
             color:
-              player.attendance_status === "confirmed" ? "#ffffff" : "#146b3a",
-            border:
+              player.attendance_status === "confirmed"
+                ? "primary.contrastText"
+                : "primary.main",
+            border: (theme) =>
               player.attendance_status === "confirmed"
                 ? 0
-                : "2px solid #146b3a",
-            boxShadow:
+                : `2px solid ${theme.palette.primary.main}`,
+            boxShadow: (theme) =>
               player.attendance_status === "confirmed"
-                ? "0 3px 0 #0d4526"
+                ? `0 3px 0 ${theme.palette.primary.dark}`
                 : "none",
             "&:hover": {
-              bgcolor: (theme) =>
+              bgcolor:
                 player.attendance_status === "confirmed"
-                  ? "#0e5c31"
-                  : theme.palette.mode === "dark"
-                    ? "rgba(20, 107, 58, 0.15)"
-                    : "#f6f4ee",
+                  ? "primary.dark"
+                  : "action.hover",
             },
             transition: "all 0.15s ease",
           }}
@@ -188,43 +182,32 @@ export default function UserAttendanceStatus({
             fontWeight: 800,
             fontSize: "17px",
             letterSpacing: ".06em",
-            bgcolor: (theme) =>
+            bgcolor:
               player.attendance_status === "declined"
-                ? "#a8452a"
-                : theme.palette.mode === "dark"
-                  ? "background.paper"
-                  : "#ffffff",
-            color: (theme) =>
+                ? "secondary.main"
+                : "background.paper",
+            color:
               player.attendance_status === "declined"
-                ? "#ffffff"
-                : theme.palette.mode === "dark"
-                  ? "text.primary"
-                  : "#6b675c",
+                ? "secondary.contrastText"
+                : "text.secondary",
             border: (theme) =>
               player.attendance_status === "declined"
                 ? 0
-                : theme.palette.mode === "dark"
-                  ? "1px solid rgba(255,255,255,0.2)"
-                  : "2px solid #ddd8cc",
-            boxShadow:
+                : `1.5px solid ${theme.palette.divider}`,
+            boxShadow: (theme) =>
               player.attendance_status === "declined"
-                ? "0 3px 0 #732a17"
+                ? `0 3px 0 ${theme.palette.secondary.dark}`
                 : "none",
             "&:hover": {
-              borderColor: (theme) =>
-                theme.palette.mode === "dark" ? "text.primary" : "#17181a",
-              color: (theme) =>
+              borderColor: "text.primary",
+              color:
                 player.attendance_status === "declined"
-                  ? "#ffffff"
-                  : theme.palette.mode === "dark"
-                    ? "text.primary"
-                    : "#17181a",
-              bgcolor: (theme) =>
+                  ? "secondary.contrastText"
+                  : "text.primary",
+              bgcolor:
                 player.attendance_status === "declined"
-                  ? "#8a351e"
-                  : theme.palette.mode === "dark"
-                    ? "rgba(255,255,255,0.06)"
-                    : "#f6f4ee",
+                  ? "secondary.dark"
+                  : "action.hover",
             },
             transition: "all 0.15s ease",
           }}
@@ -248,28 +231,24 @@ export default function UserAttendanceStatus({
           fontWeight: 800,
           fontSize: "13px",
           letterSpacing: ".06em",
-          bgcolor: (theme) =>
+          bgcolor:
             player.attendance_status === "waitlist"
-              ? "#a8452a"
-              : theme.palette.mode === "dark"
-                ? "background.paper"
-                : "#ffffff",
+              ? "secondary.main"
+              : "background.paper",
           color:
-            player.attendance_status === "waitlist" ? "#ffffff" : "#a8452a",
+            player.attendance_status === "waitlist"
+              ? "secondary.contrastText"
+              : "secondary.main",
           border: (theme) =>
             player.attendance_status === "waitlist"
-              ? "2px solid #a8452a"
-              : theme.palette.mode === "dark"
-                ? "1px solid rgba(168, 69, 42, 0.4)"
-                : "2px solid #e2c9bd",
+              ? `2px solid ${theme.palette.secondary.main}`
+              : `1.5px solid ${theme.palette.divider}`,
           "&:hover": {
-            bgcolor: (theme) =>
+            bgcolor:
               player.attendance_status === "waitlist"
-                ? "#8a351e"
-                : theme.palette.mode === "dark"
-                  ? "rgba(168, 69, 42, 0.15)"
-                  : "#fdf6f3",
-            borderColor: "#a8452a",
+                ? "secondary.dark"
+                : "secondary.light",
+            borderColor: "secondary.dark",
           },
         }}
       >

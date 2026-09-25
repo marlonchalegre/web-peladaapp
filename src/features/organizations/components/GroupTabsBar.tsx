@@ -59,14 +59,15 @@ export default function GroupTabsBar({
     "&:hover": { color: "text.primary" },
     "&:focus-visible": {
       color: "text.primary",
-      outline: "2px solid #146b3a",
+      outline: "2px solid",
+      outlineColor: "primary.main",
       outlineOffset: "2px",
     },
   });
 
   const count = (value?: number) =>
     value && value > 0 ? (
-      <Box component="span" sx={{ color: "#a8452a" }}>
+      <Box component="span" sx={{ color: "secondary.main" }}>
         {value}
       </Box>
     ) : null;
@@ -77,8 +78,7 @@ export default function GroupTabsBar({
       aria-label="Group sub-navigation"
       sx={{
         width: "100%",
-        bgcolor: (theme) =>
-          theme.palette.mode === "dark" ? "background.paper" : "#ffffff",
+        bgcolor: "background.paper",
         borderBottom: "1.5px solid",
         borderColor: "divider",
         px: { xs: 2, md: 4, lg: 5 },

@@ -83,8 +83,7 @@ export default function PeladaTabsBar({
       aria-label="Pelada sub-navigation"
       sx={{
         width: "100%",
-        bgcolor: (theme) =>
-          theme.palette.mode === "dark" ? "background.paper" : "#ffffff",
+        bgcolor: "background.paper",
         borderBottom: "1.5px solid",
         borderColor: "divider",
         px: { xs: 2, md: 4, lg: 5 },
@@ -133,7 +132,8 @@ export default function PeladaTabsBar({
             <Box
               component="span"
               sx={{
-                color: active === "attendance" ? "#146b3a" : "#a8452a",
+                color:
+                  active === "attendance" ? "primary.main" : "secondary.main",
                 ml: 0.75,
                 fontWeight: 800,
               }}

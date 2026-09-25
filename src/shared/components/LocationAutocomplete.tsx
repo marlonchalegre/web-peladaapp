@@ -156,7 +156,7 @@ export default function LocationAutocomplete({
           >
             <LocationOnIcon
               fontSize="small"
-              sx={{ color: "#146b3a", mt: 0.3, flexShrink: 0 }}
+              sx={{ color: "primary.main", mt: 0.3, flexShrink: 0 }}
             />
             <Typography
               variant="body2"

@@ -117,21 +117,19 @@ export default function DrawJustificationCard({
             size="small"
             icon={
               <AutoAwesomeIcon
-                sx={{ "&&": { fontSize: "13px", color: "#146b3a" } }}
+                sx={{ "&&": { fontSize: "13px", color: "primary.main" } }}
               />
             }
             label="EQUILÍBRIO TÁTICO · GEMINI"
             sx={{
               bgcolor: (theme) =>
-                theme.palette.mode === "dark"
-                  ? "rgba(20, 107, 58, 0.15)"
-                  : "#f4f8f5",
-              border: "1px solid #146b3a",
+                theme.palette.status?.paid?.bg || "action.hover",
+              border: (theme) => `1px solid ${theme.palette.primary.main}`,
               fontFamily: "Archivo, sans-serif",
               fontWeight: 800,
               fontSize: "9px",
               letterSpacing: ".06em",
-              color: "#146b3a",
+              color: "primary.main",
               height: 22,
             }}
           />
@@ -141,7 +139,7 @@ export default function DrawJustificationCard({
             size="small"
             icon={
               <PsychologyIcon
-                sx={{ "&&": { fontSize: "13px", color: "#8a5800" } }}
+                sx={{ "&&": { fontSize: "13px", color: "gold.main" } }}
               />
             }
             label="POR REGRAS · GPT"
@@ -149,13 +147,15 @@ export default function DrawJustificationCard({
               bgcolor: (theme) =>
                 theme.palette.mode === "dark"
                   ? "rgba(242, 161, 0, 0.15)"
-                  : "#fff8eb",
-              border: "1px solid #f2a100",
+                  : theme.palette.gold?.light || "rgba(242, 161, 0, 0.15)",
+              border: (theme) =>
+                `1px solid ${theme.palette.gold?.main || theme.palette.primary.main}`,
               fontFamily: "Archivo, sans-serif",
               fontWeight: 800,
               fontSize: "9px",
               letterSpacing: ".06em",
-              color: "#8a5800",
+              color: (theme) =>
+                theme.palette.gold?.subtleText || theme.palette.text.secondary,
               height: 22,
             }}
           />
@@ -165,10 +165,7 @@ export default function DrawJustificationCard({
             size="small"
             label="CLÁSSICO"
             sx={{
-              bgcolor: (theme) =>
-                theme.palette.mode === "dark"
-                  ? "rgba(255,255,255,0.05)"
-                  : "#f6f4ee",
+              bgcolor: "background.default",
               border: "1px solid",
               borderColor: "divider",
               fontFamily: "Archivo, sans-serif",
@@ -191,8 +188,7 @@ export default function DrawJustificationCard({
             gap: 1,
             mb: 1.75,
             p: 1.25,
-            bgcolor: (theme) =>
-              theme.palette.mode === "dark" ? "background.default" : "#f6f4ee",
+            bgcolor: "background.default",
             borderRadius: "10px",
             border: "1px solid",
             borderColor: "divider",
@@ -241,8 +237,7 @@ export default function DrawJustificationCard({
                 fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                 fontWeight: 700,
                 fontSize: "16px",
-                color: (theme) =>
-                  theme.palette.mode === "dark" ? "#34a853" : "#146b3a",
+                color: "primary.main",
               }}
             >
               {justification.algorithm === "gpt"
@@ -343,7 +338,7 @@ export default function DrawJustificationCard({
                 width: 6,
                 height: 6,
                 borderRadius: "50%",
-                bgcolor: "#146b3a",
+                bgcolor: "primary.main",
                 flexShrink: 0,
                 mt: 0.6,
               }}
@@ -370,7 +365,7 @@ export default function DrawJustificationCard({
                 width: 6,
                 height: 6,
                 borderRadius: "50%",
-                bgcolor: "#146b3a",
+                bgcolor: "primary.main",
                 flexShrink: 0,
                 mt: 0.6,
               }}
@@ -399,7 +394,7 @@ export default function DrawJustificationCard({
                 width: 6,
                 height: 6,
                 borderRadius: "50%",
-                bgcolor: "#146b3a",
+                bgcolor: "primary.main",
                 flexShrink: 0,
                 mt: 0.6,
               }}
@@ -428,7 +423,7 @@ export default function DrawJustificationCard({
                   width: 6,
                   height: 6,
                   borderRadius: "50%",
-                  bgcolor: "#146b3a",
+                  bgcolor: "primary.main",
                   flexShrink: 0,
                   mt: 0.6,
                 }}
@@ -457,7 +452,7 @@ export default function DrawJustificationCard({
                 width: 6,
                 height: 6,
                 borderRadius: "50%",
-                bgcolor: "#146b3a",
+                bgcolor: "primary.main",
                 flexShrink: 0,
                 mt: 0.6,
               }}
@@ -485,7 +480,7 @@ export default function DrawJustificationCard({
                 width: 6,
                 height: 6,
                 borderRadius: "50%",
-                bgcolor: "#146b3a",
+                bgcolor: "primary.main",
                 flexShrink: 0,
                 mt: 0.6,
               }}
@@ -513,7 +508,7 @@ export default function DrawJustificationCard({
                 width: 6,
                 height: 6,
                 borderRadius: "50%",
-                bgcolor: "#146b3a",
+                bgcolor: "primary.main",
                 flexShrink: 0,
                 mt: 0.6,
               }}
@@ -541,7 +536,7 @@ export default function DrawJustificationCard({
                   width: 6,
                   height: 6,
                   borderRadius: "50%",
-                  bgcolor: "#146b3a",
+                  bgcolor: "primary.main",
                   flexShrink: 0,
                   mt: 0.6,
                 }}
@@ -569,7 +564,7 @@ export default function DrawJustificationCard({
                 width: 6,
                 height: 6,
                 borderRadius: "50%",
-                bgcolor: "#146b3a",
+                bgcolor: "primary.main",
                 flexShrink: 0,
                 mt: 0.6,
               }}
@@ -597,7 +592,7 @@ export default function DrawJustificationCard({
                 width: 6,
                 height: 6,
                 borderRadius: "50%",
-                bgcolor: "#a8452a",
+                bgcolor: "secondary.main",
                 flexShrink: 0,
                 mt: 0.6,
               }}
@@ -625,7 +620,7 @@ export default function DrawJustificationCard({
                 width: 6,
                 height: 6,
                 borderRadius: "50%",
-                bgcolor: "#a8452a",
+                bgcolor: "secondary.main",
                 flexShrink: 0,
                 mt: 0.6,
               }}
@@ -656,10 +651,7 @@ export default function DrawJustificationCard({
           color: "text.secondary",
           mt: 1.5,
           pt: 1.25,
-          borderTop: (theme) =>
-            theme.palette.mode === "dark"
-              ? "1.5px dashed rgba(255,255,255,0.12)"
-              : "1.5px dashed #ddd8cc",
+          borderTop: (theme) => `1.5px dashed ${theme.palette.divider}`,
         }}
       >
         Isso é preferência heurística, não previsão: nota equilibrada não
@@ -675,10 +667,7 @@ export default function DrawJustificationCard({
           onClick={onOpenDialog}
           sx={{
             mt: 1.75,
-            borderColor: (theme) =>
-              theme.palette.mode === "dark"
-                ? "rgba(255,255,255,0.2)"
-                : "#17181a",
+            borderColor: "divider",
             color: "text.primary",
             fontFamily: "Archivo, sans-serif",
             fontWeight: 800,
@@ -688,16 +677,8 @@ export default function DrawJustificationCard({
             py: 0.75,
             textTransform: "uppercase",
             "&:hover": {
-              bgcolor: (theme) =>
-                theme.palette.mode === "dark"
-                  ? "rgba(255,255,255,0.08)"
-                  : "#17181a",
-              color: (theme) =>
-                theme.palette.mode === "dark" ? "text.primary" : "#ffffff",
-              borderColor: (theme) =>
-                theme.palette.mode === "dark"
-                  ? "rgba(255,255,255,0.3)"
-                  : "#17181a",
+              bgcolor: "action.hover",
+              borderColor: "text.primary",
             },
           }}
         >

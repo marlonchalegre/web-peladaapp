@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
 interface UserGroupStatsGridProps {
   peladasPlayed: number;
@@ -13,13 +13,10 @@ export function UserGroupStatsGrid({
   assists,
   titles,
 }: UserGroupStatsGridProps) {
-  const theme = useTheme();
-  const assistColor = theme.palette.mode === "dark" ? "#4caf50" : "#146b3a";
-
   const items = [
     { label: "JOGOS", val: peladasPlayed, color: "text.primary" },
     { label: "GOLS", val: goals, color: "text.primary" },
-    { label: "ASSIST.", val: assists, color: assistColor },
+    { label: "ASSIST.", val: assists, color: "primary.main" },
     { label: "TÍTULOS", val: titles, color: "text.primary" },
   ];
 

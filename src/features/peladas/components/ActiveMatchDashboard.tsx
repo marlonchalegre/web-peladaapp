@@ -138,14 +138,13 @@ const bottomSheetPaperSx = {
 const EVENT_TYPES: {
   type: MatchEventType;
   label: string;
-  color: string;
 }[] = [
-  { type: "drible", label: "Drible", color: "#c9591c" },
-  { type: "chute", label: "Chute", color: "#1f5f9c" },
-  { type: "falta", label: "Falta", color: "#a8452a" },
-  { type: "furada", label: "Furada", color: "#8a857a" },
-  { type: "defesa", label: "Defesaça", color: "#146b3a" },
-  { type: "vish", label: "Vish", color: "#6b4b9c" },
+  { type: "drible", label: "Drible" },
+  { type: "chute", label: "Chute" },
+  { type: "falta", label: "Falta" },
+  { type: "furada", label: "Furada" },
+  { type: "defesa", label: "Defesaça" },
+  { type: "vish", label: "Vish" },
 ];
 
 export default function ActiveMatchDashboard(props: Props) {
@@ -327,11 +326,16 @@ export default function ActiveMatchDashboard(props: Props) {
 
       let color: string;
       if (row.teamId === match.home_team_id) {
-        color = "#c9591c";
+        color = "home.main";
       } else if (row.teamId === match.away_team_id) {
-        color = "#1f5f9c";
+        color = "away.main";
       } else {
-        const palette = ["#146b3a", "#6b4b9c", "#d97706", "#0284c7"];
+        const palette = [
+          "primary.main",
+          "matchEvents.vish",
+          "gold.main",
+          "matchEvents.chute",
+        ];
         color = palette[index % palette.length];
       }
 
@@ -442,7 +446,7 @@ export default function ActiveMatchDashboard(props: Props) {
   const teamSection = (side: "home" | "away") => {
     const list = side === "home" ? homeList : awayList;
     const name = side === "home" ? homeTeamName : awayTeamName;
-    const color = side === "home" ? "#c9591c" : "#1f5f9c";
+    const color = side === "home" ? "home.main" : "away.main";
     return (
       <Box data-testid={`${side}-team-match-section`} sx={{ minWidth: 0 }}>
         {isDesktop ? (
@@ -470,7 +474,7 @@ export default function ActiveMatchDashboard(props: Props) {
                 fontSize: "10px",
                 lineHeight: 1,
                 letterSpacing: "0.14em",
-                color: "#6b675c",
+                color: "text.secondary",
               }}
             >
               {name.toUpperCase()}
@@ -539,8 +543,8 @@ export default function ActiveMatchDashboard(props: Props) {
   const liveStandingsCard = (
     <Box
       sx={{
-        bgcolor: "#fff",
-        border: "1.5px solid #e4e0d6",
+        bgcolor: "background.paper",
+        border: (theme) => `1.5px solid ${theme.palette.divider}`,
         borderRadius: "13px",
         px: "13px",
         py: "12px",
@@ -554,7 +558,7 @@ export default function ActiveMatchDashboard(props: Props) {
           fontSize: "9.5px",
           lineHeight: 1,
           letterSpacing: "0.14em",
-          color: "#8a857a",
+          color: "text.secondary",
           mb: "9px",
         }}
       >
@@ -571,7 +575,7 @@ export default function ActiveMatchDashboard(props: Props) {
             alignItems: "center",
             gap: "8px",
             py: "7px",
-            borderTop: "1px solid #efece4",
+            borderTop: (theme) => `1px solid ${theme.palette.divider}`,
           }}
         >
           <Typography
@@ -580,7 +584,7 @@ export default function ActiveMatchDashboard(props: Props) {
               fontWeight: 800,
               fontSize: "11px",
               lineHeight: 1,
-              color: "#8a857a",
+              color: "text.secondary",
               width: "18px",
               flexShrink: 0,
             }}
@@ -604,7 +608,7 @@ export default function ActiveMatchDashboard(props: Props) {
                 fontWeight: row.isPlaying ? 900 : 700,
                 fontSize: "12px",
                 lineHeight: 1,
-                color: "#1a1a1a",
+                color: "text.primary",
                 textTransform: "uppercase",
               }}
             >
@@ -616,7 +620,7 @@ export default function ActiveMatchDashboard(props: Props) {
                 fontSize: "9.5px",
                 fontWeight: 600,
                 lineHeight: 1,
-                color: "#8a857a",
+                color: "text.secondary",
                 mt: "3px",
               }}
             >
@@ -628,7 +632,7 @@ export default function ActiveMatchDashboard(props: Props) {
               fontFamily: "'Anton', sans-serif",
               fontSize: "20px",
               lineHeight: 1,
-              color: "#1a1a1a",
+              color: "text.primary",
             }}
           >
             {row.p}
@@ -647,8 +651,8 @@ export default function ActiveMatchDashboard(props: Props) {
         <Box
           sx={{
             p: "12px 14px",
-            bgcolor: "#fff",
-            border: "1.5px solid #e4e0d6",
+            bgcolor: "background.paper",
+            border: (theme) => `1.5px solid ${theme.palette.divider}`,
             borderRadius: "13px",
           }}
           data-testid="next-match-card"
@@ -660,7 +664,7 @@ export default function ActiveMatchDashboard(props: Props) {
               fontSize: "9.5px",
               lineHeight: 1,
               letterSpacing: "0.14em",
-              color: "#8a857a",
+              color: "text.secondary",
             }}
           >
             {t("peladas.dashboard.summary.next_up", "A SEGUIR")}
@@ -678,7 +682,7 @@ export default function ActiveMatchDashboard(props: Props) {
                 width: 10,
                 height: 10,
                 borderRadius: "50%",
-                bgcolor: "#c9591c",
+                bgcolor: "home.main",
                 border: "1px solid rgba(0,0,0,0.15)",
                 flexShrink: 0,
               }}
@@ -690,7 +694,7 @@ export default function ActiveMatchDashboard(props: Props) {
                 fontWeight: 800,
                 fontSize: "13px",
                 lineHeight: 1,
-                color: "#1a1a1a",
+                color: "text.primary",
               }}
             >
               {homeName.toUpperCase()}
@@ -702,7 +706,7 @@ export default function ActiveMatchDashboard(props: Props) {
                 fontSize: "10px",
                 lineHeight: 1,
                 letterSpacing: "0.08em",
-                color: "#8a857a",
+                color: "text.secondary",
               }}
             >
               LARANJA
@@ -713,7 +717,7 @@ export default function ActiveMatchDashboard(props: Props) {
                 fontWeight: 600,
                 fontSize: "11px",
                 lineHeight: 1,
-                color: "#8a857a",
+                color: "text.secondary",
               }}
             >
               vs
@@ -732,7 +736,7 @@ export default function ActiveMatchDashboard(props: Props) {
                 width: 10,
                 height: 10,
                 borderRadius: "50%",
-                bgcolor: "#1f5f9c",
+                bgcolor: "away.main",
                 border: "1px solid rgba(0,0,0,0.15)",
                 flexShrink: 0,
               }}
@@ -744,7 +748,7 @@ export default function ActiveMatchDashboard(props: Props) {
                 fontWeight: 800,
                 fontSize: "13px",
                 lineHeight: 1,
-                color: "#1a1a1a",
+                color: "text.primary",
               }}
             >
               {awayName.toUpperCase()}
@@ -756,7 +760,7 @@ export default function ActiveMatchDashboard(props: Props) {
                 fontSize: "10px",
                 lineHeight: 1,
                 letterSpacing: "0.08em",
-                color: "#8a857a",
+                color: "text.secondary",
               }}
             >
               AZUL
@@ -774,7 +778,7 @@ export default function ActiveMatchDashboard(props: Props) {
           mt: 0,
           mb: "8px",
           p: "12px 14px",
-          bgcolor: "#efece4",
+          bgcolor: "action.hover",
           borderRadius: "13px",
         }}
         data-testid="next-match-card"
@@ -786,7 +790,7 @@ export default function ActiveMatchDashboard(props: Props) {
             fontSize: "10px",
             lineHeight: 1,
             letterSpacing: "0.14em",
-            color: "#8a857a",
+            color: "text.secondary",
           }}
         >
           {t("peladas.dashboard.summary.next_up", "A SEGUIR")}
@@ -805,7 +809,7 @@ export default function ActiveMatchDashboard(props: Props) {
               width: 10,
               height: 10,
               borderRadius: "50%",
-              bgcolor: "#c9591c",
+              bgcolor: "home.main",
               border: "1px solid rgba(0,0,0,0.15)",
               flexShrink: 0,
             }}
@@ -817,7 +821,7 @@ export default function ActiveMatchDashboard(props: Props) {
               fontWeight: 800,
               fontSize: "12.5px",
               lineHeight: 1,
-              color: "#1a1a1a",
+              color: "text.primary",
             }}
           >
             {homeName}
@@ -828,7 +832,7 @@ export default function ActiveMatchDashboard(props: Props) {
               fontWeight: 600,
               fontSize: "11px",
               lineHeight: 1,
-              color: "#8a857a",
+              color: "text.secondary",
             }}
           >
             vs
@@ -838,7 +842,7 @@ export default function ActiveMatchDashboard(props: Props) {
               width: 10,
               height: 10,
               borderRadius: "50%",
-              bgcolor: "#1f5f9c",
+              bgcolor: "away.main",
               border: "1px solid rgba(0,0,0,0.15)",
               flexShrink: 0,
             }}
@@ -850,7 +854,7 @@ export default function ActiveMatchDashboard(props: Props) {
               fontWeight: 800,
               fontSize: "12.5px",
               lineHeight: 1,
-              color: "#1a1a1a",
+              color: "text.primary",
             }}
           >
             {awayName}
@@ -868,9 +872,9 @@ export default function ActiveMatchDashboard(props: Props) {
           data-testid="go-to-standings-button"
           sx={{
             flex: 1,
-            border: "1.5px solid #ddd8cc",
-            bgcolor: "#fff",
-            color: "#6b675c",
+            border: (theme) => `1.5px solid ${theme.palette.divider}`,
+            bgcolor: "background.paper",
+            color: "text.secondary",
             borderRadius: "11px",
             py: withEnd ? "12px" : "11px",
             fontFamily: "Archivo, sans-serif",
@@ -878,7 +882,7 @@ export default function ActiveMatchDashboard(props: Props) {
             fontSize: withEnd ? "11px" : "10.5px",
             lineHeight: 1,
             letterSpacing: "0.05em",
-            "&:hover": { borderColor: "#6b675c" },
+            "&:hover": { borderColor: "text.primary", color: "text.primary" },
           }}
         >
           {t("peladas.dashboard.live_state.table_button", "TABELA")}
@@ -890,9 +894,9 @@ export default function ActiveMatchDashboard(props: Props) {
           data-testid="go-to-timeline-button"
           sx={{
             flex: 1,
-            border: "1.5px solid #ddd8cc",
-            bgcolor: "#fff",
-            color: "#6b675c",
+            border: (theme) => `1.5px solid ${theme.palette.divider}`,
+            bgcolor: "background.paper",
+            color: "text.secondary",
             borderRadius: "11px",
             py: withEnd ? "12px" : "11px",
             fontFamily: "Archivo, sans-serif",
@@ -900,7 +904,7 @@ export default function ActiveMatchDashboard(props: Props) {
             fontSize: withEnd ? "11px" : "10.5px",
             lineHeight: 1,
             letterSpacing: "0.05em",
-            "&:hover": { borderColor: "#6b675c" },
+            "&:hover": { borderColor: "text.primary", color: "text.primary" },
           }}
         >
           {t("peladas.dashboard.live_state.sumula_button", "SÚMULA")}
@@ -912,9 +916,10 @@ export default function ActiveMatchDashboard(props: Props) {
           data-testid="end-match-button"
           sx={{
             flex: 1,
-            border: "1.5px solid #e2c3bb",
-            bgcolor: "#fff",
-            color: "#a8452a",
+            border: (theme) =>
+              `1.5px solid ${theme.palette.mode === "dark" ? theme.palette.secondary.dark : theme.palette.secondary.light}`,
+            bgcolor: "background.paper",
+            color: "secondary.main",
             borderRadius: "11px",
             py: "12px",
             fontFamily: "Archivo, sans-serif",
@@ -923,7 +928,11 @@ export default function ActiveMatchDashboard(props: Props) {
             lineHeight: 1,
             letterSpacing: "0.05em",
             "&:hover": {
-              borderColor: "#a8452a",
+              borderColor: "secondary.main",
+              bgcolor: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "rgba(224, 108, 80, 0.12)"
+                  : "secondary.light",
             },
           }}
         >
@@ -960,7 +969,7 @@ export default function ActiveMatchDashboard(props: Props) {
           fontWeight: 700,
           fontSize: "11.5px",
           lineHeight: 1,
-          color: "#146b3a",
+          color: "primary.main",
           "&:hover": { bgcolor: "transparent", textDecoration: "underline" },
         }}
       >
@@ -973,7 +982,7 @@ export default function ActiveMatchDashboard(props: Props) {
         <Box
           sx={{
             p: "12px 14px",
-            border: "1.5px dashed #ddd8cc",
+            border: (theme) => `1.5px dashed ${theme.palette.divider}`,
             borderRadius: "13px",
           }}
           data-testid="active-match-support-lineup-card"
@@ -985,7 +994,7 @@ export default function ActiveMatchDashboard(props: Props) {
               fontSize: "9.5px",
               lineHeight: 1,
               letterSpacing: "0.14em",
-              color: "#8a857a",
+              color: "text.secondary",
             }}
           >
             {t("peladas.dashboard.live_state.support_label", "SUPORTE")}
@@ -1011,7 +1020,7 @@ export default function ActiveMatchDashboard(props: Props) {
                 <VideocamOutlinedIcon
                   data-testid="support-camera-icon"
                   aria-label={camTitle}
-                  sx={{ fontSize: 16, color: "#8a857a", flexShrink: 0 }}
+                  sx={{ fontSize: 16, color: "text.secondary", flexShrink: 0 }}
                 />
               </Tooltip>
               <Typography
@@ -1021,7 +1030,7 @@ export default function ActiveMatchDashboard(props: Props) {
                   fontWeight: 600,
                   fontSize: "12px",
                   lineHeight: 1.2,
-                  color: "#6b675c",
+                  color: "text.secondary",
                 }}
               >
                 {cam || unassigned}
@@ -1041,7 +1050,7 @@ export default function ActiveMatchDashboard(props: Props) {
                 <AssignmentOutlinedIcon
                   data-testid="support-stats-icon"
                   aria-label={statsTitle}
-                  sx={{ fontSize: 16, color: "#8a857a", flexShrink: 0 }}
+                  sx={{ fontSize: 16, color: "text.secondary", flexShrink: 0 }}
                 />
               </Tooltip>
               <Typography
@@ -1051,7 +1060,7 @@ export default function ActiveMatchDashboard(props: Props) {
                   fontWeight: 600,
                   fontSize: "12px",
                   lineHeight: 1.2,
-                  color: "#6b675c",
+                  color: "text.secondary",
                 }}
               >
                 {stats || unassigned}
@@ -1071,7 +1080,7 @@ export default function ActiveMatchDashboard(props: Props) {
           mt: 0,
           mb: "12px",
           p: "12px 14px",
-          border: "1.5px dashed #ddd8cc",
+          border: (theme) => `1.5px dashed ${theme.palette.divider}`,
           borderRadius: "13px",
         }}
         data-testid="active-match-support-lineup-card"
@@ -1083,7 +1092,7 @@ export default function ActiveMatchDashboard(props: Props) {
             fontSize: "10px",
             lineHeight: 1,
             letterSpacing: "0.14em",
-            color: "#8a857a",
+            color: "text.secondary",
             flexShrink: 0,
           }}
         >
@@ -1114,7 +1123,7 @@ export default function ActiveMatchDashboard(props: Props) {
               <VideocamOutlinedIcon
                 data-testid="support-camera-icon"
                 aria-label={camTitle}
-                sx={{ fontSize: 15, color: "#8a857a", flexShrink: 0 }}
+                sx={{ fontSize: 15, color: "text.secondary", flexShrink: 0 }}
               />
             </Tooltip>
             <Typography
@@ -1124,7 +1133,7 @@ export default function ActiveMatchDashboard(props: Props) {
                 fontWeight: 600,
                 fontSize: "11.5px",
                 lineHeight: 1.2,
-                color: "#6b675c",
+                color: "text.secondary",
               }}
             >
               {cam || unassigned}
@@ -1145,7 +1154,7 @@ export default function ActiveMatchDashboard(props: Props) {
               <AssignmentOutlinedIcon
                 data-testid="support-stats-icon"
                 aria-label={statsTitle}
-                sx={{ fontSize: 15, color: "#8a857a", flexShrink: 0 }}
+                sx={{ fontSize: 15, color: "text.secondary", flexShrink: 0 }}
               />
             </Tooltip>
             <Typography
@@ -1155,7 +1164,7 @@ export default function ActiveMatchDashboard(props: Props) {
                 fontWeight: 600,
                 fontSize: "11.5px",
                 lineHeight: 1.2,
-                color: "#6b675c",
+                color: "text.secondary",
               }}
             >
               {stats || unassigned}
@@ -1179,15 +1188,15 @@ export default function ActiveMatchDashboard(props: Props) {
             display: "flex",
             alignItems: "center",
             gap: "9px",
-            border: "2px solid #e4e0d6",
-            bgcolor: "#fff",
+            border: (theme) => `1.5px solid ${theme.palette.divider}`,
+            bgcolor: "background.paper",
             borderRadius: "14px",
             p: "15px 13px",
             cursor: "pointer",
             textAlign: "left",
             "&:hover": {
-              borderColor: "#123c26",
-              bgcolor: "#f2f8f4",
+              borderColor: "primary.main",
+              bgcolor: "action.hover",
             },
           }}
         >
@@ -1196,7 +1205,7 @@ export default function ActiveMatchDashboard(props: Props) {
               width: 9,
               height: 9,
               borderRadius: "50%",
-              bgcolor: ev.color,
+              bgcolor: (theme) => theme.palette.matchEvents[ev.type],
               flexShrink: 0,
             }}
           />
@@ -1206,7 +1215,7 @@ export default function ActiveMatchDashboard(props: Props) {
               fontWeight: 800,
               fontSize: "13.5px",
               lineHeight: 1,
-              color: "#1a1a1a",
+              color: "text.primary",
             }}
           >
             {ev.label}
@@ -1253,15 +1262,15 @@ export default function ActiveMatchDashboard(props: Props) {
               flexDirection: "column",
               alignItems: "flex-start",
               gap: "4px",
-              border: "2px solid #e4e0d6",
-              bgcolor: "#fff",
+              border: (theme) => `1.5px solid ${theme.palette.divider}`,
+              bgcolor: "background.paper",
               borderRadius: "14px",
               p: "13px 12px",
               cursor: "pointer",
               textAlign: "left",
               "&:hover": {
-                borderColor: "#123c26",
-                bgcolor: "#f2f8f4",
+                borderColor: "primary.main",
+                bgcolor: "action.hover",
               },
             }}
           >
@@ -1271,7 +1280,7 @@ export default function ActiveMatchDashboard(props: Props) {
                 fontWeight: 700,
                 fontSize: "13px",
                 lineHeight: 1.15,
-                color: "#1a1a1a",
+                color: "text.primary",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
@@ -1289,7 +1298,7 @@ export default function ActiveMatchDashboard(props: Props) {
                 fontSize: "9.5px",
                 lineHeight: 1,
                 letterSpacing: "0.08em",
-                color: "#8a857a",
+                color: "text.secondary",
               }}
             >
               <span>{positionLabel(p)}</span>
@@ -1363,15 +1372,16 @@ export default function ActiveMatchDashboard(props: Props) {
                     gap: "12px",
                     border: 0,
                     borderRadius: "16px",
-                    bgcolor: "#c9591c",
-                    color: "#fff",
+                    bgcolor: "home.main",
+                    color: "home.contrastText",
                     py: "17px",
                     cursor: "pointer",
-                    boxShadow: "0 4px 0 #8f3d12",
-                    "&:hover": { bgcolor: "#a8480f" },
+                    boxShadow: (theme) => `0 4px 0 ${theme.palette.home.dark}`,
+                    "&:hover": { bgcolor: "home.dark" },
                     "&:active": {
                       transform: "translateY(3px)",
-                      boxShadow: "0 1px 0 #8f3d12",
+                      boxShadow: (theme) =>
+                        `0 1px 0 ${theme.palette.home.dark}`,
                     },
                   }}
                 >
@@ -1395,7 +1405,7 @@ export default function ActiveMatchDashboard(props: Props) {
                       fontSize: "11px",
                       lineHeight: 1,
                       letterSpacing: "0.14em",
-                      color: "#f3c19c",
+                      color: "home.light",
                     }}
                   >
                     {homeTeamName.toUpperCase()}
@@ -1413,15 +1423,16 @@ export default function ActiveMatchDashboard(props: Props) {
                     gap: "12px",
                     border: 0,
                     borderRadius: "16px",
-                    bgcolor: "#1f5f9c",
-                    color: "#fff",
+                    bgcolor: "away.main",
+                    color: "away.contrastText",
                     py: "17px",
                     cursor: "pointer",
-                    boxShadow: "0 4px 0 #164674",
-                    "&:hover": { bgcolor: "#19507f" },
+                    boxShadow: (theme) => `0 4px 0 ${theme.palette.away.dark}`,
+                    "&:hover": { bgcolor: "away.dark" },
                     "&:active": {
                       transform: "translateY(3px)",
-                      boxShadow: "0 1px 0 #164674",
+                      boxShadow: (theme) =>
+                        `0 1px 0 ${theme.palette.away.dark}`,
                     },
                   }}
                 >
@@ -1445,7 +1456,7 @@ export default function ActiveMatchDashboard(props: Props) {
                       fontSize: "11px",
                       lineHeight: 1,
                       letterSpacing: "0.14em",
-                      color: "#a9caea",
+                      color: "away.light",
                     }}
                   >
                     {awayTeamName.toUpperCase()}
@@ -1462,15 +1473,15 @@ export default function ActiveMatchDashboard(props: Props) {
                     flexDirection: "column",
                     alignItems: "center",
                     gap: "5px",
-                    border: "1.5px solid #ddd8cc",
+                    border: (theme) => `1.5px solid ${theme.palette.divider}`,
                     borderRadius: "16px",
-                    bgcolor: "#fff",
-                    color: "#123c26",
+                    bgcolor: "background.paper",
+                    color: "text.primary",
                     py: "14px",
                     cursor: "pointer",
                     "&:hover": {
-                      borderColor: "#123c26",
-                      bgcolor: "#f2f8f4",
+                      borderColor: "primary.main",
+                      bgcolor: "action.hover",
                     },
                   }}
                 >
@@ -1496,7 +1507,7 @@ export default function ActiveMatchDashboard(props: Props) {
                       fontSize: "9.5px",
                       lineHeight: 1,
                       letterSpacing: "0.06em",
-                      color: "#8a857a",
+                      color: "text.secondary",
                     }}
                   >
                     DRIBLE · CHUTE · FALTA · DEFESAÇA
@@ -1523,8 +1534,8 @@ export default function ActiveMatchDashboard(props: Props) {
           {/* Coluna Direita: Classificação ao vivo + Linha do tempo + A seguir + Suporte + Botões Tabela/Súmula */}
           <Box
             sx={{
-              borderLeft: "1.5px solid #e4e0d6",
-              bgcolor: "#f1eee6",
+              borderLeft: (theme) => `1.5px solid ${theme.palette.divider}`,
+              bgcolor: "background.default",
               p: "22px 22px 22px 20px",
               display: "flex",
               flexDirection: "column",
@@ -1583,8 +1594,8 @@ export default function ActiveMatchDashboard(props: Props) {
 
             <Box
               sx={{
-                bgcolor: "#fff",
-                border: "1.5px solid #e4e0d6",
+                bgcolor: "background.paper",
+                border: (theme) => `1.5px solid ${theme.palette.divider}`,
                 borderRadius: "15px",
                 p: "14px",
               }}
@@ -1605,7 +1616,7 @@ export default function ActiveMatchDashboard(props: Props) {
                     fontSize: "10px",
                     lineHeight: 1,
                     letterSpacing: "0.16em",
-                    color: "#6b675c",
+                    color: "text.secondary",
                   }}
                 >
                   {t("peladas.dashboard.live_state.on_field", "EM CAMPO")}
@@ -1616,7 +1627,7 @@ export default function ActiveMatchDashboard(props: Props) {
                     fontSize: "10px",
                     fontWeight: 600,
                     lineHeight: 1,
-                    color: "#8a857a",
+                    color: "text.secondary",
                   }}
                 >
                   {t(
@@ -1637,9 +1648,9 @@ export default function ActiveMatchDashboard(props: Props) {
                 sx={{
                   width: "100%",
                   mt: "12px",
-                  border: "1.5px dashed #ddd8cc",
+                  border: (theme) => `1.5px dashed ${theme.palette.divider}`,
                   bgcolor: "transparent",
-                  color: "#146b3a",
+                  color: "primary.main",
                   borderRadius: "12px",
                   py: "11px",
                   fontFamily: "Archivo, sans-serif",
@@ -1649,8 +1660,8 @@ export default function ActiveMatchDashboard(props: Props) {
                   letterSpacing: "0.1em",
                   cursor: "pointer",
                   "&:hover": {
-                    borderColor: "#146b3a",
-                    bgcolor: "#f2f8f4",
+                    borderColor: "primary.main",
+                    bgcolor: "action.hover",
                   },
                 }}
               >
@@ -1686,9 +1697,9 @@ export default function ActiveMatchDashboard(props: Props) {
                   sx={{
                     width: "100%",
                     mb: "9px",
-                    border: "1.5px solid #ddd8cc",
-                    bgcolor: "#fff",
-                    color: "#123c26",
+                    border: (theme) => `1.5px solid ${theme.palette.divider}`,
+                    bgcolor: "background.paper",
+                    color: "text.primary",
                     borderRadius: "13px",
                     py: "13px",
                     fontFamily: "Archivo, sans-serif",
@@ -1698,8 +1709,8 @@ export default function ActiveMatchDashboard(props: Props) {
                     letterSpacing: "0.08em",
                     cursor: "pointer",
                     "&:hover": {
-                      borderColor: "#123c26",
-                      bgcolor: "#f2f8f4",
+                      borderColor: "primary.main",
+                      bgcolor: "action.hover",
                     },
                   }}
                 >
@@ -1717,16 +1728,18 @@ export default function ActiveMatchDashboard(props: Props) {
                       flex: 1,
                       border: 0,
                       borderRadius: "16px",
-                      bgcolor: "#c9591c",
-                      color: "#fff",
+                      bgcolor: "home.main",
+                      color: "home.contrastText",
                       py: "18px",
                       pb: "20px",
                       cursor: "pointer",
-                      boxShadow: "0 4px 0 #8f3d12",
-                      "&:hover": { bgcolor: "#a8480f" },
+                      boxShadow: (theme) =>
+                        `0 4px 0 ${theme.palette.home.dark}`,
+                      "&:hover": { bgcolor: "home.dark" },
                       "&:active": {
                         transform: "translateY(3px)",
-                        boxShadow: "0 1px 0 #8f3d12",
+                        boxShadow: (theme) =>
+                          `0 1px 0 ${theme.palette.home.dark}`,
                       },
                     }}
                   >
@@ -1753,7 +1766,7 @@ export default function ActiveMatchDashboard(props: Props) {
                           fontSize: "10px",
                           lineHeight: 1,
                           letterSpacing: "0.14em",
-                          color: "#f3c19c",
+                          color: "home.light",
                           mt: "6px",
                         }}
                       >
@@ -1771,16 +1784,18 @@ export default function ActiveMatchDashboard(props: Props) {
                       flex: 1,
                       border: 0,
                       borderRadius: "16px",
-                      bgcolor: "#1f5f9c",
-                      color: "#fff",
+                      bgcolor: "away.main",
+                      color: "away.contrastText",
                       py: "18px",
                       pb: "20px",
                       cursor: "pointer",
-                      boxShadow: "0 4px 0 #164674",
-                      "&:hover": { bgcolor: "#19507f" },
+                      boxShadow: (theme) =>
+                        `0 4px 0 ${theme.palette.away.dark}`,
+                      "&:hover": { bgcolor: "away.dark" },
                       "&:active": {
                         transform: "translateY(3px)",
-                        boxShadow: "0 1px 0 #164674",
+                        boxShadow: (theme) =>
+                          `0 1px 0 ${theme.palette.away.dark}`,
                       },
                     }}
                   >
@@ -1807,7 +1822,7 @@ export default function ActiveMatchDashboard(props: Props) {
                           fontSize: "10px",
                           lineHeight: 1,
                           letterSpacing: "0.14em",
-                          color: "#a9caea",
+                          color: "away.light",
                           mt: "6px",
                         }}
                       >
@@ -1872,10 +1887,10 @@ export default function ActiveMatchDashboard(props: Props) {
                 borderRadius: "50%",
                 bgcolor:
                   goalSheet?.step === "own_goal"
-                    ? "#a8452a"
+                    ? "secondary.main"
                     : goalSheet?.side === "away"
-                      ? "#1f5f9c"
-                      : "#c9591c",
+                      ? "away.main"
+                      : "home.main",
                 flexShrink: 0,
               }}
             />
@@ -1887,7 +1902,7 @@ export default function ActiveMatchDashboard(props: Props) {
                 fontSize: "10px",
                 lineHeight: 1,
                 letterSpacing: "0.16em",
-                color: "#6b675c",
+                color: "text.secondary",
               }}
             >
               {goalSheet?.step === "own_goal"
@@ -1898,9 +1913,10 @@ export default function ActiveMatchDashboard(props: Props) {
               onClick={() => setGoalSheet(null)}
               aria-label={t("common.close")}
               sx={{
-                border: "1.5px solid #ddd8cc",
-                bgcolor: "#fff",
-                color: "#6b675c",
+                border: "1.5px solid",
+                borderColor: "divider",
+                bgcolor: "background.paper",
+                color: "text.secondary",
                 width: 30,
                 height: 30,
                 borderRadius: "10px",
@@ -1910,8 +1926,8 @@ export default function ActiveMatchDashboard(props: Props) {
                 lineHeight: 1,
                 p: 0,
                 "&:hover": {
-                  borderColor: "#a8452a",
-                  color: "#a8452a",
+                  borderColor: "error.main",
+                  color: "error.main",
                 },
               }}
             >
@@ -1925,7 +1941,7 @@ export default function ActiveMatchDashboard(props: Props) {
               fontWeight: 800,
               fontSize: { xs: "21px", sm: "22px" },
               lineHeight: 1.2,
-              color: "#1a1a1a",
+              color: "text.primary",
               mb: "14px",
             }}
             data-testid="goal-sheet-question"
@@ -1971,8 +1987,8 @@ export default function ActiveMatchDashboard(props: Props) {
                   mt: "12px",
                   border: 0,
                   borderRadius: "13px",
-                  bgcolor: "#123c26",
-                  color: "#fff",
+                  bgcolor: "primary.main",
+                  color: "primary.contrastText",
                   py: "15px",
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 800,
@@ -1980,7 +1996,7 @@ export default function ActiveMatchDashboard(props: Props) {
                   lineHeight: 1,
                   letterSpacing: "0.06em",
                   cursor: "pointer",
-                  "&:hover": { bgcolor: "#0d2e1d" },
+                  "&:hover": { bgcolor: "primary.dark" },
                 }}
               >
                 {t("peladas.matches.own_goal_btn", "GOL CONTRA")}
@@ -1993,14 +2009,14 @@ export default function ActiveMatchDashboard(props: Props) {
                   mt: "6px",
                   borderRadius: "13px",
                   bgcolor: "transparent",
-                  color: "#6b675c",
+                  color: "text.secondary",
                   py: "10px",
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 700,
                   fontSize: "11px",
                   letterSpacing: "0.06em",
                   cursor: "pointer",
-                  "&:hover": { bgcolor: "#efece4" },
+                  "&:hover": { bgcolor: "action.hover" },
                 }}
               >
                 {t("peladas.matches.goal_unidentified", "GOL NÃO IDENTIFICADO")}
@@ -2022,8 +2038,8 @@ export default function ActiveMatchDashboard(props: Props) {
                   mt: "12px",
                   border: 0,
                   borderRadius: "13px",
-                  bgcolor: "#123c26",
-                  color: "#fff",
+                  bgcolor: "primary.main",
+                  color: "primary.contrastText",
                   py: "15px",
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 800,
@@ -2031,7 +2047,7 @@ export default function ActiveMatchDashboard(props: Props) {
                   lineHeight: 1,
                   letterSpacing: "0.06em",
                   cursor: "pointer",
-                  "&:hover": { bgcolor: "#0d2e1d" },
+                  "&:hover": { bgcolor: "primary.dark" },
                 }}
               >
                 SEM ASSISTÊNCIA
@@ -2052,7 +2068,8 @@ export default function ActiveMatchDashboard(props: Props) {
                     width: 7,
                     height: 7,
                     borderRadius: "50%",
-                    bgcolor: goalSheet?.side === "home" ? "#1f5f9c" : "#c9591c",
+                    bgcolor:
+                      goalSheet?.side === "home" ? "away.main" : "home.main",
                   }}
                 />
                 <Typography
@@ -2062,7 +2079,7 @@ export default function ActiveMatchDashboard(props: Props) {
                     fontSize: "11px",
                     lineHeight: 1,
                     letterSpacing: "0.08em",
-                    color: "#6b675c",
+                    color: "text.secondary",
                     textTransform: "uppercase",
                   }}
                 >
@@ -2089,8 +2106,8 @@ export default function ActiveMatchDashboard(props: Props) {
                   mt: "12px",
                   border: 0,
                   borderRadius: "13px",
-                  bgcolor: "#123c26",
-                  color: "#fff",
+                  bgcolor: "primary.main",
+                  color: "primary.contrastText",
                   py: "15px",
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 800,
@@ -2098,7 +2115,7 @@ export default function ActiveMatchDashboard(props: Props) {
                   lineHeight: 1,
                   letterSpacing: "0.06em",
                   cursor: "pointer",
-                  "&:hover": { bgcolor: "#0d2e1d" },
+                  "&:hover": { bgcolor: "primary.dark" },
                 }}
               >
                 {t(
@@ -2119,14 +2136,14 @@ export default function ActiveMatchDashboard(props: Props) {
                   mt: "6px",
                   borderRadius: "13px",
                   bgcolor: "transparent",
-                  color: "#6b675c",
+                  color: "text.secondary",
                   py: "10px",
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 700,
                   fontSize: "11px",
                   letterSpacing: "0.06em",
                   cursor: "pointer",
-                  "&:hover": { bgcolor: "#efece4" },
+                  "&:hover": { bgcolor: "action.hover" },
                 }}
               >
                 {t("common.back", "VOLTAR")}
@@ -2157,7 +2174,7 @@ export default function ActiveMatchDashboard(props: Props) {
                 width: 9,
                 height: 9,
                 borderRadius: "50%",
-                bgcolor: "#6b675c",
+                bgcolor: "text.secondary",
                 flexShrink: 0,
               }}
             />
@@ -2169,7 +2186,7 @@ export default function ActiveMatchDashboard(props: Props) {
                 fontSize: "10px",
                 lineHeight: 1,
                 letterSpacing: "0.16em",
-                color: "#6b675c",
+                color: "text.secondary",
               }}
             >
               {`REGISTRAR LANCE · ${clockLabel}`}
@@ -2178,9 +2195,10 @@ export default function ActiveMatchDashboard(props: Props) {
               onClick={() => setEventSheet(null)}
               aria-label={t("common.close")}
               sx={{
-                border: "1.5px solid #ddd8cc",
-                bgcolor: "#fff",
-                color: "#6b675c",
+                border: "1.5px solid",
+                borderColor: "divider",
+                bgcolor: "background.paper",
+                color: "text.secondary",
                 width: 30,
                 height: 30,
                 borderRadius: "10px",
@@ -2190,8 +2208,8 @@ export default function ActiveMatchDashboard(props: Props) {
                 lineHeight: 1,
                 p: 0,
                 "&:hover": {
-                  borderColor: "#a8452a",
-                  color: "#a8452a",
+                  borderColor: "error.main",
+                  color: "error.main",
                 },
               }}
             >
@@ -2205,7 +2223,7 @@ export default function ActiveMatchDashboard(props: Props) {
               fontWeight: 800,
               fontSize: { xs: "21px", sm: "22px" },
               lineHeight: 1.2,
-              color: "#1a1a1a",
+              color: "text.primary",
               mb: "14px",
             }}
           >
@@ -2231,13 +2249,14 @@ export default function ActiveMatchDashboard(props: Props) {
                   mt: "12px",
                   borderRadius: "13px",
                   bgcolor: "transparent",
-                  color: "#6b675c",
+                  color: "text.secondary",
                   py: "12px",
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 800,
                   fontSize: "11px",
                   lineHeight: 1,
                   letterSpacing: "0.06em",
+                  "&:hover": { bgcolor: "action.hover" },
                 }}
               >
                 {t("common.back", "VOLTAR")}

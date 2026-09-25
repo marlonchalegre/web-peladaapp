@@ -148,18 +148,19 @@ export default function OrganizationDetailDesktopView({
               width: 46,
               height: 46,
               borderRadius: "50%",
-              bgcolor: "#146b3a",
+              bgcolor: "primary.main",
               border: (theme) =>
                 theme.palette.mode === "dark"
-                  ? "2.5px solid #2d3035"
-                  : "2.5px solid #17181a",
+                  ? `2.5px solid ${theme.palette.divider}`
+                  : theme.palette.brutalist?.border ||
+                    `2.5px solid ${theme.palette.divider}`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               fontFamily: "Archivo, sans-serif",
               fontWeight: 800,
               fontSize: "13px",
-              color: "#ffffff",
+              color: "primary.contrastText",
               flexShrink: 0,
             }}
           >
@@ -336,8 +337,7 @@ export default function OrganizationDetailDesktopView({
                 fontWeight: 700,
                 fontSize: "28px",
                 lineHeight: 1,
-                color: (theme) =>
-                  theme.palette.mode === "dark" ? "#e06c50" : "#a8452a",
+                color: "secondary.main",
               }}
             >
               —
@@ -398,22 +398,27 @@ export default function OrganizationDetailDesktopView({
           <Box
             sx={{
               bgcolor: "background.paper",
-              border: "2px solid",
-              borderColor: (theme) =>
-                theme.palette.mode === "dark" ? "divider" : "#17181a",
+              border: (theme) =>
+                theme.palette.mode === "dark"
+                  ? `1px solid ${theme.palette.divider}`
+                  : theme.palette.brutalist?.border ||
+                    `2px solid ${theme.palette.divider}`,
               borderRadius: "20px",
               overflow: "hidden",
               boxShadow: (theme) =>
                 theme.palette.mode === "dark"
-                  ? "6px 6px 0 #000000"
-                  : "6px 6px 0 #17181a",
+                  ? "0 4px 20px rgba(0,0,0,0.5)"
+                  : theme.palette.brutalist?.shadow ||
+                    `6px 6px 0 ${theme.palette.divider}`,
               mb: 3.5,
             }}
           >
             <Box
               sx={{
                 bgcolor: (theme) =>
-                  theme.palette.mode === "dark" ? "#242628" : "#17181a",
+                  theme.palette.mode === "dark"
+                    ? "action.hover"
+                    : "text.primary",
                 p: "12px 20px",
                 display: "flex",
                 justifyContent: "space-between",
@@ -426,7 +431,10 @@ export default function OrganizationDetailDesktopView({
                   fontWeight: 800,
                   fontSize: "11.5px",
                   letterSpacing: ".1em",
-                  color: "#ffffff",
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "text.primary"
+                      : "background.paper",
                 }}
               >
                 NOVA PELADA
@@ -437,7 +445,7 @@ export default function OrganizationDetailDesktopView({
                   fontWeight: 700,
                   fontSize: "10px",
                   letterSpacing: ".06em",
-                  color: "#9a958a",
+                  color: "text.secondary",
                 }}
               >
                 AGENDAR A PRÓXIMA
@@ -620,8 +628,7 @@ export default function OrganizationDetailDesktopView({
                         width: 30,
                         height: 30,
                         border: "1.5px solid",
-                        borderColor: (theme) =>
-                          theme.palette.mode === "dark" ? "divider" : "#17181a",
+                        borderColor: "divider",
                         borderRadius: "9px",
                         bgcolor: "background.paper",
                         display: "flex",
@@ -633,10 +640,7 @@ export default function OrganizationDetailDesktopView({
                         color: "text.primary",
                         cursor: "pointer",
                         "&:hover": {
-                          bgcolor: (theme) =>
-                            theme.palette.mode === "dark"
-                              ? "rgba(255,255,255,0.08)"
-                              : "#f6f4ee",
+                          bgcolor: "action.hover",
                         },
                       }}
                     >
@@ -703,16 +707,17 @@ export default function OrganizationDetailDesktopView({
                   sx={{
                     border: "none",
                     borderRadius: "13px",
-                    bgcolor: "#146b3a",
-                    color: "#ffffff",
+                    bgcolor: "primary.main",
+                    color: "primary.contrastText",
                     px: 3.5,
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 800,
                     fontSize: "14px",
                     letterSpacing: ".06em",
                     cursor: "pointer",
-                    boxShadow: "0 3px 0 #0d4526",
-                    "&:hover": { bgcolor: "#0e5c31" },
+                    boxShadow: (theme) =>
+                      `0 3px 0 ${theme.palette.primary.dark}`,
+                    "&:hover": { bgcolor: "primary.dark" },
                   }}
                 >
                   {creating ? "CRIANDO..." : "CRIAR PELADA"}
@@ -728,10 +733,10 @@ export default function OrganizationDetailDesktopView({
                   size="small"
                   sx={{
                     "& .MuiSwitch-switchBase.Mui-checked": {
-                      color: "#146b3a",
+                      color: "primary.main",
                     },
                     "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
-                      backgroundColor: "#146b3a",
+                      backgroundColor: "primary.main",
                     },
                   }}
                 />
@@ -787,9 +792,16 @@ export default function OrganizationDetailDesktopView({
                   sx={{
                     bgcolor: isSelected
                       ? (theme) =>
-                          theme.palette.mode === "dark" ? "#2d3035" : "#17181a"
+                          theme.palette.mode === "dark"
+                            ? "action.hover"
+                            : "text.primary"
                       : "background.paper",
-                    color: isSelected ? "#ffffff" : "text.primary",
+                    color: isSelected
+                      ? (theme) =>
+                          theme.palette.mode === "dark"
+                            ? "text.primary"
+                            : "background.paper"
+                      : "text.primary",
                     border: isSelected ? "none" : "1.5px solid",
                     borderColor: "divider",
                     borderRadius: "8px",
@@ -829,10 +841,7 @@ export default function OrganizationDetailDesktopView({
               alignItems: "center",
               gap: 2,
               p: "10px 18px",
-              bgcolor: (theme) =>
-                theme.palette.mode === "dark"
-                  ? "rgba(255, 255, 255, 0.04)"
-                  : "#f6f4ee",
+              bgcolor: "action.hover",
               borderBottom: "1.5px solid",
               borderColor: "divider",
               fontFamily: "Archivo, sans-serif",
@@ -900,13 +909,12 @@ export default function OrganizationDetailDesktopView({
                     p: "15px 18px",
                     bgcolor: isOpen
                       ? (theme) =>
-                          theme.palette.mode === "dark"
-                            ? "rgba(20, 107, 58, 0.15)"
-                            : "#f4f8f5"
+                          theme.palette.status?.paid?.bg || "action.hover"
                       : "background.paper",
                     borderBottom: "1.5px solid",
                     borderColor: "divider",
-                    borderLeft: isOpen ? "4px solid #146b3a" : "none",
+                    borderLeft: isOpen ? "4px solid" : "none",
+                    borderLeftColor: "primary.main",
                   }}
                 >
                   {/* DATA */}
@@ -945,8 +953,8 @@ export default function OrganizationDetailDesktopView({
                             fontWeight: 800,
                             fontSize: "9px",
                             letterSpacing: ".08em",
-                            color: "#ffffff",
-                            bgcolor: "#146b3a",
+                            color: "primary.contrastText",
+                            bgcolor: "primary.main",
                             borderRadius: "6px",
                             p: "4px 7px",
                           }}
@@ -1087,10 +1095,7 @@ export default function OrganizationDetailDesktopView({
                             cursor: "pointer",
                             "&:hover": {
                               borderColor: "text.primary",
-                              bgcolor: (theme) =>
-                                theme.palette.mode === "dark"
-                                  ? "rgba(255, 255, 255, 0.05)"
-                                  : "#f6f4ee",
+                              bgcolor: "action.hover",
                             },
                           }}
                         >
@@ -1107,9 +1112,12 @@ export default function OrganizationDetailDesktopView({
                               borderRadius: "10px",
                               bgcolor: (theme) =>
                                 theme.palette.mode === "dark"
-                                  ? "#2d3035"
-                                  : "#17181a",
-                              color: "#ffffff",
+                                  ? "action.hover"
+                                  : "text.primary",
+                              color: (theme) =>
+                                theme.palette.mode === "dark"
+                                  ? "text.primary"
+                                  : "background.paper",
                               p: "10px 13px",
                               fontFamily: "Archivo, sans-serif",
                               fontWeight: 800,
@@ -1117,10 +1125,8 @@ export default function OrganizationDetailDesktopView({
                               letterSpacing: ".06em",
                               cursor: "pointer",
                               "&:hover": {
-                                bgcolor: (theme) =>
-                                  theme.palette.mode === "dark"
-                                    ? "#3b3f46"
-                                    : "#000000",
+                                bgcolor: "primary.main",
+                                color: "primary.contrastText",
                               },
                             }}
                           >
@@ -1166,10 +1172,7 @@ export default function OrganizationDetailDesktopView({
               alignItems: "center",
               justifyContent: "space-between",
               p: "13px 18px",
-              bgcolor: (theme) =>
-                theme.palette.mode === "dark"
-                  ? "rgba(255, 255, 255, 0.04)"
-                  : "#f6f4ee",
+              bgcolor: "action.hover",
             }}
           >
             <Typography
@@ -1188,8 +1191,7 @@ export default function OrganizationDetailDesktopView({
                 fontFamily: "Archivo, sans-serif",
                 fontWeight: 700,
                 fontSize: "11.5px",
-                color: (theme) =>
-                  theme.palette.mode === "dark" ? "#34a853" : "#146b3a",
+                color: "primary.main",
                 cursor: "pointer",
                 "&:hover": { textDecoration: "underline" },
               }}

@@ -98,12 +98,13 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
     <Box
       component="header"
       sx={{
-        bgcolor: "#17181a",
+        bgcolor: "background.paper",
         px: { md: 4, lg: 5 },
         position: "sticky",
         top: 0,
         zIndex: 1100,
-        borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+        borderBottom: "1px solid",
+        borderColor: "divider",
       }}
     >
       <Box
@@ -133,14 +134,14 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               width: 30,
               height: 30,
               borderRadius: "9px",
-              bgcolor: "#146b3a",
+              bgcolor: "primary.main",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               fontFamily: "Archivo, sans-serif",
               fontWeight: 800,
               fontSize: "13px",
-              color: "#ffffff",
+              color: "primary.contrastText",
             }}
           >
             MP
@@ -152,7 +153,7 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               fontSize: "13px",
               lineHeight: 1.1,
               letterSpacing: ".04em",
-              color: "#f6f4ee",
+              color: "text.primary",
             }}
           >
             MINHA PELADA
@@ -168,18 +169,18 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               px: 1.6,
               py: 1.1,
               borderRadius: "10px",
-              bgcolor: isHome ? "#242628" : "transparent",
+              bgcolor: isHome ? "action.selected" : "transparent",
               fontFamily: "Archivo, sans-serif",
               fontWeight: isHome ? 800 : 700,
               fontSize: "12.5px",
               lineHeight: 1,
-              color: isHome ? "#f6f4ee" : "#9a958a",
+              color: isHome ? "text.primary" : "text.secondary",
               textDecoration: "none",
               cursor: "pointer",
               transition: "all 0.15s ease",
               "&:hover": {
-                color: "#f6f4ee",
-                bgcolor: isHome ? "#242628" : "rgba(255, 255, 255, 0.12)",
+                color: "text.primary",
+                bgcolor: isHome ? "action.selected" : "action.hover",
               },
             }}
           >
@@ -193,18 +194,18 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               px: 1.6,
               py: 1.1,
               borderRadius: "10px",
-              bgcolor: isProfile ? "#242628" : "transparent",
+              bgcolor: isProfile ? "action.selected" : "transparent",
               fontFamily: "Archivo, sans-serif",
               fontWeight: isProfile ? 800 : 700,
               fontSize: "12.5px",
               lineHeight: 1,
-              color: isProfile ? "#f6f4ee" : "#9a958a",
+              color: isProfile ? "text.primary" : "text.secondary",
               textDecoration: "none",
               cursor: "pointer",
               transition: "all 0.15s ease",
               "&:hover": {
-                color: "#f6f4ee",
-                bgcolor: isProfile ? "#242628" : "rgba(255, 255, 255, 0.12)",
+                color: "text.primary",
+                bgcolor: isProfile ? "action.selected" : "action.hover",
               },
             }}
           >
@@ -224,7 +225,7 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
             display: "flex",
             alignItems: "center",
             gap: 1.1,
-            border: "1.5px solid #3a3b3e",
+            border: (theme) => `1.5px solid ${theme.palette.divider}`,
             borderRadius: "11px",
             px: 1.25,
             py: 0.75,
@@ -234,12 +235,12 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
             outline: "none",
             transition: "border-color 0.15s ease",
             "&:hover": {
-              borderColor: "rgba(255, 255, 255, 0.4)",
-              bgcolor: "rgba(255, 255, 255, 0.08)",
+              borderColor: "text.secondary",
+              bgcolor: "action.hover",
             },
             "&:focus-visible": {
-              borderColor: "#146b3a",
-              boxShadow: "0 0 0 2px rgba(20, 107, 58, 0.4)",
+              borderColor: "primary.main",
+              boxShadow: (theme) => `0 0 0 2px ${theme.palette.primary.light}`,
             },
           }}
         >
@@ -248,7 +249,7 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               width: 9,
               height: 9,
               borderRadius: "2px",
-              bgcolor: isGroups ? "#146b3a" : "#f2a100",
+              bgcolor: isGroups ? "primary.main" : "gold.main",
             }}
           />
           <Typography
@@ -257,7 +258,7 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               fontWeight: 700,
               fontSize: "11.5px",
               lineHeight: 1,
-              color: "#f6f4ee",
+              color: "text.primary",
               maxWidth: 160,
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -271,7 +272,7 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               fontFamily: "Archivo, sans-serif",
               fontWeight: 700,
               fontSize: "11px",
-              color: "#9a958a",
+              color: "text.secondary",
             }}
           >
             ▾
@@ -285,9 +286,9 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
           slotProps={{
             paper: {
               sx: {
-                bgcolor: "#17181a",
-                border: "1px solid #3a3b3e",
-                color: "#f6f4ee",
+                bgcolor: "background.paper",
+                border: (theme) => `1px solid ${theme.palette.divider}`,
+                color: "text.primary",
                 borderRadius: "12px",
                 mt: 1,
                 minWidth: 220,
@@ -312,7 +313,7 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
                 display: "flex",
                 alignItems: "center",
                 gap: 1.25,
-                "&:hover": { bgcolor: "#242628" },
+                "&:hover": { bgcolor: "action.hover" },
               }}
             >
               <Box
@@ -320,7 +321,7 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
                   width: 8,
                   height: 8,
                   borderRadius: "2px",
-                  bgcolor: "#146b3a",
+                  bgcolor: "primary.main",
                   flexShrink: 0,
                 }}
               />
@@ -328,7 +329,7 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
             </MenuItem>
           ))}
           {userOrgs.length > 0 && (
-            <Divider sx={{ my: 0.5, borderColor: "#2e2f31" }} />
+            <Divider sx={{ my: 0.5, borderColor: "divider" }} />
           )}
           <MenuItem
             onClick={() => {
@@ -341,7 +342,7 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               fontSize: "13px",
               px: 2,
               py: 1.25,
-              "&:hover": { bgcolor: "#242628" },
+              "&:hover": { bgcolor: "action.hover" },
             }}
           >
             {t("home.all_groups", "Todos os grupos")}
@@ -357,7 +358,7 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               fontSize: "13px",
               px: 2,
               py: 1.25,
-              "&:hover": { bgcolor: "#242628" },
+              "&:hover": { bgcolor: "action.hover" },
             }}
           >
             {t("navigation.myGroups", "Ver todos os meus grupos")}
@@ -386,7 +387,7 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               width: 32,
               height: 32,
               borderRadius: "10px",
-              border: "1.5px solid #3a3b3e",
+              border: (theme) => `1.5px solid ${theme.palette.divider}`,
               bgcolor: "transparent",
               display: "flex",
               alignItems: "center",
@@ -394,18 +395,19 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               fontFamily: "Archivo, sans-serif",
               fontWeight: 700,
               fontSize: "11px",
-              color: "#9a958a",
+              color: "text.secondary",
               cursor: "pointer",
               outline: "none",
               transition: "all 0.15s ease",
               "&:hover": {
-                color: "#f6f4ee",
-                borderColor: "rgba(255, 255, 255, 0.4)",
-                bgcolor: "rgba(255, 255, 255, 0.08)",
+                color: "text.primary",
+                borderColor: "text.secondary",
+                bgcolor: "action.hover",
               },
               "&:focus-visible": {
-                borderColor: "#146b3a",
-                boxShadow: "0 0 0 2px rgba(20, 107, 58, 0.4)",
+                borderColor: "primary.main",
+                boxShadow: (theme) =>
+                  `0 0 0 2px ${theme.palette.primary.light}`,
               },
             }}
           >
@@ -428,7 +430,7 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
                 transform: "scale(1.05)",
               },
               "&:focus-visible": {
-                boxShadow: "0 0 0 2px rgba(255, 255, 255, 0.5)",
+                boxShadow: (theme) => `0 0 0 2px ${theme.palette.primary.main}`,
               },
             }}
           >
@@ -439,12 +441,12 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               sx={{
                 width: 32,
                 height: 32,
-                bgcolor: "#146b3a",
-                border: "2px solid rgba(255, 255, 255, 0.2)",
+                bgcolor: "primary.main",
+                border: (theme) => `2px solid ${theme.palette.divider}`,
                 fontFamily: "Archivo, sans-serif",
                 fontWeight: 800,
                 fontSize: "10.5px",
-                color: "#ffffff",
+                color: "primary.contrastText",
               }}
             />
           </IconButton>
@@ -456,9 +458,9 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
             slotProps={{
               paper: {
                 sx: {
-                  bgcolor: "#17181a",
-                  border: "1px solid #3a3b3e",
-                  color: "#f6f4ee",
+                  bgcolor: "background.paper",
+                  border: (theme) => `1px solid ${theme.palette.divider}`,
+                  color: "text.primary",
                   borderRadius: "12px",
                   mt: 1,
                   minWidth: 220,
@@ -477,7 +479,7 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
                 fontSize: "13px",
                 px: 2,
                 py: 1.25,
-                "&:hover": { bgcolor: "#242628" },
+                "&:hover": { bgcolor: "action.hover" },
               }}
             >
               {t("navigation.profile", "Perfil")}
@@ -495,7 +497,7 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
                   fontSize: "13px",
                   px: 2,
                   py: 1.25,
-                  "&:hover": { bgcolor: "#242628" },
+                  "&:hover": { bgcolor: "action.hover" },
                 }}
               >
                 {t("navigation.adminPanel", "Painel de Administração")}
@@ -511,8 +513,8 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
                 fontSize: "13px",
                 px: 2,
                 py: 1.25,
-                color: "#e57373",
-                "&:hover": { bgcolor: "#242628" },
+                color: "error.main",
+                "&:hover": { bgcolor: "action.hover" },
               }}
             >
               {t("auth.logout", "Sair")}
