@@ -105,7 +105,7 @@ export default function DrawJustificationCard({
             fontWeight: 700,
             fontSize: "9.5px",
             letterSpacing: ".14em",
-            color: "#6b675c",
+            color: "text.secondary",
             textTransform: "uppercase",
           }}
         >
@@ -204,7 +204,7 @@ export default function DrawJustificationCard({
                 fontFamily: "Archivo, sans-serif",
                 fontWeight: 700,
                 fontSize: "8.5px",
-                color: "#6b675c",
+                color: "text.secondary",
                 letterSpacing: ".08em",
                 textTransform: "uppercase",
               }}
@@ -229,7 +229,7 @@ export default function DrawJustificationCard({
                 fontFamily: "Archivo, sans-serif",
                 fontWeight: 700,
                 fontSize: "8.5px",
-                color: "#6b675c",
+                color: "text.secondary",
                 letterSpacing: ".08em",
                 textTransform: "uppercase",
               }}
@@ -241,7 +241,8 @@ export default function DrawJustificationCard({
                 fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                 fontWeight: 700,
                 fontSize: "16px",
-                color: "#146b3a",
+                color: (theme) =>
+                  theme.palette.mode === "dark" ? "#34a853" : "#146b3a",
               }}
             >
               {justification.algorithm === "gpt"
@@ -258,7 +259,7 @@ export default function DrawJustificationCard({
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 700,
                     fontSize: "8.5px",
-                    color: "#6b675c",
+                    color: "text.secondary",
                     letterSpacing: ".08em",
                     textTransform: "uppercase",
                   }}
@@ -282,7 +283,7 @@ export default function DrawJustificationCard({
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 700,
                     fontSize: "8.5px",
-                    color: "#6b675c",
+                    color: "text.secondary",
                     letterSpacing: ".08em",
                     textTransform: "uppercase",
                   }}
@@ -310,7 +311,7 @@ export default function DrawJustificationCard({
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 700,
                   fontSize: "8.5px",
-                  color: "#6b675c",
+                  color: "text.secondary",
                   letterSpacing: ".08em",
                   textTransform: "uppercase",
                 }}
@@ -652,7 +653,7 @@ export default function DrawJustificationCard({
           fontWeight: 600,
           fontSize: "10.5px",
           lineHeight: 1.45,
-          color: "#6b675c",
+          color: "text.secondary",
           mt: 1.5,
           pt: 1.25,
           borderTop: (theme) =>

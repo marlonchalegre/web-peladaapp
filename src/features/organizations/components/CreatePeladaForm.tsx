@@ -68,13 +68,13 @@ export default function CreatePeladaForm({
   const fieldSx = {
     "& .MuiOutlinedInput-root": {
       borderRadius: "13px",
-      bgcolor: "#ffffff",
+      bgcolor: "background.paper",
       fontFamily: "'Archivo Narrow', Archivo, sans-serif",
       fontWeight: 700,
-      "& fieldset": { borderColor: "#ddd8cc", borderWidth: "1.5px" },
-      "&:hover fieldset": { borderColor: "#c9c4b6" },
+      "& fieldset": { borderColor: "divider", borderWidth: "1.5px" },
+      "&:hover fieldset": { borderColor: "text.secondary" },
       "&.Mui-focused fieldset": {
-        borderColor: "#17181a",
+        borderColor: "text.primary",
         borderWidth: "1.5px",
       },
     },
@@ -82,7 +82,7 @@ export default function CreatePeladaForm({
       fontFamily: "'Archivo Narrow', Archivo, sans-serif",
       fontWeight: 700,
       fontSize: "19px",
-      color: "#17181a",
+      color: "text.primary",
     },
     "& .MuiInputLabel-root": {
       fontFamily: "Archivo, sans-serif",
@@ -90,13 +90,13 @@ export default function CreatePeladaForm({
       fontSize: "10px",
       letterSpacing: ".14em",
       textTransform: "uppercase",
-      color: "#6b675c",
+      color: "text.secondary",
     },
-    "& .MuiInputLabel-root.Mui-focused": { color: "#17181a" },
+    "& .MuiInputLabel-root.Mui-focused": { color: "text.primary" },
     "& .MuiFormHelperText-root": {
       fontFamily: "Archivo, sans-serif",
       fontWeight: 600,
-      color: "#6b675c",
+      color: "text.secondary",
     },
   } as const;
 
@@ -190,7 +190,7 @@ export default function CreatePeladaForm({
                   fontWeight: 600,
                   fontSize: "12.5px",
                   lineHeight: 1.35,
-                  color: "#4a4740",
+                  color: "text.secondary",
                 }}
               >
                 {t(

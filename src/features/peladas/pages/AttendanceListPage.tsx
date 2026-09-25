@@ -756,11 +756,19 @@ export default function AttendanceListPage() {
                         sx={{
                           width: 30,
                           height: 30,
-                          bgcolor: isCurrent ? "#c9d9cd" : "#dcd3bd",
+                          bgcolor: isCurrent
+                            ? (theme) =>
+                                theme.palette.mode === "dark"
+                                  ? "rgba(201, 217, 205, 0.2)"
+                                  : "#c9d9cd"
+                            : (theme) =>
+                                theme.palette.mode === "dark"
+                                  ? "rgba(220, 211, 189, 0.2)"
+                                  : "#dcd3bd",
                           fontFamily: "Archivo, sans-serif",
                           fontWeight: 800,
                           fontSize: "10px",
-                          color: "#17181a",
+                          color: "text.primary",
                           flexShrink: 0,
                         }}
                       />
@@ -912,7 +920,8 @@ export default function AttendanceListPage() {
                   fontWeight: 700,
                   fontSize: "9.5px",
                   letterSpacing: ".16em",
-                  color: "#a8452a",
+                  color: (theme) =>
+                    theme.palette.mode === "dark" ? "#e06c50" : "#a8452a",
                   textTransform: "uppercase",
                 }}
               >

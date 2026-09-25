@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { ThemeProvider } from "@mui/material";
+import { getTheme } from "../../../lib/theme";
 import type { ComponentProps } from "react";
 import OrganizationStatisticsMobileView from "./OrganizationStatisticsMobileView";
 import type {
@@ -174,5 +176,19 @@ describe("OrganizationStatisticsMobileView", () => {
     fireEvent.click(screen.getByTestId("stats-year-button"));
     fireEvent.click(screen.getByText("2025"));
     expect(onYearChange).toHaveBeenCalledWith(2025);
+  });
+
+  it("renders correctly in dark mode without throwing errors", () => {
+    const darkTheme = getTheme("dark");
+    const { container } = render(
+      <ThemeProvider theme={darkTheme}>
+        <MemoryRouter>
+          <OrganizationStatisticsMobileView {...defaultProps} />
+        </MemoryRouter>
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByText("CLASSIFICAÇÃO COMPLETA")).toBeInTheDocument();
+    expect(container).toBeInTheDocument();
   });
 });

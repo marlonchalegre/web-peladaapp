@@ -3,6 +3,8 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { ThemeProvider } from "@mui/material";
+import { getTheme } from "../../../lib/theme";
 import type { ComponentProps } from "react";
 import OrganizationDetailMobileView from "./OrganizationDetailMobileView";
 import type {
@@ -248,5 +250,20 @@ describe("OrganizationDetailMobileView", () => {
     fireEvent.click(screen.getByTestId("org-menu-button"));
     fireEvent.click(screen.getByTestId("leave-org-button"));
     expect(onLeaveOrg).toHaveBeenCalled();
+  });
+
+  it("renders correctly in dark mode using theme tokens", () => {
+    const darkTheme = getTheme("dark");
+    render(
+      <ThemeProvider theme={darkTheme}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <MemoryRouter>
+            <OrganizationDetailMobileView {...defaultProps} />
+          </MemoryRouter>
+        </LocalizationProvider>
+      </ThemeProvider>,
+    );
+    expect(screen.getByText("100Fôlego")).toBeInTheDocument();
+    expect(screen.getByText("AGENDA DO GRUPO")).toBeInTheDocument();
   });
 });

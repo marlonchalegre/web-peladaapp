@@ -179,40 +179,11 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               transition: "all 0.15s ease",
               "&:hover": {
                 color: "#f6f4ee",
-                bgcolor: isHome ? "#242628" : "rgba(255, 255, 255, 0.05)",
+                bgcolor: isHome ? "#242628" : "rgba(255, 255, 255, 0.12)",
               },
             }}
           >
             {t("navigation.home", "Início")}
-          </Box>
-
-          <Box
-            component={RouterLink}
-            to="/home#meus-grupos"
-            onClick={() => {
-              const el = document.getElementById("meus-grupos");
-              if (el) el.scrollIntoView({ behavior: "smooth" });
-            }}
-            sx={{
-              px: 1.6,
-              py: 1.1,
-              borderRadius: "10px",
-              bgcolor: isGroups ? "#242628" : "transparent",
-              fontFamily: "Archivo, sans-serif",
-              fontWeight: isGroups ? 800 : 700,
-              fontSize: "12.5px",
-              lineHeight: 1,
-              color: isGroups ? "#f6f4ee" : "#9a958a",
-              textDecoration: "none",
-              cursor: "pointer",
-              transition: "all 0.15s ease",
-              "&:hover": {
-                color: "#f6f4ee",
-                bgcolor: isGroups ? "#242628" : "rgba(255, 255, 255, 0.05)",
-              },
-            }}
-          >
-            {t("navigation.groups", "Grupos")}
           </Box>
 
           <Box
@@ -233,7 +204,7 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               transition: "all 0.15s ease",
               "&:hover": {
                 color: "#f6f4ee",
-                bgcolor: isProfile ? "#242628" : "rgba(255, 255, 255, 0.05)",
+                bgcolor: isProfile ? "#242628" : "rgba(255, 255, 255, 0.12)",
               },
             }}
           >
@@ -263,7 +234,8 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
             outline: "none",
             transition: "border-color 0.15s ease",
             "&:hover": {
-              borderColor: "#6b675c",
+              borderColor: "rgba(255, 255, 255, 0.4)",
+              bgcolor: "rgba(255, 255, 255, 0.08)",
             },
             "&:focus-visible": {
               borderColor: "#146b3a",
@@ -428,7 +400,8 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               transition: "all 0.15s ease",
               "&:hover": {
                 color: "#f6f4ee",
-                borderColor: "#6b675c",
+                borderColor: "rgba(255, 255, 255, 0.4)",
+                bgcolor: "rgba(255, 255, 255, 0.08)",
               },
               "&:focus-visible": {
                 borderColor: "#146b3a",

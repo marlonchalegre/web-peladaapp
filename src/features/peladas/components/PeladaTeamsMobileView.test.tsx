@@ -4,6 +4,8 @@ import PeladaTeamsMobileView, {
   type PeladaTeamsMobileViewProps,
 } from "./PeladaTeamsMobileView";
 import { MemoryRouter } from "react-router-dom";
+import { ThemeProvider } from "@mui/material";
+import { getTheme } from "../../../lib/theme";
 import type { Pelada, Team, User } from "../../../shared/api/endpoints";
 
 const mockNavigate = vi.fn();
@@ -401,5 +403,19 @@ describe("PeladaTeamsMobileView", () => {
     const backBtn = screen.getByTestId("back-to-org-button");
     fireEvent.click(backBtn);
     expect(mockNavigate).toHaveBeenCalledWith(-1);
+  });
+
+  it("renders correctly in dark mode without throwing errors", () => {
+    const darkTheme = getTheme("dark");
+    const { container } = render(
+      <ThemeProvider theme={darkTheme}>
+        <MemoryRouter>
+          <PeladaTeamsMobileView {...defaultProps} />
+        </MemoryRouter>
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByText("Sorteio de times")).toBeInTheDocument();
+    expect(container).toBeInTheDocument();
   });
 });

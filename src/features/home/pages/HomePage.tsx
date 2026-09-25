@@ -22,9 +22,12 @@ import CreateOrganizationDialog from "../components/CreateOrganizationDialog";
 import PendingInvitations from "../components/PendingInvitations";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import { getInitials } from "../../../shared/utils/initials";
+import { ThemeSwitcher } from "../../../shared/components/ThemeSwitcher";
+import { useAppTheme } from "../../../app/providers/ThemeContext";
 
 export default function HomePage() {
   const { user, refreshUser, signOut } = useAuth();
+  const { mode, toggleTheme } = useAppTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const { t, i18n } = useTranslation();
@@ -154,7 +157,7 @@ export default function HomePage() {
                         fontWeight: 700,
                         fontSize: "9.5px",
                         letterSpacing: "0.18em",
-                        color: "#6b675c",
+                        color: "text.secondary",
                         textTransform: "uppercase",
                       }}
                     >
@@ -167,12 +170,13 @@ export default function HomePage() {
                         .toUpperCase()}
                     </Typography>
                     <Typography
+                      data-testid="welcome-message"
                       sx={{
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 800,
                         fontSize: { xs: "22px", sm: "26px", md: "28px" },
                         lineHeight: 1.15,
-                        color: "#17181a",
+                        color: "text.primary",
                         mt: 0.5,
                       }}
                     >
@@ -181,7 +185,7 @@ export default function HomePage() {
                     </Typography>
                   </Box>
 
-                  {/* Mobile Right Controls: PT/EN toggle & Avatar */}
+                  {/* Mobile Right Controls: ThemeSwitcher, PT/EN toggle & Avatar */}
                   <Box
                     sx={{
                       display: { xs: "flex", md: "none" },
@@ -189,6 +193,23 @@ export default function HomePage() {
                       gap: 1,
                     }}
                   >
+                    <ThemeSwitcher
+                      data-testid="mobile-theme-switcher"
+                      sx={{
+                        bgcolor: "background.paper",
+                        border: "1.5px solid",
+                        borderColor: "divider",
+                        color: "text.secondary",
+                        "&:hover": {
+                          borderColor: "text.primary",
+                          bgcolor: (theme) =>
+                            theme.palette.mode === "dark"
+                              ? "rgba(255, 255, 255, 0.08)"
+                              : "#f6f4ee",
+                        },
+                      }}
+                    />
+
                     <Box
                       onClick={() => {
                         const newLang =
@@ -210,7 +231,13 @@ export default function HomePage() {
                         fontSize: "12px",
                         color: "text.secondary",
                         cursor: "pointer",
-                        "&:hover": { borderColor: "text.primary" },
+                        "&:hover": {
+                          borderColor: "text.primary",
+                          bgcolor: (theme) =>
+                            theme.palette.mode === "dark"
+                              ? "rgba(255, 255, 255, 0.08)"
+                              : "#f6f4ee",
+                        },
                       }}
                     >
                       {i18n.language?.startsWith("pt") ? "PT" : "EN"}
@@ -228,12 +255,18 @@ export default function HomePage() {
                         sx={{
                           width: 32,
                           height: 32,
-                          bgcolor: "#d8d2c4",
-                          border: "1.5px solid #ddd8cc",
+                          bgcolor: (theme) =>
+                            theme.palette.mode === "dark"
+                              ? "#2d3035"
+                              : "#d8d2c4",
+                          border: (theme) =>
+                            theme.palette.mode === "dark"
+                              ? "1.5px solid #3d424a"
+                              : "1.5px solid #ddd8cc",
                           fontFamily: "Archivo, sans-serif",
                           fontWeight: 800,
                           fontSize: "11px",
-                          color: "#17181a",
+                          color: "text.primary",
                         }}
                       />
                     </IconButton>
@@ -262,6 +295,20 @@ export default function HomePage() {
                       >
                         <Typography align="center">
                           {t("navigation.profile", "Meu Perfil")}
+                        </Typography>
+                      </MenuItem>
+
+                      <MenuItem
+                        onClick={() => {
+                          handleCloseUserMenu();
+                          toggleTheme();
+                        }}
+                        data-testid="toggle-theme-menu-item"
+                      >
+                        <Typography align="center">
+                          {mode === "dark"
+                            ? t("common.theme.light", "Modo Claro")
+                            : t("common.theme.dark", "Modo Escuro")}
                         </Typography>
                       </MenuItem>
 
@@ -332,7 +379,13 @@ export default function HomePage() {
                           alignItems: "center",
                           gap: 0.8,
                           cursor: "pointer",
-                          "&:hover": { borderColor: "text.primary" },
+                          "&:hover": {
+                            borderColor: "text.primary",
+                            bgcolor: (theme) =>
+                              theme.palette.mode === "dark"
+                                ? "#2d3035"
+                                : "#f6f4ee",
+                          },
                         }}
                       >
                         <Box
@@ -399,7 +452,13 @@ export default function HomePage() {
                         alignItems: "center",
                         gap: 0.8,
                         cursor: "pointer",
-                        "&:hover": { borderColor: "text.primary" },
+                        "&:hover": {
+                          borderColor: "text.primary",
+                          bgcolor: (theme) =>
+                            theme.palette.mode === "dark"
+                              ? "#2d3035"
+                              : "#f6f4ee",
+                        },
                       }}
                     >
                       <Box
@@ -883,7 +942,10 @@ export default function HomePage() {
                     borderColor: (theme) =>
                       theme.palette.mode === "dark" ? "#4a4d55" : "#c9c4b6",
                     "&:hover": {
-                      bgcolor: "background.paper",
+                      bgcolor: (theme) =>
+                        theme.palette.mode === "dark"
+                          ? "rgba(255, 255, 255, 0.08)"
+                          : "background.paper",
                       borderColor: "text.primary",
                     },
                   }}

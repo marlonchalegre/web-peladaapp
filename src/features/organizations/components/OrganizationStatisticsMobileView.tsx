@@ -299,7 +299,6 @@ export default function OrganizationStatisticsMobileView({
     const isFirst = position === 1;
     const bg =
       position === 1 ? "#dcd3bd" : position === 2 ? "#cdd6e0" : "#e2cfc7";
-    const baseColor = isFirst ? "#f2a100" : "#eae6db";
     const value = getMetricValue(player, activeMetric);
 
     return (
@@ -322,7 +321,12 @@ export default function OrganizationStatisticsMobileView({
         />
         <Box
           sx={{
-            bgcolor: baseColor,
+            bgcolor: isFirst
+              ? "#f2a100"
+              : (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "rgba(255,255,255,0.08)"
+                    : "#eae6db",
             borderRadius: "9px 9px 0 0",
             mt: 1.1,
             py: isFirst ? 1.6 : 1.1,
@@ -333,7 +337,7 @@ export default function OrganizationStatisticsMobileView({
               font: isFirst
                 ? "700 30px/1 'Archivo Narrow',Archivo,sans-serif"
                 : "700 22px/1 'Archivo Narrow',Archivo,sans-serif",
-              color: "#17181a",
+              color: isFirst ? "#17181a" : "text.primary",
             }}
           >
             {formatMetricValue(value, activeMetric)}
@@ -344,7 +348,7 @@ export default function OrganizationStatisticsMobileView({
               font: isFirst
                 ? "700 9.5px/1.2 Archivo,sans-serif"
                 : "700 9px/1.2 Archivo,sans-serif",
-              color: isFirst ? "#17181a" : "#6b675c",
+              color: isFirst ? "#17181a" : "text.secondary",
               mt: 0.5,
               px: 0.5,
             }}
@@ -356,7 +360,7 @@ export default function OrganizationStatisticsMobileView({
               font: isFirst
                 ? "800 13px/1 Archivo,sans-serif"
                 : "800 12px/1 Archivo,sans-serif",
-              color: isFirst ? "#17181a" : "#6b675c",
+              color: isFirst ? "#17181a" : "text.secondary",
               mt: 0.75,
             }}
           >
@@ -370,7 +374,19 @@ export default function OrganizationStatisticsMobileView({
   return (
     <Box sx={{ bgcolor: "background.default", minHeight: "100vh", pb: 3 }}>
       {/* Dark header */}
-      <Box sx={{ bgcolor: "#17181a", px: 2.5, pt: 1, pb: 2.5 }}>
+      <Box
+        sx={{
+          bgcolor: (theme) =>
+            theme.palette.mode === "dark" ? "#242628" : "#17181a",
+          borderBottom: (theme) =>
+            theme.palette.mode === "dark"
+              ? "1px solid rgba(255,255,255,0.12)"
+              : "none",
+          px: 2.5,
+          pt: 1,
+          pb: 2.5,
+        }}
+      >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.4 }}>
           <Box
             component="button"
@@ -381,7 +397,8 @@ export default function OrganizationStatisticsMobileView({
               bgcolor: "transparent",
               p: 0,
               font: "700 18px/1 Archivo,sans-serif",
-              color: "#9a958a",
+              color: (theme) =>
+                theme.palette.mode === "dark" ? "text.secondary" : "#9a958a",
               cursor: "pointer",
             }}
           >
@@ -393,7 +410,8 @@ export default function OrganizationStatisticsMobileView({
               sx={{
                 font: "700 9.5px/1 Archivo,sans-serif",
                 letterSpacing: ".16em",
-                color: "#9a958a",
+                color: (theme) =>
+                  theme.palette.mode === "dark" ? "text.secondary" : "#9a958a",
               }}
             >
               {org.name.toUpperCase()} · FUTEBOL
@@ -401,7 +419,8 @@ export default function OrganizationStatisticsMobileView({
             <Typography
               sx={{
                 font: "800 18px/1.15 Archivo,sans-serif",
-                color: "#f6f4ee",
+                color: (theme) =>
+                  theme.palette.mode === "dark" ? "text.primary" : "#f6f4ee",
                 mt: 0.5,
               }}
             >
@@ -418,8 +437,10 @@ export default function OrganizationStatisticsMobileView({
                   width: 32,
                   height: 32,
                   borderRadius: "9px",
-                  border: "1.5px solid #3a3b3e",
-                  color: "#f6f4ee",
+                  border: (theme) =>
+                    `1.5px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.2)" : "#3a3b3e"}`,
+                  color: (theme) =>
+                    theme.palette.mode === "dark" ? "text.primary" : "#f6f4ee",
                 }}
               >
                 <FileUploadIcon sx={{ fontSize: 16 }} />
@@ -431,8 +452,10 @@ export default function OrganizationStatisticsMobileView({
                   width: 32,
                   height: 32,
                   borderRadius: "9px",
-                  border: "1.5px solid #3a3b3e",
-                  color: "#f6f4ee",
+                  border: (theme) =>
+                    `1.5px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.2)" : "#3a3b3e"}`,
+                  color: (theme) =>
+                    theme.palette.mode === "dark" ? "text.primary" : "#f6f4ee",
                 }}
               >
                 <FileDownloadIcon sx={{ fontSize: 16 }} />
@@ -444,14 +467,16 @@ export default function OrganizationStatisticsMobileView({
             onClick={(e) => setYearAnchor(e.currentTarget)}
             data-testid="stats-year-button"
             sx={{
-              border: "1.5px solid #3a3b3e",
+              border: (theme) =>
+                `1.5px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.2)" : "#3a3b3e"}`,
               borderRadius: "9px",
               bgcolor: "transparent",
               px: 1.1,
               py: 0.9,
               font: "800 10px/1 Archivo,sans-serif",
               letterSpacing: ".06em",
-              color: "#f6f4ee",
+              color: (theme) =>
+                theme.palette.mode === "dark" ? "text.primary" : "#f6f4ee",
               cursor: "pointer",
             }}
           >
@@ -461,7 +486,17 @@ export default function OrganizationStatisticsMobileView({
             anchorEl={yearAnchor}
             open={Boolean(yearAnchor)}
             onClose={() => setYearAnchor(null)}
-            slotProps={{ paper: { sx: { borderRadius: "12px" } } }}
+            slotProps={{
+              paper: {
+                sx: {
+                  borderRadius: "12px",
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "#242628"
+                      : "background.paper",
+                },
+              },
+            }}
           >
             {years.map((y) => (
               <MenuItem
@@ -485,7 +520,8 @@ export default function OrganizationStatisticsMobileView({
             <Typography
               sx={{
                 font: "700 28px/1 'Archivo Narrow',Archivo,sans-serif",
-                color: "#f6f4ee",
+                color: (theme) =>
+                  theme.palette.mode === "dark" ? "text.primary" : "#f6f4ee",
               }}
             >
               {totalPeladas}
@@ -494,7 +530,8 @@ export default function OrganizationStatisticsMobileView({
               sx={{
                 font: "700 8.5px/1.2 Archivo,sans-serif",
                 letterSpacing: ".1em",
-                color: "#9a958a",
+                color: (theme) =>
+                  theme.palette.mode === "dark" ? "text.secondary" : "#9a958a",
                 mt: 0.5,
               }}
             >
@@ -514,7 +551,8 @@ export default function OrganizationStatisticsMobileView({
               sx={{
                 font: "700 8.5px/1.2 Archivo,sans-serif",
                 letterSpacing: ".1em",
-                color: "#9a958a",
+                color: (theme) =>
+                  theme.palette.mode === "dark" ? "text.secondary" : "#9a958a",
                 mt: 0.5,
               }}
             >
@@ -525,7 +563,8 @@ export default function OrganizationStatisticsMobileView({
             <Typography
               sx={{
                 font: "700 28px/1 'Archivo Narrow',Archivo,sans-serif",
-                color: "#f6f4ee",
+                color: (theme) =>
+                  theme.palette.mode === "dark" ? "text.primary" : "#f6f4ee",
               }}
             >
               {avgGoals}
@@ -534,7 +573,8 @@ export default function OrganizationStatisticsMobileView({
               sx={{
                 font: "700 8.5px/1.2 Archivo,sans-serif",
                 letterSpacing: ".1em",
-                color: "#9a958a",
+                color: (theme) =>
+                  theme.palette.mode === "dark" ? "text.secondary" : "#9a958a",
                 mt: 0.5,
               }}
             >
@@ -545,7 +585,8 @@ export default function OrganizationStatisticsMobileView({
             <Typography
               sx={{
                 font: "700 28px/1 'Archivo Narrow',Archivo,sans-serif",
-                color: "#f6f4ee",
+                color: (theme) =>
+                  theme.palette.mode === "dark" ? "text.primary" : "#f6f4ee",
               }}
             >
               {stats.length}
@@ -554,7 +595,8 @@ export default function OrganizationStatisticsMobileView({
               sx={{
                 font: "700 8.5px/1.2 Archivo,sans-serif",
                 letterSpacing: ".1em",
-                color: "#9a958a",
+                color: (theme) =>
+                  theme.palette.mode === "dark" ? "text.secondary" : "#9a958a",
                 mt: 0.5,
               }}
             >
@@ -578,9 +620,21 @@ export default function OrganizationStatisticsMobileView({
               }}
               data-testid={`stats-metric-${tab.key}`}
               sx={{
-                border: active ? "none" : "1.5px solid #ddd8cc",
-                bgcolor: active ? "#17181a" : "#ffffff",
-                color: active ? "#ffffff" : "#17181a",
+                border: active
+                  ? "none"
+                  : (theme) =>
+                      `1.5px solid ${theme.palette.mode === "dark" ? "rgba(255,255,255,0.12)" : "#ddd8cc"}`,
+                bgcolor: active
+                  ? (theme) =>
+                      theme.palette.mode === "dark" ? "primary.main" : "#17181a"
+                  : (theme) =>
+                      theme.palette.mode === "dark"
+                        ? "background.paper"
+                        : "#ffffff",
+                color: active
+                  ? (theme) =>
+                      theme.palette.mode === "dark" ? "#17181a" : "#ffffff"
+                  : "text.primary",
                 borderRadius: "9px",
                 px: 1.5,
                 py: 1,
@@ -619,7 +673,7 @@ export default function OrganizationStatisticsMobileView({
               sx={{
                 font: "700 9.5px/1 Archivo,sans-serif",
                 letterSpacing: ".18em",
-                color: "#6b675c",
+                color: "text.secondary",
               }}
             >
               {PODIUM_TITLES[activeMetric]} · TEMPORADA {year}
@@ -654,7 +708,7 @@ export default function OrganizationStatisticsMobileView({
             sx={{
               font: "700 9.5px/1 Archivo,sans-serif",
               letterSpacing: ".18em",
-              color: "#6b675c",
+              color: "text.secondary",
             }}
           >
             CLASSIFICAÇÃO COMPLETA
@@ -662,7 +716,7 @@ export default function OrganizationStatisticsMobileView({
           <Typography
             sx={{
               font: "700 10.5px/1 Archivo,sans-serif",
-              color: "#6b675c",
+              color: "text.secondary",
             }}
           >
             {METRIC_TABS.find(
@@ -717,7 +771,10 @@ export default function OrganizationStatisticsMobileView({
                         ? "rgba(20, 107, 58, 0.2)"
                         : "#f4f8f5"
                       : "transparent",
-                  border: me ? "2px solid #146b3a" : "none",
+                  border: me
+                    ? (theme) =>
+                        `2px solid ${theme.palette.mode === "dark" ? "#34a853" : "#146b3a"}`
+                    : "none",
                   borderRadius: me ? "13px" : 0,
                   borderBottom:
                     !me && !isLast
@@ -730,7 +787,10 @@ export default function OrganizationStatisticsMobileView({
                     width: 17,
                     flexShrink: 0,
                     font: "700 13px/1 'Archivo Narrow',Archivo,sans-serif",
-                    color: me ? "#146b3a" : "text.secondary",
+                    color: me
+                      ? (theme) =>
+                          theme.palette.mode === "dark" ? "#34a853" : "#146b3a"
+                      : "text.secondary",
                   }}
                 >
                   {position}
@@ -742,7 +802,10 @@ export default function OrganizationStatisticsMobileView({
                   sx={{
                     width: 30,
                     height: 30,
-                    bgcolor: avatarBg,
+                    bgcolor: me
+                      ? (theme) =>
+                          theme.palette.mode === "dark" ? "#34a853" : "#146b3a"
+                      : avatarBg,
                     color: me || avatarBg === "#146b3a" ? "#ffffff" : "#17181a",
                     font: "800 10px Archivo,sans-serif",
                     flexShrink: 0,
@@ -763,7 +826,10 @@ export default function OrganizationStatisticsMobileView({
                         sx={{
                           font: "700 9px Archivo,sans-serif",
                           letterSpacing: ".08em",
-                          color: "#146b3a",
+                          color: (theme) =>
+                            theme.palette.mode === "dark"
+                              ? "#34a853"
+                              : "#146b3a",
                         }}
                       >
                         {" "}
@@ -774,7 +840,12 @@ export default function OrganizationStatisticsMobileView({
                   <Typography
                     sx={{
                       font: "600 10.5px/1.3 Archivo,sans-serif",
-                      color: me ? "#146b3a" : "#6b675c",
+                      color: me
+                        ? (theme) =>
+                            theme.palette.mode === "dark"
+                              ? "#34a853"
+                              : "#146b3a"
+                        : "text.secondary",
                       mt: 0.25,
                     }}
                   >
@@ -790,7 +861,10 @@ export default function OrganizationStatisticsMobileView({
                 <Typography
                   sx={{
                     font: "700 19px/1 'Archivo Narrow',Archivo,sans-serif",
-                    color: me ? "#146b3a" : "#17181a",
+                    color: me
+                      ? (theme) =>
+                          theme.palette.mode === "dark" ? "#34a853" : "#146b3a"
+                      : "text.primary",
                     flexShrink: 0,
                   }}
                 >
@@ -813,7 +887,8 @@ export default function OrganizationStatisticsMobileView({
                 textAlign: "center",
                 p: "12px 0 8px",
                 font: "800 11.5px/1 Archivo,sans-serif",
-                color: "#146b3a",
+                color: (theme) =>
+                  theme.palette.mode === "dark" ? "#34a853" : "#146b3a",
                 cursor: "pointer",
               }}
             >
@@ -829,7 +904,7 @@ export default function OrganizationStatisticsMobileView({
           sx={{
             font: "700 9.5px/1 Archivo,sans-serif",
             letterSpacing: ".18em",
-            color: "#6b675c",
+            color: "text.secondary",
             mb: 1.25,
           }}
         >
@@ -862,10 +937,14 @@ export default function OrganizationStatisticsMobileView({
                       height: `${Math.round(
                         (week.confirmed / presenceMax) * 100,
                       )}%`,
-                      bgcolor:
+                      bgcolor: (theme) =>
                         week.confirmed < presenceWeeksAvg
-                          ? "#a8452a"
-                          : "#146b3a",
+                          ? theme.palette.mode === "dark"
+                            ? "#e06c50"
+                            : "#a8452a"
+                          : theme.palette.mode === "dark"
+                            ? "#34a853"
+                            : "#146b3a",
                       borderRadius: "3px",
                     }}
                   />
@@ -918,7 +997,7 @@ export default function OrganizationStatisticsMobileView({
             <Typography
               sx={{
                 font: "600 11.5px/1.4 Archivo,sans-serif",
-                color: "#6b675c",
+                color: "text.secondary",
               }}
             >
               Sem dados de presença.
@@ -992,7 +1071,7 @@ export default function OrganizationStatisticsMobileView({
                   <Typography
                     sx={{
                       font: "600 10.5px/1.3 Archivo,sans-serif",
-                      color: "#6b675c",
+                      color: "text.secondary",
                       mt: 0.25,
                     }}
                   >

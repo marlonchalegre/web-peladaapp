@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { ThemeProvider } from "@mui/material";
+import { getTheme } from "../../../lib/theme";
 import type { ComponentProps } from "react";
 import OrganizationDetailDesktopView from "./OrganizationDetailDesktopView";
 import type { Organization, Pelada } from "../../../shared/api/endpoints";
@@ -172,5 +174,18 @@ describe("OrganizationDetailDesktopView", () => {
     });
     expect(screen.getByText(/Encerrada · 3 partidas/)).toBeInTheDocument();
     expect(screen.getByText(/1º lugar · 2 G · 1 A · MVP/)).toBeInTheDocument();
+  });
+
+  it("renders correctly in dark mode using theme tokens", () => {
+    const darkTheme = getTheme("dark");
+    render(
+      <ThemeProvider theme={darkTheme}>
+        <MemoryRouter>
+          <OrganizationDetailDesktopView {...defaultProps} />
+        </MemoryRouter>
+      </ThemeProvider>,
+    );
+    expect(screen.getAllByText("100Fôlego").length).toBeGreaterThan(0);
+    expect(screen.getByText("AGENDA DO GRUPO")).toBeInTheDocument();
   });
 });

@@ -1,7 +1,9 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import HomePage from "./HomePage";
 import { MemoryRouter } from "react-router-dom";
+import { ThemeProvider } from "@mui/material";
+import { getTheme } from "../../../lib/theme";
 import { api } from "../../../shared/api/client";
 
 // Mock the API client
@@ -289,5 +291,47 @@ describe("HomePage", () => {
     const avatar = screen.getByTestId("secure-avatar");
     expect(avatar).toBeInTheDocument();
     expect(avatar).toHaveTextContent("TU");
+  });
+
+  it("renders welcome message with primary text color in dark mode instead of hardcoded dark color", async () => {
+    (api.get as Mock).mockResolvedValue([]);
+
+    const darkTheme = getTheme("dark");
+
+    render(
+      <MemoryRouter>
+        <ThemeProvider theme={darkTheme}>
+          <HomePage />
+        </ThemeProvider>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("welcome-message")).toBeInTheDocument();
+    });
+
+    const welcomeHeading = screen.getByTestId("welcome-message");
+    expect(welcomeHeading).toHaveStyle({
+      color: darkTheme.palette.text.primary,
+    });
+  });
+
+  it("renders mobile theme switcher and theme toggle in user menu", async () => {
+    (api.get as Mock).mockResolvedValue([]);
+
+    render(
+      <MemoryRouter>
+        <HomePage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("mobile-theme-switcher")).toBeInTheDocument();
+    });
+
+    const userSettingsBtn = screen.getByTestId("user-settings-button");
+    fireEvent.click(userSettingsBtn);
+
+    expect(screen.getByTestId("toggle-theme-menu-item")).toBeInTheDocument();
   });
 });

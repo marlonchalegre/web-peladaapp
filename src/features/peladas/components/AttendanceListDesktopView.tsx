@@ -218,7 +218,7 @@ export default function AttendanceListDesktopView({
                 fontWeight: 700,
                 fontSize: "9.5px",
                 letterSpacing: ".16em",
-                color: "#6b675c",
+                color: "text.secondary",
                 textTransform: "uppercase",
               }}
             >
@@ -270,7 +270,7 @@ export default function AttendanceListDesktopView({
                 fontFamily: "Archivo, sans-serif",
                 fontWeight: 800,
                 fontSize: "26px",
-                color: "#17181a",
+                color: "text.primary",
                 mt: 0.8,
               }}
             >
@@ -302,7 +302,8 @@ export default function AttendanceListDesktopView({
                 onClick={onCloseAttendance}
                 sx={{
                   borderRadius: "11px",
-                  bgcolor: "#17181a",
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark" ? "#2d3035" : "#17181a",
                   px: 2,
                   py: 1.4,
                   fontFamily: "Archivo, sans-serif",
@@ -312,7 +313,10 @@ export default function AttendanceListDesktopView({
                   color: "#ffffff",
                   cursor: "pointer",
                   border: "none",
-                  "&:hover": { bgcolor: "#000000" },
+                  "&:hover": {
+                    bgcolor: (theme) =>
+                      theme.palette.mode === "dark" ? "#3b3f46" : "#000000",
+                  },
                 }}
               >
                 FECHAR LISTA E SORTEAR
@@ -490,7 +494,7 @@ export default function AttendanceListDesktopView({
                   fontSize: "11.5px",
                   letterSpacing: ".04em",
                   cursor: "pointer",
-                  "&:hover": { borderColor: "#17181a" },
+                  "&:hover": { borderColor: "text.primary" },
                 }}
               >
                 NÃO VOU
@@ -509,7 +513,8 @@ export default function AttendanceListDesktopView({
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                borderBottom: "1.5px solid #ddd8cc",
+                borderBottom: "1.5px solid",
+                borderColor: "divider",
                 mb: 0,
               }}
             >
@@ -519,14 +524,22 @@ export default function AttendanceListDesktopView({
                   sx={{
                     p: "11px 16px",
                     borderBottom:
-                      activeTab === "confirmed" ? "3px solid #17181a" : "none",
+                      activeTab === "confirmed" ? "3px solid" : "none",
+                    borderBottomColor:
+                      activeTab === "confirmed"
+                        ? "text.primary"
+                        : "transparent",
                     mb: activeTab === "confirmed" ? "-1.5px" : 0,
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: activeTab === "confirmed" ? 800 : 700,
                     fontSize: "12px",
                     letterSpacing: ".04em",
-                    color: activeTab === "confirmed" ? "#17181a" : "#6b675c",
+                    color:
+                      activeTab === "confirmed"
+                        ? "text.primary"
+                        : "text.secondary",
                     cursor: "pointer",
+                    "&:hover": { color: "text.primary" },
                   }}
                 >
                   CONFIRMADOS{" "}
@@ -539,14 +552,20 @@ export default function AttendanceListDesktopView({
                   sx={{
                     p: "11px 16px",
                     borderBottom:
-                      activeTab === "waitlist" ? "3px solid #17181a" : "none",
+                      activeTab === "waitlist" ? "3px solid" : "none",
+                    borderBottomColor:
+                      activeTab === "waitlist" ? "text.primary" : "transparent",
                     mb: activeTab === "waitlist" ? "-1.5px" : 0,
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: activeTab === "waitlist" ? 800 : 700,
                     fontSize: "12px",
                     letterSpacing: ".04em",
-                    color: activeTab === "waitlist" ? "#17181a" : "#6b675c",
+                    color:
+                      activeTab === "waitlist"
+                        ? "text.primary"
+                        : "text.secondary",
                     cursor: "pointer",
+                    "&:hover": { color: "text.primary" },
                   }}
                 >
                   FILA DE ESPERA{" "}
@@ -559,14 +578,20 @@ export default function AttendanceListDesktopView({
                   sx={{
                     p: "11px 16px",
                     borderBottom:
-                      activeTab === "pending" ? "3px solid #17181a" : "none",
+                      activeTab === "pending" ? "3px solid" : "none",
+                    borderBottomColor:
+                      activeTab === "pending" ? "text.primary" : "transparent",
                     mb: activeTab === "pending" ? "-1.5px" : 0,
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: activeTab === "pending" ? 800 : 700,
                     fontSize: "12px",
                     letterSpacing: ".04em",
-                    color: activeTab === "pending" ? "#17181a" : "#6b675c",
+                    color:
+                      activeTab === "pending"
+                        ? "text.primary"
+                        : "text.secondary",
                     cursor: "pointer",
+                    "&:hover": { color: "text.primary" },
                   }}
                 >
                   PENDENTES{" "}
@@ -579,14 +604,20 @@ export default function AttendanceListDesktopView({
                   sx={{
                     p: "11px 16px",
                     borderBottom:
-                      activeTab === "declined" ? "3px solid #17181a" : "none",
+                      activeTab === "declined" ? "3px solid" : "none",
+                    borderBottomColor:
+                      activeTab === "declined" ? "text.primary" : "transparent",
                     mb: activeTab === "declined" ? "-1.5px" : 0,
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: activeTab === "declined" ? 800 : 700,
                     fontSize: "12px",
                     letterSpacing: ".04em",
-                    color: activeTab === "declined" ? "#17181a" : "#6b675c",
+                    color:
+                      activeTab === "declined"
+                        ? "text.primary"
+                        : "text.secondary",
                     cursor: "pointer",
+                    "&:hover": { color: "text.primary" },
                   }}
                 >
                   RECUSARAM {declined.length}
@@ -786,7 +817,7 @@ export default function AttendanceListDesktopView({
                               fontWeight: 600,
                               fontSize: "10.5px",
                               lineHeight: 1.3,
-                              color: "#6b675c",
+                              color: "text.secondary",
                               mt: 0.3,
                             }}
                           >
@@ -803,10 +834,9 @@ export default function AttendanceListDesktopView({
                             fontWeight: 800,
                             fontSize: "9px",
                             letterSpacing: ".08em",
-                            color: isMensalista ? "#146b3a" : "#6b675c",
-                            border: isMensalista
-                              ? "1.5px solid #146b3a"
-                              : "1.5px solid #ddd8cc",
+                            color: isMensalista ? "#146b3a" : "text.secondary",
+                            border: "1.5px solid",
+                            borderColor: isMensalista ? "#146b3a" : "divider",
                             borderRadius: "6px",
                             p: "4px 6px",
                             display: "inline-block",
@@ -824,7 +854,7 @@ export default function AttendanceListDesktopView({
                               fontFamily: "Archivo, sans-serif",
                               fontWeight: 600,
                               fontSize: "11.5px",
-                              color: "#6b675c",
+                              color: "text.secondary",
                             }}
                           >
                             em dia
@@ -891,13 +921,14 @@ export default function AttendanceListDesktopView({
                                 fontWeight: 700,
                                 fontSize: "9.5px",
                                 letterSpacing: ".06em",
-                                color: "#6b675c",
-                                border: "1.5px solid #ddd8cc",
+                                color: "text.secondary",
+                                border: "1.5px solid",
+                                borderColor: "divider",
                                 borderRadius: "7px",
                                 p: "6px 8px",
-                                bgcolor: "#fff",
+                                bgcolor: "background.paper",
                                 cursor: "pointer",
-                                "&:hover": { borderColor: "#17181a" },
+                                "&:hover": { borderColor: "text.primary" },
                               }}
                             >
                               FILA
@@ -910,15 +941,22 @@ export default function AttendanceListDesktopView({
                                 fontWeight: 700,
                                 fontSize: "9.5px",
                                 letterSpacing: ".06em",
-                                color: "#6b675c",
-                                border: "1.5px solid #ddd8cc",
+                                color: "text.secondary",
+                                border: "1.5px solid",
+                                borderColor: "divider",
                                 borderRadius: "7px",
                                 p: "6px 8px",
-                                bgcolor: "#fff",
+                                bgcolor: "background.paper",
                                 cursor: "pointer",
                                 "&:hover": {
-                                  borderColor: "#a8452a",
-                                  color: "#a8452a",
+                                  borderColor: (theme) =>
+                                    theme.palette.mode === "dark"
+                                      ? "#e06c50"
+                                      : "#a8452a",
+                                  color: (theme) =>
+                                    theme.palette.mode === "dark"
+                                      ? "#e06c50"
+                                      : "#a8452a",
                                 },
                               }}
                             >
@@ -940,9 +978,14 @@ export default function AttendanceListDesktopView({
                                 border: "1.5px solid #146b3a",
                                 borderRadius: "7px",
                                 p: "6px 8px",
-                                bgcolor: "#fff",
+                                bgcolor: "background.paper",
                                 cursor: "pointer",
-                                "&:hover": { bgcolor: "#f4f8f5" },
+                                "&:hover": {
+                                  bgcolor: (theme) =>
+                                    theme.palette.mode === "dark"
+                                      ? "rgba(20, 107, 58, 0.15)"
+                                      : "#f4f8f5",
+                                },
                               }}
                             >
                               SUBIR
@@ -955,15 +998,22 @@ export default function AttendanceListDesktopView({
                                 fontWeight: 700,
                                 fontSize: "9.5px",
                                 letterSpacing: ".06em",
-                                color: "#6b675c",
-                                border: "1.5px solid #ddd8cc",
+                                color: "text.secondary",
+                                border: "1.5px solid",
+                                borderColor: "divider",
                                 borderRadius: "7px",
                                 p: "6px 8px",
-                                bgcolor: "#fff",
+                                bgcolor: "background.paper",
                                 cursor: "pointer",
                                 "&:hover": {
-                                  borderColor: "#a8452a",
-                                  color: "#a8452a",
+                                  borderColor: (theme) =>
+                                    theme.palette.mode === "dark"
+                                      ? "#e06c50"
+                                      : "#a8452a",
+                                  color: (theme) =>
+                                    theme.palette.mode === "dark"
+                                      ? "#e06c50"
+                                      : "#a8452a",
                                 },
                               }}
                             >
@@ -985,9 +1035,14 @@ export default function AttendanceListDesktopView({
                                 border: "1.5px solid #146b3a",
                                 borderRadius: "7px",
                                 p: "6px 8px",
-                                bgcolor: "#fff",
+                                bgcolor: "background.paper",
                                 cursor: "pointer",
-                                "&:hover": { bgcolor: "#f4f8f5" },
+                                "&:hover": {
+                                  bgcolor: (theme) =>
+                                    theme.palette.mode === "dark"
+                                      ? "rgba(20, 107, 58, 0.15)"
+                                      : "#f4f8f5",
+                                },
                               }}
                             >
                               VOU
@@ -1000,15 +1055,22 @@ export default function AttendanceListDesktopView({
                                 fontWeight: 700,
                                 fontSize: "9.5px",
                                 letterSpacing: ".06em",
-                                color: "#6b675c",
-                                border: "1.5px solid #ddd8cc",
+                                color: "text.secondary",
+                                border: "1.5px solid",
+                                borderColor: "divider",
                                 borderRadius: "7px",
                                 p: "6px 8px",
-                                bgcolor: "#fff",
+                                bgcolor: "background.paper",
                                 cursor: "pointer",
                                 "&:hover": {
-                                  borderColor: "#a8452a",
-                                  color: "#a8452a",
+                                  borderColor: (theme) =>
+                                    theme.palette.mode === "dark"
+                                      ? "#e06c50"
+                                      : "#a8452a",
+                                  color: (theme) =>
+                                    theme.palette.mode === "dark"
+                                      ? "#e06c50"
+                                      : "#a8452a",
                                 },
                               }}
                             >
@@ -1030,9 +1092,14 @@ export default function AttendanceListDesktopView({
                                 border: "1.5px solid #146b3a",
                                 borderRadius: "7px",
                                 p: "6px 8px",
-                                bgcolor: "#fff",
+                                bgcolor: "background.paper",
                                 cursor: "pointer",
-                                "&:hover": { bgcolor: "#f4f8f5" },
+                                "&:hover": {
+                                  bgcolor: (theme) =>
+                                    theme.palette.mode === "dark"
+                                      ? "rgba(20, 107, 58, 0.15)"
+                                      : "#f4f8f5",
+                                },
                               }}
                             >
                               VOU
@@ -1045,13 +1112,14 @@ export default function AttendanceListDesktopView({
                                 fontWeight: 700,
                                 fontSize: "9.5px",
                                 letterSpacing: ".06em",
-                                color: "#6b675c",
-                                border: "1.5px solid #ddd8cc",
+                                color: "text.secondary",
+                                border: "1.5px solid",
+                                borderColor: "divider",
                                 borderRadius: "7px",
                                 p: "6px 8px",
-                                bgcolor: "#fff",
+                                bgcolor: "background.paper",
                                 cursor: "pointer",
-                                "&:hover": { borderColor: "#17181a" },
+                                "&:hover": { borderColor: "text.primary" },
                               }}
                             >
                               FILA
@@ -1273,7 +1341,10 @@ export default function AttendanceListDesktopView({
                           fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                           fontWeight: 700,
                           fontSize: "13px",
-                          color: "#a8452a",
+                          color: (theme) =>
+                            theme.palette.mode === "dark"
+                              ? "#e06c50"
+                              : "#a8452a",
                           flexShrink: 0,
                         }}
                       >
@@ -1289,11 +1360,14 @@ export default function AttendanceListDesktopView({
                         sx={{
                           width: 28,
                           height: 28,
-                          bgcolor: "#e2cfc7",
+                          bgcolor: (theme) =>
+                            theme.palette.mode === "dark"
+                              ? "rgba(226, 207, 199, 0.2)"
+                              : "#e2cfc7",
                           fontFamily: "Archivo, sans-serif",
                           fontWeight: 800,
                           fontSize: "9.5px",
-                          color: "#17181a",
+                          color: "text.primary",
                           flexShrink: 0,
                         }}
                       />
@@ -1388,7 +1462,8 @@ export default function AttendanceListDesktopView({
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 700,
                     fontSize: "11px",
-                    color: "#a8452a",
+                    color: (theme) =>
+                      theme.palette.mode === "dark" ? "#e06c50" : "#a8452a",
                   }}
                 >
                   {openDiariasCount} em aberto
@@ -1408,7 +1483,8 @@ export default function AttendanceListDesktopView({
                     fontWeight: 700,
                     fontSize: "34px",
                     lineHeight: 0.9,
-                    color: "#a8452a",
+                    color: (theme) =>
+                      theme.palette.mode === "dark" ? "#e06c50" : "#a8452a",
                   }}
                 >
                   R$ {openDiariasAmount}
@@ -1471,7 +1547,12 @@ export default function AttendanceListDesktopView({
             {/* Pendentes card */}
             <Box
               sx={{
-                bgcolor: "#17181a",
+                bgcolor: (theme) =>
+                  theme.palette.mode === "dark" ? "#242628" : "#17181a",
+                border: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "1px solid rgba(255,255,255,0.08)"
+                    : "none",
                 borderRadius: "16px",
                 p: 2,
                 mt: 1.8,
@@ -1483,7 +1564,10 @@ export default function AttendanceListDesktopView({
                   fontWeight: 700,
                   fontSize: "9.5px",
                   letterSpacing: ".16em",
-                  color: "#9a958a",
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "rgba(255,255,255,0.6)"
+                      : "#9a958a",
                 }}
               >
                 PENDENTES · {pending.length}
@@ -1494,7 +1578,8 @@ export default function AttendanceListDesktopView({
                   fontWeight: 600,
                   fontSize: "12px",
                   lineHeight: 1.5,
-                  color: "#f6f4ee",
+                  color: (theme) =>
+                    theme.palette.mode === "dark" ? "#ffffff" : "#f6f4ee",
                   mt: 1.4,
                 }}
               >

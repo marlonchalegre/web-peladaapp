@@ -279,6 +279,47 @@ export const getTheme = (mode: PaletteMode) => {
           }),
         },
       },
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            transition: "all 0.15s ease-in-out",
+          },
+          outlined: ({ theme }) => ({
+            ...(theme.palette.mode === "dark" && {
+              "&:hover": {
+                borderColor: theme.palette.text.primary,
+                backgroundColor: "rgba(255, 255, 255, 0.08)",
+              },
+            }),
+          }),
+          contained: ({ theme }) => ({
+            ...(theme.palette.mode === "dark" && {
+              "&:hover": {
+                filter: "brightness(1.15)",
+              },
+            }),
+          }),
+          text: ({ theme }) => ({
+            ...(theme.palette.mode === "dark" && {
+              "&:hover": {
+                backgroundColor: "rgba(255, 255, 255, 0.08)",
+              },
+            }),
+          }),
+        },
+      },
+      MuiIconButton: {
+        styleOverrides: {
+          root: ({ theme }) => ({
+            transition: "all 0.15s ease-in-out",
+            ...(theme.palette.mode === "dark" && {
+              "&:hover": {
+                backgroundColor: "rgba(255, 255, 255, 0.1)",
+              },
+            }),
+          }),
+        },
+      },
     },
   });
 
@@ -286,36 +327,37 @@ export const getTheme = (mode: PaletteMode) => {
     attendance: {
       button: {
         confirmed: {
-          bg: "#ffffff",
-          text: "#146b3a",
+          bg: mode === "dark" ? "#146b3a" : "#ffffff",
+          text: mode === "dark" ? "#ffffff" : "#146b3a",
           border: "2px solid #146b3a",
           boxShadow: "0 3px 0 #0d4526",
-          icon: "#146b3a",
-          hoverBg: alpha("#ffffff", 0.9),
+          icon: mode === "dark" ? "#ffffff" : "#146b3a",
+          hoverBg: mode === "dark" ? "#178246" : alpha("#ffffff", 0.9),
         },
         declined: {
-          bg: "#ffffff",
-          text: "#a8452a",
+          bg: mode === "dark" ? "#a8452a" : "#ffffff",
+          text: mode === "dark" ? "#ffffff" : "#a8452a",
           border: "2px solid #a8452a",
           boxShadow: "0 3px 0 #5c2011",
-          icon: "#a8452a",
-          hoverBg: alpha("#ffffff", 0.9),
+          icon: mode === "dark" ? "#ffffff" : "#a8452a",
+          hoverBg: mode === "dark" ? "#bd4f32" : alpha("#ffffff", 0.9),
         },
         dimmed: {
-          bg: "#eae6db",
-          text: "#6b675c",
-          border: "1.5px solid #ddd8cc",
+          bg: mode === "dark" ? "#2d3035" : "#eae6db",
+          text: mode === "dark" ? "#9a958a" : "#6b675c",
+          border:
+            mode === "dark" ? "1.5px solid #3d424a" : "1.5px solid #ddd8cc",
           boxShadow: "none",
-          icon: "#6b675c",
-          hoverBg: "#ddd8cc",
+          icon: mode === "dark" ? "#9a958a" : "#6b675c",
+          hoverBg: mode === "dark" ? "#383b42" : "#ddd8cc",
         },
         pending: {
-          bg: "#f6f4ee",
-          text: "#17181a",
-          border: "2px solid #17181a",
-          boxShadow: "0 3px 0 #17181a",
-          icon: "#17181a",
-          hoverBg: "#eae6db",
+          bg: mode === "dark" ? "#24262a" : "#f6f4ee",
+          text: mode === "dark" ? "#f6f4ee" : "#17181a",
+          border: mode === "dark" ? "2px solid #3d424a" : "2px solid #17181a",
+          boxShadow: mode === "dark" ? "0 3px 0 #000000" : "0 3px 0 #17181a",
+          icon: mode === "dark" ? "#f6f4ee" : "#17181a",
+          hoverBg: mode === "dark" ? "#2d3035" : "#eae6db",
         },
       },
     },

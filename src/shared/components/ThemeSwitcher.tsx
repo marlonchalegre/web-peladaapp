@@ -42,7 +42,14 @@ export function ThemeSwitcher({
           p: 0,
           "&:hover": {
             color: "text.primary",
-            borderColor: "text.secondary",
+            borderColor: (theme) =>
+              theme.palette.mode === "dark"
+                ? "rgba(255,255,255,0.4)"
+                : "text.secondary",
+            bgcolor: (theme) =>
+              theme.palette.mode === "dark"
+                ? "rgba(255, 255, 255, 0.08)"
+                : "rgba(0, 0, 0, 0.04)",
           },
           ...sx,
         }}

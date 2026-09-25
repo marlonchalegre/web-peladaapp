@@ -294,4 +294,23 @@ describe("PlayerAttendanceCard", () => {
     reverseBtn.click();
     expect(onReversePayment).toHaveBeenCalled();
   });
+
+  it("renders correctly in dark mode", () => {
+    localStorage.setItem("theme_mode", "dark");
+    render(
+      <ThemeContextProvider>
+        <PlayerAttendanceCard
+          player={mockPlayer as PlayerWithUser}
+          isAdmin={true}
+          isCurrentUser={true}
+          onUpdate={() => {}}
+          isUpdating={false}
+        />
+      </ThemeContextProvider>,
+    );
+
+    expect(screen.getByText("John Doe")).toBeInTheDocument();
+    expect(screen.getByText("common.you")).toBeInTheDocument();
+    localStorage.removeItem("theme_mode");
+  });
 });

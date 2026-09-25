@@ -7,6 +7,8 @@ import {
   cleanup,
 } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { ThemeProvider } from "@mui/material";
+import { getTheme } from "../../../lib/theme";
 import type { ComponentProps } from "react";
 import OrganizationStatisticsDesktopView from "./OrganizationStatisticsDesktopView";
 import { clearAvatarCache } from "../../../shared/utils/avatar-cache";
@@ -153,5 +155,19 @@ describe("OrganizationStatisticsDesktopView", () => {
     const assistsTab = screen.getByText("ASSISTÊNCIAS");
     fireEvent.click(assistsTab);
     expect(screen.getAllByText("Léo Prado").length).toBeGreaterThan(0);
+  });
+
+  it("renders correctly in dark mode without throwing errors", () => {
+    const darkTheme = getTheme("dark");
+    const { container } = render(
+      <ThemeProvider theme={darkTheme}>
+        <MemoryRouter>
+          <OrganizationStatisticsDesktopView {...defaultProps} />
+        </MemoryRouter>
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByText("Estatísticas da temporada")).toBeInTheDocument();
+    expect(container).toBeInTheDocument();
   });
 });

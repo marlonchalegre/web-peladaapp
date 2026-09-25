@@ -267,7 +267,7 @@ export default function PeladaTeamsMobileView({
               fontWeight: 700,
               fontSize: "9.5px",
               letterSpacing: ".16em",
-              color: "#6b675c",
+              color: "text.secondary",
               textTransform: "uppercase",
             }}
           >
@@ -306,7 +306,8 @@ export default function PeladaTeamsMobileView({
                     fontWeight: "inherit",
                     fontSize: "inherit",
                     letterSpacing: "inherit",
-                    color: "#146b3a",
+                    color: (theme) =>
+                      theme.palette.mode === "dark" ? "#34a853" : "#146b3a",
                     textTransform: "inherit",
                   }}
                 />
@@ -322,7 +323,7 @@ export default function PeladaTeamsMobileView({
             fontWeight: 800,
             fontSize: "24px",
             lineHeight: 1.1,
-            color: "#17181a",
+            color: "text.primary",
             mt: 0.75,
           }}
         >
@@ -472,7 +473,8 @@ export default function PeladaTeamsMobileView({
         >
           <Box
             sx={{
-              bgcolor: "#17181a",
+              bgcolor: (theme) =>
+                theme.palette.mode === "dark" ? "#242628" : "#17181a",
               px: 2,
               py: 1.25,
               display: "flex",
@@ -513,7 +515,7 @@ export default function PeladaTeamsMobileView({
                 fontWeight: 600,
                 fontSize: "11.5px",
                 lineHeight: 1.4,
-                color: "#6b675c",
+                color: "text.secondary",
                 mb: 1.75,
               }}
             >
@@ -528,9 +530,15 @@ export default function PeladaTeamsMobileView({
                   border:
                     selectedAlgorithm === "classic"
                       ? "2px solid #146b3a"
-                      : "1.5px solid #ddd8cc",
-                  bgcolor:
-                    selectedAlgorithm === "classic" ? "#f4f8f5" : "#ffffff",
+                      : "1.5px solid",
+                  borderColor:
+                    selectedAlgorithm === "classic" ? "#146b3a" : "divider",
+                  bgcolor: (theme) =>
+                    selectedAlgorithm === "classic"
+                      ? theme.palette.mode === "dark"
+                        ? "rgba(20, 107, 58, 0.15)"
+                        : "#f4f8f5"
+                      : "background.paper",
                   borderRadius: "12px",
                   p: 1.5,
                   cursor: "pointer",
@@ -545,8 +553,10 @@ export default function PeladaTeamsMobileView({
                       border:
                         selectedAlgorithm === "classic"
                           ? "5px solid #146b3a"
-                          : "2px solid #c9c4b6",
-                      bgcolor: "#ffffff",
+                          : "2px solid",
+                      borderColor:
+                        selectedAlgorithm === "classic" ? "#146b3a" : "divider",
+                      bgcolor: "background.paper",
                     }}
                   />
                   <Typography
@@ -554,7 +564,7 @@ export default function PeladaTeamsMobileView({
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 800,
                       fontSize: "12.5px",
-                      color: "#17181a",
+                      color: "text.primary",
                       flex: 1,
                     }}
                   >
@@ -581,7 +591,7 @@ export default function PeladaTeamsMobileView({
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 600,
                     fontSize: "11px",
-                    color: "#6b675c",
+                    color: "text.secondary",
                     mt: 0.75,
                     pl: 3.2,
                   }}
@@ -597,9 +607,15 @@ export default function PeladaTeamsMobileView({
                   border:
                     selectedAlgorithm === "gemini"
                       ? "2px solid #146b3a"
-                      : "1.5px solid #ddd8cc",
-                  bgcolor:
-                    selectedAlgorithm === "gemini" ? "#f4f8f5" : "#ffffff",
+                      : "1.5px solid",
+                  borderColor:
+                    selectedAlgorithm === "gemini" ? "#146b3a" : "divider",
+                  bgcolor: (theme) =>
+                    selectedAlgorithm === "gemini"
+                      ? theme.palette.mode === "dark"
+                        ? "rgba(20, 107, 58, 0.15)"
+                        : "#f4f8f5"
+                      : "background.paper",
                   borderRadius: "12px",
                   p: 1.5,
                   cursor: "pointer",
@@ -614,8 +630,10 @@ export default function PeladaTeamsMobileView({
                       border:
                         selectedAlgorithm === "gemini"
                           ? "5px solid #146b3a"
-                          : "2px solid #c9c4b6",
-                      bgcolor: "#ffffff",
+                          : "2px solid",
+                      borderColor:
+                        selectedAlgorithm === "gemini" ? "#146b3a" : "divider",
+                      bgcolor: "background.paper",
                     }}
                   />
                   <Typography
@@ -623,7 +641,7 @@ export default function PeladaTeamsMobileView({
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: selectedAlgorithm === "gemini" ? 800 : 700,
                       fontSize: "12.5px",
-                      color: "#17181a",
+                      color: "text.primary",
                       flex: 1,
                     }}
                   >
@@ -635,8 +653,9 @@ export default function PeladaTeamsMobileView({
                       fontWeight: 800,
                       fontSize: "8.5px",
                       letterSpacing: ".08em",
-                      color: "#146b3a",
-                      border: "1.5px solid #146b3a",
+                      color: "text.secondary",
+                      border: "1.5px solid",
+                      borderColor: "divider",
                       borderRadius: "5px",
                       px: 0.6,
                       py: 0.25,
@@ -650,7 +669,7 @@ export default function PeladaTeamsMobileView({
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 600,
                     fontSize: "11px",
-                    color: "#6b675c",
+                    color: "text.secondary",
                     mt: 0.75,
                     pl: 3.2,
                   }}
@@ -667,8 +686,15 @@ export default function PeladaTeamsMobileView({
                   border:
                     selectedAlgorithm === "gpt"
                       ? "2px solid #146b3a"
-                      : "1.5px solid #ddd8cc",
-                  bgcolor: selectedAlgorithm === "gpt" ? "#f4f8f5" : "#ffffff",
+                      : "1.5px solid",
+                  borderColor:
+                    selectedAlgorithm === "gpt" ? "#146b3a" : "divider",
+                  bgcolor: (theme) =>
+                    selectedAlgorithm === "gpt"
+                      ? theme.palette.mode === "dark"
+                        ? "rgba(20, 107, 58, 0.15)"
+                        : "#f4f8f5"
+                      : "background.paper",
                   borderRadius: "12px",
                   p: 1.5,
                   cursor: "pointer",
@@ -683,8 +709,10 @@ export default function PeladaTeamsMobileView({
                       border:
                         selectedAlgorithm === "gpt"
                           ? "5px solid #146b3a"
-                          : "2px solid #c9c4b6",
-                      bgcolor: "#ffffff",
+                          : "2px solid",
+                      borderColor:
+                        selectedAlgorithm === "gpt" ? "#146b3a" : "divider",
+                      bgcolor: "background.paper",
                     }}
                   />
                   <Typography
@@ -692,7 +720,7 @@ export default function PeladaTeamsMobileView({
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: selectedAlgorithm === "gpt" ? 800 : 700,
                       fontSize: "12.5px",
-                      color: "#17181a",
+                      color: "text.primary",
                       flex: 1,
                     }}
                   >
@@ -719,7 +747,7 @@ export default function PeladaTeamsMobileView({
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 600,
                     fontSize: "11px",
-                    color: "#6b675c",
+                    color: "text.secondary",
                     mt: 0.75,
                     pl: 3.2,
                   }}
@@ -735,7 +763,8 @@ export default function PeladaTeamsMobileView({
               sx={{
                 mt: 2,
                 pt: 1.5,
-                borderTop: "1.5px dashed #ddd8cc",
+                borderTop: "1.5px dashed",
+                borderColor: "divider",
               }}
             >
               <Typography
@@ -744,7 +773,7 @@ export default function PeladaTeamsMobileView({
                   fontWeight: 700,
                   fontSize: "9px",
                   letterSpacing: ".14em",
-                  color: "#6b675c",
+                  color: "text.secondary",
                   textTransform: "uppercase",
                 }}
               >
@@ -755,7 +784,8 @@ export default function PeladaTeamsMobileView({
                 <Box
                   sx={{
                     flex: 1,
-                    border: "1.5px solid #ddd8cc",
+                    border: "1.5px solid",
+                    borderColor: "divider",
                     borderRadius: "12px",
                     p: "9px 10px",
                   }}
@@ -766,7 +796,7 @@ export default function PeladaTeamsMobileView({
                       fontWeight: 700,
                       fontSize: "9px",
                       letterSpacing: ".08em",
-                      color: "#6b675c",
+                      color: "text.secondary",
                       textTransform: "uppercase",
                     }}
                   >
@@ -796,7 +826,7 @@ export default function PeladaTeamsMobileView({
                         fontWeight: 700,
                         fontSize: "20px",
                         lineHeight: 1,
-                        color: "#17181a",
+                        color: "text.primary",
                       }}
                     >
                       {numTeams}
@@ -816,7 +846,8 @@ export default function PeladaTeamsMobileView({
                 <Box
                   sx={{
                     flex: 1,
-                    border: "1.5px solid #ddd8cc",
+                    border: "1.5px solid",
+                    borderColor: "divider",
                     borderRadius: "12px",
                     p: "9px 10px",
                   }}
@@ -827,7 +858,7 @@ export default function PeladaTeamsMobileView({
                       fontWeight: 700,
                       fontSize: "9px",
                       letterSpacing: ".08em",
-                      color: "#6b675c",
+                      color: "text.secondary",
                       textTransform: "uppercase",
                     }}
                   >
@@ -859,7 +890,7 @@ export default function PeladaTeamsMobileView({
                         fontWeight: 700,
                         fontSize: "20px",
                         lineHeight: 1,
-                        color: "#17181a",
+                        color: "text.primary",
                       }}
                     >
                       {playersPerTeam}
@@ -888,7 +919,8 @@ export default function PeladaTeamsMobileView({
                 justifyContent: "space-between",
                 mt: 2,
                 pt: 1.5,
-                borderTop: "1.5px dashed #ddd8cc",
+                borderTop: "1.5px dashed",
+                borderColor: "divider",
               }}
             >
               <Box>
@@ -898,7 +930,9 @@ export default function PeladaTeamsMobileView({
                     fontWeight: 800,
                     fontSize: "11.5px",
                     color:
-                      selectedAlgorithm === "classic" ? "#9a958a" : "#17181a",
+                      selectedAlgorithm === "classic"
+                        ? "text.secondary"
+                        : "text.primary",
                   }}
                 >
                   Usar sinais históricos
@@ -908,7 +942,7 @@ export default function PeladaTeamsMobileView({
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 600,
                     fontSize: "10.5px",
-                    color: "#6b675c",
+                    color: "text.secondary",
                   }}
                 >
                   {selectedAlgorithm === "classic"
@@ -935,7 +969,8 @@ export default function PeladaTeamsMobileView({
                 justifyContent: "space-between",
                 mt: 1.5,
                 pt: 1.5,
-                borderTop: "1.5px dashed #ddd8cc",
+                borderTop: "1.5px dashed",
+                borderColor: "divider",
               }}
             >
               <Box>
@@ -944,7 +979,7 @@ export default function PeladaTeamsMobileView({
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 800,
                     fontSize: "11.5px",
-                    color: "#17181a",
+                    color: "text.primary",
                   }}
                 >
                   Goleiros fixos
@@ -954,7 +989,7 @@ export default function PeladaTeamsMobileView({
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 600,
                     fontSize: "10.5px",
-                    color: "#6b675c",
+                    color: "text.secondary",
                   }}
                 >
                   {pelada.fixed_goalkeepers
@@ -1035,7 +1070,7 @@ export default function PeladaTeamsMobileView({
               fontWeight: 700,
               fontSize: "9.5px",
               letterSpacing: ".18em",
-              color: "#6b675c",
+              color: "text.secondary",
               textTransform: "uppercase",
             }}
           >
@@ -1046,7 +1081,7 @@ export default function PeladaTeamsMobileView({
               fontFamily: "Archivo, sans-serif",
               fontWeight: 600,
               fontSize: "11px",
-              color: "#6b675c",
+              color: "text.secondary",
             }}
           >
             toque em ⋯ para mover
@@ -1113,7 +1148,12 @@ export default function PeladaTeamsMobileView({
                         fontWeight: 700,
                         fontSize: "9px",
                         letterSpacing: ".1em",
-                        color: openSlots > 0 ? "#a8452a" : "#6b675c",
+                        color: (theme) =>
+                          openSlots > 0
+                            ? theme.palette.mode === "dark"
+                              ? "#e06c50"
+                              : "#a8452a"
+                            : "text.secondary",
                         mt: 0.5,
                         textTransform: "uppercase",
                       }}
@@ -1147,7 +1187,10 @@ export default function PeladaTeamsMobileView({
                         sx={{
                           minWidth: 28,
                           p: 0.25,
-                          color: "#a8452a",
+                          color: (theme) =>
+                            theme.palette.mode === "dark"
+                              ? "#e06c50"
+                              : "#a8452a",
                           fontSize: "10px",
                           fontWeight: 700,
                         }}
@@ -1201,7 +1244,7 @@ export default function PeladaTeamsMobileView({
                             width: 28,
                             height: 28,
                             bgcolor: isYou ? "#146b3a" : color,
-                            color: isYou ? "#ffffff" : "#17181a",
+                            color: isYou ? "#ffffff" : "text.primary",
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: 800,
                             fontSize: "9.5px",
@@ -1290,7 +1333,10 @@ export default function PeladaTeamsMobileView({
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: 800,
                             fontSize: "11px",
-                            color: "#146b3a",
+                            color: (theme) =>
+                              theme.palette.mode === "dark"
+                                ? "#34a853"
+                                : "#146b3a",
                             pr: 0.5,
                           }}
                         >
@@ -1339,7 +1385,7 @@ export default function PeladaTeamsMobileView({
                         fontWeight: 700,
                         fontSize: "10px",
                         letterSpacing: ".06em",
-                        color: "#6b675c",
+                        color: "text.secondary",
                       }}
                     >
                       VAGA LIVRE
@@ -1470,7 +1516,7 @@ export default function PeladaTeamsMobileView({
                       width: 28,
                       height: 28,
                       bgcolor: color,
-                      color: "#17181a",
+                      color: "text.primary",
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 800,
                       fontSize: "9.5px",
@@ -1485,7 +1531,7 @@ export default function PeladaTeamsMobileView({
                         fontWeight: 700,
                         fontSize: "12px",
                         lineHeight: 1.2,
-                        color: "#17181a",
+                        color: "text.primary",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
@@ -1498,7 +1544,7 @@ export default function PeladaTeamsMobileView({
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 600,
                         fontSize: "9.5px",
-                        color: "#6b675c",
+                        color: "text.secondary",
                       }}
                     >
                       {formatPosition(player.user?.position)} · no banco
@@ -1510,7 +1556,10 @@ export default function PeladaTeamsMobileView({
                       fontFamily: "Archivo, sans-serif",
                       fontWeight: 800,
                       fontSize: "11px",
-                      color: "#6b675c",
+                      color: (theme) =>
+                        theme.palette.mode === "dark"
+                          ? "#34a853"
+                          : "text.secondary",
                       pr: 0.5,
                     }}
                   >
@@ -1525,7 +1574,7 @@ export default function PeladaTeamsMobileView({
                       sx={{
                         minWidth: 28,
                         p: 0.25,
-                        color: "#6b675c",
+                        color: "text.secondary",
                       }}
                     >
                       <MoreVertIcon sx={{ fontSize: "16px" }} />
@@ -1548,7 +1597,8 @@ export default function PeladaTeamsMobileView({
             sx: {
               borderRadius: "14px",
               boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
-              border: "1.5px solid #eae6db",
+              border: "1.5px solid",
+              borderColor: "divider",
               minWidth: 200,
             },
           },
@@ -1560,7 +1610,7 @@ export default function PeladaTeamsMobileView({
               fontFamily: "Archivo, sans-serif",
               fontWeight: 800,
               fontSize: "12px",
-              color: "#17181a",
+              color: "text.primary",
             }}
           >
             {selectedPlayer?.player.user?.name}
@@ -1570,7 +1620,7 @@ export default function PeladaTeamsMobileView({
               fontFamily: "Archivo, sans-serif",
               fontWeight: 600,
               fontSize: "10px",
-              color: "#6b675c",
+              color: "text.secondary",
             }}
           >
             Mover jogador para:
@@ -1594,7 +1644,7 @@ export default function PeladaTeamsMobileView({
                 fontFamily: "Archivo, sans-serif",
                 fontWeight: 700,
                 fontSize: "12px",
-                color: "#17181a",
+                color: "text.primary",
               }}
             >
               {t.name || `Time ${idx + 1}`}
@@ -1615,7 +1665,8 @@ export default function PeladaTeamsMobileView({
               fontFamily: "Archivo, sans-serif",
               fontWeight: 700,
               fontSize: "12px",
-              color: "#a8452a",
+              color: (theme) =>
+                theme.palette.mode === "dark" ? "#e06c50" : "#a8452a",
             }}
           >
             Enviar para o banco

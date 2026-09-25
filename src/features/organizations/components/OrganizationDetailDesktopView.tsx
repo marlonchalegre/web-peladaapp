@@ -149,7 +149,10 @@ export default function OrganizationDetailDesktopView({
               height: 46,
               borderRadius: "50%",
               bgcolor: "#146b3a",
-              border: "2.5px solid #17181a",
+              border: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "2.5px solid #2d3035"
+                  : "2.5px solid #17181a",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -169,7 +172,7 @@ export default function OrganizationDetailDesktopView({
                 fontWeight: 800,
                 fontSize: "24px",
                 lineHeight: 1.1,
-                color: "#17181a",
+                color: "text.primary",
               }}
             >
               {org.name}
@@ -180,7 +183,7 @@ export default function OrganizationDetailDesktopView({
                 fontWeight: 700,
                 fontSize: "9.5px",
                 letterSpacing: ".14em",
-                color: "#6b675c",
+                color: "text.secondary",
                 mt: 0.6,
                 textTransform: "uppercase",
               }}
@@ -196,8 +199,9 @@ export default function OrganizationDetailDesktopView({
                 navigate(`/organizations/${org.id}/management?tab=invitations`)
               }
               sx={{
-                border: "1.5px solid #ddd8cc",
-                bgcolor: "#ffffff",
+                border: "1.5px solid",
+                borderColor: "divider",
+                bgcolor: "background.paper",
                 borderRadius: "11px",
                 px: 1.8,
                 py: 1.2,
@@ -205,9 +209,9 @@ export default function OrganizationDetailDesktopView({
                 fontWeight: 800,
                 fontSize: "11px",
                 letterSpacing: ".04em",
-                color: "#17181a",
+                color: "text.primary",
                 cursor: "pointer",
-                "&:hover": { borderColor: "#17181a" },
+                "&:hover": { borderColor: "text.primary" },
               }}
             >
               CONVIDAR
@@ -216,17 +220,21 @@ export default function OrganizationDetailDesktopView({
               component="button"
               onClick={() => navigate(`/organizations/${org.id}/management`)}
               sx={{
-                border: "1.5px solid #ddd8cc",
-                bgcolor: "#ffffff",
+                border: "1.5px solid",
+                borderColor: "divider",
+                bgcolor: "background.paper",
                 borderRadius: "11px",
                 px: 1.5,
                 py: 1.2,
                 fontFamily: "Archivo, sans-serif",
                 fontWeight: 700,
                 fontSize: "13px",
-                color: "#6b675c",
+                color: "text.secondary",
                 cursor: "pointer",
-                "&:hover": { borderColor: "#17181a", color: "#17181a" },
+                "&:hover": {
+                  borderColor: "text.primary",
+                  color: "text.primary",
+                },
               }}
             >
               ⋯
@@ -245,8 +253,9 @@ export default function OrganizationDetailDesktopView({
         >
           <Box
             sx={{
-              bgcolor: "#ffffff",
-              border: "1.5px solid #ddd8cc",
+              bgcolor: "background.paper",
+              border: "1.5px solid",
+              borderColor: "divider",
               borderRadius: "14px",
               p: "14px 15px",
             }}
@@ -257,7 +266,7 @@ export default function OrganizationDetailDesktopView({
                 fontWeight: 700,
                 fontSize: "28px",
                 lineHeight: 1,
-                color: "#17181a",
+                color: "text.primary",
               }}
             >
               {peladasCount}
@@ -268,7 +277,7 @@ export default function OrganizationDetailDesktopView({
                 fontWeight: 700,
                 fontSize: "8.5px",
                 letterSpacing: ".1em",
-                color: "#6b675c",
+                color: "text.secondary",
                 mt: 0.6,
                 textTransform: "uppercase",
               }}
@@ -279,8 +288,9 @@ export default function OrganizationDetailDesktopView({
 
           <Box
             sx={{
-              bgcolor: "#ffffff",
-              border: "1.5px solid #ddd8cc",
+              bgcolor: "background.paper",
+              border: "1.5px solid",
+              borderColor: "divider",
               borderRadius: "14px",
               p: "14px 15px",
             }}
@@ -291,7 +301,7 @@ export default function OrganizationDetailDesktopView({
                 fontWeight: 700,
                 fontSize: "28px",
                 lineHeight: 1,
-                color: "#17181a",
+                color: "text.primary",
               }}
             >
               {avgPresence == null ? "—" : avgPresence}
@@ -302,7 +312,7 @@ export default function OrganizationDetailDesktopView({
                 fontWeight: 700,
                 fontSize: "8.5px",
                 letterSpacing: ".1em",
-                color: "#6b675c",
+                color: "text.secondary",
                 mt: 0.6,
                 textTransform: "uppercase",
               }}
@@ -313,8 +323,9 @@ export default function OrganizationDetailDesktopView({
 
           <Box
             sx={{
-              bgcolor: "#ffffff",
-              border: "1.5px solid #ddd8cc",
+              bgcolor: "background.paper",
+              border: "1.5px solid",
+              borderColor: "divider",
               borderRadius: "14px",
               p: "14px 15px",
             }}
@@ -325,7 +336,8 @@ export default function OrganizationDetailDesktopView({
                 fontWeight: 700,
                 fontSize: "28px",
                 lineHeight: 1,
-                color: "#a8452a",
+                color: (theme) =>
+                  theme.palette.mode === "dark" ? "#e06c50" : "#a8452a",
               }}
             >
               —
@@ -336,7 +348,7 @@ export default function OrganizationDetailDesktopView({
                 fontWeight: 700,
                 fontSize: "8.5px",
                 letterSpacing: ".1em",
-                color: "#6b675c",
+                color: "text.secondary",
                 mt: 0.6,
                 textTransform: "uppercase",
               }}
@@ -347,8 +359,9 @@ export default function OrganizationDetailDesktopView({
 
           <Box
             sx={{
-              bgcolor: "#ffffff",
-              border: "1.5px solid #ddd8cc",
+              bgcolor: "background.paper",
+              border: "1.5px solid",
+              borderColor: "divider",
               borderRadius: "14px",
               p: "14px 15px",
             }}
@@ -359,7 +372,7 @@ export default function OrganizationDetailDesktopView({
                 fontWeight: 700,
                 fontSize: "28px",
                 lineHeight: 1,
-                color: "#17181a",
+                color: "text.primary",
               }}
             >
               {waitlistCount}
@@ -370,7 +383,7 @@ export default function OrganizationDetailDesktopView({
                 fontWeight: 700,
                 fontSize: "8.5px",
                 letterSpacing: ".1em",
-                color: "#6b675c",
+                color: "text.secondary",
                 mt: 0.6,
                 textTransform: "uppercase",
               }}
@@ -384,17 +397,23 @@ export default function OrganizationDetailDesktopView({
         {isAdmin && (
           <Box
             sx={{
-              bgcolor: "#ffffff",
-              border: "2px solid #17181a",
+              bgcolor: "background.paper",
+              border: "2px solid",
+              borderColor: (theme) =>
+                theme.palette.mode === "dark" ? "divider" : "#17181a",
               borderRadius: "20px",
               overflow: "hidden",
-              boxShadow: "6px 6px 0 #17181a",
+              boxShadow: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "6px 6px 0 #000000"
+                  : "6px 6px 0 #17181a",
               mb: 3.5,
             }}
           >
             <Box
               sx={{
-                bgcolor: "#17181a",
+                bgcolor: (theme) =>
+                  theme.palette.mode === "dark" ? "#242628" : "#17181a",
                 p: "12px 20px",
                 display: "flex",
                 justifyContent: "space-between",
@@ -430,7 +449,8 @@ export default function OrganizationDetailDesktopView({
                 <Box
                   sx={{
                     flex: 1.2,
-                    border: "1.5px solid #ddd8cc",
+                    border: "1.5px solid",
+                    borderColor: "divider",
                     borderRadius: "13px",
                     p: "11px 13px",
                   }}
@@ -441,7 +461,7 @@ export default function OrganizationDetailDesktopView({
                       fontWeight: 700,
                       fontSize: "8.5px",
                       letterSpacing: ".14em",
-                      color: "#6b675c",
+                      color: "text.secondary",
                     }}
                   >
                     DATA
@@ -451,7 +471,7 @@ export default function OrganizationDetailDesktopView({
                       fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                       fontWeight: 700,
                       fontSize: "19px",
-                      color: "#17181a",
+                      color: "text.primary",
                       mt: 1,
                     }}
                   >
@@ -467,7 +487,8 @@ export default function OrganizationDetailDesktopView({
                         fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                         fontWeight: 700,
                         fontSize: "19px",
-                        color: "#17181a",
+                        color: "text.primary",
+                        colorScheme: (theme) => theme.palette.mode,
                         mt: 1,
                         p: 0,
                         width: "100%",
@@ -480,7 +501,8 @@ export default function OrganizationDetailDesktopView({
                 <Box
                   sx={{
                     flex: 0.8,
-                    border: "1.5px solid #ddd8cc",
+                    border: "1.5px solid",
+                    borderColor: "divider",
                     borderRadius: "13px",
                     p: "11px 13px",
                   }}
@@ -491,7 +513,7 @@ export default function OrganizationDetailDesktopView({
                       fontWeight: 700,
                       fontSize: "8.5px",
                       letterSpacing: ".14em",
-                      color: "#6b675c",
+                      color: "text.secondary",
                     }}
                   >
                     HORA
@@ -501,7 +523,7 @@ export default function OrganizationDetailDesktopView({
                       fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                       fontWeight: 700,
                       fontSize: "19px",
-                      color: "#17181a",
+                      color: "text.primary",
                       mt: 1,
                     }}
                   >
@@ -517,7 +539,8 @@ export default function OrganizationDetailDesktopView({
                         fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                         fontWeight: 700,
                         fontSize: "19px",
-                        color: "#17181a",
+                        color: "text.primary",
+                        colorScheme: (theme) => theme.palette.mode,
                         mt: 1,
                         p: 0,
                         width: "100%",
@@ -530,7 +553,8 @@ export default function OrganizationDetailDesktopView({
                 <Box
                   sx={{
                     flex: 1.2,
-                    border: "1.5px solid #ddd8cc",
+                    border: "1.5px solid",
+                    borderColor: "divider",
                     borderRadius: "13px",
                     p: "11px 13px",
                     display: "flex",
@@ -545,7 +569,7 @@ export default function OrganizationDetailDesktopView({
                         fontWeight: 700,
                         fontSize: "8.5px",
                         letterSpacing: ".14em",
-                        color: "#6b675c",
+                        color: "text.secondary",
                       }}
                     >
                       MÁXIMO
@@ -555,7 +579,7 @@ export default function OrganizationDetailDesktopView({
                         fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                         fontWeight: 700,
                         fontSize: "19px",
-                        color: "#17181a",
+                        color: "text.primary",
                         mt: 1,
                       }}
                     >
@@ -569,18 +593,22 @@ export default function OrganizationDetailDesktopView({
                       sx={{
                         width: 30,
                         height: 30,
-                        border: "1.5px solid #ddd8cc",
+                        border: "1.5px solid",
+                        borderColor: "divider",
                         borderRadius: "9px",
-                        bgcolor: "#fff",
+                        bgcolor: "background.paper",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 800,
                         fontSize: "14px",
-                        color: "#6b675c",
+                        color: "text.secondary",
                         cursor: "pointer",
-                        "&:hover": { borderColor: "#17181a", color: "#17181a" },
+                        "&:hover": {
+                          borderColor: "text.primary",
+                          color: "text.primary",
+                        },
                       }}
                     >
                       –
@@ -591,18 +619,25 @@ export default function OrganizationDetailDesktopView({
                       sx={{
                         width: 30,
                         height: 30,
-                        border: "1.5px solid #17181a",
+                        border: "1.5px solid",
+                        borderColor: (theme) =>
+                          theme.palette.mode === "dark" ? "divider" : "#17181a",
                         borderRadius: "9px",
-                        bgcolor: "#fff",
+                        bgcolor: "background.paper",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 800,
                         fontSize: "14px",
-                        color: "#17181a",
+                        color: "text.primary",
                         cursor: "pointer",
-                        "&:hover": { bgcolor: "#f6f4ee" },
+                        "&:hover": {
+                          bgcolor: (theme) =>
+                            theme.palette.mode === "dark"
+                              ? "rgba(255,255,255,0.08)"
+                              : "#f6f4ee",
+                        },
                       }}
                     >
                       +
@@ -614,7 +649,8 @@ export default function OrganizationDetailDesktopView({
                 <Box
                   sx={{
                     flex: 1.6,
-                    border: "1.5px solid #ddd8cc",
+                    border: "1.5px solid",
+                    borderColor: "divider",
                     borderRadius: "13px",
                     p: "9px 13px",
                     minWidth: 160,
@@ -626,7 +662,7 @@ export default function OrganizationDetailDesktopView({
                       fontWeight: 700,
                       fontSize: "8.5px",
                       letterSpacing: ".14em",
-                      color: "#6b675c",
+                      color: "text.secondary",
                     }}
                   >
                     LOCAL
@@ -648,9 +684,12 @@ export default function OrganizationDetailDesktopView({
                         fontWeight: 600,
                         fontSize: "13.5px",
                         lineHeight: 1.2,
-                        color: "#17181a",
+                        color: "text.primary",
                         p: 0,
-                        "&::placeholder": { color: "#9a958a", opacity: 1 },
+                        "&::placeholder": {
+                          color: "text.secondary",
+                          opacity: 1,
+                        },
                       },
                     }}
                   />
@@ -701,7 +740,7 @@ export default function OrganizationDetailDesktopView({
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 600,
                     fontSize: "12.5px",
-                    color: "#4a4740",
+                    color: "text.secondary",
                   }}
                 >
                   Avisar diaristas e convidados que a lista abriu
@@ -726,77 +765,59 @@ export default function OrganizationDetailDesktopView({
               fontWeight: 700,
               fontSize: "9.5px",
               letterSpacing: ".18em",
-              color: "#6b675c",
+              color: "text.secondary",
             }}
           >
             AGENDA DO GRUPO
           </Typography>
           <Box sx={{ display: "flex", gap: 1 }}>
-            <Box
-              component="button"
-              onClick={() => setFilter("all")}
-              sx={{
-                bgcolor: filter === "all" ? "#17181a" : "#ffffff",
-                color: filter === "all" ? "#ffffff" : "#17181a",
-                border: filter === "all" ? "none" : "1.5px solid #ddd8cc",
-                borderRadius: "8px",
-                px: 1.2,
-                py: 0.7,
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: filter === "all" ? 800 : 700,
-                fontSize: "10px",
-                letterSpacing: ".06em",
-                cursor: "pointer",
-              }}
-            >
-              TODAS
-            </Box>
-            <Box
-              component="button"
-              onClick={() => setFilter("open")}
-              sx={{
-                bgcolor: filter === "open" ? "#17181a" : "#ffffff",
-                color: filter === "open" ? "#ffffff" : "#17181a",
-                border: filter === "open" ? "none" : "1.5px solid #ddd8cc",
-                borderRadius: "8px",
-                px: 1.2,
-                py: 0.7,
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: filter === "open" ? 800 : 700,
-                fontSize: "10px",
-                letterSpacing: ".06em",
-                cursor: "pointer",
-              }}
-            >
-              ABERTAS
-            </Box>
-            <Box
-              component="button"
-              onClick={() => setFilter("pending")}
-              sx={{
-                bgcolor: filter === "pending" ? "#17181a" : "#ffffff",
-                color: filter === "pending" ? "#ffffff" : "#17181a",
-                border: filter === "pending" ? "none" : "1.5px solid #ddd8cc",
-                borderRadius: "8px",
-                px: 1.2,
-                py: 0.7,
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: filter === "pending" ? 800 : 700,
-                fontSize: "10px",
-                letterSpacing: ".06em",
-                cursor: "pointer",
-              }}
-            >
-              PENDÊNCIA
-            </Box>
+            {(["all", "open", "pending"] as const).map((filterKey) => {
+              const label =
+                filterKey === "all"
+                  ? "TODAS"
+                  : filterKey === "open"
+                    ? "ABERTAS"
+                    : "PENDÊNCIA";
+              const isSelected = filter === filterKey;
+              return (
+                <Box
+                  key={filterKey}
+                  component="button"
+                  onClick={() => setFilter(filterKey)}
+                  sx={{
+                    bgcolor: isSelected
+                      ? (theme) =>
+                          theme.palette.mode === "dark" ? "#2d3035" : "#17181a"
+                      : "background.paper",
+                    color: isSelected ? "#ffffff" : "text.primary",
+                    border: isSelected ? "none" : "1.5px solid",
+                    borderColor: "divider",
+                    borderRadius: "8px",
+                    px: 1.2,
+                    py: 0.7,
+                    fontFamily: "Archivo, sans-serif",
+                    fontWeight: isSelected ? 800 : 700,
+                    fontSize: "10px",
+                    letterSpacing: ".06em",
+                    cursor: "pointer",
+                    "&:hover": {
+                      borderColor: "text.primary",
+                    },
+                  }}
+                >
+                  {label}
+                </Box>
+              );
+            })}
           </Box>
         </Box>
 
         {/* Table Container */}
         <Box
           sx={{
-            bgcolor: "#ffffff",
-            border: "1.5px solid #eae6db",
+            bgcolor: "background.paper",
+            border: "1.5px solid",
+            borderColor: "divider",
             borderRadius: "16px",
             overflow: "hidden",
           }}
@@ -808,13 +829,17 @@ export default function OrganizationDetailDesktopView({
               alignItems: "center",
               gap: 2,
               p: "10px 18px",
-              bgcolor: "#f6f4ee",
-              borderBottom: "1.5px solid #eae6db",
+              bgcolor: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "rgba(255, 255, 255, 0.04)"
+                  : "#f6f4ee",
+              borderBottom: "1.5px solid",
+              borderColor: "divider",
               fontFamily: "Archivo, sans-serif",
               fontWeight: 700,
               fontSize: "8.5px",
               letterSpacing: ".14em",
-              color: "#6b675c",
+              color: "text.secondary",
             }}
           >
             <Box sx={{ width: 86, flexShrink: 0 }}>DATA</Box>
@@ -828,7 +853,7 @@ export default function OrganizationDetailDesktopView({
 
           {/* Rows */}
           {filteredPeladas.length === 0 ? (
-            <Box sx={{ p: 4, textAlign: "center", color: "#6b675c" }}>
+            <Box sx={{ p: 4, textAlign: "center", color: "text.secondary" }}>
               <Typography
                 sx={{
                   fontFamily: "Archivo, sans-serif",
@@ -873,8 +898,14 @@ export default function OrganizationDetailDesktopView({
                     alignItems: "center",
                     gap: 2,
                     p: "15px 18px",
-                    bgcolor: isOpen ? "#f4f8f5" : "#ffffff",
-                    borderBottom: "1.5px solid #eae6db",
+                    bgcolor: isOpen
+                      ? (theme) =>
+                          theme.palette.mode === "dark"
+                            ? "rgba(20, 107, 58, 0.15)"
+                            : "#f4f8f5"
+                      : "background.paper",
+                    borderBottom: "1.5px solid",
+                    borderColor: "divider",
                     borderLeft: isOpen ? "4px solid #146b3a" : "none",
                   }}
                 >
@@ -885,7 +916,7 @@ export default function OrganizationDetailDesktopView({
                         fontFamily: "'Archivo Narrow', Archivo, sans-serif",
                         fontWeight: 700,
                         fontSize: "15px",
-                        color: "#17181a",
+                        color: "text.primary",
                       }}
                     >
                       {dateDisplay}
@@ -895,7 +926,7 @@ export default function OrganizationDetailDesktopView({
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 600,
                         fontSize: "10px",
-                        color: "#6b675c",
+                        color: "text.secondary",
                         mt: 0.4,
                       }}
                     >
@@ -927,7 +958,7 @@ export default function OrganizationDetailDesktopView({
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: 600,
                             fontSize: "11px",
-                            color: "#6b675c",
+                            color: "text.secondary",
                             mt: 0.8,
                           }}
                         >
@@ -941,7 +972,7 @@ export default function OrganizationDetailDesktopView({
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: 700,
                             fontSize: "12.5px",
-                            color: "#17181a",
+                            color: "text.primary",
                           }}
                         >
                           Encerrada
@@ -954,7 +985,7 @@ export default function OrganizationDetailDesktopView({
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: 600,
                             fontSize: "11px",
-                            color: "#6b675c",
+                            color: "text.secondary",
                             mt: 0.4,
                           }}
                         >
@@ -989,7 +1020,7 @@ export default function OrganizationDetailDesktopView({
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: 700,
                             fontSize: "12px",
-                            color: "#17181a",
+                            color: "text.primary",
                           }}
                         >
                           {pelada.max_players
@@ -1003,7 +1034,7 @@ export default function OrganizationDetailDesktopView({
                           fontFamily: "Archivo, sans-serif",
                           fontWeight: 600,
                           fontSize: "11.5px",
-                          color: "#6b675c",
+                          color: "text.secondary",
                         }}
                       >
                         {history ? `${history.players_count} jogadores` : "—"}
@@ -1015,7 +1046,7 @@ export default function OrganizationDetailDesktopView({
                   <Box sx={{ width: 110, flexShrink: 0 }}>
                     <Typography
                       sx={{
-                        color: "#6b675c",
+                        color: "text.secondary",
                         fontWeight: 600,
                         fontSize: "12px",
                       }}
@@ -1043,10 +1074,11 @@ export default function OrganizationDetailDesktopView({
                           }
                           data-testid={`view-list-${pelada.id}`}
                           sx={{
-                            border: "1.5px solid #ddd8cc",
+                            border: "1.5px solid",
+                            borderColor: "divider",
                             borderRadius: "10px",
-                            bgcolor: "#ffffff",
-                            color: "#17181a",
+                            bgcolor: "background.paper",
+                            color: "text.primary",
                             p: "9px 13px",
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: 800,
@@ -1054,8 +1086,11 @@ export default function OrganizationDetailDesktopView({
                             letterSpacing: ".06em",
                             cursor: "pointer",
                             "&:hover": {
-                              borderColor: "#17181a",
-                              bgcolor: "#f6f4ee",
+                              borderColor: "text.primary",
+                              bgcolor: (theme) =>
+                                theme.palette.mode === "dark"
+                                  ? "rgba(255, 255, 255, 0.05)"
+                                  : "#f6f4ee",
                             },
                           }}
                         >
@@ -1070,7 +1105,10 @@ export default function OrganizationDetailDesktopView({
                             sx={{
                               border: "none",
                               borderRadius: "10px",
-                              bgcolor: "#17181a",
+                              bgcolor: (theme) =>
+                                theme.palette.mode === "dark"
+                                  ? "#2d3035"
+                                  : "#17181a",
                               color: "#ffffff",
                               p: "10px 13px",
                               fontFamily: "Archivo, sans-serif",
@@ -1078,7 +1116,12 @@ export default function OrganizationDetailDesktopView({
                               fontSize: "10.5px",
                               letterSpacing: ".06em",
                               cursor: "pointer",
-                              "&:hover": { bgcolor: "#000000" },
+                              "&:hover": {
+                                bgcolor: (theme) =>
+                                  theme.palette.mode === "dark"
+                                    ? "#3b3f46"
+                                    : "#000000",
+                              },
                             }}
                           >
                             FECHAR E SORTEAR
@@ -1090,10 +1133,11 @@ export default function OrganizationDetailDesktopView({
                         component="button"
                         onClick={() => navigate(`/peladas/${pelada.id}`)}
                         sx={{
-                          border: "1.5px solid #ddd8cc",
+                          border: "1.5px solid",
+                          borderColor: "divider",
                           borderRadius: "8px",
-                          bgcolor: "#ffffff",
-                          color: "#6b675c",
+                          bgcolor: "background.paper",
+                          color: "text.secondary",
                           p: "8px 11px",
                           fontFamily: "Archivo, sans-serif",
                           fontWeight: 700,
@@ -1101,8 +1145,8 @@ export default function OrganizationDetailDesktopView({
                           letterSpacing: ".06em",
                           cursor: "pointer",
                           "&:hover": {
-                            borderColor: "#17181a",
-                            color: "#17181a",
+                            borderColor: "text.primary",
+                            color: "text.primary",
                           },
                         }}
                       >
@@ -1122,7 +1166,10 @@ export default function OrganizationDetailDesktopView({
               alignItems: "center",
               justifyContent: "space-between",
               p: "13px 18px",
-              bgcolor: "#f6f4ee",
+              bgcolor: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "rgba(255, 255, 255, 0.04)"
+                  : "#f6f4ee",
             }}
           >
             <Typography
@@ -1130,7 +1177,7 @@ export default function OrganizationDetailDesktopView({
                 fontFamily: "Archivo, sans-serif",
                 fontWeight: 600,
                 fontSize: "11.5px",
-                color: "#6b675c",
+                color: "text.secondary",
               }}
             >
               1–{Math.min(filteredPeladas.length, 10)} de{" "}
@@ -1141,7 +1188,8 @@ export default function OrganizationDetailDesktopView({
                 fontFamily: "Archivo, sans-serif",
                 fontWeight: 700,
                 fontSize: "11.5px",
-                color: "#146b3a",
+                color: (theme) =>
+                  theme.palette.mode === "dark" ? "#34a853" : "#146b3a",
                 cursor: "pointer",
                 "&:hover": { textDecoration: "underline" },
               }}

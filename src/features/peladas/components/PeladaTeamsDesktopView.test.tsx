@@ -4,6 +4,8 @@ import PeladaTeamsDesktopView, {
   type PeladaTeamsDesktopViewProps,
 } from "./PeladaTeamsDesktopView";
 import { MemoryRouter } from "react-router-dom";
+import { ThemeProvider } from "@mui/material";
+import { getTheme } from "../../../lib/theme";
 import type { Pelada, Team, User } from "../../../shared/api/endpoints";
 
 vi.mock("react-i18next", () => ({
@@ -318,5 +320,19 @@ describe("PeladaTeamsDesktopView", () => {
     expect(
       screen.queryByTestId("desktop-add-team-button"),
     ).not.toBeInTheDocument();
+  });
+
+  it("renders correctly in dark mode without styling or contrast regressions", () => {
+    render(
+      <MemoryRouter>
+        <ThemeProvider theme={getTheme("dark")}>
+          <PeladaTeamsDesktopView {...defaultProps} />
+        </ThemeProvider>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("Sorteio de times")).toBeInTheDocument();
+    expect(screen.getByText("COMO SORTEAR")).toBeInTheDocument();
+    expect(screen.getByTestId("desktop-save-button")).toBeInTheDocument();
   });
 });

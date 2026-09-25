@@ -3,6 +3,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import ActiveMatchesCarousel from "./ActiveMatchesCarousel";
 import { BrowserRouter } from "react-router-dom";
+import { ThemeProvider } from "@mui/material";
+import { getTheme } from "../../../lib/theme";
 
 // Mock useNavigate
 const mockNavigate = vi.fn();
@@ -518,6 +520,25 @@ describe("ActiveMatchesCarousel", () => {
       expect(
         screen.queryByTestId("carousel-attendance-cancel-btn"),
       ).not.toBeInTheDocument();
+    });
+
+    it("renders section header with secondary text color in dark mode", () => {
+      const darkTheme = getTheme("dark");
+      render(
+        <ThemeProvider theme={darkTheme}>
+          <BrowserRouter>
+            <ActiveMatchesCarousel
+              peladas={mockPeladas as any}
+              onUpdateAttendance={mockUpdateAttendance}
+            />
+          </BrowserRouter>
+        </ThemeProvider>,
+      );
+
+      const sectionTitle = screen.getByText("SUA SEMANA");
+      expect(sectionTitle).toHaveStyle({
+        color: darkTheme.palette.text.secondary,
+      });
     });
   });
 });

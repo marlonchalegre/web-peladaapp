@@ -48,4 +48,16 @@ describe("DesktopHeader", () => {
     expect(avatar).toBeInTheDocument();
     expect(avatar).toHaveTextContent("IM");
   });
+
+  it("renders Início and Minha ficha nav links but excludes Grupos in desktop header", () => {
+    render(
+      <MemoryRouter>
+        <DesktopHeader />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("navigation.home")).toBeInTheDocument();
+    expect(screen.getByText("navigation.myCard")).toBeInTheDocument();
+    expect(screen.queryByText("navigation.groups")).not.toBeInTheDocument();
+  });
 });

@@ -291,7 +291,9 @@ export default function OrganizationDetailMobileView({
           display: "flex",
           alignItems: "center",
           gap: 1.1,
-          bgcolor: statsEnabled ? "#17181a" : "#6b675c",
+          bgcolor: statsEnabled
+            ? (theme) => (theme.palette.mode === "dark" ? "#242628" : "#17181a")
+            : "action.disabledBackground",
           borderRadius: "13px",
           p: "11px 13px",
           cursor: statsEnabled ? "pointer" : "not-allowed",
@@ -371,8 +373,9 @@ export default function OrganizationDetailMobileView({
           alignItems: "center",
           justifyContent: "center",
           gap: 0.5,
-          border: "1.5px solid #ddd8cc",
-          bgcolor: "#ffffff",
+          border: "1.5px solid",
+          borderColor: "divider",
+          bgcolor: "background.paper",
           borderRadius: "13px",
           p: "10px 13px",
           cursor: "pointer",
@@ -383,14 +386,17 @@ export default function OrganizationDetailMobileView({
             width: 15,
             height: 15,
             borderRadius: "50%",
-            border: "2px solid #17181a",
+            border: (theme) =>
+              theme.palette.mode === "dark"
+                ? "2px solid #ffffff"
+                : "2px solid #17181a",
           }}
         />
         <Typography
           sx={{
             font: "800 8.5px/1 Archivo,sans-serif",
             letterSpacing: ".06em",
-            color: "#17181a",
+            color: "text.primary",
           }}
         >
           ELENCO
@@ -409,7 +415,10 @@ export default function OrganizationDetailMobileView({
         key={pelada.id}
         data-testid={`mobile-open-pelada-${pelada.id}`}
         sx={{
-          bgcolor: "#f4f8f5",
+          bgcolor: (theme) =>
+            theme.palette.mode === "dark"
+              ? "rgba(20, 107, 58, 0.15)"
+              : "#f4f8f5",
           border: "2px solid #146b3a",
           borderRadius: "16px",
           p: "13px 14px",
@@ -427,7 +436,7 @@ export default function OrganizationDetailMobileView({
           <Typography
             sx={{
               font: "700 13px/1 'Archivo Narrow',Archivo,sans-serif",
-              color: "#17181a",
+              color: "text.primary",
             }}
           >
             {formatDayMonth(pelada.scheduled_at)} ·{" "}
@@ -474,7 +483,10 @@ export default function OrganizationDetailMobileView({
               flex: 1,
               height: 6,
               borderRadius: 4,
-              bgcolor: "#dfe8e1",
+              bgcolor: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "rgba(255, 255, 255, 0.12)"
+                  : "#dfe8e1",
               overflow: "hidden",
               display: "flex",
             }}
@@ -484,7 +496,7 @@ export default function OrganizationDetailMobileView({
           <Typography
             sx={{
               font: "700 11.5px/1 Archivo,sans-serif",
-              color: "#17181a",
+              color: "text.primary",
             }}
           >
             {confirmed}/{max || "—"}
@@ -500,13 +512,17 @@ export default function OrganizationDetailMobileView({
               flex: 1,
               border: 0,
               borderRadius: "11px",
-              bgcolor: "#17181a",
+              bgcolor: (theme) =>
+                theme.palette.mode === "dark" ? "#2d3035" : "#17181a",
               color: "#ffffff",
               p: "11px 0",
               font: "800 11px/1 Archivo,sans-serif",
               letterSpacing: ".06em",
               cursor: "pointer",
-              "&:hover": { bgcolor: "#000000" },
+              "&:hover": {
+                bgcolor: (theme) =>
+                  theme.palette.mode === "dark" ? "#3b3f46" : "#000000",
+              },
             }}
           >
             FECHAR E SORTEAR
@@ -516,15 +532,16 @@ export default function OrganizationDetailMobileView({
             onClick={() => navigate(`/peladas/${pelada.id}/attendance`)}
             sx={{
               flexShrink: 0,
-              border: "1.5px solid #c9c4b6",
+              border: "1.5px solid",
+              borderColor: "divider",
               borderRadius: "11px",
-              bgcolor: "#ffffff",
-              color: "#17181a",
+              bgcolor: "background.paper",
+              color: "text.primary",
               p: "11px 13px",
               font: "800 11px/1 Archivo,sans-serif",
               letterSpacing: ".06em",
               cursor: "pointer",
-              "&:hover": { borderColor: "#17181a" },
+              "&:hover": { borderColor: "text.primary" },
             }}
           >
             COBRAR
@@ -548,7 +565,8 @@ export default function OrganizationDetailMobileView({
           alignItems: "center",
           gap: 1.5,
           py: "13px",
-          borderBottom: "1.5px solid #f2efe7",
+          borderBottom: "1.5px solid",
+          borderColor: "divider",
           "&:last-of-type": { borderBottom: "none" },
         }}
       >
@@ -556,7 +574,7 @@ export default function OrganizationDetailMobileView({
           <Typography
             sx={{
               font: "700 13px/1.2 'Archivo Narrow',Archivo,sans-serif",
-              color: "#17181a",
+              color: "text.primary",
             }}
           >
             {formatDayMonth(pelada.scheduled_at)}
@@ -564,7 +582,7 @@ export default function OrganizationDetailMobileView({
           <Typography
             sx={{
               font: "600 10px/1.3 Archivo,sans-serif",
-              color: "#6b675c",
+              color: "text.secondary",
               mt: 0.25,
             }}
           >
@@ -575,7 +593,7 @@ export default function OrganizationDetailMobileView({
           <Typography
             sx={{
               font: "700 12.5px/1.2 Archivo,sans-serif",
-              color: "#17181a",
+              color: "text.primary",
             }}
           >
             {matches !== undefined
@@ -585,7 +603,7 @@ export default function OrganizationDetailMobileView({
           <Typography
             sx={{
               font: "600 10.5px/1.3 Archivo,sans-serif",
-              color: "#6b675c",
+              color: "text.secondary",
               mt: 0.25,
             }}
           >
@@ -612,15 +630,16 @@ export default function OrganizationDetailMobileView({
           onClick={() => navigate(`/peladas/${pelada.id}`)}
           sx={{
             flexShrink: 0,
-            border: "1.5px solid #ddd8cc",
+            border: "1.5px solid",
+            borderColor: "divider",
             borderRadius: "6px",
-            bgcolor: "#ffffff",
-            color: "#6b675c",
+            bgcolor: "background.paper",
+            color: "text.secondary",
             p: "4px 6px",
             font: "700 9px/1 Archivo,sans-serif",
             letterSpacing: ".06em",
             cursor: "pointer",
-            "&:hover": { borderColor: "#17181a", color: "#17181a" },
+            "&:hover": { borderColor: "text.primary", color: "text.primary" },
           }}
         >
           SÚMULA
@@ -643,7 +662,7 @@ export default function OrganizationDetailMobileView({
               bgcolor: "transparent",
               p: 0,
               font: "700 18px/1 Archivo,sans-serif",
-              color: "#6b675c",
+              color: "text.secondary",
               cursor: "pointer",
             }}
           >
@@ -654,7 +673,10 @@ export default function OrganizationDetailMobileView({
               width: 34,
               height: 34,
               bgcolor: "#146b3a",
-              border: "2.5px solid #17181a",
+              border: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "2.5px solid #2d3035"
+                  : "2.5px solid #17181a",
               font: "800 11px Archivo,sans-serif",
               color: "#ffffff",
             }}
@@ -666,7 +688,7 @@ export default function OrganizationDetailMobileView({
               noWrap
               sx={{
                 font: "800 15px/1.15 Archivo,sans-serif",
-                color: "#17181a",
+                color: "text.primary",
               }}
             >
               {org.name}
@@ -675,7 +697,7 @@ export default function OrganizationDetailMobileView({
               sx={{
                 font: "700 9.5px/1 Archivo,sans-serif",
                 letterSpacing: ".14em",
-                color: "#6b675c",
+                color: "text.secondary",
                 mt: 0.4,
               }}
             >
@@ -696,9 +718,10 @@ export default function OrganizationDetailMobileView({
               width: 32,
               height: 32,
               borderRadius: "10px",
-              border: "1.5px solid #ddd8cc",
-              bgcolor: "#ffffff",
-              color: "#6b675c",
+              border: "1.5px solid",
+              borderColor: "divider",
+              bgcolor: "background.paper",
+              color: "text.secondary",
             }}
           >
             <MoreHorizIcon sx={{ fontSize: 18 }} />
@@ -714,7 +737,8 @@ export default function OrganizationDetailMobileView({
               sx: {
                 minWidth: 230,
                 borderRadius: "12px",
-                border: "1.5px solid #eae6db",
+                border: "1.5px solid",
+                borderColor: "divider",
               },
             },
           }}
@@ -741,7 +765,8 @@ export default function OrganizationDetailMobileView({
               sx={{
                 font: "700 13px Archivo,sans-serif",
                 py: 1.25,
-                color: "#a8452a",
+                color: (theme) =>
+                  theme.palette.mode === "dark" ? "#e06c50" : "#a8452a",
               }}
             >
               <ExitToAppIcon sx={{ fontSize: 18, mr: 1.25 }} />
@@ -822,8 +847,9 @@ export default function OrganizationDetailMobileView({
           >
             <Box
               sx={{
-                bgcolor: "#ffffff",
-                border: "1.5px solid #ddd8cc",
+                bgcolor: "background.paper",
+                border: "1.5px solid",
+                borderColor: "divider",
                 borderRadius: "13px",
                 p: "10px 11px",
               }}
@@ -831,7 +857,7 @@ export default function OrganizationDetailMobileView({
               <Typography
                 sx={{
                   font: "700 20px/1 'Archivo Narrow',Archivo,sans-serif",
-                  color: "#17181a",
+                  color: "text.primary",
                 }}
               >
                 {totalPeladas}
@@ -840,7 +866,7 @@ export default function OrganizationDetailMobileView({
                 sx={{
                   font: "700 8px/1.2 Archivo,sans-serif",
                   letterSpacing: ".08em",
-                  color: "#6b675c",
+                  color: "text.secondary",
                   mt: 0.5,
                 }}
               >
@@ -849,8 +875,9 @@ export default function OrganizationDetailMobileView({
             </Box>
             <Box
               sx={{
-                bgcolor: "#ffffff",
-                border: "1.5px solid #ddd8cc",
+                bgcolor: "background.paper",
+                border: "1.5px solid",
+                borderColor: "divider",
                 borderRadius: "13px",
                 p: "10px 11px",
               }}
@@ -858,7 +885,8 @@ export default function OrganizationDetailMobileView({
               <Typography
                 sx={{
                   font: "700 20px/1 'Archivo Narrow',Archivo,sans-serif",
-                  color: "#a8452a",
+                  color: (theme) =>
+                    theme.palette.mode === "dark" ? "#e06c50" : "#a8452a",
                 }}
               >
                 0
@@ -867,7 +895,7 @@ export default function OrganizationDetailMobileView({
                 sx={{
                   font: "700 8px/1.2 Archivo,sans-serif",
                   letterSpacing: ".08em",
-                  color: "#6b675c",
+                  color: "text.secondary",
                   mt: 0.5,
                 }}
               >
@@ -876,8 +904,9 @@ export default function OrganizationDetailMobileView({
             </Box>
             <Box
               sx={{
-                bgcolor: "#ffffff",
-                border: "1.5px solid #ddd8cc",
+                bgcolor: "background.paper",
+                border: "1.5px solid",
+                borderColor: "divider",
                 borderRadius: "13px",
                 p: "10px 11px",
               }}
@@ -885,7 +914,7 @@ export default function OrganizationDetailMobileView({
               <Typography
                 sx={{
                   font: "700 20px/1 'Archivo Narrow',Archivo,sans-serif",
-                  color: "#17181a",
+                  color: "text.primary",
                 }}
               >
                 {waitlistStatus?.in_queue ? 1 : 0}
@@ -894,7 +923,7 @@ export default function OrganizationDetailMobileView({
                 sx={{
                   font: "700 8px/1.2 Archivo,sans-serif",
                   letterSpacing: ".08em",
-                  color: "#6b675c",
+                  color: "text.secondary",
                   mt: 0.5,
                 }}
               >
@@ -909,15 +938,18 @@ export default function OrganizationDetailMobileView({
       {isAdmin && !org.is_blocked && (
         <Box
           sx={{
-            bgcolor: "#ffffff",
-            borderTop: "2px solid #17181a",
-            borderBottom: "2px solid #17181a",
+            bgcolor: "background.paper",
+            borderTop: "2px solid",
+            borderBottom: "2px solid",
+            borderColor: (theme) =>
+              theme.palette.mode === "dark" ? "divider" : "#17181a",
             overflow: "hidden",
           }}
         >
           <Box
             sx={{
-              bgcolor: "#17181a",
+              bgcolor: (theme) =>
+                theme.palette.mode === "dark" ? "#242628" : "#17181a",
               px: 2.5,
               py: 1.4,
               display: "flex",
@@ -963,7 +995,7 @@ export default function OrganizationDetailMobileView({
             sx={{
               font: "700 9.5px/1 Archivo,sans-serif",
               letterSpacing: ".18em",
-              color: "#6b675c",
+              color: "text.secondary",
               mb: 1.25,
             }}
           >
@@ -971,11 +1003,16 @@ export default function OrganizationDetailMobileView({
           </Typography>
           <Box
             sx={{
-              bgcolor: "#ffffff",
-              border: "2px solid #17181a",
+              bgcolor: "background.paper",
+              border: "2px solid",
+              borderColor: (theme) =>
+                theme.palette.mode === "dark" ? "divider" : "#17181a",
               borderRadius: "18px",
               overflow: "hidden",
-              boxShadow: "5px 5px 0 #17181a",
+              boxShadow: (theme) =>
+                theme.palette.mode === "dark"
+                  ? "5px 5px 0 #000000"
+                  : "5px 5px 0 #17181a",
             }}
           >
             <Box
@@ -1027,7 +1064,7 @@ export default function OrganizationDetailMobileView({
                   sx={{
                     font: "700 58px/0.82 'Archivo Narrow',Archivo,sans-serif",
                     letterSpacing: "-.03em",
-                    color: "#17181a",
+                    color: "text.primary",
                   }}
                 >
                   {activePelada.scheduled_at
@@ -1038,7 +1075,7 @@ export default function OrganizationDetailMobileView({
                   <Typography
                     sx={{
                       font: "800 13.5px/1.1 Archivo,sans-serif",
-                      color: "#17181a",
+                      color: "text.primary",
                     }}
                   >
                     {formatWeekday(activePelada.scheduled_at)}
@@ -1046,7 +1083,7 @@ export default function OrganizationDetailMobileView({
                   <Typography
                     sx={{
                       font: "600 12.5px/1.3 Archivo,sans-serif",
-                      color: "#6b675c",
+                      color: "text.secondary",
                     }}
                   >
                     {formatMonth(activePelada.scheduled_at)} ·{" "}
@@ -1062,7 +1099,8 @@ export default function OrganizationDetailMobileView({
                   gap: 1,
                   mt: 1.75,
                   pt: 1.5,
-                  borderTop: "1.5px dashed #ddd8cc",
+                  borderTop: "1.5px dashed",
+                  borderColor: "divider",
                 }}
               >
                 <Box sx={{ display: "flex" }}>
@@ -1076,7 +1114,10 @@ export default function OrganizationDetailMobileView({
                         sx={{
                           width: 28,
                           height: 28,
-                          border: "2px solid #ffffff",
+                          border: (theme) =>
+                            theme.palette.mode === "dark"
+                              ? "2px solid #242628"
+                              : "2px solid #ffffff",
                           ml: idx === 0 ? 0 : "-8px",
                           bgcolor:
                             AVATAR_BG_COLORS[idx % AVATAR_BG_COLORS.length],
@@ -1099,9 +1140,13 @@ export default function OrganizationDetailMobileView({
                       sx={{
                         width: 28,
                         height: 28,
-                        border: "2px solid #ffffff",
+                        border: (theme) =>
+                          theme.palette.mode === "dark"
+                            ? "2px solid #242628"
+                            : "2px solid #ffffff",
                         ml: "-8px",
-                        bgcolor: "#17181a",
+                        bgcolor: (theme) =>
+                          theme.palette.mode === "dark" ? "#2d3035" : "#17181a",
                         color: "#ffffff",
                         font: "800 9px Archivo,sans-serif",
                       }}
@@ -1121,13 +1166,13 @@ export default function OrganizationDetailMobileView({
                 <Typography
                   sx={{
                     font: "700 12px/1.3 Archivo,sans-serif",
-                    color: "#17181a",
+                    color: "text.primary",
                   }}
                 >
                   {activePelada.confirmed_count || 0}{" "}
                   <Box
                     component="span"
-                    sx={{ color: "#6b675c", fontWeight: 600 }}
+                    sx={{ color: "text.secondary", fontWeight: 600 }}
                   >
                     de {activePelada.max_players || "—"} na lista
                   </Box>
@@ -1173,7 +1218,7 @@ export default function OrganizationDetailMobileView({
               sx={{
                 font: "700 9.5px/1 Archivo,sans-serif",
                 letterSpacing: ".18em",
-                color: "#6b675c",
+                color: "text.secondary",
               }}
             >
               PÓDIO DA TEMPORADA
@@ -1183,7 +1228,8 @@ export default function OrganizationDetailMobileView({
               to={`/organizations/${org.id}/statistics`}
               sx={{
                 font: "700 11px/1 Archivo,sans-serif",
-                color: "#146b3a",
+                color: (theme) =>
+                  theme.palette.mode === "dark" ? "#34a853" : "#146b3a",
                 textDecoration: "none",
               }}
             >
@@ -1196,8 +1242,9 @@ export default function OrganizationDetailMobileView({
               <Box
                 sx={{
                   flex: 1,
-                  bgcolor: "#ffffff",
-                  border: "1.5px solid #eae6db",
+                  bgcolor: "background.paper",
+                  border: "1.5px solid",
+                  borderColor: "divider",
                   borderRadius: "14px",
                   p: "12px 11px",
                 }}
@@ -1206,7 +1253,7 @@ export default function OrganizationDetailMobileView({
                   sx={{
                     font: "700 8.5px/1 Archivo,sans-serif",
                     letterSpacing: ".12em",
-                    color: "#6b675c",
+                    color: "text.secondary",
                   }}
                 >
                   ARTILHEIRO
@@ -1234,7 +1281,7 @@ export default function OrganizationDetailMobileView({
                   <Typography
                     sx={{
                       font: "700 25px/1 'Archivo Narrow',Archivo,sans-serif",
-                      color: "#17181a",
+                      color: "text.primary",
                     }}
                   >
                     {topScorer.goal || 0}
@@ -1244,7 +1291,7 @@ export default function OrganizationDetailMobileView({
                   noWrap
                   sx={{
                     font: "700 11px/1.3 Archivo,sans-serif",
-                    color: "#17181a",
+                    color: "text.primary",
                     mt: 1,
                   }}
                 >
@@ -1257,8 +1304,9 @@ export default function OrganizationDetailMobileView({
               <Box
                 sx={{
                   flex: 1,
-                  bgcolor: "#ffffff",
-                  border: "1.5px solid #eae6db",
+                  bgcolor: "background.paper",
+                  border: "1.5px solid",
+                  borderColor: "divider",
                   borderRadius: "14px",
                   p: "12px 11px",
                 }}
@@ -1267,7 +1315,7 @@ export default function OrganizationDetailMobileView({
                   sx={{
                     font: "700 8.5px/1 Archivo,sans-serif",
                     letterSpacing: ".12em",
-                    color: "#6b675c",
+                    color: "text.secondary",
                   }}
                 >
                   GARÇOM
@@ -1295,7 +1343,7 @@ export default function OrganizationDetailMobileView({
                   <Typography
                     sx={{
                       font: "700 25px/1 'Archivo Narrow',Archivo,sans-serif",
-                      color: "#17181a",
+                      color: "text.primary",
                     }}
                   >
                     {topAssister.assist || 0}
@@ -1305,7 +1353,7 @@ export default function OrganizationDetailMobileView({
                   noWrap
                   sx={{
                     font: "700 11px/1.3 Archivo,sans-serif",
-                    color: "#17181a",
+                    color: "text.primary",
                     mt: 1,
                   }}
                 >
@@ -1319,7 +1367,10 @@ export default function OrganizationDetailMobileView({
                 data-testid="member-podium-you"
                 sx={{
                   flex: 1,
-                  bgcolor: "#f4f8f5",
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "rgba(20, 107, 58, 0.15)"
+                      : "#f4f8f5",
                   border: "2px solid #146b3a",
                   borderRadius: "14px",
                   p: "12px 11px",
@@ -1357,7 +1408,7 @@ export default function OrganizationDetailMobileView({
                   <Typography
                     sx={{
                       font: "700 25px/1 'Archivo Narrow',Archivo,sans-serif",
-                      color: "#17181a",
+                      color: "text.primary",
                     }}
                   >
                     {myBest.value}
@@ -1367,7 +1418,7 @@ export default function OrganizationDetailMobileView({
                   noWrap
                   sx={{
                     font: "700 11px/1.3 Archivo,sans-serif",
-                    color: "#17181a",
+                    color: "text.primary",
                     mt: 1,
                   }}
                 >
@@ -1384,8 +1435,9 @@ export default function OrganizationDetailMobileView({
         <Box sx={{ px: 2.5, pt: 2.5 }}>
           <Box
             sx={{
-              bgcolor: "#ffffff",
-              border: "1.5px solid #eae6db",
+              bgcolor: "background.paper",
+              border: "1.5px solid",
+              borderColor: "divider",
               borderRadius: "16px",
               overflow: "hidden",
             }}
@@ -1396,15 +1448,19 @@ export default function OrganizationDetailMobileView({
                 justifyContent: "space-between",
                 alignItems: "center",
                 p: "11px 14px",
-                bgcolor: "#f6f4ee",
-                borderBottom: "1.5px solid #eae6db",
+                bgcolor: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "rgba(255, 255, 255, 0.04)"
+                    : "#f6f4ee",
+                borderBottom: "1.5px solid",
+                borderColor: "divider",
               }}
             >
               <Typography
                 sx={{
                   font: "700 9.5px/1 Archivo,sans-serif",
                   letterSpacing: ".14em",
-                  color: "#6b675c",
+                  color: "text.secondary",
                 }}
               >
                 ELENCO · {players.length}
@@ -1417,7 +1473,8 @@ export default function OrganizationDetailMobileView({
                   bgcolor: "transparent",
                   p: 0,
                   font: "700 10.5px/1 Archivo,sans-serif",
-                  color: "#146b3a",
+                  color: (theme) =>
+                    theme.palette.mode === "dark" ? "#34a853" : "#146b3a",
                   cursor: "pointer",
                 }}
               >
@@ -1452,7 +1509,8 @@ export default function OrganizationDetailMobileView({
                   sx={{
                     width: 34,
                     height: 34,
-                    bgcolor: "#17181a",
+                    bgcolor: (theme) =>
+                      theme.palette.mode === "dark" ? "#2d3035" : "#17181a",
                     color: "#ffffff",
                     font: "800 9.5px Archivo,sans-serif",
                   }}
@@ -1480,7 +1538,7 @@ export default function OrganizationDetailMobileView({
               sx={{
                 font: "700 9.5px/1 Archivo,sans-serif",
                 letterSpacing: ".18em",
-                color: "#6b675c",
+                color: "text.secondary",
               }}
             >
               HISTÓRICO DO GRUPO
@@ -1488,7 +1546,7 @@ export default function OrganizationDetailMobileView({
             <Typography
               sx={{
                 font: "700 11px/1 Archivo,sans-serif",
-                color: "#6b675c",
+                color: "text.secondary",
               }}
             >
               {totalPeladas} peladas
@@ -1497,8 +1555,9 @@ export default function OrganizationDetailMobileView({
 
           <Box
             sx={{
-              bgcolor: "#ffffff",
-              border: "1.5px solid #eae6db",
+              bgcolor: "background.paper",
+              border: "1.5px solid",
+              borderColor: "divider",
               borderRadius: "16px",
               px: 1.75,
             }}
@@ -1506,14 +1565,14 @@ export default function OrganizationDetailMobileView({
             {historyEntries.map((entry, idx) => {
               const line = entry.user;
               const badge = !line
-                ? { label: "FALTA", color: "#6b675c", border: "#ddd8cc" }
+                ? { label: "FALTA", color: "text.secondary", isTitle: false }
                 : line.team_position === 1
-                  ? { label: "TÍTULO", color: "#146b3a", border: "#146b3a" }
+                  ? { label: "TÍTULO", color: "#146b3a", isTitle: true }
                   : line.team_position
                     ? {
                         label: `${line.team_position}º`,
-                        color: "#6b675c",
-                        border: "#ddd8cc",
+                        color: "text.secondary",
+                        isTitle: false,
                       }
                     : null;
               const subtitle = line
@@ -1538,7 +1597,8 @@ export default function OrganizationDetailMobileView({
                     borderBottom:
                       idx === historyEntries.length - 1
                         ? "none"
-                        : "1.5px solid #f2efe7",
+                        : "1.5px solid",
+                    borderBottomColor: "divider",
                   }}
                 >
                   <Typography
@@ -1546,7 +1606,7 @@ export default function OrganizationDetailMobileView({
                       width: 46,
                       flexShrink: 0,
                       font: "700 13px/1.2 'Archivo Narrow',Archivo,sans-serif",
-                      color: "#17181a",
+                      color: "text.primary",
                     }}
                   >
                     {formatDayMonth(entry.scheduled_at)}
@@ -1555,7 +1615,7 @@ export default function OrganizationDetailMobileView({
                     <Typography
                       sx={{
                         font: "700 12.5px/1.2 Archivo,sans-serif",
-                        color: "#17181a",
+                        color: "text.primary",
                       }}
                     >
                       {entry.matches_count} partida
@@ -1565,7 +1625,7 @@ export default function OrganizationDetailMobileView({
                     <Typography
                       sx={{
                         font: "600 10.5px/1.3 Archivo,sans-serif",
-                        color: "#6b675c",
+                        color: "text.secondary",
                         mt: 0.25,
                       }}
                     >
@@ -1578,8 +1638,19 @@ export default function OrganizationDetailMobileView({
                         flexShrink: 0,
                         font: "700 9px/1 Archivo,sans-serif",
                         letterSpacing: ".06em",
-                        color: badge.color,
-                        border: `1.5px solid ${badge.border}`,
+                        color: badge.isTitle
+                          ? (theme) =>
+                              theme.palette.mode === "dark"
+                                ? "#34a853"
+                                : "#146b3a"
+                          : badge.color,
+                        border: "1.5px solid",
+                        borderColor: badge.isTitle
+                          ? (theme) =>
+                              theme.palette.mode === "dark"
+                                ? "#34a853"
+                                : "#146b3a"
+                          : "divider",
                         borderRadius: "6px",
                         p: "4px 6px",
                       }}
@@ -1609,7 +1680,7 @@ export default function OrganizationDetailMobileView({
               sx={{
                 font: "700 9.5px/1 Archivo,sans-serif",
                 letterSpacing: ".18em",
-                color: "#6b675c",
+                color: "text.secondary",
               }}
             >
               AGENDA DO GRUPO
@@ -1617,7 +1688,7 @@ export default function OrganizationDetailMobileView({
             <Typography
               sx={{
                 font: "700 11px/1 Archivo,sans-serif",
-                color: "#6b675c",
+                color: "text.secondary",
               }}
             >
               {totalPeladas} peladas
@@ -1627,8 +1698,9 @@ export default function OrganizationDetailMobileView({
           {visiblePeladas.length === 0 ? (
             <Box
               sx={{
-                bgcolor: "#ffffff",
-                border: "1.5px solid #eae6db",
+                bgcolor: "background.paper",
+                border: "1.5px solid",
+                borderColor: "divider",
                 borderRadius: "16px",
                 p: 3,
                 textAlign: "center",
@@ -1637,7 +1709,7 @@ export default function OrganizationDetailMobileView({
               <Typography
                 sx={{
                   font: "600 12px/1.4 Archivo,sans-serif",
-                  color: "#6b675c",
+                  color: "text.secondary",
                 }}
               >
                 Nenhuma pelada encontrada.
@@ -1646,8 +1718,9 @@ export default function OrganizationDetailMobileView({
           ) : (
             <Box
               sx={{
-                bgcolor: "#ffffff",
-                border: "1.5px solid #eae6db",
+                bgcolor: "background.paper",
+                border: "1.5px solid",
+                borderColor: "divider",
                 borderRadius: "16px",
                 px: 1.75,
                 py: 0.5,
@@ -1671,7 +1744,7 @@ export default function OrganizationDetailMobileView({
               <Typography
                 sx={{
                   font: "700 11.5px/1 Archivo,sans-serif",
-                  color: "#6b675c",
+                  color: "text.secondary",
                 }}
               >
                 {rangeStart}–{rangeEnd} de {totalPeladas}
@@ -1685,7 +1758,8 @@ export default function OrganizationDetailMobileView({
                     border: 0,
                     bgcolor: "transparent",
                     font: "800 11.5px/1 Archivo,sans-serif",
-                    color: "#146b3a",
+                    color: (theme) =>
+                      theme.palette.mode === "dark" ? "#34a853" : "#146b3a",
                     cursor: "pointer",
                   }}
                 >

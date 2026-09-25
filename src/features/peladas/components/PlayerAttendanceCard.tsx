@@ -71,9 +71,9 @@ export default function PlayerAttendanceCard({
         borderRadius: "12px",
         border: "1.5px solid",
         borderColor: "divider",
-        bgcolor: "#ffffff",
+        bgcolor: "background.paper",
         "&:hover": {
-          borderColor: "#17181a",
+          borderColor: "text.primary",
           bgcolor: "background.paper",
         },
         transition: "all 0.15s ease",
@@ -97,11 +97,17 @@ export default function PlayerAttendanceCard({
               width: 34,
               height: 34,
               mr: 1.5,
-              bgcolor: isCurrentUser ? "#146b3a" : "#eae6db",
-              color: isCurrentUser ? "#ffffff" : "#17181a",
+              bgcolor: isCurrentUser
+                ? "#146b3a"
+                : (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "rgba(234, 230, 219, 0.15)"
+                      : "#eae6db",
+              color: isCurrentUser ? "#ffffff" : "text.primary",
               fontSize: "0.75rem",
               fontWeight: 800,
-              border: isCurrentUser ? "none" : "1.5px solid #ddd8cc",
+              border: isCurrentUser ? "none" : "1.5px solid",
+              borderColor: isCurrentUser ? "transparent" : "divider",
             }}
             fallbackText={initials}
           />
@@ -115,7 +121,7 @@ export default function PlayerAttendanceCard({
                 fontWeight: 800,
                 fontSize: "0.95rem",
                 lineHeight: 1.2,
-                color: "#17181a",
+                color: "text.primary",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
               }}

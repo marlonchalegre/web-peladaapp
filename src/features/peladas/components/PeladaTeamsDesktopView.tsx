@@ -215,7 +215,7 @@ export default function PeladaTeamsDesktopView({
                 fontWeight: 700,
                 fontSize: "9.5px",
                 letterSpacing: ".16em",
-                color: "#6b675c",
+                color: "text.secondary",
                 textTransform: "uppercase",
               }}
             >
@@ -254,7 +254,8 @@ export default function PeladaTeamsDesktopView({
                       fontWeight: "inherit",
                       fontSize: "inherit",
                       letterSpacing: "inherit",
-                      color: "#146b3a",
+                      color: (theme) =>
+                        theme.palette.mode === "dark" ? "#34a853" : "#146b3a",
                       textTransform: "inherit",
                     }}
                   />
@@ -268,7 +269,7 @@ export default function PeladaTeamsDesktopView({
                 fontWeight: 800,
                 fontSize: "26px",
                 lineHeight: 1.1,
-                color: "#17181a",
+                color: "text.primary",
                 mt: 1,
               }}
             >
@@ -283,7 +284,7 @@ export default function PeladaTeamsDesktopView({
                 fontWeight: 600,
                 fontSize: "11.5px",
                 lineHeight: 1.3,
-                color: "#6b675c",
+                color: "text.secondary",
                 textAlign: "right",
               }}
             >
@@ -295,8 +296,9 @@ export default function PeladaTeamsDesktopView({
               onClick={onCopyAnnouncement}
               data-testid="desktop-zap-button"
               sx={{
-                border: "1.5px solid #ddd8cc",
-                bgcolor: "#fff",
+                border: "1.5px solid",
+                borderColor: "divider",
+                bgcolor: "background.paper",
                 borderRadius: "11px",
                 py: 1.25,
                 px: 1.75,
@@ -304,9 +306,15 @@ export default function PeladaTeamsDesktopView({
                 fontWeight: 800,
                 fontSize: "11px",
                 letterSpacing: ".04em",
-                color: "#17181a",
+                color: "text.primary",
                 textTransform: "none",
-                "&:hover": { bgcolor: "#f6f4ee" },
+                "&:hover": {
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "rgba(255,255,255,0.06)"
+                      : "#f6f4ee",
+                  borderColor: "text.primary",
+                },
               }}
             >
               MANDAR NO ZAP
@@ -316,7 +324,8 @@ export default function PeladaTeamsDesktopView({
               data-testid="desktop-save-button"
               sx={{
                 borderRadius: "11px",
-                bgcolor: "#17181a",
+                bgcolor: (theme) =>
+                  theme.palette.mode === "dark" ? "#2d3035" : "#17181a",
                 py: 1.25,
                 px: 2,
                 fontFamily: "Archivo, sans-serif",
@@ -325,7 +334,10 @@ export default function PeladaTeamsDesktopView({
                 letterSpacing: ".04em",
                 color: "#fff",
                 textTransform: "none",
-                "&:hover": { bgcolor: "#242628" },
+                "&:hover": {
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark" ? "#3b3f46" : "#000000",
+                },
               }}
             >
               SALVAR TIMES
@@ -362,7 +374,8 @@ export default function PeladaTeamsDesktopView({
             >
               <Box
                 sx={{
-                  bgcolor: "#17181a",
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark" ? "#242628" : "#17181a",
                   py: 1.4,
                   px: 2,
                   display: "flex",
@@ -401,7 +414,7 @@ export default function PeladaTeamsDesktopView({
                     fontWeight: 600,
                     fontSize: "11.5px",
                     lineHeight: 1.45,
-                    color: "#6b675c",
+                    color: "text.secondary",
                   }}
                 >
                   Escolha como os confirmados serão divididos. O sorteio
@@ -425,8 +438,15 @@ export default function PeladaTeamsDesktopView({
                       border:
                         algorithm === "classic"
                           ? "2px solid #146b3a"
-                          : "1.5px solid #ddd8cc",
-                      bgcolor: algorithm === "classic" ? "#f4f8f5" : "#fff",
+                          : "1.5px solid",
+                      borderColor:
+                        algorithm === "classic" ? "#146b3a" : "divider",
+                      bgcolor: (theme) =>
+                        algorithm === "classic"
+                          ? theme.palette.mode === "dark"
+                            ? "rgba(20, 107, 58, 0.15)"
+                            : "#f4f8f5"
+                          : "background.paper",
                       borderRadius: "14px",
                       p: 1.5,
                       cursor: "pointer",
@@ -448,8 +468,10 @@ export default function PeladaTeamsDesktopView({
                           border:
                             algorithm === "classic"
                               ? "5px solid #146b3a"
-                              : "2px solid #c9c4b6",
-                          bgcolor: "#fff",
+                              : "2px solid",
+                          borderColor:
+                            algorithm === "classic" ? "#146b3a" : "divider",
+                          bgcolor: "background.paper",
                           flexShrink: 0,
                         }}
                       />
@@ -458,7 +480,7 @@ export default function PeladaTeamsDesktopView({
                           fontFamily: "Archivo, sans-serif",
                           fontWeight: algorithm === "classic" ? 800 : 700,
                           fontSize: "12.5px",
-                          color: "#17181a",
+                          color: "text.primary",
                           flex: 1,
                         }}
                       >
@@ -489,7 +511,7 @@ export default function PeladaTeamsDesktopView({
                         fontWeight: 600,
                         fontSize: "11px",
                         lineHeight: 1.4,
-                        color: "#6b675c",
+                        color: "text.secondary",
                         mt: 1,
                         pl: 3.25,
                       }}
@@ -509,8 +531,15 @@ export default function PeladaTeamsDesktopView({
                       border:
                         algorithm === "gemini"
                           ? "2px solid #146b3a"
-                          : "1.5px solid #ddd8cc",
-                      bgcolor: algorithm === "gemini" ? "#f4f8f5" : "#fff",
+                          : "1.5px solid",
+                      borderColor:
+                        algorithm === "gemini" ? "#146b3a" : "divider",
+                      bgcolor: (theme) =>
+                        algorithm === "gemini"
+                          ? theme.palette.mode === "dark"
+                            ? "rgba(20, 107, 58, 0.15)"
+                            : "#f4f8f5"
+                          : "background.paper",
                       borderRadius: "14px",
                       p: 1.5,
                       cursor: "pointer",
@@ -532,8 +561,10 @@ export default function PeladaTeamsDesktopView({
                           border:
                             algorithm === "gemini"
                               ? "5px solid #146b3a"
-                              : "2px solid #c9c4b6",
-                          bgcolor: "#fff",
+                              : "2px solid",
+                          borderColor:
+                            algorithm === "gemini" ? "#146b3a" : "divider",
+                          bgcolor: "background.paper",
                           flexShrink: 0,
                         }}
                       />
@@ -542,7 +573,7 @@ export default function PeladaTeamsDesktopView({
                           fontFamily: "Archivo, sans-serif",
                           fontWeight: algorithm === "gemini" ? 800 : 700,
                           fontSize: "12.5px",
-                          color: "#17181a",
+                          color: "text.primary",
                           flex: 1,
                         }}
                       >
@@ -557,8 +588,9 @@ export default function PeladaTeamsDesktopView({
                           fontWeight: 800,
                           fontSize: "8.5px",
                           letterSpacing: ".08em",
-                          color: "#6b675c",
-                          border: "1.5px solid #ddd8cc",
+                          color: "text.secondary",
+                          border: "1.5px solid",
+                          borderColor: "divider",
                           borderRadius: "5px",
                           px: 0.6,
                           py: 0.3,
@@ -576,7 +608,7 @@ export default function PeladaTeamsDesktopView({
                         fontWeight: 600,
                         fontSize: "11px",
                         lineHeight: 1.4,
-                        color: "#6b675c",
+                        color: "text.secondary",
                         mt: 1,
                         pl: 3.25,
                       }}
@@ -596,8 +628,14 @@ export default function PeladaTeamsDesktopView({
                       border:
                         algorithm === "gpt"
                           ? "2px solid #146b3a"
-                          : "1.5px solid #ddd8cc",
-                      bgcolor: algorithm === "gpt" ? "#f4f8f5" : "#fff",
+                          : "1.5px solid",
+                      borderColor: algorithm === "gpt" ? "#146b3a" : "divider",
+                      bgcolor: (theme) =>
+                        algorithm === "gpt"
+                          ? theme.palette.mode === "dark"
+                            ? "rgba(20, 107, 58, 0.15)"
+                            : "#f4f8f5"
+                          : "background.paper",
                       borderRadius: "14px",
                       p: 1.5,
                       cursor: "pointer",
@@ -619,8 +657,10 @@ export default function PeladaTeamsDesktopView({
                           border:
                             algorithm === "gpt"
                               ? "5px solid #146b3a"
-                              : "2px solid #c9c4b6",
-                          bgcolor: "#fff",
+                              : "2px solid",
+                          borderColor:
+                            algorithm === "gpt" ? "#146b3a" : "divider",
+                          bgcolor: "background.paper",
                           flexShrink: 0,
                         }}
                       />
@@ -629,7 +669,7 @@ export default function PeladaTeamsDesktopView({
                           fontFamily: "Archivo, sans-serif",
                           fontWeight: algorithm === "gpt" ? 800 : 700,
                           fontSize: "12.5px",
-                          color: "#17181a",
+                          color: "text.primary",
                           flex: 1,
                         }}
                       >
@@ -641,8 +681,9 @@ export default function PeladaTeamsDesktopView({
                           fontWeight: 800,
                           fontSize: "8.5px",
                           letterSpacing: ".08em",
-                          color: "#6b675c",
-                          border: "1.5px solid #ddd8cc",
+                          color: "text.secondary",
+                          border: "1.5px solid",
+                          borderColor: "divider",
                           borderRadius: "5px",
                           px: 0.6,
                           py: 0.3,
@@ -660,7 +701,7 @@ export default function PeladaTeamsDesktopView({
                         fontWeight: 600,
                         fontSize: "11px",
                         lineHeight: 1.4,
-                        color: "#6b675c",
+                        color: "text.secondary",
                         mt: 1,
                         pl: 3.25,
                       }}
@@ -679,7 +720,8 @@ export default function PeladaTeamsDesktopView({
                     sx={{
                       mt: 2,
                       pt: 2,
-                      borderTop: "1.5px dashed #ddd8cc",
+                      borderTop: "1.5px dashed",
+                      borderColor: "divider",
                     }}
                   >
                     <Typography
@@ -688,7 +730,7 @@ export default function PeladaTeamsDesktopView({
                         fontWeight: 700,
                         fontSize: "9px",
                         letterSpacing: ".14em",
-                        color: "#6b675c",
+                        color: "text.secondary",
                         textTransform: "uppercase",
                       }}
                     >
@@ -699,7 +741,8 @@ export default function PeladaTeamsDesktopView({
                       <Box
                         sx={{
                           flex: 1,
-                          border: "1.5px solid #ddd8cc",
+                          border: "1.5px solid",
+                          borderColor: "divider",
                           borderRadius: "12px",
                           p: "9px 10px",
                         }}
@@ -710,7 +753,7 @@ export default function PeladaTeamsDesktopView({
                             fontWeight: 700,
                             fontSize: "9px",
                             letterSpacing: ".08em",
-                            color: "#6b675c",
+                            color: "text.secondary",
                             textTransform: "uppercase",
                           }}
                         >
@@ -741,7 +784,7 @@ export default function PeladaTeamsDesktopView({
                               fontWeight: 700,
                               fontSize: "20px",
                               lineHeight: 1,
-                              color: "#17181a",
+                              color: "text.primary",
                             }}
                           >
                             {numTeams}
@@ -761,7 +804,8 @@ export default function PeladaTeamsDesktopView({
                       <Box
                         sx={{
                           flex: 1,
-                          border: "1.5px solid #ddd8cc",
+                          border: "1.5px solid",
+                          borderColor: "divider",
                           borderRadius: "12px",
                           p: "9px 10px",
                         }}
@@ -772,7 +816,7 @@ export default function PeladaTeamsDesktopView({
                             fontWeight: 700,
                             fontSize: "9px",
                             letterSpacing: ".08em",
-                            color: "#6b675c",
+                            color: "text.secondary",
                             textTransform: "uppercase",
                           }}
                         >
@@ -805,7 +849,7 @@ export default function PeladaTeamsDesktopView({
                               fontWeight: 700,
                               fontSize: "20px",
                               lineHeight: 1,
-                              color: "#17181a",
+                              color: "text.primary",
                             }}
                           >
                             {playersPerTeam}
@@ -835,7 +879,8 @@ export default function PeladaTeamsDesktopView({
                     gap: 1.5,
                     mt: 2,
                     pt: 2,
-                    borderTop: "1.5px dashed #ddd8cc",
+                    borderTop: "1.5px dashed",
+                    borderColor: "divider",
                   }}
                 >
                   <Switch
@@ -852,7 +897,10 @@ export default function PeladaTeamsDesktopView({
                         fontWeight: 800,
                         fontSize: "11.5px",
                         lineHeight: 1.2,
-                        color: algorithm === "classic" ? "#6b675c" : "#17181a",
+                        color:
+                          algorithm === "classic"
+                            ? "text.secondary"
+                            : "text.primary",
                       }}
                     >
                       Usar sinais históricos
@@ -863,7 +911,7 @@ export default function PeladaTeamsDesktopView({
                         fontWeight: 600,
                         fontSize: "10.5px",
                         lineHeight: 1.35,
-                        color: "#6b675c",
+                        color: "text.secondary",
                         mt: 0.5,
                       }}
                     >
@@ -879,7 +927,8 @@ export default function PeladaTeamsDesktopView({
                   sx={{
                     mt: 2,
                     pt: 2,
-                    borderTop: "1.5px dashed #ddd8cc",
+                    borderTop: "1.5px dashed",
+                    borderColor: "divider",
                   }}
                 >
                   <Typography
@@ -888,7 +937,7 @@ export default function PeladaTeamsDesktopView({
                       fontWeight: 700,
                       fontSize: "9px",
                       letterSpacing: ".14em",
-                      color: "#6b675c",
+                      color: "text.secondary",
                       textTransform: "uppercase",
                     }}
                   >
@@ -902,13 +951,19 @@ export default function PeladaTeamsDesktopView({
                       onDrop={(e) => dropToFixedGk(e, "home")}
                       sx={{
                         flex: 1,
-                        border: "1.5px solid #ddd8cc",
+                        border: "1.5px solid",
+                        borderColor: "divider",
                         borderRadius: "12px",
                         p: "10px 11px",
                         display: "flex",
                         alignItems: "center",
                         gap: 1.2,
-                        bgcolor: homeGk ? "#fff" : "#f6f4ee",
+                        bgcolor: (theme) =>
+                          homeGk
+                            ? "background.paper"
+                            : theme.palette.mode === "dark"
+                              ? "rgba(255,255,255,0.04)"
+                              : "#f6f4ee",
                         minHeight: 46,
                       }}
                     >
@@ -921,11 +976,14 @@ export default function PeladaTeamsDesktopView({
                             sx={{
                               width: 28,
                               height: 28,
-                              bgcolor: "#dcd3bd",
+                              bgcolor: (theme) =>
+                                theme.palette.mode === "dark"
+                                  ? "rgba(220, 211, 189, 0.2)"
+                                  : "#dcd3bd",
                               fontFamily: "Archivo, sans-serif",
                               fontWeight: 800,
                               fontSize: "9.5px",
-                              color: "#17181a",
+                              color: "text.primary",
                               flexShrink: 0,
                             }}
                           />
@@ -936,7 +994,7 @@ export default function PeladaTeamsDesktopView({
                                 fontWeight: 700,
                                 fontSize: "11px",
                                 lineHeight: 1.2,
-                                color: "#17181a",
+                                color: "text.primary",
                                 whiteSpace: "nowrap",
                                 overflow: "hidden",
                                 textOverflow: "ellipsis",
@@ -950,7 +1008,7 @@ export default function PeladaTeamsDesktopView({
                                 fontWeight: 600,
                                 fontSize: "9.5px",
                                 lineHeight: 1.2,
-                                color: "#6b675c",
+                                color: "text.secondary",
                                 mt: 0.25,
                               }}
                             >
@@ -961,7 +1019,7 @@ export default function PeladaTeamsDesktopView({
                             <IconButton
                               size="small"
                               onClick={() => removeFixedGk("home")}
-                              sx={{ p: 0.25, color: "#6b675c" }}
+                              sx={{ p: 0.25, color: "text.secondary" }}
                             >
                               <CloseIcon sx={{ fontSize: 13 }} />
                             </IconButton>
@@ -973,7 +1031,7 @@ export default function PeladaTeamsDesktopView({
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: 600,
                             fontSize: "10.5px",
-                            color: "#9a958a",
+                            color: "text.secondary",
                             textAlign: "center",
                             width: "100%",
                           }}
@@ -989,13 +1047,19 @@ export default function PeladaTeamsDesktopView({
                       onDrop={(e) => dropToFixedGk(e, "away")}
                       sx={{
                         flex: 1,
-                        border: "1.5px solid #ddd8cc",
+                        border: "1.5px solid",
+                        borderColor: "divider",
                         borderRadius: "12px",
                         p: "10px 11px",
                         display: "flex",
                         alignItems: "center",
                         gap: 1.2,
-                        bgcolor: awayGk ? "#fff" : "#f6f4ee",
+                        bgcolor: (theme) =>
+                          awayGk
+                            ? "background.paper"
+                            : theme.palette.mode === "dark"
+                              ? "rgba(255,255,255,0.04)"
+                              : "#f6f4ee",
                         minHeight: 46,
                       }}
                     >
@@ -1008,11 +1072,14 @@ export default function PeladaTeamsDesktopView({
                             sx={{
                               width: 28,
                               height: 28,
-                              bgcolor: "#cdd6e0",
+                              bgcolor: (theme) =>
+                                theme.palette.mode === "dark"
+                                  ? "rgba(205, 214, 224, 0.2)"
+                                  : "#cdd6e0",
                               fontFamily: "Archivo, sans-serif",
                               fontWeight: 800,
                               fontSize: "9.5px",
-                              color: "#17181a",
+                              color: "text.primary",
                               flexShrink: 0,
                             }}
                           />
@@ -1023,7 +1090,7 @@ export default function PeladaTeamsDesktopView({
                                 fontWeight: 700,
                                 fontSize: "11px",
                                 lineHeight: 1.2,
-                                color: "#17181a",
+                                color: "text.primary",
                                 whiteSpace: "nowrap",
                                 overflow: "hidden",
                                 textOverflow: "ellipsis",
@@ -1037,7 +1104,7 @@ export default function PeladaTeamsDesktopView({
                                 fontWeight: 600,
                                 fontSize: "9.5px",
                                 lineHeight: 1.2,
-                                color: "#6b675c",
+                                color: "text.secondary",
                                 mt: 0.25,
                               }}
                             >
@@ -1048,7 +1115,7 @@ export default function PeladaTeamsDesktopView({
                             <IconButton
                               size="small"
                               onClick={() => removeFixedGk("away")}
-                              sx={{ p: 0.25, color: "#6b675c" }}
+                              sx={{ p: 0.25, color: "text.secondary" }}
                             >
                               <CloseIcon sx={{ fontSize: 13 }} />
                             </IconButton>
@@ -1060,7 +1127,7 @@ export default function PeladaTeamsDesktopView({
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: 600,
                             fontSize: "10.5px",
-                            color: "#9a958a",
+                            color: "text.secondary",
                             textAlign: "center",
                             width: "100%",
                           }}
@@ -1077,7 +1144,7 @@ export default function PeladaTeamsDesktopView({
                       fontWeight: 600,
                       fontSize: "10.5px",
                       lineHeight: 1.4,
-                      color: "#6b675c",
+                      color: "text.secondary",
                       mt: 1.25,
                     }}
                   >
@@ -1139,7 +1206,7 @@ export default function PeladaTeamsDesktopView({
                   fontWeight: 700,
                   fontSize: "9.5px",
                   letterSpacing: ".18em",
-                  color: "#6b675c",
+                  color: "text.secondary",
                   textTransform: "uppercase",
                 }}
               >
@@ -1151,7 +1218,7 @@ export default function PeladaTeamsDesktopView({
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 600,
                     fontSize: "11.5px",
-                    color: "#6b675c",
+                    color: "text.secondary",
                   }}
                 >
                   arraste um jogador para trocar de time
@@ -1245,7 +1312,8 @@ export default function PeladaTeamsDesktopView({
                         justifyContent: "space-between",
                         alignItems: "center",
                         p: "12px 14px",
-                        borderBottom: "1.5px solid #eae6db",
+                        borderBottom: "1.5px solid",
+                        borderColor: "divider",
                       }}
                     >
                       <Box>
@@ -1255,7 +1323,7 @@ export default function PeladaTeamsDesktopView({
                             fontWeight: 800,
                             fontSize: "14px",
                             lineHeight: 1.1,
-                            color: "#17181a",
+                            color: "text.primary",
                             textTransform: "uppercase",
                           }}
                         >
@@ -1267,7 +1335,12 @@ export default function PeladaTeamsDesktopView({
                             fontWeight: 700,
                             fontSize: "9px",
                             letterSpacing: ".1em",
-                            color: isUnderfilled ? "#a8452a" : "#6b675c",
+                            color: (theme) =>
+                              isUnderfilled
+                                ? theme.palette.mode === "dark"
+                                  ? "#e06c50"
+                                  : "#a8452a"
+                                : "text.secondary",
                             mt: 0.6,
                             textTransform: "uppercase",
                           }}
@@ -1301,7 +1374,7 @@ export default function PeladaTeamsDesktopView({
                           <IconButton
                             size="small"
                             onClick={() => onDeleteTeam(team.id)}
-                            sx={{ p: 0.25, color: "#6b675c" }}
+                            sx={{ p: 0.25, color: "text.secondary" }}
                             aria-label={`Excluir ${team.name}`}
                           >
                             <CloseIcon sx={{ fontSize: 14 }} />
@@ -1348,12 +1421,19 @@ export default function PeladaTeamsDesktopView({
                               gap: 1.2,
                               border: isYou
                                 ? "2px solid #146b3a"
-                                : "1.5px solid #eae6db",
+                                : "1.5px solid",
+                              borderColor: isYou ? "#146b3a" : "divider",
                               bgcolor: isYou
-                                ? "#f4f8f5"
+                                ? (theme) =>
+                                    theme.palette.mode === "dark"
+                                      ? "rgba(20, 107, 58, 0.15)"
+                                      : "#f4f8f5"
                                 : isGk
-                                  ? "#f6f4ee"
-                                  : "#fff",
+                                  ? (theme) =>
+                                      theme.palette.mode === "dark"
+                                        ? "rgba(255, 255, 255, 0.04)"
+                                        : "#f6f4ee"
+                                  : "background.paper",
                               borderRadius: "11px",
                               p: isYou ? "7px 8px" : "8px 9px",
                               cursor: "grab",
@@ -1371,7 +1451,7 @@ export default function PeladaTeamsDesktopView({
                                 fontFamily: "Archivo, sans-serif",
                                 fontWeight: 800,
                                 fontSize: "9px",
-                                color: isYou ? "#fff" : "#17181a",
+                                color: isYou ? "#fff" : "text.primary",
                                 flexShrink: 0,
                               }}
                             />
@@ -1383,7 +1463,7 @@ export default function PeladaTeamsDesktopView({
                                   fontWeight: 700,
                                   fontSize: "11.5px",
                                   lineHeight: 1.2,
-                                  color: "#17181a",
+                                  color: "text.primary",
                                   whiteSpace: "nowrap",
                                   overflow: "hidden",
                                   textOverflow: "ellipsis",
@@ -1397,7 +1477,7 @@ export default function PeladaTeamsDesktopView({
                                   fontWeight: 600,
                                   fontSize: "9.5px",
                                   lineHeight: 1.2,
-                                  color: isYou ? "#146b3a" : "#6b675c",
+                                  color: isYou ? "#146b3a" : "text.secondary",
                                   mt: 0.25,
                                   whiteSpace: "nowrap",
                                   overflow: "hidden",
@@ -1418,7 +1498,10 @@ export default function PeladaTeamsDesktopView({
                                 fontFamily: "Archivo, sans-serif",
                                 fontWeight: 800,
                                 fontSize: "11px",
-                                color: "#146b3a",
+                                color: (theme) =>
+                                  theme.palette.mode === "dark"
+                                    ? "#34a853"
+                                    : "#146b3a",
                               }}
                             >
                               {gradeVal}
@@ -1491,7 +1574,7 @@ export default function PeladaTeamsDesktopView({
                     fontWeight: 700,
                     fontSize: "9.5px",
                     letterSpacing: ".16em",
-                    color: "#6b675c",
+                    color: "text.secondary",
                     textTransform: "uppercase",
                   }}
                 >
@@ -1502,7 +1585,7 @@ export default function PeladaTeamsDesktopView({
                     fontFamily: "Archivo, sans-serif",
                     fontWeight: 600,
                     fontSize: "11px",
-                    color: "#6b675c",
+                    color: "text.secondary",
                   }}
                 >
                   arraste para dentro de um time
@@ -1551,7 +1634,7 @@ export default function PeladaTeamsDesktopView({
                         fontFamily: "Archivo, sans-serif",
                         fontWeight: 800,
                         fontSize: "9px",
-                        color: "#17181a",
+                        color: "text.primary",
                         flexShrink: 0,
                       }}
                     />
