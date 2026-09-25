@@ -74,7 +74,7 @@ export default function UserAttendanceStatus({
           textTransform: "uppercase",
         }}
       >
-        SUA PRESENÇA
+        {t("peladas.attendance.user_status.your_attendance")}
       </Typography>
 
       <Box sx={{ mb: 2 }}>
@@ -90,7 +90,7 @@ export default function UserAttendanceStatus({
             color: "text.primary",
           }}
         >
-          Bora pro jogo?
+          {t("peladas.attendance.user_status.ready_heading")}
         </Typography>
         <Typography
           variant="body2"
@@ -107,8 +107,11 @@ export default function UserAttendanceStatus({
           </span>
           {player.member_type === "mensalista" ? (
             <>
-              Você é mensalista: sua vaga fica garantida até{" "}
-              <strong style={{ color: "inherit" }}>terça, 22h</strong>.
+              {t("peladas.attendance.user_status.mensalista_priority_info")}{" "}
+              <strong style={{ color: "inherit" }}>
+                {t("peladas.attendance.user_status.mensalista_deadline")}
+              </strong>
+              .
             </>
           ) : (
             getStatusMessage()
@@ -161,7 +164,7 @@ export default function UserAttendanceStatus({
             transition: "all 0.15s ease",
           }}
         >
-          SIM
+          {t("peladas.attendance.user_status.yes")}
         </Button>
         <Button
           fullWidth
@@ -212,7 +215,7 @@ export default function UserAttendanceStatus({
             transition: "all 0.15s ease",
           }}
         >
-          NÃO
+          {t("peladas.attendance.user_status.no")}
         </Button>
       </Stack>
 

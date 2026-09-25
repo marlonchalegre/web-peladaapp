@@ -520,7 +520,7 @@ describe("PeladaMatchesPage", () => {
     expect(screen.getByText("peladas.timeline.title")).toBeInTheDocument();
 
     // Dashboard
-    fireEvent.click(screen.getByText("Dashboard"));
+    fireEvent.click(screen.getByText("peladas.matches.dashboard_tab"));
     expect(screen.getByTestId("active-match-dashboard")).toBeInTheDocument();
   });
 

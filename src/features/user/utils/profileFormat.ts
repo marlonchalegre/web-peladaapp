@@ -1,3 +1,4 @@
+import type { TFunction } from "i18next";
 import type { ProfileRecentPelada } from "../../../shared/api/endpoints";
 
 export const formatRating = (value: number | null | undefined) =>
@@ -29,6 +30,7 @@ export interface RecentMatchRow {
 
 export const toRecentMatchRows = (
   peladas: ProfileRecentPelada[] | undefined,
+  t?: TFunction,
 ): RecentMatchRow[] =>
   (peladas ?? []).map((pelada) => {
     const when = pelada.scheduled_at ? new Date(pelada.scheduled_at) : null;
@@ -39,15 +41,38 @@ export const toRecentMatchRows = (
           ).padStart(2, "0")}`
         : "--";
     const line = pelada.user;
+    const goalsLabel = t ? t("common.goals_short", "gols") : "gols";
+    const assistsLabel = t ? t("common.assists_short", "assist.") : "assist.";
+    const championLabel = t
+      ? t(
+          "user.profile.format.champion",
+          `Campeão: ${pelada.champion_team_name}`,
+          {
+            team: pelada.champion_team_name,
+          },
+        )
+      : `Campeão: ${pelada.champion_team_name}`;
+    const notPlayedLabel = t
+      ? t("user.profile.format.didnt_play", "Não jogou")
+      : "Não jogou";
+    const placeStr = line?.team_position
+      ? t
+        ? ` · ${t("user.profile.format.place", `${line.team_position}º lugar`, { place: line.team_position })}`
+        : ` · ${line.team_position}º lugar`
+      : "";
+    const garcomLabel = t
+      ? t("user.profile.format.garcom", "GARÇOM")
+      : "GARÇOM";
+
     const desc = line
-      ? `${line.goals} gols · ${line.assists} assist.`
+      ? `${line.goals} ${goalsLabel} · ${line.assists} ${assistsLabel}`
       : pelada.champion_team_name
-        ? `Campeão: ${pelada.champion_team_name}`
-        : "Não jogou";
+        ? championLabel
+        : notPlayedLabel;
     const sub = line?.team_name
-      ? `${line.team_name}${line.team_position ? ` · ${line.team_position}º lugar` : ""}`
+      ? `${line.team_name}${placeStr}`
       : pelada.location || "";
-    const badge = line?.is_mvp ? "MVP" : line?.is_garcom ? "GARÇOM" : null;
+    const badge = line?.is_mvp ? "MVP" : line?.is_garcom ? garcomLabel : null;
     const score =
       line?.avg_stars != null
         ? formatRating(performanceFromStars(line.avg_stars))

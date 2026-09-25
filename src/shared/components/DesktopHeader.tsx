@@ -156,7 +156,7 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
               color: "text.primary",
             }}
           >
-            MINHA PELADA
+            {t("navigation.app_name", "MINHA PELADA")}
           </Typography>
         </Box>
 

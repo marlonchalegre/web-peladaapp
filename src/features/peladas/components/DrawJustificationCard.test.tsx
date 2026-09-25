@@ -44,16 +44,22 @@ describe("DrawJustificationCard", () => {
 
   it("renders the classic chip when there is no justification", () => {
     render(<DrawJustificationCard justification={null} />);
-    expect(screen.getByText("POR QUE FICOU ASSIM")).toBeInTheDocument();
-    expect(screen.getByText("CLÁSSICO")).toBeInTheDocument();
     expect(
-      screen.queryByText("VER JUSTIFICATIVA COMPLETA"),
+      screen.getByText("peladas.draw.justification.title"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.draw.justification.chip_classic"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("peladas.draw.justification.view_full"),
     ).not.toBeInTheDocument();
   });
 
   it("does not render team average balance row when teamAverages is empty", () => {
     render(<DrawJustificationCard justification={null} teamAverages={[]} />);
-    expect(screen.queryByText(/Média por time entre/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/peladas\.draw\.justification\.team_avg_balance/),
+    ).not.toBeInTheDocument();
   });
 
   it("renders the gemini chip and chemistry metrics", () => {
@@ -66,36 +72,51 @@ describe("DrawJustificationCard", () => {
         ]}
       />,
     );
-    expect(screen.getByText("EQUILÍBRIO TÁTICO · GEMINI")).toBeInTheDocument();
-    expect(screen.getByText("MÉDIA ELENCO")).toBeInTheDocument();
-    expect(screen.getByText("7,42")).toBeInTheDocument();
-    expect(screen.getByText("GAP GERAL")).toBeInTheDocument();
-    expect(screen.getByText("0,150")).toBeInTheDocument();
-    expect(screen.getByText("GAP DEFESA")).toBeInTheDocument();
-    expect(screen.getByText("GAP ATAQUE")).toBeInTheDocument();
     expect(
-      screen.getByText("Média por time entre 7,2 e 7,6 — diferença de 0,4."),
+      screen.getByText("peladas.draw.justification.chip_gemini"),
     ).toBeInTheDocument();
     expect(
-      screen.queryByText("VER JUSTIFICATIVA COMPLETA"),
+      screen.getByText("peladas.draw.justification.squad_mean"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("7,42")).toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.draw.justification.gap_overall"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("0,150")).toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.draw.justification.gap_defense"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.draw.justification.gap_attack"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.draw.justification.team_avg_balance"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("peladas.draw.justification.view_full"),
     ).not.toBeInTheDocument();
   });
 
   it("renders the GPT chip and tactical metrics", () => {
     render(<DrawJustificationCard justification={tacticalJustification} />);
-    expect(screen.getByText("POR REGRAS · GPT")).toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.draw.justification.chip_gpt"),
+    ).toBeInTheDocument();
     expect(screen.getByText("7,10")).toBeInTheDocument();
     expect(screen.getByText("0,320")).toBeInTheDocument();
-    expect(screen.getByText("GAP SETORIAL")).toBeInTheDocument();
-    expect(screen.queryByText("GAP DEFESA")).not.toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.draw.justification.gap_sector"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("peladas.draw.justification.gap_defense"),
+    ).not.toBeInTheDocument();
   });
 
   it("lists benched players waiting for a slot", () => {
     render(<DrawJustificationCard justification={chemistryJustification} />);
     expect(
-      screen.getByText(/1 jogador\(es\) no banco aguardando/),
+      screen.getByText("peladas.draw.justification.benched_text"),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Felipe M\./)).toBeInTheDocument();
   });
 
   it("warns about incomplete teams when a team is below playersPerTeam", () => {
@@ -106,7 +127,9 @@ describe("DrawJustificationCard", () => {
         teamAverages={[{ name: "Time 1", avg: 7.5, count: 3 }]}
       />,
     );
-    expect(screen.getByText(/Há times incompletos/)).toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.draw.justification.incomplete_teams"),
+    ).toBeInTheDocument();
   });
 
   it("invokes onOpenDialog from the full-justification button", () => {
@@ -117,14 +140,14 @@ describe("DrawJustificationCard", () => {
         onOpenDialog={onOpenDialog}
       />,
     );
-    fireEvent.click(screen.getByText("VER JUSTIFICATIVA COMPLETA"));
+    fireEvent.click(screen.getByText("peladas.draw.justification.view_full"));
     expect(onOpenDialog).toHaveBeenCalledTimes(1);
   });
 
   it("shows the heuristic disclaimer", () => {
     render(<DrawJustificationCard justification={null} />);
     expect(
-      screen.getByText(/Isso é preferência heurística, não previsão/),
+      screen.getByText("peladas.draw.justification.heuristic_caveat"),
     ).toBeInTheDocument();
   });
 });

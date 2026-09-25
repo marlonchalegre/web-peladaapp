@@ -659,12 +659,12 @@ export default function SupportLineupTab({
               <TableCell
                 sx={{ fontWeight: "bold", width: { xs: "60px", sm: "80px" } }}
               >
-                Partida
+                {t("peladas.support_lineup.match_label", "Partida")}
               </TableCell>
               <TableCell
                 sx={{ fontWeight: "bold", width: { xs: "120px", sm: "160px" } }}
               >
-                Confronto
+                {t("peladas.support_lineup.matchup_label", "Confronto")}
               </TableCell>
               <TableCell
                 sx={{ fontWeight: "bold", width: { xs: "auto", sm: "35%" } }}
@@ -699,7 +699,7 @@ export default function SupportLineupTab({
                   align="right"
                   sx={{ fontWeight: "bold", width: "100px" }}
                 >
-                  Ações
+                  {t("peladas.support_lineup.actions_label", "Ações")}
                 </TableCell>
               )}
             </TableRow>
@@ -759,7 +759,10 @@ export default function SupportLineupTab({
                       </Typography>
                       {m.status === "running" && (
                         <Chip
-                          label="Ao Vivo"
+                          label={t(
+                            "peladas.support_lineup.status_live",
+                            "Ao Vivo",
+                          )}
                           size="small"
                           color="primary"
                           sx={{ fontSize: "0.65rem", height: 20 }}
@@ -767,7 +770,10 @@ export default function SupportLineupTab({
                       )}
                       {m.status === "finished" && (
                         <Chip
-                          label="Finalizado"
+                          label={t(
+                            "peladas.support_lineup.status_finished",
+                            "Finalizado",
+                          )}
                           size="small"
                           color="success"
                           sx={{ fontSize: "0.65rem", height: 20 }}

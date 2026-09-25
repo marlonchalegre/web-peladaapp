@@ -1081,11 +1081,21 @@ describe("OrganizationDetailPage", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("AGENDA DO GRUPO")).toBeInTheDocument();
-      expect(screen.getByText("NOVA PELADA")).toBeInTheDocument();
-      expect(screen.getByText("PELADAS")).toBeInTheDocument();
-      expect(screen.getByText("MÉDIA DE PRESENÇA")).toBeInTheDocument();
-      expect(screen.getByText("NA FILA DE ESPERA")).toBeInTheDocument();
+      expect(
+        screen.getByText("organizations.detail.group_agenda"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("organizations.detail.new_pelada"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("organizations.detail.peladas_count"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("organizations.detail.avg_attendance"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("organizations.detail.in_waitlist"),
+      ).toBeInTheDocument();
     });
   });
 });

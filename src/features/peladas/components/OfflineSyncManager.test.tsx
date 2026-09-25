@@ -56,7 +56,9 @@ describe("OfflineSyncManager", () => {
       />,
     );
 
-    expect(screen.getByText(/Modo Offline ativo/)).toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.offline.active_message"),
+    ).toBeInTheDocument();
   });
 
   it("renders queue size and offline warning when offline with items in queue", () => {
@@ -73,13 +75,17 @@ describe("OfflineSyncManager", () => {
       />,
     );
 
-    expect(screen.getByText(/Modo Offline ativo/)).toBeInTheDocument();
     expect(
-      screen.getByText(/Existem alterações pendentes de sincronização/),
+      screen.getByText("peladas.offline.active_message"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.offline.pending_changes_offline"),
     ).toBeInTheDocument();
     // Sync button should not be present when offline
     expect(
-      screen.queryByRole("button", { name: /Sincronizar Agora/ }),
+      screen.queryByRole("button", {
+        name: /peladas\.offline\.sync_button_now/,
+      }),
     ).toBeNull();
   });
 
@@ -98,9 +104,11 @@ describe("OfflineSyncManager", () => {
       />,
     );
 
-    expect(screen.queryByText(/Modo Offline ativo/)).toBeNull();
+    expect(screen.queryByText("peladas.offline.active_message")).toBeNull();
     expect(screen.getByText(/1/)).toBeInTheDocument();
-    expect(screen.getByText(/ação pendente/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/peladas\.offline\.pending_action_one/),
+    ).toBeInTheDocument();
     // It's going to render the error or still have the button
   });
 
@@ -185,7 +193,9 @@ describe("OfflineSyncManager", () => {
       expect(dequeueSpy).not.toHaveBeenCalled();
       // Should show error message
       expect(
-        screen.getByText(/Erro: Server validation failed/),
+        screen.getByText(
+          /peladas\.offline\.error_prefix\s*Server validation failed/,
+        ),
       ).toBeInTheDocument();
       expect(mockOnSyncComplete).not.toHaveBeenCalled();
     });
@@ -224,7 +234,7 @@ describe("OfflineSyncManager", () => {
     await waitFor(() => {
       expect(api.delete).toHaveBeenCalled();
       expect(
-        screen.getByText(/Conexão perdida durante a sincronização/),
+        screen.getByText(/peladas\.offline\.sync_lost_connection/),
       ).toBeInTheDocument();
     });
   });
@@ -246,7 +256,7 @@ describe("OfflineSyncManager", () => {
       />,
     );
 
-    expect(screen.queryByText(/ação pendente/)).toBeNull();
+    expect(screen.queryByText(/peladas\.offline\.pending_action/)).toBeNull();
 
     // Trigger the custom event
     fireEvent(window, new Event("offlineQueueChanged"));
@@ -254,7 +264,7 @@ describe("OfflineSyncManager", () => {
     await waitFor(() => {
       expect(getOfflineQueueSpy).toHaveBeenCalledTimes(2);
       expect(
-        screen.getByText(/Existem alterações pendentes de sincronização/),
+        screen.getByText("peladas.offline.pending_changes_offline"),
       ).toBeInTheDocument();
     });
 

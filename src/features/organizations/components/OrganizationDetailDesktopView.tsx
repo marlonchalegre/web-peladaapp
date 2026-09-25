@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Box, Typography, Switch } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import type {
   Organization,
   Pelada,
@@ -38,6 +39,7 @@ export default function OrganizationDetailDesktopView({
   onCreatePeladaQuick,
 }: OrganizationDetailDesktopViewProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Filter state for agenda: TODAS | ABERTAS | PENDÊNCIA
   const [filter, setFilter] = useState<"all" | "open" | "pending">("all");
@@ -215,7 +217,7 @@ export default function OrganizationDetailDesktopView({
                 "&:hover": { borderColor: "text.primary" },
               }}
             >
-              CONVIDAR
+              {t("organizations.management.tabs.invitations", "CONVIDAR")}
             </Box>
             <Box
               component="button"
@@ -283,7 +285,7 @@ export default function OrganizationDetailDesktopView({
                 textTransform: "uppercase",
               }}
             >
-              PELADAS
+              {t("organizations.detail.peladas_count", "PELADAS")}
             </Typography>
           </Box>
 
@@ -318,7 +320,7 @@ export default function OrganizationDetailDesktopView({
                 textTransform: "uppercase",
               }}
             >
-              MÉDIA DE PRESENÇA
+              {t("organizations.detail.avg_attendance", "MÉDIA DE PRESENÇA")}
             </Typography>
           </Box>
 
@@ -353,7 +355,7 @@ export default function OrganizationDetailDesktopView({
                 textTransform: "uppercase",
               }}
             >
-              FINANCEIRO
+              {t("organizations.tabs.finance", "FINANCEIRO")}
             </Typography>
           </Box>
 
@@ -388,7 +390,7 @@ export default function OrganizationDetailDesktopView({
                 textTransform: "uppercase",
               }}
             >
-              NA FILA DE ESPERA
+              {t("organizations.detail.in_waitlist", "NA FILA DE ESPERA")}
             </Typography>
           </Box>
         </Box>
@@ -437,7 +439,7 @@ export default function OrganizationDetailDesktopView({
                       : "background.paper",
                 }}
               >
-                NOVA PELADA
+                {t("organizations.detail.new_pelada", "NOVA PELADA")}
               </Typography>
               <Typography
                 sx={{
@@ -448,7 +450,7 @@ export default function OrganizationDetailDesktopView({
                   color: "text.secondary",
                 }}
               >
-                AGENDAR A PRÓXIMA
+                {t("organizations.detail.schedule_next", "AGENDAR A PRÓXIMA")}
               </Typography>
             </Box>
             <Box sx={{ p: "18px 20px" }}>
@@ -472,7 +474,7 @@ export default function OrganizationDetailDesktopView({
                       color: "text.secondary",
                     }}
                   >
-                    DATA
+                    {t("organizations.detail.date_label", "DATA")}
                   </Typography>
                   <Typography
                     sx={{
@@ -524,7 +526,7 @@ export default function OrganizationDetailDesktopView({
                       color: "text.secondary",
                     }}
                   >
-                    HORA
+                    {t("organizations.detail.time_label", "HORA")}
                   </Typography>
                   <Typography
                     sx={{
@@ -580,7 +582,7 @@ export default function OrganizationDetailDesktopView({
                         color: "text.secondary",
                       }}
                     >
-                      MÁXIMO
+                      {t("organizations.detail.max_label", "MÁXIMO")}
                     </Typography>
                     <Typography
                       sx={{
@@ -669,7 +671,7 @@ export default function OrganizationDetailDesktopView({
                       color: "text.secondary",
                     }}
                   >
-                    LOCAL
+                    {t("organizations.detail.location_label", "LOCAL")}
                   </Typography>
                   <LocationAutocomplete
                     value={newLocation}
@@ -720,7 +722,9 @@ export default function OrganizationDetailDesktopView({
                     "&:hover": { bgcolor: "primary.dark" },
                   }}
                 >
-                  {creating ? "CRIANDO..." : "CRIAR PELADA"}
+                  {creating
+                    ? t("organizations.detail.creating", "CRIANDO...")
+                    : t("organizations.detail.create_pelada", "CRIAR PELADA")}
                 </Box>
               </Box>
 
@@ -748,7 +752,10 @@ export default function OrganizationDetailDesktopView({
                     color: "text.secondary",
                   }}
                 >
-                  Avisar diaristas e convidados que a lista abriu
+                  {t(
+                    "organizations.detail.notify_casual",
+                    "Avisar diaristas e convidados que a lista abriu",
+                  )}
                 </Typography>
               </Box>
             </Box>
@@ -773,16 +780,16 @@ export default function OrganizationDetailDesktopView({
               color: "text.secondary",
             }}
           >
-            AGENDA DO GRUPO
+            {t("organizations.detail.group_agenda", "AGENDA DO GRUPO")}
           </Typography>
           <Box sx={{ display: "flex", gap: 1 }}>
             {(["all", "open", "pending"] as const).map((filterKey) => {
               const label =
                 filterKey === "all"
-                  ? "TODAS"
+                  ? t("organizations.detail.filter_all", "TODAS")
                   : filterKey === "open"
-                    ? "ABERTAS"
-                    : "PENDÊNCIA";
+                    ? t("organizations.detail.filter_open", "ABERTAS")
+                    : t("organizations.detail.filter_pending", "PENDÊNCIA");
               const isSelected = filter === filterKey;
               return (
                 <Box
@@ -851,12 +858,20 @@ export default function OrganizationDetailDesktopView({
               color: "text.secondary",
             }}
           >
-            <Box sx={{ width: 86, flexShrink: 0 }}>DATA</Box>
-            <Box sx={{ flex: 1 }}>SITUAÇÃO</Box>
-            <Box sx={{ width: 190, flexShrink: 0 }}>LISTA</Box>
-            <Box sx={{ width: 110, flexShrink: 0 }}>FINANCEIRO</Box>
+            <Box sx={{ width: 86, flexShrink: 0 }}>
+              {t("organizations.detail.table.date", "DATA")}
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              {t("organizations.detail.table.situation", "SITUAÇÃO")}
+            </Box>
+            <Box sx={{ width: 190, flexShrink: 0 }}>
+              {t("organizations.detail.table.list", "LISTA")}
+            </Box>
+            <Box sx={{ width: 110, flexShrink: 0 }}>
+              {t("organizations.detail.table.financial", "FINANCEIRO")}
+            </Box>
             <Box sx={{ width: 170, flexShrink: 0, textAlign: "right" }}>
-              AÇÃO
+              {t("organizations.detail.table.action", "AÇÃO")}
             </Box>
           </Box>
 
@@ -870,7 +885,10 @@ export default function OrganizationDetailDesktopView({
                   fontWeight: 600,
                 }}
               >
-                Nenhuma pelada encontrada nesta visualização.
+                {t(
+                  "organizations.detail.no_peladas_in_view",
+                  "Nenhuma pelada encontrada nesta visualização.",
+                )}
               </Typography>
             </Box>
           ) : (
@@ -884,11 +902,13 @@ export default function OrganizationDetailDesktopView({
                 : "16/09";
               const dayOfWeek = !isNaN(pDate.getDay())
                 ? pDate
-                    .toLocaleDateString("pt-BR", { weekday: "short" })
+                    .toLocaleDateString(t("common.locale_code", "pt-BR"), {
+                      weekday: "short",
+                    })
                     .replace(".", "")
                 : "qua";
               const timeDisplay = !isNaN(pDate.getTime())
-                ? pDate.toLocaleTimeString("pt-BR", {
+                ? pDate.toLocaleTimeString(t("common.locale_code", "pt-BR"), {
                     hour: "2-digit",
                     minute: "2-digit",
                   })
@@ -959,7 +979,7 @@ export default function OrganizationDetailDesktopView({
                             p: "4px 7px",
                           }}
                         >
-                          LISTA ABERTA
+                          {t("peladas.status.open", "LISTA ABERTA")}
                         </Box>
                         <Typography
                           sx={{
@@ -983,9 +1003,13 @@ export default function OrganizationDetailDesktopView({
                             color: "text.primary",
                           }}
                         >
-                          Encerrada
+                          {t("peladas.status.closed", "Encerrada")}
                           {history
-                            ? ` · ${history.matches_count} partidas`
+                            ? ` · ${t(
+                                "peladas.matches.matches_count",
+                                "{{count}} partidas",
+                                { count: history.matches_count },
+                              )}`
                             : ""}
                         </Typography>
                         <Typography
@@ -1000,18 +1024,20 @@ export default function OrganizationDetailDesktopView({
                           {userLine
                             ? [
                                 userLine.team_position
-                                  ? `${userLine.team_position}º lugar`
+                                  ? `${userLine.team_position}º ${t("common.place", "lugar")}`
                                   : null,
                                 `${userLine.goals} G`,
                                 `${userLine.assists} A`,
                                 userLine.is_mvp ? "MVP" : null,
-                                userLine.is_garcom ? "garçom" : null,
+                                userLine.is_garcom
+                                  ? t("organizations.detail.garcom", "garçom")
+                                  : null,
                               ]
                                 .filter(Boolean)
                                 .join(" · ")
                             : history?.champion_team_name
-                              ? `Campeão: ${history.champion_team_name}`
-                              : "Sem dados"}
+                              ? `${t("organizations.detail.champion_prefix", "Campeão:")} ${history.champion_team_name}`
+                              : t("common.no_data", "Sem dados")}
                         </Typography>
                       </>
                     )}
@@ -1032,8 +1058,12 @@ export default function OrganizationDetailDesktopView({
                           }}
                         >
                           {pelada.max_players
-                            ? `até ${pelada.max_players} jogadores`
-                            : "Lista aberta"}
+                            ? t(
+                                "organizations.detail.up_to_players",
+                                "até {{max}} jogadores",
+                                { max: pelada.max_players },
+                              )
+                            : t("peladas.status.open", "Lista aberta")}
                         </Typography>
                       </Box>
                     ) : (
@@ -1045,7 +1075,11 @@ export default function OrganizationDetailDesktopView({
                           color: "text.secondary",
                         }}
                       >
-                        {history ? `${history.players_count} jogadores` : "—"}
+                        {history
+                          ? t("common.players_count", "{{count}} jogadores", {
+                              count: history.players_count,
+                            })
+                          : "—"}
                       </Typography>
                     )}
                   </Box>
@@ -1099,7 +1133,7 @@ export default function OrganizationDetailDesktopView({
                             },
                           }}
                         >
-                          VER LISTA
+                          {t("peladas.attendance.view_list", "VER LISTA")}
                         </Box>
                         {isAdmin && (
                           <Box
@@ -1130,7 +1164,10 @@ export default function OrganizationDetailDesktopView({
                               },
                             }}
                           >
-                            FECHAR E SORTEAR
+                            {t(
+                              "peladas.attendance.desktop.close_and_draw",
+                              "FECHAR E SORTEAR",
+                            )}
                           </Box>
                         )}
                       </>
@@ -1156,7 +1193,7 @@ export default function OrganizationDetailDesktopView({
                           },
                         }}
                       >
-                        VER SÚMULA
+                        {t("organizations.detail.view_sumula", "VER SÚMULA")}
                       </Box>
                     )}
                   </Box>
@@ -1183,8 +1220,14 @@ export default function OrganizationDetailDesktopView({
                 color: "text.secondary",
               }}
             >
-              1–{Math.min(filteredPeladas.length, 10)} de{" "}
-              {totalPeladas || peladas.length} peladas
+              {t(
+                "organizations.detail.pagination_count",
+                "1–{{end}} de {{total}} peladas",
+                {
+                  end: Math.min(filteredPeladas.length, 10),
+                  total: totalPeladas || peladas.length,
+                },
+              )}
             </Typography>
             <Typography
               sx={{
@@ -1196,7 +1239,7 @@ export default function OrganizationDetailDesktopView({
                 "&:hover": { textDecoration: "underline" },
               }}
             >
-              Ver todas →
+              {t("organizations.detail.view_all", "Ver todas →")}
             </Typography>
           </Box>
         </Box>

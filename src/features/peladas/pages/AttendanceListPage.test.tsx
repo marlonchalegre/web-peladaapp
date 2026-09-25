@@ -168,12 +168,24 @@ describe("AttendanceListPage", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("VAGAS")).toBeInTheDocument();
-      expect(screen.getByText("DIÁRIAS DESTA PELADA")).toBeInTheDocument();
-      expect(screen.getByText("SUA RESPOSTA")).toBeInTheDocument();
-      expect(screen.getByText("VOU JOGAR")).toBeInTheDocument();
-      expect(screen.getAllByText("FILA DE ESPERA").length).toBeGreaterThan(0);
-      expect(screen.getByText("NÃO VOU")).toBeInTheDocument();
+      expect(
+        screen.getByText("peladas.attendance.desktop.spots_label"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("peladas.attendance.desktop.daily_fees_title"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("peladas.attendance.desktop.your_response"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("peladas.attendance.desktop.will_play"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getAllByText("peladas.attendance.desktop.waitlist").length,
+      ).toBeGreaterThan(0);
+      expect(
+        screen.getByText("peladas.attendance.desktop.wont_play"),
+      ).toBeInTheDocument();
       expect(screen.getByText("Confirmed Player")).toBeInTheDocument();
     });
   });
@@ -244,7 +256,7 @@ describe("AttendanceListPage", () => {
       expect(screen.getByText("Confirmed Player")).toBeInTheDocument();
     });
 
-    const removeBtn = screen.getByTitle("Remover da lista");
+    const removeBtn = screen.getByTitle("peladas.attendance.remove_from_list");
     fireEvent.click(removeBtn);
 
     expect(api.post).toHaveBeenCalledWith(
@@ -255,7 +267,9 @@ describe("AttendanceListPage", () => {
       }),
     );
 
-    const promoteBtn = screen.getByTitle("Promover para confirmados");
+    const promoteBtn = screen.getByTitle(
+      "peladas.attendance.promote_to_confirmed",
+    );
     fireEvent.click(promoteBtn);
 
     expect(api.post).toHaveBeenCalledWith(

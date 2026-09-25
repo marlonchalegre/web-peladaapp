@@ -111,7 +111,9 @@ describe("AttendanceListDesktopView", () => {
     expect(screen.getByText("Neymar Jr")).toBeInTheDocument();
     expect(screen.getByText("Alisson Becker")).toBeInTheDocument();
     expect(screen.getByText("Arena Central")).toBeInTheDocument();
-    expect(screen.getByText("VAGAS")).toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.attendance.desktop.spots_label"),
+    ).toBeInTheDocument();
   });
 
   it("renders correctly in dark mode without styling or contrast regressions", () => {
@@ -125,7 +127,11 @@ describe("AttendanceListDesktopView", () => {
 
     expect(screen.getByText("Neymar Jr")).toBeInTheDocument();
     expect(screen.getByText("Alisson Becker")).toBeInTheDocument();
-    expect(screen.getByText("FILA DE ESPERA · 1")).toBeInTheDocument();
-    expect(screen.getByText("DIÁRIAS DESTA PELADA")).toBeInTheDocument();
+    expect(
+      screen.getByText(/peladas\.attendance\.desktop\.waitlist_section/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.attendance.desktop.daily_fees_title"),
+    ).toBeInTheDocument();
   });
 });

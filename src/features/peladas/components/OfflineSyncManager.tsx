@@ -18,6 +18,7 @@ import { api } from "../../../shared/api/client";
 import { createApi } from "../../../shared/api/endpoints";
 import CloudOffIcon from "@mui/icons-material/CloudOff";
 import SyncIcon from "@mui/icons-material/Sync";
+import { useTranslation } from "react-i18next";
 
 const endpoints = createApi(api);
 
@@ -30,6 +31,7 @@ export default function OfflineSyncManager({
   peladaId,
   onSyncComplete,
 }: OfflineSyncManagerProps) {
+  const { t } = useTranslation();
   const isOnline = useNetwork();
   const [queue, setQueue] = useState<OfflineAction[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -155,12 +157,12 @@ export default function OfflineSyncManager({
       // If it's a network error, stop syncing, but don't show a big error, just wait.
       // If it's a server error (e.g., 400), show error.
       if (isNetworkError(error)) {
-        setSyncError("Conexão perdida durante a sincronização.");
+        setSyncError(t("peladas.offline.sync_lost_connection"));
       } else {
         setSyncError(
           error instanceof Error
             ? error.message
-            : "Erro ao sincronizar. Operação cancelada.",
+            : t("peladas.offline.sync_generic_error"),
         );
       }
     } finally {
@@ -190,8 +192,7 @@ export default function OfflineSyncManager({
           sx={{ mb: queue.length > 0 ? 1 : 0 }}
           data-testid="offline-banner"
         >
-          Modo Offline ativo. Suas alterações serão sincronizadas quando a
-          conexão retornar.
+          {t("peladas.offline.active_message")}
         </Alert>
       )}
 
@@ -214,7 +215,9 @@ export default function OfflineSyncManager({
                   )
                 }
               >
-                {isSyncing ? "Sincronizando..." : "Sincronizar Agora"}
+                {isSyncing
+                  ? t("peladas.offline.sync_button_syncing")
+                  : t("peladas.offline.sync_button_now")}
               </Button>
             ) : undefined
           }
@@ -223,13 +226,15 @@ export default function OfflineSyncManager({
             {isOnline ? (
               <>
                 <strong>{queue.length}</strong>{" "}
-                {queue.length === 1 ? "ação pendente" : "ações pendentes"} de
-                sincronização.
+                {queue.length === 1
+                  ? t("peladas.offline.pending_action_one")
+                  : t("peladas.offline.pending_action_other")}{" "}
+                {t("peladas.offline.pending_action_suffix")}
               </>
             ) : (
-              "Existem alterações pendentes de sincronização."
+              t("peladas.offline.pending_changes_offline")
             )}
-            {syncError && ` Erro: ${syncError}`}
+            {syncError && ` ${t("peladas.offline.error_prefix")}${syncError}`}
           </Typography>
         </Alert>
       )}

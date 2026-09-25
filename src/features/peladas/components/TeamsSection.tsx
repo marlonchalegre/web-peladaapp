@@ -263,7 +263,7 @@ export default function TeamsSection(props: TeamsSectionProps) {
                   {t("peladas.teams.button.add_placeholder")}
                 </Typography>
                 <Typography variant="caption" sx={{ mt: 0.5, opacity: 0.7 }}>
-                  Adicione um novo time para equilibrar a pelada
+                  {t("peladas.teams.add_team_hint")}
                 </Typography>
               </Button>
             </Grid>

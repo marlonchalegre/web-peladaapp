@@ -148,7 +148,7 @@ export default function FixedGoalkeepersSection({
             </Typography>
             <Chip
               icon={<SecurityIcon style={{ fontSize: 12 }} />}
-              label="ESPECIALISTA"
+              label={t("peladas.teams.specialist")}
               size="small"
               color="primary"
               sx={{ height: 20, fontSize: "0.65rem", fontWeight: 900, mt: 0.5 }}

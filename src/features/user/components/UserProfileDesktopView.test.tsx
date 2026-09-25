@@ -9,9 +9,18 @@ import type { User, UserProfileDashboard } from "../../../shared/api/endpoints";
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
-    t: (key: string) => {
+    t: (
+      key: string,
+      fallback?: string | Record<string, unknown>,
+      options?: Record<string, unknown>,
+    ) => {
+      let text = typeof fallback === "string" ? fallback : key;
+      const opts = (typeof fallback === "object" ? fallback : options) || {};
+      for (const [k, v] of Object.entries(opts)) {
+        text = text.replace(new RegExp(`{{${k}}}`, "g"), String(v));
+      }
       if (key === "common.positions.midfielder") return "Meio-campo";
-      return key;
+      return text;
     },
     i18n: { language: "pt-BR", changeLanguage: vi.fn() },
   }),

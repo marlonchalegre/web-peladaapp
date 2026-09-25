@@ -54,13 +54,13 @@ export const LanguageSwitcher: React.FC = () => {
           onClick={() => changeLanguage("pt-BR")}
           selected={currentLang.startsWith("pt")}
         >
-          Português (BR)
+          {t("components.language_switcher.portuguese", "Português (BR)")}
         </MenuItem>
         <MenuItem
           onClick={() => changeLanguage("en")}
           selected={currentLang.startsWith("en")}
         >
-          English
+          {t("components.language_switcher.english", "English")}
         </MenuItem>
       </Menu>
     </>

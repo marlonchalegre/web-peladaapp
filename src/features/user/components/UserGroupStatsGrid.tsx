@@ -1,4 +1,5 @@
 import { Box, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 interface UserGroupStatsGridProps {
   peladasPlayed: number;
@@ -13,11 +14,24 @@ export function UserGroupStatsGrid({
   assists,
   titles,
 }: UserGroupStatsGridProps) {
+  const { t } = useTranslation();
   const items = [
-    { label: "JOGOS", val: peladasPlayed, color: "text.primary" },
-    { label: "GOLS", val: goals, color: "text.primary" },
-    { label: "ASSIST.", val: assists, color: "primary.main" },
-    { label: "TÍTULOS", val: titles, color: "text.primary" },
+    {
+      label: t("common.games", "JOGOS"),
+      val: peladasPlayed,
+      color: "text.primary",
+    },
+    { label: t("common.goals", "GOLS"), val: goals, color: "text.primary" },
+    {
+      label: t("common.assists_short", "ASSIST."),
+      val: assists,
+      color: "primary.main",
+    },
+    {
+      label: t("common.titles", "TÍTULOS"),
+      val: titles,
+      color: "text.primary",
+    },
   ];
 
   return (

@@ -1218,7 +1218,7 @@ export default function ActiveMatchDashboard(props: Props) {
               color: "text.primary",
             }}
           >
-            {ev.label}
+            {t(`common.${ev.type}`, ev.label)}
           </Typography>
         </Button>
       ))}

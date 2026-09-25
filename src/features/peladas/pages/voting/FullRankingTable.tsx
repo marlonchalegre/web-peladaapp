@@ -51,18 +51,22 @@ export default function FullRankingTable({ mvp }: FullRankingTableProps) {
           <TableHead>
             <TableRow sx={{ bgcolor: "grey.50" }}>
               <TableCell width={60} sx={{ fontWeight: "bold" }}>
-                Pos.
+                {t("peladas.voting.results.ranking.position")}
               </TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Jogador</TableCell>
-              <TableCell sx={{ fontWeight: "bold" }}>Posição</TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                Avaliação
+              <TableCell sx={{ fontWeight: "bold" }}>
+                {t("peladas.voting.results.ranking.player")}
               </TableCell>
-              <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                Gols
+              <TableCell sx={{ fontWeight: "bold" }}>
+                {t("peladas.voting.results.ranking.player_position")}
               </TableCell>
               <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                Assis.
+                {t("peladas.voting.results.ranking.rating")}
+              </TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                {t("peladas.voting.results.ranking.goals")}
+              </TableCell>
+              <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                {t("peladas.voting.results.ranking.assists")}
               </TableCell>
             </TableRow>
           </TableHead>

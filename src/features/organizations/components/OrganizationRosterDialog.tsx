@@ -7,6 +7,8 @@ import {
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import type { Player } from "../../../shared/api/endpoints";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import { getInitials } from "../../../shared/utils/initials";
@@ -19,38 +21,56 @@ interface OrganizationRosterDialogProps {
   players: Player[];
 }
 
-const formatPosition = (pos?: string) => {
-  if (!pos) return "jogador";
-  switch (pos.toLowerCase()) {
+const formatPosition = (pos?: string, t?: TFunction) => {
+  if (!pos) return t ? t("common.player", "jogador").toLowerCase() : "jogador";
+  const p = pos.toLowerCase();
+  switch (p) {
     case "goalkeeper":
     case "goleiro":
-      return "goleiro";
+      return t ? t("positions.goalkeeper", "goleiro").toLowerCase() : "goleiro";
     case "defender":
     case "zagueiro":
-      return "zagueiro";
+      return t ? t("positions.defender", "zagueiro").toLowerCase() : "zagueiro";
     case "midfielder":
     case "meio-campo":
-      return "meia";
+    case "meia":
+      return t ? t("positions.midfielder", "meia").toLowerCase() : "meia";
     case "striker":
     case "atacante":
-      return "atacante";
+      return t ? t("positions.striker", "atacante").toLowerCase() : "atacante";
     default:
-      return pos.toLowerCase();
+      return p;
   }
 };
 
-const formatMemberType = (memberType?: string) => {
+const formatMemberType = (memberType?: string, t?: TFunction) => {
   switch (memberType) {
     case "mensalista":
-      return "mensalista";
+      return t
+        ? t("member_types.mensalista", "mensalista").toLowerCase()
+        : "mensalista";
     case "mensalista_temporario":
-      return "mensalista temporário";
+      return t
+        ? t(
+            "member_types.mensalista_temporario",
+            "mensalista temporário",
+          ).toLowerCase()
+        : "mensalista temporário";
     case "diarista":
-      return "diarista";
+      return t
+        ? t("member_types.diarista", "diarista").toLowerCase()
+        : "diarista";
     case "diarista_temporario":
-      return "diarista temporário";
+      return t
+        ? t(
+            "member_types.diarista_temporario",
+            "diarista temporário",
+          ).toLowerCase()
+        : "diarista temporário";
     case "convidado":
-      return "convidado";
+      return t
+        ? t("member_types.convidado", "convidado").toLowerCase()
+        : "convidado";
     default:
       return "";
   }
@@ -62,6 +82,7 @@ export default function OrganizationRosterDialog({
   orgName,
   players,
 }: OrganizationRosterDialogProps) {
+  const { t } = useTranslation();
   const sortedPlayers = [...players].sort((a, b) =>
     (a.user_name || "").localeCompare(b.user_name || ""),
   );
@@ -97,10 +118,12 @@ export default function OrganizationRosterDialog({
           color: "text.primary",
         }}
       >
-        ELENCO · {players.length}
+        {t("organizations.roster.dialog_title", "ELENCO · {{count}}", {
+          count: players.length,
+        })}
         <IconButton
           onClick={onClose}
-          aria-label="Fechar"
+          aria-label={t("common.close", "Fechar")}
           data-testid="roster-close-button"
           sx={{ color: "text.secondary" }}
         >
@@ -163,7 +186,7 @@ export default function OrganizationRosterDialog({
                     color: "text.primary",
                   }}
                 >
-                  {player.user_name || "Jogador"}
+                  {player.user_name || t("common.player", "Jogador")}
                 </Typography>
                 <Typography
                   sx={{
@@ -172,9 +195,9 @@ export default function OrganizationRosterDialog({
                     mt: 0.25,
                   }}
                 >
-                  {formatPosition(player.position || player.user_position)}
-                  {formatMemberType(player.member_type)
-                    ? ` · ${formatMemberType(player.member_type)}`
+                  {formatPosition(player.position || player.user_position, t)}
+                  {formatMemberType(player.member_type, t)
+                    ? ` · ${formatMemberType(player.member_type, t)}`
                     : ""}
                 </Typography>
               </Box>
@@ -188,7 +211,7 @@ export default function OrganizationRosterDialog({
                   color: "text.secondary",
                 }}
               >
-                Nenhum jogador no elenco.
+                {t("organizations.roster.empty", "Nenhum jogador no elenco.")}
               </Typography>
             </Box>
           )}

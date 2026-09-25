@@ -116,15 +116,21 @@ export default function AttendanceListPage() {
   const dayNumber = !isNaN(peladaDate.getDate()) ? peladaDate.getDate() : 16;
   const weekday = !isNaN(peladaDate.getTime())
     ? peladaDate
-        .toLocaleDateString("pt-BR", { weekday: "short" })
+        .toLocaleDateString(t("common.locale_code", "pt-BR"), {
+          weekday: "short",
+        })
         .replace(".", "")
         .toUpperCase()
     : "QUA";
   const month = !isNaN(peladaDate.getTime())
-    ? peladaDate.toLocaleDateString("pt-BR", { month: "long" }).toUpperCase()
+    ? peladaDate
+        .toLocaleDateString(t("common.locale_code", "pt-BR"), {
+          month: "long",
+        })
+        .toUpperCase()
     : "SETEMBRO";
   const timeStr = !isNaN(peladaDate.getTime())
-    ? peladaDate.toLocaleTimeString("pt-BR", {
+    ? peladaDate.toLocaleTimeString(t("common.locale_code", "pt-BR"), {
         hour: "2-digit",
         minute: "2-digit",
       })
@@ -297,7 +303,7 @@ export default function AttendanceListPage() {
                     bgcolor: "rgba(255,255,255,0.1)",
                   },
                 }}
-                aria-label="Voltar"
+                aria-label={t("peladas.attendance.back", "Voltar")}
               >
                 <ArrowBackIosNewIcon sx={{ fontSize: 18 }} />
               </IconButton>
@@ -312,7 +318,8 @@ export default function AttendanceListPage() {
                     textTransform: "uppercase",
                   }}
                 >
-                  {pelada.organization_name || t("common.organization")} · FUT
+                  {pelada.organization_name || t("common.organization")} ·{" "}
+                  {t("peladas.attendance.sport_football", "FUT")}
                 </Typography>
                 <Typography
                   variant="h5"
@@ -494,7 +501,7 @@ export default function AttendanceListPage() {
                     mt: 0.5,
                   }}
                 >
-                  CONFIRM.
+                  {t("peladas.attendance.stat_confirmed_short", "CONFIRM.")}
                 </Typography>
               </Box>
 
@@ -530,7 +537,7 @@ export default function AttendanceListPage() {
                     mt: 0.5,
                   }}
                 >
-                  RECUSAS
+                  {t("peladas.attendance.stat_declined_short", "RECUSAS")}
                 </Typography>
               </Box>
 
@@ -566,7 +573,7 @@ export default function AttendanceListPage() {
                     mt: 0.5,
                   }}
                 >
-                  PENDENT.
+                  {t("peladas.attendance.stat_pending_short", "PENDENT.")}
                 </Typography>
               </Box>
 
@@ -602,7 +609,7 @@ export default function AttendanceListPage() {
                     mt: 0.5,
                   }}
                 >
-                  ESPERA
+                  {t("peladas.attendance.stat_waitlist_short", "ESPERA")}
                 </Typography>
               </Box>
             </Box>
@@ -636,7 +643,8 @@ export default function AttendanceListPage() {
                   textTransform: "uppercase",
                 }}
               >
-                CONFIRMADOS · {confirmed.length}
+                {t("peladas.attendance.confirmed_label", "CONFIRMADOS")} ·{" "}
+                {confirmed.length}
                 {maxPlayers ? ` DE ${maxPlayers}` : ""}
               </Typography>
               <Typography
@@ -794,7 +802,7 @@ export default function AttendanceListPage() {
                                 flexShrink: 0,
                               }}
                             >
-                              · VOCÊ
+                              · {t("peladas.attendance.you_label", "VOCÊ")}
                             </Box>
                           )}
                         </Typography>
@@ -846,7 +854,10 @@ export default function AttendanceListPage() {
                             onClick={() =>
                               handleUpdateAttendance("declined", p.id)
                             }
-                            title="Remover da lista"
+                            title={t(
+                              "peladas.attendance.remove_from_list",
+                              "Remover da lista",
+                            )}
                             sx={{ color: "secondary.main", p: 0.25 }}
                           >
                             <HighlightOffIcon sx={{ fontSize: 16 }} />
@@ -906,14 +917,15 @@ export default function AttendanceListPage() {
               <Typography
                 sx={{
                   fontFamily: "Archivo, sans-serif",
-                  fontWeight: 700,
+                  fontWeight: 800,
                   fontSize: "9.5px",
                   letterSpacing: ".16em",
                   color: "secondary.main",
                   textTransform: "uppercase",
                 }}
               >
-                FILA DE ESPERA · {waitlist.length}
+                {t("peladas.attendance.waitlist_label", "FILA DE ESPERA")} ·{" "}
+                {waitlist.length}
               </Typography>
               <Typography
                 sx={{
@@ -923,7 +935,10 @@ export default function AttendanceListPage() {
                   color: "text.secondary",
                 }}
               >
-                entram se abrir vaga
+                {t(
+                  "peladas.attendance.waitlist_auto_enter",
+                  "entram se abrir vaga",
+                )}
               </Typography>
             </Box>
 
@@ -944,7 +959,10 @@ export default function AttendanceListPage() {
                     color: "text.secondary",
                   }}
                 >
-                  Nenhum jogador na fila de espera.
+                  {t(
+                    "peladas.attendance.waitlist_empty",
+                    "Nenhum jogador na fila de espera.",
+                  )}
                 </Typography>
               ) : (
                 waitlist.map((p, idx) => (
@@ -988,7 +1006,10 @@ export default function AttendanceListPage() {
                           onClick={() =>
                             handleUpdateAttendance("confirmed", p.id)
                           }
-                          title="Promover para confirmados"
+                          title={t(
+                            "peladas.attendance.promote_to_confirmed",
+                            "Promover para confirmados",
+                          )}
                           sx={{ color: "primary.main", p: 0.2 }}
                         >
                           <CheckCircleIcon sx={{ fontSize: 16 }} />
@@ -1023,7 +1044,7 @@ export default function AttendanceListPage() {
                   textTransform: "uppercase",
                 }}
               >
-                AÇÕES DO ADMIN
+                {t("peladas.attendance.admin_actions", "AÇÕES DO ADMIN")}
               </Typography>
               <Button
                 fullWidth
@@ -1099,7 +1120,10 @@ export default function AttendanceListPage() {
                     },
                   }}
                 >
-                  Avisar o grupo no WhatsApp
+                  {t(
+                    "peladas.attendance.notify_whatsapp_group",
+                    "Avisar o grupo no WhatsApp",
+                  )}
                 </Typography>
               </Box>
             </Box>

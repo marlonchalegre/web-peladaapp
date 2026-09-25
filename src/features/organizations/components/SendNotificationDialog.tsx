@@ -183,15 +183,36 @@ export default function SendNotificationDialog({
   const formatDate = (dateStr?: string | null) => {
     if (!dateStr) return "";
     try {
-      return new Date(dateStr).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
+      return new Date(dateStr).toLocaleDateString(
+        t("common.locale_code", "pt-BR"),
+        {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        },
+      );
     } catch {
       return dateStr;
+    }
+  };
+
+  const formatPeladaStatus = (status?: string | null) => {
+    if (!status) return "";
+    switch (status) {
+      case "open":
+        return t("pelada.status.open", "Aberta");
+      case "attendance":
+        return t("pelada.status.attendance", "Lista de Presença");
+      case "running":
+        return t("pelada.status.running", "Em Andamento");
+      case "closed":
+        return t("pelada.status.closed", "Encerrada");
+      case "voting":
+        return t("pelada.status.voting", "Votação Aberta");
+      default:
+        return status;
     }
   };
 
@@ -322,8 +343,10 @@ export default function SendNotificationDialog({
                 >
                   <span>{customMessage.length}/2000</span>
                   <span>
-                    Dica: Use <b>*negrito*</b>, <i>_itálico_</i>, ~tachado~ ou
-                    ```mono```
+                    {t(
+                      "organizations.management.notifications.formatting_hint",
+                      "Dica: Use *negrito*, _itálico_, ~tachado~ ou ```mono```",
+                    )}
                   </span>
                 </Box>
               }
@@ -436,7 +459,7 @@ export default function SendNotificationDialog({
                 renderValue={(selected) => {
                   const p = peladas.find((item) => item.id === selected);
                   return p
-                    ? `${formatDate(p.scheduled_at)} (${p.status})`
+                    ? `${formatDate(p.scheduled_at)} (${formatPeladaStatus(p.status)})`
                     : selected;
                 }}
               >
@@ -471,7 +494,8 @@ export default function SendNotificationDialog({
                           {formatDate(p.scheduled_at)}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          Status: {p.status}
+                          {t("common.status", "Status")}:{" "}
+                          {formatPeladaStatus(p.status)}
                         </Typography>
                       </Box>
                     </MenuItem>

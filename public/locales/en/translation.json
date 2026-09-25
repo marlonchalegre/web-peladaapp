@@ -22,7 +22,9 @@
     "profile_short": "PROFILE",
     "selectGroup": "Select group",
     "switchLanguage": "Switch language",
-    "userMenu": "User menu"
+    "userMenu": "User menu",
+    "app_name": "MINHA PELADA",
+    "app_name_short": "MP"
   },
   "location": {
     "open_in_google_maps": "Open \"{{location}}\" in Google Maps"
@@ -101,7 +103,9 @@
   },
   "components": {
     "language_switcher": {
-      "label": "Language"
+      "label": "Language",
+      "portuguese": "Português (BR)",
+      "english": "English"
     }
   },
   "common": {
@@ -144,6 +148,7 @@
     "sending": "Sending...",
     "selected": "{{count}} selected",
     "load_more": "Load more",
+    "status": "Status",
     "sub": "Sub",
     "matches_played": "Matches",
     "team": "Team",
@@ -248,6 +253,43 @@
       "username_already_exists": "This username is already taken by another user.",
       "server_error": "A server error occurred. Please try again later.",
       "unexpected": "An unexpected error occurred."
+    },
+    "edit": "Edit",
+    "send": "Send",
+    "locale": "en-US",
+    "premium": {
+      "benefits_title": "Benefits Included:",
+      "activation_notice": "Contact the PeladaApp Global Administrator to unlock this feature.",
+      "finance_title": "Advanced Financial Control",
+      "finance_description": "Manage monthly fees, daily payments and group transactions with a complete financial dashboard.",
+      "finance_benefit1": "Monthly fee control per player",
+      "finance_benefit2": "Income and expense transaction tracking",
+      "finance_benefit3": "Financial summary with balance, income and expenses",
+      "statistics_title": "Statistics and Performance",
+      "statistics_description": "Track goals, assists, attendance and top scorers for each player across seasons.",
+      "statistics_benefit1": "Top scorers and assisters ranking by season",
+      "statistics_benefit2": "Individual goals and assists history",
+      "statistics_benefit3": "Statistics export and import via CSV",
+      "voting_title": "Post-Game MVP Voting",
+      "voting_description": "Allow players to rate each other with 1-5 stars after each pelada to elect the MVP.",
+      "voting_benefit1": "Mandatory voting with 1-5 star scale",
+      "voting_benefit2": "Normalized ranking (Z-Score) for fair ratings",
+      "voting_benefit3": "Results with pelada highlights podium",
+      "substitutions_title": "Substitution Management",
+      "substitutions_description": "Manage the substitution of absent monthly members with temporary players, keeping track of who is playing in whose place.",
+      "substitutions_benefit1": "Temporary monthly member substitution",
+      "substitutions_benefit2": "Permanent member substitutions",
+      "substitutions_benefit3": "Substitution history",
+      "characteristics_title": "Player Evaluations and Characteristics",
+      "characteristics_description": "Define technical and physical attributes of your players to generate personalized radar charts.",
+      "characteristics_benefit1": "6-axis skill radar charts",
+      "characteristics_benefit2": "Custom attributes (Shooting, Speed, Passing, etc.)",
+      "characteristics_benefit3": "Better team balancing based on real data",
+      "waha_title": "Automated WhatsApp Communications",
+      "waha_description": "Integrate your organization with WhatsApp to automate pelada notifications, attendance and waitlists.",
+      "waha_benefit1": "Automatic new event notifications",
+      "waha_benefit2": "Attendance confirmation alerts",
+      "waha_benefit3": "Direct WAHA API service integration"
     }
   },
   "home": {
@@ -390,6 +432,50 @@
         "load_peladas_failed": "Error loading peladas",
         "create_pelada_failed": "Error creating pelada",
         "delete_pelada_failed": "Error deleting pelada"
+      },
+      "avg_attendance": "AVERAGE ATTENDANCE",
+      "new_pelada": "NEW PELADA",
+      "schedule_next": "SCHEDULE NEXT",
+      "date_label": "DATE",
+      "time_label": "TIME",
+      "max_label": "MAXIMUM",
+      "location_label": "LOCATION",
+      "creating": "CREATING...",
+      "create_pelada": "CREATE PELADA",
+      "notify_casual": "Notify daily players and guests that the list is open",
+      "group_agenda": "GROUP AGENDA",
+      "filter_all": "ALL",
+      "filter_open": "OPEN",
+      "filter_pending": "PENDING",
+      "table": {
+        "date": "DATE",
+        "situation": "SITUATION",
+        "list": "LIST",
+        "financial": "FINANCIAL",
+        "action": "ACTION"
+      },
+      "no_peladas_in_view": "No peladas found in this view.",
+      "garcom": "assister",
+      "champion_prefix": "Champion:",
+      "up_to_players": "up to {{max}} players",
+      "view_sumula": "VIEW RESULTS",
+      "mobile": {
+        "mensalista_temp": "TEMPORARY MONTHLY",
+        "diarista_temp": "TEMPORARY DAILY",
+        "in_attendance": "in attendance",
+        "next_pelada": "NEXT PELADA",
+        "season_podium": "SEASON PODIUM",
+        "garcom_label": "ASSISTER",
+        "you_label": "YOU",
+        "group_history": "GROUP HISTORY",
+        "title_badge": "TITLE",
+        "mvp_you": "MVP: you",
+        "your_goals": "you: {{goals}} goal",
+        "your_goals_plural": "you: {{goals}} goals",
+        "didnt_play": "You didn't play",
+        "org_options": "Organization options",
+        "sumula": "RESULTS",
+        "stats_label": "top scorers, attendance, titles"
       }
     },
     "invitation": {
@@ -592,7 +678,35 @@
         "convidado": "Guest",
         "mensalista_temporario": "Mensalista (Temp.)",
         "diarista_temporario": "Diarista (Subst.)"
-      }
+      },
+      "notifications": {
+        "card_title": "WhatsApp Communications",
+        "card_desc": "Send custom messages or resend call-ups, lineups and results directly to the organization's WhatsApp group.",
+        "button_send": "Send Notification",
+        "title": "WhatsApp Communications",
+        "tab_custom": "Custom Message",
+        "tab_resend": "Resend Notification",
+        "custom_instruction": "Write a custom message to be sent directly to the organization's WhatsApp group.",
+        "custom_placeholder": "Write your message here...",
+        "resend_instruction": "Select a notification type and a specific pelada to resend the formatted alert to the group.",
+        "type_label": "Notification Type",
+        "pelada_label": "Select the Pelada",
+        "waha_disabled_warning": "Warning: WhatsApp (WAHA) integration is not enabled in this organization's settings. Messages will not be delivered until WAHA communications are configured and active.",
+        "types": {
+          "new_pelada": "New Pelada Confirmed / Call-up",
+          "attendance_reminder": "Attendance Reminder",
+          "start": "Lineup / Pelada Started",
+          "support_lineup": "Support Lineup (Camera and Stats)",
+          "end": "Pelada Ended / Results",
+          "vote_reminder": "Voting Reminder",
+          "vote_ended": "Voting Results"
+        },
+        "formatting_hint": "Tip: Use *bold*, _italic_, ~strikethrough~ or ```mono```",
+        "success": "Message sent successfully!",
+        "error": "Failed to send message."
+      },
+      "reset_invite_link_title": "Reset Invite Link",
+      "reset_invite_link_confirm": "Are you sure you want to reset the invite link? The current link will stop working immediately."
     },
     "ratings": {
       "title": "Player Ratings - {{name}}",
@@ -666,7 +780,15 @@
       "error": {
         "load_org_failed": "Error loading organization",
         "load_stats_failed": "Error loading statistics"
-      }
+      },
+      "garcom_label": "Assister",
+      "assists_count": "asst.",
+      "attendance_label": "Attendance",
+      "games_label": "games",
+      "avg_rating_label": "Average rating",
+      "season_stats_title": "Season statistics",
+      "avg_per_game": "AVG/GAME",
+      "avg_attendance": "AVERAGE ATTENDANCE"
     },
     "form": {
       "pelada": {
@@ -677,7 +799,8 @@
         "max_players_help": "Max player limit for this match (optional)",
         "location": "Location",
         "location_placeholder": "e.g. Arena Vila Nova · Q2",
-        "submit": "Create pelada"
+        "submit": "Create pelada",
+        "notify_casual_players": "Notify guests and daily players that the list is open?"
       }
     },
     "dialog": {
@@ -736,6 +859,11 @@
       "remove_last_admin": "Cannot remove the last administrator of the organization",
       "remove_admin_failed": "Error removing administrator",
       "add_players_failed": "Error adding players"
+    },
+    "roster": {
+      "mensalista_temp": "temporary monthly member",
+      "diarista_temp": "temporary daily player",
+      "empty": "No players in the roster."
     }
   },
   "peladas": {
@@ -831,7 +959,13 @@
         "confirmed_msg": "You're in! See you on the pitch.",
         "declined_msg": "Sad to hear you can't make it. Hope to see you next time!",
         "waitlist_msg": "You are on the waitlist.",
-        "waitlist_button": "Waitlist"
+        "waitlist_button": "Waitlist",
+        "your_attendance": "YOUR ATTENDANCE",
+        "mensalista_priority_info": "You're a monthly member: your spot is guaranteed until",
+        "yes": "YES",
+        "no": "NO",
+        "ready_heading": "Ready for the match?",
+        "mensalista_deadline": "Tuesday, 10 PM"
       },
       "status": {
         "confirmed": "Confirmed",
@@ -850,6 +984,76 @@
         "total_confirmed": "TOTAL CONFIRMED",
         "total_declined": "TOTAL DECLINED",
         "total_pending": "TOTAL PENDING"
+      },
+      "copy_list": "Copy list",
+      "empty_confirmed": "No players confirmed yet.",
+      "back": "Back",
+      "sport_football": "FUT",
+      "stat_confirmed_short": "CONF.",
+      "stat_declined_short": "DECLINED",
+      "stat_pending_short": "PENDING",
+      "stat_waitlist_short": "WAITLIST",
+      "confirmed_label": "CONFIRMED",
+      "you_label": "YOU",
+      "remove_from_list": "Remove from list",
+      "waitlist_label": "WAITLIST",
+      "waitlist_auto_enter": "auto-enter when a spot opens",
+      "waitlist_empty": "No players on the waitlist.",
+      "promote_to_confirmed": "Promote to confirmed",
+      "admin_actions": "ADMIN ACTIONS",
+      "notify_whatsapp_group": "Notify WhatsApp group",
+      "desktop": {
+        "close_and_draw": "CLOSE LIST AND DRAW",
+        "your_response": "YOUR RESPONSE",
+        "will_play": "WILL PLAY",
+        "waitlist": "WAITLIST",
+        "wont_play": "WON'T PLAY",
+        "confirmed": "CONFIRMED",
+        "pending": "PENDING",
+        "declined": "DECLINED",
+        "player_col": "PLAYER",
+        "type_col": "TYPE",
+        "payment_col": "PAYMENT",
+        "move_to_col": "MOVE TO",
+        "empty_list": "No players in this list.",
+        "paid_status": "paid up",
+        "undo_payment": "Undo payment",
+        "paid_check": "paid ✓",
+        "mark_daily_paid": "Mark daily as paid",
+        "currency": "R$",
+        "charge": "CHARGE",
+        "queue": "QUEUE",
+        "out": "OUT",
+        "up": "UP",
+        "in": "IN",
+        "spots_label": "SPOTS",
+        "waitlist_auto_info": "waitlisted players auto-enter when someone leaves.",
+        "waitlist_section": "WAITLIST",
+        "waitlist_empty": "Queue is empty at the moment.",
+        "daily_fees_title": "DAILY FEES FOR THIS PELADA",
+        "open_amount": "outstanding",
+        "expected": "expected",
+        "charge_whatsapp": "CHARGE VIA WHATSAPP",
+        "pending_section": "PENDING",
+        "pending_reminder_hint": "monthly members haven't responded yet. A group reminder usually works before closing the list.",
+        "remind_button": "REMIND THEM",
+        "open_list_notice": "OPEN LIST · CLOSES IN 2 DAYS",
+        "open_status": "OPEN",
+        "you_confirmed": "You are confirmed",
+        "you_waitlist": "You are on the waitlist",
+        "you_declined": "You marked you will not play in this pelada",
+        "you_unanswered": "You haven't replied whether you will play yet",
+        "you_badge": "· YOU",
+        "open_spots": "{{count}} open spots · ",
+        "of_total": "of {{total}}",
+        "pagination": "1–{{displayed}} of {{total}} {{tab}}",
+        "see_less": "See less ↑",
+        "see_all": "See all →",
+        "charge_whatsapp_count": "CHARGE THE {{count}} ON WHATSAPP",
+        "remind_button_count": "REMIND THE {{count}}",
+        "pending_reminder_hint_interpolated": "{{count}} monthly members haven't responded yet. A group reminder usually works before closing the list.",
+        "whatsapp_daily_msg": "Daily fee collection for {{org}}: R$ {{amount}} pending.",
+        "whatsapp_pending_msg": "Reminder: {{count}} players haven't confirmed attendance yet for the pelada on {{weekday}} {{day}}. Confirm your attendance in the app!"
       }
     },
     "detail": {
@@ -926,7 +1130,8 @@
         "matches_per_team_label": "Matches per Team",
         "no_template": "No saved template for this configuration.",
         "planned_matches": "Planned Matches",
-        "random_tip": "Reset schedule to algorithmic default"
+        "random_tip": "Reset schedule to algorithmic default",
+        "match_count": "{{count}} Matches"
       },
       "draw_report": {
         "title": "Draw justifications",
@@ -1094,7 +1299,18 @@
       "event_sheet_title": "LOG EVENT · {{time}}",
       "event_what": "What was the play?",
       "event_who": "Who made the play?",
-      "own_goal_skip": "OWN GOAL / UNIDENTIFIED"
+      "own_goal_skip": "OWN GOAL / UNIDENTIFIED",
+      "team_orange": "ORANGE",
+      "team_blue": "BLUE",
+      "insights_tabs_label": "Session insights tabs",
+      "breadcrumb_home": "Home",
+      "breadcrumb_profile": "My profile",
+      "session_label": "SESSION",
+      "dashboard_tab": "Dashboard",
+      "close_confirm_desc": "When closing the pelada, all matches will be finished and the standings will be consolidated.",
+      "delete_event_confirm": "Are you sure you want to delete this event? If it's a goal, the associated assist will also be deleted.",
+      "reset_session_confirm": "Are you sure you want to reset the session timer? This cannot be undone.",
+      "reset_match_confirm": "Are you sure you want to reset this match timer?"
     },
     "voting": {
       "title": "Voting for Pelada",
@@ -1147,6 +1363,15 @@
           "not_found": "Results not found",
           "still_voting": "Voting is still in progress. Results will be available once the voting period ends.",
           "not_voted": "You participated in this match but didn't vote during the allowed period. Therefore, you no longer have access to the results for this match."
+        },
+        "restricted_title": "Restricted Results",
+        "ranking": {
+          "position": "Pos.",
+          "player": "Player",
+          "player_position": "Position",
+          "rating": "Rating",
+          "goals": "Goals",
+          "assists": "Asst."
         }
       },
       "stars": "stars",
@@ -1207,7 +1432,8 @@
         "support_label": "SUPORTE",
         "end_match_full": "END MATCH",
         "reset_session_timer": "Reset session timer",
-        "other_event_short": "DRIBBLE, SHOT, FOUL…"
+        "other_event_short": "DRIBBLE, SHOT, FOUL…",
+        "match_word": "MATCH"
       }
     },
     "panel": {
@@ -1254,7 +1480,72 @@
       "home_goalkeeper": "GOALKEEPER (HOME)",
       "away_goalkeeper": "GOALKEEPER (AWAY)",
       "drag_gk_here": "Drag a goalkeeper here",
-      "default_name": "Team {{number}}"
+      "default_name": "Team {{number}}",
+      "add_team_hint": "Add a new team to balance the pelada",
+      "specialist": "SPECIALIST",
+      "draw_title": "Team Draw",
+      "drawn_at": "drawn at",
+      "drawn_by_you": "by you",
+      "send_whatsapp": "SEND ON WHATSAPP",
+      "save_teams": "SAVE TEAMS",
+      "how_to_draw": "HOW TO DRAW",
+      "confirmed_players": "CONFIRMED",
+      "draw_description": "Choose how confirmed players will be divided. The draw replaces the current teams.",
+      "draw_description_mobile": "Choose the team division algorithm.",
+      "default_badge": "DEFAULT",
+      "draw_format": "DRAW FORMAT",
+      "teams_label": "TEAMS",
+      "per_team": "PER TEAM",
+      "use_history": "Use historical signals",
+      "history_unavailable": "unavailable in classic",
+      "history_hint": "avoids repeating recent formations",
+      "fixed_goalkeepers": "FIXED GOALKEEPERS",
+      "goalkeeper_section": "Fixed goalkeepers",
+      "team_1": "team 1",
+      "drag_gk_1": "Drag Goalkeeper 1",
+      "team_2": "team 2",
+      "drag_gk_2": "Drag Goalkeeper 2",
+      "gk_locked_hint": "Goalkeepers locked in teams. Other positions are shuffled and balanced by level.",
+      "draw_button": "DRAW",
+      "close_panel": "CLOSE PANEL",
+      "gk_locked_opposed": "goalkeepers locked in opposing teams",
+      "gk_common_draw": "goalkeepers enter common draw",
+      "teams_per_side": "TEAMS · PER SIDE",
+      "drag_to_swap": "drag a player to swap teams",
+      "tap_to_move": "tap ⋯ to move",
+      "add_team": "ADD TEAM",
+      "empty_slot": "EMPTY SLOT",
+      "bench_title": "BENCH · OUT OF TEAMS",
+      "bench_title_count": "BENCH · {{count}} OUT OF TEAMS",
+      "drag_to_team": "drag into a team",
+      "no_bench_players": "No players on the bench at the moment.",
+      "on_bench": "on bench",
+      "player_actions": "Player actions",
+      "move_player_to": "Move player to:",
+      "send_to_bench": "Send to bench",
+      "start_pelada": "START PELADA",
+      "back": "Back",
+      "missing_players": "NEED {{count}} PLAYER",
+      "missing_players_plural": "NEED {{count}} PLAYERS",
+      "fixed_label": "fixed",
+      "you_label": "you",
+      "vest_green": "GREEN VEST",
+      "vest_none": "NO VEST",
+      "vest_blue": "BLUE VEST",
+      "vest_orange": "ORANGE VEST",
+      "vest_white": "WHITE VEST",
+      "vest_black": "BLACK VEST",
+      "vest_default": "VEST",
+      "algorithm": {
+        "classic_name": "Classic",
+        "classic_desc": "Balances rating and position without history.",
+        "gemini_name": "Tactical balance",
+        "gemini_tag": "AI · GEMINI",
+        "gemini_desc": "Balances overall strength, defense and attack with ratings, votes and statistics. Separates winning cliques.",
+        "gpt_name": "By rules",
+        "gpt_tag": "AI · GPT",
+        "gpt_desc": "Follows explicit restrictions on level, position and pairs that cannot be together."
+      }
     },
     "team_card": {
       "average": "AVG: {{score}}",
@@ -1263,6 +1554,102 @@
       "empty_slot": "Empty slot",
       "set_goalkeeper": "Set as Goalkeeper",
       "remove_player": "Remove from Team"
+    },
+    "support_lineup": {
+      "title": "Support Lineup",
+      "subtitle": "Two resting players record the match and keep the stats.",
+      "tab_title": "Support Lineup",
+      "view_escalation": "Schedule",
+      "view_participation_button": "Participation ({{count}})",
+      "reroll_all_button": "Re-draw Full Schedule",
+      "reroll_all_confirm": "Are you sure you want to re-draw support for all matches?",
+      "notify_whatsapp_button": "Notify on WhatsApp",
+      "duty_summary_title": "Participation Transparency",
+      "duty_summary_subtitle": "History of how many times each player served on support",
+      "view_details": "View detailed list",
+      "camera": "Camera / Video",
+      "stats": "Stats / Statistics",
+      "unassigned": "Unassigned",
+      "swap_roles_button": "Swap roles (Camera ⇄ Stats)",
+      "reroll_match_button": "Re-draw match",
+      "confirm_notify_title": "Notify Support Lineup?",
+      "confirm_notify_desc": "Do you want to send the full support schedule to the WhatsApp group mentioning the players assigned to each match?",
+      "confirm_notify_action": "Send Notification",
+      "confirm_match_reroll_title": "Re-draw support for match {{sequence}}?",
+      "confirm_match_reroll_desc": "Do you want to re-draw the support duo for this match? Current players will be replaced by other resting players.",
+      "search_player_placeholder": "Search player...",
+      "filter_all": "All",
+      "player_col": "Player",
+      "team_col": "Team",
+      "total_col": "Total",
+      "no_players_found": "No players found",
+      "notify_success": "Notification sent successfully to the WhatsApp group!",
+      "notify_error": "Failed to send support lineup notification",
+      "match_label": "Match",
+      "matchup_label": "Matchup",
+      "actions_label": "Actions",
+      "status_live": "Live",
+      "status_finished": "Finished"
+    },
+    "tabs": {
+      "attendance": "ATTENDANCE LIST",
+      "teams": "TEAMS",
+      "matches": "MATCHES",
+      "voting": "VOTING",
+      "results": "RESULTS",
+      "aria_label": "Pelada sub-navigation"
+    },
+    "offline": {
+      "active_message": "Offline mode active. Your changes will be synced when the connection returns.",
+      "sync_error": "Synchronization error.",
+      "sync_lost_connection": "Connection lost during synchronization.",
+      "sync_generic_error": "Failed to sync. Operation canceled.",
+      "sync_button_syncing": "Syncing...",
+      "sync_button_now": "Sync Now",
+      "pending_action_one": "pending action",
+      "pending_action_other": "pending actions",
+      "pending_action_suffix": "to sync.",
+      "pending_changes_offline": "There are pending changes to sync.",
+      "error_prefix": "Error: "
+    },
+    "draw": {
+      "justification": {
+        "title": "WHY IT ENDED UP LIKE THIS",
+        "chip_gemini": "TACTICAL BALANCE · GEMINI",
+        "chip_gpt": "BY RULES · GPT",
+        "chip_classic": "CLASSIC",
+        "squad_mean": "SQUAD AVERAGE",
+        "gap_overall": "OVERALL GAP",
+        "gap_defense": "DEFENSE GAP",
+        "gap_attack": "ATTACK GAP",
+        "gap_sector": "SECTOR GAP",
+        "team_avg_between": "Team average between",
+        "difference_of": "difference of",
+        "champion_pair": "Champion pair",
+        "titles_together": "titles together",
+        "pairs_balanced": "Frequent and champion pairs balanced between teams to maintain competitiveness.",
+        "connection_label": "Connection:",
+        "assists_label": "assists",
+        "top_winner": "Top recent winner:",
+        "titles_label": "titles",
+        "new_pair": "New pairing:",
+        "players_swapped": "player(s) swapped between teams to avoid repeating recent formations.",
+        "fixed_goalkeepers_split": "Fixed goalkeepers split between Team 1 and Team 2.",
+        "players_on_bench": "player(s) on bench waiting for a spot",
+        "incomplete_teams": "There are incomplete teams: drag players from the bench to fill empty spots.",
+        "heuristic_caveat": "This is heuristic preference, not prediction: balanced ratings don't guarantee a balanced game.",
+        "view_full": "VIEW FULL JUSTIFICATION",
+        "team_avg_balance": "Team average between {{min}} and {{max}} — difference of {{diff}}.",
+        "rule_summary_gpt": "Draw by rules and restrictions: balanced ratings and positions without technical concentration.",
+        "rule_summary_gemini": "Draw with tactical balance: separated champion pairs and distributed chemistry.",
+        "champion_pair_text": "Champion pair {{players}} ({{titles}} titles together).",
+        "assist_link_text": "Connection: {{from}} → {{to}} ({{count}} assists).",
+        "top_winner_text": "Top recent winner: {{name}} ({{titles}} titles).",
+        "first_time_pair_text": "New pairing: {{players}}.",
+        "history_moves_text": "{{count}} player(s) swapped between teams to avoid repeating recent formations.",
+        "fixed_gk_text": "Fixed goalkeepers {{home}} and {{away}} split between Team 1 and Team 2.",
+        "benched_text": "{{count}} player(s) on the bench waiting for a spot ({{names}})."
+      }
     }
   },
   "pelada": {
@@ -1290,7 +1677,9 @@
         "new_password": "New Password",
         "confirm_password": "Confirm New Password",
         "dark_mode": "Dark Mode",
-        "dark_mode_description": "Toggle between light and dark theme"
+        "dark_mode_description": "Toggle between light and dark theme",
+        "receive_non_mensalista_updates": "Notifications for Daily Players and Guests",
+        "receive_non_mensalista_updates_description": "Receive private WhatsApp notifications when the attendance list opens and when monthly member priority ends (maximum 2 messages per pelada)."
       },
       "hint": {
         "password": "Leave blank if you don't want to change password"
@@ -1322,6 +1711,47 @@
         "upload_failed": "Failed to upload profile picture",
         "delete_failed": "Failed to delete account",
         "file_too_large": "File too large. Maximum 2MB."
+      },
+      "titles_label": "TITLES",
+      "mvp_label": "× MVP",
+      "garcom_label": "× ASSISTER",
+      "streak_of": "STREAK OF",
+      "avg_rating": "AVERAGE RATING",
+      "games_in_year": "GAMES IN {{year}}",
+      "attendance_label": "ATTENDANCE",
+      "edit_button": "EDIT",
+      "skills_title": "SKILL CARD",
+      "no_ratings": "no ratings",
+      "avg_prefix": "average",
+      "ratings_count": "ratings",
+      "ratings_subtitle": "Ratings given by teammates after peladas.",
+      "recent_peladas": "RECENT PELADAS",
+      "full_history": "Full history →",
+      "attendance_12_weeks": "ATTENDANCE · 12 WEEKS",
+      "attendance_last_12": "ATTENDANCE · LAST 12 WEEKS",
+      "present": "present",
+      "absent": "absent",
+      "no_game": "no game",
+      "longest_streak": "Longest streak:",
+      "sport_football": "FOOTBALL",
+      "payments_title": "PAYMENTS",
+      "payments_hint": "Open the group screen to see monthly fees and daily fees.",
+      "view_statement": "View statement →",
+      "per_group": "PER GROUP",
+      "note_label": "RATING",
+      "skill_ball_control": "BALL CONTROL",
+      "skill_defending": "DEFENDING",
+      "back": "Back",
+      "overview_tab": "OVERVIEW",
+      "history_tab": "GAME HISTORY",
+      "group_stats": {
+        "titles": "TITLES"
+      },
+      "format": {
+        "champion": "Champion: {{team}}",
+        "didnt_play": "Didn't play",
+        "garcom": "ASSISTER",
+        "place": "{{place}}th place"
       }
     }
   },
@@ -1386,6 +1816,159 @@
       "mvp": "MVP",
       "raw_stars": "Raw: {{val}} ⭐",
       "normalized_score": "Normalized: {{val}}/10"
+    }
+  },
+  "admin": {
+    "title": "Global Admin Panel",
+    "subtitle": "Manage organizations, block users, and administer global system permissions.",
+    "tabs": {
+      "users": "Users",
+      "organizations": "Organizations",
+      "peladas": "Peladas"
+    },
+    "sections": {
+      "users": {
+        "title": "Registered Users",
+        "search_placeholder": "Search by name, username or email..."
+      },
+      "orgs": {
+        "title": "System Organizations",
+        "search_placeholder": "Search organization by name..."
+      },
+      "peladas": {
+        "title": "System Peladas"
+      }
+    },
+    "table": {
+      "user": "User",
+      "position": "Position",
+      "allow_org_creation": "Create Orgs",
+      "global_admin": "Global Admin",
+      "no_users_found": "No users found.",
+      "org_name": "Organization",
+      "org_id": "Organization ID",
+      "blocked": "Blocked",
+      "actions": "Actions",
+      "no_orgs_found": "No organizations found.",
+      "organization": "Organization",
+      "scheduled_at": "Scheduled Date",
+      "status": "Status",
+      "pelada_id": "Pelada ID",
+      "no_peladas_found": "No peladas found."
+    },
+    "actions": {
+      "edit_user": "Edit User",
+      "reset_password": "Reset Password",
+      "remove_user": "Remove User",
+      "manage_admins": "Manage Admins",
+      "manage_feature_flags": "Manage Premium Flags",
+      "send_notification": "Send Notification",
+      "delete_org": "Remove Organization",
+      "delete_pelada": "Remove Pelada",
+      "remove_admin": "Remove Administrator"
+    },
+    "dialogs": {
+      "delete_org": {
+        "title": "Remove Organization",
+        "description": "Are you sure you want to permanently remove the organization {{name}}? This action cannot be undone and all associated data will be deleted."
+      },
+      "delete_pelada": {
+        "title": "Remove Pelada",
+        "description": "Are you sure you want to permanently remove the pelada scheduled for {{date}} from organization {{orgName}}? This will delete all teams, statistics, matches, votes, reminders and attendances. This action cannot be undone."
+      },
+      "delete_user": {
+        "title": "Remove User",
+        "description": "Are you sure you want to permanently remove user {{name}} (@{{username}})? This action cannot be undone and all associated data will be deleted."
+      },
+      "edit_user": {
+        "title": "Edit User",
+        "description": "Update email and phone data for user {{name}} (@{{username}}).",
+        "email": "Email",
+        "phone": "Phone"
+      },
+      "reset_password": {
+        "title": "Reset Password",
+        "description": "Enter the new password for user {{name}} (@{{username}}).",
+        "new_password": "New Password"
+      },
+      "feature_flags": {
+        "title": "Premium Feature Flags",
+        "description": "Enable or disable Premium features for organization {{name}}.",
+        "load_error": "Failed to load organization flags",
+        "save_success": "Premium feature flags saved successfully!",
+        "save_error": "Failed to save flags",
+        "finance": "Financial Control",
+        "finance_desc": "Access to the finance tab, transactions and monthly fees.",
+        "waha": "WhatsApp Notifications (WAHA)",
+        "waha_desc": "Automated integration to send call-ups, teams and results.",
+        "characteristics": "Player Attribute Card",
+        "characteristics_desc": "6-axis radar chart visualization for players.",
+        "substitutions": "Substitute Members",
+        "substitutions_desc": "Manage temporary and permanent substitutes in the roster.",
+        "statistics": "Statistics & Analytics",
+        "statistics_desc": "Goals history, top scorers, MVP and annual performance dashboard.",
+        "voting": "Post-Game Voting",
+        "voting_desc": "Allow star/grade voting among members after the pelada.",
+        "unlimited_members": "Unlimited Members",
+        "unlimited_members_desc": "Ignore the 15-member limit for the organization.",
+        "unlimited_peladas": "Unlimited Peladas",
+        "unlimited_peladas_desc": "Override the limit of creating at most 2 peladas per month."
+      },
+      "manage_admins": {
+        "title": "Manage Administrators",
+        "description": "Manage the administrators of organization {{name}}.",
+        "current_admins": "Current Administrators",
+        "no_admins": "No administrators found.",
+        "add_admin": "Add New Administrator",
+        "search_placeholder": "Search user by name/email/username...",
+        "already_admin": "Already Admin"
+      }
+    },
+    "errors": {
+      "fetch_orgs": "Failed to load organizations.",
+      "toggle_org_block": "Failed to toggle organization block status.",
+      "delete_org": "Failed to delete the organization.",
+      "fetch_peladas": "Failed to load peladas.",
+      "delete_pelada": "Failed to delete the pelada.",
+      "fetch_users": "Failed to load users.",
+      "toggle_block": "Failed to toggle block status.",
+      "toggle_org_creation": "Failed to toggle creation permission.",
+      "password_too_short": "Password must be at least 4 characters.",
+      "reset_password": "Failed to reset the password.",
+      "remove_user": "Failed to remove the user.",
+      "edit_user": "Failed to update the user.",
+      "fetch_admins": "Failed to load administrators.",
+      "search_users": "Failed to search users.",
+      "add_admin": "Failed to add administrator.",
+      "last_admin": "The organization must have at least one administrator.",
+      "remove_admin": "Failed to remove administrator.",
+      "toggle_global_admin": "Failed to toggle Global Admin status."
+    },
+    "warnings": {
+      "cannot_demote_self": "You cannot remove your own Global Admin privilege."
+    },
+    "success": {
+      "org_blocked": "Organization blocked successfully.",
+      "org_unblocked": "Organization unblocked successfully.",
+      "org_deleted": "Organization deleted successfully.",
+      "pelada_deleted": "Pelada deleted successfully.",
+      "user_blocked": "User blocked successfully.",
+      "user_unblocked": "User unblocked successfully.",
+      "org_creation_allowed": "Organization creation allowed.",
+      "org_creation_disallowed": "Organization creation restricted.",
+      "global_admin_granted": "Global Admin privileges granted.",
+      "global_admin_revoked": "Global Admin privileges revoked.",
+      "reset_password": "Password reset successfully.",
+      "remove_user": "User removed successfully.",
+      "edit_user": "User updated successfully.",
+      "add_admin": "Administrator added successfully.",
+      "remove_admin": "Administrator removed successfully."
+    }
+  },
+  "finance": {
+    "reversal": {
+      "title": "Reverse Transaction",
+      "confirm": "Are you sure you want to reverse this transaction?"
     }
   }
 }

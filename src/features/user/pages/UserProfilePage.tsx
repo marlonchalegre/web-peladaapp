@@ -293,12 +293,30 @@ export default function UserProfilePage() {
     .substring(0, 2);
 
   const profileSkills = [
-    { label: "PASSE", value: dashboard?.skills.passing },
-    { label: "DOMÍNIO", value: dashboard?.skills.ball_control },
-    { label: "VELOCIDADE", value: dashboard?.skills.velocity },
-    { label: "CHUTE", value: dashboard?.skills.shooting },
-    { label: "DRIBLE", value: dashboard?.skills.dribbling },
-    { label: "MARCAÇÃO", value: dashboard?.skills.defending },
+    {
+      label: t("user.characteristics.passing", "PASSE").toUpperCase(),
+      value: dashboard?.skills.passing,
+    },
+    {
+      label: t("user.characteristics.ball_control", "DOMÍNIO").toUpperCase(),
+      value: dashboard?.skills.ball_control,
+    },
+    {
+      label: t("user.characteristics.velocity", "VELOCIDADE").toUpperCase(),
+      value: dashboard?.skills.velocity,
+    },
+    {
+      label: t("user.characteristics.shooting", "CHUTE").toUpperCase(),
+      value: dashboard?.skills.shooting,
+    },
+    {
+      label: t("user.characteristics.dribbling", "DRIBLE").toUpperCase(),
+      value: dashboard?.skills.dribbling,
+    },
+    {
+      label: t("user.characteristics.defending", "MARCAÇÃO").toUpperCase(),
+      value: dashboard?.skills.defending,
+    },
   ];
   const skillValues = profileSkills
     .map((s) => s.value)
@@ -308,7 +326,7 @@ export default function UserProfilePage() {
     : null;
   const presenceWeeks = dashboard?.presence ?? [];
   const inactivePresenceBarColor = theme.palette.divider;
-  const recentMatches = toRecentMatchRows(dashboard?.recent_peladas);
+  const recentMatches = toRecentMatchRows(dashboard?.recent_peladas, t);
 
   return (
     <Box

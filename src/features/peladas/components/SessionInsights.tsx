@@ -83,7 +83,7 @@ export default function SessionInsights({
         <Tabs
           value={tabValue}
           onChange={handleChange}
-          aria-label="session insights tabs"
+          aria-label={t("peladas.matches.insights_tabs_label")}
           variant="fullWidth"
           indicatorColor="primary"
           textColor="primary"

@@ -211,7 +211,7 @@ export default function MatchScoreHero({
                 mt: "6px",
               }}
             >
-              LARANJA
+              {t("peladas.matches.team_orange")}
             </Typography>
           </Box>
 
@@ -332,7 +332,7 @@ export default function MatchScoreHero({
                 mt: "6px",
               }}
             >
-              AZUL
+              {t("peladas.matches.team_blue")}
             </Typography>
           </Box>
         </Box>
@@ -629,7 +629,7 @@ export default function MatchScoreHero({
               mt: "6px",
             }}
           >
-            LARANJA
+            {t("peladas.matches.team_orange")}
           </Typography>
         </Box>
 
@@ -731,7 +731,7 @@ export default function MatchScoreHero({
               mt: "6px",
             }}
           >
-            AZUL
+            {t("peladas.matches.team_blue")}
           </Typography>
         </Box>
       </Box>

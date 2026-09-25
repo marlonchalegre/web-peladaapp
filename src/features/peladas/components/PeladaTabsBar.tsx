@@ -1,4 +1,5 @@
 import { Box, Typography, Button } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router-dom";
 
 export type PeladaTabKey =
@@ -35,6 +36,7 @@ export default function PeladaTabsBar({
   isPeladaOpen,
   status,
 }: PeladaTabsBarProps) {
+  const { t } = useTranslation();
   const finalOpen =
     isPeladaOpen !== undefined
       ? isPeladaOpen
@@ -80,7 +82,7 @@ export default function PeladaTabsBar({
   return (
     <Box
       component="nav"
-      aria-label="Pelada sub-navigation"
+      aria-label={t("peladas.tabs.aria_label")}
       sx={{
         width: "100%",
         bgcolor: "background.paper",
@@ -127,7 +129,7 @@ export default function PeladaTabsBar({
           to={`/peladas/${peladaId}/attendance`}
           sx={tabButtonSx("attendance")}
         >
-          LISTA DE PRESENÇA
+          {t("peladas.tabs.attendance")}
           {count !== undefined && count > 0 && (
             <Box
               component="span"
@@ -149,7 +151,7 @@ export default function PeladaTabsBar({
           to={`/peladas/${peladaId}`}
           sx={tabButtonSx("teams")}
         >
-          TIMES
+          {t("peladas.tabs.teams")}
         </Button>
 
         {/* 3. Partidas */}
@@ -162,7 +164,7 @@ export default function PeladaTabsBar({
           }
           sx={tabButtonSx("matches")}
         >
-          PARTIDAS
+          {t("peladas.tabs.matches")}
         </Button>
 
         {/* 4. Votação */}
@@ -171,7 +173,7 @@ export default function PeladaTabsBar({
           to={`/peladas/${peladaId}/voting`}
           sx={tabButtonSx("voting")}
         >
-          VOTAÇÃO
+          {t("peladas.tabs.voting")}
         </Button>
 
         {/* 5. Súmula */}
@@ -180,7 +182,7 @@ export default function PeladaTabsBar({
           to={`/peladas/${peladaId}/results`}
           sx={tabButtonSx("results")}
         >
-          SÚMULA
+          {t("peladas.tabs.results")}
         </Button>
       </Box>
     </Box>

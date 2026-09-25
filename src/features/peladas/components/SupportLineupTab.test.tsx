@@ -519,8 +519,12 @@ describe("SupportLineupTab", () => {
       </ThemeContextProvider>,
     );
 
-    expect(screen.getByText("Finalizado")).toBeInTheDocument();
-    expect(screen.getByText("Ao Vivo")).toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.support_lineup.status_finished"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("peladas.support_lineup.status_live"),
+    ).toBeInTheDocument();
     expect(screen.queryByText("Agendado")).not.toBeInTheDocument();
   });
 

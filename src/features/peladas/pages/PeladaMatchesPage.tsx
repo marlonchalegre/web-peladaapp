@@ -396,14 +396,14 @@ export default function PeladaMatchesPage() {
             <Typography
               sx={{
                 fontFamily: "Archivo, sans-serif",
-                fontWeight: 900,
+                fontWeight: 800,
                 fontSize: "12.5px",
                 lineHeight: 1,
                 letterSpacing: ".1em",
                 color: "pitch.contrastText",
               }}
             >
-              MINHA PELADA
+              {t("navigation.app_name", "MINHA PELADA")}
             </Typography>
           </Box>
 
@@ -426,7 +426,7 @@ export default function PeladaMatchesPage() {
                 "&:hover": { color: "pitch.contrastText" },
               }}
             >
-              Início
+              {t("peladas.matches.breadcrumb_home", "Início")}
             </Box>
             <Box
               component={RouterLink}
@@ -437,7 +437,7 @@ export default function PeladaMatchesPage() {
                 "&:hover": { color: "pitch.contrastText" },
               }}
             >
-              Minha ficha
+              {t("peladas.matches.breadcrumb_profile", "Minha ficha")}
             </Box>
           </Box>
 
@@ -452,7 +452,8 @@ export default function PeladaMatchesPage() {
               color: "pitch.subtle",
             }}
           >
-            SESSÃO {sessionTimer.formattedTime}
+            {t("peladas.matches.session_label", "SESSÃO")}{" "}
+            {sessionTimer.formattedTime}
           </Typography>
 
           <Box
@@ -650,7 +651,10 @@ export default function PeladaMatchesPage() {
             scrollButtons="auto"
             sx={{ borderBottom: 1, borderColor: "divider" }}
           >
-            <Tab icon={<SportsSoccerIcon />} label="Dashboard" />
+            <Tab
+              icon={<SportsSoccerIcon />}
+              label={t("peladas.matches.dashboard_tab", "Dashboard")}
+            />
             <Tab
               icon={<AssessmentIcon />}
               label={`${t("peladas.panel.standings.title")} & ${t("peladas.panel.stats.title")}`}
@@ -793,8 +797,10 @@ export default function PeladaMatchesPage() {
                       mb: 2,
                     }}
                   >
-                    Ao encerrar a pelada, todas as partidas serão finalizadas e
-                    a classificação será consolidada.
+                    {t(
+                      "peladas.matches.close_confirm_desc",
+                      "Ao encerrar a pelada, todas as partidas serão finalizadas e a classificação será consolidada.",
+                    )}
                   </Typography>
                   <Button
                     variant="contained"
@@ -881,8 +887,14 @@ export default function PeladaMatchesPage() {
         title={t("common.confirm")}
         description={
           resetConfirmOpen?.type === "session"
-            ? "Tem certeza que deseja zerar o cronômetro da sessão? Isso não pode ser desfeito."
-            : "Tem certeza que deseja zerar o cronômetro desta partida?"
+            ? t(
+                "peladas.matches.reset_session_confirm",
+                "Tem certeza que deseja zerar o cronômetro da sessão? Isso não pode ser desfeito.",
+              )
+            : t(
+                "peladas.matches.reset_match_confirm",
+                "Tem certeza que deseja zerar o cronômetro desta partida?",
+              )
         }
         onConfirm={confirmReset}
         onClose={() => setResetConfirmOpen(null)}
@@ -908,7 +920,10 @@ export default function PeladaMatchesPage() {
       <PrettyConfirmDialog
         open={Boolean(deleteEventConfirmOpen)}
         title={t("common.confirm")}
-        description="Tem certeza que deseja deletar este evento? Se for um gol, a assistência associada também será deletada."
+        description={t(
+          "peladas.matches.delete_event_confirm",
+          "Tem certeza que deseja deletar este evento? Se for um gol, a assistência associada também será deletada.",
+        )}
         onConfirm={handleConfirmDeleteEvent}
         onClose={() => setDeleteEventConfirmOpen(null)}
         severity="error"

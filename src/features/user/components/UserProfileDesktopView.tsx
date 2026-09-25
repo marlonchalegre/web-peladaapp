@@ -40,12 +40,30 @@ export default function UserProfileDesktopView({
   const summary = dashboard?.summary;
   const skills = dashboard?.skills;
   const skillRows = [
-    { label: "PASSE", value: skills?.passing },
-    { label: "DOMÍNIO", value: skills?.ball_control },
-    { label: "VELOCIDADE", value: skills?.velocity },
-    { label: "CHUTE", value: skills?.shooting },
-    { label: "DRIBLE", value: skills?.dribbling },
-    { label: "MARCAÇÃO", value: skills?.defending },
+    {
+      label: t("user.characteristics.passing", "PASSE").toUpperCase(),
+      value: skills?.passing,
+    },
+    {
+      label: t("user.characteristics.ball_control", "DOMÍNIO").toUpperCase(),
+      value: skills?.ball_control,
+    },
+    {
+      label: t("user.characteristics.velocity", "VELOCIDADE").toUpperCase(),
+      value: skills?.velocity,
+    },
+    {
+      label: t("user.characteristics.shooting", "CHUTE").toUpperCase(),
+      value: skills?.shooting,
+    },
+    {
+      label: t("user.characteristics.dribbling", "DRIBLE").toUpperCase(),
+      value: skills?.dribbling,
+    },
+    {
+      label: t("user.characteristics.defending", "MARCAÇÃO").toUpperCase(),
+      value: skills?.defending,
+    },
   ];
   const skillValues = skillRows
     .map((s) => s.value)
@@ -69,10 +87,11 @@ export default function UserProfileDesktopView({
   ).length;
   const inactivePresenceColor = theme.palette.divider;
 
-  const recentMatches = toRecentMatchRows(dashboard?.recent_peladas);
+  const recentMatches = toRecentMatchRows(dashboard?.recent_peladas, t);
 
-  const displayName = name || user?.name || "Jogador";
-  const displayUsername = username || user?.username || "jogador";
+  const displayName = name || user?.name || t("common.player", "Jogador");
+  const displayUsername =
+    username || user?.username || t("common.player", "jogador").toLowerCase();
   const displayPosition = position
     ? t(`common.positions.${position.toLowerCase()}`).toUpperCase()
     : "MEIO-CAMPO";

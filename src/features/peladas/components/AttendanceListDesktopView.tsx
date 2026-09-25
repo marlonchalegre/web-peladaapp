@@ -87,20 +87,20 @@ export default function AttendanceListDesktopView({
   };
 
   const getPositionLabel = (pos?: string) => {
-    if (!pos) return "meia";
+    if (!pos) return t("positions.midfielder", "meia");
     switch (pos.toLowerCase()) {
       case "goalkeeper":
       case "goleiro":
-        return "goleiro";
+        return t("positions.goalkeeper", "goleiro");
       case "defender":
       case "zagueiro":
-        return "zagueiro";
+        return t("positions.defender", "zagueiro");
       case "midfielder":
       case "meio-campo":
-        return "meia";
+        return t("positions.midfielder", "meia");
       case "striker":
       case "atacante":
-        return "atacante";
+        return t("positions.striker", "atacante");
       default:
         return pos.toLowerCase();
     }
@@ -109,14 +109,14 @@ export default function AttendanceListDesktopView({
   const formatMemberType = (memberType?: string) => {
     switch (memberType) {
       case "mensalista":
-        return "MENSALISTA";
+        return t("common.member_types.mensalista", "MENSALISTA").toUpperCase();
       case "diarista":
       case "diarista_temporario":
-        return "DIARISTA";
+        return t("common.member_types.diarista", "DIARISTA").toUpperCase();
       case "convidado":
-        return "CONVIDADO";
+        return t("common.member_types.convidado", "CONVIDADO").toUpperCase();
       default:
-        return "DIARISTA";
+        return t("common.member_types.diarista", "DIARISTA").toUpperCase();
     }
   };
 
@@ -281,8 +281,13 @@ export default function AttendanceListDesktopView({
               }}
             >
               {pelada.status === "attendance"
-                ? "LISTA ABERTA · FECHA EM 2 DIAS"
-                : (pelada.status || "ABERTA").toUpperCase()}
+                ? t(
+                    "peladas.attendance.desktop.open_list_notice",
+                    "LISTA ABERTA · FECHA EM 2 DIAS",
+                  )
+                : pelada.status
+                  ? pelada.status.toUpperCase()
+                  : t("peladas.attendance.desktop.open_status", "ABERTA")}
             </Box>
             {isAdmin && (
               <Box
@@ -314,7 +319,10 @@ export default function AttendanceListDesktopView({
                   },
                 }}
               >
-                FECHAR LISTA E SORTEAR
+                {t(
+                  "peladas.attendance.desktop.close_and_draw",
+                  "FECHAR LISTA E SORTEAR",
+                )}
               </Box>
             )}
           </Box>
@@ -364,7 +372,7 @@ export default function AttendanceListDesktopView({
                   color: "text.secondary",
                 }}
               >
-                SUA RESPOSTA
+                {t("peladas.attendance.desktop.your_response", "SUA RESPOSTA")}
               </Typography>
               <Typography
                 sx={{
@@ -376,12 +384,18 @@ export default function AttendanceListDesktopView({
                 }}
               >
                 {currentPlayerAsPlayer.attendance_status === "confirmed"
-                  ? `Você está confirmado · ${getPositionLabel(currentUser?.position)} · ${formatMemberType(currentPlayerAsPlayer.member_type).toLowerCase()}`
+                  ? `${t("peladas.attendance.desktop.you_confirmed", "Você está confirmado")} · ${getPositionLabel(currentUser?.position)} · ${formatMemberType(currentPlayerAsPlayer.member_type).toLowerCase()}`
                   : currentPlayerAsPlayer.attendance_status === "waitlist"
-                    ? `Você está na fila de espera · ${getPositionLabel(currentUser?.position)} · ${formatMemberType(currentPlayerAsPlayer.member_type).toLowerCase()}`
+                    ? `${t("peladas.attendance.desktop.you_waitlist", "Você está na fila de espera")} · ${getPositionLabel(currentUser?.position)} · ${formatMemberType(currentPlayerAsPlayer.member_type).toLowerCase()}`
                     : currentPlayerAsPlayer.attendance_status === "declined"
-                      ? "Você informou que não vai jogar nesta pelada"
-                      : "Você ainda não respondeu se vai jogar"}
+                      ? t(
+                          "peladas.attendance.desktop.you_declined",
+                          "Você informou que não vai jogar nesta pelada",
+                        )
+                      : t(
+                          "peladas.attendance.desktop.you_unanswered",
+                          "Você ainda não respondeu se vai jogar",
+                        )}
               </Typography>
             </Box>
             <Box sx={{ display: "flex", gap: 1, flexShrink: 0 }}>
@@ -414,7 +428,7 @@ export default function AttendanceListDesktopView({
                   "&:hover": { borderColor: "primary.main" },
                 }}
               >
-                VOU JOGAR
+                {t("peladas.attendance.desktop.will_play", "VOU JOGAR")}
               </Box>
               <Box
                 component="button"
@@ -445,7 +459,7 @@ export default function AttendanceListDesktopView({
                   "&:hover": { borderColor: "secondary.main" },
                 }}
               >
-                FILA DE ESPERA
+                {t("peladas.attendance.desktop.waitlist", "FILA DE ESPERA")}
               </Box>
               <Box
                 component="button"
@@ -476,7 +490,7 @@ export default function AttendanceListDesktopView({
                   "&:hover": { borderColor: "text.primary" },
                 }}
               >
-                NÃO VOU
+                {t("peladas.attendance.desktop.wont_play", "NÃO VOU")}
               </Box>
             </Box>
           </Box>
@@ -521,7 +535,7 @@ export default function AttendanceListDesktopView({
                     "&:hover": { color: "text.primary" },
                   }}
                 >
-                  CONFIRMADOS{" "}
+                  {t("peladas.attendance.desktop.confirmed", "CONFIRMADOS")}{" "}
                   <Box component="span" sx={{ color: "primary.main" }}>
                     {confirmed.length}
                   </Box>
@@ -547,7 +561,7 @@ export default function AttendanceListDesktopView({
                     "&:hover": { color: "text.primary" },
                   }}
                 >
-                  FILA DE ESPERA{" "}
+                  {t("peladas.attendance.desktop.waitlist", "FILA DE ESPERA")}{" "}
                   <Box component="span" sx={{ color: "secondary.main" }}>
                     {waitlist.length}
                   </Box>
@@ -573,7 +587,7 @@ export default function AttendanceListDesktopView({
                     "&:hover": { color: "text.primary" },
                   }}
                 >
-                  PENDENTES{" "}
+                  {t("peladas.attendance.desktop.pending", "PENDENTES")}{" "}
                   <Box component="span" sx={{ color: "secondary.main" }}>
                     {pending.length}
                   </Box>
@@ -599,7 +613,8 @@ export default function AttendanceListDesktopView({
                     "&:hover": { color: "text.primary" },
                   }}
                 >
-                  RECUSARAM {declined.length}
+                  {t("peladas.attendance.desktop.declined", "RECUSARAM")}{" "}
+                  {declined.length}
                 </Box>
               </Box>
 
@@ -664,11 +679,17 @@ export default function AttendanceListDesktopView({
                 }}
               >
                 <Box sx={{ width: 22, flexShrink: 0 }}>#</Box>
-                <Box sx={{ flex: 1 }}>JOGADOR</Box>
-                <Box sx={{ width: 104, flexShrink: 0 }}>TIPO</Box>
-                <Box sx={{ width: 104, flexShrink: 0 }}>PAGAMENTO</Box>
+                <Box sx={{ flex: 1 }}>
+                  {t("peladas.attendance.desktop.player_col", "JOGADOR")}
+                </Box>
+                <Box sx={{ width: 104, flexShrink: 0 }}>
+                  {t("peladas.attendance.desktop.type_col", "TIPO")}
+                </Box>
+                <Box sx={{ width: 104, flexShrink: 0 }}>
+                  {t("peladas.attendance.desktop.payment_col", "PAGAMENTO")}
+                </Box>
                 <Box sx={{ width: 120, flexShrink: 0, textAlign: "right" }}>
-                  MOVER PARA
+                  {t("peladas.attendance.desktop.move_to_col", "MOVER PARA")}
                 </Box>
               </Box>
 
@@ -684,13 +705,17 @@ export default function AttendanceListDesktopView({
                       fontWeight: 600,
                     }}
                   >
-                    Nenhum jogador nesta lista.
+                    {t(
+                      "peladas.attendance.desktop.empty_list",
+                      "Nenhum jogador nesta lista.",
+                    )}
                   </Typography>
                 </Box>
               ) : (
                 displayedList.map((player, idx) => {
                   const isCurrent = player.user_id === currentUser?.id;
-                  const pName = player.user?.name || "Jogador";
+                  const pName =
+                    player.user?.name || t("common.player", "Jogador");
                   const pInitials = getInitials(pName);
                   const pos = getPositionLabel(player.user?.position);
                   const memberTag = formatMemberType(player.member_type);
@@ -784,7 +809,10 @@ export default function AttendanceListDesktopView({
                                   color: "primary.main",
                                 }}
                               >
-                                · VOCÊ
+                                {t(
+                                  "peladas.attendance.desktop.you_badge",
+                                  "· VOCÊ",
+                                )}
                               </Box>
                             )}
                           </Typography>
@@ -838,13 +866,19 @@ export default function AttendanceListDesktopView({
                               color: "text.secondary",
                             }}
                           >
-                            em dia
+                            {t(
+                              "peladas.attendance.desktop.paid_status",
+                              "em dia",
+                            )}
                           </Typography>
                         ) : paidPlayerIds.has(player.id) ? (
                           <Box
                             component="button"
                             onClick={() => onReversePayment?.(player.id)}
-                            title="Desfazer pagamento"
+                            title={t(
+                              "peladas.attendance.desktop.undo_payment",
+                              "Desfazer pagamento",
+                            )}
                             sx={{
                               fontFamily: "Archivo, sans-serif",
                               fontWeight: 700,
@@ -856,13 +890,19 @@ export default function AttendanceListDesktopView({
                               cursor: onReversePayment ? "pointer" : "default",
                             }}
                           >
-                            pago ✓
+                            {t(
+                              "peladas.attendance.desktop.paid_check",
+                              "pago ✓",
+                            )}
                           </Box>
                         ) : (
                           <Box
                             component="button"
                             onClick={() => onMarkPaid?.(player.id)}
-                            title="Marcar diária como paga"
+                            title={t(
+                              "peladas.attendance.desktop.mark_daily_paid",
+                              "Marcar diária como paga",
+                            )}
                             sx={{
                               fontFamily: "Archivo, sans-serif",
                               fontWeight: 800,
@@ -877,7 +917,8 @@ export default function AttendanceListDesktopView({
                               "&:hover": { opacity: 0.9 },
                             }}
                           >
-                            R$ {price} · COBRAR
+                            R$ {price} ·{" "}
+                            {t("peladas.attendance.desktop.charge", "COBRAR")}
                           </Box>
                         )}
                       </Box>
@@ -912,7 +953,7 @@ export default function AttendanceListDesktopView({
                                 "&:hover": { borderColor: "text.primary" },
                               }}
                             >
-                              FILA
+                              {t("peladas.attendance.desktop.queue", "FILA")}
                             </Box>
                             <Box
                               component="button"
@@ -935,7 +976,7 @@ export default function AttendanceListDesktopView({
                                 },
                               }}
                             >
-                              FORA
+                              {t("peladas.attendance.desktop.out", "FORA")}
                             </Box>
                           </>
                         )}
@@ -963,7 +1004,7 @@ export default function AttendanceListDesktopView({
                                 },
                               }}
                             >
-                              SUBIR
+                              {t("peladas.attendance.desktop.up", "SUBIR")}
                             </Box>
                             <Box
                               component="button"
@@ -986,7 +1027,7 @@ export default function AttendanceListDesktopView({
                                 },
                               }}
                             >
-                              FORA
+                              {t("peladas.attendance.desktop.out", "FORA")}
                             </Box>
                           </>
                         )}
@@ -1014,7 +1055,7 @@ export default function AttendanceListDesktopView({
                                 },
                               }}
                             >
-                              VOU
+                              {t("peladas.attendance.desktop.in", "VOU")}
                             </Box>
                             <Box
                               component="button"
@@ -1037,7 +1078,7 @@ export default function AttendanceListDesktopView({
                                 },
                               }}
                             >
-                              FORA
+                              {t("peladas.attendance.desktop.out", "FORA")}
                             </Box>
                           </>
                         )}
@@ -1065,7 +1106,7 @@ export default function AttendanceListDesktopView({
                                 },
                               }}
                             >
-                              VOU
+                              {t("peladas.attendance.desktop.in", "VOU")}
                             </Box>
                             <Box
                               component="button"
@@ -1085,7 +1126,7 @@ export default function AttendanceListDesktopView({
                                 "&:hover": { borderColor: "text.primary" },
                               }}
                             >
-                              FILA
+                              {t("peladas.attendance.desktop.queue", "FILA")}
                             </Box>
                           </>
                         )}
@@ -1116,8 +1157,18 @@ export default function AttendanceListDesktopView({
                       color: "text.secondary",
                     }}
                   >
-                    1–{Math.min(displayedList.length, currentList.length)} de{" "}
-                    {currentList.length} {activeTab}
+                    {t("peladas.attendance.desktop.pagination", {
+                      displayed: Math.min(
+                        displayedList.length,
+                        currentList.length,
+                      ),
+                      total: currentList.length,
+                      tab: t(
+                        `peladas.attendance.desktop.${activeTab}`,
+                        activeTab,
+                      ),
+                      defaultValue: `1–${Math.min(displayedList.length, currentList.length)} de ${currentList.length} ${activeTab}`,
+                    })}
                   </Typography>
                   <Box
                     component="button"
@@ -1133,7 +1184,9 @@ export default function AttendanceListDesktopView({
                       "&:hover": { textDecoration: "underline" },
                     }}
                   >
-                    {showAll ? "Ver menos ↑" : "Ver todos →"}
+                    {showAll
+                      ? t("peladas.attendance.desktop.see_less", "Ver menos ↑")
+                      : t("peladas.attendance.desktop.see_all", "Ver todos →")}
                   </Box>
                 </Box>
               )}
@@ -1161,7 +1214,7 @@ export default function AttendanceListDesktopView({
                   color: "text.secondary",
                 }}
               >
-                VAGAS
+                {t("peladas.attendance.desktop.spots_label", "VAGAS")}
               </Typography>
               <Box
                 sx={{
@@ -1191,7 +1244,12 @@ export default function AttendanceListDesktopView({
                     color: "text.secondary",
                   }}
                 >
-                  {maxPlayers ? `de ${maxPlayers}` : ""}
+                  {maxPlayers
+                    ? t("peladas.attendance.desktop.of_total", {
+                        total: maxPlayers,
+                        defaultValue: `de ${maxPlayers}`,
+                      })
+                    : ""}
                 </Typography>
               </Box>
               <Box
@@ -1229,10 +1287,16 @@ export default function AttendanceListDesktopView({
                 }}
               >
                 {maxPlayers
-                  ? `${Math.max(0, maxPlayers - confirmed.length)} vagas abertas · `
+                  ? t("peladas.attendance.desktop.open_spots", {
+                      count: Math.max(0, maxPlayers - confirmed.length),
+                      defaultValue: `${Math.max(0, maxPlayers - confirmed.length)} vagas abertas · `,
+                    })
                   : ""}
-                {waitlist.length} na fila de espera entram automaticamente se
-                alguém sair.
+                {waitlist.length}{" "}
+                {t(
+                  "peladas.attendance.desktop.waitlist_auto_info",
+                  "na fila de espera entram automaticamente se alguém sair.",
+                )}
               </Typography>
             </Box>
 
@@ -1259,7 +1323,11 @@ export default function AttendanceListDesktopView({
                   color: "text.secondary",
                 }}
               >
-                FILA DE ESPERA · {waitlist.length}
+                {t(
+                  "peladas.attendance.desktop.waitlist_section",
+                  "FILA DE ESPERA",
+                )}{" "}
+                · {waitlist.length}
               </Box>
               {waitlist.length === 0 ? (
                 <Box
@@ -1272,12 +1340,16 @@ export default function AttendanceListDesktopView({
                       fontWeight: 600,
                     }}
                   >
-                    Fila vazia no momento.
+                    {t(
+                      "peladas.attendance.desktop.waitlist_empty",
+                      "Fila vazia no momento.",
+                    )}
                   </Typography>
                 </Box>
               ) : (
                 waitlist.slice(0, 3).map((wPlayer, wIdx) => {
-                  const wName = wPlayer.user?.name || "Jogador";
+                  const wName =
+                    wPlayer.user?.name || t("common.player", "Jogador");
                   const wInitials = getInitials(wName);
                   return (
                     <Box
@@ -1367,7 +1439,7 @@ export default function AttendanceListDesktopView({
                           },
                         }}
                       >
-                        SUBIR
+                        {t("peladas.attendance.desktop.up", "SUBIR")}
                       </Box>
                     </Box>
                   );
@@ -1402,7 +1474,10 @@ export default function AttendanceListDesktopView({
                     color: "text.secondary",
                   }}
                 >
-                  DIÁRIAS DESTA PELADA
+                  {t(
+                    "peladas.attendance.desktop.daily_fees_title",
+                    "DIÁRIAS DESTA PELADA",
+                  )}
                 </Typography>
                 <Typography
                   sx={{
@@ -1412,7 +1487,8 @@ export default function AttendanceListDesktopView({
                     color: "secondary.main",
                   }}
                 >
-                  {openDiariasCount} em aberto
+                  {openDiariasCount}{" "}
+                  {t("peladas.attendance.desktop.open_amount", "em aberto")}
                 </Typography>
               </Box>
               <Box
@@ -1444,16 +1520,23 @@ export default function AttendanceListDesktopView({
                     color: "text.secondary",
                   }}
                 >
-                  de R$ {totalDiariasAmount}
+                  {t("peladas.attendance.desktop.of_total", {
+                    total: `R$ ${totalDiariasAmount}`,
+                    defaultValue: `de R$ ${totalDiariasAmount}`,
+                  })}
                   <br />
-                  previstos
+                  {t("peladas.attendance.desktop.expected", "previstos")}
                 </Typography>
               </Box>
               <Box
                 component="button"
                 onClick={() => {
                   const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(
-                    `Cobrança de diárias da pelada ${pelada.organization_name || ""}: R$ ${openDiariasAmount} em aberto.`,
+                    t("peladas.attendance.desktop.whatsapp_daily_msg", {
+                      org: pelada.organization_name || "",
+                      amount: openDiariasAmount,
+                      defaultValue: `Cobrança de diárias da pelada ${pelada.organization_name || ""}: R$ ${openDiariasAmount} em aberto.`,
+                    }),
                   )}`;
                   window.open(url, "_blank");
                 }}
@@ -1476,7 +1559,10 @@ export default function AttendanceListDesktopView({
                   },
                 }}
               >
-                COBRAR OS {openDiariasCount} NO ZAP
+                {t("peladas.attendance.desktop.charge_whatsapp_count", {
+                  count: openDiariasCount,
+                  defaultValue: `COBRAR OS ${openDiariasCount} NO ZAP`,
+                })}
               </Box>
             </Box>
 
@@ -1506,7 +1592,8 @@ export default function AttendanceListDesktopView({
                       : "primary.light",
                 }}
               >
-                PENDENTES · {pending.length}
+                {t("peladas.attendance.desktop.pending_section", "PENDENTES")} ·{" "}
+                {pending.length}
               </Typography>
               <Typography
                 sx={{
@@ -1521,14 +1608,24 @@ export default function AttendanceListDesktopView({
                   mt: 1.4,
                 }}
               >
-                {pending.length} mensalistas ainda não responderam. Um lembrete
-                no grupo costuma resolver antes de fechar a lista.
+                {t(
+                  "peladas.attendance.desktop.pending_reminder_hint_interpolated",
+                  {
+                    count: pending.length,
+                    defaultValue: `${pending.length} mensalistas ainda não responderam. Um lembrete no grupo costuma resolver antes de fechar a lista.`,
+                  },
+                )}
               </Typography>
               <Box
                 component="button"
                 onClick={() => {
                   const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(
-                    `Lembrete: ${pending.length} jogadores ainda não confirmaram presença na pelada de ${weekday} ${dayNumber}. Confirme sua presença pelo app!`,
+                    t("peladas.attendance.desktop.whatsapp_pending_msg", {
+                      count: pending.length,
+                      weekday,
+                      day: dayNumber,
+                      defaultValue: `Lembrete: ${pending.length} jogadores ainda não confirmaram presença na pelada de ${weekday} ${dayNumber}. Confirme sua presença pelo app!`,
+                    }),
                   )}`;
                   window.open(url, "_blank");
                 }}
@@ -1551,7 +1648,10 @@ export default function AttendanceListDesktopView({
                   "&:hover": { opacity: 0.9 },
                 }}
               >
-                LEMBRAR OS {pending.length}
+                {t("peladas.attendance.desktop.remind_button_count", {
+                  count: pending.length,
+                  defaultValue: `LEMBRAR OS ${pending.length}`,
+                })}
               </Box>
             </Box>
           </Box>

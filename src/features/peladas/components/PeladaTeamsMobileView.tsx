@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Box,
   Typography,
@@ -105,6 +106,7 @@ export default function PeladaTeamsMobileView({
   onMarkPaid,
   onReversePayment,
 }: PeladaTeamsMobileViewProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   // Local draw options state
@@ -147,10 +149,14 @@ export default function PeladaTeamsMobileView({
     ? String(pDate.getMonth() + 1).padStart(2, "0")
     : "09";
   const weekdayStr = !isNaN(pDate.getDay())
-    ? pDate.toLocaleDateString("pt-BR", { weekday: "short" }).toUpperCase()
+    ? pDate
+        .toLocaleDateString(t("common.locale_code", "pt-BR"), {
+          weekday: "short",
+        })
+        .toUpperCase()
     : "QUA";
   const timeStr = !isNaN(pDate.getHours())
-    ? pDate.toLocaleTimeString("pt-BR", {
+    ? pDate.toLocaleTimeString(t("common.locale_code", "pt-BR"), {
         hour: "2-digit",
         minute: "2-digit",
       })
@@ -235,7 +241,7 @@ export default function PeladaTeamsMobileView({
               }
             }}
             size="small"
-            aria-label="Voltar"
+            aria-label={t("peladas.teams.back", "Voltar")}
             data-testid="back-to-org-button"
             sx={{
               color: "text.primary",
@@ -275,8 +281,8 @@ export default function PeladaTeamsMobileView({
                 textTransform: "inherit",
               }}
             >
-              {pelada.organization_name || "PELADA"} · {weekdayStr} {dayStr}/
-              {monthStr} · {timeStr}
+              {pelada.organization_name || t("common.pelada", "PELADA")} ·{" "}
+              {weekdayStr} {dayStr}/{monthStr} · {timeStr}
             </Typography>
             {pelada.location && (
               <>
@@ -319,7 +325,7 @@ export default function PeladaTeamsMobileView({
             mt: 0.75,
           }}
         >
-          Sorteio de times
+          {t("peladas.teams.draw_title", "Sorteio de times")}
         </Typography>
 
         {/* Action buttons row */}
@@ -355,7 +361,7 @@ export default function PeladaTeamsMobileView({
               },
             }}
           >
-            MANDAR NO ZAP
+            {t("peladas.teams.send_whatsapp", "MANDAR NO ZAP")}
           </Button>
 
           {isAdmin && (
@@ -389,7 +395,7 @@ export default function PeladaTeamsMobileView({
                 },
               }}
             >
-              INICIAR PELADA
+              {t("peladas.teams.start_pelada", "INICIAR PELADA")}
             </Button>
           )}
 
@@ -433,7 +439,9 @@ export default function PeladaTeamsMobileView({
                 },
               }}
             >
-              {showDrawConfig ? "FECHAR PAINEL" : "SORTEAR"}
+              {showDrawConfig
+                ? t("peladas.teams.close_panel", "FECHAR PAINEL")
+                : t("peladas.teams.draw_button", "SORTEAR")}
             </Button>
           )}
         </Box>
@@ -481,7 +489,7 @@ export default function PeladaTeamsMobileView({
                 textTransform: "uppercase",
               }}
             >
-              COMO SORTEAR
+              {t("peladas.teams.how_to_draw", "COMO SORTEAR")}
             </Typography>
             <Typography
               sx={{
@@ -493,7 +501,9 @@ export default function PeladaTeamsMobileView({
                 textTransform: "uppercase",
               }}
             >
-              {totalConfirmed} CONFIRMADOS
+              {t("peladas.teams.confirmed_count", "{{count}} CONFIRMADOS", {
+                count: totalConfirmed,
+              })}
             </Typography>
           </Box>
 
@@ -508,7 +518,10 @@ export default function PeladaTeamsMobileView({
                 mb: 1.75,
               }}
             >
-              Escolha o algoritmo de divisão dos times.
+              {t(
+                "peladas.teams.choose_algorithm",
+                "Escolha o algoritmo de divisão dos times.",
+              )}
             </Typography>
 
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
@@ -559,7 +572,7 @@ export default function PeladaTeamsMobileView({
                       flex: 1,
                     }}
                   >
-                    Clássico
+                    {t("peladas.teams.classic", "Clássico")}
                   </Typography>
                   <Typography
                     sx={{
@@ -575,7 +588,7 @@ export default function PeladaTeamsMobileView({
                       py: 0.25,
                     }}
                   >
-                    PADRÃO
+                    {t("peladas.teams.default", "PADRÃO")}
                   </Typography>
                 </Box>
                 <Typography
@@ -588,7 +601,10 @@ export default function PeladaTeamsMobileView({
                     pl: 3.2,
                   }}
                 >
-                  Equilibra nota e posição sem histórico.
+                  {t(
+                    "peladas.teams.classic_desc",
+                    "Equilibra nota e posição sem histórico.",
+                  )}
                 </Typography>
               </Box>
 
@@ -637,7 +653,7 @@ export default function PeladaTeamsMobileView({
                       flex: 1,
                     }}
                   >
-                    Equilíbrio tático
+                    {t("peladas.teams.tactical_balance", "Equilíbrio tático")}
                   </Typography>
                   <Typography
                     sx={{
@@ -653,7 +669,7 @@ export default function PeladaTeamsMobileView({
                       py: 0.25,
                     }}
                   >
-                    IA · GEMINI
+                    {t("peladas.teams.ai_gemini", "IA · GEMINI")}
                   </Typography>
                 </Box>
                 <Typography
@@ -666,8 +682,10 @@ export default function PeladaTeamsMobileView({
                     pl: 3.2,
                   }}
                 >
-                  Equilibra força geral, defesa e ataque com notas, votos e
-                  estatísticas. Separa panelinhas vencedoras.
+                  {t(
+                    "peladas.teams.tactical_desc",
+                    "Equilibra força geral, defesa e ataque com notas, votos e estatísticas. Separa panelinhas vencedoras.",
+                  )}
                 </Typography>
               </Box>
 
@@ -716,7 +734,7 @@ export default function PeladaTeamsMobileView({
                       flex: 1,
                     }}
                   >
-                    Por regras
+                    {t("peladas.teams.by_rules", "Por regras")}
                   </Typography>
                   <Typography
                     sx={{
@@ -735,7 +753,7 @@ export default function PeladaTeamsMobileView({
                       py: 0.25,
                     }}
                   >
-                    IA · GPT
+                    {t("peladas.teams.ai_gpt", "IA · GPT")}
                   </Typography>
                 </Box>
                 <Typography
@@ -748,8 +766,10 @@ export default function PeladaTeamsMobileView({
                     pl: 3.2,
                   }}
                 >
-                  Segue restrições explícitas de nível, posição e duplas que não
-                  podem cair juntas.
+                  {t(
+                    "peladas.teams.by_rules_desc",
+                    "Segue restrições explícitas de nível, posição e duplas que não podem cair juntas.",
+                  )}
                 </Typography>
               </Box>
             </Box>
@@ -773,7 +793,7 @@ export default function PeladaTeamsMobileView({
                   textTransform: "uppercase",
                 }}
               >
-                FORMATO DO SORTEIO
+                {t("peladas.teams.draw_format", "FORMATO DO SORTEIO")}
               </Typography>
 
               <Box sx={{ display: "flex", gap: 1, mt: 1.25 }}>
@@ -796,7 +816,7 @@ export default function PeladaTeamsMobileView({
                       textTransform: "uppercase",
                     }}
                   >
-                    TIMES
+                    {t("peladas.teams.teams_label", "TIMES")}
                   </Typography>
                   <Box
                     sx={{
@@ -858,7 +878,7 @@ export default function PeladaTeamsMobileView({
                       textTransform: "uppercase",
                     }}
                   >
-                    POR TIME
+                    {t("peladas.teams.per_team_label", "POR TIME")}
                   </Typography>
                   <Box
                     sx={{
@@ -931,7 +951,7 @@ export default function PeladaTeamsMobileView({
                         : "text.primary",
                   }}
                 >
-                  Usar sinais históricos
+                  {t("peladas.teams.use_history", "Usar sinais históricos")}
                 </Typography>
                 <Typography
                   sx={{
@@ -942,8 +962,14 @@ export default function PeladaTeamsMobileView({
                   }}
                 >
                   {selectedAlgorithm === "classic"
-                    ? "indisponível no clássico"
-                    : "evita repetir formações recentes"}
+                    ? t(
+                        "peladas.teams.unavailable_classic",
+                        "indisponível no clássico",
+                      )
+                    : t(
+                        "peladas.teams.avoid_recent_formations",
+                        "evita repetir formações recentes",
+                      )}
                 </Typography>
               </Box>
               <Switch
@@ -952,7 +978,12 @@ export default function PeladaTeamsMobileView({
                 onChange={(e) => setUseHistory(e.target.checked)}
                 size="small"
                 slotProps={{
-                  input: { "aria-label": "Usar sinais históricos" },
+                  input: {
+                    "aria-label": t(
+                      "peladas.teams.use_history",
+                      "Usar sinais históricos",
+                    ),
+                  },
                 }}
               />
             </Box>
@@ -978,7 +1009,7 @@ export default function PeladaTeamsMobileView({
                     color: "text.primary",
                   }}
                 >
-                  Goleiros fixos
+                  {t("peladas.teams.fixed_goalkeepers", "Goleiros fixos")}
                 </Typography>
                 <Typography
                   sx={{
@@ -989,8 +1020,14 @@ export default function PeladaTeamsMobileView({
                   }}
                 >
                   {pelada.fixed_goalkeepers
-                    ? "goleiros travados em times opostos"
-                    : "goleiros entram no sorteio comum"}
+                    ? t(
+                        "peladas.teams.gk_locked_opposed",
+                        "goleiros travados em times opostos",
+                      )
+                    : t(
+                        "peladas.teams.gk_common_draw",
+                        "goleiros entram no sorteio comum",
+                      )}
                 </Typography>
               </Box>
               <Switch
@@ -1001,7 +1038,14 @@ export default function PeladaTeamsMobileView({
                   )
                 }
                 size="small"
-                slotProps={{ input: { "aria-label": "Goleiros fixos" } }}
+                slotProps={{
+                  input: {
+                    "aria-label": t(
+                      "peladas.teams.fixed_goalkeepers",
+                      "Goleiros fixos",
+                    ),
+                  },
+                }}
               />
             </Box>
 
@@ -1029,7 +1073,7 @@ export default function PeladaTeamsMobileView({
               {processing ? (
                 <CircularProgress size={22} color="inherit" />
               ) : (
-                "SORTEAR"
+                t("peladas.teams.draw_button", "SORTEAR")
               )}
             </Button>
           </Box>
@@ -1070,7 +1114,9 @@ export default function PeladaTeamsMobileView({
               textTransform: "uppercase",
             }}
           >
-            TIMES · {playersPerTeam} POR LADO
+            {t("peladas.teams.teams_per_side", "TIMES · {{count}} POR LADO", {
+              count: playersPerTeam,
+            })}
           </Typography>
           <Typography
             sx={{
@@ -1080,7 +1126,7 @@ export default function PeladaTeamsMobileView({
               color: "text.secondary",
             }}
           >
-            toque em ⋯ para mover
+            {t("peladas.teams.tap_to_move", "toque em ⋯ para mover")}
           </Typography>
         </Box>
 
@@ -1092,10 +1138,10 @@ export default function PeladaTeamsMobileView({
             const openSlots = Math.max(0, playersPerTeam - players.length);
             const teamVestLabel =
               idx === 0
-                ? "COLETE VERDE"
+                ? t("peladas.teams.vest_green", "COLETE VERDE")
                 : idx === 1
-                  ? "SEM COLETE"
-                  : `TIME ${idx + 1}`;
+                  ? t("peladas.teams.vest_none", "SEM COLETE")
+                  : t("peladas.teams.team_n", "TIME {{n}}", { n: idx + 1 });
 
             return (
               <Box
@@ -1138,7 +1184,10 @@ export default function PeladaTeamsMobileView({
                         color: "text.primary",
                       }}
                     >
-                      {team.name || `TIME ${idx + 1}`}
+                      {team.name ||
+                        t("peladas.teams.team_n", "TIME {{n}}", {
+                          n: idx + 1,
+                        })}
                     </Typography>
                     <Typography
                       sx={{
@@ -1153,7 +1202,14 @@ export default function PeladaTeamsMobileView({
                       }}
                     >
                       {openSlots > 0
-                        ? `FALTA ${openSlots} JOGADOR${openSlots > 1 ? "ES" : ""}`
+                        ? t(
+                            "peladas.teams.missing_players",
+                            "FALTA {{count}} JOGADOR{{plural}}",
+                            {
+                              count: openSlots,
+                              plural: openSlots > 1 ? "ES" : "",
+                            },
+                          )
                         : teamVestLabel}
                     </Typography>
                   </Box>
@@ -1261,7 +1317,8 @@ export default function PeladaTeamsMobileView({
                               whiteSpace: "nowrap",
                             }}
                           >
-                            {player.user?.name || "Jogador"}
+                            {player.user?.name ||
+                              t("peladas.teams.player_fallback", "Jogador")}
                           </Typography>
                           <Typography
                             sx={{
@@ -1274,8 +1331,12 @@ export default function PeladaTeamsMobileView({
                             }}
                           >
                             {formatPosition(player.user?.position)}
-                            {isYou ? " · você" : ""}
-                            {diarista ? " · diarista" : ""}
+                            {isYou
+                              ? ` · ${t("peladas.teams.you", "você")}`
+                              : ""}
+                            {diarista
+                              ? ` · ${t("peladas.attendance.diarista", "diarista")}`
+                              : ""}
                           </Typography>
                         </Box>
 
@@ -1326,7 +1387,9 @@ export default function PeladaTeamsMobileView({
                                       "secondary.main",
                               }}
                             >
-                              {isPaid ? "PAGO" : "PENDENTE"}
+                              {isPaid
+                                ? t("peladas.attendance.paid", "PAGO")
+                                : t("peladas.attendance.pending", "PENDENTE")}
                             </Typography>
                           </Box>
                         )}
@@ -1346,7 +1409,10 @@ export default function PeladaTeamsMobileView({
                         {isAdmin && (
                           <Button
                             size="small"
-                            aria-label="Ações do jogador"
+                            aria-label={t(
+                              "peladas.teams.player_actions_label",
+                              "Ações do jogador",
+                            )}
                             onClick={(e) =>
                               handleOpenPlayerMenu(e, player, team.id)
                             }
@@ -1383,7 +1449,7 @@ export default function PeladaTeamsMobileView({
                         color: "text.secondary",
                       }}
                     >
-                      VAGA LIVRE
+                      {t("peladas.teams.free_slot", "VAGA LIVRE")}
                     </Box>
                   ))}
                 </Box>
@@ -1422,7 +1488,7 @@ export default function PeladaTeamsMobileView({
                 },
               }}
             >
-              ADICIONAR TIME
+              {t("peladas.teams.add_team", "ADICIONAR TIME")}
             </Button>
           )}
         </Box>
@@ -1456,7 +1522,11 @@ export default function PeladaTeamsMobileView({
               textTransform: "uppercase",
             }}
           >
-            BANCO · {benchPlayers.length} FORA DOS TIMES
+            {t(
+              "peladas.teams.bench_title_count",
+              "BANCO · {{count}} FORA DOS TIMES",
+              { count: benchPlayers.length },
+            )}
           </Typography>
         </Box>
 
@@ -1470,7 +1540,10 @@ export default function PeladaTeamsMobileView({
               py: 1,
             }}
           >
-            Nenhum jogador no banco no momento.
+            {t(
+              "peladas.teams.no_bench_players",
+              "Nenhum jogador no banco no momento.",
+            )}
           </Typography>
         ) : (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 0.75 }}>
@@ -1521,7 +1594,8 @@ export default function PeladaTeamsMobileView({
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {player.user?.name || "Jogador"}
+                      {player.user?.name ||
+                        t("peladas.teams.player_fallback", "Jogador")}
                     </Typography>
                     <Typography
                       sx={{
@@ -1531,7 +1605,8 @@ export default function PeladaTeamsMobileView({
                         color: "text.secondary",
                       }}
                     >
-                      {formatPosition(player.user?.position)} · no banco
+                      {formatPosition(player.user?.position)} ·{" "}
+                      {t("peladas.teams.on_bench", "no banco")}
                     </Typography>
                   </Box>
 
@@ -1550,7 +1625,10 @@ export default function PeladaTeamsMobileView({
                   {isAdmin && (
                     <Button
                       size="small"
-                      aria-label="Ações do jogador"
+                      aria-label={t(
+                        "peladas.teams.player_actions_label",
+                        "Ações do jogador",
+                      )}
                       onClick={(e) => handleOpenPlayerMenu(e, player, null)}
                       sx={{
                         minWidth: 28,
@@ -1604,20 +1682,20 @@ export default function PeladaTeamsMobileView({
               color: "text.secondary",
             }}
           >
-            Mover jogador para:
+            {t("peladas.teams.move_player_to", "Mover jogador para:")}
           </Typography>
         </Box>
         <Divider />
 
         {/* Move to Teams */}
-        {teams.map((t, idx) => {
-          if (t.id === selectedPlayer?.currentTeamId) return null;
+        {teams.map((tItem, idx) => {
+          if (tItem.id === selectedPlayer?.currentTeamId) return null;
           return (
             <MenuItem
-              key={t.id}
+              key={tItem.id}
               onClick={() => {
                 if (selectedPlayer) {
-                  onMoveToTeam(selectedPlayer.player.id, t.id);
+                  onMoveToTeam(selectedPlayer.player.id, tItem.id);
                 }
                 handleClosePlayerMenu();
               }}
@@ -1628,7 +1706,10 @@ export default function PeladaTeamsMobileView({
                 color: "text.primary",
               }}
             >
-              {t.name || `Time ${idx + 1}`}
+              {tItem.name ||
+                t("peladas.teams.team_n_mixed", "Time {{n}}", {
+                  n: idx + 1,
+                })}
             </MenuItem>
           );
         })}
@@ -1649,7 +1730,7 @@ export default function PeladaTeamsMobileView({
               color: "secondary.main",
             }}
           >
-            Enviar para o banco
+            {t("peladas.teams.send_to_bench", "Enviar para o banco")}
           </MenuItem>
         )}
       </Menu>

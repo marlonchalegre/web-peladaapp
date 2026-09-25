@@ -7,6 +7,7 @@ import type {
   DrawChemistryTeam,
 } from "../../../shared/api/endpoints";
 import { formatDecimal } from "../utils/formatNumber";
+import { useTranslation } from "react-i18next";
 
 export interface DrawJustificationCardProps {
   justification: DrawJustification | null;
@@ -30,6 +31,7 @@ export default function DrawJustificationCard({
   awayGkName,
   onOpenDialog,
 }: DrawJustificationCardProps) {
+  const { t } = useTranslation();
   const hasAverages = teamAverages.length > 0;
   const minAvg = hasAverages
     ? formatDecimal(Math.min(...teamAverages.map((t) => t.avg)), 1)
@@ -109,7 +111,7 @@ export default function DrawJustificationCard({
             textTransform: "uppercase",
           }}
         >
-          POR QUE FICOU ASSIM
+          {t("peladas.draw.justification.title", "POR QUE FICOU ASSIM")}
         </Typography>
 
         {algorithm === "gemini" && (
@@ -120,7 +122,10 @@ export default function DrawJustificationCard({
                 sx={{ "&&": { fontSize: "13px", color: "primary.main" } }}
               />
             }
-            label="EQUILÍBRIO TÁTICO · GEMINI"
+            label={t(
+              "peladas.draw.justification.chip_gemini",
+              "EQUILÍBRIO TÁTICO · GEMINI",
+            )}
             sx={{
               bgcolor: (theme) =>
                 theme.palette.status?.paid?.bg || "action.hover",
@@ -142,7 +147,7 @@ export default function DrawJustificationCard({
                 sx={{ "&&": { fontSize: "13px", color: "gold.main" } }}
               />
             }
-            label="POR REGRAS · GPT"
+            label={t("peladas.draw.justification.chip_gpt", "POR REGRAS · GPT")}
             sx={{
               bgcolor: (theme) =>
                 theme.palette.mode === "dark"
@@ -163,7 +168,7 @@ export default function DrawJustificationCard({
         {!isAi && (
           <Chip
             size="small"
-            label="CLÁSSICO"
+            label={t("peladas.draw.justification.chip_classic", "CLÁSSICO")}
             sx={{
               bgcolor: "background.default",
               border: "1px solid",
@@ -205,7 +210,7 @@ export default function DrawJustificationCard({
                 textTransform: "uppercase",
               }}
             >
-              MÉDIA ELENCO
+              {t("peladas.draw.justification.squad_mean", "MÉDIA ELENCO")}
             </Typography>
             <Typography
               sx={{
@@ -230,7 +235,7 @@ export default function DrawJustificationCard({
                 textTransform: "uppercase",
               }}
             >
-              GAP GERAL
+              {t("peladas.draw.justification.gap_overall", "GAP GERAL")}
             </Typography>
             <Typography
               sx={{
@@ -259,7 +264,7 @@ export default function DrawJustificationCard({
                     textTransform: "uppercase",
                   }}
                 >
-                  GAP DEFESA
+                  {t("peladas.draw.justification.gap_defense", "GAP DEFESA")}
                 </Typography>
                 <Typography
                   sx={{
@@ -283,7 +288,7 @@ export default function DrawJustificationCard({
                     textTransform: "uppercase",
                   }}
                 >
-                  GAP ATAQUE
+                  {t("peladas.draw.justification.gap_attack", "GAP ATAQUE")}
                 </Typography>
                 <Typography
                   sx={{
@@ -311,7 +316,7 @@ export default function DrawJustificationCard({
                   textTransform: "uppercase",
                 }}
               >
-                GAP SETORIAL
+                {t("peladas.draw.justification.gap_sector", "GAP SETORIAL")}
               </Typography>
               <Typography
                 sx={{
@@ -352,7 +357,12 @@ export default function DrawJustificationCard({
                 color: "text.secondary",
               }}
             >
-              Média por time entre {minAvg} e {maxAvg} — diferença de {diffAvg}.
+              {t("peladas.draw.justification.team_avg_balance", {
+                min: minAvg,
+                max: maxAvg,
+                diff: diffAvg,
+                defaultValue: `Média por time entre ${minAvg} e ${maxAvg} — diferença de ${diffAvg}.`,
+              })}
             </Typography>
           </Box>
         )}
@@ -380,8 +390,14 @@ export default function DrawJustificationCard({
               }}
             >
               {justification.algorithm === "gpt"
-                ? "Sorteio por regras e restrições: notas e posições equilibradas sem concentração técnica."
-                : "Sorteio com equilíbrio tático: duplas campeãs separadas e entrosamento distribuído."}
+                ? t(
+                    "peladas.draw.justification.rule_summary_gpt",
+                    "Sorteio por regras e restrições: notas e posições equilibradas sem concentração técnica.",
+                  )
+                : t(
+                    "peladas.draw.justification.rule_summary_gemini",
+                    "Sorteio com equilíbrio tático: duplas campeãs separadas e entrosamento distribuído.",
+                  )}
             </Typography>
           </Box>
         )}
@@ -408,8 +424,11 @@ export default function DrawJustificationCard({
                 color: "text.secondary",
               }}
             >
-              Dupla campeã {topChampionPair.players.join(" e ")} (
-              {topChampionPair.titles_together} títulos juntos).
+              {t("peladas.draw.justification.champion_pair_text", {
+                players: topChampionPair.players.join(" e "),
+                titles: topChampionPair.titles_together,
+                defaultValue: `Dupla campeã ${topChampionPair.players.join(" e ")} (${topChampionPair.titles_together} títulos juntos).`,
+              })}
             </Typography>
           </Box>
         ) : (
@@ -437,8 +456,10 @@ export default function DrawJustificationCard({
                   color: "text.secondary",
                 }}
               >
-                Duplas frequentes e campeãs balanceadas entre os times para
-                manter competitividade.
+                {t(
+                  "peladas.draw.justification.pairs_balanced",
+                  "Duplas frequentes e campeãs balanceadas entre os times para manter competitividade.",
+                )}
               </Typography>
             </Box>
           )
@@ -466,8 +487,12 @@ export default function DrawJustificationCard({
                 color: "text.secondary",
               }}
             >
-              Conexão: {topAssistLink.from} → {topAssistLink.to} (
-              {topAssistLink.count} assistências).
+              {t("peladas.draw.justification.assist_link_text", {
+                from: topAssistLink.from,
+                to: topAssistLink.to,
+                count: topAssistLink.count,
+                defaultValue: `Conexão: ${topAssistLink.from} → ${topAssistLink.to} (${topAssistLink.count} assistências).`,
+              })}
             </Typography>
           </Box>
         )}
@@ -494,8 +519,11 @@ export default function DrawJustificationCard({
                 color: "text.secondary",
               }}
             >
-              Maior vencedor recente: {topWinner.name.trim()} (
-              {topWinner.titles} títulos).
+              {t("peladas.draw.justification.top_winner_text", {
+                name: topWinner.name.trim(),
+                titles: topWinner.titles,
+                defaultValue: `Maior vencedor recente: ${topWinner.name.trim()} (${topWinner.titles} títulos).`,
+              })}
             </Typography>
           </Box>
         )}
@@ -522,7 +550,10 @@ export default function DrawJustificationCard({
                 color: "text.secondary",
               }}
             >
-              Parceria inédita: {firstTimePair.players.join(" e ")}.
+              {t("peladas.draw.justification.first_time_pair_text", {
+                players: firstTimePair.players.join(" e "),
+                defaultValue: `Parceria inédita: ${firstTimePair.players.join(" e ")}.`,
+              })}
             </Typography>
           </Box>
         )}
@@ -550,8 +581,10 @@ export default function DrawJustificationCard({
                   color: "text.secondary",
                 }}
               >
-                {justification.history.moves.length} jogador(es) trocado(s) de
-                time para evitar repetição de formações recentes.
+                {t("peladas.draw.justification.history_moves_text", {
+                  count: justification.history.moves.length,
+                  defaultValue: `${justification.history.moves.length} jogador(es) trocado(s) de time para evitar repetição de formações recentes.`,
+                })}
               </Typography>
             </Box>
           )}
@@ -578,8 +611,11 @@ export default function DrawJustificationCard({
                 color: "text.secondary",
               }}
             >
-              Goleiros fixos {homeGkName} e {awayGkName} divididos entre Time 1
-              e Time 2.
+              {t("peladas.draw.justification.fixed_gk_text", {
+                home: homeGkName,
+                away: awayGkName,
+                defaultValue: `Goleiros fixos ${homeGkName} e ${awayGkName} divididos entre Time 1 e Time 2.`,
+              })}
             </Typography>
           </Box>
         )}
@@ -606,8 +642,11 @@ export default function DrawJustificationCard({
                 color: "text.secondary",
               }}
             >
-              {justification.benched.length} jogador(es) no banco aguardando
-              vaga ({justification.benched.map((b) => b.name).join(", ")}).
+              {t("peladas.draw.justification.benched_text", {
+                count: justification.benched.length,
+                names: justification.benched.map((b) => b.name).join(", "),
+                defaultValue: `${justification.benched.length} jogador(es) no banco aguardando vaga (${justification.benched.map((b) => b.name).join(", ")}).`,
+              })}
             </Typography>
           </Box>
         )}
@@ -634,8 +673,10 @@ export default function DrawJustificationCard({
                 color: "text.secondary",
               }}
             >
-              Há times incompletos: arraste jogadores do banco para preencher as
-              vagas livres.
+              {t(
+                "peladas.draw.justification.incomplete_teams",
+                "Há times incompletos: arraste jogadores do banco para preencher as vagas livres.",
+              )}
             </Typography>
           </Box>
         )}
@@ -654,8 +695,10 @@ export default function DrawJustificationCard({
           borderTop: (theme) => `1.5px dashed ${theme.palette.divider}`,
         }}
       >
-        Isso é preferência heurística, não previsão: nota equilibrada não
-        garante jogo equilibrado.
+        {t(
+          "peladas.draw.justification.heuristic_caveat",
+          "Isso é preferência heurística, não previsão: nota equilibrada não garante jogo equilibrado.",
+        )}
       </Typography>
 
       {/* Button to view full justification dialog */}
@@ -682,7 +725,10 @@ export default function DrawJustificationCard({
             },
           }}
         >
-          VER JUSTIFICATIVA COMPLETA
+          {t(
+            "peladas.draw.justification.view_full",
+            "VER JUSTIFICATIVA COMPLETA",
+          )}
         </Button>
       )}
     </Box>
