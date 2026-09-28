@@ -15,6 +15,15 @@ import type {
   Player,
 } from "../../../shared/api/endpoints";
 
+const mockNavigate = vi.fn();
+vi.mock("react-router-dom", async () => {
+  const actual = await vi.importActual("react-router-dom");
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key: string, fallback?: string) => fallback ?? key,
@@ -164,7 +173,7 @@ describe("OrganizationDetailMobileView", () => {
     expect(screen.getByText("AGENDA DO GRUPO")).toBeInTheDocument();
     expect(screen.getByText("LISTA ABERTA")).toBeInTheDocument();
     expect(screen.getByText("14/24")).toBeInTheDocument();
-    expect(screen.getByText("FECHAR E SORTEAR")).toBeInTheDocument();
+    expect(screen.getByText("VER LISTA")).toBeInTheDocument();
     expect(screen.getByText("Encerrada · 4 partidas")).toBeInTheDocument();
     expect(screen.getByText(/1–2 de 25/)).toBeInTheDocument();
   });
@@ -265,5 +274,60 @@ describe("OrganizationDetailMobileView", () => {
     );
     expect(screen.getByText("100Fôlego")).toBeInTheDocument();
     expect(screen.getByText("AGENDA DO GRUPO")).toBeInTheDocument();
+  });
+
+  it("navigates to attendance page when tapping the open pelada card or the VER LISTA button, without showing FECHAR E SORTEAR or COBRAR", () => {
+    renderView({ isAdmin: true });
+
+    // Open pelada card itself should be clickable and navigate to attendance
+    fireEvent.click(screen.getByTestId("mobile-open-pelada-pelada-open"));
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/peladas/pelada-open/attendance",
+    );
+    mockNavigate.mockClear();
+
+    // VER LISTA button should be available and navigate to attendance
+    const viewListBtn = screen.getByTestId("view-list-pelada-open");
+    expect(viewListBtn).toBeInTheDocument();
+    expect(viewListBtn).toHaveTextContent("VER LISTA");
+    fireEvent.click(viewListBtn);
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/peladas/pelada-open/attendance",
+    );
+
+    // Neither FECHAR E SORTEAR nor COBRAR buttons should be rendered on the card
+    expect(screen.queryByText("FECHAR E SORTEAR")).not.toBeInTheDocument();
+    expect(screen.queryByText("COBRAR")).not.toBeInTheDocument();
+  });
+
+  it("navigates to pelada details when clicking a closed pelada row", () => {
+    renderView({ isAdmin: true });
+
+    // Clicking the row itself should navigate to the pelada detail page
+    const closedRow = screen.getByTestId("pelada-row");
+    fireEvent.click(closedRow);
+    expect(mockNavigate).toHaveBeenCalledWith("/peladas/pelada-closed");
+    mockNavigate.mockClear();
+
+    // Clicking SÚMULA button should also navigate
+    fireEvent.click(screen.getByText("SÚMULA"));
+    expect(mockNavigate).toHaveBeenCalledWith("/peladas/pelada-closed");
+  });
+
+  it("navigates to attendance when tapping member next pelada card and to pelada details when tapping history row", () => {
+    renderView({ isAdmin: false });
+
+    // Clicking history row navigates to pelada detail
+    const historyRow = screen.getByTestId("history-row");
+    fireEvent.click(historyRow);
+    expect(mockNavigate).toHaveBeenCalledWith("/peladas/pelada-closed");
+    mockNavigate.mockClear();
+
+    // Clicking next pelada card navigates to attendance
+    const nextPeladaCard = screen.getByTestId("member-next-pelada-card");
+    fireEvent.click(nextPeladaCard);
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "/peladas/pelada-open/attendance",
+    );
   });
 });

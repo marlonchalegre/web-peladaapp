@@ -7,6 +7,15 @@ import type { ComponentProps } from "react";
 import OrganizationDetailDesktopView from "./OrganizationDetailDesktopView";
 import type { Organization, Pelada } from "../../../shared/api/endpoints";
 
+const mockNavigate = vi.fn();
+vi.mock("react-router-dom", async () => {
+  const actual = await vi.importActual("react-router-dom");
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
 type ViewProps = ComponentProps<typeof OrganizationDetailDesktopView>;
 
 vi.mock("react-i18next", () => ({
@@ -205,5 +214,19 @@ describe("OrganizationDetailDesktopView", () => {
     );
     expect(screen.getAllByText("100Fôlego").length).toBeGreaterThan(0);
     expect(screen.getByText("AGENDA DO GRUPO")).toBeInTheDocument();
+  });
+
+  it("navigates to attendance when clicking an open pelada row and to detail when clicking a closed pelada row", () => {
+    renderView();
+
+    const rows = screen.getAllByTestId("pelada-row");
+    // First row is open (f1)
+    fireEvent.click(rows[0]);
+    expect(mockNavigate).toHaveBeenCalledWith("/peladas/f1/attendance");
+    mockNavigate.mockClear();
+
+    // Fifth row is closed (c1)
+    fireEvent.click(rows[4]);
+    expect(mockNavigate).toHaveBeenCalledWith("/peladas/c1");
   });
 });

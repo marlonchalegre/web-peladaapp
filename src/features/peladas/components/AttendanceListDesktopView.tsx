@@ -140,21 +140,18 @@ export default function AttendanceListDesktopView({
     [peladaTransactions],
   );
 
-  const {
-    totalDiariasAmount,
-    openDiariasCount,
-    openDiariasAmount,
-  } = useMemo(() => {
-    const diarias = confirmed.filter((p) => !isMensalista(p.member_type));
-    const totalAmount = diarias.length * price;
-    const openCount = diarias.filter((p) => !paidPlayerIds.has(p.id)).length;
-    const openAmount = openCount * price;
-    return {
-      totalDiariasAmount: totalAmount,
-      openDiariasCount: openCount,
-      openDiariasAmount: openAmount,
-    };
-  }, [confirmed, price, paidPlayerIds]);
+  const { totalDiariasAmount, openDiariasCount, openDiariasAmount } =
+    useMemo(() => {
+      const diarias = confirmed.filter((p) => !isMensalista(p.member_type));
+      const totalAmount = diarias.length * price;
+      const openCount = diarias.filter((p) => !paidPlayerIds.has(p.id)).length;
+      const openAmount = openCount * price;
+      return {
+        totalDiariasAmount: totalAmount,
+        openDiariasCount: openCount,
+        openDiariasAmount: openAmount,
+      };
+    }, [confirmed, price, paidPlayerIds]);
 
   const handleMover = (
     player: Player,

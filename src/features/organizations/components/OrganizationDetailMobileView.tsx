@@ -113,6 +113,28 @@ const formatMonth = (dateStr?: string | null) => {
   return date.toLocaleDateString("pt-BR", { month: "long" });
 };
 
+const compactActionBtnSx = {
+  flexShrink: 0,
+  border: "1.5px solid",
+  borderColor: "divider",
+  borderRadius: "6px",
+  bgcolor: "background.paper",
+  color: "text.secondary",
+  p: "4px 6px",
+  font: "700 9px/1 Archivo,sans-serif",
+  letterSpacing: ".06em",
+  cursor: "pointer",
+  "&:hover": { borderColor: "text.primary", color: "text.primary" },
+} as const;
+
+const clickableRowSx = {
+  cursor: "pointer",
+  transition: "background-color 0.15s ease",
+  "&:hover": {
+    bgcolor: "action.hover",
+  },
+} as const;
+
 export default function OrganizationDetailMobileView({
   org,
   peladas,
@@ -138,6 +160,11 @@ export default function OrganizationDetailMobileView({
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
   const [rosterOpen, setRosterOpen] = useState(false);
   const [nowTs, setNowTs] = useState(0);
+
+  const navigateTo = (e: React.MouseEvent, path: string) => {
+    e.stopPropagation();
+    navigate(path);
+  };
 
   useEffect(() => {
     setNowTs(Date.now());
@@ -412,6 +439,7 @@ export default function OrganizationDetailMobileView({
       <Box
         key={pelada.id}
         data-testid={`mobile-open-pelada-${pelada.id}`}
+        onClick={() => navigate(`/peladas/${pelada.id}/attendance`)}
         sx={{
           bgcolor: (theme) => theme.palette.status?.paid?.bg || "action.hover",
           border: "2px solid",
@@ -419,6 +447,11 @@ export default function OrganizationDetailMobileView({
           borderRadius: "16px",
           p: "13px 14px",
           mb: 1.5,
+          cursor: "pointer",
+          transition: "opacity 0.15s ease",
+          "&:hover": {
+            opacity: 0.95,
+          },
         }}
       >
         <Box
@@ -439,11 +472,14 @@ export default function OrganizationDetailMobileView({
             {formatWeekday(pelada.scheduled_at).slice(0, 3)} ·{" "}
             {formatTime(pelada.scheduled_at)}
           </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
             {isAdmin && (
               <IconButton
                 aria-label={t("organizations.peladas.aria.delete")}
-                onClick={() => onDeletePelada(pelada)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDeletePelada(pelada);
+                }}
                 size="small"
                 sx={{ color: "secondary.main", p: 0.5 }}
               >
@@ -462,6 +498,14 @@ export default function OrganizationDetailMobileView({
               }}
             >
               LISTA ABERTA
+            </Box>
+            <Box
+              component="button"
+              onClick={(e) => navigateTo(e, `/peladas/${pelada.id}/attendance`)}
+              data-testid={`view-list-${pelada.id}`}
+              sx={compactActionBtnSx}
+            >
+              {t("peladas.attendance.view_list", "VER LISTA")}
             </Box>
           </Box>
         </Box>
@@ -495,54 +539,6 @@ export default function OrganizationDetailMobileView({
             {confirmed}/{max || "—"}
           </Typography>
         </Box>
-
-        <Box sx={{ display: "flex", gap: 1, mt: 1.5 }}>
-          <Box
-            component="button"
-            onClick={() => navigate(`/peladas/${pelada.id}/attendance`)}
-            data-testid={`mobile-close-pelada-${pelada.id}`}
-            sx={{
-              flex: 1,
-              border: 0,
-              borderRadius: "11px",
-              bgcolor: (theme) =>
-                theme.palette.mode === "dark" ? "action.hover" : "text.primary",
-              color: (theme) =>
-                theme.palette.mode === "dark"
-                  ? "text.primary"
-                  : "background.paper",
-              p: "11px 0",
-              font: "800 11px/1 Archivo,sans-serif",
-              letterSpacing: ".06em",
-              cursor: "pointer",
-              "&:hover": {
-                bgcolor: "primary.main",
-                color: "primary.contrastText",
-              },
-            }}
-          >
-            FECHAR E SORTEAR
-          </Box>
-          <Box
-            component="button"
-            onClick={() => navigate(`/peladas/${pelada.id}/attendance`)}
-            sx={{
-              flexShrink: 0,
-              border: "1.5px solid",
-              borderColor: "divider",
-              borderRadius: "11px",
-              bgcolor: "background.paper",
-              color: "text.primary",
-              p: "11px 13px",
-              font: "800 11px/1 Archivo,sans-serif",
-              letterSpacing: ".06em",
-              cursor: "pointer",
-              "&:hover": { borderColor: "text.primary" },
-            }}
-          >
-            COBRAR
-          </Box>
-        </Box>
       </Box>
     );
   };
@@ -556,6 +552,7 @@ export default function OrganizationDetailMobileView({
       <Box
         key={pelada.id}
         data-testid="pelada-row"
+        onClick={() => navigate(`/peladas/${pelada.id}`)}
         sx={{
           display: "flex",
           alignItems: "center",
@@ -564,6 +561,7 @@ export default function OrganizationDetailMobileView({
           borderBottom: "1.5px solid",
           borderColor: "divider",
           "&:last-of-type": { borderBottom: "none" },
+          ...clickableRowSx,
         }}
       >
         <Box sx={{ width: 46, flexShrink: 0 }}>
@@ -614,7 +612,10 @@ export default function OrganizationDetailMobileView({
         {isAdmin && (
           <IconButton
             aria-label={t("organizations.peladas.aria.delete")}
-            onClick={() => onDeletePelada(pelada)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDeletePelada(pelada);
+            }}
             size="small"
             sx={{ color: "secondary.main", p: 0.5 }}
           >
@@ -623,20 +624,8 @@ export default function OrganizationDetailMobileView({
         )}
         <Box
           component="button"
-          onClick={() => navigate(`/peladas/${pelada.id}`)}
-          sx={{
-            flexShrink: 0,
-            border: "1.5px solid",
-            borderColor: "divider",
-            borderRadius: "6px",
-            bgcolor: "background.paper",
-            color: "text.secondary",
-            p: "4px 6px",
-            font: "700 9px/1 Archivo,sans-serif",
-            letterSpacing: ".06em",
-            cursor: "pointer",
-            "&:hover": { borderColor: "text.primary", color: "text.primary" },
-          }}
+          onClick={(e) => navigateTo(e, `/peladas/${pelada.id}`)}
+          sx={compactActionBtnSx}
         >
           SÚMULA
         </Box>
@@ -999,6 +988,8 @@ export default function OrganizationDetailMobileView({
             PRÓXIMA PELADA
           </Typography>
           <Box
+            data-testid="member-next-pelada-card"
+            onClick={() => navigate(`/peladas/${activePelada.id}/attendance`)}
             sx={{
               bgcolor: "background.paper",
               border: (theme) =>
@@ -1008,6 +999,11 @@ export default function OrganizationDetailMobileView({
                     `2px solid ${theme.palette.divider}`,
               borderRadius: "18px",
               overflow: "hidden",
+              cursor: "pointer",
+              transition: "transform 0.12s ease",
+              "&:hover": {
+                transform: "translateY(-1px)",
+              },
               boxShadow: (theme) =>
                 theme.palette.mode === "dark"
                   ? "0 4px 20px rgba(0,0,0,0.5)"
@@ -1583,6 +1579,7 @@ export default function OrganizationDetailMobileView({
                 <Box
                   key={entry.id}
                   data-testid="history-row"
+                  onClick={() => navigate(`/peladas/${entry.id}`)}
                   sx={{
                     display: "flex",
                     alignItems: "center",
@@ -1593,6 +1590,7 @@ export default function OrganizationDetailMobileView({
                         ? "none"
                         : "1.5px solid",
                     borderBottomColor: "divider",
+                    ...clickableRowSx,
                   }}
                 >
                   <Typography

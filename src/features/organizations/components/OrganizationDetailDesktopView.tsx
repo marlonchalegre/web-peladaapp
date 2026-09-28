@@ -41,6 +41,11 @@ export default function OrganizationDetailDesktopView({
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  const navigateTo = (e: React.MouseEvent, path: string) => {
+    e.stopPropagation();
+    navigate(path);
+  };
+
   // Filter state for agenda: TODAS | ABERTAS | PENDÊNCIA
   const [filter, setFilter] = useState<"all" | "open" | "pending">("all");
   // Clock captured after mount so the overdue filter stays render-pure.
@@ -922,6 +927,14 @@ export default function OrganizationDetailDesktopView({
               return (
                 <Box
                   key={pelada.id}
+                  data-testid="pelada-row"
+                  onClick={() =>
+                    navigate(
+                      isOpen
+                        ? `/peladas/${pelada.id}/attendance`
+                        : `/peladas/${pelada.id}`,
+                    )
+                  }
                   sx={{
                     display: "flex",
                     alignItems: "center",
@@ -935,6 +948,11 @@ export default function OrganizationDetailDesktopView({
                     borderColor: "divider",
                     borderLeft: isOpen ? "4px solid" : "none",
                     borderLeftColor: "primary.main",
+                    cursor: "pointer",
+                    transition: "background-color 0.15s ease",
+                    "&:hover": {
+                      bgcolor: "action.hover",
+                    },
                   }}
                 >
                   {/* DATA */}
@@ -1111,8 +1129,8 @@ export default function OrganizationDetailDesktopView({
                       <>
                         <Box
                           component="button"
-                          onClick={() =>
-                            navigate(`/peladas/${pelada.id}/attendance`)
+                          onClick={(e) =>
+                            navigateTo(e, `/peladas/${pelada.id}/attendance`)
                           }
                           data-testid={`view-list-${pelada.id}`}
                           sx={{
@@ -1138,8 +1156,8 @@ export default function OrganizationDetailDesktopView({
                         {isAdmin && (
                           <Box
                             component="button"
-                            onClick={() =>
-                              navigate(`/peladas/${pelada.id}/attendance`)
+                            onClick={(e) =>
+                              navigateTo(e, `/peladas/${pelada.id}/attendance`)
                             }
                             sx={{
                               border: "none",
@@ -1174,7 +1192,7 @@ export default function OrganizationDetailDesktopView({
                     ) : (
                       <Box
                         component="button"
-                        onClick={() => navigate(`/peladas/${pelada.id}`)}
+                        onClick={(e) => navigateTo(e, `/peladas/${pelada.id}`)}
                         sx={{
                           border: "1.5px solid",
                           borderColor: "divider",
