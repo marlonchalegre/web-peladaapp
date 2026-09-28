@@ -130,22 +130,17 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
           }}
         >
           <Box
+            component="img"
+            src="/logo.png"
+            alt={t("navigation.app_name", "MINHA PELADA")}
             sx={{
-              width: 30,
-              height: 30,
-              borderRadius: "9px",
-              bgcolor: "primary.main",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: "Archivo, sans-serif",
-              fontWeight: 800,
-              fontSize: "13px",
-              color: "primary.contrastText",
+              width: 32,
+              height: 32,
+              borderRadius: "8px",
+              objectFit: "contain",
+              display: "block",
             }}
-          >
-            MP
-          </Box>
+          />
           <Typography
             sx={{
               fontFamily: "Archivo, sans-serif",

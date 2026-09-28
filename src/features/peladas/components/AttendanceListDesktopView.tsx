@@ -179,6 +179,7 @@ export default function AttendanceListDesktopView({
           width: "100%",
           maxWidth: 1124,
           mx: "auto",
+          pt: 3.5,
           px: { xs: 2, md: 4 },
           pb: 5,
         }}
@@ -1292,7 +1293,7 @@ export default function AttendanceListDesktopView({
                 {waitlist.length}{" "}
                 {t(
                   "peladas.attendance.desktop.waitlist_auto_info",
-                  "na fila de espera entram automaticamente se alguém sair.",
+                  "na fila de espera aguardando aprovação do organizador.",
                 )}
               </Typography>
             </Box>

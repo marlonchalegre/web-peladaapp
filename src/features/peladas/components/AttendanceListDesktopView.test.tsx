@@ -209,4 +209,39 @@ describe("AttendanceListDesktopView", () => {
       screen.getByTitle("peladas.attendance.desktop.mark_daily_paid"),
     ).toBeInTheDocument();
   });
+
+  it("renders waitlist info indicating awaiting organizer approval instead of auto-enter", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <ThemeProvider theme={getTheme("light")}>
+          <AttendanceListDesktopView
+            {...defaultProps}
+            waitlist={[
+              {
+                id: "w1",
+                organization_id: "org-1",
+                pelada_id: "pelada-1",
+                user_id: "u-w1",
+                member_type: "diarista",
+                attendance_status: "waitlist",
+                user: {
+                  id: "u-w1",
+                  name: "Waitlist Player",
+                  username: "waitlistplayer",
+                  position: "midfielder",
+                } as unknown as User,
+              } as PlayerWithUser,
+            ]}
+          />
+        </ThemeProvider>
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByText(/peladas\.attendance\.desktop\.waitlist_auto_info/),
+    ).toBeInTheDocument();
+    expect(container.textContent).not.toContain(
+      "automaticamente se alguém sair",
+    );
+  });
 });

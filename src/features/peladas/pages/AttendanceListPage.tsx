@@ -675,7 +675,7 @@ export default function AttendanceListPage() {
               >
                 {t(
                   "peladas.attendance.waitlist_auto_enter",
-                  "entram se abrir vaga",
+                  "aguardando aprovação",
                 )}
               </Typography>
             ) : null}
@@ -1157,7 +1157,7 @@ export default function AttendanceListPage() {
               >
                 {t(
                   "peladas.attendance.waitlist_auto_enter",
-                  "entram se abrir vaga",
+                  "aguardando aprovação",
                 )}
               </Typography>
             </Box>

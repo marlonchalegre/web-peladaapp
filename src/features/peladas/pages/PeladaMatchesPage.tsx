@@ -377,22 +377,17 @@ export default function PeladaMatchesPage() {
             }}
           >
             <Box
+              component="img"
+              src="/logo.png"
+              alt={t("navigation.app_name", "MINHA PELADA")}
               sx={{
-                width: 26,
-                height: 26,
+                width: 28,
+                height: 28,
                 borderRadius: "7px",
-                bgcolor: "primary.main",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 900,
-                fontSize: "10px",
-                color: "primary.contrastText",
+                objectFit: "contain",
+                display: "block",
               }}
-            >
-              MP
-            </Box>
+            />
             <Typography
               sx={{
                 fontFamily: "Archivo, sans-serif",

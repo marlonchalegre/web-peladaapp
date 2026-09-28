@@ -60,4 +60,16 @@ describe("DesktopHeader", () => {
     expect(screen.getByText("navigation.myCard")).toBeInTheDocument();
     expect(screen.queryByText("navigation.groups")).not.toBeInTheDocument();
   });
+
+  it("renders app logo icon instead of MP text", () => {
+    render(
+      <MemoryRouter>
+        <DesktopHeader />
+      </MemoryRouter>,
+    );
+
+    const logo = screen.getByRole("img", { name: "navigation.app_name" });
+    expect(logo).toBeInTheDocument();
+    expect(logo).toHaveAttribute("src", "/logo.png");
+  });
 });
