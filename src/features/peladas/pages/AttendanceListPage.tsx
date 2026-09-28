@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   Container,
   Typography,
@@ -18,6 +18,9 @@ import {
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import PaidIcon from "@mui/icons-material/Paid";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import { useAttendance } from "../hooks/useAttendance";
@@ -29,6 +32,12 @@ import AttendanceListDesktopView from "../components/AttendanceListDesktopView";
 import LocationDisplay from "../../../shared/components/LocationDisplay";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import { getInitials } from "../../../shared/utils/initials";
+import {
+  isMensalista,
+  formatMemberType as formatMemberTypeHelper,
+  getPaidPlayerIds,
+} from "../utils/playerUtils";
+import { copyToClipboard } from "../utils/exportUtils";
 
 export default function AttendanceListPage() {
   const { t } = useTranslation();
@@ -42,6 +51,10 @@ export default function AttendanceListPage() {
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [showAllConfirmed, setShowAllConfirmed] = useState(false);
   const [copiedList, setCopiedList] = useState(false);
+  const [mobileTab, setMobileTab] = useState<
+    "confirmed" | "declined" | "pending" | "waitlist"
+  >("confirmed");
+  const [showAllList, setShowAllList] = useState(false);
 
   const {
     pelada,
@@ -94,6 +107,76 @@ export default function AttendanceListPage() {
     }
   }, [pelada?.organization_id, user, isAnyAdmin]);
 
+  const copyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) {
+        clearTimeout(copyTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const diaristaPrice = organizationFinance?.diarista_price ?? 0;
+  const paidPlayerIds = useMemo(
+    () => getPaidPlayerIds(peladaTransactions),
+    [peladaTransactions],
+  );
+
+  const currentList = useMemo(() => {
+    switch (mobileTab) {
+      case "confirmed":
+        return confirmed;
+      case "waitlist":
+        return waitlist;
+      case "pending":
+        return pending;
+      case "declined":
+        return declined;
+      default:
+        return confirmed;
+    }
+  }, [mobileTab, confirmed, waitlist, pending, declined]);
+
+  const displayedList = useMemo(() => {
+    if (mobileTab === "confirmed") {
+      return showAllConfirmed ? confirmed : confirmed.slice(0, 5);
+    }
+    return showAllList ? currentList : currentList.slice(0, 10);
+  }, [mobileTab, showAllConfirmed, confirmed, showAllList, currentList]);
+
+  const { dayNumber, weekday, month, timeStr } = useMemo(() => {
+    const rawDate =
+      pelada?.scheduled_at ||
+      pelada?.when ||
+      (pelada as unknown as { date?: string })?.date;
+    const peladaDate = rawDate ? new Date(rawDate) : new Date();
+    const validTime = !isNaN(peladaDate.getTime());
+    return {
+      dayNumber: !isNaN(peladaDate.getDate()) ? peladaDate.getDate() : 16,
+      weekday: validTime
+        ? peladaDate
+            .toLocaleDateString(t("common.locale_code", "pt-BR"), {
+              weekday: "short",
+            })
+            .replace(".", "")
+            .toUpperCase()
+        : "QUA",
+      month: validTime
+        ? peladaDate
+            .toLocaleDateString(t("common.locale_code", "pt-BR"), {
+              month: "long",
+            })
+            .toUpperCase()
+        : "SETEMBRO",
+      timeStr: validTime
+        ? peladaDate.toLocaleTimeString(t("common.locale_code", "pt-BR"), {
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : "19:00",
+    };
+  }, [pelada, t]);
+
   if (loading && !pelada) return <Loading message={t("common.loading")} />;
   if (error)
     return (
@@ -108,65 +191,21 @@ export default function AttendanceListPage() {
       </Container>
     );
 
-  const rawDate =
-    pelada.scheduled_at ||
-    pelada.when ||
-    (pelada as unknown as { date?: string }).date;
-  const peladaDate = rawDate ? new Date(rawDate) : new Date();
-  const dayNumber = !isNaN(peladaDate.getDate()) ? peladaDate.getDate() : 16;
-  const weekday = !isNaN(peladaDate.getTime())
-    ? peladaDate
-        .toLocaleDateString(t("common.locale_code", "pt-BR"), {
-          weekday: "short",
-        })
-        .replace(".", "")
-        .toUpperCase()
-    : "QUA";
-  const month = !isNaN(peladaDate.getTime())
-    ? peladaDate
-        .toLocaleDateString(t("common.locale_code", "pt-BR"), {
-          month: "long",
-        })
-        .toUpperCase()
-    : "SETEMBRO";
-  const timeStr = !isNaN(peladaDate.getTime())
-    ? peladaDate.toLocaleTimeString(t("common.locale_code", "pt-BR"), {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : "19:00";
   const locationStr = pelada.location ?? "";
   const maxPlayers = pelada.max_players ?? undefined;
 
-  const handleCopyList = () => {
+  const handleCopyList = async () => {
     const text = confirmed
       .map(
         (p, idx) =>
           `${idx + 1}. ${p.user?.name || "Jogador"} (${t(`common.member_types.${p.member_type || "diarista"}`)})`,
       )
       .join("\n");
-    if (navigator?.clipboard?.writeText) {
-      navigator.clipboard.writeText(text).catch(() => {});
+    const success = await copyToClipboard(text);
+    if (success) {
       setCopiedList(true);
-      setTimeout(() => setCopiedList(false), 2000);
-    }
-  };
-
-  const displayedConfirmed = showAllConfirmed
-    ? confirmed
-    : confirmed.slice(0, 5);
-
-  const formatMemberType = (memberType?: string) => {
-    switch (memberType) {
-      case "mensalista":
-        return "MENSALISTA";
-      case "diarista":
-      case "diarista_temporario":
-        return "DIARISTA";
-      case "convidado":
-        return "CONVIDADO";
-      default:
-        return "DIARISTA";
+      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+      copyTimeoutRef.current = setTimeout(() => setCopiedList(false), 2000);
     }
   };
 
@@ -272,381 +311,340 @@ export default function AttendanceListPage() {
       }}
       disableGutters
     >
-      <>
-        {/* Template 2b Green Top Header Card */}
+      {/* Template 2b Green Top Header Card */}
+      <Box
+        sx={{
+          bgcolor: "pitch.main",
+          borderRadius: { xs: "18px", sm: "22px" },
+          p: { xs: 2.2, sm: 3 },
+          mb: 2.5,
+          color: "pitch.contrastText",
+        }}
+      >
         <Box
           sx={{
-            bgcolor: "pitch.main",
-            borderRadius: { xs: "18px", sm: "22px" },
-            p: { xs: 2.2, sm: 3 },
-            mb: 2.5,
-            color: "pitch.contrastText",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 1.5,
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 1.5,
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <IconButton
-                onClick={() => navigate(-1)}
-                sx={{
-                  color: "pitch.subtle",
-                  p: 0.5,
-                  ml: -0.5,
-                  "&:hover": {
-                    color: "pitch.contrastText",
-                    bgcolor: "rgba(255,255,255,0.1)",
-                  },
-                }}
-                aria-label={t("peladas.attendance.back", "Voltar")}
-              >
-                <ArrowBackIosNewIcon sx={{ fontSize: 18 }} />
-              </IconButton>
-              <Box>
-                <Typography
-                  sx={{
-                    fontFamily: "Archivo, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "9.5px",
-                    letterSpacing: ".16em",
-                    color: "pitch.subtle",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {pelada.organization_name || t("common.organization")} ·{" "}
-                  {t("peladas.attendance.sport_football", "FUT")}
-                </Typography>
-                <Typography
-                  variant="h5"
-                  component="h1"
-                  sx={{
-                    fontFamily: "Archivo, sans-serif",
-                    fontWeight: 800,
-                    fontSize: { xs: "18px", sm: "22px" },
-                    color: "pitch.contrastText",
-                    mt: 0.25,
-                    letterSpacing: -0.5,
-                  }}
-                >
-                  {t("peladas.attendance.title", "Lista de presença")}
-                </Typography>
-              </Box>
-            </Box>
-
-            <Box
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+            <IconButton
+              onClick={() => navigate(-1)}
               sx={{
-                bgcolor: "pitch.subtle",
-                borderRadius: "7px",
-                px: 1.25,
-                py: 0.6,
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 800,
-                fontSize: "9px",
-                letterSpacing: ".08em",
-                color: "pitch.dark",
-                textTransform: "uppercase",
-                flexShrink: 0,
-              }}
-            >
-              {pelada.status === "attendance"
-                ? "ABERTA"
-                : (pelada.status || "ABERTA").toUpperCase()}
-            </Box>
-          </Box>
-
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "flex-end",
-              gap: 1.5,
-              mt: 2.5,
-            }}
-          >
-            <Typography
-              sx={{
-                fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                fontWeight: 700,
-                fontSize: "44px",
-                lineHeight: 0.85,
-                color: "pitch.contrastText",
-              }}
-            >
-              {dayNumber}
-            </Typography>
-            <Box sx={{ pb: 0.5 }}>
-              <Typography
-                sx={{
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: 800,
-                  fontSize: "13px",
-                  lineHeight: 1.1,
+                color: "pitch.subtle",
+                p: 0.5,
+                ml: -0.5,
+                "&:hover": {
                   color: "pitch.contrastText",
-                }}
-              >
-                {weekday} · {month}
-              </Typography>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  flexWrap: "wrap",
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: 600,
-                  fontSize: "12px",
-                  color: "pitch.subtle",
-                  mt: 0.25,
-                }}
-              >
-                <Typography
-                  component="span"
-                  sx={{
-                    fontFamily: "inherit",
-                    fontWeight: "inherit",
-                    fontSize: "inherit",
-                    color: "inherit",
-                  }}
-                >
-                  {timeStr}
-                </Typography>
-                {locationStr && (
-                  <>
-                    <Typography
-                      component="span"
-                      sx={{
-                        mx: 0.5,
-                        fontFamily: "inherit",
-                        fontWeight: "inherit",
-                        fontSize: "inherit",
-                        color: "inherit",
-                      }}
-                    >
-                      ·
-                    </Typography>
-                    <LocationDisplay
-                      location={locationStr}
-                      textSx={{
-                        fontFamily: "inherit",
-                        fontWeight: "inherit",
-                        fontSize: "inherit",
-                        color: "pitch.contrastText",
-                        textDecoration: "underline",
-                        textUnderlineOffset: "2px",
-                      }}
-                    />
-                  </>
-                )}
-              </Box>
-            </Box>
-          </Box>
-        </Box>
-
-        <div data-testid="attendance-list-container">
-          {/* User attendance callout card */}
-          {currentPlayerAsPlayer && (
-            <UserAttendanceStatus
-              player={currentPlayerAsPlayer}
-              isUpdating={isUpdatingSelf}
-              onUpdate={(status) => handleUpdateAttendance(status)}
-            />
-          )}
-
-          {/* 4-Metric Counter Grid */}
-          <Box sx={{ mb: 2.5 }}>
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: "repeat(4, 1fr)",
-                gap: "1px",
-                bgcolor: "divider",
-                border: 1,
-                borderColor: "divider",
-                borderRadius: "14px",
-                overflow: "hidden",
+                  bgcolor: "rgba(255,255,255,0.1)",
+                },
               }}
+              aria-label={t("peladas.attendance.back", "Voltar")}
             >
-              {/* CONFIRMADOS */}
-              <Box
-                sx={{
-                  bgcolor: "background.paper",
-                  p: 1.5,
-                  textAlign: "center",
-                }}
-              >
-                <span style={{ display: "none" }}>
-                  {t("peladas.attendance.status.confirmed")}
-                </span>
-                <Typography
-                  sx={{
-                    fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "22px",
-                    lineHeight: 1,
-                    color: "primary.main",
-                  }}
-                >
-                  {confirmed.length}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "Archivo, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "8px",
-                    letterSpacing: ".08em",
-                    color: "text.secondary",
-                    mt: 0.5,
-                  }}
-                >
-                  {t("peladas.attendance.stat_confirmed_short", "CONFIRM.")}
-                </Typography>
-              </Box>
-
-              {/* RECUSAS */}
-              <Box
-                sx={{
-                  bgcolor: "background.paper",
-                  p: 1.5,
-                  textAlign: "center",
-                }}
-              >
-                <span style={{ display: "none" }}>
-                  {t("peladas.attendance.status.declined")}
-                </span>
-                <Typography
-                  sx={{
-                    fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "22px",
-                    lineHeight: 1,
-                    color: "text.primary",
-                  }}
-                >
-                  {declined.length}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "Archivo, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "8px",
-                    letterSpacing: ".08em",
-                    color: "text.secondary",
-                    mt: 0.5,
-                  }}
-                >
-                  {t("peladas.attendance.stat_declined_short", "RECUSAS")}
-                </Typography>
-              </Box>
-
-              {/* PENDENTES */}
-              <Box
-                sx={{
-                  bgcolor: "background.paper",
-                  p: 1.5,
-                  textAlign: "center",
-                }}
-              >
-                <span style={{ display: "none" }}>
-                  {t("peladas.attendance.status.pending")}
-                </span>
-                <Typography
-                  sx={{
-                    fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "22px",
-                    lineHeight: 1,
-                    color: "text.primary",
-                  }}
-                >
-                  {pending.length}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "Archivo, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "8px",
-                    letterSpacing: ".08em",
-                    color: "text.secondary",
-                    mt: 0.5,
-                  }}
-                >
-                  {t("peladas.attendance.stat_pending_short", "PENDENT.")}
-                </Typography>
-              </Box>
-
-              {/* ESPERA */}
-              <Box
-                sx={{
-                  bgcolor: "background.paper",
-                  p: 1.5,
-                  textAlign: "center",
-                }}
-              >
-                <span style={{ display: "none" }}>
-                  {t("peladas.attendance.status.waitlist", "Lista de Espera")}
-                </span>
-                <Typography
-                  sx={{
-                    fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "22px",
-                    lineHeight: 1,
-                    color: "secondary.main",
-                  }}
-                >
-                  {waitlist.length}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "Archivo, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "8px",
-                    letterSpacing: ".08em",
-                    color: "text.secondary",
-                    mt: 0.5,
-                  }}
-                >
-                  {t("peladas.attendance.stat_waitlist_short", "ESPERA")}
-                </Typography>
-              </Box>
-            </Box>
-          </Box>
-
-          {/* Confirmed List Section */}
-          <Box
-            sx={{
-              bgcolor: "background.paper",
-              p: { xs: 2, sm: 2.5 },
-              borderRadius: "18px",
-              border: 1,
-              borderColor: "divider",
-              mb: 2.5,
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "baseline",
-              }}
-            >
+              <ArrowBackIosNewIcon sx={{ fontSize: 18 }} />
+            </IconButton>
+            <Box>
               <Typography
                 sx={{
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 700,
                   fontSize: "9.5px",
-                  letterSpacing: ".18em",
-                  color: "text.secondary",
+                  letterSpacing: ".16em",
+                  color: "pitch.subtle",
                   textTransform: "uppercase",
                 }}
               >
-                {t("peladas.attendance.confirmed_label", "CONFIRMADOS")} ·{" "}
-                {confirmed.length}
-                {maxPlayers ? ` DE ${maxPlayers}` : ""}
+                {pelada.organization_name || t("common.organization")} ·{" "}
+                {t("peladas.attendance.sport_football", "FUT")}
               </Typography>
+              <Typography
+                variant="h5"
+                component="h1"
+                sx={{
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 800,
+                  fontSize: { xs: "18px", sm: "22px" },
+                  color: "pitch.contrastText",
+                  mt: 0.25,
+                  letterSpacing: -0.5,
+                }}
+              >
+                {t("peladas.attendance.title", "Lista de presença")}
+              </Typography>
+            </Box>
+          </Box>
+
+          <Box
+            sx={{
+              bgcolor: "pitch.subtle",
+              borderRadius: "7px",
+              px: 1.25,
+              py: 0.6,
+              fontFamily: "Archivo, sans-serif",
+              fontWeight: 800,
+              fontSize: "9px",
+              letterSpacing: ".08em",
+              color: "pitch.dark",
+              textTransform: "uppercase",
+              flexShrink: 0,
+            }}
+          >
+            {pelada.status === "attendance"
+              ? "ABERTA"
+              : (pelada.status || "ABERTA").toUpperCase()}
+          </Box>
+        </Box>
+
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "flex-end",
+            gap: 1.5,
+            mt: 2.5,
+          }}
+        >
+          <Typography
+            sx={{
+              fontFamily: "'Archivo Narrow', Archivo, sans-serif",
+              fontWeight: 700,
+              fontSize: "44px",
+              lineHeight: 0.85,
+              color: "pitch.contrastText",
+            }}
+          >
+            {dayNumber}
+          </Typography>
+          <Box sx={{ pb: 0.5 }}>
+            <Typography
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 800,
+                fontSize: "13px",
+                lineHeight: 1.1,
+                color: "pitch.contrastText",
+              }}
+            >
+              {weekday} · {month}
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                flexWrap: "wrap",
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 600,
+                fontSize: "12px",
+                color: "pitch.subtle",
+                mt: 0.25,
+              }}
+            >
+              <Typography
+                component="span"
+                sx={{
+                  fontFamily: "inherit",
+                  fontWeight: "inherit",
+                  fontSize: "inherit",
+                  color: "inherit",
+                }}
+              >
+                {timeStr}
+              </Typography>
+              {locationStr && (
+                <>
+                  <Typography
+                    component="span"
+                    sx={{
+                      mx: 0.5,
+                      fontFamily: "inherit",
+                      fontWeight: "inherit",
+                      fontSize: "inherit",
+                      color: "inherit",
+                    }}
+                  >
+                    ·
+                  </Typography>
+                  <LocationDisplay
+                    location={locationStr}
+                    textSx={{
+                      fontFamily: "inherit",
+                      fontWeight: "inherit",
+                      fontSize: "inherit",
+                      color: "pitch.contrastText",
+                      textDecoration: "underline",
+                      textUnderlineOffset: "2px",
+                    }}
+                  />
+                </>
+              )}
+            </Box>
+          </Box>
+        </Box>
+      </Box>
+
+      <div data-testid="attendance-list-container">
+        {/* User attendance callout card */}
+        {currentPlayerAsPlayer && (
+          <UserAttendanceStatus
+            player={currentPlayerAsPlayer}
+            isUpdating={isUpdatingSelf}
+            onUpdate={(status) => handleUpdateAttendance(status)}
+          />
+        )}
+
+        {/* 4-Metric Counter Grid */}
+        <Box sx={{ mb: 2.5 }}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(4, 1fr)",
+              gap: "1px",
+              bgcolor: "divider",
+              border: 1,
+              borderColor: "divider",
+              borderRadius: "14px",
+              overflow: "hidden",
+            }}
+          >
+            {[
+              {
+                key: "confirmed" as const,
+                count: confirmed.length,
+                label: t("peladas.attendance.stat_confirmed_short", "CONFIRM."),
+                countColor: "primary.main",
+                indicatorColor: "primary.main",
+                statusKey: "confirmed",
+              },
+              {
+                key: "declined" as const,
+                count: declined.length,
+                label: t("peladas.attendance.stat_declined_short", "RECUSAS"),
+                countColor: "text.primary",
+                indicatorColor: "secondary.main",
+                statusKey: "declined",
+              },
+              {
+                key: "pending" as const,
+                count: pending.length,
+                label: t("peladas.attendance.stat_pending_short", "PENDENT."),
+                countColor: "text.primary",
+                indicatorColor: "primary.main",
+                statusKey: "pending",
+              },
+              {
+                key: "waitlist" as const,
+                count: waitlist.length,
+                label: t("peladas.attendance.stat_waitlist_short", "ESPERA"),
+                countColor: "secondary.main",
+                indicatorColor: "secondary.main",
+                statusKey: "waitlist",
+              },
+            ].map((tab) => {
+              const isActive = mobileTab === tab.key;
+              return (
+                <Box
+                  component="button"
+                  key={tab.key}
+                  data-testid={`stat-tab-${tab.key}`}
+                  onClick={() => {
+                    if (mobileTab !== tab.key) {
+                      setMobileTab(tab.key);
+                      setShowAllList(false);
+                    }
+                  }}
+                  sx={{
+                    bgcolor: isActive
+                      ? (theme) =>
+                          theme.palette.mode === "dark"
+                            ? "action.selected"
+                            : "action.hover"
+                      : "background.paper",
+                    p: 1.5,
+                    textAlign: "center",
+                    border: "none",
+                    borderBottom: (theme) =>
+                      isActive
+                        ? `3.5px solid ${tab.indicatorColor === "primary.main" ? theme.palette.primary.main : tab.indicatorColor === "secondary.main" ? theme.palette.secondary.main : theme.palette.text.primary}`
+                        : "3.5px solid transparent",
+                    cursor: "pointer",
+                    transition: "all 0.15s ease",
+                    outline: "none",
+                    "&:hover": {
+                      bgcolor: "action.hover",
+                    },
+                  }}
+                >
+                  <span style={{ display: "none" }}>
+                    {t(`peladas.attendance.status.${tab.statusKey}`)}
+                  </span>
+                  <Typography
+                    sx={{
+                      fontFamily: "'Archivo Narrow', Archivo, sans-serif",
+                      fontWeight: isActive ? 800 : 700,
+                      fontSize: "22px",
+                      lineHeight: 1,
+                      color: tab.countColor,
+                    }}
+                  >
+                    {tab.count}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: isActive ? 800 : 700,
+                      fontSize: "8px",
+                      letterSpacing: ".08em",
+                      color: isActive ? "text.primary" : "text.secondary",
+                      mt: 0.5,
+                    }}
+                  >
+                    {tab.label}
+                  </Typography>
+                </Box>
+              );
+            })}
+          </Box>
+        </Box>
+
+        {/* Main List Section */}
+        <Box
+          sx={{
+            bgcolor: "background.paper",
+            p: { xs: 2, sm: 2.5 },
+            borderRadius: "18px",
+            border: 1,
+            borderColor: "divider",
+            mb: 2.5,
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "baseline",
+            }}
+          >
+            <Typography
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 700,
+                fontSize: "9.5px",
+                letterSpacing: ".18em",
+                color: "text.secondary",
+                textTransform: "uppercase",
+              }}
+            >
+              {mobileTab === "confirmed" &&
+                `${t("peladas.attendance.confirmed_label", "CONFIRMADOS")} · ${confirmed.length}${maxPlayers ? ` DE ${maxPlayers}` : ""}`}
+              {mobileTab === "waitlist" &&
+                `${t("peladas.attendance.waitlist_label", "FILA DE ESPERA")} · ${waitlist.length}`}
+              {mobileTab === "pending" &&
+                `${t("peladas.attendance.desktop.pending", "PENDENTES")} · ${pending.length}`}
+              {mobileTab === "declined" &&
+                `${t("peladas.attendance.stat_declined_short", "RECUSAS")} · ${declined.length}`}
+            </Typography>
+            {mobileTab === "confirmed" ? (
               <Typography
                 component="button"
                 onClick={handleCopyList}
@@ -666,9 +664,25 @@ export default function AttendanceListPage() {
                   ? t("common.copied", "Copiado!")
                   : t("peladas.attendance.copy_list", "Copiar lista")}
               </Typography>
-            </Box>
+            ) : mobileTab === "waitlist" ? (
+              <Typography
+                sx={{
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 600,
+                  fontSize: "10.5px",
+                  color: "text.secondary",
+                }}
+              >
+                {t(
+                  "peladas.attendance.waitlist_auto_enter",
+                  "entram se abrir vaga",
+                )}
+              </Typography>
+            ) : null}
+          </Box>
 
-            {/* Green Progress Bar */}
+          {/* Green Progress Bar for confirmed */}
+          {mobileTab === "confirmed" && (
             <Box
               sx={{
                 height: 7,
@@ -695,162 +709,233 @@ export default function AttendanceListPage() {
                 }}
               />
             </Box>
+          )}
 
-            {/* Confirmed Players Rows */}
-            <Box sx={{ display: "flex", flexDirection: "column" }}>
-              {confirmed.length === 0 ? (
-                <Typography
-                  sx={{
-                    py: 3,
-                    textAlign: "center",
-                    color: "text.secondary",
-                    fontFamily: "Archivo, sans-serif",
-                    fontSize: "13px",
-                  }}
-                >
-                  {t(
+          {/* Players Rows */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              mt: mobileTab === "confirmed" ? 0 : 1,
+            }}
+          >
+            {currentList.length === 0 ? (
+              <Typography
+                sx={{
+                  py: 3,
+                  textAlign: "center",
+                  color: "text.secondary",
+                  fontFamily: "Archivo, sans-serif",
+                  fontSize: "13px",
+                }}
+              >
+                {mobileTab === "confirmed" &&
+                  t(
                     "peladas.attendance.empty_confirmed",
                     "Nenhum jogador confirmado ainda.",
                   )}
-                </Typography>
-              ) : (
-                displayedConfirmed.map((p, idx) => {
-                  const isCurrent = p.user_id === user?.id;
-                  const pName = p.user?.name || "Jogador";
-                  const pInitials = getInitials(pName);
-                  const pos = getPositionLabel(p.user?.position);
-                  const memberTag = formatMemberType(p.member_type);
+                {mobileTab === "waitlist" &&
+                  t(
+                    "peladas.attendance.waitlist_empty",
+                    "Nenhum jogador na fila de espera.",
+                  )}
+                {mobileTab === "pending" &&
+                  t("peladas.attendance.empty.pending", "Todos responderam!")}
+                {mobileTab === "declined" &&
+                  t(
+                    "peladas.attendance.empty.declined",
+                    "Ninguém recusou ainda.",
+                  )}
+              </Typography>
+            ) : (
+              displayedList.map((p, idx) => {
+                const isCurrent = p.user_id === user?.id;
+                const pName = p.user?.name || "Jogador";
+                const pInitials = getInitials(pName);
+                const pos = getPositionLabel(p.user?.position);
+                const memberTag = formatMemberTypeHelper(p.member_type);
+                const playerIsMensalista = isMensalista(p.member_type);
+                const isPaid = paidPlayerIds.has(p.id);
 
-                  return (
-                    <Box
-                      key={p.id}
-                      data-testid="player-card"
+                return (
+                  <Box
+                    key={p.id}
+                    data-testid="player-card"
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1.5,
+                      py: 1.4,
+                      borderBottom:
+                        idx === displayedList.length - 1 &&
+                        ((mobileTab === "confirmed" &&
+                          (!showAllConfirmed || confirmed.length <= 5)) ||
+                          (mobileTab !== "confirmed" &&
+                            (!showAllList || currentList.length <= 10)) ||
+                          displayedList.length === currentList.length)
+                          ? "none"
+                          : (theme) => `1.5px solid ${theme.palette.divider}`,
+                    }}
+                  >
+                    {/* Rank Number */}
+                    <Typography
                       sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1.5,
-                        py: 1.4,
-                        borderBottom:
-                          idx === displayedConfirmed.length - 1 &&
-                          (!showAllConfirmed || confirmed.length <= 5)
-                            ? "none"
-                            : (theme) => `1.5px solid ${theme.palette.divider}`,
+                        width: 18,
+                        fontFamily: "'Archivo Narrow', Archivo, sans-serif",
+                        fontWeight: 700,
+                        fontSize: "12px",
+                        color: "text.secondary",
+                        textAlign: "center",
+                        flexShrink: 0,
                       }}
                     >
-                      {/* Rank Number */}
-                      <Typography
-                        sx={{
-                          width: 18,
-                          fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                          fontWeight: 700,
-                          fontSize: "12px",
-                          color: "text.secondary",
-                          textAlign: "center",
-                          flexShrink: 0,
-                        }}
-                      >
-                        {idx + 1}
-                      </Typography>
+                      {idx + 1}
+                    </Typography>
 
-                      <SecureAvatar
-                        userId={p.user_id}
-                        filename={
-                          p.user?.avatar_filename || p.user_avatar_filename
-                        }
-                        fallbackText={pInitials}
+                    <SecureAvatar
+                      userId={p.user_id}
+                      filename={
+                        p.user?.avatar_filename || p.user_avatar_filename
+                      }
+                      fallbackText={pInitials}
+                      sx={{
+                        width: 30,
+                        height: 30,
+                        bgcolor: isCurrent ? "primary.main" : "action.hover",
+                        fontFamily: "Archivo, sans-serif",
+                        fontWeight: 800,
+                        fontSize: "10px",
+                        color: isCurrent
+                          ? "primary.contrastText"
+                          : "text.primary",
+                        flexShrink: 0,
+                      }}
+                    />
+
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Typography
+                        data-testid="attendance-card-name"
                         sx={{
-                          width: 30,
-                          height: 30,
-                          bgcolor: isCurrent ? "primary.main" : "action.hover",
                           fontFamily: "Archivo, sans-serif",
                           fontWeight: 800,
-                          fontSize: "10px",
-                          color: isCurrent
-                            ? "primary.contrastText"
-                            : "text.primary",
-                          flexShrink: 0,
+                          fontSize: "12.5px",
+                          lineHeight: 1.2,
+                          color: "text.primary",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 0.5,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
                         }}
-                      />
-
-                      <Box sx={{ flex: 1, minWidth: 0 }}>
-                        <Typography
-                          data-testid="attendance-card-name"
-                          sx={{
-                            fontFamily: "Archivo, sans-serif",
-                            fontWeight: 800,
-                            fontSize: "12.5px",
-                            lineHeight: 1.2,
-                            color: "text.primary",
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 0.5,
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            whiteSpace: "nowrap",
-                          }}
-                        >
-                          {pName}
-                          {isCurrent && (
-                            <Box
-                              component="span"
-                              sx={{
-                                fontFamily: "Archivo, sans-serif",
-                                fontWeight: 700,
-                                fontSize: "9px",
-                                letterSpacing: ".08em",
-                                color: "primary.main",
-                                flexShrink: 0,
-                              }}
-                            >
-                              · {t("peladas.attendance.you_label", "VOCÊ")}
-                            </Box>
-                          )}
-                        </Typography>
-                        <Typography
-                          sx={{
-                            fontFamily: "Archivo, sans-serif",
-                            fontWeight: 600,
-                            fontSize: "10.5px",
-                            lineHeight: 1.3,
-                            color: "text.secondary",
-                          }}
-                        >
-                          {pos}
-                        </Typography>
-                      </Box>
-
-                      {/* Member Type Pill */}
-                      <Box
+                      >
+                        {pName}
+                        {isCurrent && (
+                          <Box
+                            component="span"
+                            sx={{
+                              fontFamily: "Archivo, sans-serif",
+                              fontWeight: 700,
+                              fontSize: "9px",
+                              letterSpacing: ".08em",
+                              color: "primary.main",
+                              flexShrink: 0,
+                            }}
+                          >
+                            · {t("peladas.attendance.you_label", "VOCÊ")}
+                          </Box>
+                        )}
+                      </Typography>
+                      <Typography
                         sx={{
                           fontFamily: "Archivo, sans-serif",
-                          fontWeight: 700,
-                          fontSize: "9px",
-                          letterSpacing: ".06em",
-                          color:
-                            memberTag === "MENSALISTA"
-                              ? "text.primary"
-                              : "text.secondary",
-                          border: 1,
-                          borderColor: "divider",
-                          borderRadius: "6px",
-                          px: 0.8,
-                          py: 0.4,
+                          fontWeight: 600,
+                          fontSize: "10.5px",
+                          lineHeight: 1.3,
+                          color: "text.secondary",
+                        }}
+                      >
+                        {pos}
+                      </Typography>
+                    </Box>
+
+                    {/* Member Type Pill */}
+                    <Box
+                      sx={{
+                        fontFamily: "Archivo, sans-serif",
+                        fontWeight: 700,
+                        fontSize: "9px",
+                        letterSpacing: ".06em",
+                        color: playerIsMensalista
+                          ? "text.primary"
+                          : "text.secondary",
+                        border: 1,
+                        borderColor: "divider",
+                        borderRadius: "6px",
+                        px: 0.8,
+                        py: 0.4,
+                        flexShrink: 0,
+                      }}
+                    >
+                      {memberTag}
+                    </Box>
+
+                    {/* Payment Action for Non-Mensalistas */}
+                    {!playerIsMensalista && (
+                      <Box
+                        sx={{
+                          flexShrink: 0,
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        {isPaid ? (
+                          <IconButton
+                            size="small"
+                            data-testid="reverse-payment-button"
+                            onClick={() =>
+                              isAnyAdmin && handleReversePayment(p.id)
+                            }
+                            disabled={!isAnyAdmin}
+                            title={t(
+                              "peladas.attendance.desktop.undo_payment",
+                              "Desfazer pagamento",
+                            )}
+                            sx={{ color: "primary.main", p: 0.25 }}
+                          >
+                            <PaidIcon sx={{ fontSize: 18 }} />
+                          </IconButton>
+                        ) : isAnyAdmin ? (
+                          <IconButton
+                            size="small"
+                            data-testid="mark-paid-button"
+                            onClick={() => handleMarkPaid(p.id, diaristaPrice)}
+                            title={t(
+                              "organizations.management.finance.monthly_fees.mark_as_paid",
+                              "Marcar como pago",
+                            )}
+                            sx={{ color: "warning.main", p: 0.25 }}
+                          >
+                            <AttachMoneyIcon sx={{ fontSize: 18 }} />
+                          </IconButton>
+                        ) : null}
+                      </Box>
+                    )}
+
+                    {/* Admin Actions */}
+                    {isAnyAdmin && (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 0.25,
                           flexShrink: 0,
                         }}
                       >
-                        {memberTag}
-                      </Box>
-
-                      {isAnyAdmin && (
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            gap: 0.5,
-                          }}
-                        >
+                        {mobileTab === "confirmed" && (
                           <IconButton
                             size="small"
+                            data-testid="decline-player-button"
                             onClick={() =>
                               handleUpdateAttendance("declined", p.id)
                             }
@@ -862,37 +947,172 @@ export default function AttendanceListPage() {
                           >
                             <HighlightOffIcon sx={{ fontSize: 16 }} />
                           </IconButton>
-                        </Box>
-                      )}
-                    </Box>
-                  );
-                })
-              )}
+                        )}
 
-              {/* Expand / Collapse Button */}
-              {confirmed.length > 5 && (
-                <Box
-                  onClick={() => setShowAllConfirmed(!showAllConfirmed)}
-                  sx={{
-                    textAlign: "center",
-                    pt: 1.5,
-                    fontFamily: "Archivo, sans-serif",
-                    fontWeight: 800,
-                    fontSize: "11.5px",
-                    color: "primary.main",
-                    cursor: "pointer",
-                    "&:hover": { textDecoration: "underline" },
-                  }}
-                >
-                  {showAllConfirmed
-                    ? "MOSTRAR MENOS ↑"
-                    : `VER OS OUTROS ${confirmed.length - 5} →`}
-                </Box>
-              )}
-            </Box>
+                        {mobileTab === "pending" && (
+                          <>
+                            <IconButton
+                              size="small"
+                              data-testid="confirm-player-button"
+                              onClick={() =>
+                                handleUpdateAttendance("confirmed", p.id)
+                              }
+                              title={t(
+                                "peladas.attendance.status.confirmed",
+                                "Confirmar presença",
+                              )}
+                              sx={{ color: "primary.main", p: 0.25 }}
+                            >
+                              <CheckCircleIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              data-testid="waitlist-player-button"
+                              onClick={() =>
+                                handleUpdateAttendance("waitlist", p.id)
+                              }
+                              title={t(
+                                "peladas.attendance.status.waitlist",
+                                "Fila de espera",
+                              )}
+                              sx={{ color: "warning.main", p: 0.25 }}
+                            >
+                              <AccessTimeIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              data-testid="decline-player-button"
+                              onClick={() =>
+                                handleUpdateAttendance("declined", p.id)
+                              }
+                              title={t(
+                                "peladas.attendance.status.declined",
+                                "Marcar ausência",
+                              )}
+                              sx={{ color: "secondary.main", p: 0.25 }}
+                            >
+                              <HighlightOffIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                          </>
+                        )}
+
+                        {mobileTab === "waitlist" && (
+                          <>
+                            <IconButton
+                              size="small"
+                              data-testid="promote-waitlist-button"
+                              onClick={() =>
+                                handleUpdateAttendance("confirmed", p.id)
+                              }
+                              title={t(
+                                "peladas.attendance.promote_to_confirmed",
+                                "Promover para confirmados",
+                              )}
+                              sx={{ color: "primary.main", p: 0.25 }}
+                            >
+                              <CheckCircleIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              data-testid="decline-player-button"
+                              onClick={() =>
+                                handleUpdateAttendance("declined", p.id)
+                              }
+                              title={t(
+                                "peladas.attendance.remove_from_list",
+                                "Remover da lista",
+                              )}
+                              sx={{ color: "secondary.main", p: 0.25 }}
+                            >
+                              <HighlightOffIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                          </>
+                        )}
+
+                        {mobileTab === "declined" && (
+                          <>
+                            <IconButton
+                              size="small"
+                              data-testid="confirm-player-button"
+                              onClick={() =>
+                                handleUpdateAttendance("confirmed", p.id)
+                              }
+                              title={t(
+                                "peladas.attendance.status.confirmed",
+                                "Confirmar presença",
+                              )}
+                              sx={{ color: "primary.main", p: 0.25 }}
+                            >
+                              <CheckCircleIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              data-testid="waitlist-player-button"
+                              onClick={() =>
+                                handleUpdateAttendance("waitlist", p.id)
+                              }
+                              title={t(
+                                "peladas.attendance.status.waitlist",
+                                "Fila de espera",
+                              )}
+                              sx={{ color: "warning.main", p: 0.25 }}
+                            >
+                              <AccessTimeIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                          </>
+                        )}
+                      </Box>
+                    )}
+                  </Box>
+                );
+              })
+            )}
+
+            {/* Expand / Collapse Button */}
+            {mobileTab === "confirmed" && confirmed.length > 5 && (
+              <Box
+                onClick={() => setShowAllConfirmed(!showAllConfirmed)}
+                sx={{
+                  textAlign: "center",
+                  pt: 1.5,
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 800,
+                  fontSize: "11.5px",
+                  color: "primary.main",
+                  cursor: "pointer",
+                  "&:hover": { textDecoration: "underline" },
+                }}
+              >
+                {showAllConfirmed
+                  ? "MOSTRAR MENOS ↑"
+                  : `VER OS OUTROS ${confirmed.length - 5} →`}
+              </Box>
+            )}
+
+            {mobileTab !== "confirmed" && currentList.length > 10 && (
+              <Box
+                onClick={() => setShowAllList(!showAllList)}
+                sx={{
+                  textAlign: "center",
+                  pt: 1.5,
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 800,
+                  fontSize: "11.5px",
+                  color: "primary.main",
+                  cursor: "pointer",
+                  "&:hover": { textDecoration: "underline" },
+                }}
+              >
+                {showAllList
+                  ? "MOSTRAR MENOS ↑"
+                  : `VER TODOS OS ${currentList.length} →`}
+              </Box>
+            )}
           </Box>
+        </Box>
 
-          {/* Fila de Espera Box */}
+        {/* Fila de Espera Box (only shown on confirmed tab) */}
+        {mobileTab === "confirmed" && (
           <Box
             sx={{
               border: 1,
@@ -1021,115 +1241,115 @@ export default function AttendanceListPage() {
               )}
             </Box>
           </Box>
+        )}
 
-          {/* Admin Actions Footer */}
-          {isAnyAdmin && (
+        {/* Admin Actions Footer */}
+        {isAnyAdmin && (
+          <Box
+            sx={{
+              bgcolor: "background.default",
+              borderTop: 1,
+              borderColor: "divider",
+              pt: 2.5,
+              pb: 3,
+            }}
+          >
+            <Typography
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 700,
+                fontSize: "9px",
+                letterSpacing: ".16em",
+                color: "text.secondary",
+                mb: 1.5,
+                textTransform: "uppercase",
+              }}
+            >
+              {t("peladas.attendance.admin_actions", "AÇÕES DO ADMIN")}
+            </Typography>
+            <Button
+              fullWidth
+              variant="contained"
+              onClick={() => setIsConfirmDialogOpen(true)}
+              data-testid="close-attendance-button"
+              sx={{
+                bgcolor: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "primary.main"
+                    : "text.primary",
+                color: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "primary.contrastText"
+                    : "background.paper",
+                border: 1,
+                borderColor: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "primary.main"
+                    : "text.primary",
+                borderRadius: "14px",
+                py: 2,
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 800,
+                fontSize: "14px",
+                letterSpacing: ".04em",
+                textTransform: "uppercase",
+                "&:hover": {
+                  bgcolor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "primary.light"
+                      : "text.primary",
+                  borderColor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "primary.light"
+                      : "text.primary",
+                },
+                transition: "all 0.15s ease",
+              }}
+            >
+              {t(
+                "peladas.attendance.button.close_list",
+                "FECHAR LISTA E SORTEAR TIMES",
+              )}
+            </Button>
             <Box
               sx={{
-                bgcolor: "background.default",
-                borderTop: 1,
-                borderColor: "divider",
-                pt: 2.5,
-                pb: 3,
+                textAlign: "center",
+                mt: 1.5,
               }}
             >
               <Typography
+                component="button"
+                onClick={() => {
+                  const url = window.location.href;
+                  const shareText = `Lista de Presença: ${pelada.organization_name || "Pelada"} - ${weekday}, ${timeStr}\n${url}`;
+                  window.open(
+                    `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`,
+                    "_blank",
+                  );
+                }}
                 sx={{
+                  background: "none",
+                  border: "none",
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 700,
-                  fontSize: "9px",
-                  letterSpacing: ".16em",
+                  fontSize: "11.5px",
                   color: "text.secondary",
-                  mb: 1.5,
-                  textTransform: "uppercase",
-                }}
-              >
-                {t("peladas.attendance.admin_actions", "AÇÕES DO ADMIN")}
-              </Typography>
-              <Button
-                fullWidth
-                variant="contained"
-                onClick={() => setIsConfirmDialogOpen(true)}
-                data-testid="close-attendance-button"
-                sx={{
-                  bgcolor: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "primary.main"
-                      : "text.primary",
-                  color: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "primary.contrastText"
-                      : "background.paper",
-                  border: 1,
-                  borderColor: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "primary.main"
-                      : "text.primary",
-                  borderRadius: "14px",
-                  py: 2,
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: 800,
-                  fontSize: "14px",
-                  letterSpacing: ".04em",
-                  textTransform: "uppercase",
+                  cursor: "pointer",
                   "&:hover": {
-                    bgcolor: (theme) =>
-                      theme.palette.mode === "dark"
-                        ? "primary.light"
-                        : "text.primary",
-                    borderColor: (theme) =>
-                      theme.palette.mode === "dark"
-                        ? "primary.light"
-                        : "text.primary",
+                    color: "primary.main",
+                    textDecoration: "underline",
                   },
-                  transition: "all 0.15s ease",
                 }}
               >
                 {t(
-                  "peladas.attendance.button.close_list",
-                  "FECHAR LISTA E SORTEAR TIMES",
+                  "peladas.attendance.notify_whatsapp_group",
+                  "Avisar o grupo no WhatsApp",
                 )}
-              </Button>
-              <Box
-                sx={{
-                  textAlign: "center",
-                  mt: 1.5,
-                }}
-              >
-                <Typography
-                  component="button"
-                  onClick={() => {
-                    const url = window.location.href;
-                    const shareText = `Lista de Presença: ${pelada.organization_name || "Pelada"} - ${weekday}, ${timeStr}\n${url}`;
-                    window.open(
-                      `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`,
-                      "_blank",
-                    );
-                  }}
-                  sx={{
-                    background: "none",
-                    border: "none",
-                    fontFamily: "Archivo, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "11.5px",
-                    color: "text.secondary",
-                    cursor: "pointer",
-                    "&:hover": {
-                      color: "primary.main",
-                      textDecoration: "underline",
-                    },
-                  }}
-                >
-                  {t(
-                    "peladas.attendance.notify_whatsapp_group",
-                    "Avisar o grupo no WhatsApp",
-                  )}
-                </Typography>
-              </Box>
+              </Typography>
             </Box>
-          )}
-        </div>
-      </>
+          </Box>
+        )}
+      </div>
 
       <Dialog
         open={isConfirmDialogOpen}

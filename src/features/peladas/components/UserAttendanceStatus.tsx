@@ -10,6 +10,7 @@ import {
 import { useTranslation } from "react-i18next";
 import type { AttendanceStatus } from "../../../shared/api/endpoints";
 import type { PlayerWithUser } from "../hooks/useAttendance";
+import { isMensalista } from "../utils/playerUtils";
 
 interface UserAttendanceStatusProps {
   player: PlayerWithUser;
@@ -105,7 +106,7 @@ export default function UserAttendanceStatus({
           <span style={{ display: "none" }}>
             {t("common.hello")}, {firstName}!
           </span>
-          {player.member_type === "mensalista" ? (
+          {isMensalista(player.member_type) ? (
             <>
               {t("peladas.attendance.user_status.mensalista_priority_info")}{" "}
               <strong style={{ color: "inherit" }}>

@@ -235,4 +235,26 @@ describe("UserAttendanceStatus", () => {
       screen.getByText("peladas.attendance.user_status.waitlist_msg"),
     ).toBeInTheDocument();
   });
+
+  it("renders mensalista priority info for mensalista_temporario", () => {
+    const tempMensalistaPlayer = {
+      ...mockPlayer,
+      member_type: "mensalista_temporario" as const,
+    };
+    render(
+      <ThemeContextProvider>
+        <UserAttendanceStatus
+          player={tempMensalistaPlayer as PlayerWithUser}
+          isUpdating={false}
+          onUpdate={() => {}}
+        />
+      </ThemeContextProvider>,
+    );
+
+    expect(
+      screen.getByText(
+        /peladas\.attendance\.user_status\.mensalista_priority_info/,
+      ),
+    ).toBeInTheDocument();
+  });
 });

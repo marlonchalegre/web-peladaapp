@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Box, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import type {
@@ -13,6 +13,11 @@ import LocationDisplay from "../../../shared/components/LocationDisplay";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import { getInitials } from "../../../shared/utils/initials";
+import {
+  isMensalista,
+  formatMemberType as formatMemberTypeHelper,
+  getPaidPlayerIds,
+} from "../utils/playerUtils";
 
 interface AttendanceListDesktopViewProps {
   pelada: Pelada;
@@ -106,55 +111,50 @@ export default function AttendanceListDesktopView({
     }
   };
 
-  const formatMemberType = (memberType?: string) => {
-    switch (memberType) {
-      case "mensalista":
-        return t("common.member_types.mensalista", "MENSALISTA").toUpperCase();
-      case "diarista":
-      case "diarista_temporario":
-        return t("common.member_types.diarista", "DIARISTA").toUpperCase();
-      case "convidado":
-        return t("common.member_types.convidado", "CONVIDADO").toUpperCase();
+  const formatMemberType = (memberType?: string) =>
+    formatMemberTypeHelper(memberType, (k, d) => (d ? t(k, d) : t(k)));
+
+  const currentList = useMemo(() => {
+    switch (activeTab) {
+      case "confirmed":
+        return confirmed;
+      case "waitlist":
+        return waitlist;
+      case "pending":
+        return pending;
+      case "declined":
+        return declined;
       default:
-        return t("common.member_types.diarista", "DIARISTA").toUpperCase();
+        return confirmed;
     }
-  };
+  }, [activeTab, confirmed, waitlist, pending, declined]);
 
-  const currentList =
-    activeTab === "confirmed"
-      ? confirmed
-      : activeTab === "waitlist"
-        ? waitlist
-        : activeTab === "pending"
-          ? pending
-          : declined;
+  const displayedList = useMemo(
+    () => (showAll ? currentList : currentList.slice(0, 7)),
+    [showAll, currentList],
+  );
 
-  const displayedList = showAll ? currentList : currentList.slice(0, 7);
-
-  // Financial calculations from real data: the diarista price comes from the
-  // organization finance config and "paid" from this pelada's transactions.
   const price = diaristaPrice ?? 0;
-  const paidPlayerIds = new Set(
-    peladaTransactions
-      .filter(
-        (tx) =>
-          tx.type === "income" &&
-          tx.category === "diarista_fee" &&
-          tx.status === "paid",
-      )
-      .map((tx) => tx.player_id),
+  const paidPlayerIds = useMemo(
+    () => getPaidPlayerIds(peladaTransactions),
+    [peladaTransactions],
   );
-  const diariasInConfirmed = confirmed.filter(
-    (p) =>
-      p.member_type === "diarista" ||
-      p.member_type === "diarista_temporario" ||
-      p.member_type === "convidado",
-  );
-  const totalDiariasAmount = diariasInConfirmed.length * price;
-  const openDiariasCount = diariasInConfirmed.filter(
-    (p) => !paidPlayerIds.has(p.id),
-  ).length;
-  const openDiariasAmount = openDiariasCount * price;
+
+  const {
+    totalDiariasAmount,
+    openDiariasCount,
+    openDiariasAmount,
+  } = useMemo(() => {
+    const diarias = confirmed.filter((p) => !isMensalista(p.member_type));
+    const totalAmount = diarias.length * price;
+    const openCount = diarias.filter((p) => !paidPlayerIds.has(p.id)).length;
+    const openAmount = openCount * price;
+    return {
+      totalDiariasAmount: totalAmount,
+      openDiariasCount: openCount,
+      openDiariasAmount: openAmount,
+    };
+  }, [confirmed, price, paidPlayerIds]);
 
   const handleMover = (
     player: Player,
@@ -719,7 +719,7 @@ export default function AttendanceListDesktopView({
                   const pInitials = getInitials(pName);
                   const pos = getPositionLabel(player.user?.position);
                   const memberTag = formatMemberType(player.member_type);
-                  const isMensalista = memberTag === "MENSALISTA";
+                  const isMensalistaPlayer = isMensalista(player.member_type);
 
                   return (
                     <Box
@@ -839,11 +839,11 @@ export default function AttendanceListDesktopView({
                             fontWeight: 800,
                             fontSize: "9px",
                             letterSpacing: ".08em",
-                            color: isMensalista
+                            color: isMensalistaPlayer
                               ? "primary.main"
                               : "text.secondary",
                             border: "1.5px solid",
-                            borderColor: isMensalista
+                            borderColor: isMensalistaPlayer
                               ? "primary.main"
                               : "divider",
                             borderRadius: "6px",
@@ -857,7 +857,7 @@ export default function AttendanceListDesktopView({
 
                       {/* Payment Column */}
                       <Box sx={{ width: 104, flexShrink: 0 }}>
-                        {isMensalista ? (
+                        {isMensalistaPlayer ? (
                           <Typography
                             sx={{
                               fontFamily: "Archivo, sans-serif",

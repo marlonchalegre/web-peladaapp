@@ -262,3 +262,62 @@ export function formatPosition(pos?: string | null, fallback = "meia"): string {
       return pos.toLowerCase();
   }
 }
+
+/**
+ * Checks whether a player member type is considered a monthly member (mensalista or mensalista_temporario).
+ */
+export function isMensalista(memberType?: string | null): boolean {
+  return memberType === "mensalista" || memberType === "mensalista_temporario";
+}
+
+/**
+ * Formats a player's member type to an uppercase display label.
+ */
+export function formatMemberType(
+  memberType?: string | null,
+  t?: (key: string, defaultVal?: string) => string,
+): string {
+  if (isMensalista(memberType)) {
+    return t
+      ? t("common.member_types.mensalista", "MENSALISTA").toUpperCase()
+      : "MENSALISTA";
+  }
+  switch (memberType) {
+    case "convidado":
+      return t
+        ? t("common.member_types.convidado", "CONVIDADO").toUpperCase()
+        : "CONVIDADO";
+    case "diarista":
+    case "diarista_temporario":
+    default:
+      return t
+        ? t("common.member_types.diarista", "DIARISTA").toUpperCase()
+        : "DIARISTA";
+  }
+}
+
+/**
+ * Computes a Set of player IDs who have paid their diarista fee in a single pass.
+ */
+export function getPaidPlayerIds(
+  transactions?: Array<{
+    type?: string | null;
+    category?: string | null;
+    status?: string | null;
+    player_id?: string | null;
+  }> | null,
+): Set<string> {
+  const ids = new Set<string>();
+  if (!transactions) return ids;
+  for (const tx of transactions) {
+    if (
+      tx.type === "income" &&
+      tx.category === "diarista_fee" &&
+      tx.status === "paid" &&
+      tx.player_id
+    ) {
+      ids.add(tx.player_id);
+    }
+  }
+  return ids;
+}

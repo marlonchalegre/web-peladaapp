@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import AttendanceListDesktopView from "./AttendanceListDesktopView";
 import { ThemeProvider } from "@mui/material";
 import { getTheme } from "../../../lib/theme";
@@ -96,8 +97,6 @@ const defaultProps = {
   diaristaPrice: 25,
 };
 
-import { MemoryRouter } from "react-router-dom";
-
 describe("AttendanceListDesktopView", () => {
   it("renders correctly in light mode", () => {
     render(
@@ -132,6 +131,82 @@ describe("AttendanceListDesktopView", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText("peladas.attendance.desktop.daily_fees_title"),
+    ).toBeInTheDocument();
+  });
+
+  it("formats mensalista_temporario as mensalista and does not render daily fee payment button", () => {
+    const tempMensalistaConfirmed: PlayerWithUser[] = [
+      {
+        id: "p4",
+        organization_id: "org-1",
+        pelada_id: "pelada-1",
+        user_id: "u4",
+        member_type: "mensalista_temporario",
+        attendance_status: "confirmed",
+        user: {
+          id: "u4",
+          name: "Jorge Batista",
+          username: "jorge",
+          position: "striker",
+        } as unknown as User,
+      } as PlayerWithUser,
+    ];
+
+    render(
+      <MemoryRouter>
+        <ThemeProvider theme={getTheme("light")}>
+          <AttendanceListDesktopView
+            {...defaultProps}
+            confirmed={tempMensalistaConfirmed}
+          />
+        </ThemeProvider>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("Jorge Batista")).toBeInTheDocument();
+    expect(
+      screen.getByText("COMMON.MEMBER_TYPES.MENSALISTA"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByTitle("peladas.attendance.desktop.mark_daily_paid"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("handles player with undefined member_type defaulting to diarista and showing daily fee payment button", () => {
+    const undefinedMemberTypeConfirmed: PlayerWithUser[] = [
+      {
+        id: "p5",
+        organization_id: "org-1",
+        pelada_id: "pelada-1",
+        user_id: "u5",
+        attendance_status: "confirmed",
+        user: {
+          id: "u5",
+          name: "Unknown Player",
+          username: "unknown",
+          position: "striker",
+        } as unknown as User,
+      } as PlayerWithUser,
+    ];
+
+    render(
+      <MemoryRouter>
+        <ThemeProvider theme={getTheme("light")}>
+          <AttendanceListDesktopView
+            {...defaultProps}
+            confirmed={undefinedMemberTypeConfirmed}
+            diaristaPrice={30}
+          />
+        </ThemeProvider>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("Unknown Player")).toBeInTheDocument();
+    expect(
+      screen.getByText("COMMON.MEMBER_TYPES.DIARISTA"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTitle("peladas.attendance.desktop.mark_daily_paid"),
     ).toBeInTheDocument();
   });
 });
