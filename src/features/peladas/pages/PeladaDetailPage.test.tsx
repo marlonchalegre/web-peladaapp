@@ -44,6 +44,12 @@ const MockPeladaView = (props: any) => (
           Start
         </button>
       )}
+      <button
+        data-testid="invite-player-button"
+        onClick={props.onAddPlayersClick}
+      >
+        Add Players
+      </button>
       {!props.pelada?.has_schedule_plan && (
         <button data-testid="build-schedule-button">Build</button>
       )}
@@ -967,6 +973,46 @@ describe("PeladaDetailPage", () => {
         expect.stringContaining("/api/peladas/1"),
         expect.objectContaining({ home_fixed_goalkeeper_id: "10" }),
       );
+    });
+  });
+
+  it("opens add players dialog and submits selected players", async () => {
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/peladas/1/full-details")
+        return Promise.resolve(mockFullDetails);
+      if (path === "/api/organizations/101/admins")
+        return Promise.resolve([{ user_id: "1" }]);
+      if (path === "/api/organizations/101/players")
+        return Promise.resolve([
+          {
+            id: "99",
+            user_id: "99",
+            user_name: "Late Player",
+            user_username: "late",
+          },
+        ]);
+      return Promise.resolve({});
+    });
+
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByTestId("invite-player-button")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByTestId("invite-player-button"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Late Player")).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByText("Late Player"));
+    await user.click(
+      screen.getByText("peladas.panel.available.add_dialog.submit"),
+    );
+
+    expect(api.post).toHaveBeenCalledWith("/api/peladas/1/attendance/batch", {
+      player_ids: ["99"],
+      status: "confirmed",
     });
   });
 });

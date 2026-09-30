@@ -320,6 +320,39 @@ describe("PeladaTeamsDesktopView", () => {
     expect(
       screen.queryByTestId("desktop-add-team-button"),
     ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("invite-player-button"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("calls onAddPlayersClick when clicking invite-player-button on bench", () => {
+    const onAddPlayersClick = vi.fn();
+    render(
+      <MemoryRouter>
+        <PeladaTeamsDesktopView
+          {...defaultProps}
+          isAdmin={true}
+          onAddPlayersClick={onAddPlayersClick}
+        />
+      </MemoryRouter>,
+    );
+
+    const addBtn = screen.getByTestId("invite-player-button");
+    expect(addBtn).toBeInTheDocument();
+    fireEvent.click(addBtn);
+    expect(onAddPlayersClick).toHaveBeenCalledTimes(1);
+  });
+
+  it("displays empty state message when bench has no players", () => {
+    render(
+      <MemoryRouter>
+        <PeladaTeamsDesktopView {...defaultProps} benchPlayers={[]} />
+      </MemoryRouter>,
+    );
+
+    expect(
+      screen.getByText("Nenhum jogador no banco no momento."),
+    ).toBeInTheDocument();
   });
 
   it("renders correctly in dark mode without styling or contrast regressions", () => {

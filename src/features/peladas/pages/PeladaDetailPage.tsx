@@ -1,5 +1,11 @@
 import { useParams } from "react-router-dom";
-import { useState, useEffect, useMemo, type DragEvent } from "react";
+import {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  type DragEvent,
+} from "react";
 import { Container, Alert, useTheme, useMediaQuery } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
@@ -18,6 +24,7 @@ import {
 import StartPeladaDialog from "../components/StartPeladaDialog";
 import SwapPlayerDialog from "../components/SwapPlayerDialog";
 import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
+import AddPlayersFromOrgDialog from "../components/AddPlayersFromOrgDialog";
 import {
   generateAnnouncementText,
   copyToClipboard,
@@ -67,9 +74,17 @@ export default function PeladaDetailPage() {
     handleMarkPaid,
     handleReversePayment,
     peladaTransactions,
+    handleAddPlayersFromOrg,
+    allPlayerIdsInPelada,
   } = usePeladaDetail(peladaId);
 
   const [justificationDialogOpen, setJustificationDialogOpen] = useState(false);
+  const [addPlayersDialogOpen, setAddPlayersDialogOpen] = useState(false);
+
+  const handleOpenAddPlayers = useCallback(
+    () => setAddPlayersDialogOpen(true),
+    [],
+  );
 
   useEffect(() => {
     if (drawJustification) {
@@ -331,6 +346,7 @@ export default function PeladaDetailPage() {
           peladaTransactions={peladaTransactions}
           onMarkPaid={handleMarkPaid}
           onReversePayment={onReverseClick}
+          onAddPlayersClick={handleOpenAddPlayers}
         />
       ) : (
         <PeladaTeamsMobileView
@@ -364,6 +380,7 @@ export default function PeladaDetailPage() {
           peladaTransactions={peladaTransactions}
           onMarkPaid={handleMarkPaid}
           onReversePayment={onReverseClick}
+          onAddPlayersClick={handleOpenAddPlayers}
         />
       )}
 
@@ -416,6 +433,14 @@ export default function PeladaDetailPage() {
           pendingSwap ? teamPlayers[pendingSwap.targetTeamId] || [] : []
         }
         onSwap={handlePerformSwap}
+      />
+
+      <AddPlayersFromOrgDialog
+        open={addPlayersDialogOpen}
+        onClose={() => setAddPlayersDialogOpen(false)}
+        onAdd={handleAddPlayersFromOrg}
+        organizationId={pelada.organization_id}
+        excludePlayerIds={allPlayerIdsInPelada}
       />
     </>
   );

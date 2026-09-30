@@ -560,22 +560,25 @@ export function usePeladaDetail(peladaId: string) {
     }
   };
 
-  const handleAddPlayersFromOrg = async (playerIds: string[]) => {
-    if (processing) return;
-    setProcessing(true);
-    try {
-      await endpoints.batchUpdateAttendance(peladaId, playerIds, "confirmed");
-      await fetchPeladaData();
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : t("peladas.detail.error.update_failed");
-      setError(message);
-    } finally {
-      setProcessing(false);
-    }
-  };
+  const handleAddPlayersFromOrg = useCallback(
+    async (playerIds: string[]) => {
+      if (processing) return;
+      setProcessing(true);
+      try {
+        await endpoints.batchUpdateAttendance(peladaId, playerIds, "confirmed");
+        await fetchPeladaData();
+      } catch (error: unknown) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : t("peladas.detail.error.update_failed");
+        setError(message);
+      } finally {
+        setProcessing(false);
+      }
+    },
+    [processing, peladaId, fetchPeladaData, t],
+  );
 
   const handleMarkPaid = async (playerId: string, amount: number) => {
     if (!pelada) return;

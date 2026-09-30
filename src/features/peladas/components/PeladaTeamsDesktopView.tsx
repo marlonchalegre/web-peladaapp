@@ -4,6 +4,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { useTranslation } from "react-i18next";
+import AddPlayersButton from "./AddPlayersButton";
 import type {
   Pelada,
   Team,
@@ -65,6 +66,7 @@ export interface PeladaTeamsDesktopViewProps {
   peladaTransactions?: Transaction[];
   onMarkPaid?: (playerId: string, amount: number) => void;
   onReversePayment?: (playerId: string) => void;
+  onAddPlayersClick?: () => void;
 }
 
 const VEST_KEYS = [
@@ -101,6 +103,7 @@ export default function PeladaTeamsDesktopView({
   onStartClick,
   onCopyAnnouncement,
   currentUser,
+  onAddPlayersClick,
 }: PeladaTeamsDesktopViewProps) {
   const { t } = useTranslation();
   const [algorithm, setAlgorithm] = useState<DrawAlgorithm>("classic");
@@ -1584,21 +1587,30 @@ export default function PeladaTeamsDesktopView({
                   alignItems: "center",
                 }}
               >
-                <Typography
-                  sx={{
-                    fontFamily: "Archivo, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "9.5px",
-                    letterSpacing: ".16em",
-                    color: "text.secondary",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {t("peladas.teams.bench_title_count", {
-                    count: benchPlayers.length,
-                    defaultValue: `BANCO · ${benchPlayers.length} FORA DOS TIMES`,
-                  })}
-                </Typography>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                  <Typography
+                    sx={{
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 700,
+                      fontSize: "9.5px",
+                      letterSpacing: ".16em",
+                      color: "text.secondary",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {t(
+                      "peladas.teams.bench_title_count",
+                      "BANCO · {{count}} FORA DOS TIMES",
+                      { count: benchPlayers.length },
+                    )}
+                  </Typography>
+                  {isAdmin && (
+                    <AddPlayersButton
+                      onClick={onAddPlayersClick}
+                      disabled={processing}
+                    />
+                  )}
+                </Box>
                 <Typography
                   sx={{
                     fontFamily: "Archivo, sans-serif",
@@ -1623,68 +1635,86 @@ export default function PeladaTeamsDesktopView({
                   alignItems: "center",
                 }}
               >
-                {benchPlayers.map((bp, bIdx) => (
-                  <Box
-                    key={bp.id}
-                    draggable
-                    onDragStart={(e) => onDragStartPlayer(e, bp.id, null)}
+                {benchPlayers.length === 0 ? (
+                  <Typography
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1.2,
-                      border: 1,
-                      borderColor: "divider",
-                      borderRadius: "12px",
-                      p: "8px 12px 8px 9px",
-                      bgcolor: "action.hover",
-                      cursor: "grab",
-                      "&:active": { cursor: "grabbing" },
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 600,
+                      fontSize: "11.5px",
+                      color: "text.secondary",
+                      py: 1,
                     }}
                   >
-                    <SecureAvatar
-                      userId={bp.user?.id}
-                      filename={bp.user?.avatar_filename}
-                      fallbackText={getInitials(bp.user?.name)}
+                    {t(
+                      "peladas.teams.no_bench_players",
+                      "Nenhum jogador no banco no momento.",
+                    )}
+                  </Typography>
+                ) : (
+                  benchPlayers.map((bp, bIdx) => (
+                    <Box
+                      key={bp.id}
+                      data-testid="player-row"
+                      draggable
+                      onDragStart={(e) => onDragStartPlayer(e, bp.id, null)}
                       sx={{
-                        width: 26,
-                        height: 26,
-                        bgcolor:
-                          AVATAR_BG_COLORS[bIdx % AVATAR_BG_COLORS.length],
-                        fontFamily: "Archivo, sans-serif",
-                        fontWeight: 800,
-                        fontSize: "9px",
-                        color: "text.primary",
-                        flexShrink: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1.2,
+                        border: 1,
+                        borderColor: "divider",
+                        borderRadius: "12px",
+                        p: "8px 12px 8px 9px",
+                        bgcolor: "action.hover",
+                        cursor: "grab",
+                        "&:active": { cursor: "grabbing" },
                       }}
-                    />
-                    <Box>
-                      <Typography
+                    >
+                      <SecureAvatar
+                        userId={bp.user?.id}
+                        filename={bp.user?.avatar_filename}
+                        fallbackText={getInitials(bp.user?.name)}
                         sx={{
+                          width: 26,
+                          height: 26,
+                          bgcolor:
+                            AVATAR_BG_COLORS[bIdx % AVATAR_BG_COLORS.length],
                           fontFamily: "Archivo, sans-serif",
-                          fontWeight: 700,
-                          fontSize: "11.5px",
-                          lineHeight: 1.2,
+                          fontWeight: 800,
+                          fontSize: "9px",
                           color: "text.primary",
+                          flexShrink: 0,
                         }}
-                      >
-                        {bp.user?.name}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontFamily: "Archivo, sans-serif",
-                          fontWeight: 600,
-                          fontSize: "9.5px",
-                          lineHeight: 1.2,
-                          color: "text.secondary",
-                          mt: 0.25,
-                        }}
-                      >
-                        {formatPosition(bp.position || bp.user?.position)} ·{" "}
-                        {t("peladas.teams.on_bench", "no banco")}
-                      </Typography>
+                      />
+                      <Box>
+                        <Typography
+                          sx={{
+                            fontFamily: "Archivo, sans-serif",
+                            fontWeight: 700,
+                            fontSize: "11.5px",
+                            lineHeight: 1.2,
+                            color: "text.primary",
+                          }}
+                        >
+                          {bp.user?.name}
+                        </Typography>
+                        <Typography
+                          sx={{
+                            fontFamily: "Archivo, sans-serif",
+                            fontWeight: 600,
+                            fontSize: "9.5px",
+                            lineHeight: 1.2,
+                            color: "text.secondary",
+                            mt: 0.25,
+                          }}
+                        >
+                          {formatPosition(bp.position || bp.user?.position)} ·{" "}
+                          {t("peladas.teams.on_bench", "no banco")}
+                        </Typography>
+                      </Box>
                     </Box>
-                  </Box>
-                ))}
+                  ))
+                )}
               </Box>
             </Box>
           </Box>

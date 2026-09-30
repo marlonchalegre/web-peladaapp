@@ -19,6 +19,7 @@ import CasinoIcon from "@mui/icons-material/Casino";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import AddPlayersButton from "./AddPlayersButton";
 import type {
   Pelada,
   Team,
@@ -77,6 +78,7 @@ export interface PeladaTeamsMobileViewProps {
   peladaTransactions?: Transaction[];
   onMarkPaid?: (playerId: string, amount: number) => void;
   onReversePayment?: (playerId: string) => void;
+  onAddPlayersClick?: () => void;
 }
 
 export default function PeladaTeamsMobileView({
@@ -105,6 +107,7 @@ export default function PeladaTeamsMobileView({
   peladaTransactions = [],
   onMarkPaid,
   onReversePayment,
+  onAddPlayersClick,
 }: PeladaTeamsMobileViewProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -1528,6 +1531,12 @@ export default function PeladaTeamsMobileView({
               { count: benchPlayers.length },
             )}
           </Typography>
+          {isAdmin && (
+            <AddPlayersButton
+              onClick={onAddPlayersClick}
+              disabled={processing}
+            />
+          )}
         </Box>
 
         {benchPlayers.length === 0 ? (
@@ -1554,6 +1563,7 @@ export default function PeladaTeamsMobileView({
               return (
                 <Box
                   key={player.id}
+                  data-testid="player-row"
                   sx={{
                     display: "flex",
                     alignItems: "center",

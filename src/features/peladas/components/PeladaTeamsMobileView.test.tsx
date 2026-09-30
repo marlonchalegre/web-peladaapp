@@ -384,6 +384,19 @@ describe("PeladaTeamsMobileView", () => {
     expect(
       screen.queryByRole("checkbox", { name: "Goleiros fixos" }),
     ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId("invite-player-button"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("calls onAddPlayersClick when clicking invite-player-button on mobile bench", () => {
+    const onAddPlayersClick = vi.fn();
+    renderComponent({ isAdmin: true, onAddPlayersClick });
+
+    const addBtn = screen.getByTestId("invite-player-button");
+    expect(addBtn).toBeInTheDocument();
+    fireEvent.click(addBtn);
+    expect(onAddPlayersClick).toHaveBeenCalledTimes(1);
   });
 
   it("renders back button and navigates to organization page", () => {
