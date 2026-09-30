@@ -1024,4 +1024,127 @@ describe("usePeladaDetail", () => {
       expect(sessionStorage.getItem(storageKey)).toBeNull();
     });
   });
+
+  it("deduplicates players in teams and bench if duplicate entries are returned", async () => {
+    mockApi.getPeladaFullDetails.mockResolvedValue({
+      pelada: {
+        id: peladaId,
+        status: "open",
+        organization_id: "org1",
+      },
+      teams: [
+        {
+          id: "team1",
+          name: "Team 1",
+          pelada_id: peladaId,
+          players: [
+            {
+              id: "p1",
+              name: "Player 1",
+              user: { id: "u1", name: "Player 1" },
+            },
+            {
+              id: "p1",
+              name: "Player 1",
+              user: { id: "u1", name: "Player 1" },
+            },
+            {
+              id: "p2",
+              name: "Player 2",
+              user: { id: "u2", name: "Player 2" },
+            },
+          ],
+        },
+      ],
+      available_players: [
+        { id: "p3", name: "Player 3", user: { id: "u3", name: "Player 3" } },
+        { id: "p3", name: "Player 3", user: { id: "u3", name: "Player 3" } },
+      ],
+    });
+
+    const { result } = renderHook(() => usePeladaDetail(peladaId), {
+      wrapper: MemoryRouter,
+    });
+
+    await waitFor(() => {
+      expect(result.current.teamPlayers["team1"]).toHaveLength(2);
+    });
+    expect(result.current.teamPlayers["team1"].map((p) => p.id)).toEqual([
+      "p1",
+      "p2",
+    ]);
+    expect(result.current.benchPlayers).toHaveLength(1);
+    expect(result.current.benchPlayers[0].id).toBe("p3");
+  });
+
+  it("guards against concurrent dropToTeam calls (ignores duplicate simultaneous drop events)", async () => {
+    mockApi.getPeladaFullDetails.mockResolvedValue({
+      pelada: {
+        id: peladaId,
+        status: "open",
+        organization_id: "org1",
+      },
+      teams: [
+        { id: "team1", name: "Team 1", pelada_id: peladaId, players: [] },
+      ],
+      available_players: [
+        { id: "p1", name: "Player 1", user: { id: "u1", name: "Player 1" } },
+      ],
+    });
+
+    let resolveAdd: () => void;
+    mockApi.addPlayerToTeam.mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveAdd = resolve;
+        }),
+    );
+
+    const { result } = renderHook(() => usePeladaDetail(peladaId), {
+      wrapper: MemoryRouter,
+    });
+
+    await waitFor(() => {
+      expect(result.current.pelada).not.toBeNull();
+    });
+
+    const dropEvent1 = {
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      dataTransfer: {
+        getData: vi
+          .fn()
+          .mockReturnValue(
+            JSON.stringify({ playerId: "p1", sourceTeamId: null }),
+          ),
+      },
+    } as any;
+
+    const dropEvent2 = {
+      preventDefault: vi.fn(),
+      stopPropagation: vi.fn(),
+      dataTransfer: {
+        getData: vi
+          .fn()
+          .mockReturnValue(
+            JSON.stringify({ playerId: "p1", sourceTeamId: null }),
+          ),
+      },
+    } as any;
+
+    // Simulate two concurrent drop events (e.g. from bubbling)
+    let p1Promise: Promise<void>;
+    let p2Promise: Promise<void>;
+    act(() => {
+      p1Promise = result.current.dropToTeam(dropEvent1, "team1");
+      p2Promise = result.current.dropToTeam(dropEvent2, "team1");
+    });
+
+    resolveAdd!();
+    await act(async () => {
+      await Promise.all([p1Promise, p2Promise]);
+    });
+
+    expect(mockApi.addPlayerToTeam).toHaveBeenCalledTimes(1);
+  });
 });

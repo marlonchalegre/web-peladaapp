@@ -10,6 +10,9 @@ import {
   getPlayerInitials,
   getInitials,
   formatPosition,
+  getPlayerPosition,
+  formatPlayerPosition,
+  distinctById,
   AVATAR_BG_COLORS,
 } from "./playerUtils";
 
@@ -448,6 +451,78 @@ describe("playerUtils", () => {
 
     it("falls back to lowercase pos for unknown positions", () => {
       expect(formatPosition("winger")).toBe("winger");
+    });
+  });
+
+  describe("getPlayerPosition", () => {
+    it("returns empty string if player is null or undefined", () => {
+      expect(getPlayerPosition(null)).toBe("");
+      expect(getPlayerPosition(undefined)).toBe("");
+    });
+
+    it("prefers position on player object", () => {
+      expect(
+        getPlayerPosition({
+          position: "goleiro",
+          user_position: "zagueiro",
+          user: { position: "atacante" },
+        }),
+      ).toBe("goleiro");
+    });
+
+    it("falls back to user_position if position is missing", () => {
+      expect(
+        getPlayerPosition({
+          position: null,
+          user_position: "zagueiro",
+          user: { position: "atacante" },
+        }),
+      ).toBe("zagueiro");
+    });
+
+    it("falls back to user.position if position and user_position are missing", () => {
+      expect(
+        getPlayerPosition({
+          position: null,
+          user_position: null,
+          user: { position: "atacante" },
+        }),
+      ).toBe("atacante");
+    });
+  });
+
+  describe("formatPlayerPosition", () => {
+    it("formats resolved position and applies fallback if empty", () => {
+      expect(formatPlayerPosition({ position: "goalkeeper" })).toBe("goleiro");
+      expect(formatPlayerPosition({ user_position: "striker" })).toBe(
+        "atacante",
+      );
+      expect(formatPlayerPosition({ user: { position: "defender" } })).toBe(
+        "zagueiro",
+      );
+      expect(formatPlayerPosition(null)).toBe("meia");
+      expect(formatPlayerPosition(null, "goleiro")).toBe("goleiro");
+    });
+  });
+
+  describe("distinctById", () => {
+    it("returns empty array for nullish input", () => {
+      expect(distinctById(null)).toEqual([]);
+      expect(distinctById(undefined)).toEqual([]);
+    });
+
+    it("deduplicates items by id while preserving order", () => {
+      const items = [
+        { id: "1", name: "A" },
+        { id: "2", name: "B" },
+        { id: "1", name: "A-duplicate" },
+        { id: "3", name: "C" },
+      ];
+      expect(distinctById(items)).toEqual([
+        { id: "1", name: "A" },
+        { id: "2", name: "B" },
+        { id: "3", name: "C" },
+      ]);
     });
   });
 

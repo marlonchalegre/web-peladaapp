@@ -134,6 +134,7 @@ export default function PeladaDetailPage() {
     // Mock the DragEvent since dropToTeam expects it
     const mockEvent = {
       preventDefault: () => {},
+      stopPropagation: () => {},
       dataTransfer: {
         getData: () => JSON.stringify({ playerId, sourceTeamId }),
       },
@@ -147,6 +148,7 @@ export default function PeladaDetailPage() {
     targetTeamId: string,
   ) => {
     e.preventDefault();
+    e.stopPropagation?.();
     const dataText = e.dataTransfer.getData("application/json");
     if (!dataText) return;
 
@@ -181,46 +183,40 @@ export default function PeladaDetailPage() {
     await dropToTeam(e, targetTeamId);
   };
 
-  const handleSendToBench = (playerId: string) => {
-    // Find which team the player is in
-    let sourceTeamId: string | null = null;
+  function findPlayerTeamId(
+    teamPlayers: Record<string, { id: string }[]>,
+    playerId: string,
+  ): string | null {
     for (const tid in teamPlayers) {
-      if (teamPlayers[tid].some((p) => p.id === playerId)) {
-        sourceTeamId = String(tid);
-        break;
+      if (teamPlayers[tid]?.some((p) => p.id === playerId)) {
+        return String(tid);
       }
     }
+    return null;
+  }
 
-    if (sourceTeamId === null) return;
-
-    const mockEvent = {
+  function createMockDragEvent(
+    playerId: string,
+    sourceTeamId: string | null,
+  ): DragEvent<HTMLElement> {
+    return {
       preventDefault: () => {},
+      stopPropagation: () => {},
       dataTransfer: {
         getData: () => JSON.stringify({ playerId, sourceTeamId }),
       },
     } as unknown as DragEvent<HTMLElement>;
+  }
 
-    dropToBench(mockEvent);
+  const handleSendToBench = (playerId: string) => {
+    const sourceTeamId = findPlayerTeamId(teamPlayers, playerId);
+    if (sourceTeamId === null) return;
+    dropToBench(createMockDragEvent(playerId, sourceTeamId));
   };
 
   const handleMoveToFixedGk = (playerId: string, side: "home" | "away") => {
-    // Find where player is currently (team or bench)
-    let sourceTeamId: string | null = null;
-    for (const tid in teamPlayers) {
-      if (teamPlayers[tid].some((p) => p.id === playerId)) {
-        sourceTeamId = String(tid);
-        break;
-      }
-    }
-
-    const mockEvent = {
-      preventDefault: () => {},
-      dataTransfer: {
-        getData: () => JSON.stringify({ playerId, sourceTeamId }),
-      },
-    } as unknown as DragEvent<HTMLElement>;
-
-    dropToFixedGk(mockEvent, side);
+    const sourceTeamId = findPlayerTeamId(teamPlayers, playerId);
+    dropToFixedGk(createMockDragEvent(playerId, sourceTeamId), side);
   };
 
   const [isReverseDialogOpen, setIsReverseDialogOpen] = useState(false);

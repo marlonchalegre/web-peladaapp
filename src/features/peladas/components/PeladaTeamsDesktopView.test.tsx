@@ -368,4 +368,53 @@ describe("PeladaTeamsDesktopView", () => {
     expect(screen.getByText("COMO SORTEAR")).toBeInTheDocument();
     expect(screen.getByTestId("desktop-save-button")).toBeInTheDocument();
   });
+
+  it("displays player position from user profile when player.position is undefined", () => {
+    const customTeamPlayers = {
+      ...mockTeamPlayers,
+      "team-1": [
+        {
+          id: "p1-def",
+          pelada_id: "pelada-1",
+          organization_id: "org-1",
+          user_id: "u-def",
+          grade: 8.0,
+          position: undefined,
+          user: {
+            id: "u-def",
+            name: "Carlos Z.",
+            username: "carlos",
+            position: "Defender",
+          },
+        },
+      ],
+    };
+
+    render(
+      <MemoryRouter>
+        <PeladaTeamsDesktopView
+          {...defaultProps}
+          teamPlayers={customTeamPlayers}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("Carlos Z.")).toBeInTheDocument();
+    expect(screen.getByText(/zagueiro/i)).toBeInTheDocument();
+  });
+
+  it("does not trigger dropToTeam twice when dropping on empty slot", () => {
+    const dropToTeam = vi.fn();
+    render(
+      <MemoryRouter>
+        <PeladaTeamsDesktopView {...defaultProps} dropToTeam={dropToTeam} />
+      </MemoryRouter>,
+    );
+
+    const emptySlots = screen.getAllByText("VAGA LIVRE");
+    expect(emptySlots.length).toBeGreaterThan(0);
+    fireEvent.drop(emptySlots[0]);
+
+    expect(dropToTeam).toHaveBeenCalledTimes(1);
+  });
 });

@@ -33,7 +33,7 @@ import DrawJustificationCard from "./DrawJustificationCard";
 import LocationDisplay from "../../../shared/components/LocationDisplay";
 import {
   getInitials,
-  formatPosition,
+  formatPlayerPosition,
   AVATAR_BG_COLORS,
 } from "../utils/playerUtils";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
@@ -1333,7 +1333,7 @@ export default function PeladaTeamsMobileView({
                               mt: 0.25,
                             }}
                           >
-                            {formatPosition(player.user?.position)}
+                            {formatPlayerPosition(player)}
                             {isYou
                               ? ` · ${t("peladas.teams.you", "você")}`
                               : ""}
@@ -1615,7 +1615,7 @@ export default function PeladaTeamsMobileView({
                         color: "text.secondary",
                       }}
                     >
-                      {formatPosition(player.user?.position)} ·{" "}
+                      {formatPlayerPosition(player)} ·{" "}
                       {t("peladas.teams.on_bench", "no banco")}
                     </Typography>
                   </Box>

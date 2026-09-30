@@ -14,7 +14,15 @@ export interface SortablePlayer {
   is_goalkeeper?: boolean;
   isGoalkeeper?: boolean;
   name?: string;
-  user?: { name?: string; position?: string };
+  user?: { name?: string; position?: string | null };
+}
+
+/**
+ * Resolves a player's position from player model, user profile, or snake_case payload.
+ */
+export function getPlayerPosition(player?: SortablePlayer | null): string {
+  if (!player) return "";
+  return player.position || player.user_position || player.user?.position || "";
 }
 
 /**
@@ -30,8 +38,8 @@ export function comparePlayersByPosition(
   if (isGkA && !isGkB) return -1;
   if (!isGkA && isGkB) return 1;
 
-  const rawPosA = a.position || a.user_position || a.user?.position || "";
-  const rawPosB = b.position || b.user_position || b.user?.position || "";
+  const rawPosA = getPlayerPosition(a);
+  const rawPosB = getPlayerPosition(b);
   const posA = POSITION_ORDER[rawPosA.toLowerCase()] ?? 4;
   const posB = POSITION_ORDER[rawPosB.toLowerCase()] ?? 4;
   if (posA !== posB) return posA - posB;
@@ -261,6 +269,31 @@ export function formatPosition(pos?: string | null, fallback = "meia"): string {
     default:
       return pos.toLowerCase();
   }
+}
+
+/**
+ * Returns the localized position label directly from a player object.
+ */
+export function formatPlayerPosition(
+  player?: SortablePlayer | null,
+  fallback = "meia",
+): string {
+  return formatPosition(getPlayerPosition(player), fallback);
+}
+
+/**
+ * Deduplicates an array of items with an `id` property, preserving order.
+ */
+export function distinctById<T extends { id: string }>(
+  items?: T[] | null,
+): T[] {
+  if (!items) return [];
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    if (!item?.id || seen.has(item.id)) return false;
+    seen.add(item.id);
+    return true;
+  });
 }
 
 /**

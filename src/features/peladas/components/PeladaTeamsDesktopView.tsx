@@ -20,7 +20,7 @@ import LocationDisplay from "../../../shared/components/LocationDisplay";
 import {
   AVATAR_BG_COLORS,
   getInitials,
-  formatPosition,
+  formatPlayerPosition,
 } from "../utils/playerUtils";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 
@@ -970,7 +970,11 @@ export default function PeladaTeamsDesktopView({
                     {/* Home GK */}
                     <Box
                       onDragOver={(e) => e.preventDefault()}
-                      onDrop={(e) => dropToFixedGk(e, "home")}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dropToFixedGk(e, "home");
+                      }}
                       sx={{
                         flex: 1,
                         border: "1.5px solid",
@@ -1059,7 +1063,11 @@ export default function PeladaTeamsDesktopView({
                     {/* Away GK */}
                     <Box
                       onDragOver={(e) => e.preventDefault()}
-                      onDrop={(e) => dropToFixedGk(e, "away")}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dropToFixedGk(e, "away");
+                      }}
                       sx={{
                         flex: 1,
                         border: "1.5px solid",
@@ -1303,7 +1311,11 @@ export default function PeladaTeamsDesktopView({
                   <Box
                     key={team.id}
                     onDragOver={(e) => e.preventDefault()}
-                    onDrop={(e) => dropToTeam(e, team.id)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      dropToTeam(e, team.id);
+                    }}
                     data-testid={`team-card-${team.id}`}
                     sx={{
                       bgcolor: "background.paper",
@@ -1507,7 +1519,7 @@ export default function PeladaTeamsDesktopView({
                                   textOverflow: "ellipsis",
                                 }}
                               >
-                                {formatPosition(p.position || "meia")}
+                                {formatPlayerPosition(p)}
                                 {isGk
                                   ? ` · ${t("peladas.teams.fixed_label", "fixo")}`
                                   : ""}
@@ -1540,8 +1552,6 @@ export default function PeladaTeamsDesktopView({
                       }).map((_, emptyIdx) => (
                         <Box
                           key={`empty-${emptyIdx}`}
-                          onDragOver={(e) => e.preventDefault()}
-                          onDrop={(e) => dropToTeam(e, team.id)}
                           sx={{
                             height: 42,
                             border: (theme) =>
@@ -1570,7 +1580,11 @@ export default function PeladaTeamsDesktopView({
             {/* Banco Card */}
             <Box
               onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => dropToBench(e)}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropToBench(e);
+              }}
               sx={{
                 bgcolor: "background.paper",
                 border: 1,
@@ -1708,7 +1722,7 @@ export default function PeladaTeamsDesktopView({
                             mt: 0.25,
                           }}
                         >
-                          {formatPosition(bp.position || bp.user?.position)} ·{" "}
+                          {formatPlayerPosition(bp)} ·{" "}
                           {t("peladas.teams.on_bench", "no banco")}
                         </Typography>
                       </Box>
