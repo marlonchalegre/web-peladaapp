@@ -23,6 +23,7 @@ import {
   formatPlayerPosition,
 } from "../utils/playerUtils";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
+import { useCopyFeedback } from "../../../shared/hooks/useCopyFeedback";
 
 export interface PeladaTeamsDesktopViewProps {
   pelada: Pelada;
@@ -59,7 +60,7 @@ export interface PeladaTeamsDesktopViewProps {
   onCreateTeam: (name: string) => Promise<void>;
   onDeleteTeam: (teamId: string) => Promise<void>;
   onStartClick: () => void;
-  onCopyAnnouncement: () => void;
+  onCopyAnnouncement: () => Promise<boolean | void> | boolean | void;
   onToggleFixedGk: (enabled: boolean) => void;
   onOpenJustificationDialog?: () => void;
   currentUser?: User | null;
@@ -77,6 +78,136 @@ const VEST_KEYS = [
   "vest_white",
   "vest_black",
 ];
+
+interface FixedGkSlotProps {
+  side: "home" | "away";
+  gk: PlayerWithUser | null;
+  isAdmin: boolean;
+  onDrop: (e: DragEvent<HTMLElement>, side: "home" | "away") => void;
+  onRemove: (side: "home" | "away") => void;
+}
+
+function FixedGkSlot({
+  side,
+  gk,
+  isAdmin,
+  onDrop,
+  onRemove,
+}: FixedGkSlotProps) {
+  const { t } = useTranslation();
+  const isHome = side === "home";
+  const teamNum = isHome ? 1 : 2;
+
+  return (
+    <Box
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onDrop(e, side);
+      }}
+      sx={{
+        flex: 1,
+        minWidth: 0,
+        border: "1.5px solid",
+        borderColor: "divider",
+        borderRadius: "12px",
+        p: "8px 9px",
+        display: "flex",
+        alignItems: "center",
+        gap: 1,
+        bgcolor: gk ? "background.paper" : "action.hover",
+        minHeight: 46,
+        overflow: "hidden",
+      }}
+    >
+      {gk ? (
+        <>
+          <SecureAvatar
+            userId={gk.user?.id}
+            filename={gk.user?.avatar_filename}
+            fallbackText={getInitials(gk.user?.name)}
+            sx={{
+              width: 26,
+              height: 26,
+              bgcolor: "action.hover",
+              fontFamily: "Archivo, sans-serif",
+              fontWeight: 800,
+              fontSize: "9px",
+              color: "text.primary",
+              flexShrink: 0,
+            }}
+          />
+          <Box sx={{ minWidth: 0, flex: 1, overflow: "hidden" }}>
+            <Typography
+              title={gk.user?.name}
+              noWrap
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 700,
+                fontSize: "11px",
+                lineHeight: 1.2,
+                color: "text.primary",
+              }}
+            >
+              {gk.user?.name ||
+                t(
+                  isHome
+                    ? "peladas.teams.home_goalkeeper"
+                    : "peladas.teams.away_goalkeeper",
+                  `Goleiro ${teamNum}`,
+                )}
+            </Typography>
+            <Typography
+              noWrap
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 600,
+                fontSize: "9.5px",
+                lineHeight: 1.2,
+                color: "text.secondary",
+                mt: 0.25,
+              }}
+            >
+              {t(`peladas.teams.team_${teamNum}`, `time ${teamNum}`)}
+            </Typography>
+          </Box>
+          {isAdmin && (
+            <IconButton
+              size="small"
+              onClick={() => onRemove(side)}
+              sx={{
+                p: 0.25,
+                color: "text.secondary",
+                flexShrink: 0,
+              }}
+            >
+              <CloseIcon sx={{ fontSize: 13 }} />
+            </IconButton>
+          )}
+        </>
+      ) : (
+        <Typography
+          sx={{
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 600,
+            fontSize: "10px",
+            lineHeight: 1.2,
+            color: "text.secondary",
+            textAlign: "center",
+            width: "100%",
+            px: 0.5,
+          }}
+        >
+          {t(
+            isHome ? "peladas.teams.drag_gk_1" : "peladas.teams.drag_gk_2",
+            `Arraste o Goleiro ${teamNum}`,
+          )}
+        </Typography>
+      )}
+    </Box>
+  );
+}
 
 export default function PeladaTeamsDesktopView({
   pelada,
@@ -108,6 +239,8 @@ export default function PeladaTeamsDesktopView({
   const { t } = useTranslation();
   const [algorithm, setAlgorithm] = useState<DrawAlgorithm>("classic");
   const [useHistory, setUseHistory] = useState(true);
+  const { copied: copiedZap, triggerCopy: handleCopyZap } =
+    useCopyFeedback(onCopyAnnouncement);
 
   const playersPerTeam = pelada.players_per_team || 5;
   const numTeams = pelada.num_teams || teams.length || 2;
@@ -298,12 +431,12 @@ export default function PeladaTeamsDesktopView({
               {t("peladas.teams.drawn_by_you", "por você")}
             </Typography>
             <Button
-              onClick={onCopyAnnouncement}
+              onClick={handleCopyZap}
               data-testid="desktop-zap-button"
               sx={{
                 border: "1.5px solid",
-                borderColor: "divider",
-                bgcolor: "background.paper",
+                borderColor: copiedZap ? "success.main" : "divider",
+                bgcolor: copiedZap ? "action.hover" : "background.paper",
                 borderRadius: "11px",
                 py: 1.25,
                 px: 1.75,
@@ -311,7 +444,7 @@ export default function PeladaTeamsDesktopView({
                 fontWeight: 800,
                 fontSize: "11px",
                 letterSpacing: ".04em",
-                color: "text.primary",
+                color: copiedZap ? "success.main" : "text.primary",
                 textTransform: "none",
                 "&:hover": {
                   bgcolor: "action.hover",
@@ -319,7 +452,9 @@ export default function PeladaTeamsDesktopView({
                 },
               }}
             >
-              {t("peladas.teams.send_whatsapp", "MANDAR NO ZAP")}
+              {copiedZap
+                ? t("common.copied", "COPIADO!").toUpperCase()
+                : t("peladas.teams.send_whatsapp", "COPIAR P/ O ZAP")}
             </Button>
             <Button
               onClick={onStartClick}
@@ -967,191 +1102,20 @@ export default function PeladaTeamsDesktopView({
                   </Typography>
 
                   <Box sx={{ display: "flex", gap: 1, mt: 1.25 }}>
-                    {/* Home GK */}
-                    <Box
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        dropToFixedGk(e, "home");
-                      }}
-                      sx={{
-                        flex: 1,
-                        border: "1.5px solid",
-                        borderColor: "divider",
-                        borderRadius: "12px",
-                        p: "10px 11px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1.2,
-                        bgcolor: homeGk ? "background.paper" : "action.hover",
-                        minHeight: 46,
-                      }}
-                    >
-                      {homeGk ? (
-                        <>
-                          <SecureAvatar
-                            userId={homeGk.user?.id}
-                            filename={homeGk.user?.avatar_filename}
-                            fallbackText={getInitials(homeGk.user?.name)}
-                            sx={{
-                              width: 28,
-                              height: 28,
-                              bgcolor: "action.hover",
-                              fontFamily: "Archivo, sans-serif",
-                              fontWeight: 800,
-                              fontSize: "9.5px",
-                              color: "text.primary",
-                              flexShrink: 0,
-                            }}
-                          />
-                          <Box sx={{ minWidth: 0, flex: 1 }}>
-                            <Typography
-                              sx={{
-                                fontFamily: "Archivo, sans-serif",
-                                fontWeight: 700,
-                                fontSize: "11px",
-                                lineHeight: 1.2,
-                                color: "text.primary",
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                              }}
-                            >
-                              {homeGk.user?.name ||
-                                t("peladas.teams.home_goalkeeper", "Goleiro 1")}
-                            </Typography>
-                            <Typography
-                              sx={{
-                                fontFamily: "Archivo, sans-serif",
-                                fontWeight: 600,
-                                fontSize: "9.5px",
-                                lineHeight: 1.2,
-                                color: "text.secondary",
-                                mt: 0.25,
-                              }}
-                            >
-                              {t("peladas.teams.team_1", "time 1")}
-                            </Typography>
-                          </Box>
-                          {isAdmin && (
-                            <IconButton
-                              size="small"
-                              onClick={() => removeFixedGk("home")}
-                              sx={{ p: 0.25, color: "text.secondary" }}
-                            >
-                              <CloseIcon sx={{ fontSize: 13 }} />
-                            </IconButton>
-                          )}
-                        </>
-                      ) : (
-                        <Typography
-                          sx={{
-                            fontFamily: "Archivo, sans-serif",
-                            fontWeight: 600,
-                            fontSize: "10.5px",
-                            color: "text.secondary",
-                            textAlign: "center",
-                            width: "100%",
-                          }}
-                        >
-                          {t("peladas.teams.drag_gk_1", "Arraste o Goleiro 1")}
-                        </Typography>
-                      )}
-                    </Box>
-
-                    {/* Away GK */}
-                    <Box
-                      onDragOver={(e) => e.preventDefault()}
-                      onDrop={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        dropToFixedGk(e, "away");
-                      }}
-                      sx={{
-                        flex: 1,
-                        border: "1.5px solid",
-                        borderColor: "divider",
-                        borderRadius: "12px",
-                        p: "10px 11px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1.2,
-                        bgcolor: awayGk ? "background.paper" : "action.hover",
-                        minHeight: 46,
-                      }}
-                    >
-                      {awayGk ? (
-                        <>
-                          <SecureAvatar
-                            userId={awayGk.user?.id}
-                            filename={awayGk.user?.avatar_filename}
-                            fallbackText={getInitials(awayGk.user?.name)}
-                            sx={{
-                              width: 28,
-                              height: 28,
-                              bgcolor: "action.hover",
-                              fontFamily: "Archivo, sans-serif",
-                              fontWeight: 800,
-                              fontSize: "9.5px",
-                              color: "text.primary",
-                              flexShrink: 0,
-                            }}
-                          />
-                          <Box sx={{ minWidth: 0, flex: 1 }}>
-                            <Typography
-                              sx={{
-                                fontFamily: "Archivo, sans-serif",
-                                fontWeight: 700,
-                                fontSize: "11px",
-                                lineHeight: 1.2,
-                                color: "text.primary",
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                              }}
-                            >
-                              {awayGk.user?.name ||
-                                t("peladas.teams.away_goalkeeper", "Goleiro 2")}
-                            </Typography>
-                            <Typography
-                              sx={{
-                                fontFamily: "Archivo, sans-serif",
-                                fontWeight: 600,
-                                fontSize: "9.5px",
-                                lineHeight: 1.2,
-                                color: "text.secondary",
-                                mt: 0.25,
-                              }}
-                            >
-                              {t("peladas.teams.team_2", "time 2")}
-                            </Typography>
-                          </Box>
-                          {isAdmin && (
-                            <IconButton
-                              size="small"
-                              onClick={() => removeFixedGk("away")}
-                              sx={{ p: 0.25, color: "text.secondary" }}
-                            >
-                              <CloseIcon sx={{ fontSize: 13 }} />
-                            </IconButton>
-                          )}
-                        </>
-                      ) : (
-                        <Typography
-                          sx={{
-                            fontFamily: "Archivo, sans-serif",
-                            fontWeight: 600,
-                            fontSize: "10.5px",
-                            color: "text.secondary",
-                            textAlign: "center",
-                            width: "100%",
-                          }}
-                        >
-                          {t("peladas.teams.drag_gk_2", "Arraste o Goleiro 2")}
-                        </Typography>
-                      )}
-                    </Box>
+                    <FixedGkSlot
+                      side="home"
+                      gk={homeGk}
+                      isAdmin={isAdmin}
+                      onDrop={dropToFixedGk}
+                      onRemove={removeFixedGk}
+                    />
+                    <FixedGkSlot
+                      side="away"
+                      gk={awayGk}
+                      isAdmin={isAdmin}
+                      onDrop={dropToFixedGk}
+                      onRemove={removeFixedGk}
+                    />
                   </Box>
 
                   <Typography

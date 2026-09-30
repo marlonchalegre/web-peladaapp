@@ -25,10 +25,7 @@ import StartPeladaDialog from "../components/StartPeladaDialog";
 import SwapPlayerDialog from "../components/SwapPlayerDialog";
 import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
 import AddPlayersFromOrgDialog from "../components/AddPlayersFromOrgDialog";
-import {
-  generateAnnouncementText,
-  copyToClipboard,
-} from "../utils/exportUtils";
+import { generateExportText, copyToClipboard } from "../utils/exportUtils";
 
 export default function PeladaDetailPage() {
   const { t } = useTranslation();
@@ -283,11 +280,8 @@ export default function PeladaDetailPage() {
   if (!pelada) return <Loading message={t("common.loading")} />;
 
   const handleCopyAnnouncement = async () => {
-    const text = generateAnnouncementText(teams, teamPlayers);
-    const success = await copyToClipboard(text);
-    if (success) {
-      // alert(t("common.actions.copy_success", "Copied to clipboard!"));
-    }
+    const text = generateExportText(teams, teamPlayers, scores);
+    return await copyToClipboard(text);
   };
 
   const handleStartPeladaClick = () => {

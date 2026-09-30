@@ -37,6 +37,7 @@ import {
   AVATAR_BG_COLORS,
 } from "../utils/playerUtils";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
+import { useCopyFeedback } from "../../../shared/hooks/useCopyFeedback";
 
 export interface PeladaTeamsMobileViewProps {
   pelada: Pelada;
@@ -63,7 +64,7 @@ export interface PeladaTeamsMobileViewProps {
   onCreateTeam?: (name: string) => Promise<void> | void;
   onDeleteTeam?: (teamId: string) => Promise<void> | void;
   onStartClick: () => void;
-  onCopyAnnouncement: () => void;
+  onCopyAnnouncement: () => Promise<boolean | void> | boolean | void;
   onToggleFixedGk: (enabled: boolean) => void;
   dropToTeam?: (
     e: React.DragEvent<HTMLElement>,
@@ -117,6 +118,8 @@ export default function PeladaTeamsMobileView({
     useState<DrawAlgorithm>("classic");
   const [useHistory, setUseHistory] = useState(true);
   const [showDrawConfig, setShowDrawConfig] = useState(false);
+  const { copied: copiedZap, triggerCopy: handleCopyZap } =
+    useCopyFeedback(onCopyAnnouncement);
 
   // Player action menu state
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
@@ -343,14 +346,15 @@ export default function PeladaTeamsMobileView({
         >
           <Button
             variant="outlined"
-            onClick={onCopyAnnouncement}
+            onClick={handleCopyZap}
+            data-testid="mobile-zap-button"
             startIcon={<WhatsAppIcon />}
             sx={{
               flex: 1,
               minWidth: 130,
-              bgcolor: "background.paper",
-              borderColor: "divider",
-              color: "text.primary",
+              bgcolor: copiedZap ? "action.hover" : "background.paper",
+              borderColor: copiedZap ? "success.main" : "divider",
+              color: copiedZap ? "success.main" : "text.primary",
               borderRadius: "11px",
               py: 1,
               fontFamily: "Archivo, sans-serif",
@@ -364,7 +368,9 @@ export default function PeladaTeamsMobileView({
               },
             }}
           >
-            {t("peladas.teams.send_whatsapp", "MANDAR NO ZAP")}
+            {copiedZap
+              ? t("common.copied", "COPIADO!").toUpperCase()
+              : t("peladas.teams.send_whatsapp", "COPIAR P/ O ZAP")}
           </Button>
 
           {isAdmin && (

@@ -147,7 +147,7 @@ describe("PeladaTeamsMobileView", () => {
     expect(screen.getByText("Sorteio de times")).toBeInTheDocument();
     expect(screen.getByText("SORTEAR")).toBeInTheDocument();
     expect(screen.getByText("INICIAR PELADA")).toBeInTheDocument();
-    expect(screen.getByText("MANDAR NO ZAP")).toBeInTheDocument();
+    expect(screen.getByText("COPIAR P/ O ZAP")).toBeInTheDocument();
   });
 
   it("triggers onStartClick when clicking INICIAR PELADA", () => {
@@ -159,13 +159,14 @@ describe("PeladaTeamsMobileView", () => {
     expect(defaultProps.onStartClick).toHaveBeenCalledTimes(1);
   });
 
-  it("triggers onCopyAnnouncement when clicking MANDAR NO ZAP", () => {
+  it("triggers onCopyAnnouncement when clicking COPIAR P/ O ZAP and shows COPIADO!", async () => {
     renderComponent();
 
-    const zapBtn = screen.getByText("MANDAR NO ZAP");
+    const zapBtn = screen.getByText("COPIAR P/ O ZAP");
     fireEvent.click(zapBtn);
 
     expect(defaultProps.onCopyAnnouncement).toHaveBeenCalledTimes(1);
+    expect(await screen.findByText("COPIADO!")).toBeInTheDocument();
   });
 
   it("triggers onRandomizeTeams with selected algorithm and history toggle", () => {

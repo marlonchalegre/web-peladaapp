@@ -139,7 +139,7 @@ describe("PeladaTeamsDesktopView", () => {
     expect(screen.getByText("Clássico")).toBeInTheDocument();
     expect(screen.getByText("Gemini")).toBeInTheDocument();
     expect(screen.getByText("ChatGPT")).toBeInTheDocument();
-    expect(screen.getByText("MANDAR NO ZAP")).toBeInTheDocument();
+    expect(screen.getByText("COPIAR P/ O ZAP")).toBeInTheDocument();
     expect(screen.getByText("SALVAR TIMES")).toBeInTheDocument();
     expect(screen.getByText("Time 1")).toBeInTheDocument();
     expect(screen.getByText("Time 2")).toBeInTheDocument();
@@ -172,7 +172,7 @@ describe("PeladaTeamsDesktopView", () => {
     });
   });
 
-  it("calls onCopyAnnouncement when clicking MANDAR NO ZAP", () => {
+  it("calls onCopyAnnouncement when clicking COPIAR P/ O ZAP and shows COPIADO!", async () => {
     const onCopyAnnouncement = vi.fn();
     render(
       <MemoryRouter>
@@ -185,6 +185,7 @@ describe("PeladaTeamsDesktopView", () => {
 
     fireEvent.click(screen.getByTestId("desktop-zap-button"));
     expect(onCopyAnnouncement).toHaveBeenCalled();
+    expect(await screen.findByText("COPIADO!")).toBeInTheDocument();
   });
 
   it("calls onStartClick when clicking SALVAR TIMES", () => {
@@ -416,5 +417,28 @@ describe("PeladaTeamsDesktopView", () => {
     fireEvent.drop(emptySlots[0]);
 
     expect(dropToTeam).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders both fixed goalkeepers side-by-side without cut-off and allows removal", () => {
+    const removeFixedGk = vi.fn();
+    render(
+      <MemoryRouter>
+        <PeladaTeamsDesktopView
+          {...defaultProps}
+          homeGk={mockTeamPlayers["team-1"][0]}
+          awayGk={mockTeamPlayers["team-2"][0]}
+          removeFixedGk={removeFixedGk}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getAllByText("Wagner").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Igor Matos").length).toBeGreaterThan(0);
+    expect(screen.getByText("time 1")).toBeInTheDocument();
+    expect(screen.getByText("time 2")).toBeInTheDocument();
+
+    const closeIcons = screen.getAllByTestId("CloseIcon");
+    // At least the 2 close icons for the fixed goalkeepers
+    expect(closeIcons.length).toBeGreaterThanOrEqual(2);
   });
 });
