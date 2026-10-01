@@ -865,7 +865,14 @@ export default function ActiveMatchDashboard(props: Props) {
   };
 
   const tabButtons = (withEnd: boolean) => (
-    <Box sx={{ display: "flex", gap: "8px", mt: withEnd ? "18px" : 0 }}>
+    <Box
+      data-testid="tab-buttons"
+      sx={{
+        display: "flex",
+        gap: "8px",
+        mt: withEnd ? "18px" : isDesktop ? 0 : "12px",
+      }}
+    >
       {onNavigateToStandings && (
         <Button
           onClick={onNavigateToStandings}

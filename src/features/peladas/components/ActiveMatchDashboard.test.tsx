@@ -25,6 +25,19 @@ function mockDesktopMediaQuery() {
   }));
 }
 
+function mockMobileMediaQuery() {
+  window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  }));
+}
+
 describe("ActiveMatchDashboard", () => {
   const mockMatch: Match = {
     id: "1",
@@ -933,6 +946,27 @@ describe("ActiveMatchDashboard", () => {
       );
 
       expect(screen.queryByTestId("end-match-button")).not.toBeInTheDocument();
+    });
+  });
+
+  describe("mobile layout tab buttons", () => {
+    beforeAll(() => {
+      mockMobileMediaQuery();
+    });
+
+    it("renders tab buttons with top margin separating them from the container above", () => {
+      render(
+        <ThemeContextProvider>
+          <ActiveMatchDashboard
+            {...defaultProps}
+            onNavigateToTimeline={vi.fn()}
+            onNavigateToStandings={vi.fn()}
+          />
+        </ThemeContextProvider>,
+      );
+
+      const tabButtonsBox = screen.getByTestId("tab-buttons");
+      expect(tabButtonsBox).toHaveStyle({ marginTop: "12px" });
     });
   });
 });
