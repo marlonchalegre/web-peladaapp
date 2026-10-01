@@ -26,9 +26,12 @@ vi.mock("../../../app/providers/AuthContext", () => ({
   }),
 }));
 
+import { clearFinanceCache } from "../../../shared/hooks/useOrganizationFinance";
+
 describe("AttendanceListPage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    clearFinanceCache();
   });
 
   it("renders attendance list and tabs", async () => {
@@ -580,15 +583,17 @@ describe("AttendanceListPage", () => {
     const markPaidBtn = screen.getByTestId("mark-paid-button");
     fireEvent.click(markPaidBtn);
 
-    expect(api.post).toHaveBeenCalledWith(
-      "/api/organizations/101/finance/transactions",
-      expect.objectContaining({
-        player_id: "20",
-        amount: 30,
-        type: "income",
-        category: "diarista_fee",
-      }),
-    );
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledWith(
+        "/api/organizations/101/finance/transactions",
+        expect.objectContaining({
+          player_id: "20",
+          amount: 30,
+          type: "income",
+          category: "diarista_fee",
+        }),
+      );
+    });
   });
 
   it("allows admin to view declined list by clicking declined stat tab and confirm or waitlist a player", async () => {

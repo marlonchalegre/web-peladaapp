@@ -116,7 +116,6 @@ export default function AttendanceListPage() {
     };
   }, []);
 
-  const diaristaPrice = organizationFinance?.diarista_price ?? 0;
   const paidPlayerIds = useMemo(
     () => getPaidPlayerIds(peladaTransactions),
     [peladaTransactions],
@@ -909,7 +908,12 @@ export default function AttendanceListPage() {
                           <IconButton
                             size="small"
                             data-testid="mark-paid-button"
-                            onClick={() => handleMarkPaid(p.id, diaristaPrice)}
+                            onClick={() =>
+                              handleMarkPaid(
+                                p.id,
+                                organizationFinance?.diarista_price,
+                              )
+                            }
                             title={t(
                               "organizations.management.finance.monthly_fees.mark_as_paid",
                               "Marcar como pago",

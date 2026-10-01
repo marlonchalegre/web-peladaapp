@@ -202,7 +202,18 @@ export function useAttendance(peladaId: string) {
       setUpdatingPlayers((prev) => new Set(prev).add(playerId));
 
       // Payment: add new transaction
-      const finalAmount = amount ?? organizationFinance?.diarista_price ?? 0;
+      let price = amount;
+      if (!price && !organizationFinance) {
+        try {
+          const finance = await endpoints.getOrganizationFinance(
+            pelada.organization_id,
+          );
+          price = finance?.diarista_price;
+        } catch {
+          // ignore error if finance cannot be loaded
+        }
+      }
+      const finalAmount = price ?? organizationFinance?.diarista_price ?? 0;
       const peladaDate = pelada.scheduled_at
         ? new Date(pelada.scheduled_at).toLocaleDateString(
             t("common.locale", "pt-BR"),
