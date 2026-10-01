@@ -3,12 +3,63 @@ import { getInitials as getSharedInitials } from "../../../shared/utils/initials
 
 export const POSITION_ORDER: Record<string, number> = {
   goalkeeper: 0,
+  goleiro: 0,
+  goleira: 0,
+  gk: 0,
+  g: 0,
   defender: 1,
+  zagueiro: 1,
+  zagueira: 1,
+  df: 1,
+  zag: 1,
+  z: 1,
   midfielder: 2,
+  meia: 2,
+  "meio-campo": 2,
+  mf: 2,
+  mei: 2,
+  m: 2,
   striker: 3,
+  atacante: 3,
+  st: 3,
+  ata: 3,
+  a: 3,
 };
 
+export const POSITION_CODE_MAP: Record<string, string> = {
+  goalkeeper: "G",
+  goleiro: "G",
+  goleira: "G",
+  gk: "G",
+  g: "G",
+  defender: "Z",
+  zagueiro: "Z",
+  zagueira: "Z",
+  df: "Z",
+  zag: "Z",
+  z: "Z",
+  midfielder: "M",
+  meia: "M",
+  "meio-campo": "M",
+  mf: "M",
+  mei: "M",
+  m: "M",
+  striker: "A",
+  atacante: "A",
+  st: "A",
+  ata: "A",
+  a: "A",
+};
+
+export function getPlayerPositionCode(player?: SortablePlayer | null): string {
+  if (!player) return "?";
+  if (player.isGoalkeeper ?? player.is_goalkeeper) return "G";
+  const pos = getPlayerPosition(player).trim().toLowerCase();
+  return POSITION_CODE_MAP[pos] ?? "?";
+}
+
 export interface SortablePlayer {
+  id?: string;
   position?: string | null;
   user_position?: string | null;
   is_goalkeeper?: boolean;
@@ -40,8 +91,8 @@ export function comparePlayersByPosition(
 
   const rawPosA = getPlayerPosition(a);
   const rawPosB = getPlayerPosition(b);
-  const posA = POSITION_ORDER[rawPosA.toLowerCase()] ?? 4;
-  const posB = POSITION_ORDER[rawPosB.toLowerCase()] ?? 4;
+  const posA = POSITION_ORDER[rawPosA.trim().toLowerCase()] ?? 4;
+  const posB = POSITION_ORDER[rawPosB.trim().toLowerCase()] ?? 4;
   if (posA !== posB) return posA - posB;
 
   const nameA = a.name || a.user?.name || "";
@@ -251,24 +302,20 @@ export function getInitials(name?: string | null, fallback = "JG"): string {
 /**
  * Formats a football position code to a localized pt-BR label.
  */
+const CANONICAL_POSITIONS = [
+  "goleiro",
+  "zagueiro",
+  "meia",
+  "atacante",
+] as const;
+
 export function formatPosition(pos?: string | null, fallback = "meia"): string {
   if (!pos) return fallback;
-  switch (pos.toLowerCase()) {
-    case "goalkeeper":
-    case "goleiro":
-      return "goleiro";
-    case "defender":
-    case "zagueiro":
-      return "zagueiro";
-    case "midfielder":
-    case "meio-campo":
-      return "meia";
-    case "striker":
-    case "atacante":
-      return "atacante";
-    default:
-      return pos.toLowerCase();
+  const rank = POSITION_ORDER[pos.trim().toLowerCase()];
+  if (rank !== undefined && rank in CANONICAL_POSITIONS) {
+    return CANONICAL_POSITIONS[rank];
   }
+  return pos.toLowerCase();
 }
 
 /**

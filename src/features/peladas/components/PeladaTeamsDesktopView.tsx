@@ -1,4 +1,4 @@
-import { useState, type DragEvent } from "react";
+import { useState, useMemo, type DragEvent } from "react";
 import { Box, Typography, Switch, IconButton, Button } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
@@ -21,6 +21,7 @@ import {
   AVATAR_BG_COLORS,
   getInitials,
   formatPlayerPosition,
+  sortPlayersByPosition,
 } from "../utils/playerUtils";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import { useCopyFeedback } from "../../../shared/hooks/useCopyFeedback";
@@ -280,15 +281,26 @@ export default function PeladaTeamsDesktopView({
     name: string;
     avg: number;
     count: number;
-  }[] = teams.map((team) => {
-    const pList = teamPlayers[team.id] || [];
-    const vals = pList
-      .map((p) => (typeof scores[p.id] === "number" ? scores[p.id] : p.grade))
-      .filter((g): g is number => typeof g === "number");
-    const avg =
-      vals.length > 0 ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
-    return { teamId: team.id, name: team.name, avg, count: pList.length };
-  });
+  }[] = useMemo(() => {
+    return teams.map((team) => {
+      const pList = teamPlayers[team.id] || [];
+      const vals = pList
+        .map((p) => (typeof scores[p.id] === "number" ? scores[p.id] : p.grade))
+        .filter((g): g is number => typeof g === "number");
+      const avg =
+        vals.length > 0 ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
+      return { teamId: team.id, name: team.name, avg, count: pList.length };
+    });
+  }, [teams, teamPlayers, scores]);
+
+  const sortedTeamPlayers = useMemo(() => {
+    const result: Record<string, PlayerWithUser[]> = {};
+    for (const team of teams) {
+      const players = teamPlayers[team.id];
+      result[team.id] = players ? sortPlayersByPosition(players) : [];
+    }
+    return result;
+  }, [teams, teamPlayers]);
 
   const handleRandomizeClick = () => {
     onRandomizeTeams({
@@ -1257,15 +1269,11 @@ export default function PeladaTeamsDesktopView({
             >
               {teams.map((team, idx) => {
                 const players = teamPlayers[team.id] || [];
-                const vals = players
-                  .map((p) =>
-                    typeof scores[p.id] === "number" ? scores[p.id] : p.grade,
-                  )
-                  .filter((g): g is number => typeof g === "number");
-                const avg =
-                  vals.length > 0
-                    ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1)
-                    : "-";
+                const sortedPlayers = sortedTeamPlayers[team.id] || [];
+                const teamAvg = teamAverages.find(
+                  (t) => t.teamId === team.id,
+                )?.avg;
+                const avg = teamAvg && teamAvg > 0 ? teamAvg.toFixed(1) : "-";
                 const isUnderfilled = players.length < playersPerTeam;
                 const vestKey =
                   VEST_KEYS[idx % VEST_KEYS.length] || "vest_default";
@@ -1390,7 +1398,7 @@ export default function PeladaTeamsDesktopView({
                         p: 1.5,
                       }}
                     >
-                      {players.map((p, pIdx) => {
+                      {sortedPlayers.map((p, pIdx) => {
                         const isYou =
                           currentUser && p.user?.id === currentUser.id;
                         const isGk =

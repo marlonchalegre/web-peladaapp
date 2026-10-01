@@ -2,6 +2,7 @@
 import { describe, it, expect } from "vitest";
 import {
   sortPlayersByPosition,
+  type SortablePlayer,
   getPlayerTeamInMatch,
   isAssistForGoal,
   findMatchingAssistForGoal,
@@ -99,6 +100,42 @@ describe("playerUtils", () => {
       const sorted = sortPlayersByPosition(unknown);
       expect(sorted[0]?.user?.name).toBe("Striker");
       expect(sorted[1]?.user?.name).toBe("Unknown");
+    });
+
+    it("should sort Portuguese positions correctly (goleiro > zagueiro > meia > atacante)", () => {
+      const ptPlayers: SortablePlayer[] = [
+        { id: "1", user: { name: "Anderson Pinheiro", position: "atacante" } },
+        { id: "2", user: { name: "Rafael Medeiros", position: "zagueiro" } },
+        { id: "3", user: { name: "Matheus Andrade", position: "meia" } },
+        { id: "4", user: { name: "Jorge batista", position: "atacante" } },
+        { id: "5", user: { name: "Lindoso", position: "atacante" } },
+      ];
+      const sorted = sortPlayersByPosition(ptPlayers);
+      expect(sorted.map((p) => p.user?.name)).toEqual([
+        "Rafael Medeiros",
+        "Matheus Andrade",
+        "Anderson Pinheiro",
+        "Jorge batista",
+        "Lindoso",
+      ]);
+    });
+
+    it("should sort second team correctly by formation order zag -> mei -> striker", () => {
+      const ptPlayers: SortablePlayer[] = [
+        { id: "1", user: { name: "Felipe Bruce", position: "meia" } },
+        { id: "2", user: { name: "Paloma", position: "zagueiro" } },
+        { id: "3", user: { name: "Rodolfo Bispo", position: "meia" } },
+        { id: "4", user: { name: "ex-gordinho", position: "atacante" } },
+        { id: "5", user: { name: "MarlonAlmeida", position: "zagueiro" } },
+      ];
+      const sorted = sortPlayersByPosition(ptPlayers);
+      expect(sorted.map((p) => p.user?.name)).toEqual([
+        "MarlonAlmeida",
+        "Paloma",
+        "Felipe Bruce",
+        "Rodolfo Bispo",
+        "ex-gordinho",
+      ]);
     });
   });
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, within } from "@testing-library/react";
 import PeladaTeamsDesktopView, {
   type PeladaTeamsDesktopViewProps,
 } from "./PeladaTeamsDesktopView";
@@ -440,5 +440,55 @@ describe("PeladaTeamsDesktopView", () => {
     const closeIcons = screen.getAllByTestId("CloseIcon");
     // At least the 2 close icons for the fixed goalkeepers
     expect(closeIcons.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("renders team players ordered by position (zag -> mei -> striker) regardless of input order", () => {
+    const unsortedTeamPlayers = {
+      "team-1": [
+        {
+          id: "p-st",
+          user_id: "u-st",
+          grade: 8,
+          member_type: "mensalista",
+          user: { id: "u-st", name: "Striker One", position: "atacante" },
+        },
+        {
+          id: "p-df",
+          user_id: "u-df",
+          grade: 7,
+          member_type: "mensalista",
+          user: { id: "u-df", name: "Defender One", position: "zagueiro" },
+        },
+        {
+          id: "p-mf",
+          user_id: "u-mf",
+          grade: 9,
+          member_type: "mensalista",
+          user: { id: "u-mf", name: "Midfielder One", position: "meia" },
+        },
+      ],
+      "team-2": [],
+    } as unknown as PeladaTeamsDesktopViewProps["teamPlayers"];
+
+    render(
+      <MemoryRouter>
+        <PeladaTeamsDesktopView
+          {...defaultProps}
+          teamPlayers={unsortedTeamPlayers}
+        />
+      </MemoryRouter>,
+    );
+
+    const teamCard = screen.getByTestId("team-card-team-1");
+    const def = within(teamCard).getByText("Defender One");
+    const mid = within(teamCard).getByText("Midfielder One");
+    const str = within(teamCard).getByText("Striker One");
+
+    expect(
+      def.compareDocumentPosition(mid) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      mid.compareDocumentPosition(str) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 });

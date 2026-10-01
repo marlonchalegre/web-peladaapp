@@ -35,6 +35,7 @@ import {
   getInitials,
   formatPlayerPosition,
   AVATAR_BG_COLORS,
+  sortPlayersByPosition,
 } from "../utils/playerUtils";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import { useCopyFeedback } from "../../../shared/hooks/useCopyFeedback";
@@ -212,6 +213,15 @@ export default function PeladaTeamsMobileView({
       };
     });
   }, [teams, teamPlayers, getPlayerScore]);
+
+  const sortedTeamPlayers = useMemo(() => {
+    const result: Record<string, PlayerWithUser[]> = {};
+    for (const team of teams) {
+      const players = teamPlayers[team.id];
+      result[team.id] = players ? sortPlayersByPosition(players) : [];
+    }
+    return result;
+  }, [teams, teamPlayers]);
 
   const isDiarista = (memberType?: string) =>
     memberType === "diarista" ||
@@ -1142,6 +1152,7 @@ export default function PeladaTeamsMobileView({
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
           {teams.map((team, idx) => {
             const players = teamPlayers[team.id] || [];
+            const sortedPlayers = sortedTeamPlayers[team.id] || [];
             const avg =
               teamAverages.find((t) => t.teamName === team.name)?.avg ?? 7.0;
             const openSlots = Math.max(0, playersPerTeam - players.length);
@@ -1270,7 +1281,7 @@ export default function PeladaTeamsMobileView({
                     gap: 0.75,
                   }}
                 >
-                  {players.map((player, pIdx) => {
+                  {sortedPlayers.map((player, pIdx) => {
                     const isYou = player.user_id === currentUser?.id;
                     const pScore = getPlayerScore(player);
                     const isPaid = paidPlayerIds.has(player.id);

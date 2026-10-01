@@ -432,4 +432,48 @@ describe("PeladaTeamsMobileView", () => {
     expect(screen.getByText("Sorteio de times")).toBeInTheDocument();
     expect(container).toBeInTheDocument();
   });
+
+  it("renders team players ordered by position (zag -> mei -> striker) regardless of input order", () => {
+    const unsortedTeamPlayers = {
+      "team-1": [
+        {
+          id: "p-st",
+          user_id: "u-st",
+          grade: 8,
+          member_type: "mensalista",
+          user: { id: "u-st", name: "Striker One", position: "atacante" },
+        },
+        {
+          id: "p-df",
+          user_id: "u-df",
+          grade: 7,
+          member_type: "mensalista",
+          user: { id: "u-df", name: "Defender One", position: "zagueiro" },
+        },
+        {
+          id: "p-mf",
+          user_id: "u-mf",
+          grade: 9,
+          member_type: "mensalista",
+          user: { id: "u-mf", name: "Midfielder One", position: "meia" },
+        },
+      ],
+      "team-2": [],
+    } as unknown as PeladaTeamsMobileViewProps["teamPlayers"];
+
+    renderComponent({
+      teamPlayers: unsortedTeamPlayers,
+    });
+
+    const def = screen.getByText("Defender One");
+    const mid = screen.getByText("Midfielder One");
+    const str = screen.getByText("Striker One");
+
+    expect(
+      def.compareDocumentPosition(mid) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      mid.compareDocumentPosition(str) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
 });

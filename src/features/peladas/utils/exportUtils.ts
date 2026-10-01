@@ -1,5 +1,5 @@
 import type { Player, Team, User } from "../../../shared/api/endpoints";
-import { sortPlayersByPosition } from "./playerUtils";
+import { sortPlayersByPosition, getPlayerPositionCode } from "./playerUtils";
 import { formatDecimal } from "./formatNumber";
 
 export type PlayerWithUser = Player & { user: User; is_goalkeeper?: boolean };
@@ -96,22 +96,11 @@ export function generateExportText(
     sortedPlayers.forEach((p, i) => {
       const score = scores[p.id] ?? p.grade;
       const scoreStr = formatDecimal(score);
-
-      const posMap: Record<string, string> = {
-        defender: "Z",
-        midfielder: "M",
-        striker: "A",
-        goalkeeper: "G",
-        unknown: "?",
-      };
-      const pos = p.is_goalkeeper
-        ? "G"
-        : posMap[(p.user?.position || "").toLowerCase()] || "?";
+      const pos = getPlayerPositionCode(p);
 
       const indexStr = `${i + 1}`.padEnd(3);
       const nameStr = (p.user?.name || "Unknown").padEnd(nameWidth);
 
-      // Row: 1  Name (padded) POS  Score
       text += `${indexStr}${nameStr}${pos.padEnd(3)}${scoreStr}\n`;
     });
 
@@ -148,16 +137,7 @@ export function generateAnnouncementText(
     text += `*${team.name.toUpperCase()}*\n`;
 
     sortedPlayers.forEach((p) => {
-      const posMap: Record<string, string> = {
-        defender: "Z",
-        midfielder: "M",
-        striker: "A",
-        goalkeeper: "G",
-        unknown: "?",
-      };
-      const pos = p.is_goalkeeper
-        ? "G"
-        : posMap[(p.user?.position || "").toLowerCase()] || "?";
+      const pos = getPlayerPositionCode(p);
       const nameStr = (p.user?.name || "Unknown").padEnd(nameWidth);
 
       text += `• ${nameStr}${pos}\n`;
@@ -189,16 +169,7 @@ export function generateExportCsv(
       const score = scores[p.id] ?? p.grade;
       const scoreStr = formatDecimal(score);
 
-      const posMap: Record<string, string> = {
-        defender: "Z",
-        midfielder: "M",
-        striker: "A",
-        goalkeeper: "G",
-        unknown: "?",
-      };
-      const pos = p.is_goalkeeper
-        ? "G"
-        : posMap[(p.user?.position || "").toLowerCase()] || "?";
+      const pos = getPlayerPositionCode(p);
 
       csv += `${team.name};${p.user?.name || "Unknown"};${pos};${scoreStr}\n`;
     });

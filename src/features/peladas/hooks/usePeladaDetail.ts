@@ -22,7 +22,7 @@ import {
   type RandomizeTeamsResponse,
 } from "../../../shared/api/endpoints";
 import { useAuth } from "../../../app/providers/AuthContext";
-import { distinctById } from "../utils/playerUtils";
+import { distinctById, sortPlayersByPosition } from "../utils/playerUtils";
 
 const endpoints = createApi(api);
 
@@ -112,7 +112,7 @@ export function usePeladaDetail(peladaId: string) {
       setPelada(data.pelada);
       const dedupedTeams = (data.teams || []).map((t) => ({
         ...t,
-        players: distinctById(t.players),
+        players: sortPlayersByPosition(distinctById(t.players)),
       }));
       setTeams(dedupedTeams);
       setAvailablePlayers(distinctById(data.available_players));
@@ -162,8 +162,10 @@ export function usePeladaDetail(peladaId: string) {
 
   const benchPlayers = useMemo(
     () =>
-      availablePlayers.filter(
-        (p) => !assignedIds.has(p.id) && !globalGkIds.has(p.id),
+      sortPlayersByPosition(
+        availablePlayers.filter(
+          (p) => !assignedIds.has(p.id) && !globalGkIds.has(p.id),
+        ),
       ),
     [availablePlayers, assignedIds, globalGkIds],
   );
