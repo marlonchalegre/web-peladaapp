@@ -299,6 +299,34 @@ export function getInitials(name?: string | null, fallback = "JG"): string {
   return getSharedInitials(name, fallback);
 }
 
+export interface PlayerAvatarSource {
+  user_id?: string;
+  user_name?: string;
+  user_avatar_filename?: string | null;
+  user?: {
+    id?: string;
+    name?: string;
+    avatar_filename?: string | null;
+  } | null;
+}
+
+/**
+ * Resolves standard avatar props (userId, filename, fallbackText) for a player,
+ * checking both nested user object and top-level player properties.
+ */
+export function getPlayerAvatarProps(
+  player?: PlayerAvatarSource | null,
+  fallback = "JG",
+) {
+  const userId = player?.user?.id || player?.user_id;
+  const filename =
+    player?.user?.avatar_filename || player?.user_avatar_filename;
+  const name = player?.user?.name || player?.user_name;
+  const fallbackText = getInitials(name, fallback);
+
+  return { userId, filename, fallbackText };
+}
+
 /**
  * Formats a football position code to a localized pt-BR label.
  */

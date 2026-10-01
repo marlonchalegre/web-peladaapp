@@ -15,7 +15,10 @@ import {
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useTranslation } from "react-i18next";
 import { type Player, type User } from "../../../shared/api/endpoints";
-import { sortPlayersByPosition, getPlayerInitials } from "../utils/playerUtils";
+import {
+  sortPlayersByPosition,
+  getPlayerAvatarProps,
+} from "../utils/playerUtils";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 
 type PlayerWithUser = Player & { user: User };
@@ -83,9 +86,7 @@ export default function SwapPlayerDialog({
                 >
                   <ListItemAvatar>
                     <SecureAvatar
-                      userId={player.user?.id}
-                      filename={player.user?.avatar_filename}
-                      fallbackText={getPlayerInitials(player.user?.name)}
+                      {...getPlayerAvatarProps(player)}
                       sx={{
                         bgcolor: isSamePosition ? "primary.main" : "grey.400",
                         width: 32,

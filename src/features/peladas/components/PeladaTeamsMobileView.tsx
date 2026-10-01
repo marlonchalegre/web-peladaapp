@@ -32,10 +32,10 @@ import type { PlayerWithUser } from "./TeamsSection";
 import DrawJustificationCard from "./DrawJustificationCard";
 import LocationDisplay from "../../../shared/components/LocationDisplay";
 import {
-  getInitials,
   formatPlayerPosition,
   AVATAR_BG_COLORS,
   sortPlayersByPosition,
+  getPlayerAvatarProps,
 } from "../utils/playerUtils";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import { useCopyFeedback } from "../../../shared/hooks/useCopyFeedback";
@@ -1307,9 +1307,7 @@ export default function PeladaTeamsMobileView({
                         }}
                       >
                         <SecureAvatar
-                          userId={player.user?.id}
-                          filename={player.user?.avatar_filename}
-                          fallbackText={getInitials(player.user?.name)}
+                          {...getPlayerAvatarProps(player)}
                           sx={{
                             width: 28,
                             height: 28,
@@ -1593,9 +1591,7 @@ export default function PeladaTeamsMobileView({
                   }}
                 >
                   <SecureAvatar
-                    userId={player.user?.id}
-                    filename={player.user?.avatar_filename}
-                    fallbackText={getInitials(player.user?.name)}
+                    {...getPlayerAvatarProps(player)}
                     sx={{
                       width: 28,
                       height: 28,

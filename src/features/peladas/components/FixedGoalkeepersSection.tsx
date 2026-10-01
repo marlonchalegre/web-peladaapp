@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import type { Player, User } from "../../../shared/api/endpoints";
 import type { DragEvent } from "react";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
+import { getPlayerAvatarProps } from "../utils/playerUtils";
 
 type PlayerWithUser = Player & { user: User };
 
@@ -127,9 +128,7 @@ export default function FixedGoalkeepersSection({
           }}
         >
           <SecureAvatar
-            userId={player.user?.id}
-            filename={player.user?.avatar_filename}
-            fallbackText={player.user?.name?.[0]?.toUpperCase() || "G"}
+            {...getPlayerAvatarProps(player, "G")}
             sx={{
               bgcolor: "primary.main",
               width: 48,

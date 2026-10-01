@@ -15,6 +15,7 @@ import {
   formatPlayerPosition,
   distinctById,
   AVATAR_BG_COLORS,
+  getPlayerAvatarProps,
 } from "./playerUtils";
 
 describe("playerUtils", () => {
@@ -568,6 +569,47 @@ describe("playerUtils", () => {
       expect(Array.isArray(AVATAR_BG_COLORS)).toBe(true);
       expect(AVATAR_BG_COLORS.length).toBeGreaterThan(0);
       expect(AVATAR_BG_COLORS[0]).toMatch(/^#[0-9a-fA-F]{6}$/);
+    });
+  });
+
+  describe("getPlayerAvatarProps", () => {
+    it("extracts props from nested user object", () => {
+      const player = {
+        id: "p1",
+        user_id: "u1",
+        user: {
+          id: "u1",
+          name: "Carlos Silva",
+          avatar_filename: "carlos.jpg",
+        },
+      };
+      expect(getPlayerAvatarProps(player)).toEqual({
+        userId: "u1",
+        filename: "carlos.jpg",
+        fallbackText: "CS",
+      });
+    });
+
+    it("falls back to top-level player properties when nested user is absent or incomplete", () => {
+      const player = {
+        id: "p2",
+        user_id: "u2",
+        user_name: "Ana Souza",
+        user_avatar_filename: "ana.png",
+      };
+      expect(getPlayerAvatarProps(player)).toEqual({
+        userId: "u2",
+        filename: "ana.png",
+        fallbackText: "AS",
+      });
+    });
+
+    it("handles nullish input gracefully with custom fallback", () => {
+      expect(getPlayerAvatarProps(null, "G")).toEqual({
+        userId: undefined,
+        filename: undefined,
+        fallbackText: "G",
+      });
     });
   });
 });

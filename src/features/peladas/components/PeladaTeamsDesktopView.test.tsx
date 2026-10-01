@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, within } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  within,
+  waitFor,
+} from "@testing-library/react";
 import PeladaTeamsDesktopView, {
   type PeladaTeamsDesktopViewProps,
 } from "./PeladaTeamsDesktopView";
@@ -490,5 +496,53 @@ describe("PeladaTeamsDesktopView", () => {
     expect(
       mid.compareDocumentPosition(str) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
+  });
+
+  it("passes avatar information to SecureAvatar for team players with user_avatar_filename", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockImplementation(() =>
+      Promise.resolve({
+        ok: true,
+        blob: () => Promise.resolve(new Blob(["avatar-bytes"])),
+      } as Response),
+    );
+
+    const teamPlayersWithAvatar = {
+      "team-1": [
+        {
+          id: "p-avatar",
+          user_id: "u-avatar",
+          user_name: "Augusto Gondim",
+          user_avatar_filename: "augusto.jpg",
+          grade: 8,
+          member_type: "diarista",
+          position: "zagueiro",
+          user: {
+            id: "u-avatar",
+            name: "Augusto Gondim",
+            position: "zagueiro",
+            avatar_filename: "augusto.jpg",
+          },
+        },
+      ],
+      "team-2": [],
+    } as unknown as PeladaTeamsDesktopViewProps["teamPlayers"];
+
+    render(
+      <MemoryRouter>
+        <PeladaTeamsDesktopView
+          {...defaultProps}
+          teamPlayers={teamPlayersWithAvatar}
+        />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(fetchSpy).toHaveBeenCalledWith(
+        expect.stringContaining("/api/user/u-avatar/avatar?t=augusto.jpg"),
+        expect.anything(),
+      );
+    });
+
+    fetchSpy.mockRestore();
   });
 });

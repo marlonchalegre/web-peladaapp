@@ -19,9 +19,9 @@ import DrawJustificationCard from "./DrawJustificationCard";
 import LocationDisplay from "../../../shared/components/LocationDisplay";
 import {
   AVATAR_BG_COLORS,
-  getInitials,
   formatPlayerPosition,
   sortPlayersByPosition,
+  getPlayerAvatarProps,
 } from "../utils/playerUtils";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import { useCopyFeedback } from "../../../shared/hooks/useCopyFeedback";
@@ -125,9 +125,7 @@ function FixedGkSlot({
       {gk ? (
         <>
           <SecureAvatar
-            userId={gk.user?.id}
-            filename={gk.user?.avatar_filename}
-            fallbackText={getInitials(gk.user?.name)}
+            {...getPlayerAvatarProps(gk, "G")}
             sx={{
               width: 26,
               height: 26,
@@ -1444,9 +1442,7 @@ export default function PeladaTeamsDesktopView({
                             }}
                           >
                             <SecureAvatar
-                              userId={p.user?.id}
-                              filename={p.user?.avatar_filename}
-                              fallbackText={getInitials(p.user?.name)}
+                              {...getPlayerAvatarProps(p)}
                               sx={{
                                 width: 26,
                                 height: 26,
@@ -1657,9 +1653,7 @@ export default function PeladaTeamsDesktopView({
                       }}
                     >
                       <SecureAvatar
-                        userId={bp.user?.id}
-                        filename={bp.user?.avatar_filename}
-                        fallbackText={getInitials(bp.user?.name)}
+                        {...getPlayerAvatarProps(bp)}
                         sx={{
                           width: 26,
                           height: 26,
