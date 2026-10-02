@@ -32,6 +32,10 @@ vi.mock("../../../app/providers/AuthContext", () => ({
 vi.mock("../components/ActiveMatchDashboard", () => ({
   default: ({
     match,
+    activeTab,
+    standingsComponent,
+    timelineComponent,
+    supportComponent,
     statsMap,
     finished,
     isAdmin,
@@ -47,6 +51,10 @@ vi.mock("../components/ActiveMatchDashboard", () => ({
     addPlayerToTeam,
   }: {
     match: { id: string; sequence?: number };
+    activeTab?: number;
+    standingsComponent?: React.ReactNode;
+    timelineComponent?: React.ReactNode;
+    supportComponent?: React.ReactNode;
     statsMap: Record<string, unknown>;
     finished: boolean;
     isAdmin: boolean;
@@ -135,6 +143,9 @@ vi.mock("../components/ActiveMatchDashboard", () => ({
         Add Player
       </button>
       <pre data-testid="stats-map">{JSON.stringify(statsMap)}</pre>
+      {activeTab === 1 && standingsComponent}
+      {activeTab === 2 && timelineComponent}
+      {activeTab === 3 && supportComponent}
     </div>
   ),
 }));

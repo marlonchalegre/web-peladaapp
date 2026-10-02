@@ -91,19 +91,19 @@ export function usePeladaMatches(peladaId: string) {
 
   // Auto-select match if nothing is selected:
   // Priority: Running > Scheduled > First Available
-  if (!selectedMatchId && matches.length > 0) {
+  const defaultMatchId = useMemo(() => {
+    if (matches.length === 0) return null;
     const running = matches.find((m) => m.status === "running");
-    if (running) {
-      setSelectedMatchId(running.id);
-    } else {
-      const firstScheduled = matches.find((m) => m.status === "scheduled");
-      setSelectedMatchId(firstScheduled ? firstScheduled.id : matches[0].id);
-    }
-  }
+    if (running) return running.id;
+    const firstScheduled = matches.find((m) => m.status === "scheduled");
+    return firstScheduled ? firstScheduled.id : matches[0].id;
+  }, [matches]);
+
+  const effectiveMatchId = selectedMatchId ?? defaultMatchId;
 
   const selectedMatch = useMemo(
-    () => matches.find((m) => String(m.id) === String(selectedMatchId)),
-    [matches, selectedMatchId],
+    () => matches.find((m) => String(m.id) === String(effectiveMatchId)),
+    [matches, effectiveMatchId],
   );
 
   const justFinishedMatch = useMemo(
@@ -117,9 +117,9 @@ export function usePeladaMatches(peladaId: string) {
   );
 
   const currentMatchStats = useMemo(() => {
-    if (!selectedMatchId) return {};
+    if (!effectiveMatchId) return {};
     const filteredEvents = matchEvents.filter(
-      (e) => e.match_id === selectedMatchId,
+      (e) => e.match_id === effectiveMatchId,
     );
 
     // Using simple internal calculation for current match stats UI
@@ -139,7 +139,7 @@ export function usePeladaMatches(peladaId: string) {
       counts[evt.player_id] = current;
     }
     return counts;
-  }, [matchEvents, selectedMatchId]);
+  }, [matchEvents, effectiveMatchId]);
 
   const activeMatchData = useMemo(() => {
     if (!selectedMatch) return null;
@@ -227,7 +227,7 @@ export function usePeladaMatches(peladaId: string) {
     loading,
     error,
     matches,
-    selectedMatchId,
+    selectedMatchId: effectiveMatchId,
     setSelectedMatchId,
     pelada,
     teamPlayers,

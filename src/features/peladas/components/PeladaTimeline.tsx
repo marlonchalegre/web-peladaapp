@@ -6,6 +6,7 @@ import {
   IconButton,
   useTheme,
   Button,
+  alpha,
 } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
@@ -75,6 +76,7 @@ function TimelineCard({
   teamColor: string;
 }) {
   const { t } = useTranslation();
+  const theme = useTheme();
 
   const scorerId =
     groupedEvent.goalEvent?.player_id ||
@@ -89,74 +91,75 @@ function TimelineCard({
     switch (type) {
       case "goal":
         return {
-          icon: <SportsSoccerIcon fontSize="small" color="success" />,
+          icon: <SportsSoccerIcon sx={{ fontSize: "15px" }} />,
           title: t("common.goal"),
+          color: theme.palette.matchEvents?.goal || theme.palette.success.main,
+          bg: theme.palette.matchEventBg?.goal || theme.palette.action.hover,
         };
       case "own_goal":
         return {
-          icon: <ErrorOutlinedIcon fontSize="small" color="error" />,
+          icon: <ErrorOutlinedIcon sx={{ fontSize: "15px" }} />,
           title: t("common.own_goal"),
+          color:
+            theme.palette.matchEvents?.own_goal || theme.palette.error.main,
+          bg:
+            theme.palette.matchEventBg?.own_goal || theme.palette.action.hover,
         };
       case "assist":
         return {
-          icon: <StarsIcon fontSize="small" color="info" />,
+          icon: <StarsIcon sx={{ fontSize: "15px" }} />,
           title: t("common.assist"),
+          color: theme.palette.matchEvents?.assist || theme.palette.info.main,
+          bg: theme.palette.matchEventBg?.assist || theme.palette.action.hover,
         };
       case "drible":
         return {
-          icon: (
-            <BoltIcon fontSize="small" sx={{ color: "matchEvents.drible" }} />
-          ),
+          icon: <BoltIcon sx={{ fontSize: "15px" }} />,
           title: t("common.drible"),
+          color: theme.palette.matchEvents?.drible || "#f6a45c",
+          bg: theme.palette.matchEventBg?.drible || theme.palette.action.hover,
         };
       case "chute":
         return {
-          icon: (
-            <LocalFireDepartmentIcon
-              fontSize="small"
-              sx={{ color: "matchEvents.chute" }}
-            />
-          ),
+          icon: <LocalFireDepartmentIcon sx={{ fontSize: "15px" }} />,
           title: t("common.chute"),
+          color: theme.palette.matchEvents?.chute || "#8fbde8",
+          bg: theme.palette.matchEventBg?.chute || theme.palette.action.hover,
         };
       case "falta":
         return {
-          icon: (
-            <WarningIcon fontSize="small" sx={{ color: "matchEvents.falta" }} />
-          ),
+          icon: <WarningIcon sx={{ fontSize: "15px" }} />,
           title: t("common.falta"),
+          color: theme.palette.matchEvents?.falta || "#e06c50",
+          bg: theme.palette.matchEventBg?.falta || theme.palette.action.hover,
         };
       case "furada":
         return {
-          icon: (
-            <SentimentVeryDissatisfiedIcon
-              fontSize="small"
-              sx={{ color: "matchEvents.furada" }}
-            />
-          ),
+          icon: <SentimentVeryDissatisfiedIcon sx={{ fontSize: "15px" }} />,
           title: t("common.furada"),
+          color: theme.palette.matchEvents?.furada || "#9a958a",
+          bg: theme.palette.matchEventBg?.furada || theme.palette.action.hover,
         };
       case "defesa":
         return {
-          icon: (
-            <ShieldIcon fontSize="small" sx={{ color: "matchEvents.defesa" }} />
-          ),
+          icon: <ShieldIcon sx={{ fontSize: "15px" }} />,
           title: t("common.defesa"),
+          color: theme.palette.matchEvents?.defesa || "#2e7d32",
+          bg: theme.palette.matchEventBg?.defesa || theme.palette.action.hover,
         };
       case "vish":
         return {
-          icon: (
-            <SentimentVerySatisfiedIcon
-              fontSize="small"
-              sx={{ color: "matchEvents.vish" }}
-            />
-          ),
+          icon: <SentimentVerySatisfiedIcon sx={{ fontSize: "15px" }} />,
           title: t("common.vish"),
+          color: theme.palette.matchEvents?.vish || "#a78bfa",
+          bg: theme.palette.matchEventBg?.vish || theme.palette.action.hover,
         };
       default:
         return {
-          icon: <SportsSoccerIcon fontSize="small" color="disabled" />,
+          icon: <SportsSoccerIcon sx={{ fontSize: "15px" }} color="disabled" />,
           title: t(`common.${type}`, type),
+          color: theme.palette.text.secondary,
+          bg: theme.palette.action.hover,
         };
     }
   };
@@ -167,22 +170,21 @@ function TimelineCard({
     <Paper
       elevation={0}
       sx={{
-        p: 1.5,
-        borderRadius: 3,
-        border: "1px solid",
-        borderColor: "divider",
+        p: { xs: 1.25, sm: 1.5 },
+        borderRadius: "13px",
+        border: (theme) => `1.5px solid ${theme.palette.divider}`,
         position: "relative",
-        minWidth: { xs: 150, sm: 220 },
-        maxWidth: 280,
+        minWidth: { xs: 130, sm: 210 },
+        maxWidth: 290,
         bgcolor: "background.paper",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
+        boxShadow: (theme) => theme.customShadows?.card || "none",
         display: "flex",
         flexDirection: "column",
         gap: 0.5,
 
-        // Highlight accent border on the spine edge
-        borderRight: side === "home" ? `4px solid ${teamColor}` : undefined,
-        borderLeft: side === "away" ? `4px solid ${teamColor}` : undefined,
+        // Refined side spine accent border
+        borderRight: side === "home" ? `3.5px solid ${teamColor}` : undefined,
+        borderLeft: side === "away" ? `3.5px solid ${teamColor}` : undefined,
       }}
     >
       <Stack
@@ -195,37 +197,59 @@ function TimelineCard({
       >
         <Stack
           direction="row"
-          spacing={1}
+          spacing={1.25}
           sx={{
             alignItems: "center",
             minWidth: 0,
             flexGrow: 1,
           }}
         >
-          {config.icon}
+          {/* Dedicated event icon box */}
+          <Box
+            sx={{
+              width: 28,
+              height: 28,
+              borderRadius: "8px",
+              bgcolor: config.bg,
+              color: config.color,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            {config.icon}
+          </Box>
 
           <Box sx={{ minWidth: 0 }}>
             <Typography
-              variant="body2"
               sx={{
-                fontWeight: "bold",
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 800,
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
-                fontSize: { xs: "0.75rem", sm: "0.85rem" },
+                fontSize: { xs: "11px", sm: "12px" },
+                letterSpacing: ".03em",
+                color: "text.primary",
+                lineHeight: 1.2,
+                textTransform: "uppercase",
               }}
             >
               {config.title}
             </Typography>
             <Typography
-              variant="caption"
-              color="text.secondary"
               sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 600,
+                color: "text.secondary",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
                 display: "block",
-                fontSize: { xs: "0.7rem", sm: "0.75rem" },
+                fontSize: { xs: "10.5px", sm: "11.5px" },
+                lineHeight: 1.2,
+                mt: "2px",
               }}
             >
               {scorerName}
@@ -235,23 +259,32 @@ function TimelineCard({
 
         {/* Admin actions */}
         {isAdmin && targetEvent && (
-          <Stack direction="row" spacing={0.5} sx={{ ml: 1, flexShrink: 0 }}>
+          <Stack direction="row" spacing={0.25} sx={{ ml: 0.5, flexShrink: 0 }}>
             <IconButton
               size="small"
               onClick={() => onEditClick?.(targetEvent)}
-              sx={{ p: 0.25 }}
+              sx={{
+                p: 0.5,
+                color: "text.secondary",
+                "&:hover": { color: "text.primary", bgcolor: "action.hover" },
+              }}
               data-testid={`edit-event-${targetEvent.id}`}
             >
-              <EditIcon fontSize="inherit" sx={{ fontSize: "1.1rem" }} />
+              <EditIcon sx={{ fontSize: "14px" }} />
             </IconButton>
             <IconButton
               size="small"
-              color="error"
               onClick={() => onDeleteClick?.(targetEvent)}
-              sx={{ p: 0.25 }}
+              sx={{
+                p: 0.5,
+                color: "error.main",
+                "&:hover": {
+                  bgcolor: (theme) => alpha(theme.palette.error.main, 0.1),
+                },
+              }}
               data-testid={`delete-event-${targetEvent.id}`}
             >
-              <DeleteIcon fontSize="inherit" sx={{ fontSize: "1.1rem" }} />
+              <DeleteIcon sx={{ fontSize: "14px" }} />
             </IconButton>
           </Stack>
         )}
@@ -261,28 +294,26 @@ function TimelineCard({
       {assistantName && (
         <Box
           sx={{
-            mt: 1,
+            mt: 0.75,
             pt: 0.75,
-            borderTop: "1px dashed",
-            borderColor: "divider",
+            borderTop: (theme) => `1px solid ${theme.palette.divider}`,
             display: "flex",
             alignItems: "center",
-            gap: 0.5,
+            gap: 0.75,
           }}
         >
           <StarsIcon
-            fontSize="inherit"
-            sx={{ fontSize: "0.9rem", color: "info.main" }}
+            sx={{ fontSize: "12px", color: "info.main", flexShrink: 0 }}
           />
           <Typography
-            variant="caption"
-            color="text.secondary"
             sx={{
+              fontFamily: "Archivo, sans-serif",
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
-              fontWeight: "medium",
-              fontSize: { xs: "0.65rem", sm: "0.75rem" },
+              fontWeight: 600,
+              fontSize: { xs: "10px", sm: "11px" },
+              color: "text.secondary",
             }}
           >
             {t("common.assist")}: {assistantName}
@@ -330,30 +361,7 @@ export default function PeladaTimeline({
 
     const rows: string[][] = [];
 
-    const getEventTitle = (type: string) => {
-      switch (type) {
-        case "goal":
-          return t("common.goal");
-        case "own_goal":
-          return t("common.own_goal");
-        case "assist":
-          return t("common.assist");
-        case "drible":
-          return t("common.drible");
-        case "chute":
-          return t("common.chute");
-        case "falta":
-          return t("common.falta");
-        case "furada":
-          return t("common.furada");
-        case "defesa":
-          return t("common.defesa");
-        case "vish":
-          return t("common.vish");
-        default:
-          return t(`common.${type}`, type);
-      }
-    };
+    const getEventTitle = (type: string) => t(`common.${type}`, type);
 
     if (!matches || matches.length === 0) {
       const sortedEvents = [...events].sort((a, b) => {
@@ -494,20 +502,51 @@ export default function PeladaTimeline({
   };
 
   const exportButton = (
-    <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2, px: 1 }}>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        flexWrap: "wrap",
+        gap: 1.5,
+        mb: 3,
+        px: 0.5,
+      }}
+    >
+      <Typography
+        sx={{
+          fontFamily: "Archivo, sans-serif",
+          fontWeight: 800,
+          fontSize: "10.5px",
+          letterSpacing: ".14em",
+          color: "text.secondary",
+          textTransform: "uppercase",
+        }}
+      >
+        {matches && matches.length > 0
+          ? `${matches.length} ${matches.length === 1 ? t("peladas.dashboard.live_state.match_word", "PARTIDA") : t("peladas.matches.title", "PARTIDAS")} · ${events.length} ${t("peladas.dashboard.live_state.records_count", { count: events.length, defaultValue: `${events.length} registros` })}`
+          : `${events.length} ${t("peladas.dashboard.live_state.records_count", { count: events.length, defaultValue: `${events.length} registros` })}`}
+      </Typography>
       <Button
         variant="outlined"
         size="small"
-        startIcon={<ContentCopyIcon />}
+        startIcon={<ContentCopyIcon sx={{ fontSize: "14px" }} />}
         onClick={handleExportTimeline}
         sx={{
-          borderRadius: 2,
+          borderRadius: "10px",
+          border: (theme) => `1.5px solid ${theme.palette.divider}`,
+          bgcolor: "background.paper",
+          color: "text.secondary",
+          fontFamily: "Archivo, sans-serif",
+          fontWeight: 800,
+          fontSize: "11px",
+          letterSpacing: ".04em",
           textTransform: "none",
-          fontWeight: "medium",
-          borderColor: "divider",
-          color: "text.primary",
+          px: "14px",
+          py: "6px",
           "&:hover": {
             borderColor: "text.primary",
+            color: "text.primary",
             bgcolor: "action.hover",
           },
         }}
@@ -519,11 +558,38 @@ export default function PeladaTimeline({
 
   if (events.length === 0) {
     return (
-      <Box sx={{ p: 4, textAlign: "center" }}>
-        <Typography sx={{ color: "text.secondary" }}>
+      <Paper
+        elevation={0}
+        sx={{
+          p: { xs: 4, sm: 6 },
+          textAlign: "center",
+          borderRadius: "14px",
+          border: (theme) => `1.5px solid ${theme.palette.divider}`,
+          bgcolor: "background.paper",
+          maxWidth: 420,
+          mx: "auto",
+          my: 4,
+        }}
+      >
+        <SportsSoccerIcon
+          sx={{
+            fontSize: "40px",
+            color: "text.secondary",
+            opacity: 0.35,
+            mb: 1.5,
+          }}
+        />
+        <Typography
+          sx={{
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 700,
+            fontSize: "14px",
+            color: "text.secondary",
+          }}
+        >
           {t("peladas.timeline.no_events")}
         </Typography>
-      </Box>
+      </Paper>
     );
   }
 
@@ -548,12 +614,22 @@ export default function PeladaTimeline({
           return (
             <Paper
               key={event.id || index}
-              variant="outlined"
-              sx={{ p: 1.5, borderRadius: 2 }}
+              elevation={0}
+              sx={{
+                p: 2,
+                borderRadius: "12px",
+                border: (theme) => `1.5px solid ${theme.palette.divider}`,
+                bgcolor: "background.paper",
+              }}
             >
               <Typography
                 variant="body2"
-                sx={{ fontWeight: isGoal ? "bold" : "normal" }}
+                sx={{
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: isGoal ? 800 : 600,
+                  fontSize: "13px",
+                  color: "text.primary",
+                }}
               >
                 {event.event_type === "own_goal"
                   ? t("common.own_goal")
@@ -562,15 +638,23 @@ export default function PeladaTimeline({
               </Typography>
               <Typography
                 variant="caption"
-                color="text.secondary"
-                sx={{ display: "block", mt: 0.5 }}
+                sx={{
+                  display: "block",
+                  mt: 0.5,
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 600,
+                  color: "text.secondary",
+                }}
               >
                 {formatMs(event.session_time_ms)}
               </Typography>
               <Typography
                 variant="caption"
-                color="text.disabled"
-                sx={{ display: "block" }}
+                sx={{
+                  display: "block",
+                  fontFamily: "Archivo, sans-serif",
+                  color: "text.disabled",
+                }}
               >
                 ({t("peladas.timeline.match_short")}{" "}
                 {formatMs(event.match_time_ms)})
@@ -588,7 +672,7 @@ export default function PeladaTimeline({
   );
 
   return (
-    <Box sx={{ py: 2 }} className="MuiTimeline-root">
+    <Box sx={{ py: 1 }} className="MuiTimeline-root">
       {exportButton}
       {sortedMatches.map((match, matchIdx) => {
         // Filter events for this match
@@ -678,7 +762,7 @@ export default function PeladaTimeline({
         const awayName = teamNameById[match.away_team_id] || "Away";
 
         return (
-          <Box key={match.id} sx={{ mb: 6, mt: matchIdx > 0 ? 6 : 2 }}>
+          <Box key={match.id} sx={{ mb: 6, mt: matchIdx > 0 ? 6 : 1 }}>
             <Paper
               elevation={0}
               sx={{
@@ -687,18 +771,18 @@ export default function PeladaTimeline({
                 alignItems: "center",
                 justifyContent: "space-between",
                 mb: 4,
-                bgcolor: "action.hover",
-                py: { xs: 1.5, md: 2 },
-                px: 3,
-                borderRadius: 3,
-                border: "1px solid",
-                borderColor: "divider",
-                gap: { xs: 2, md: 0 },
+                bgcolor: "background.paper",
+                py: { xs: 1.5, md: "14px" },
+                px: { xs: 2, md: 3 },
+                borderRadius: "14px",
+                border: (theme) => `1.5px solid ${theme.palette.divider}`,
+                boxShadow: (theme) => theme.customShadows?.card || "none",
+                gap: { xs: 1.5, md: 0 },
                 width: "100%",
                 boxSizing: "border-box",
               }}
             >
-              {/* Left Side: Circular Sequence Badge + Uppercase Label */}
+              {/* Left Side: Sequence Pill Badge */}
               <Stack
                 direction="row"
                 spacing={1.5}
@@ -710,23 +794,24 @@ export default function PeladaTimeline({
               >
                 <Box
                   sx={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: "50%",
-                    bgcolor: "background.paper",
+                    px: "10px",
+                    py: "4px",
+                    borderRadius: "8px",
+                    bgcolor: "action.hover",
+                    border: (theme) => `1px solid ${theme.palette.divider}`,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    border: "1px solid",
-                    borderColor: "divider",
                   }}
                 >
                   <Typography
-                    variant="caption"
                     sx={{
-                      fontWeight: "bold",
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 900,
                       color: "text.primary",
-                      fontSize: "0.8rem",
+                      fontSize: "11px",
+                      letterSpacing: ".08em",
+                      textTransform: "uppercase",
                     }}
                   >
                     {match.sequence}
@@ -737,7 +822,7 @@ export default function PeladaTimeline({
               {/* Center: Teams Name & Large Score */}
               <Stack
                 direction="row"
-                spacing={{ xs: 1, sm: 2 }}
+                spacing={{ xs: 1.5, sm: 2.5 }}
                 sx={{
                   alignItems: "center",
                   justifyContent: "center",
@@ -752,24 +837,25 @@ export default function PeladaTimeline({
                 >
                   <Box
                     sx={{
-                      width: { xs: 10, md: 12 },
-                      height: { xs: 10, md: 12 },
-                      borderRadius: "3px",
+                      width: 8,
+                      height: 8,
+                      borderRadius: "50%",
                       bgcolor: homeColor,
                       flexShrink: 0,
                     }}
                   />
                   <Typography
-                    variant="subtitle2"
                     sx={{
-                      fontWeight: "bold",
-                      fontSize: { xs: "0.75rem", md: "0.85rem" },
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 800,
+                      fontSize: { xs: "12px", md: "13px" },
                       color: "text.primary",
                       textTransform: "uppercase",
+                      letterSpacing: ".02em",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
-                      maxWidth: { xs: 80, sm: 120, md: 180 },
+                      maxWidth: { xs: 90, sm: 140, md: 200 },
                     }}
                   >
                     {homeName}
@@ -777,35 +863,50 @@ export default function PeladaTimeline({
                 </Stack>
 
                 {/* Score */}
-                <Typography
-                  variant="h5"
+                <Box
                   sx={{
-                    fontWeight: "bold",
                     display: "flex",
                     alignItems: "center",
                     mx: { xs: 1, md: 2 },
-                    fontSize: { xs: "1.15rem", md: "1.35rem" },
                     flexShrink: 0,
                   }}
                 >
-                  <span style={{ color: homeColor }}>
-                    {match.home_score ?? 0}
-                  </span>
                   <Typography
                     component="span"
                     sx={{
-                      color: "text.disabled",
-                      mx: { xs: 0.75, md: 1.5 },
-                      fontWeight: "normal",
-                      fontSize: { xs: "0.9rem", md: "1.1rem" },
+                      fontFamily: "'Anton', sans-serif",
+                      fontSize: { xs: "22px", md: "26px" },
+                      color: homeColor,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {match.home_score ?? 0}
+                  </Typography>
+                  <Typography
+                    component="span"
+                    sx={{
+                      color: "text.secondary",
+                      mx: { xs: 1, md: 1.5 },
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 600,
+                      fontSize: { xs: "13px", md: "15px" },
+                      lineHeight: 1,
                     }}
                   >
                     ×
                   </Typography>
-                  <span style={{ color: awayColor }}>
+                  <Typography
+                    component="span"
+                    sx={{
+                      fontFamily: "'Anton', sans-serif",
+                      fontSize: { xs: "22px", md: "26px" },
+                      color: awayColor,
+                      lineHeight: 1,
+                    }}
+                  >
                     {match.away_score ?? 0}
-                  </span>
-                </Typography>
+                  </Typography>
+                </Box>
 
                 {/* Away Team */}
                 <Stack
@@ -814,25 +915,26 @@ export default function PeladaTimeline({
                   sx={{ alignItems: "center", minWidth: 0 }}
                 >
                   <Typography
-                    variant="subtitle2"
                     sx={{
-                      fontWeight: "bold",
-                      fontSize: { xs: "0.75rem", md: "0.85rem" },
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 800,
+                      fontSize: { xs: "12px", md: "13px" },
                       color: "text.primary",
                       textTransform: "uppercase",
+                      letterSpacing: ".02em",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
-                      maxWidth: { xs: 80, sm: 120, md: 180 },
+                      maxWidth: { xs: 90, sm: 140, md: 200 },
                     }}
                   >
                     {awayName}
                   </Typography>
                   <Box
                     sx={{
-                      width: { xs: 10, md: 12 },
-                      height: { xs: 10, md: 12 },
-                      borderRadius: "3px",
+                      width: 8,
+                      height: 8,
+                      borderRadius: "50%",
                       bgcolor: awayColor,
                       flexShrink: 0,
                     }}
@@ -843,7 +945,7 @@ export default function PeladaTimeline({
               {/* Right Side: Duration Label & Time */}
               <Stack
                 direction={{ xs: "row", md: "column" }}
-                spacing={{ xs: 1, md: 0.5 }}
+                spacing={{ xs: 1, md: 0.25 }}
                 sx={{
                   alignItems: { xs: "center", md: "flex-end" },
                   justifyContent: { xs: "center", md: "flex-end" },
@@ -852,23 +954,24 @@ export default function PeladaTimeline({
                 }}
               >
                 <Typography
-                  variant="caption"
                   sx={{
-                    fontSize: "0.55rem",
-                    fontWeight: "bold",
+                    fontFamily: "Archivo, sans-serif",
+                    fontSize: "8.5px",
+                    fontWeight: 800,
                     color: "text.secondary",
-                    letterSpacing: "0.1em",
+                    letterSpacing: ".14em",
+                    textTransform: "uppercase",
                   }}
                 >
                   {t("peladas.matches.duration", "DURATION").toUpperCase()}
                 </Typography>
                 <Typography
-                  variant="body2"
                   sx={{
-                    fontWeight: "bold",
+                    fontFamily: "Archivo, sans-serif",
+                    fontWeight: 800,
                     color: "text.primary",
-                    fontSize: "0.95rem",
-                    lineHeight: 1.2,
+                    fontSize: "13px",
+                    lineHeight: 1.1,
                   }}
                 >
                   {formatMs(match.timer_accumulated_ms || 0)}
@@ -893,7 +996,7 @@ export default function PeladaTimeline({
               />
 
               {/* Timeline rows */}
-              <Stack spacing={4}>
+              <Stack spacing={3.5}>
                 {grouped.map((groupedEvent) => {
                   // Determine side: scorer's team compared to match home/away team
                   const targetEvent =
@@ -916,7 +1019,10 @@ export default function PeladaTimeline({
                       key={groupedEvent.id}
                       sx={{
                         display: "grid",
-                        gridTemplateColumns: "1fr 96px 1fr",
+                        gridTemplateColumns: {
+                          xs: "1fr 76px 1fr",
+                          sm: "1fr 92px 1fr",
+                        },
                         alignItems: "center",
                         position: "relative",
                       }}
@@ -926,7 +1032,7 @@ export default function PeladaTimeline({
                         sx={{
                           display: "flex",
                           justifyContent: "flex-end",
-                          pr: { xs: 1.5, sm: 3 },
+                          pr: { xs: 1, sm: 2.5 },
                           visibility: side === "home" ? "visible" : "hidden",
                         }}
                       >
@@ -953,40 +1059,46 @@ export default function PeladaTimeline({
                           zIndex: 1,
                         }}
                       >
-                        <Paper
-                          variant="outlined"
+                        <Box
                           sx={{
-                            px: { xs: 1, sm: 1.5 },
-                            py: 0.5,
-                            borderRadius: 10,
+                            px: { xs: 1, sm: "11px" },
+                            py: "3px",
+                            borderRadius: "20px",
                             bgcolor: "background.paper",
-                            borderColor: "divider",
-                            boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-                            minWidth: 72,
+                            border: (theme) =>
+                              `1.5px solid ${theme.palette.divider}`,
+                            boxShadow: (theme) =>
+                              theme.customShadows?.subtle || "none",
+                            minWidth: { xs: 58, sm: 68 },
                             textAlign: "center",
                           }}
                         >
                           <Typography
-                            variant="caption"
                             sx={{
-                              fontWeight: "bold",
+                              fontFamily: "Archivo, sans-serif",
+                              fontWeight: 800,
                               display: "block",
-                              fontSize: { xs: "0.65rem", sm: "0.75rem" },
+                              fontSize: { xs: "10px", sm: "11px" },
+                              lineHeight: 1.2,
+                              color: "text.primary",
                             }}
                           >
                             {formatMs(groupedEvent.timeMs)}
                           </Typography>
                           <Typography
-                            variant="caption"
                             sx={{
-                              color: "text.disabled",
-                              fontSize: "0.6rem",
+                              fontFamily: "Archivo, sans-serif",
+                              fontWeight: 600,
+                              color: "text.secondary",
+                              fontSize: { xs: "8.5px", sm: "9px" },
                               display: "block",
+                              lineHeight: 1,
+                              mt: "1px",
                             }}
                           >
                             {formatMs(groupedEvent.matchTimeMs)}
                           </Typography>
-                        </Paper>
+                        </Box>
                       </Box>
 
                       {/* Right side: Away card */}
@@ -994,7 +1106,7 @@ export default function PeladaTimeline({
                         sx={{
                           display: "flex",
                           justifyContent: "flex-start",
-                          pl: { xs: 1.5, sm: 3 },
+                          pl: { xs: 1, sm: 2.5 },
                           visibility: side === "away" ? "visible" : "hidden",
                         }}
                       >

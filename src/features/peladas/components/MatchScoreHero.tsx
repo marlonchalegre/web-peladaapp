@@ -29,7 +29,6 @@ interface MatchScoreHeroProps {
   standings: StandingRow[];
   clockLabel: string;
   running: boolean;
-  sessionLabel: string;
   homeOnFieldCount?: number;
   awayOnFieldCount?: number;
   onToggleHistory: () => void;
@@ -54,7 +53,6 @@ export default function MatchScoreHero({
   standings,
   clockLabel,
   running,
-  sessionLabel,
   onToggleHistory,
   onToggleRun,
   onOpenResetConfirm,
@@ -528,8 +526,7 @@ export default function MatchScoreHero({
               color: "pitch.light",
             }}
           >
-            {(pelada.organization_name || "100FÔLEGO").toUpperCase()} ·{" "}
-            {sessionLabel.toUpperCase()}
+            {(pelada.organization_name || "100FÔLEGO").toUpperCase()}
           </Typography>
           <Typography
             sx={{

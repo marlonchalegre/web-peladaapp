@@ -50,36 +50,47 @@ export default function GlobalSessionTimer({
       sx={{
         display: "flex",
         alignItems: "center",
-        gap: { xs: 1, sm: 2 },
-        px: { xs: 1.5, sm: 2 },
-        py: { xs: 0.5, sm: 1 },
-        borderRadius: 3,
-        border: "1px solid",
-        borderColor: "divider",
-        bgcolor: "action.hover",
+        gap: { xs: 1, sm: 1.5 },
+        px: "14px",
+        py: "8px",
+        borderRadius: "11px",
+        border: (theme) => `1.5px solid ${theme.palette.divider}`,
+        bgcolor: "background.paper",
+        boxShadow: (theme) => theme.customShadows?.subtle || "none",
       }}
     >
-      <TimerIcon color="action" fontSize="small" />
+      <TimerIcon
+        sx={{
+          color:
+            sessionTimer.status === "running"
+              ? "primary.main"
+              : "text.secondary",
+          fontSize: "18px",
+        }}
+      />
       <Box>
         <Typography
-          variant="caption"
           sx={{
             display: "block",
             lineHeight: 1,
-            fontWeight: "bold",
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 800,
             color: "text.secondary",
-            fontSize: { xs: "0.55rem", sm: "0.6rem" },
+            fontSize: "8.5px",
+            letterSpacing: ".12em",
+            textTransform: "uppercase",
           }}
         >
-          {t("peladas.timeline.session_timer")}
+          {t("peladas.timeline.session_timer", "TEMPO TOTAL DA SESSÃO")}
         </Typography>
         <Typography
-          variant="h5"
           sx={{
-            fontFamily: "monospace",
-            fontWeight: "bold",
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 800,
             lineHeight: 1.2,
-            fontSize: { xs: "1.1rem", sm: "1.5rem" },
+            fontSize: { xs: "13px", sm: "15px" },
+            color: "text.primary",
+            letterSpacing: ".02em",
           }}
           data-testid="global-timer-text"
         >
@@ -92,10 +103,9 @@ export default function GlobalSessionTimer({
           direction="row"
           spacing={0.5}
           sx={{
-            ml: { xs: 0.5, sm: 1 },
-            borderLeft: "1px solid",
-            borderColor: "divider",
-            pl: { xs: 0.5, sm: 1 },
+            ml: 1,
+            borderLeft: (theme) => `1.5px solid ${theme.palette.divider}`,
+            pl: 1,
           }}
         >
           {sessionTimer.status === "running" ? (
@@ -105,8 +115,9 @@ export default function GlobalSessionTimer({
                 onClick={sessionTimer.pause}
                 color="warning"
                 data-testid="pause-global-timer-button"
+                sx={{ p: 0.5 }}
               >
-                <PauseIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
+                <PauseIcon sx={{ fontSize: "16px" }} />
               </IconButton>
             </Tooltip>
           ) : (
@@ -116,8 +127,9 @@ export default function GlobalSessionTimer({
                 onClick={sessionTimer.start}
                 color="success"
                 data-testid="start-global-timer-button"
+                sx={{ p: 0.5 }}
               >
-                <PlayArrowIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
+                <PlayArrowIcon sx={{ fontSize: "16px" }} />
               </IconButton>
             </Tooltip>
           )}
@@ -126,8 +138,9 @@ export default function GlobalSessionTimer({
               size="small"
               onClick={onOpenResetConfirm}
               data-testid="reset-global-timer-button"
+              sx={{ p: 0.5, color: "text.secondary" }}
             >
-              <ReplayIcon sx={{ fontSize: { xs: 18, sm: 20 } }} />
+              <ReplayIcon sx={{ fontSize: "16px" }} />
             </IconButton>
           </Tooltip>
         </Stack>

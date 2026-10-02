@@ -1248,7 +1248,7 @@
         "end_match_failed": "Error ending match"
       },
       "support_lineup": {
-        "tab_title": "Support Lineup",
+        "tab_title": "Support",
         "title": "Support Lineup",
         "subtitle": "Two resting players record the match video and mark statistics in the app.",
         "camera": "Camera / Video",
@@ -1306,7 +1306,7 @@
       "breadcrumb_home": "Home",
       "breadcrumb_profile": "My profile",
       "session_label": "SESSION",
-      "dashboard_tab": "Dashboard",
+      "dashboard_tab": "Live",
       "close_confirm_desc": "When closing the pelada, all matches will be finished and the standings will be consolidated.",
       "delete_event_confirm": "Are you sure you want to delete this event? If it's a goal, the associated assist will also be deleted.",
       "reset_session_confirm": "Are you sure you want to reset the session timer? This cannot be undone.",
@@ -1558,7 +1558,7 @@
     "support_lineup": {
       "title": "Support Lineup",
       "subtitle": "Two resting players record the match and keep the stats.",
-      "tab_title": "Support Lineup",
+      "tab_title": "Support",
       "view_escalation": "Schedule",
       "view_participation_button": "Participation ({{count}})",
       "reroll_all_button": "Re-draw Full Schedule",

@@ -877,7 +877,7 @@
       "not_found": "Pelada não encontrada"
     },
     "timeline": {
-      "title": "Linha do Tempo",
+      "title": "Súmula",
       "session_timer": "TEMPO TOTAL DA SESSÃO",
       "match_timer": "TEMPO DA PARTIDA #{{seq}}",
       "no_events": "Nenhum gol ou assistência registrado ainda.",
@@ -894,7 +894,7 @@
       "scorer_label": "Autor do Gol",
       "quick_select": "Seleção rápida",
       "export_tabular": "Copiar Tabela",
-      "export_success": "Linha do tempo copiada como tabela!",
+      "export_success": "Súmula copiada como tabela!",
       "export": {
         "headers": {
           "match": "Partida",
@@ -1248,7 +1248,7 @@
         "end_match_failed": "Erro ao encerrar partida"
       },
       "support_lineup": {
-        "tab_title": "Escalação de Apoio",
+        "tab_title": "Apoio",
         "title": "Escalação de Apoio",
         "subtitle": "Dois jogadores que estão descansando gravam a partida e anotam as estatísticas.",
         "camera": "Câmera / Vídeo",
@@ -1306,7 +1306,7 @@
       "breadcrumb_home": "Início",
       "breadcrumb_profile": "Minha ficha",
       "session_label": "SESSÃO",
-      "dashboard_tab": "Dashboard",
+      "dashboard_tab": "Ao Vivo",
       "close_confirm_desc": "Ao encerrar a pelada, todas as partidas serão finalizadas e a classificação será consolidada.",
       "delete_event_confirm": "Tem certeza que deseja deletar este evento? Se for um gol, a assistência associada também será deletada.",
       "reset_session_confirm": "Tem certeza que deseja zerar o cronômetro da sessão? Isso não pode ser desfeito.",
@@ -1558,7 +1558,7 @@
     "support_lineup": {
       "title": "Escalação de Apoio",
       "subtitle": "Dois jogadores que estão descansando gravam a partida e anotam as estatísticas.",
-      "tab_title": "Escalação de Apoio",
+      "tab_title": "Apoio",
       "view_escalation": "Escala",
       "view_participation_button": "Participação ({{count}})",
       "reroll_all_button": "Re-sortear Escala Completa",

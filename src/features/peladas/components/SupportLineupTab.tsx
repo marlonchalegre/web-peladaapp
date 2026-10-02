@@ -650,10 +650,10 @@ export default function SupportLineupTab({
           borderRadius: 3,
           border: "1px solid",
           borderColor: "divider",
-          overflow: "hidden",
+          overflowX: "auto",
         }}
       >
-        <Table>
+        <Table sx={{ minWidth: { xs: 580, sm: "auto" } }}>
           <TableHead sx={{ bgcolor: "action.hover" }}>
             <TableRow>
               <TableCell

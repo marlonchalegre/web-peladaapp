@@ -2,6 +2,24 @@ import { createTheme, alpha } from "@mui/material";
 import type { PaletteMode } from "@mui/material";
 
 declare module "@mui/material/styles" {
+  interface Theme {
+    customShadows: {
+      subtle: string;
+      card: string;
+      cardHover: string;
+      dropdown: string;
+      dialog: string;
+    };
+  }
+  interface ThemeOptions {
+    customShadows?: {
+      subtle?: string;
+      card?: string;
+      cardHover?: string;
+      dropdown?: string;
+      dialog?: string;
+    };
+  }
   interface Palette {
     home: Palette["primary"] & { subtleBg: string; subtleText: string };
     away: Palette["primary"] & { subtleBg: string; subtleText: string };
@@ -28,6 +46,21 @@ declare module "@mui/material/styles" {
       };
     };
     matchEvents: {
+      goal: string;
+      own_goal: string;
+      assist: string;
+      drible: string;
+      chute: string;
+      falta: string;
+      furada: string;
+      defesa: string;
+      vish: string;
+      [key: string]: string;
+    };
+    matchEventBg: {
+      goal: string;
+      own_goal: string;
+      assist: string;
       drible: string;
       chute: string;
       falta: string;
@@ -105,6 +138,7 @@ declare module "@mui/material/styles" {
       };
     };
     matchEvents?: Record<string, string>;
+    matchEventBg?: Record<string, string>;
     attendance?: {
       button?: {
         confirmed?: {
@@ -145,6 +179,48 @@ declare module "@mui/material/styles" {
 }
 
 export const getTheme = (mode: PaletteMode) => {
+  const customShadows = {
+    subtle:
+      mode === "dark"
+        ? "0 2px 8px rgba(0,0,0,0.25)"
+        : "0 1px 4px rgba(0,0,0,0.03)",
+    card:
+      mode === "dark"
+        ? "0 4px 16px rgba(0,0,0,0.25)"
+        : "0 2px 8px rgba(0,0,0,0.04)",
+    cardHover:
+      mode === "dark"
+        ? "0 6px 20px rgba(0,0,0,0.35)"
+        : "0 4px 14px rgba(0,0,0,0.08)",
+    dropdown:
+      mode === "dark"
+        ? "0 8px 32px rgba(0,0,0,0.5)"
+        : "0 4px 16px rgba(0,0,0,0.08)",
+    dialog:
+      mode === "dark"
+        ? "0 16px 48px rgba(0,0,0,0.6)"
+        : "0 8px 32px rgba(0,0,0,0.12)",
+  };
+
+  const matchEvents = {
+    goal: mode === "light" ? "#146b3a" : "#2e7d32",
+    own_goal: "#d32f2f",
+    assist: mode === "light" ? "#1f5f9c" : "#0288d1",
+    drible: mode === "light" ? "#c9591c" : "#f6a45c",
+    chute: mode === "light" ? "#1f5f9c" : "#8fbde8",
+    falta: mode === "light" ? "#a8452a" : "#e06c50",
+    furada: mode === "light" ? "#6b675c" : "#9a958a",
+    defesa: mode === "light" ? "#146b3a" : "#2e7d32",
+    vish: mode === "light" ? "#6b4b9c" : "#a78bfa",
+  };
+
+  const matchEventBg = Object.fromEntries(
+    Object.entries(matchEvents).map(([key, hex]) => [
+      key,
+      alpha(hex, mode === "dark" ? 0.2 : 0.12),
+    ]),
+  ) as typeof matchEvents;
+
   const baseTheme = createTheme({
     palette: {
       mode,
@@ -190,14 +266,8 @@ export const getTheme = (mode: PaletteMode) => {
         subtleText: mode === "light" ? "#8a5800" : "#ffe082",
         contrastText: mode === "light" ? "#17181a" : "#000000",
       },
-      matchEvents: {
-        drible: mode === "light" ? "#c9591c" : "#f6a45c",
-        chute: mode === "light" ? "#1f5f9c" : "#8fbde8",
-        falta: mode === "light" ? "#a8452a" : "#e06c50",
-        furada: mode === "light" ? "#6b675c" : "#9a958a",
-        defesa: mode === "light" ? "#146b3a" : "#2e7d32",
-        vish: mode === "light" ? "#6b4b9c" : "#a78bfa",
-      },
+      matchEvents,
+      matchEventBg,
       success: {
         main: "#146b3a",
         light: "#bfe6ce",
@@ -467,6 +537,7 @@ export const getTheme = (mode: PaletteMode) => {
       shadowSmall:
         mode === "dark" ? "0 2px 10px rgba(0,0,0,0.3)" : "3px 3px 0 #17181a",
     },
+    customShadows,
     status: {
       paid: {
         bg: mode === "dark" ? "rgba(46, 125, 50, 0.2)" : "#f4f8f5",
@@ -480,6 +551,8 @@ export const getTheme = (mode: PaletteMode) => {
       },
     },
   });
+
+  baseTheme.customShadows = customShadows;
 
   return baseTheme;
 };

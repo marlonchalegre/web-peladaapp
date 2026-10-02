@@ -11,6 +11,7 @@ import {
   List,
   ListItem,
   ListItemButton,
+  Paper,
   Portal,
   Stack,
   Tooltip,
@@ -113,10 +114,15 @@ type Props = {
   onSelectMatch: (id: string) => void;
   teamNameById: Record<string, string>;
   // Tab navigation
+  activeTab?: number;
+  onNavigateToLive?: () => void;
   onNavigateToTimeline?: () => void;
   onNavigateToStandings?: () => void;
   onNavigateToSupportTab?: () => void;
   playerTeamMap?: Record<string, string>;
+  timelineComponent?: React.ReactNode;
+  standingsComponent?: React.ReactNode;
+  supportComponent?: React.ReactNode;
 };
 
 const bottomSheetPaperSx = {
@@ -178,10 +184,15 @@ export default function ActiveMatchDashboard(props: Props) {
     matches,
     onSelectMatch,
     teamNameById,
+    activeTab = 0,
+    onNavigateToLive,
     onNavigateToTimeline,
     onNavigateToStandings,
     onNavigateToSupportTab,
     playerTeamMap,
+    timelineComponent,
+    standingsComponent,
+    supportComponent,
   } = props;
 
   const { t } = useTranslation();
@@ -206,15 +217,7 @@ export default function ActiveMatchDashboard(props: Props) {
     () => onPauseMatch(match.id),
   );
 
-  const sessionTimer = usePeladaTimer(
-    pelada.timer_started_at,
-    pelada.timer_accumulated_ms,
-    pelada.timer_status,
-    (pelada.status || "").toLowerCase() === "closed",
-  );
-
   const clockLabel = matchTimer.formattedTime.substring(3);
-  const sessionLabel = `${t("peladas.dashboard.live_state.session", "SESSÃO")} ${sessionTimer.formattedTime.substring(0, 5)}`;
 
   const getPlayerName = useCallback(
     (pid: string) =>
@@ -864,6 +867,76 @@ export default function ActiveMatchDashboard(props: Props) {
     );
   };
 
+  const liveMatchBanner = (
+    <Paper
+      elevation={0}
+      sx={{
+        p: { xs: "10px 14px", sm: "12px 18px" },
+        borderRadius: "14px",
+        border: (theme) => `1.5px solid ${theme.palette.divider}`,
+        bgcolor: "background.paper",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        flexWrap: "wrap",
+        gap: 1.5,
+        boxShadow: (theme) => theme.customShadows?.subtle || "none",
+      }}
+    >
+      <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
+        <Box
+          sx={{
+            width: 9,
+            height: 9,
+            borderRadius: "50%",
+            bgcolor:
+              matchTimer.status === "running"
+                ? "success.main"
+                : "text.secondary",
+          }}
+        />
+        <Typography
+          sx={{
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 800,
+            fontSize: { xs: "11px", sm: "12px" },
+            letterSpacing: ".06em",
+            textTransform: "uppercase",
+            color: "text.primary",
+          }}
+        >
+          {t("peladas.matches.current_match", "PARTIDA EM ANDAMENTO")}:{" "}
+          {homeTeamName} ({match.home_score}) × ({match.away_score}){" "}
+          {awayTeamName}
+          {clockLabel ? ` · ${clockLabel}` : ""}
+        </Typography>
+      </Stack>
+
+      {onNavigateToLive && (
+        <Button
+          onClick={onNavigateToLive}
+          variant="outlined"
+          size="small"
+          data-testid="return-to-live-btn"
+          sx={{
+            borderRadius: "9px",
+            borderColor: "primary.main",
+            color: "primary.main",
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 800,
+            fontSize: "11px",
+            letterSpacing: ".04em",
+            px: 1.75,
+            py: "5px",
+            "&:hover": { bgcolor: "action.hover", borderColor: "primary.dark" },
+          }}
+        >
+          ← {t("peladas.matches.back_to_live", "VOLTAR AO JOGO")}
+        </Button>
+      )}
+    </Paper>
+  );
+
   const tabButtons = (withEnd: boolean) => (
     <Box
       data-testid="tab-buttons"
@@ -873,7 +946,50 @@ export default function ActiveMatchDashboard(props: Props) {
         mt: withEnd ? "18px" : isDesktop ? 0 : "12px",
       }}
     >
-      {onNavigateToStandings && (
+      {activeTab !== 0 && onNavigateToLive ? (
+        <Button
+          onClick={onNavigateToLive}
+          data-testid="go-to-live-button"
+          sx={{
+            flex: 1,
+            border: (theme) => `1.5px solid ${theme.palette.primary.main}`,
+            bgcolor: "primary.main",
+            color: "primary.contrastText",
+            borderRadius: "11px",
+            py: withEnd ? "12px" : "11px",
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 800,
+            fontSize: withEnd ? "11px" : "10.5px",
+            lineHeight: 1,
+            letterSpacing: "0.05em",
+            "&:hover": { borderColor: "primary.dark", bgcolor: "primary.dark" },
+          }}
+        >
+          {t("peladas.dashboard.live_state.live_button", "AO VIVO")}
+        </Button>
+      ) : onNavigateToStandings ? (
+        <Button
+          onClick={onNavigateToStandings}
+          data-testid="go-to-standings-button"
+          sx={{
+            flex: 1,
+            border: (theme) => `1.5px solid ${theme.palette.divider}`,
+            bgcolor: activeTab === 1 ? "action.selected" : "background.paper",
+            color: activeTab === 1 ? "text.primary" : "text.secondary",
+            borderRadius: "11px",
+            py: withEnd ? "12px" : "11px",
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 800,
+            fontSize: withEnd ? "11px" : "10.5px",
+            lineHeight: 1,
+            letterSpacing: "0.05em",
+            "&:hover": { borderColor: "text.primary", color: "text.primary" },
+          }}
+        >
+          {t("peladas.dashboard.live_state.table_button", "TABELA")}
+        </Button>
+      ) : null}
+      {activeTab === 2 && onNavigateToStandings ? (
         <Button
           onClick={onNavigateToStandings}
           data-testid="go-to-standings-button"
@@ -894,16 +1010,15 @@ export default function ActiveMatchDashboard(props: Props) {
         >
           {t("peladas.dashboard.live_state.table_button", "TABELA")}
         </Button>
-      )}
-      {onNavigateToTimeline && (
+      ) : onNavigateToTimeline ? (
         <Button
           onClick={onNavigateToTimeline}
           data-testid="go-to-timeline-button"
           sx={{
             flex: 1,
             border: (theme) => `1.5px solid ${theme.palette.divider}`,
-            bgcolor: "background.paper",
-            color: "text.secondary",
+            bgcolor: activeTab === 2 ? "action.selected" : "background.paper",
+            color: activeTab === 2 ? "text.primary" : "text.secondary",
             borderRadius: "11px",
             py: withEnd ? "12px" : "11px",
             fontFamily: "Archivo, sans-serif",
@@ -916,15 +1031,14 @@ export default function ActiveMatchDashboard(props: Props) {
         >
           {t("peladas.dashboard.live_state.sumula_button", "SÚMULA")}
         </Button>
-      )}
+      ) : null}
       {withEnd && isAdmin && !effectiveFinished && (
         <Button
           onClick={onEndMatch}
           data-testid="end-match-button"
           sx={{
             flex: 1,
-            border: (theme) =>
-              `1.5px solid ${theme.palette.mode === "dark" ? theme.palette.secondary.dark : theme.palette.secondary.light}`,
+            border: (theme) => `1.5px solid ${theme.palette.secondary.main}`,
             bgcolor: "background.paper",
             color: "secondary.main",
             borderRadius: "11px",
@@ -936,10 +1050,7 @@ export default function ActiveMatchDashboard(props: Props) {
             letterSpacing: "0.05em",
             "&:hover": {
               borderColor: "secondary.main",
-              bgcolor: (theme) =>
-                theme.palette.mode === "dark"
-                  ? "rgba(224, 108, 80, 0.12)"
-                  : "secondary.light",
+              bgcolor: (theme) => alpha(theme.palette.secondary.main, 0.1),
             },
           }}
         >
@@ -1338,204 +1449,228 @@ export default function ActiveMatchDashboard(props: Props) {
               minHeight: 0,
             }}
           >
-            {/* Placar Hero dentro da coluna esquerda */}
-            <MatchScoreHero
-              match={match}
-              pelada={pelada}
-              homeTeamName={homeTeamName}
-              awayTeamName={awayTeamName}
-              isAdmin={isAdmin}
-              totalMatches={matches.length}
-              standings={standings}
-              clockLabel={clockLabel}
-              running={matchTimer.status === "running"}
-              sessionLabel={sessionLabel}
-              homeOnFieldCount={homePlayers.length}
-              awayOnFieldCount={awayPlayers.length}
-              onToggleHistory={() => setHistoryOpen(true)}
-              onToggleRun={() => {
-                if (matchTimer.status === "running") matchTimer.pause?.();
-                else matchTimer.start?.();
-              }}
-              onOpenResetConfirm={onOpenResetConfirm}
-              onEndMatch={onEndMatch}
-              updating={updating}
-              finished={isMatchFinished}
-              isEditing={isEditing}
-              onToggleEdit={() => setIsEditing(!isEditing)}
-            />
+            {(!activeTab || activeTab === 0) && (
+              <>
+                {/* Placar Hero dentro da coluna esquerda */}
+                <MatchScoreHero
+                  match={match}
+                  pelada={pelada}
+                  homeTeamName={homeTeamName}
+                  awayTeamName={awayTeamName}
+                  isAdmin={isAdmin}
+                  totalMatches={matches.length}
+                  standings={standings}
+                  clockLabel={clockLabel}
+                  running={matchTimer.status === "running"}
+                  homeOnFieldCount={homePlayers.length}
+                  awayOnFieldCount={awayPlayers.length}
+                  onToggleHistory={() => setHistoryOpen(true)}
+                  onToggleRun={() => {
+                    if (matchTimer.status === "running") matchTimer.pause?.();
+                    else matchTimer.start?.();
+                  }}
+                  onOpenResetConfirm={onOpenResetConfirm}
+                  onEndMatch={onEndMatch}
+                  updating={updating}
+                  finished={isMatchFinished}
+                  isEditing={isEditing}
+                  onToggleEdit={() => setIsEditing(!isEditing)}
+                />
 
-            {/* Linha com os 3 botões de ação: GOL TIME 1, GOL TIME 2, OUTRO LANCE */}
-            {canRecord && (
-              <Box sx={{ display: "flex", gap: "14px", flexShrink: 0 }}>
-                <Button
-                  onClick={() => setGoalSheet({ side: "home", step: "scorer" })}
-                  data-testid="goal-button-home"
+                {/* Linha com os 3 botões de ação: GOL TIME 1, GOL TIME 2, OUTRO LANCE */}
+                {canRecord && (
+                  <Box sx={{ display: "flex", gap: "14px", flexShrink: 0 }}>
+                    <Button
+                      onClick={() =>
+                        setGoalSheet({ side: "home", step: "scorer" })
+                      }
+                      data-testid="goal-button-home"
+                      sx={{
+                        flex: 1,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "12px",
+                        border: 0,
+                        borderRadius: "16px",
+                        bgcolor: "home.main",
+                        color: "home.contrastText",
+                        py: "17px",
+                        cursor: "pointer",
+                        boxShadow: (theme) =>
+                          `0 4px 0 ${theme.palette.home.dark}`,
+                        "&:hover": { bgcolor: "home.dark" },
+                        "&:active": {
+                          transform: "translateY(3px)",
+                          boxShadow: (theme) =>
+                            `0 1px 0 ${theme.palette.home.dark}`,
+                        },
+                      }}
+                    >
+                      <Typography
+                        component="span"
+                        sx={{
+                          fontFamily: "'Anton', sans-serif",
+                          fontWeight: 400,
+                          fontSize: "26px",
+                          lineHeight: 1,
+                          letterSpacing: "0.04em",
+                        }}
+                      >
+                        GOL
+                      </Typography>
+                      <Typography
+                        component="span"
+                        sx={{
+                          fontFamily: "Archivo, sans-serif",
+                          fontWeight: 800,
+                          fontSize: "11px",
+                          lineHeight: 1,
+                          letterSpacing: "0.14em",
+                          color: "home.light",
+                        }}
+                      >
+                        {homeTeamName.toUpperCase()}
+                      </Typography>
+                    </Button>
+
+                    <Button
+                      onClick={() =>
+                        setGoalSheet({ side: "away", step: "scorer" })
+                      }
+                      data-testid="goal-button-away"
+                      sx={{
+                        flex: 1,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        gap: "12px",
+                        border: 0,
+                        borderRadius: "16px",
+                        bgcolor: "away.main",
+                        color: "away.contrastText",
+                        py: "17px",
+                        cursor: "pointer",
+                        boxShadow: (theme) =>
+                          `0 4px 0 ${theme.palette.away.dark}`,
+                        "&:hover": { bgcolor: "away.dark" },
+                        "&:active": {
+                          transform: "translateY(3px)",
+                          boxShadow: (theme) =>
+                            `0 1px 0 ${theme.palette.away.dark}`,
+                        },
+                      }}
+                    >
+                      <Typography
+                        component="span"
+                        sx={{
+                          fontFamily: "'Anton', sans-serif",
+                          fontWeight: 400,
+                          fontSize: "26px",
+                          lineHeight: 1,
+                          letterSpacing: "0.04em",
+                        }}
+                      >
+                        GOL
+                      </Typography>
+                      <Typography
+                        component="span"
+                        sx={{
+                          fontFamily: "Archivo, sans-serif",
+                          fontWeight: 800,
+                          fontSize: "11px",
+                          lineHeight: 1,
+                          letterSpacing: "0.14em",
+                          color: "away.light",
+                        }}
+                      >
+                        {awayTeamName.toUpperCase()}
+                      </Typography>
+                    </Button>
+
+                    <Button
+                      onClick={() => setEventSheet({ step: "type" })}
+                      data-testid="record-event-inline-button"
+                      sx={{
+                        flexShrink: 0,
+                        width: 210,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: "5px",
+                        border: (theme) =>
+                          `1.5px solid ${alpha(theme.palette.text.primary, 0.22)}`,
+                        borderRadius: "16px",
+                        bgcolor: "background.paper",
+                        color: "text.primary",
+                        py: "14px",
+                        cursor: "pointer",
+                        boxShadow: (theme) =>
+                          theme.customShadows?.card ||
+                          "0 2px 8px rgba(0,0,0,0.1)",
+                        "&:hover": {
+                          borderColor: "primary.main",
+                          bgcolor: "action.hover",
+                          boxShadow: (theme) =>
+                            theme.customShadows?.cardHover || "none",
+                        },
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontFamily: "Archivo, sans-serif",
+                          fontWeight: 800,
+                          fontSize: "13px",
+                          lineHeight: 1,
+                          letterSpacing: "0.06em",
+                        }}
+                      >
+                        ＋{" "}
+                        {t(
+                          "peladas.dashboard.live_state.other_event",
+                          "OUTRO LANCE",
+                        )}
+                      </Typography>
+                      <Typography
+                        sx={{
+                          fontFamily: "Archivo, sans-serif",
+                          fontWeight: 600,
+                          fontSize: "9.5px",
+                          lineHeight: 1,
+                          letterSpacing: "0.06em",
+                          color: "text.secondary",
+                        }}
+                      >
+                        DRIBLE · CHUTE · FALTA · DEFESAÇA
+                      </Typography>
+                    </Button>
+                  </Box>
+                )}
+
+                {/* Escalações dos dois times em duas colunas */}
+                <Box
                   sx={{
                     flex: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "12px",
-                    border: 0,
-                    borderRadius: "16px",
-                    bgcolor: "home.main",
-                    color: "home.contrastText",
-                    py: "17px",
-                    cursor: "pointer",
-                    boxShadow: (theme) => `0 4px 0 ${theme.palette.home.dark}`,
-                    "&:hover": { bgcolor: "home.dark" },
-                    "&:active": {
-                      transform: "translateY(3px)",
-                      boxShadow: (theme) =>
-                        `0 1px 0 ${theme.palette.home.dark}`,
-                    },
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: "14px",
+                    minHeight: 0,
                   }}
                 >
-                  <Typography
-                    component="span"
-                    sx={{
-                      fontFamily: "'Anton', sans-serif",
-                      fontWeight: 400,
-                      fontSize: "26px",
-                      lineHeight: 1,
-                      letterSpacing: "0.04em",
-                    }}
-                  >
-                    GOL
-                  </Typography>
-                  <Typography
-                    component="span"
-                    sx={{
-                      fontFamily: "Archivo, sans-serif",
-                      fontWeight: 800,
-                      fontSize: "11px",
-                      lineHeight: 1,
-                      letterSpacing: "0.14em",
-                      color: "home.light",
-                    }}
-                  >
-                    {homeTeamName.toUpperCase()}
-                  </Typography>
-                </Button>
-
-                <Button
-                  onClick={() => setGoalSheet({ side: "away", step: "scorer" })}
-                  data-testid="goal-button-away"
-                  sx={{
-                    flex: 1,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "12px",
-                    border: 0,
-                    borderRadius: "16px",
-                    bgcolor: "away.main",
-                    color: "away.contrastText",
-                    py: "17px",
-                    cursor: "pointer",
-                    boxShadow: (theme) => `0 4px 0 ${theme.palette.away.dark}`,
-                    "&:hover": { bgcolor: "away.dark" },
-                    "&:active": {
-                      transform: "translateY(3px)",
-                      boxShadow: (theme) =>
-                        `0 1px 0 ${theme.palette.away.dark}`,
-                    },
-                  }}
-                >
-                  <Typography
-                    component="span"
-                    sx={{
-                      fontFamily: "'Anton', sans-serif",
-                      fontWeight: 400,
-                      fontSize: "26px",
-                      lineHeight: 1,
-                      letterSpacing: "0.04em",
-                    }}
-                  >
-                    GOL
-                  </Typography>
-                  <Typography
-                    component="span"
-                    sx={{
-                      fontFamily: "Archivo, sans-serif",
-                      fontWeight: 800,
-                      fontSize: "11px",
-                      lineHeight: 1,
-                      letterSpacing: "0.14em",
-                      color: "away.light",
-                    }}
-                  >
-                    {awayTeamName.toUpperCase()}
-                  </Typography>
-                </Button>
-
-                <Button
-                  onClick={() => setEventSheet({ step: "type" })}
-                  data-testid="record-event-inline-button"
-                  sx={{
-                    flexShrink: 0,
-                    width: 210,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: "5px",
-                    border: (theme) => `1.5px solid ${theme.palette.divider}`,
-                    borderRadius: "16px",
-                    bgcolor: "background.paper",
-                    color: "text.primary",
-                    py: "14px",
-                    cursor: "pointer",
-                    "&:hover": {
-                      borderColor: "primary.main",
-                      bgcolor: "action.hover",
-                    },
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      fontFamily: "Archivo, sans-serif",
-                      fontWeight: 800,
-                      fontSize: "13px",
-                      lineHeight: 1,
-                      letterSpacing: "0.06em",
-                    }}
-                  >
-                    ＋{" "}
-                    {t(
-                      "peladas.dashboard.live_state.other_event",
-                      "OUTRO LANCE",
-                    )}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontFamily: "Archivo, sans-serif",
-                      fontWeight: 600,
-                      fontSize: "9.5px",
-                      lineHeight: 1,
-                      letterSpacing: "0.06em",
-                      color: "text.secondary",
-                    }}
-                  >
-                    DRIBLE · CHUTE · FALTA · DEFESAÇA
-                  </Typography>
-                </Button>
-              </Box>
+                  {teamSection("home")}
+                  {teamSection("away")}
+                </Box>
+              </>
             )}
 
-            {/* Escalações dos dois times em duas colunas */}
-            <Box
-              sx={{
-                flex: 1,
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "14px",
-                minHeight: 0,
-              }}
-            >
-              {teamSection("home")}
-              {teamSection("away")}
-            </Box>
+            {activeTab !== 0 && (
+              <>
+                {liveMatchBanner}
+                {activeTab === 1 && standingsComponent}
+                {activeTab === 2 && timelineComponent}
+                {activeTab === 3 && supportComponent}
+              </>
+            )}
           </Box>
 
           {/* Coluna Direita: Classificação ao vivo + Linha do tempo + A seguir + Suporte + Botões Tabela/Súmula */}
@@ -1566,280 +1701,275 @@ export default function ActiveMatchDashboard(props: Props) {
       ) : (
         /* ---------- Mobile (referência 1a) ---------- */
         <Box sx={{ pb: 0 }}>
-          {/* Header Placar Mobile */}
-          <MatchScoreHero
-            match={match}
-            pelada={pelada}
-            homeTeamName={homeTeamName}
-            awayTeamName={awayTeamName}
-            isAdmin={isAdmin}
-            totalMatches={matches.length}
-            standings={standings}
-            clockLabel={clockLabel}
-            running={matchTimer.status === "running"}
-            sessionLabel={sessionLabel}
-            homeOnFieldCount={homePlayers.length}
-            awayOnFieldCount={awayPlayers.length}
-            onToggleHistory={() => setHistoryOpen(true)}
-            onToggleRun={() => {
-              if (matchTimer.status === "running") matchTimer.pause?.();
-              else matchTimer.start?.();
-            }}
-            onOpenResetConfirm={onOpenResetConfirm}
-            onEndMatch={onEndMatch}
-            updating={updating}
-            finished={isMatchFinished}
-            isEditing={isEditing}
-            onToggleEdit={() => setIsEditing(!isEditing)}
-          />
+          {!activeTab || activeTab === 0 ? (
+            <>
+              {/* Header Placar Mobile */}
+              <MatchScoreHero
+                match={match}
+                pelada={pelada}
+                homeTeamName={homeTeamName}
+                awayTeamName={awayTeamName}
+                isAdmin={isAdmin}
+                totalMatches={matches.length}
+                standings={standings}
+                clockLabel={clockLabel}
+                running={matchTimer.status === "running"}
+                homeOnFieldCount={homePlayers.length}
+                awayOnFieldCount={awayPlayers.length}
+                onToggleHistory={() => setHistoryOpen(true)}
+                onToggleRun={() => {
+                  if (matchTimer.status === "running") matchTimer.pause?.();
+                  else matchTimer.start?.();
+                }}
+                onOpenResetConfirm={onOpenResetConfirm}
+                onEndMatch={onEndMatch}
+                updating={updating}
+                finished={isMatchFinished}
+                isEditing={isEditing}
+                onToggleEdit={() => setIsEditing(!isEditing)}
+              />
 
-          {/* Área de conteúdo rolável */}
-          <Box sx={{ p: "16px", pb: canRecord ? "190px" : "16px" }}>
-            {nextMatchSection()}
+              {/* Área de conteúdo rolável */}
+              <Box sx={{ p: "16px", pb: canRecord ? "190px" : "16px" }}>
+                {nextMatchSection()}
 
-            {supportRow()}
+                {supportRow()}
 
+                <Box
+                  sx={{
+                    bgcolor: "background.paper",
+                    border: (theme) => `1.5px solid ${theme.palette.divider}`,
+                    borderRadius: "15px",
+                    p: "14px",
+                  }}
+                  data-testid="on-field-card"
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "baseline",
+                      justifyContent: "space-between",
+                      mb: "12px",
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontFamily: "Archivo, sans-serif",
+                        fontWeight: 800,
+                        fontSize: "10px",
+                        lineHeight: 1,
+                        letterSpacing: "0.16em",
+                        color: "text.secondary",
+                      }}
+                    >
+                      {t("peladas.dashboard.live_state.on_field", "EM CAMPO")}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontFamily: "Archivo, sans-serif",
+                        fontSize: "10px",
+                        fontWeight: 600,
+                        lineHeight: 1,
+                        color: "text.secondary",
+                      }}
+                    >
+                      {t(
+                        "peladas.dashboard.live_state.swap_hint",
+                        "toque em ⇄ para substituir",
+                      )}
+                    </Typography>
+                  </Box>
+
+                  {teamSection("home")}
+                  {teamSection("away")}
+                </Box>
+
+                {tabButtons(false)}
+              </Box>
+
+              {/* Barra inferior fixa para o polegar */}
+              {canRecord && (
+                <Portal>
+                  <Box
+                    sx={{
+                      position: "fixed",
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      zIndex: 1100,
+                      p: "14px 16px 26px",
+                      background: (theme) =>
+                        `linear-gradient(180deg, ${alpha(theme.palette.background.default, 0)} 0%, ${theme.palette.background.default} 34%)`,
+                    }}
+                    data-testid="live-action-bar"
+                  >
+                    <Button
+                      onClick={() => setEventSheet({ step: "type" })}
+                      data-testid="record-event-inline-button"
+                      sx={{
+                        width: "100%",
+                        mb: "10px",
+                        border: (theme) =>
+                          `1.5px solid ${alpha(theme.palette.text.primary, 0.22)}`,
+                        bgcolor: "background.paper",
+                        color: "text.primary",
+                        borderRadius: "14px",
+                        py: "13px",
+                        fontFamily: "Archivo, sans-serif",
+                        fontWeight: 800,
+                        fontSize: "12px",
+                        lineHeight: 1,
+                        letterSpacing: "0.08em",
+                        cursor: "pointer",
+                        boxShadow: (theme) =>
+                          theme.customShadows?.card ||
+                          "0 2px 8px rgba(0,0,0,0.1)",
+                        "&:hover": {
+                          borderColor: "primary.main",
+                          bgcolor: "action.hover",
+                          boxShadow: (theme) =>
+                            theme.customShadows?.cardHover || "none",
+                        },
+                      }}
+                    >
+                      ＋{" "}
+                      {t(
+                        "peladas.dashboard.live_state.other_event",
+                        "OUTRO LANCE",
+                      )}{" "}
+                      · DRIBLE, CHUTE, FALTA…
+                    </Button>
+                    <Box sx={{ display: "flex", gap: "10px" }}>
+                      <Button
+                        onClick={() =>
+                          setGoalSheet({ side: "home", step: "scorer" })
+                        }
+                        data-testid="goal-button-home"
+                        sx={{
+                          flex: 1,
+                          border: 0,
+                          borderRadius: "16px",
+                          bgcolor: "home.main",
+                          color: "home.contrastText",
+                          py: "18px",
+                          pb: "20px",
+                          cursor: "pointer",
+                          boxShadow: (theme) =>
+                            `0 4px 0 ${theme.palette.home.dark}`,
+                          "&:hover": { bgcolor: "home.dark" },
+                          "&:active": {
+                            transform: "translateY(3px)",
+                            boxShadow: (theme) =>
+                              `0 1px 0 ${theme.palette.home.dark}`,
+                          },
+                        }}
+                      >
+                        <Box sx={{ display: "block", textAlign: "center" }}>
+                          <Typography
+                            component="span"
+                            sx={{
+                              display: "block",
+                              fontFamily: "'Anton', sans-serif",
+                              fontWeight: 400,
+                              fontSize: "30px",
+                              lineHeight: 1,
+                              letterSpacing: "0.04em",
+                            }}
+                          >
+                            GOL
+                          </Typography>
+                          <Typography
+                            component="span"
+                            sx={{
+                              display: "block",
+                              fontFamily: "Archivo, sans-serif",
+                              fontWeight: 800,
+                              fontSize: "10px",
+                              lineHeight: 1,
+                              letterSpacing: "0.14em",
+                              color: "home.light",
+                              mt: "6px",
+                            }}
+                          >
+                            {homeTeamName.toUpperCase()}
+                          </Typography>
+                        </Box>
+                      </Button>
+
+                      <Button
+                        onClick={() =>
+                          setGoalSheet({ side: "away", step: "scorer" })
+                        }
+                        data-testid="goal-button-away"
+                        sx={{
+                          flex: 1,
+                          border: 0,
+                          borderRadius: "16px",
+                          bgcolor: "away.main",
+                          color: "away.contrastText",
+                          py: "18px",
+                          pb: "20px",
+                          cursor: "pointer",
+                          boxShadow: (theme) =>
+                            `0 4px 0 ${theme.palette.away.dark}`,
+                          "&:hover": { bgcolor: "away.dark" },
+                          "&:active": {
+                            transform: "translateY(3px)",
+                            boxShadow: (theme) =>
+                              `0 1px 0 ${theme.palette.away.dark}`,
+                          },
+                        }}
+                      >
+                        <Box sx={{ display: "block", textAlign: "center" }}>
+                          <Typography
+                            component="span"
+                            sx={{
+                              display: "block",
+                              fontFamily: "'Anton', sans-serif",
+                              fontWeight: 400,
+                              fontSize: "30px",
+                              lineHeight: 1,
+                              letterSpacing: "0.04em",
+                            }}
+                          >
+                            GOL
+                          </Typography>
+                          <Typography
+                            component="span"
+                            sx={{
+                              display: "block",
+                              fontFamily: "Archivo, sans-serif",
+                              fontWeight: 800,
+                              fontSize: "10px",
+                              lineHeight: 1,
+                              letterSpacing: "0.14em",
+                              color: "away.light",
+                              mt: "6px",
+                            }}
+                          >
+                            {awayTeamName.toUpperCase()}
+                          </Typography>
+                        </Box>
+                      </Button>
+                    </Box>
+                  </Box>
+                </Portal>
+              )}
+            </>
+          ) : (
             <Box
               sx={{
-                bgcolor: "background.paper",
-                border: (theme) => `1.5px solid ${theme.palette.divider}`,
-                borderRadius: "15px",
-                p: "14px",
+                p: "16px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "14px",
               }}
-              data-testid="on-field-card"
             >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "baseline",
-                  justifyContent: "space-between",
-                  mb: "12px",
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontFamily: "Archivo, sans-serif",
-                    fontWeight: 800,
-                    fontSize: "10px",
-                    lineHeight: 1,
-                    letterSpacing: "0.16em",
-                    color: "text.secondary",
-                  }}
-                >
-                  {t("peladas.dashboard.live_state.on_field", "EM CAMPO")}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "Archivo, sans-serif",
-                    fontSize: "10px",
-                    fontWeight: 600,
-                    lineHeight: 1,
-                    color: "text.secondary",
-                  }}
-                >
-                  {t(
-                    "peladas.dashboard.live_state.swap_hint",
-                    "toque em ⇄ para substituir",
-                  )}
-                </Typography>
-              </Box>
-
-              {teamSection("home")}
-              {teamSection("away")}
+              {liveMatchBanner}
+              {activeTab === 1 && standingsComponent}
+              {activeTab === 2 && timelineComponent}
+              {activeTab === 3 && supportComponent}
             </Box>
-
-            {onNavigateToTimeline && (
-              <Button
-                onClick={onNavigateToTimeline}
-                data-testid="go-to-timeline-button"
-                sx={{
-                  width: "100%",
-                  mt: "12px",
-                  border: (theme) => `1.5px dashed ${theme.palette.divider}`,
-                  bgcolor: "transparent",
-                  color: "primary.main",
-                  borderRadius: "12px",
-                  py: "11px",
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: 800,
-                  fontSize: "10.5px",
-                  lineHeight: 1,
-                  letterSpacing: "0.1em",
-                  cursor: "pointer",
-                  "&:hover": {
-                    borderColor: "primary.main",
-                    bgcolor: "action.hover",
-                  },
-                }}
-              >
-                {t(
-                  "peladas.dashboard.live_state.view_timeline",
-                  "VER LINHA DO TEMPO COMPLETA",
-                )}
-              </Button>
-            )}
-
-            {tabButtons(false)}
-          </Box>
-
-          {/* Barra inferior fixa para o polegar */}
-          {canRecord && (
-            <Portal>
-              <Box
-                sx={{
-                  position: "fixed",
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  zIndex: 1100,
-                  p: "14px 16px 26px",
-                  background: (theme) =>
-                    `linear-gradient(180deg, ${alpha(theme.palette.background.default, 0)} 0%, ${theme.palette.background.default} 34%)`,
-                }}
-                data-testid="live-action-bar"
-              >
-                <Button
-                  onClick={() => setEventSheet({ step: "type" })}
-                  data-testid="record-event-inline-button"
-                  sx={{
-                    width: "100%",
-                    mb: "9px",
-                    border: (theme) => `1.5px solid ${theme.palette.divider}`,
-                    bgcolor: "background.paper",
-                    color: "text.primary",
-                    borderRadius: "13px",
-                    py: "13px",
-                    fontFamily: "Archivo, sans-serif",
-                    fontWeight: 800,
-                    fontSize: "11.5px",
-                    lineHeight: 1,
-                    letterSpacing: "0.08em",
-                    cursor: "pointer",
-                    "&:hover": {
-                      borderColor: "primary.main",
-                      bgcolor: "action.hover",
-                    },
-                  }}
-                >
-                  ＋{" "}
-                  {t("peladas.dashboard.live_state.other_event", "OUTRO LANCE")}{" "}
-                  · DRIBLE, CHUTE, FALTA…
-                </Button>
-                <Box sx={{ display: "flex", gap: "10px" }}>
-                  <Button
-                    onClick={() =>
-                      setGoalSheet({ side: "home", step: "scorer" })
-                    }
-                    data-testid="goal-button-home"
-                    sx={{
-                      flex: 1,
-                      border: 0,
-                      borderRadius: "16px",
-                      bgcolor: "home.main",
-                      color: "home.contrastText",
-                      py: "18px",
-                      pb: "20px",
-                      cursor: "pointer",
-                      boxShadow: (theme) =>
-                        `0 4px 0 ${theme.palette.home.dark}`,
-                      "&:hover": { bgcolor: "home.dark" },
-                      "&:active": {
-                        transform: "translateY(3px)",
-                        boxShadow: (theme) =>
-                          `0 1px 0 ${theme.palette.home.dark}`,
-                      },
-                    }}
-                  >
-                    <Box sx={{ display: "block", textAlign: "center" }}>
-                      <Typography
-                        component="span"
-                        sx={{
-                          display: "block",
-                          fontFamily: "'Anton', sans-serif",
-                          fontWeight: 400,
-                          fontSize: "30px",
-                          lineHeight: 1,
-                          letterSpacing: "0.04em",
-                        }}
-                      >
-                        GOL
-                      </Typography>
-                      <Typography
-                        component="span"
-                        sx={{
-                          display: "block",
-                          fontFamily: "Archivo, sans-serif",
-                          fontWeight: 800,
-                          fontSize: "10px",
-                          lineHeight: 1,
-                          letterSpacing: "0.14em",
-                          color: "home.light",
-                          mt: "6px",
-                        }}
-                      >
-                        {homeTeamName.toUpperCase()}
-                      </Typography>
-                    </Box>
-                  </Button>
-
-                  <Button
-                    onClick={() =>
-                      setGoalSheet({ side: "away", step: "scorer" })
-                    }
-                    data-testid="goal-button-away"
-                    sx={{
-                      flex: 1,
-                      border: 0,
-                      borderRadius: "16px",
-                      bgcolor: "away.main",
-                      color: "away.contrastText",
-                      py: "18px",
-                      pb: "20px",
-                      cursor: "pointer",
-                      boxShadow: (theme) =>
-                        `0 4px 0 ${theme.palette.away.dark}`,
-                      "&:hover": { bgcolor: "away.dark" },
-                      "&:active": {
-                        transform: "translateY(3px)",
-                        boxShadow: (theme) =>
-                          `0 1px 0 ${theme.palette.away.dark}`,
-                      },
-                    }}
-                  >
-                    <Box sx={{ display: "block", textAlign: "center" }}>
-                      <Typography
-                        component="span"
-                        sx={{
-                          display: "block",
-                          fontFamily: "'Anton', sans-serif",
-                          fontWeight: 400,
-                          fontSize: "30px",
-                          lineHeight: 1,
-                          letterSpacing: "0.04em",
-                        }}
-                      >
-                        GOL
-                      </Typography>
-                      <Typography
-                        component="span"
-                        sx={{
-                          display: "block",
-                          fontFamily: "Archivo, sans-serif",
-                          fontWeight: 800,
-                          fontSize: "10px",
-                          lineHeight: 1,
-                          letterSpacing: "0.14em",
-                          color: "away.light",
-                          mt: "6px",
-                        }}
-                      >
-                        {awayTeamName.toUpperCase()}
-                      </Typography>
-                    </Box>
-                  </Button>
-                </Box>
-              </Box>
-            </Portal>
           )}
         </Box>
       )}
