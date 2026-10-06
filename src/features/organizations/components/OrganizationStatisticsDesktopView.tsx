@@ -1,5 +1,14 @@
 import { useState, useMemo } from "react";
-import { Box, Typography, Menu, MenuItem, useTheme } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Menu,
+  MenuItem,
+  Button,
+  useTheme,
+} from "@mui/material";
+import FileUploadIcon from "@mui/icons-material/FileUpload";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import { useTranslation } from "react-i18next";
 import type {
   Organization,
@@ -41,6 +50,8 @@ export default function OrganizationStatisticsDesktopView({
   onYearChange,
   currentUser,
   isAdmin = false,
+  onOpenImport,
+  onOpenExport,
   weeklyPresence = [],
 }: OrganizationStatisticsDesktopViewProps) {
   const { t } = useTranslation();
@@ -125,52 +136,57 @@ export default function OrganizationStatisticsDesktopView({
       : null;
 
   // Season highlights derived from the real per-player stats.
-  const highlights = [
-    {
-      key: "top-scorer",
-      item: [...stats].sort((a, b) => (b.goal || 0) - (a.goal || 0))[0],
-      color: theme.palette.gold?.main || theme.palette.primary.main,
-      label: (p: OrganizationPlayerStats) => `Artilheiro · ${p.goal} gols`,
-      eligible: (p: OrganizationPlayerStats) => (p.goal || 0) > 0,
-    },
-    {
-      key: "top-assist",
-      item: [...stats].sort((a, b) => (b.assist || 0) - (a.assist || 0))[0],
-      color: AVATAR_BG_COLORS[1] || "primary.light",
-      label: (p: OrganizationPlayerStats) => `Garçom · ${p.assist} assist.`,
-      eligible: (p: OrganizationPlayerStats) => (p.assist || 0) > 0,
-    },
-    {
-      key: "most-games",
-      item: [...stats].sort(
-        (a, b) => (b.peladas_played || 0) - (a.peladas_played || 0),
-      )[0],
-      color: AVATAR_BG_COLORS[4] || "secondary.light",
-      label: (p: OrganizationPlayerStats) =>
-        `Presença · ${p.peladas_played} jogos`,
-      eligible: (p: OrganizationPlayerStats) => (p.peladas_played || 0) > 0,
-    },
-    {
-      key: "best-rating",
-      item: [...stats]
-        .filter((p) => (p.avg_rating || 0) > 0)
-        .sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0))[0],
-      color: AVATAR_BG_COLORS[6] || "info.light",
-      label: (p: OrganizationPlayerStats) =>
-        `Nota média · ${(p.avg_rating || 0).toFixed(1)}`,
-      eligible: (p: OrganizationPlayerStats) => (p.avg_rating || 0) > 0,
-    },
-  ].filter((h) => h.item && h.eligible(h.item));
+  const highlights = useMemo(() => {
+    return [
+      {
+        key: "top-scorer",
+        item: [...stats].sort((a, b) => (b.goal || 0) - (a.goal || 0))[0],
+        color: theme.palette.gold?.main || theme.palette.primary.main,
+        label: (p: OrganizationPlayerStats) => `Artilheiro · ${p.goal} gols`,
+        eligible: (p: OrganizationPlayerStats) => (p.goal || 0) > 0,
+      },
+      {
+        key: "top-assist",
+        item: [...stats].sort((a, b) => (b.assist || 0) - (a.assist || 0))[0],
+        color: AVATAR_BG_COLORS[1] || "primary.light",
+        label: (p: OrganizationPlayerStats) => `Garçom · ${p.assist} assist.`,
+        eligible: (p: OrganizationPlayerStats) => (p.assist || 0) > 0,
+      },
+      {
+        key: "most-games",
+        item: [...stats].sort(
+          (a, b) => (b.peladas_played || 0) - (a.peladas_played || 0),
+        )[0],
+        color: AVATAR_BG_COLORS[4] || "secondary.light",
+        label: (p: OrganizationPlayerStats) =>
+          `Presença · ${p.peladas_played} jogos`,
+        eligible: (p: OrganizationPlayerStats) => (p.peladas_played || 0) > 0,
+      },
+      {
+        key: "best-rating",
+        item: [...stats]
+          .filter((p) => (p.avg_rating || 0) > 0)
+          .sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0))[0],
+        color: AVATAR_BG_COLORS[6] || "info.light",
+        label: (p: OrganizationPlayerStats) =>
+          `Nota média · ${(p.avg_rating || 0).toFixed(1)}`,
+        eligible: (p: OrganizationPlayerStats) => (p.avg_rating || 0) > 0,
+      },
+    ].filter((h) => h.item && h.eligible(h.item));
+  }, [stats, theme]);
 
   const myStat = currentUser
     ? stats.find((s) => s.user_id === currentUser.id)
     : undefined;
-  const myRank =
-    myStat && stats.length
-      ? [...stats]
-          .sort((a, b) => (b.goal || 0) - (a.goal || 0))
-          .findIndex((s) => s.user_id === currentUser?.id) + 1
-      : 0;
+
+  const myRank = useMemo(() => {
+    if (!myStat || !stats.length) return 0;
+    return (
+      [...stats]
+        .sort((a, b) => (b.goal || 0) - (a.goal || 0))
+        .findIndex((s) => s.user_id === currentUser?.id) + 1
+    );
+  }, [stats, myStat, currentUser?.id]);
 
   const presenceMax = Math.max(1, ...weeklyPresence.map((w) => w.confirmed));
   const presenceWeeksAvg = weeklyPresence.length
@@ -248,6 +264,8 @@ export default function OrganizationStatisticsDesktopView({
           >
             <Box>
               <Typography
+                component="h2"
+                data-testid="org-name-header"
                 sx={{
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 700,
@@ -276,60 +294,117 @@ export default function OrganizationStatisticsDesktopView({
               </Typography>
             </Box>
 
-            <Box
-              component="button"
-              onClick={(e) => setYearMenuAnchor(e.currentTarget)}
-              sx={{
-                border: "1.5px solid",
-                borderColor: isDark ? "divider" : "rgba(255,255,255,0.3)",
-                borderRadius: "10px",
-                px: 1.5,
-                py: 1,
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 800,
-                fontSize: "11px",
-                letterSpacing: ".06em",
-                color: isDark ? "text.primary" : "background.paper",
-                bgcolor: "transparent",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: 0.6,
-                "&:hover": {
-                  borderColor: isDark ? "text.primary" : "background.paper",
-                  bgcolor: "action.hover",
-                },
-              }}
-            >
-              {year} ▾
-            </Box>
-            <Menu
-              anchorEl={yearMenuAnchor}
-              open={Boolean(yearMenuAnchor)}
-              onClose={() => setYearMenuAnchor(null)}
-              slotProps={{
-                paper: {
-                  sx: {
-                    bgcolor: "background.paper",
-                    color: "text.primary",
-                    border: "1px solid",
-                    borderColor: "divider",
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
+              {isAdmin && (
+                <>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={<FileUploadIcon sx={{ fontSize: 16 }} />}
+                    onClick={onOpenImport}
+                    data-testid="import-stats-button"
+                    sx={{
+                      borderColor: "divider",
+                      color: "inherit",
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 800,
+                      fontSize: "11px",
+                      letterSpacing: ".06em",
+                      borderRadius: "10px",
+                      py: 0.8,
+                      px: 1.5,
+                      textTransform: "uppercase",
+                      "&:hover": {
+                        borderColor: "text.primary",
+                        bgcolor: "action.hover",
+                      },
+                    }}
+                  >
+                    {t("common.import", "Importar")}
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={<FileDownloadIcon sx={{ fontSize: 16 }} />}
+                    onClick={onOpenExport}
+                    data-testid="export-stats-button"
+                    sx={{
+                      borderColor: "divider",
+                      color: "inherit",
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 800,
+                      fontSize: "11px",
+                      letterSpacing: ".06em",
+                      borderRadius: "10px",
+                      py: 0.8,
+                      px: 1.5,
+                      textTransform: "uppercase",
+                      "&:hover": {
+                        borderColor: "text.primary",
+                        bgcolor: "action.hover",
+                      },
+                    }}
+                  >
+                    {t("common.export", "Exportar")}
+                  </Button>
+                </>
+              )}
+
+              <Box
+                component="button"
+                onClick={(e) => setYearMenuAnchor(e.currentTarget)}
+                sx={{
+                  border: "1.5px solid",
+                  borderColor: isDark ? "divider" : "rgba(255,255,255,0.3)",
+                  borderRadius: "10px",
+                  px: 1.5,
+                  py: 1,
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 800,
+                  fontSize: "11px",
+                  letterSpacing: ".06em",
+                  color: isDark ? "text.primary" : "background.paper",
+                  bgcolor: "transparent",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 0.6,
+                  "&:hover": {
+                    borderColor: isDark ? "text.primary" : "background.paper",
+                    bgcolor: "action.hover",
                   },
-                },
-              }}
-            >
-              {years.map((y) => (
-                <MenuItem
-                  key={y}
-                  onClick={() => {
-                    onYearChange(Number(y));
-                    setYearMenuAnchor(null);
-                  }}
-                >
-                  {y}
-                </MenuItem>
-              ))}
-            </Menu>
+                }}
+              >
+                {year} ▾
+              </Box>
+              <Menu
+                anchorEl={yearMenuAnchor}
+                open={Boolean(yearMenuAnchor)}
+                onClose={() => setYearMenuAnchor(null)}
+                slotProps={{
+                  paper: {
+                    sx: {
+                      bgcolor: "background.paper",
+                      color: "text.primary",
+                      border: "1px solid",
+                      borderColor: "divider",
+                    },
+                  },
+                }}
+              >
+                {years.map((y) => (
+                  <MenuItem
+                    key={y}
+                    onClick={() => {
+                      onYearChange(Number(y));
+                      setYearMenuAnchor(null);
+                    }}
+                  >
+                    {y}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
           </Box>
 
           {/* 5 Season Metrics */}
@@ -801,6 +876,7 @@ export default function OrganizationStatisticsDesktopView({
                 return (
                   <Box
                     key={item.player_id || idx}
+                    data-testid="stats-player-row"
                     sx={{
                       display: "flex",
                       alignItems: "center",

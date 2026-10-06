@@ -1,6 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import type { OrganizationFeatureFlags } from "../../../shared/api/endpoints";
 
 export type GroupTabKey =
   | "agenda"
@@ -16,6 +17,7 @@ interface GroupTabsBarProps {
   playersCount?: number;
   financePending?: number;
   isAdmin?: boolean;
+  featureFlags?: OrganizationFeatureFlags | null;
   /**
    * When true (default) the strip uses negative margins to reach the viewport
    * edges, for pages whose container is full-width on desktop.
@@ -35,6 +37,7 @@ export default function GroupTabsBar({
   playersCount,
   financePending,
   isAdmin = false,
+  featureFlags,
 }: GroupTabsBarProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -137,8 +140,19 @@ export default function GroupTabsBar({
         <Box
           component="button"
           type="button"
-          onClick={() => navigate(`/organizations/${orgId}/statistics`)}
-          sx={tabSx("statistics")}
+          data-testid="org-statistics-button"
+          disabled={featureFlags?.org_statistics === false}
+          onClick={() => {
+            if (featureFlags?.org_statistics !== false) {
+              navigate(`/organizations/${orgId}/statistics`);
+            }
+          }}
+          sx={{
+            ...tabSx("statistics"),
+            ...(featureFlags?.org_statistics === false
+              ? { opacity: 0.5, cursor: "not-allowed" }
+              : {}),
+          }}
         >
           {t("organizations.tabs.statistics", "ESTATÍSTICAS")}
         </Box>

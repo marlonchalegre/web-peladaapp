@@ -33,13 +33,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const signOut = useCallback(async () => {
+    setUser(null);
+    localStorage.removeItem("authUser");
     try {
       await logout();
     } catch (e) {
       console.error("Failed to logout from server", e);
     }
-    setUser(null);
-    localStorage.removeItem("authUser");
   }, []);
 
   useEffect(() => {

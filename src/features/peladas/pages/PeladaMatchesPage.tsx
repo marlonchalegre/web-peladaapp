@@ -14,8 +14,13 @@ import {
   ListItemIcon,
   ListItemText,
   Grid,
+  IconButton,
   type Theme,
 } from "@mui/material";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import PauseIcon from "@mui/icons-material/Pause";
+import ReplayIcon from "@mui/icons-material/Replay";
+import ShareIcon from "@mui/icons-material/Share";
 import ActiveMatchDashboard from "../components/ActiveMatchDashboard";
 import MatchReportSummary from "../components/MatchReportSummary";
 import SupportLineupTab from "../components/SupportLineupTab";
@@ -96,6 +101,8 @@ interface HeaderSessionBadgeProps {
   isPeladaClosed: boolean;
   onStartPeladaTimer: () => Promise<void>;
   onPausePeladaTimer: () => Promise<void>;
+  isAdmin?: boolean;
+  onOpenResetConfirm?: () => void;
 }
 
 function HeaderSessionBadge({
@@ -103,6 +110,8 @@ function HeaderSessionBadge({
   isPeladaClosed,
   onStartPeladaTimer,
   onPausePeladaTimer,
+  isAdmin = false,
+  onOpenResetConfirm,
 }: HeaderSessionBadgeProps) {
   const { t } = useTranslation();
   const sessionTimer = usePeladaTimer(
@@ -115,31 +124,71 @@ function HeaderSessionBadge({
   );
 
   return (
-    <Typography
-      sx={{
-        fontFamily: "Archivo, sans-serif",
-        fontWeight: 800,
-        fontSize: { xs: "11px", sm: "12.5px" },
-        lineHeight: 1,
-        letterSpacing: ".06em",
-        color: "pitch.subtle",
-        display: "flex",
-        alignItems: "center",
-        gap: "6px",
-        whiteSpace: "nowrap",
-      }}
-    >
-      <span>{t("peladas.matches.session_label", "SESSÃO")}</span>
-      <Box
-        component="span"
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <Typography
         sx={{
-          color: "pitch.contrastText",
+          fontFamily: "Archivo, sans-serif",
           fontWeight: 800,
+          fontSize: { xs: "11px", sm: "12.5px" },
+          lineHeight: 1,
+          letterSpacing: ".06em",
+          color: "pitch.subtle",
+          display: "flex",
+          alignItems: "center",
+          gap: "6px",
+          whiteSpace: "nowrap",
         }}
       >
-        {sessionTimer.formattedTime}
-      </Box>
-    </Typography>
+        <span>{t("peladas.matches.session_label", "SESSÃO")}</span>
+        <Box
+          component="span"
+          data-testid="global-timer-text"
+          sx={{
+            color: "pitch.contrastText",
+            fontWeight: 800,
+          }}
+        >
+          {sessionTimer.formattedTime}
+        </Box>
+      </Typography>
+
+      {isAdmin && !isPeladaClosed && (
+        <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
+          {sessionTimer.status === "running" ? (
+            <IconButton
+              size="small"
+              onClick={sessionTimer.pause}
+              data-testid="pause-global-timer-button"
+              aria-label={t("common.pause")}
+              sx={{ color: "pitch.contrastText", p: "2px" }}
+            >
+              <PauseIcon sx={{ fontSize: 16 }} />
+            </IconButton>
+          ) : (
+            <IconButton
+              size="small"
+              onClick={sessionTimer.start}
+              data-testid="start-global-timer-button"
+              aria-label={t("common.start")}
+              sx={{ color: "pitch.contrastText", p: "2px" }}
+            >
+              <PlayArrowIcon sx={{ fontSize: 16 }} />
+            </IconButton>
+          )}
+          {onOpenResetConfirm && (
+            <IconButton
+              size="small"
+              onClick={onOpenResetConfirm}
+              data-testid="reset-global-timer-button"
+              aria-label={t("common.reset")}
+              sx={{ color: "pitch.contrastText", p: "2px" }}
+            >
+              <ReplayIcon sx={{ fontSize: 16 }} />
+            </IconButton>
+          )}
+        </Stack>
+      )}
+    </Box>
   );
 }
 
@@ -676,6 +725,8 @@ export default function PeladaMatchesPage() {
                 return (
                   <Button
                     key={tab.id}
+                    role="tab"
+                    aria-selected={isActive}
                     size="small"
                     onClick={() => setActiveTab(tab.id)}
                     data-testid={tab.testId}
@@ -748,15 +799,29 @@ export default function PeladaMatchesPage() {
                 isPeladaClosed={isPeladaClosed}
                 onStartPeladaTimer={handleStartPeladaTimer}
                 onPausePeladaTimer={pausePeladaTimer}
+                isAdmin={isAdmin}
+                onOpenResetConfirm={() => handleResetClick("session")}
               />
             )}
 
-            {/* Hidden fallback button to support automated share menu test workflows */}
-            <Button
+            <IconButton
               onClick={handleShareClick}
               data-testid="share-dropdown-button"
-              sx={{ display: "none" }}
-            />
+              aria-label={t("common.share", "Compartilhar")}
+              sx={{
+                width: 34,
+                height: 34,
+                borderRadius: "10px",
+                border: "1.5px solid rgba(255,255,255,0.18)",
+                bgcolor: "rgba(0,0,0,0.2)",
+                color: "pitch.contrastText",
+                "&:hover": {
+                  bgcolor: "rgba(255,255,255,0.1)",
+                },
+              }}
+            >
+              <ShareIcon sx={{ fontSize: 18 }} />
+            </IconButton>
 
             {pelada?.status === "voting" && (
               <Button

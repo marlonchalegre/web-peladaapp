@@ -407,6 +407,25 @@ export default function MatchScoreHero({
             </Button>
           )}
 
+          <IconButton
+            onClick={onToggleHistory}
+            data-testid="toggle-history-drawer"
+            aria-label={t("peladas.dashboard.button.history")}
+            sx={{
+              border: "1.5px solid",
+              borderColor: "divider",
+              bgcolor: "action.hover",
+              color: "text.secondary",
+              width: 36,
+              height: 36,
+              borderRadius: "11px",
+              p: 0,
+              "&:hover": { borderColor: "text.primary", color: "text.primary" },
+            }}
+          >
+            <HistoryIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+
           <Box sx={{ flex: 1 }} />
 
           {isMatchFinished ? (

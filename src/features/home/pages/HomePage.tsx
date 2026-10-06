@@ -10,9 +10,10 @@ import {
   MenuItem,
   IconButton,
 } from "@mui/material";
-import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
+import { Link as RouterLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../../app/providers/AuthContext";
+import { useLogout } from "../../../shared/hooks/useLogout";
 import { Loading } from "../../../shared/components/Loading";
 import { useHomeDashboard } from "../hooks/useHomeDashboard";
 import PeladasList from "../components/PeladasList";
@@ -26,9 +27,8 @@ import { ThemeSwitcher } from "../../../shared/components/ThemeSwitcher";
 import { useAppTheme } from "../../../app/providers/ThemeContext";
 
 export default function HomePage() {
-  const { user, refreshUser, signOut } = useAuth();
+  const { user, refreshUser } = useAuth();
   const { mode, toggleTheme } = useAppTheme();
-  const navigate = useNavigate();
   const location = useLocation();
   const { t, i18n } = useTranslation();
   const currentYear = new Date().getFullYear();
@@ -43,11 +43,8 @@ export default function HomePage() {
     setAnchorElUser(null);
   };
 
-  const handleLogout = () => {
-    handleCloseUserMenu();
-    signOut();
-    navigate("/");
-  };
+  const logout = useLogout();
+  const handleLogout = () => logout(handleCloseUserMenu);
 
   useEffect(() => {
     refreshUser();
@@ -268,7 +265,6 @@ export default function HomePage() {
                         vertical: "top",
                         horizontal: "right",
                       }}
-                      keepMounted
                       transformOrigin={{
                         vertical: "top",
                         horizontal: "right",

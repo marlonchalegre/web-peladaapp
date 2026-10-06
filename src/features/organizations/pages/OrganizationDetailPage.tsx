@@ -298,42 +298,6 @@ export default function OrganizationDetailPage() {
     );
   if (!org) return <Loading message={t("common.loading")} />;
 
-  if (isDesktop) {
-    return (
-      <Box
-        sx={{
-          width: "100%",
-          bgcolor: "background.default",
-          minHeight: "100vh",
-        }}
-      >
-        <OrganizationDetailDesktopView
-          org={org}
-          peladas={peladas}
-          totalPeladas={totalPeladas}
-          isAdmin={isAdmin}
-          playersCount={playersCount}
-          waitlistCount={orgWaitlistCount}
-          historyByPelada={historyByPelada}
-          onCreatePeladaSuccess={fetchPeladas}
-          onCreatePeladaQuick={async (data) => {
-            const scheduledAt = new Date(
-              `${data.date}T${data.time}:00`,
-            ).toISOString();
-            await endpoints.createPelada({
-              organization_id: orgId,
-              scheduled_at: scheduledAt,
-              max_players: data.maxPlayers,
-              location: data.location || undefined,
-              notify_casual_players: true,
-            });
-            await fetchPeladas();
-          }}
-        />
-      </Box>
-    );
-  }
-
   return (
     <Box
       sx={{ width: "100%", bgcolor: "background.default", minHeight: "100vh" }}
@@ -351,40 +315,74 @@ export default function OrganizationDetailPage() {
         </Alert>
       )}
 
-      <OrganizationDetailMobileView
-        org={org}
-        peladas={peladas}
-        totalPeladas={totalPeladas}
-        historyByPelada={historyByPelada}
-        players={players}
-        isAdmin={isAdmin}
-        featureFlags={featureFlags}
-        waitlistStatus={waitlistStatus}
-        waitlistLoading={waitlistLoading}
-        currentPlayer={currentPlayer}
-        currentUser={user}
-        memberStats={memberStats}
-        onJoinWaitlist={handleJoinWaitlist}
-        onLeaveWaitlist={() => setLeaveWaitlistConfirmOpen(true)}
-        onCreatePelada={async (payload) => {
-          try {
-            const newPelada = await endpoints.createPelada(payload);
+      {isDesktop ? (
+        <OrganizationDetailDesktopView
+          org={org}
+          peladas={peladas}
+          totalPeladas={totalPeladas}
+          isAdmin={isAdmin}
+          playersCount={playersCount}
+          waitlistCount={orgWaitlistCount}
+          historyByPelada={historyByPelada}
+          currentPlayer={currentPlayer}
+          waitlistStatus={waitlistStatus}
+          waitlistLoading={waitlistLoading}
+          featureFlags={featureFlags}
+          onJoinWaitlist={handleJoinWaitlist}
+          onLeaveWaitlist={() => setLeaveWaitlistConfirmOpen(true)}
+          onLeaveOrg={() => setLeaveDialogOpen(true)}
+          onCreatePeladaSuccess={fetchPeladas}
+          onCreatePeladaQuick={async (data) => {
+            const scheduledAt = new Date(
+              `${data.date}T${data.time}:00`,
+            ).toISOString();
+            const newPelada = await endpoints.createPelada({
+              organization_id: orgId,
+              scheduled_at: scheduledAt,
+              max_players: data.maxPlayers,
+              location: data.location || undefined,
+              notify_casual_players: true,
+            });
+            await fetchPeladas();
             navigate(`/peladas/${newPelada.id}/attendance`);
-          } catch (error: unknown) {
-            const message =
-              error instanceof Error
-                ? error.message
-                : t("organizations.detail.error.create_pelada_failed");
-            setError(message);
-          }
-        }}
-        onDeletePelada={(pelada) => {
-          setPeladaToDelete(pelada);
-          setDeleteDialogOpen(true);
-        }}
-        onLeaveOrg={() => setLeaveDialogOpen(true)}
-        onLoadMore={handleLoadMore}
-      />
+          }}
+        />
+      ) : (
+        <OrganizationDetailMobileView
+          org={org}
+          peladas={peladas}
+          totalPeladas={totalPeladas}
+          historyByPelada={historyByPelada}
+          players={players}
+          isAdmin={isAdmin}
+          featureFlags={featureFlags}
+          waitlistStatus={waitlistStatus}
+          waitlistLoading={waitlistLoading}
+          currentPlayer={currentPlayer}
+          currentUser={user}
+          memberStats={memberStats}
+          onJoinWaitlist={handleJoinWaitlist}
+          onLeaveWaitlist={() => setLeaveWaitlistConfirmOpen(true)}
+          onCreatePelada={async (payload) => {
+            try {
+              const newPelada = await endpoints.createPelada(payload);
+              navigate(`/peladas/${newPelada.id}/attendance`);
+            } catch (error: unknown) {
+              const message =
+                error instanceof Error
+                  ? error.message
+                  : t("organizations.detail.error.create_pelada_failed");
+              setError(message);
+            }
+          }}
+          onDeletePelada={(pelada) => {
+            setPeladaToDelete(pelada);
+            setDeleteDialogOpen(true);
+          }}
+          onLeaveOrg={() => setLeaveDialogOpen(true)}
+          onLoadMore={handleLoadMore}
+        />
+      )}
 
       {/* Confirmation Dialog */}
       <Dialog

@@ -912,13 +912,14 @@ export default function PeladaTeamsMobileView({
                       onClick={() =>
                         onUpdatePlayersPerTeam?.(playersPerTeam - 1)
                       }
-                      disabled={processing || playersPerTeam <= 2}
+                      disabled={processing || playersPerTeam <= 1}
                       data-testid="mobile-players-per-team-decrement"
                       sx={{ p: 0.25 }}
                     >
                       <RemoveIcon sx={{ fontSize: 15 }} />
                     </IconButton>
                     <Typography
+                      component="h6"
                       data-testid="mobile-players-per-team-value"
                       sx={{
                         fontFamily: "'Archivo Narrow', Archivo, sans-serif",

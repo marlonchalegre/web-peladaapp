@@ -5,7 +5,6 @@ import {
   Route,
   Link as RouterLink,
   useLocation,
-  useNavigate,
 } from "react-router-dom";
 import {
   AppBar,
@@ -23,6 +22,7 @@ import Brightness7Icon from "@mui/icons-material/Brightness7";
 import "./App.css";
 import { AuthProvider } from "./app/providers/AuthProvider";
 import { useAuth } from "./app/providers/AuthContext";
+import { useLogout } from "./shared/hooks/useLogout";
 import { useAppTheme } from "./app/providers/ThemeContext";
 import { LanguageSwitcher } from "./shared/components/LanguageSwitcher";
 import { useTranslation } from "react-i18next";
@@ -244,8 +244,7 @@ function Footer() {
 }
 
 function AppLayout() {
-  const { isAuthenticated, user, signOut } = useAuth();
-  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
   const location = useLocation();
   const { mode, toggleTheme } = useAppTheme();
   const { t } = useTranslation();
@@ -282,11 +281,8 @@ function AppLayout() {
     setAnchorElUser(null);
   };
 
-  const handleLogout = () => {
-    handleCloseUserMenu();
-    signOut();
-    navigate("/");
-  };
+  const logout = useLogout();
+  const handleLogout = () => logout(handleCloseUserMenu);
 
   const handleInstallApp = () => {
     handleCloseUserMenu();

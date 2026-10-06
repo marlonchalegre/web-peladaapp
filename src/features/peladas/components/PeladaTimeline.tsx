@@ -530,6 +530,7 @@ export default function PeladaTimeline({
       <Button
         variant="outlined"
         size="small"
+        data-testid="export-tabular-button"
         startIcon={<ContentCopyIcon sx={{ fontSize: "14px" }} />}
         onClick={handleExportTimeline}
         sx={{

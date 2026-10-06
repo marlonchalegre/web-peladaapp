@@ -37,7 +37,7 @@ export function usePeladaTimer(
       setNow(Date.now());
       const interval = setInterval(() => {
         setNow(Date.now());
-      }, 100);
+      }, 1000);
       return () => clearInterval(interval);
     }
   }, [effectiveRunning]);

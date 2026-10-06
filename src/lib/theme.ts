@@ -30,6 +30,8 @@ declare module "@mui/material/styles" {
       borderThick: string;
       shadow: string;
       shadowSmall: string;
+      cardHeaderBg: string;
+      cardHeaderText: string;
     };
     status: {
       paid: {
@@ -122,6 +124,8 @@ declare module "@mui/material/styles" {
       borderThick?: string;
       shadow?: string;
       shadowSmall?: string;
+      cardHeaderBg?: string;
+      cardHeaderText?: string;
     };
     status?: {
       paid?: {
@@ -536,6 +540,8 @@ export const getTheme = (mode: PaletteMode) => {
         mode === "dark" ? "0 4px 20px rgba(0,0,0,0.5)" : "5px 5px 0 #17181a",
       shadowSmall:
         mode === "dark" ? "0 2px 10px rgba(0,0,0,0.3)" : "3px 3px 0 #17181a",
+      cardHeaderBg: mode === "dark" ? "#222428" : "#17181a",
+      cardHeaderText: mode === "dark" ? "#f6f4ee" : "#ffffff",
     },
     customShadows,
     status: {

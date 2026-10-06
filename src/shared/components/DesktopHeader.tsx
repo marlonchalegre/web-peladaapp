@@ -10,6 +10,7 @@ import {
 import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../app/providers/AuthContext";
+import { useLogout } from "../hooks/useLogout";
 import { api } from "../../shared/api/client";
 import { createApi, type Organization } from "../../shared/api/endpoints";
 import { ThemeSwitcher } from "./ThemeSwitcher";
@@ -22,7 +23,7 @@ interface DesktopHeaderProps {
 }
 
 export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { t, i18n } = useTranslation();
@@ -51,11 +52,8 @@ export default function DesktopHeader({ currentOrgName }: DesktopHeaderProps) {
     setAnchorElOrg(null);
   };
 
-  const handleLogout = () => {
-    handleCloseUserMenu();
-    signOut();
-    navigate("/");
-  };
+  const logout = useLogout();
+  const handleLogout = () => logout(handleCloseUserMenu);
 
   const userInitials = useMemo(() => {
     if (!user?.name) return "U";

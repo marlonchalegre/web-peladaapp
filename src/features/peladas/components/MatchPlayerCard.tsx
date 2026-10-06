@@ -151,7 +151,7 @@ export default function MatchPlayerCard({
 
   return (
     <Box
-      data-testid={`player-row-${playerName}`}
+      data-testid="player-row"
       sx={{
         display: "flex",
         alignItems: "center",
@@ -166,6 +166,7 @@ export default function MatchPlayerCard({
       }}
     >
       <Box
+        data-testid={`player-row-${playerName}`}
         sx={{
           display: "flex",
           alignItems: "center",

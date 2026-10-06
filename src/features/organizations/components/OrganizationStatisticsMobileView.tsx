@@ -463,6 +463,7 @@ export default function OrganizationStatisticsMobileView({
               </IconButton>
               <IconButton
                 onClick={onOpenExport}
+                data-testid="export-stats-button"
                 aria-label={t("common.export", "Exportar")}
                 sx={{
                   width: 32,

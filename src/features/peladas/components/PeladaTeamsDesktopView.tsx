@@ -1,10 +1,27 @@
 import { useState, useMemo, type DragEvent } from "react";
-import { Box, Typography, Switch, IconButton, Button } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Switch,
+  IconButton,
+  Button,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+} from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import GroupsIcon from "@mui/icons-material/Groups";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import SecurityIcon from "@mui/icons-material/Security";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useTranslation } from "react-i18next";
 import AddPlayersButton from "./AddPlayersButton";
+import { copyToClipboard } from "../utils/exportUtils";
 import type {
   Pelada,
   Team,
@@ -101,6 +118,7 @@ function FixedGkSlot({
 
   return (
     <Box
+      data-testid={`gk-slot-${side}`}
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
         e.preventDefault();
@@ -223,6 +241,10 @@ export default function PeladaTeamsDesktopView({
   dropToBench,
   dropToFixedGk,
   removeFixedGk,
+  onMoveToTeam,
+  onSendToBench,
+  onMoveToFixedGk,
+  onToggleFixedGk,
   onRandomizeTeams,
   onUpdatePlayersPerTeam,
   onUpdateNumTeams,
@@ -238,8 +260,43 @@ export default function PeladaTeamsDesktopView({
   const { t } = useTranslation();
   const [algorithm, setAlgorithm] = useState<DrawAlgorithm>("classic");
   const [useHistory, setUseHistory] = useState(true);
+  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  const [activePlayerForMenu, setActivePlayerForMenu] = useState<{
+    player: PlayerWithUser;
+    sourceTeamId: string | null;
+  } | null>(null);
+
+  const handleOpenPlayerMenu = (
+    e: React.MouseEvent<HTMLElement>,
+    player: PlayerWithUser,
+    sourceTeamId: string | null,
+  ) => {
+    e.stopPropagation();
+    setMenuAnchor(e.currentTarget);
+    setActivePlayerForMenu({ player, sourceTeamId });
+  };
+
+  const handleClosePlayerMenu = () => {
+    setMenuAnchor(null);
+    setActivePlayerForMenu(null);
+  };
+
   const { copied: copiedZap, triggerCopy: handleCopyZap } =
     useCopyFeedback(onCopyAnnouncement);
+
+  const handleCopyBenchPlayers = async () => {
+    const text = benchPlayers
+      .map(
+        (bp, idx) =>
+          `${idx + 1}. ${bp.user.name} (${formatPlayerPosition(bp)})`,
+      )
+      .join("\n");
+    if (!text) return;
+    const success = await copyToClipboard(text);
+    if (success) {
+      alert(t("common.actions.copy_success", "Copied to clipboard!"));
+    }
+  };
 
   const playersPerTeam = pelada.players_per_team || 5;
   const numTeams = pelada.num_teams || teams.length || 2;
@@ -466,35 +523,65 @@ export default function PeladaTeamsDesktopView({
                 ? t("common.copied", "COPIADO!").toUpperCase()
                 : t("peladas.teams.send_whatsapp", "COPIAR P/ O ZAP")}
             </Button>
+            {isAdmin && (
+              <Button
+                component={RouterLink}
+                to={`/peladas/${pelada.id}/build-schedule`}
+                data-testid={
+                  pelada.has_schedule_plan
+                    ? "build-schedule-button-edit"
+                    : "build-schedule-button"
+                }
+                sx={{
+                  border: "1.5px solid",
+                  borderColor: "divider",
+                  bgcolor: "background.paper",
+                  borderRadius: "11px",
+                  py: 1.25,
+                  px: 1.75,
+                  fontFamily: "Archivo, sans-serif",
+                  fontWeight: 800,
+                  fontSize: "11px",
+                  letterSpacing: ".04em",
+                  color: "text.primary",
+                  textTransform: "none",
+                  "&:hover": {
+                    bgcolor: "action.hover",
+                    borderColor: "text.primary",
+                  },
+                }}
+              >
+                {pelada.has_schedule_plan
+                  ? t("peladas.detail.button.edit_schedule", "EDITAR PARTIDAS")
+                  : t("peladas.detail.button.build_schedule", "GERAR PARTIDAS")}
+              </Button>
+            )}
             <Button
               onClick={onStartClick}
-              data-testid="desktop-save-button"
+              data-testid={
+                pelada.has_schedule_plan
+                  ? "start-pelada-button"
+                  : "desktop-save-button"
+              }
               sx={{
                 borderRadius: "11px",
-                bgcolor: (theme) =>
-                  theme.palette.mode === "dark"
-                    ? "primary.main"
-                    : "text.primary",
+                bgcolor: "text.primary",
                 py: 1.25,
                 px: 2,
                 fontFamily: "Archivo, sans-serif",
                 fontWeight: 800,
                 fontSize: "11px",
                 letterSpacing: ".04em",
-                color: (theme) =>
-                  theme.palette.mode === "dark"
-                    ? "primary.contrastText"
-                    : "background.paper",
+                color: "background.paper",
                 textTransform: "none",
                 "&:hover": {
-                  bgcolor: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "primary.light"
-                      : "text.primary",
+                  opacity: 0.9,
                 },
               }}
             >
-              {t("peladas.teams.save_teams", "SALVAR TIMES")}
+              {pelada.has_schedule_plan
+                ? t("peladas.admin.start.title", "INICIAR PELADA")
+                : t("peladas.teams.save_teams", "SALVAR TIMES")}
             </Button>
           </Box>
         </Box>
@@ -527,9 +614,7 @@ export default function PeladaTeamsDesktopView({
               <Box
                 sx={{
                   bgcolor: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "background.paper"
-                      : "text.primary",
+                    theme.palette.brutalist?.cardHeaderBg || "text.primary",
                   py: 1.4,
                   px: 2,
                   display: "flex",
@@ -544,9 +629,8 @@ export default function PeladaTeamsDesktopView({
                     fontSize: "11px",
                     letterSpacing: ".1em",
                     color: (theme) =>
-                      theme.palette.mode === "dark"
-                        ? "text.primary"
-                        : "background.paper",
+                      theme.palette.brutalist?.cardHeaderText ||
+                      "background.paper",
                   }}
                 >
                   {t("peladas.teams.how_to_draw", "COMO SORTEAR")}
@@ -996,13 +1080,14 @@ export default function PeladaTeamsDesktopView({
                             onClick={() =>
                               onUpdatePlayersPerTeam?.(playersPerTeam - 1)
                             }
-                            disabled={processing || playersPerTeam <= 2}
+                            disabled={processing || playersPerTeam <= 1}
                             data-testid="players-per-team-decrement"
                             sx={{ p: 0.25 }}
                           >
                             <RemoveIcon sx={{ fontSize: 15 }} />
                           </IconButton>
                           <Typography
+                            component="h6"
                             data-testid="players-per-team-value"
                             sx={{
                               fontFamily:
@@ -1098,18 +1183,45 @@ export default function PeladaTeamsDesktopView({
                     borderColor: "divider",
                   }}
                 >
-                  <Typography
+                  <Box
                     sx={{
-                      fontFamily: "Archivo, sans-serif",
-                      fontWeight: 700,
-                      fontSize: "9px",
-                      letterSpacing: ".14em",
-                      color: "text.secondary",
-                      textTransform: "uppercase",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      mb: 0.5,
                     }}
                   >
-                    {t("peladas.teams.fixed_goalkeepers", "GOLEIROS FIXOS")}
-                  </Typography>
+                    <Typography
+                      data-testid="fixed-goalkeepers-title"
+                      sx={{
+                        fontFamily: "Archivo, sans-serif",
+                        fontWeight: 700,
+                        fontSize: "9px",
+                        letterSpacing: ".14em",
+                        color: "text.secondary",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {t("peladas.teams.fixed_goalkeepers", "GOLEIROS FIXOS")}
+                    </Typography>
+                    <Switch
+                      checked={Boolean(pelada.fixed_goalkeepers)}
+                      onChange={(e, checked) =>
+                        onToggleFixedGk?.(
+                          checked !== undefined ? checked : e.target.checked,
+                        )
+                      }
+                      size="small"
+                      slotProps={{
+                        input: {
+                          "aria-label": t(
+                            "peladas.teams.fixed_goalkeepers",
+                            "Goleiros Fixos",
+                          ),
+                        },
+                      }}
+                    />
+                  </Box>
 
                   <Box sx={{ display: "flex", gap: 1, mt: 1.25 }}>
                     <FixedGkSlot
@@ -1224,6 +1336,7 @@ export default function PeladaTeamsDesktopView({
                   <Box
                     component="button"
                     onClick={handleAddTeam}
+                    disabled={processing}
                     data-testid="desktop-add-team-button"
                     sx={{
                       display: "flex",
@@ -1239,7 +1352,8 @@ export default function PeladaTeamsDesktopView({
                       fontSize: "10.5px",
                       letterSpacing: ".04em",
                       color: "text.secondary",
-                      cursor: "pointer",
+                      cursor: processing ? "not-allowed" : "pointer",
+                      opacity: processing ? 0.6 : 1,
                       "&:hover": {
                         borderColor: "primary.main",
                         color: "primary.main",
@@ -1280,13 +1394,13 @@ export default function PeladaTeamsDesktopView({
                 return (
                   <Box
                     key={team.id}
+                    data-testid="team-card"
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
                       dropToTeam(e, team.id);
                     }}
-                    data-testid={`team-card-${team.id}`}
                     sx={{
                       bgcolor: "background.paper",
                       border: (theme) =>
@@ -1298,247 +1412,269 @@ export default function PeladaTeamsDesktopView({
                       overflow: "hidden",
                     }}
                   >
-                    {/* Team Header */}
                     <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        p: "12px 14px",
-                        borderBottom: "1.5px solid",
-                        borderColor: "divider",
-                      }}
+                      data-testid={`team-card-${team.id}`}
+                      sx={{ width: "100%", height: "100%" }}
                     >
-                      <Box>
-                        <Typography
-                          sx={{
-                            fontFamily: "Archivo, sans-serif",
-                            fontWeight: 800,
-                            fontSize: "14px",
-                            lineHeight: 1.1,
-                            color: "text.primary",
-                            textTransform: "uppercase",
-                          }}
-                        >
-                          {team.name}
-                        </Typography>
-                        <Typography
-                          sx={{
-                            fontFamily: "Archivo, sans-serif",
-                            fontWeight: 700,
-                            fontSize: "9px",
-                            letterSpacing: ".1em",
-                            color: isUnderfilled
-                              ? "secondary.main"
-                              : "text.secondary",
-                            mt: 0.6,
-                            textTransform: "uppercase",
-                          }}
-                        >
-                          {isUnderfilled
-                            ? playersPerTeam - players.length > 1
-                              ? t("peladas.teams.missing_players_plural", {
-                                  count: playersPerTeam - players.length,
-                                  defaultValue: `FALTA ${playersPerTeam - players.length} JOGADORES`,
-                                })
-                              : t("peladas.teams.missing_players", {
-                                  count: 1,
-                                  defaultValue: "FALTA 1 JOGADOR",
-                                })
-                            : vestLabel}
-                        </Typography>
-                      </Box>
-
+                      {/* Team Header */}
                       <Box
-                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          p: "12px 14px",
+                          borderBottom: "1.5px solid",
+                          borderColor: "divider",
+                        }}
                       >
-                        <Box
-                          sx={{
-                            fontFamily: "Archivo, sans-serif",
-                            fontWeight: 800,
-                            fontSize: "10px",
-                            lineHeight: 1,
-                            color: isUnderfilled
-                              ? "text.secondary"
-                              : "primary.contrastText",
-                            bgcolor: isUnderfilled
-                              ? "action.hover"
-                              : "primary.main",
-                            borderRadius: "6px",
-                            p: "5px 7px",
-                          }}
-                        >
-                          {avg}
-                        </Box>
-                        {isAdmin && (
-                          <IconButton
-                            size="small"
-                            onClick={() => onDeleteTeam(team.id)}
-                            sx={{ p: 0.25, color: "text.secondary" }}
-                            aria-label={t(
-                              "peladas.team_card.delete",
-                              `Excluir ${team.name}`,
-                              { name: team.name },
-                            )}
-                          >
-                            <CloseIcon sx={{ fontSize: 14 }} />
-                          </IconButton>
-                        )}
-                      </Box>
-                    </Box>
-
-                    {/* Players List */}
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 0.75,
-                        p: 1.5,
-                      }}
-                    >
-                      {sortedPlayers.map((p, pIdx) => {
-                        const isYou =
-                          currentUser && p.user?.id === currentUser.id;
-                        const isGk =
-                          p.id === homeGk?.id ||
-                          p.id === awayGk?.id ||
-                          p.is_goalkeeper;
-                        const gradeVal =
-                          typeof scores[p.id] === "number"
-                            ? scores[p.id].toFixed(1)
-                            : typeof p.grade === "number"
-                              ? p.grade.toFixed(1)
-                              : "-";
-                        const avatarBg =
-                          AVATAR_BG_COLORS[pIdx % AVATAR_BG_COLORS.length];
-
-                        return (
-                          <Box
-                            key={p.id}
-                            draggable
-                            onDragStart={(e) =>
-                              onDragStartPlayer(e, p.id, team.id)
-                            }
+                        <Box>
+                          <Typography
+                            data-testid="team-card-name"
                             sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1.2,
-                              border: isYou
-                                ? (theme) =>
-                                    `2px solid ${theme.palette.primary.main}`
-                                : "1.5px solid",
-                              borderColor: isYou ? "primary.main" : "divider",
-                              bgcolor: isYou
-                                ? (theme) =>
-                                    theme.palette.status?.paid?.bg ||
-                                    "action.hover"
-                                : isGk
-                                  ? "action.hover"
-                                  : "background.paper",
-                              borderRadius: "11px",
-                              p: isYou ? "7px 8px" : "8px 9px",
-                              cursor: "grab",
-                              "&:active": { cursor: "grabbing" },
+                              fontFamily: "Archivo, sans-serif",
+                              fontWeight: 800,
+                              fontSize: "14px",
+                              lineHeight: 1.1,
+                              color: "text.primary",
+                              textTransform: "uppercase",
                             }}
                           >
-                            <SecureAvatar
-                              {...getPlayerAvatarProps(p)}
-                              sx={{
-                                width: 26,
-                                height: 26,
-                                bgcolor: isYou ? "primary.main" : avatarBg,
-                                fontFamily: "Archivo, sans-serif",
-                                fontWeight: 800,
-                                fontSize: "9px",
-                                color: isYou
-                                  ? "primary.contrastText"
-                                  : "text.primary",
-                                flexShrink: 0,
-                              }}
-                            />
+                            {team.name}
+                          </Typography>
+                          <Typography
+                            sx={{
+                              fontFamily: "Archivo, sans-serif",
+                              fontWeight: 700,
+                              fontSize: "9px",
+                              letterSpacing: ".1em",
+                              color: isUnderfilled
+                                ? "secondary.main"
+                                : "text.secondary",
+                              mt: 0.6,
+                              textTransform: "uppercase",
+                            }}
+                          >
+                            {isUnderfilled
+                              ? playersPerTeam - players.length > 1
+                                ? t("peladas.teams.missing_players_plural", {
+                                    count: playersPerTeam - players.length,
+                                    defaultValue: `FALTA ${playersPerTeam - players.length} JOGADORES`,
+                                  })
+                                : t("peladas.teams.missing_players", {
+                                    count: 1,
+                                    defaultValue: "FALTA 1 JOGADOR",
+                                  })
+                              : vestLabel}
+                          </Typography>
+                        </Box>
 
-                            <Box sx={{ flex: 1, minWidth: 0 }}>
-                              <Typography
-                                sx={{
-                                  fontFamily: "Archivo, sans-serif",
-                                  fontWeight: 700,
-                                  fontSize: "11.5px",
-                                  lineHeight: 1.2,
-                                  color: "text.primary",
-                                  whiteSpace: "nowrap",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                }}
-                              >
-                                {p.user?.name}
-                              </Typography>
-                              <Typography
-                                sx={{
-                                  fontFamily: "Archivo, sans-serif",
-                                  fontWeight: 600,
-                                  fontSize: "9.5px",
-                                  lineHeight: 1.2,
-                                  color: isYou
-                                    ? "primary.main"
-                                    : "text.secondary",
-                                  mt: 0.25,
-                                  whiteSpace: "nowrap",
-                                  overflow: "hidden",
-                                  textOverflow: "ellipsis",
-                                }}
-                              >
-                                {formatPlayerPosition(p)}
-                                {isGk
-                                  ? ` · ${t("peladas.teams.fixed_label", "fixo")}`
-                                  : ""}
-                                {isYou
-                                  ? ` · ${t("peladas.teams.you_label", "você")}`
-                                  : ""}
-                                {p.member_type === "diarista"
-                                  ? ` · ${t("common.member_types.diarista", "diarista").toLowerCase()}`
-                                  : ""}
-                              </Typography>
-                            </Box>
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        >
+                          <Box
+                            sx={{
+                              fontFamily: "Archivo, sans-serif",
+                              fontWeight: 800,
+                              fontSize: "10px",
+                              lineHeight: 1,
+                              color: isUnderfilled
+                                ? "text.secondary"
+                                : "primary.contrastText",
+                              bgcolor: isUnderfilled
+                                ? "action.hover"
+                                : "primary.main",
+                              borderRadius: "6px",
+                              p: "5px 7px",
+                            }}
+                          >
+                            {avg}
+                          </Box>
+                          {isAdmin && (
+                            <IconButton
+                              size="small"
+                              onClick={() => onDeleteTeam(team.id)}
+                              sx={{ p: 0.25, color: "text.secondary" }}
+                              aria-label={t(
+                                "peladas.team_card.delete",
+                                `Excluir ${team.name}`,
+                                { name: team.name },
+                              )}
+                            >
+                              <CloseIcon sx={{ fontSize: 14 }} />
+                            </IconButton>
+                          )}
+                        </Box>
+                      </Box>
 
-                            <Typography
+                      {/* Players List */}
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: 0.75,
+                          p: 1.5,
+                        }}
+                      >
+                        {sortedPlayers.map((p, pIdx) => {
+                          const isYou =
+                            currentUser && p.user?.id === currentUser.id;
+                          const isGk =
+                            p.id === homeGk?.id ||
+                            p.id === awayGk?.id ||
+                            p.is_goalkeeper;
+                          const gradeVal =
+                            typeof scores[p.id] === "number"
+                              ? scores[p.id].toFixed(1)
+                              : typeof p.grade === "number"
+                                ? p.grade.toFixed(1)
+                                : "-";
+                          const avatarBg =
+                            AVATAR_BG_COLORS[pIdx % AVATAR_BG_COLORS.length];
+
+                          return (
+                            <Box
+                              key={p.id}
+                              data-testid="player-row"
+                              draggable
+                              onDragStart={(e) =>
+                                onDragStartPlayer(e, p.id, team.id)
+                              }
                               sx={{
-                                fontFamily: "Archivo, sans-serif",
-                                fontWeight: 800,
-                                fontSize: "11px",
-                                color: "primary.main",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1.2,
+                                border: isYou
+                                  ? (theme) =>
+                                      `2px solid ${theme.palette.primary.main}`
+                                  : "1.5px solid",
+                                borderColor: isYou ? "primary.main" : "divider",
+                                bgcolor: isYou
+                                  ? (theme) =>
+                                      theme.palette.status?.paid?.bg ||
+                                      "action.hover"
+                                  : isGk
+                                    ? "action.hover"
+                                    : "background.paper",
+                                borderRadius: "11px",
+                                p: isYou ? "7px 8px" : "8px 9px",
+                                cursor: "grab",
+                                "&:active": { cursor: "grabbing" },
                               }}
                             >
-                              {gradeVal}
-                            </Typography>
-                          </Box>
-                        );
-                      })}
+                              <SecureAvatar
+                                {...getPlayerAvatarProps(p)}
+                                sx={{
+                                  width: 26,
+                                  height: 26,
+                                  bgcolor: isYou ? "primary.main" : avatarBg,
+                                  fontFamily: "Archivo, sans-serif",
+                                  fontWeight: 800,
+                                  fontSize: "9px",
+                                  color: isYou
+                                    ? "primary.contrastText"
+                                    : "text.primary",
+                                  flexShrink: 0,
+                                }}
+                              />
 
-                      {/* Open Slots (VAGA LIVRE) */}
-                      {Array.from({
-                        length: Math.max(0, playersPerTeam - players.length),
-                      }).map((_, emptyIdx) => (
-                        <Box
-                          key={`empty-${emptyIdx}`}
-                          sx={{
-                            height: 42,
-                            border: (theme) =>
-                              `1.5px dashed ${theme.palette.divider}`,
-                            borderRadius: "11px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontFamily: "Archivo, sans-serif",
-                            fontWeight: 700,
-                            fontSize: "10.5px",
-                            letterSpacing: ".06em",
-                            color: "text.secondary",
-                            bgcolor: "action.hover",
-                          }}
-                        >
-                          {t("peladas.teams.empty_slot", "VAGA LIVRE")}
-                        </Box>
-                      ))}
+                              <Box sx={{ flex: 1, minWidth: 0 }}>
+                                <Typography
+                                  sx={{
+                                    fontFamily: "Archivo, sans-serif",
+                                    fontWeight: 700,
+                                    fontSize: "11.5px",
+                                    lineHeight: 1.2,
+                                    color: "text.primary",
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                  }}
+                                >
+                                  {p.user?.name}
+                                </Typography>
+                                <Typography
+                                  sx={{
+                                    fontFamily: "Archivo, sans-serif",
+                                    fontWeight: 600,
+                                    fontSize: "9.5px",
+                                    lineHeight: 1.2,
+                                    color: isYou
+                                      ? "primary.main"
+                                      : "text.secondary",
+                                    mt: 0.25,
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                  }}
+                                >
+                                  {formatPlayerPosition(p)}
+                                  {isGk
+                                    ? ` · ${t("peladas.teams.fixed_label", "fixo")}`
+                                    : ""}
+                                  {isYou
+                                    ? ` · ${t("peladas.teams.you_label", "você")}`
+                                    : ""}
+                                  {p.member_type === "diarista"
+                                    ? ` · ${t("common.member_types.diarista", "diarista").toLowerCase()}`
+                                    : ""}
+                                </Typography>
+                              </Box>
+
+                              <Typography
+                                sx={{
+                                  fontFamily: "Archivo, sans-serif",
+                                  fontWeight: 800,
+                                  fontSize: "11px",
+                                  color: "primary.main",
+                                }}
+                              >
+                                {gradeVal}
+                              </Typography>
+                              {isAdmin && (
+                                <IconButton
+                                  size="small"
+                                  onClick={(e) =>
+                                    handleOpenPlayerMenu(e, p, team.id)
+                                  }
+                                  sx={{
+                                    p: 0.25,
+                                    color: "text.secondary",
+                                    "&:hover": { color: "primary.main" },
+                                  }}
+                                >
+                                  <SwapHorizIcon sx={{ fontSize: "1.2rem" }} />
+                                </IconButton>
+                              )}
+                            </Box>
+                          );
+                        })}
+
+                        {/* Open Slots (VAGA LIVRE) */}
+                        {Array.from({
+                          length: Math.max(0, playersPerTeam - players.length),
+                        }).map((_, emptyIdx) => (
+                          <Box
+                            key={`empty-${emptyIdx}`}
+                            sx={{
+                              height: 42,
+                              border: (theme) =>
+                                `1.5px dashed ${theme.palette.divider}`,
+                              borderRadius: "11px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              fontFamily: "Archivo, sans-serif",
+                              fontWeight: 700,
+                              fontSize: "10.5px",
+                              letterSpacing: ".06em",
+                              color: "text.secondary",
+                              bgcolor: "action.hover",
+                            }}
+                          >
+                            {t("peladas.teams.empty_slot", "VAGA LIVRE")}
+                          </Box>
+                        ))}
+                      </Box>
                     </Box>
                   </Box>
                 );
@@ -1587,10 +1723,33 @@ export default function PeladaTeamsDesktopView({
                     )}
                   </Typography>
                   {isAdmin && (
-                    <AddPlayersButton
-                      onClick={onAddPlayersClick}
-                      disabled={processing}
-                    />
+                    <>
+                      <AddPlayersButton
+                        onClick={onAddPlayersClick}
+                        disabled={processing}
+                      />
+                      <Button
+                        variant="text"
+                        size="small"
+                        startIcon={<ContentCopyIcon sx={{ fontSize: 16 }} />}
+                        onClick={handleCopyBenchPlayers}
+                        disabled={benchPlayers.length === 0}
+                        data-testid="copy-players-button"
+                        sx={{
+                          textTransform: "none",
+                          color: "text.secondary",
+                          fontWeight: 700,
+                          fontSize: "11px",
+                          fontFamily: "Archivo, sans-serif",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {t(
+                          "peladas.available.button.copy_list",
+                          "Copiar lista",
+                        )}
+                      </Button>
+                    </>
                   )}
                 </Box>
                 <Typography
@@ -1692,6 +1851,20 @@ export default function PeladaTeamsDesktopView({
                           {t("peladas.teams.on_bench", "no banco")}
                         </Typography>
                       </Box>
+                      {isAdmin && (
+                        <IconButton
+                          size="small"
+                          onClick={(e) => handleOpenPlayerMenu(e, bp, null)}
+                          sx={{
+                            p: 0.25,
+                            ml: "auto",
+                            color: "text.secondary",
+                            "&:hover": { color: "primary.main" },
+                          }}
+                        >
+                          <SwapHorizIcon sx={{ fontSize: "1.2rem" }} />
+                        </IconButton>
+                      )}
                     </Box>
                   ))
                 )}
@@ -1700,6 +1873,88 @@ export default function PeladaTeamsDesktopView({
           </Box>
         </Box>
       </Box>
+
+      {/* Player Action Menu */}
+      <Menu
+        anchorEl={menuAnchor}
+        open={Boolean(menuAnchor && activePlayerForMenu)}
+        onClose={handleClosePlayerMenu}
+      >
+        {activePlayerForMenu?.sourceTeamId && (
+          <MenuItem
+            onClick={() => {
+              onSendToBench?.(activePlayerForMenu.player.id);
+              handleClosePlayerMenu();
+            }}
+          >
+            <ListItemIcon>
+              <ArrowDownwardIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>
+              {t("peladas.teams.menu.send_to_bench", "Enviar para o Banco")}
+            </ListItemText>
+          </MenuItem>
+        )}
+        {teams
+          .filter((t) => t.id !== activePlayerForMenu?.sourceTeamId)
+          .map((targetTeam) => (
+            <MenuItem
+              key={targetTeam.id}
+              onClick={() => {
+                if (activePlayerForMenu) {
+                  onMoveToTeam?.(activePlayerForMenu.player.id, targetTeam.id);
+                }
+                handleClosePlayerMenu();
+              }}
+            >
+              <ListItemIcon>
+                <GroupsIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>
+                {t("peladas.teams.menu.move_to", {
+                  name: targetTeam.name,
+                  defaultValue: `Mover para ${targetTeam.name}`,
+                })}
+              </ListItemText>
+            </MenuItem>
+          ))}
+        {Boolean(pelada.fixed_goalkeepers) && [
+          <MenuItem
+            key="home-gk"
+            data-testid="move-to-home-gk-item"
+            onClick={() => {
+              if (activePlayerForMenu) {
+                onMoveToFixedGk?.(activePlayerForMenu.player.id, "home");
+              }
+              handleClosePlayerMenu();
+            }}
+          >
+            <ListItemIcon>
+              <SecurityIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>
+              {t("peladas.teams.menu.move_to_home_gk", "Goleiro Time 1")}
+            </ListItemText>
+          </MenuItem>,
+          <MenuItem
+            key="away-gk"
+            data-testid="move-to-away-gk-item"
+            onClick={() => {
+              if (activePlayerForMenu) {
+                onMoveToFixedGk?.(activePlayerForMenu.player.id, "away");
+              }
+              handleClosePlayerMenu();
+            }}
+          >
+            <ListItemIcon>
+              <SecurityIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>
+              {t("peladas.teams.menu.move_to_away_gk", "Goleiro Time 2")}
+            </ListItemText>
+          </MenuItem>,
+        ]}
+      </Menu>
     </Box>
   );
 }

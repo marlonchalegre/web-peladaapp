@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
-import { Box, Typography, Switch } from "@mui/material";
+import { Box, Typography, Switch, Chip, Button } from "@mui/material";
+import HourglassTopIcon from "@mui/icons-material/HourglassTop";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type {
   Organization,
   Pelada,
   PeladaHistoryEntry,
+  Player,
+  MonthlyWaitlistStatus,
+  OrganizationFeatureFlags,
 } from "../../../shared/api/endpoints";
 import GroupTabsBar from "./GroupTabsBar";
 import LocationAutocomplete from "../../../shared/components/LocationAutocomplete";
@@ -18,6 +22,13 @@ interface OrganizationDetailDesktopViewProps {
   playersCount: number;
   waitlistCount: number;
   historyByPelada?: Record<string, PeladaHistoryEntry>;
+  currentPlayer?: Player | null;
+  waitlistStatus?: MonthlyWaitlistStatus | null;
+  waitlistLoading?: boolean;
+  featureFlags?: OrganizationFeatureFlags | null;
+  onJoinWaitlist?: () => void;
+  onLeaveWaitlist?: () => void;
+  onLeaveOrg?: () => void;
   onCreatePeladaSuccess: () => void;
   onCreatePeladaQuick?: (data: {
     date: string;
@@ -27,6 +38,9 @@ interface OrganizationDetailDesktopViewProps {
   }) => Promise<void>;
 }
 
+const isCandidate = (memberType?: string) =>
+  memberType !== "mensalista" && memberType !== "mensalista_temporario";
+
 export default function OrganizationDetailDesktopView({
   org,
   peladas,
@@ -35,6 +49,13 @@ export default function OrganizationDetailDesktopView({
   playersCount,
   waitlistCount,
   historyByPelada = {},
+  currentPlayer,
+  waitlistStatus,
+  waitlistLoading,
+  featureFlags,
+  onJoinWaitlist,
+  onLeaveWaitlist,
+  onLeaveOrg,
   onCreatePeladaSuccess,
   onCreatePeladaQuick,
 }: OrganizationDetailDesktopViewProps) {
@@ -72,6 +93,15 @@ export default function OrganizationDetailDesktopView({
       setNewLocation(org.default_location);
     }
   }, [org.default_location]);
+
+  useEffect(() => {
+    if (
+      org.default_max_players !== undefined &&
+      org.default_max_players !== null
+    ) {
+      setNewMax(org.default_max_players);
+    }
+  }, [org.default_max_players]);
 
   const orgInitials = org.name
     .split(" ")
@@ -131,6 +161,7 @@ export default function OrganizationDetailDesktopView({
         active="agenda"
         playersCount={playersCount}
         isAdmin={isAdmin}
+        featureFlags={featureFlags}
       />
       <Box
         sx={{
@@ -201,52 +232,140 @@ export default function OrganizationDetailDesktopView({
             </Typography>
           </Box>
           <Box sx={{ display: "flex", gap: 1 }}>
-            <Box
-              component="button"
-              onClick={() =>
-                navigate(`/organizations/${org.id}/management?tab=invitations`)
-              }
-              sx={{
-                border: "1.5px solid",
-                borderColor: "divider",
-                bgcolor: "background.paper",
-                borderRadius: "11px",
-                px: 1.8,
-                py: 1.2,
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 800,
-                fontSize: "11px",
-                letterSpacing: ".04em",
-                color: "text.primary",
-                cursor: "pointer",
-                "&:hover": { borderColor: "text.primary" },
-              }}
-            >
-              {t("organizations.management.tabs.invitations", "CONVIDAR")}
-            </Box>
-            <Box
-              component="button"
-              onClick={() => navigate(`/organizations/${org.id}/management`)}
-              sx={{
-                border: "1.5px solid",
-                borderColor: "divider",
-                bgcolor: "background.paper",
-                borderRadius: "11px",
-                px: 1.5,
-                py: 1.2,
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 700,
-                fontSize: "13px",
-                color: "text.secondary",
-                cursor: "pointer",
-                "&:hover": {
-                  borderColor: "text.primary",
-                  color: "text.primary",
-                },
-              }}
-            >
-              ⋯
-            </Box>
+            {isAdmin ? (
+              <>
+                <Box
+                  component="button"
+                  onClick={() =>
+                    navigate(
+                      `/organizations/${org.id}/management?tab=invitations`,
+                    )
+                  }
+                  sx={{
+                    border: "1.5px solid",
+                    borderColor: "divider",
+                    bgcolor: "background.paper",
+                    borderRadius: "11px",
+                    px: 1.8,
+                    py: 1.2,
+                    fontFamily: "Archivo, sans-serif",
+                    fontWeight: 800,
+                    fontSize: "11px",
+                    letterSpacing: ".04em",
+                    color: "text.primary",
+                    cursor: "pointer",
+                    "&:hover": { borderColor: "text.primary" },
+                  }}
+                >
+                  {t("organizations.management.tabs.invitations", "CONVIDAR")}
+                </Box>
+                <Box
+                  component="button"
+                  data-testid="org-management-button"
+                  onClick={() =>
+                    navigate(`/organizations/${org.id}/management`)
+                  }
+                  sx={{
+                    border: "1.5px solid",
+                    borderColor: "divider",
+                    bgcolor: "background.paper",
+                    borderRadius: "11px",
+                    px: 1.8,
+                    py: 1.2,
+                    fontFamily: "Archivo, sans-serif",
+                    fontWeight: 800,
+                    fontSize: "11px",
+                    letterSpacing: ".04em",
+                    color: "text.primary",
+                    cursor: "pointer",
+                    "&:hover": {
+                      borderColor: "text.primary",
+                    },
+                  }}
+                >
+                  {t("organizations.detail.button.management", "GERENCIAMENTO")}
+                </Box>
+              </>
+            ) : (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                {currentPlayer &&
+                  isCandidate(currentPlayer.member_type) &&
+                  waitlistStatus !== null &&
+                  waitlistStatus !== undefined &&
+                  (waitlistStatus.in_queue ? (
+                    <>
+                      <Chip
+                        icon={<HourglassTopIcon />}
+                        label={t(
+                          "organizations.detail.waitlist.in_queue_badge",
+                        )}
+                        color="primary"
+                        variant="outlined"
+                        size="small"
+                        data-testid="waitlist-in-queue-badge"
+                        sx={{ font: "700 11px Archivo,sans-serif" }}
+                      />
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        size="small"
+                        onClick={onLeaveWaitlist}
+                        disabled={waitlistLoading}
+                        data-testid="leave-waitlist-button"
+                        sx={{
+                          textTransform: "none",
+                          font: "700 11px Archivo,sans-serif",
+                        }}
+                      >
+                        {t("organizations.detail.waitlist.leave_button")}
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      size="small"
+                      onClick={onJoinWaitlist}
+                      disabled={waitlistLoading}
+                      data-testid="join-waitlist-button"
+                      sx={{
+                        textTransform: "none",
+                        font: "800 11px Archivo,sans-serif",
+                        borderRadius: "10px",
+                      }}
+                    >
+                      {t("organizations.detail.waitlist.candidate_button")}
+                    </Button>
+                  ))}
+                {onLeaveOrg && (
+                  <Box
+                    component="button"
+                    data-testid="leave-org-button"
+                    onClick={onLeaveOrg}
+                    sx={{
+                      border: "1.5px solid",
+                      borderColor: "divider",
+                      bgcolor: "background.paper",
+                      borderRadius: "11px",
+                      px: 1.8,
+                      py: 1.2,
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 800,
+                      fontSize: "11px",
+                      letterSpacing: ".04em",
+                      color: "error.main",
+                      cursor: "pointer",
+                      "&:hover": { borderColor: "error.main" },
+                    }}
+                  >
+                    {t(
+                      "organizations.detail.button.leave",
+                      "SAIR DA ORGANIZAÇÃO",
+                    )}
+                  </Box>
+                )}
+              </Box>
+            )}
           </Box>
         </Box>
 
@@ -401,7 +520,7 @@ export default function OrganizationDetailDesktopView({
         </Box>
 
         {/* 4. NOVA PELADA Form (Inline Desktop 4b) */}
-        {isAdmin && (
+        {isAdmin && !org.is_blocked && (
           <Box
             sx={{
               bgcolor: "background.paper",
@@ -589,17 +708,31 @@ export default function OrganizationDetailDesktopView({
                     >
                       {t("organizations.detail.max_label", "MÁXIMO")}
                     </Typography>
-                    <Typography
-                      sx={{
-                        fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                        fontWeight: 700,
-                        fontSize: "19px",
-                        color: "text.primary",
-                        mt: 1,
-                      }}
+                    <Box
+                      data-testid="create-pelada-max-players"
+                      sx={{ display: "inline-block", mt: 1 }}
                     >
-                      {newMax}
-                    </Typography>
+                      <Box
+                        component="input"
+                        type="number"
+                        value={newMax}
+                        onChange={(e) =>
+                          setNewMax(parseInt(e.target.value, 10) || 0)
+                        }
+                        sx={{
+                          border: "none",
+                          outline: "none",
+                          bgcolor: "transparent",
+                          fontFamily: "'Archivo Narrow', Archivo, sans-serif",
+                          fontWeight: 700,
+                          fontSize: "19px",
+                          color: "text.primary",
+                          width: "48px",
+                          p: 0,
+                          m: 0,
+                        }}
+                      />
+                    </Box>
                   </Box>
                   <Box sx={{ display: "flex", gap: 0.8 }}>
                     <Box
@@ -709,6 +842,7 @@ export default function OrganizationDetailDesktopView({
                 {/* CRIAR PELADA BUTTON */}
                 <Box
                   component="button"
+                  data-testid="create-pelada-submit"
                   onClick={handleCreate}
                   disabled={creating}
                   sx={{

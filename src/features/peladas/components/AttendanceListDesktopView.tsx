@@ -17,7 +17,9 @@ import {
   isMensalista,
   formatMemberType as formatMemberTypeHelper,
   getPaidPlayerIds,
+  formatPosition,
 } from "../utils/playerUtils";
+import { useCopyFeedback } from "../../../shared/hooks/useCopyFeedback";
 
 interface AttendanceListDesktopViewProps {
   pelada: Pelada;
@@ -74,42 +76,24 @@ export default function AttendanceListDesktopView({
     "confirmed" | "waitlist" | "pending" | "declined"
   >("confirmed");
   const [showAll, setShowAll] = useState(false);
-  const [copiedList, setCopiedList] = useState(false);
 
-  const handleCopyList = () => {
-    const targetList = activeTab === "waitlist" ? waitlist : confirmed;
-    const text = targetList
-      .map(
-        (p, idx) =>
-          `${idx + 1}. ${p.user?.name || "Jogador"} (${t(`common.member_types.${p.member_type || "diarista"}`)})`,
-      )
-      .join("\n");
-    if (navigator?.clipboard?.writeText) {
-      navigator.clipboard.writeText(text).catch(() => {});
-      setCopiedList(true);
-      setTimeout(() => setCopiedList(false), 2000);
-    }
-  };
+  const { copied: copiedList, triggerCopy: handleCopyList } = useCopyFeedback(
+    () => {
+      const targetList = activeTab === "waitlist" ? waitlist : confirmed;
+      const text = targetList
+        .map(
+          (p, idx) =>
+            `${idx + 1}. ${p.user?.name || "Jogador"} (${t(`common.member_types.${p.member_type || "diarista"}`)})`,
+        )
+        .join("\n");
+      if (navigator?.clipboard?.writeText) {
+        return navigator.clipboard.writeText(text);
+      }
+    },
+    2000,
+  );
 
-  const getPositionLabel = (pos?: string) => {
-    if (!pos) return t("positions.midfielder", "meia");
-    switch (pos.toLowerCase()) {
-      case "goalkeeper":
-      case "goleiro":
-        return t("positions.goalkeeper", "goleiro");
-      case "defender":
-      case "zagueiro":
-        return t("positions.defender", "zagueiro");
-      case "midfielder":
-      case "meio-campo":
-        return t("positions.midfielder", "meia");
-      case "striker":
-      case "atacante":
-        return t("positions.striker", "atacante");
-      default:
-        return pos.toLowerCase();
-    }
-  };
+  const getPositionLabel = (pos?: string) => formatPosition(pos);
 
   const formatMemberType = (memberType?: string) =>
     formatMemberTypeHelper(memberType, (k, d) => (d ? t(k, d) : t(k)));
@@ -175,6 +159,7 @@ export default function AttendanceListDesktopView({
         isPeladaOpen={pelada.status === "open"}
       />
       <Box
+        data-testid="attendance-list-container"
         sx={{
           width: "100%",
           maxWidth: 1124,
@@ -290,30 +275,22 @@ export default function AttendanceListDesktopView({
             {isAdmin && (
               <Box
                 component="button"
+                data-testid="close-attendance-button"
                 onClick={onCloseAttendance}
                 sx={{
                   borderRadius: "11px",
-                  bgcolor: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "primary.main"
-                      : "text.primary",
+                  bgcolor: "primary.main",
                   px: 2,
                   py: 1.4,
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 800,
                   fontSize: "11px",
                   letterSpacing: ".04em",
-                  color: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "primary.contrastText"
-                      : "background.paper",
+                  color: "primary.contrastText",
                   cursor: "pointer",
                   border: "none",
                   "&:hover": {
-                    bgcolor: (theme) =>
-                      theme.palette.mode === "dark"
-                        ? "primary.light"
-                        : "text.primary",
+                    bgcolor: "primary.dark",
                   },
                 }}
               >
@@ -399,6 +376,7 @@ export default function AttendanceListDesktopView({
             <Box sx={{ display: "flex", gap: 1, flexShrink: 0 }}>
               <Box
                 component="button"
+                data-testid="attendance-confirm-button"
                 onClick={() => onUpdateAttendance("confirmed")}
                 sx={{
                   border: (theme) =>
@@ -430,6 +408,7 @@ export default function AttendanceListDesktopView({
               </Box>
               <Box
                 component="button"
+                data-testid="attendance-waitlist-button"
                 onClick={() => onUpdateAttendance("waitlist")}
                 sx={{
                   border: (theme) =>
@@ -461,6 +440,7 @@ export default function AttendanceListDesktopView({
               </Box>
               <Box
                 component="button"
+                data-testid="attendance-decline-button"
                 onClick={() => onUpdateAttendance("declined")}
                 sx={{
                   border: (theme) =>
@@ -509,8 +489,11 @@ export default function AttendanceListDesktopView({
                 mb: 0,
               }}
             >
-              <Box sx={{ display: "flex" }}>
+              <Box sx={{ display: "flex" }} role="tablist">
                 <Box
+                  role="tab"
+                  aria-selected={activeTab === "confirmed"}
+                  data-testid="attendance-tab-confirmed"
                   onClick={() => setActiveTab("confirmed")}
                   sx={{
                     p: "11px 16px",
@@ -539,6 +522,9 @@ export default function AttendanceListDesktopView({
                   </Box>
                 </Box>
                 <Box
+                  role="tab"
+                  aria-selected={activeTab === "waitlist"}
+                  data-testid="attendance-tab-waitlist"
                   onClick={() => setActiveTab("waitlist")}
                   sx={{
                     p: "11px 16px",
@@ -565,6 +551,9 @@ export default function AttendanceListDesktopView({
                   </Box>
                 </Box>
                 <Box
+                  role="tab"
+                  aria-selected={activeTab === "pending"}
+                  data-testid="attendance-tab-pending"
                   onClick={() => setActiveTab("pending")}
                   sx={{
                     p: "11px 16px",
@@ -591,6 +580,9 @@ export default function AttendanceListDesktopView({
                   </Box>
                 </Box>
                 <Box
+                  role="tab"
+                  aria-selected={activeTab === "declined"}
+                  data-testid="attendance-tab-declined"
                   onClick={() => setActiveTab("declined")}
                   sx={{
                     p: "11px 16px",
@@ -619,6 +611,7 @@ export default function AttendanceListDesktopView({
               <Box
                 component="button"
                 onClick={handleCopyList}
+                data-testid="copy-players-button"
                 sx={{
                   background: "none",
                   border: "none",
@@ -686,9 +679,11 @@ export default function AttendanceListDesktopView({
                 <Box sx={{ width: 104, flexShrink: 0 }}>
                   {t("peladas.attendance.desktop.payment_col", "PAGAMENTO")}
                 </Box>
-                <Box sx={{ width: 120, flexShrink: 0, textAlign: "right" }}>
-                  {t("peladas.attendance.desktop.move_to_col", "MOVER PARA")}
-                </Box>
+                {isAdmin && (
+                  <Box sx={{ width: 120, flexShrink: 0, textAlign: "right" }}>
+                    {t("peladas.attendance.desktop.move_to_col", "MOVER PARA")}
+                  </Box>
+                )}
               </Box>
 
               {/* Table Rows */}
@@ -722,6 +717,7 @@ export default function AttendanceListDesktopView({
                   return (
                     <Box
                       key={player.id}
+                      data-testid={`attendance-card-${player.user?.username || player.user_id}`}
                       sx={{
                         display: "flex",
                         alignItems: "center",
@@ -795,7 +791,12 @@ export default function AttendanceListDesktopView({
                               gap: 0.6,
                             }}
                           >
-                            {pName}
+                            <Box
+                              component="span"
+                              data-testid="attendance-card-name"
+                            >
+                              {pName}
+                            </Box>
                             {isCurrent && (
                               <Box
                                 component="span"
@@ -872,6 +873,7 @@ export default function AttendanceListDesktopView({
                         ) : paidPlayerIds.has(player.id) ? (
                           <Box
                             component="button"
+                            data-testid="reverse-payment-button"
                             onClick={() => onReversePayment?.(player.id)}
                             title={t(
                               "peladas.attendance.desktop.undo_payment",
@@ -888,14 +890,17 @@ export default function AttendanceListDesktopView({
                               cursor: onReversePayment ? "pointer" : "default",
                             }}
                           >
-                            {t(
-                              "peladas.attendance.desktop.paid_check",
-                              "pago ✓",
-                            )}
+                            <Box component="span" data-testid="paid-icon">
+                              {t(
+                                "peladas.attendance.desktop.paid_check",
+                                "pago ✓",
+                              )}
+                            </Box>
                           </Box>
                         ) : (
                           <Box
                             component="button"
+                            data-testid="mark-as-paid-button"
                             onClick={() => onMarkPaid?.(player.id)}
                             title={t(
                               "peladas.attendance.desktop.mark_daily_paid",
@@ -922,213 +927,223 @@ export default function AttendanceListDesktopView({
                       </Box>
 
                       {/* Actions: Mover Para */}
-                      <Box
-                        sx={{
-                          width: 120,
-                          flexShrink: 0,
-                          display: "flex",
-                          gap: 0.8,
-                          justifyContent: "flex-end",
-                        }}
-                      >
-                        {activeTab === "confirmed" && (
-                          <>
-                            <Box
-                              component="button"
-                              onClick={() => handleMover(player, "waitlist")}
-                              sx={{
-                                fontFamily: "Archivo, sans-serif",
-                                fontWeight: 700,
-                                fontSize: "9.5px",
-                                letterSpacing: ".06em",
-                                color: "text.secondary",
-                                border: "1.5px solid",
-                                borderColor: "divider",
-                                borderRadius: "7px",
-                                p: "6px 8px",
-                                bgcolor: "background.paper",
-                                cursor: "pointer",
-                                "&:hover": { borderColor: "text.primary" },
-                              }}
-                            >
-                              {t("peladas.attendance.desktop.queue", "FILA")}
-                            </Box>
-                            <Box
-                              component="button"
-                              onClick={() => handleMover(player, "declined")}
-                              sx={{
-                                fontFamily: "Archivo, sans-serif",
-                                fontWeight: 700,
-                                fontSize: "9.5px",
-                                letterSpacing: ".06em",
-                                color: "text.secondary",
-                                border: "1.5px solid",
-                                borderColor: "divider",
-                                borderRadius: "7px",
-                                p: "6px 8px",
-                                bgcolor: "background.paper",
-                                cursor: "pointer",
-                                "&:hover": {
-                                  borderColor: "secondary.main",
-                                  color: "secondary.main",
-                                },
-                              }}
-                            >
-                              {t("peladas.attendance.desktop.out", "FORA")}
-                            </Box>
-                          </>
-                        )}
-                        {activeTab === "waitlist" && (
-                          <>
-                            <Box
-                              component="button"
-                              onClick={() => handleMover(player, "confirmed")}
-                              sx={{
-                                fontFamily: "Archivo, sans-serif",
-                                fontWeight: 800,
-                                fontSize: "9.5px",
-                                letterSpacing: ".06em",
-                                color: "primary.main",
-                                border: "1.5px solid",
-                                borderColor: "primary.main",
-                                borderRadius: "7px",
-                                p: "6px 8px",
-                                bgcolor: "background.paper",
-                                cursor: "pointer",
-                                "&:hover": {
-                                  bgcolor: (theme) =>
-                                    theme.palette.status?.paid?.bg ||
-                                    "action.hover",
-                                },
-                              }}
-                            >
-                              {t("peladas.attendance.desktop.up", "SUBIR")}
-                            </Box>
-                            <Box
-                              component="button"
-                              onClick={() => handleMover(player, "declined")}
-                              sx={{
-                                fontFamily: "Archivo, sans-serif",
-                                fontWeight: 700,
-                                fontSize: "9.5px",
-                                letterSpacing: ".06em",
-                                color: "text.secondary",
-                                border: "1.5px solid",
-                                borderColor: "divider",
-                                borderRadius: "7px",
-                                p: "6px 8px",
-                                bgcolor: "background.paper",
-                                cursor: "pointer",
-                                "&:hover": {
-                                  borderColor: "secondary.main",
-                                  color: "secondary.main",
-                                },
-                              }}
-                            >
-                              {t("peladas.attendance.desktop.out", "FORA")}
-                            </Box>
-                          </>
-                        )}
-                        {activeTab === "pending" && (
-                          <>
-                            <Box
-                              component="button"
-                              onClick={() => handleMover(player, "confirmed")}
-                              sx={{
-                                fontFamily: "Archivo, sans-serif",
-                                fontWeight: 800,
-                                fontSize: "9.5px",
-                                letterSpacing: ".06em",
-                                color: "primary.main",
-                                border: "1.5px solid",
-                                borderColor: "primary.main",
-                                borderRadius: "7px",
-                                p: "6px 8px",
-                                bgcolor: "background.paper",
-                                cursor: "pointer",
-                                "&:hover": {
-                                  bgcolor: (theme) =>
-                                    theme.palette.status?.paid?.bg ||
-                                    "action.hover",
-                                },
-                              }}
-                            >
-                              {t("peladas.attendance.desktop.in", "VOU")}
-                            </Box>
-                            <Box
-                              component="button"
-                              onClick={() => handleMover(player, "declined")}
-                              sx={{
-                                fontFamily: "Archivo, sans-serif",
-                                fontWeight: 700,
-                                fontSize: "9.5px",
-                                letterSpacing: ".06em",
-                                color: "text.secondary",
-                                border: "1.5px solid",
-                                borderColor: "divider",
-                                borderRadius: "7px",
-                                p: "6px 8px",
-                                bgcolor: "background.paper",
-                                cursor: "pointer",
-                                "&:hover": {
-                                  borderColor: "secondary.main",
-                                  color: "secondary.main",
-                                },
-                              }}
-                            >
-                              {t("peladas.attendance.desktop.out", "FORA")}
-                            </Box>
-                          </>
-                        )}
-                        {activeTab === "declined" && (
-                          <>
-                            <Box
-                              component="button"
-                              onClick={() => handleMover(player, "confirmed")}
-                              sx={{
-                                fontFamily: "Archivo, sans-serif",
-                                fontWeight: 800,
-                                fontSize: "9.5px",
-                                letterSpacing: ".06em",
-                                color: "primary.main",
-                                border: "1.5px solid",
-                                borderColor: "primary.main",
-                                borderRadius: "7px",
-                                p: "6px 8px",
-                                bgcolor: "background.paper",
-                                cursor: "pointer",
-                                "&:hover": {
-                                  bgcolor: (theme) =>
-                                    theme.palette.status?.paid?.bg ||
-                                    "action.hover",
-                                },
-                              }}
-                            >
-                              {t("peladas.attendance.desktop.in", "VOU")}
-                            </Box>
-                            <Box
-                              component="button"
-                              onClick={() => handleMover(player, "waitlist")}
-                              sx={{
-                                fontFamily: "Archivo, sans-serif",
-                                fontWeight: 700,
-                                fontSize: "9.5px",
-                                letterSpacing: ".06em",
-                                color: "text.secondary",
-                                border: "1.5px solid",
-                                borderColor: "divider",
-                                borderRadius: "7px",
-                                p: "6px 8px",
-                                bgcolor: "background.paper",
-                                cursor: "pointer",
-                                "&:hover": { borderColor: "text.primary" },
-                              }}
-                            >
-                              {t("peladas.attendance.desktop.queue", "FILA")}
-                            </Box>
-                          </>
-                        )}
-                      </Box>
+                      {isAdmin && (
+                        <Box
+                          sx={{
+                            width: 120,
+                            flexShrink: 0,
+                            display: "flex",
+                            gap: 0.8,
+                            justifyContent: "flex-end",
+                          }}
+                        >
+                          {activeTab === "confirmed" && (
+                            <>
+                              <Box
+                                component="button"
+                                data-testid="attendance-card-waitlist"
+                                onClick={() => handleMover(player, "waitlist")}
+                                sx={{
+                                  fontFamily: "Archivo, sans-serif",
+                                  fontWeight: 700,
+                                  fontSize: "9.5px",
+                                  letterSpacing: ".06em",
+                                  color: "text.secondary",
+                                  border: "1.5px solid",
+                                  borderColor: "divider",
+                                  borderRadius: "7px",
+                                  p: "6px 8px",
+                                  bgcolor: "background.paper",
+                                  cursor: "pointer",
+                                  "&:hover": { borderColor: "text.primary" },
+                                }}
+                              >
+                                {t("peladas.attendance.desktop.queue", "FILA")}
+                              </Box>
+                              <Box
+                                component="button"
+                                data-testid="attendance-card-decline"
+                                onClick={() => handleMover(player, "declined")}
+                                sx={{
+                                  fontFamily: "Archivo, sans-serif",
+                                  fontWeight: 700,
+                                  fontSize: "9.5px",
+                                  letterSpacing: ".06em",
+                                  color: "text.secondary",
+                                  border: "1.5px solid",
+                                  borderColor: "divider",
+                                  borderRadius: "7px",
+                                  p: "6px 8px",
+                                  bgcolor: "background.paper",
+                                  cursor: "pointer",
+                                  "&:hover": {
+                                    borderColor: "secondary.main",
+                                    color: "secondary.main",
+                                  },
+                                }}
+                              >
+                                {t("peladas.attendance.desktop.out", "FORA")}
+                              </Box>
+                            </>
+                          )}
+                          {activeTab === "waitlist" && (
+                            <>
+                              <Box
+                                component="button"
+                                data-testid="attendance-card-confirm"
+                                onClick={() => handleMover(player, "confirmed")}
+                                sx={{
+                                  fontFamily: "Archivo, sans-serif",
+                                  fontWeight: 800,
+                                  fontSize: "9.5px",
+                                  letterSpacing: ".06em",
+                                  color: "primary.main",
+                                  border: "1.5px solid",
+                                  borderColor: "primary.main",
+                                  borderRadius: "7px",
+                                  p: "6px 8px",
+                                  bgcolor: "background.paper",
+                                  cursor: "pointer",
+                                  "&:hover": {
+                                    bgcolor: (theme) =>
+                                      theme.palette.status?.paid?.bg ||
+                                      "action.hover",
+                                  },
+                                }}
+                              >
+                                {t("peladas.attendance.desktop.up", "SUBIR")}
+                              </Box>
+                              <Box
+                                component="button"
+                                data-testid="attendance-card-decline"
+                                onClick={() => handleMover(player, "declined")}
+                                sx={{
+                                  fontFamily: "Archivo, sans-serif",
+                                  fontWeight: 700,
+                                  fontSize: "9.5px",
+                                  letterSpacing: ".06em",
+                                  color: "text.secondary",
+                                  border: "1.5px solid",
+                                  borderColor: "divider",
+                                  borderRadius: "7px",
+                                  p: "6px 8px",
+                                  bgcolor: "background.paper",
+                                  cursor: "pointer",
+                                  "&:hover": {
+                                    borderColor: "secondary.main",
+                                    color: "secondary.main",
+                                  },
+                                }}
+                              >
+                                {t("peladas.attendance.desktop.out", "FORA")}
+                              </Box>
+                            </>
+                          )}
+                          {activeTab === "pending" && (
+                            <>
+                              <Box
+                                component="button"
+                                data-testid="attendance-card-confirm"
+                                onClick={() => handleMover(player, "confirmed")}
+                                sx={{
+                                  fontFamily: "Archivo, sans-serif",
+                                  fontWeight: 800,
+                                  fontSize: "9.5px",
+                                  letterSpacing: ".06em",
+                                  color: "primary.main",
+                                  border: "1.5px solid",
+                                  borderColor: "primary.main",
+                                  borderRadius: "7px",
+                                  p: "6px 8px",
+                                  bgcolor: "background.paper",
+                                  cursor: "pointer",
+                                  "&:hover": {
+                                    bgcolor: (theme) =>
+                                      theme.palette.status?.paid?.bg ||
+                                      "action.hover",
+                                  },
+                                }}
+                              >
+                                {t("peladas.attendance.desktop.in", "VOU")}
+                              </Box>
+                              <Box
+                                component="button"
+                                data-testid="attendance-card-decline"
+                                onClick={() => handleMover(player, "declined")}
+                                sx={{
+                                  fontFamily: "Archivo, sans-serif",
+                                  fontWeight: 700,
+                                  fontSize: "9.5px",
+                                  letterSpacing: ".06em",
+                                  color: "text.secondary",
+                                  border: "1.5px solid",
+                                  borderColor: "divider",
+                                  borderRadius: "7px",
+                                  p: "6px 8px",
+                                  bgcolor: "background.paper",
+                                  cursor: "pointer",
+                                  "&:hover": {
+                                    borderColor: "secondary.main",
+                                    color: "secondary.main",
+                                  },
+                                }}
+                              >
+                                {t("peladas.attendance.desktop.out", "FORA")}
+                              </Box>
+                            </>
+                          )}
+                          {activeTab === "declined" && (
+                            <>
+                              <Box
+                                component="button"
+                                data-testid="attendance-card-confirm"
+                                onClick={() => handleMover(player, "confirmed")}
+                                sx={{
+                                  fontFamily: "Archivo, sans-serif",
+                                  fontWeight: 800,
+                                  fontSize: "9.5px",
+                                  letterSpacing: ".06em",
+                                  color: "primary.main",
+                                  border: "1.5px solid",
+                                  borderColor: "primary.main",
+                                  borderRadius: "7px",
+                                  p: "6px 8px",
+                                  bgcolor: "background.paper",
+                                  cursor: "pointer",
+                                  "&:hover": {
+                                    bgcolor: (theme) =>
+                                      theme.palette.status?.paid?.bg ||
+                                      "action.hover",
+                                  },
+                                }}
+                              >
+                                {t("peladas.attendance.desktop.in", "VOU")}
+                              </Box>
+                              <Box
+                                component="button"
+                                data-testid="attendance-card-waitlist"
+                                onClick={() => handleMover(player, "waitlist")}
+                                sx={{
+                                  fontFamily: "Archivo, sans-serif",
+                                  fontWeight: 700,
+                                  fontSize: "9.5px",
+                                  letterSpacing: ".06em",
+                                  color: "text.secondary",
+                                  border: "1.5px solid",
+                                  borderColor: "divider",
+                                  borderRadius: "7px",
+                                  p: "6px 8px",
+                                  bgcolor: "background.paper",
+                                  cursor: "pointer",
+                                  "&:hover": { borderColor: "text.primary" },
+                                }}
+                              >
+                                {t("peladas.attendance.desktop.queue", "FILA")}
+                              </Box>
+                            </>
+                          )}
+                        </Box>
+                      )}
                     </Box>
                   );
                 })
@@ -1568,9 +1583,7 @@ export default function AttendanceListDesktopView({
             <Box
               sx={{
                 bgcolor: (theme) =>
-                  theme.palette.mode === "dark"
-                    ? "background.paper"
-                    : "text.primary",
+                  theme.palette.brutalist?.cardHeaderBg || "background.paper",
                 border: 1,
                 borderColor: "divider",
                 borderRadius: "16px",
@@ -1584,10 +1597,7 @@ export default function AttendanceListDesktopView({
                   fontWeight: 700,
                   fontSize: "9.5px",
                   letterSpacing: ".16em",
-                  color: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "text.secondary"
-                      : "primary.light",
+                  color: "primary.light",
                 }}
               >
                 {t("peladas.attendance.desktop.pending_section", "PENDENTES")} ·{" "}
@@ -1600,9 +1610,7 @@ export default function AttendanceListDesktopView({
                   fontSize: "12px",
                   lineHeight: 1.5,
                   color: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? "text.primary"
-                      : "primary.contrastText",
+                    theme.palette.brutalist?.cardHeaderText || "text.primary",
                   mt: 1.4,
                 }}
               >
