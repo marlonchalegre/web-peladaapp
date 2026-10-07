@@ -1021,7 +1021,7 @@
         "paid_check": "paid ✓",
         "mark_daily_paid": "Mark daily as paid",
         "currency": "R$",
-        "charge": "CHARGE",
+        "charge": "PAID ?",
         "queue": "QUEUE",
         "out": "OUT",
         "up": "UP",

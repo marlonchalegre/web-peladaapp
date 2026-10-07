@@ -921,7 +921,7 @@ export default function AttendanceListDesktopView({
                             }}
                           >
                             R$ {price} ·{" "}
-                            {t("peladas.attendance.desktop.charge", "COBRAR")}
+                            {t("peladas.attendance.desktop.charge", "PAGO ?")}
                           </Box>
                         )}
                       </Box>

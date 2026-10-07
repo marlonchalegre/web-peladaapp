@@ -244,4 +244,20 @@ describe("AttendanceListDesktopView", () => {
       "automaticamente se alguém sair",
     );
   });
+
+  it("renders mark-as-paid button for unpaid diarista with MARCAR COMO PAGO label", () => {
+    render(
+      <MemoryRouter>
+        <ThemeProvider theme={getTheme("light")}>
+          <AttendanceListDesktopView {...defaultProps} diaristaPrice={21.5} />
+        </ThemeProvider>
+      </MemoryRouter>,
+    );
+
+    const payButton = screen.getByTestId("mark-as-paid-button");
+    expect(payButton).toBeInTheDocument();
+    expect(payButton.textContent).toContain(
+      "R$ 21.5 · peladas.attendance.desktop.charge",
+    );
+  });
 });
