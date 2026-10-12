@@ -2425,17 +2425,14 @@ export default function ActiveMatchDashboard(props: Props) {
           <List sx={{ px: 0 }}>
             {matches.map((m) => {
               const isSelected = match.id === m.id;
-              const isNext = m.id === nextMatch?.id;
-              const status = isNext ? "next" : m.status;
+              const status = m.status;
 
               const statusColor =
                 status === "finished"
                   ? "success"
                   : status === "running"
                     ? "primary"
-                    : status === "next"
-                      ? "info"
-                      : "default";
+                    : "default";
 
               return (
                 <ListItem key={m.id} disablePadding sx={{ mb: 1.5 }}>
@@ -2448,16 +2445,8 @@ export default function ActiveMatchDashboard(props: Props) {
                     sx={{
                       borderRadius: 3,
                       border: "1px solid",
-                      borderColor: isSelected
-                        ? "primary.main"
-                        : isNext
-                          ? "info.light"
-                          : "divider",
-                      bgcolor: isSelected
-                        ? "primary.lighter"
-                        : isNext
-                          ? "info.lighter"
-                          : "transparent",
+                      borderColor: isSelected ? "primary.main" : "divider",
+                      bgcolor: isSelected ? "primary.lighter" : "transparent",
                       flexDirection: "column",
                       alignItems: "stretch",
                       gap: 1,
@@ -2465,9 +2454,7 @@ export default function ActiveMatchDashboard(props: Props) {
                       "&:hover": {
                         bgcolor: isSelected
                           ? "primary.lighter"
-                          : isNext
-                            ? "info.lighter"
-                            : "action.hover",
+                          : "action.hover",
                       },
                     }}
                     data-testid={`match-history-item-${m.sequence}`}
@@ -2493,9 +2480,7 @@ export default function ActiveMatchDashboard(props: Props) {
                             fontSize: "0.75rem",
                             bgcolor: isSelected
                               ? "primary.main"
-                              : isNext
-                                ? "info.main"
-                                : "text.secondary",
+                              : "text.secondary",
                             fontWeight: "bold",
                           }}
                         >
@@ -2503,13 +2488,7 @@ export default function ActiveMatchDashboard(props: Props) {
                         </Avatar>
                         <Typography
                           variant="caption"
-                          color={
-                            isSelected
-                              ? "primary.main"
-                              : isNext
-                                ? "info.main"
-                                : "text.secondary"
-                          }
+                          color={isSelected ? "primary.main" : "text.secondary"}
                           sx={{
                             fontFamily: "Archivo, sans-serif",
                             fontWeight: "bold",
@@ -2524,11 +2503,7 @@ export default function ActiveMatchDashboard(props: Props) {
                         label={t(`peladas.matches.status.${status}`)}
                         size="small"
                         color={statusColor}
-                        variant={
-                          status === "running" || status === "next"
-                            ? "filled"
-                            : "outlined"
-                        }
+                        variant={status === "running" ? "filled" : "outlined"}
                         sx={{
                           height: 20,
                           fontSize: "0.65rem",
