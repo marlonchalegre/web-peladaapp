@@ -23,7 +23,7 @@
     "@mui/x-date-pickers": "^9.0.4",
     "axios": "^1.18.0",
     "dayjs": "^1.11.20",
-    "i18next": "26.0.8",
+    "i18next": "26.4.4",
     "i18next-browser-languagedetector": "8.2.1",
     "i18next-http-backend": "3.0.6",
     "jwt-decode": "^4.0.0",
