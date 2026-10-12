@@ -30,7 +30,7 @@
     "react": "19.3.0",
     "react-dom": "19.3.0",
     "react-ga4": "3.0.1",
-    "react-i18next": "17.0.15",
+    "react-i18next": "17.0.16",
     "react-router-dom": "7.18.4",
     "web-vitals": "^5.2.0"
   },
