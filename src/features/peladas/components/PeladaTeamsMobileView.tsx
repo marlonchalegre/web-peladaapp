@@ -8,11 +8,14 @@ import {
   Switch,
   Menu,
   MenuItem,
+  ListItemIcon,
+  ListItemText,
   CircularProgress,
   Divider,
   IconButton,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import CasinoIcon from "@mui/icons-material/Casino";
@@ -81,6 +84,7 @@ export interface PeladaTeamsMobileViewProps {
   onMarkPaid?: (playerId: string, amount: number) => void;
   onReversePayment?: (playerId: string) => void;
   onAddPlayersClick?: () => void;
+  onRemovePlayerFromPelada?: (player: PlayerWithUser) => void;
 }
 
 export default function PeladaTeamsMobileView({
@@ -110,6 +114,7 @@ export default function PeladaTeamsMobileView({
   onMarkPaid,
   onReversePayment,
   onAddPlayersClick,
+  onRemovePlayerFromPelada,
 }: PeladaTeamsMobileViewProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -1647,21 +1652,44 @@ export default function PeladaTeamsMobileView({
                   </Typography>
 
                   {isAdmin && (
-                    <Button
-                      size="small"
-                      aria-label={t(
-                        "peladas.teams.player_actions_label",
-                        "Ações do jogador",
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      {onRemovePlayerFromPelada && (
+                        <IconButton
+                          size="small"
+                          data-testid="mobile-remove-bench-player-button"
+                          aria-label={t(
+                            "peladas.teams.menu.remove_from_pelada",
+                            "Remover da pelada",
+                          )}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onRemovePlayerFromPelada(player);
+                          }}
+                          sx={{
+                            p: 0.25,
+                            color: "text.secondary",
+                            "&:hover": { color: "error.main" },
+                          }}
+                        >
+                          <PersonRemoveIcon sx={{ fontSize: "16px" }} />
+                        </IconButton>
                       )}
-                      onClick={(e) => handleOpenPlayerMenu(e, player, null)}
-                      sx={{
-                        minWidth: 28,
-                        p: 0.25,
-                        color: "text.secondary",
-                      }}
-                    >
-                      <MoreVertIcon sx={{ fontSize: "16px" }} />
-                    </Button>
+                      <Button
+                        size="small"
+                        aria-label={t(
+                          "peladas.teams.player_actions_label",
+                          "Ações do jogador",
+                        )}
+                        onClick={(e) => handleOpenPlayerMenu(e, player, null)}
+                        sx={{
+                          minWidth: 28,
+                          p: 0.25,
+                          color: "text.secondary",
+                        }}
+                      >
+                        <MoreVertIcon sx={{ fontSize: "16px" }} />
+                      </Button>
+                    </Box>
                   )}
                 </Box>
               );
@@ -1757,6 +1785,37 @@ export default function PeladaTeamsMobileView({
             {t("peladas.teams.send_to_bench", "Enviar para o banco")}
           </MenuItem>
         )}
+
+        {isAdmin &&
+          onRemovePlayerFromPelada && [
+            <Divider key="mobile-remove-divider" />,
+            <MenuItem
+              key="mobile-remove-player-item"
+              data-testid="mobile-menu-remove-player-item"
+              onClick={() => {
+                if (selectedPlayer) {
+                  onRemovePlayerFromPelada(selectedPlayer.player);
+                }
+                handleClosePlayerMenu();
+              }}
+              sx={{
+                fontFamily: "Archivo, sans-serif",
+                fontWeight: 700,
+                fontSize: "12px",
+                color: "error.main",
+              }}
+            >
+              <ListItemIcon sx={{ color: "error.main", minWidth: 28 }}>
+                <PersonRemoveIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>
+                {t(
+                  "peladas.teams.menu.remove_from_pelada",
+                  "Remover da pelada",
+                )}
+              </ListItemText>
+            </MenuItem>,
+          ]}
       </Menu>
     </Box>
   );

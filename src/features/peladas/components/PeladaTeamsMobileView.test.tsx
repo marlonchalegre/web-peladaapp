@@ -476,4 +476,28 @@ describe("PeladaTeamsMobileView", () => {
       mid.compareDocumentPosition(str) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
   });
+
+  it("calls onRemovePlayerFromPelada when clicking the remove button on a mobile bench card", () => {
+    const onRemovePlayerFromPelada = vi.fn();
+    renderComponent({ onRemovePlayerFromPelada });
+
+    const removeBtn = screen.getByTestId("mobile-remove-bench-player-button");
+    fireEvent.click(removeBtn);
+
+    expect(onRemovePlayerFromPelada).toHaveBeenCalledWith(mockBenchPlayers[0]);
+  });
+
+  it("calls onRemovePlayerFromPelada from the mobile player action menu", () => {
+    const onRemovePlayerFromPelada = vi.fn();
+    renderComponent({ onRemovePlayerFromPelada });
+
+    const menuBtns = screen.getAllByLabelText("Ações do jogador");
+    // Click the last menu button (which belongs to the bench player)
+    fireEvent.click(menuBtns[menuBtns.length - 1]);
+
+    const removeMenuItem = screen.getByTestId("mobile-menu-remove-player-item");
+    fireEvent.click(removeMenuItem);
+
+    expect(onRemovePlayerFromPelada).toHaveBeenCalledWith(mockBenchPlayers[0]);
+  });
 });

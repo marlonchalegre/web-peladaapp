@@ -47,6 +47,7 @@ const { mockApiClient, mockApi } = vi.hoisted(() => ({
     markTransactionPaid: vi.fn(),
     reverseTransactionPayment: vi.fn(),
     batchUpdateAttendance: vi.fn(),
+    updateAttendance: vi.fn(),
     addTransaction: vi.fn(),
     reverseTransaction: vi.fn(),
   },
@@ -1146,5 +1147,43 @@ describe("usePeladaDetail", () => {
     });
 
     expect(mockApi.addPlayerToTeam).toHaveBeenCalledTimes(1);
+  });
+
+  it("handles remove player from pelada via updateAttendance declined", async () => {
+    mockApi.getPeladaFullDetails.mockResolvedValue({
+      pelada: { id: "p1", organization_id: "org1", status: "open" },
+      teams: [],
+      available_players: [
+        {
+          id: "player-to-remove",
+          user_id: "u-rem",
+          user: { id: "u-rem", name: "To Remove" },
+        },
+      ],
+      users_map: {},
+      org_players_map: {},
+      voting_info: null,
+      pelada_transactions: [],
+    });
+    mockApi.updateAttendance.mockResolvedValue({ updated: 1 });
+
+    const { result } = renderHook(() => usePeladaDetail(peladaId), {
+      wrapper: ({ children }) => <MemoryRouter>{children}</MemoryRouter>,
+    });
+
+    await waitFor(() => {
+      expect(result.current.availablePlayers.length).toBe(1);
+    });
+
+    await act(async () => {
+      await result.current.handleRemovePlayerFromPelada("player-to-remove");
+    });
+
+    expect(mockApi.updateAttendance).toHaveBeenCalledWith(
+      "p1",
+      "declined",
+      "player-to-remove",
+    );
+    expect(mockApi.getPeladaFullDetails).toHaveBeenCalledTimes(2);
   });
 });

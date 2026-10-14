@@ -1474,8 +1474,11 @@
         "move_to": "Move to {{name}}",
         "send_to_bench": "Send to Bench",
         "move_to_home_gk": "Move to Home GK",
-        "move_to_away_gk": "Move to Away GK"
+        "move_to_away_gk": "Move to Away GK",
+        "remove_from_pelada": "Remove from pelada"
       },
+      "remove_player_confirm_title": "Remove player from pelada?",
+      "remove_player_confirm_desc": "Are you sure you want to remove {{name}} from the pelada? The player will be removed from the bench and will not participate in draws.",
       "fixed_goalkeepers_title": "Session Fixed Goalkeepers",
       "home_goalkeeper": "GOALKEEPER (HOME)",
       "away_goalkeeper": "GOALKEEPER (AWAY)",
@@ -1484,8 +1487,6 @@
       "add_team_hint": "Add a new team to balance the pelada",
       "specialist": "SPECIALIST",
       "draw_title": "Team Draw",
-      "drawn_at": "drawn at",
-      "drawn_by_you": "by you",
       "send_whatsapp": "COPY TO WHATSAPP",
       "save_teams": "SAVE TEAMS",
       "how_to_draw": "HOW TO DRAW",

@@ -72,11 +72,26 @@ export default function PeladaDetailPage() {
     handleReversePayment,
     peladaTransactions,
     handleAddPlayersFromOrg,
+    handleRemovePlayerFromPelada,
     allPlayerIdsInPelada,
   } = usePeladaDetail(peladaId);
 
   const [justificationDialogOpen, setJustificationDialogOpen] = useState(false);
   const [addPlayersDialogOpen, setAddPlayersDialogOpen] = useState(false);
+  const [playerToRemove, setPlayerToRemove] = useState<PlayerWithUser | null>(
+    null,
+  );
+
+  const handleRequestRemovePlayer = useCallback((player: PlayerWithUser) => {
+    setPlayerToRemove(player);
+  }, []);
+
+  const handleConfirmRemovePlayer = useCallback(async () => {
+    if (playerToRemove) {
+      await handleRemovePlayerFromPelada(playerToRemove.id);
+      setPlayerToRemove(null);
+    }
+  }, [playerToRemove, handleRemovePlayerFromPelada]);
 
   const handleOpenAddPlayers = useCallback(
     () => setAddPlayersDialogOpen(true),
@@ -337,6 +352,7 @@ export default function PeladaDetailPage() {
           onMarkPaid={handleMarkPaid}
           onReversePayment={onReverseClick}
           onAddPlayersClick={handleOpenAddPlayers}
+          onRemovePlayerFromPelada={handleRequestRemovePlayer}
         />
       ) : (
         <PeladaTeamsMobileView
@@ -371,6 +387,7 @@ export default function PeladaDetailPage() {
           onMarkPaid={handleMarkPaid}
           onReversePayment={onReverseClick}
           onAddPlayersClick={handleOpenAddPlayers}
+          onRemovePlayerFromPelada={handleRequestRemovePlayer}
         />
       )}
 
@@ -410,6 +427,25 @@ export default function PeladaDetailPage() {
           amount: 0,
         })}
         severity="warning"
+      />
+
+      <PrettyConfirmDialog
+        open={Boolean(playerToRemove)}
+        loading={processing}
+        onClose={() => setPlayerToRemove(null)}
+        onConfirm={handleConfirmRemovePlayer}
+        title={t(
+          "peladas.teams.remove_player_confirm_title",
+          "Remover jogador da pelada?",
+        )}
+        description={t(
+          "peladas.teams.remove_player_confirm_desc",
+          "Tem certeza que deseja remover {{name}} da pelada? O jogador sairá do banco e não participará dos sorteios.",
+          { name: playerToRemove?.user?.name || "" },
+        )}
+        confirmLabel={t("common.remove", "Remover")}
+        cancelLabel={t("common.cancel", "Cancelar")}
+        severity="error"
       />
 
       <SwapPlayerDialog

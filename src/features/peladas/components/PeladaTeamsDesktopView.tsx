@@ -9,12 +9,15 @@ import {
   MenuItem,
   ListItemIcon,
   ListItemText,
+  Tooltip,
+  Divider,
 } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import CloseIcon from "@mui/icons-material/Close";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import GroupsIcon from "@mui/icons-material/Groups";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import SecurityIcon from "@mui/icons-material/Security";
@@ -86,6 +89,7 @@ export interface PeladaTeamsDesktopViewProps {
   onMarkPaid?: (playerId: string, amount: number) => void;
   onReversePayment?: (playerId: string) => void;
   onAddPlayersClick?: () => void;
+  onRemovePlayerFromPelada?: (player: PlayerWithUser) => void;
 }
 
 const VEST_KEYS = [
@@ -256,6 +260,7 @@ export default function PeladaTeamsDesktopView({
   onCopyAnnouncement,
   currentUser,
   onAddPlayersClick,
+  onRemovePlayerFromPelada,
 }: PeladaTeamsDesktopViewProps) {
   const { t } = useTranslation();
   const [algorithm, setAlgorithm] = useState<DrawAlgorithm>("classic");
@@ -483,20 +488,6 @@ export default function PeladaTeamsDesktopView({
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
-            <Typography
-              sx={{
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 600,
-                fontSize: "11.5px",
-                lineHeight: 1.3,
-                color: "text.secondary",
-                textAlign: "right",
-              }}
-            >
-              {t("peladas.teams.drawn_at", "sorteado às")} {timeStr}
-              <br />
-              {t("peladas.teams.drawn_by_you", "por você")}
-            </Typography>
             <Button
               onClick={handleCopyZap}
               data-testid="desktop-zap-button"
@@ -1852,18 +1843,57 @@ export default function PeladaTeamsDesktopView({
                         </Typography>
                       </Box>
                       {isAdmin && (
-                        <IconButton
-                          size="small"
-                          onClick={(e) => handleOpenPlayerMenu(e, bp, null)}
+                        <Box
                           sx={{
-                            p: 0.25,
                             ml: "auto",
-                            color: "text.secondary",
-                            "&:hover": { color: "primary.main" },
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 0.25,
                           }}
                         >
-                          <SwapHorizIcon sx={{ fontSize: "1.2rem" }} />
-                        </IconButton>
+                          {onRemovePlayerFromPelada && (
+                            <Tooltip
+                              title={t(
+                                "peladas.teams.menu.remove_from_pelada",
+                                "Remover da pelada",
+                              )}
+                            >
+                              <IconButton
+                                size="small"
+                                data-testid="remove-bench-player-button"
+                                aria-label={t(
+                                  "peladas.teams.menu.remove_from_pelada",
+                                  "Remover da pelada",
+                                )}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  onRemovePlayerFromPelada(bp);
+                                }}
+                                sx={{
+                                  p: 0.25,
+                                  color: "text.secondary",
+                                  "&:hover": { color: "error.main" },
+                                }}
+                              >
+                                <PersonRemoveIcon
+                                  sx={{ fontSize: "1.15rem" }}
+                                />
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                          <IconButton
+                            size="small"
+                            data-testid="player-menu-button"
+                            onClick={(e) => handleOpenPlayerMenu(e, bp, null)}
+                            sx={{
+                              p: 0.25,
+                              color: "text.secondary",
+                              "&:hover": { color: "primary.main" },
+                            }}
+                          >
+                            <SwapHorizIcon sx={{ fontSize: "1.2rem" }} />
+                          </IconButton>
+                        </Box>
                       )}
                     </Box>
                   ))
@@ -1954,6 +1984,31 @@ export default function PeladaTeamsDesktopView({
             </ListItemText>
           </MenuItem>,
         ]}
+        {isAdmin &&
+          onRemovePlayerFromPelada && [
+            <Divider key="remove-player-divider" />,
+            <MenuItem
+              key="remove-player-item"
+              data-testid="menu-remove-player-item"
+              onClick={() => {
+                if (activePlayerForMenu) {
+                  onRemovePlayerFromPelada(activePlayerForMenu.player);
+                }
+                handleClosePlayerMenu();
+              }}
+              sx={{ color: "error.main" }}
+            >
+              <ListItemIcon sx={{ color: "error.main" }}>
+                <PersonRemoveIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>
+                {t(
+                  "peladas.teams.menu.remove_from_pelada",
+                  "Remover da pelada",
+                )}
+              </ListItemText>
+            </MenuItem>,
+          ]}
       </Menu>
     </Box>
   );

@@ -545,4 +545,52 @@ describe("PeladaTeamsDesktopView", () => {
 
     fetchSpy.mockRestore();
   });
+
+  it("does not render mock draw timestamp or hardcoded 'por você' author label", () => {
+    render(
+      <MemoryRouter>
+        <PeladaTeamsDesktopView {...defaultProps} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.queryByText(/sorteado às/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/por você/i)).not.toBeInTheDocument();
+  });
+
+  it("calls onRemovePlayerFromPelada when clicking the remove button on a bench player card", () => {
+    const onRemovePlayerFromPelada = vi.fn();
+    render(
+      <MemoryRouter>
+        <PeladaTeamsDesktopView
+          {...defaultProps}
+          onRemovePlayerFromPelada={onRemovePlayerFromPelada}
+        />
+      </MemoryRouter>,
+    );
+
+    const removeBtn = screen.getByTestId("remove-bench-player-button");
+    fireEvent.click(removeBtn);
+
+    expect(onRemovePlayerFromPelada).toHaveBeenCalledWith(mockBenchPlayers[0]);
+  });
+
+  it("calls onRemovePlayerFromPelada from the player action menu", () => {
+    const onRemovePlayerFromPelada = vi.fn();
+    render(
+      <MemoryRouter>
+        <PeladaTeamsDesktopView
+          {...defaultProps}
+          onRemovePlayerFromPelada={onRemovePlayerFromPelada}
+        />
+      </MemoryRouter>,
+    );
+
+    const menuBtn = screen.getByTestId("player-menu-button");
+    fireEvent.click(menuBtn);
+
+    const removeMenuItem = screen.getByTestId("menu-remove-player-item");
+    fireEvent.click(removeMenuItem);
+
+    expect(onRemovePlayerFromPelada).toHaveBeenCalledWith(mockBenchPlayers[0]);
+  });
 });

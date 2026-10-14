@@ -551,6 +551,22 @@ export function usePeladaDetail(peladaId: string) {
     [processing, peladaId, fetchPeladaData, t],
   );
 
+  const handleRemovePlayerFromPelada = useCallback(
+    async (playerId: string) => {
+      return withProcessingLock(
+        async () => {
+          await endpoints.updateAttendance(peladaId, "declined", playerId);
+          await fetchPeladaData();
+        },
+        t(
+          "peladas.detail.error.remove_player_failed",
+          "Falha ao remover jogador da pelada",
+        ),
+      );
+    },
+    [withProcessingLock, peladaId, fetchPeladaData, t],
+  );
+
   const handleMarkPaid = async (playerId: string, amount: number) => {
     if (!pelada) return;
     try {
@@ -709,6 +725,7 @@ export function usePeladaDetail(peladaId: string) {
     handleUpdatePlayersPerTeam,
     handleUpdateNumTeams,
     handleAddPlayersFromOrg,
+    handleRemovePlayerFromPelada,
     handleMarkPaid,
     handleReversePayment,
     allPlayerIdsInPelada,

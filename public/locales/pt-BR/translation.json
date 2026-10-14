@@ -1474,8 +1474,11 @@
         "move_to": "Mover para {{name}}",
         "send_to_bench": "Enviar para o Banco",
         "move_to_home_gk": "Mover para Goleiro (Casa)",
-        "move_to_away_gk": "Mover para Goleiro (Fora)"
+        "move_to_away_gk": "Mover para Goleiro (Fora)",
+        "remove_from_pelada": "Remover da pelada"
       },
+      "remove_player_confirm_title": "Remover jogador da pelada?",
+      "remove_player_confirm_desc": "Tem certeza que deseja remover {{name}} da pelada? O jogador sairá do banco e não participará dos sorteios.",
       "fixed_goalkeepers_title": "Goleiros Fixos da Sessão",
       "home_goalkeeper": "GOLEIRO (CASA)",
       "away_goalkeeper": "GOLEIRO (FORA)",
@@ -1484,8 +1487,6 @@
       "add_team_hint": "Adicione um novo time para equilibrar a pelada",
       "specialist": "ESPECIALISTA",
       "draw_title": "Sorteio de times",
-      "drawn_at": "sorteado às",
-      "drawn_by_you": "por você",
       "send_whatsapp": "COPIAR P/ O ZAP",
       "save_teams": "SALVAR TIMES",
       "how_to_draw": "COMO SORTEAR",

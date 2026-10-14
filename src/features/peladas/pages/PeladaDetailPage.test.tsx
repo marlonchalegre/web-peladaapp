@@ -262,6 +262,17 @@ const MockPeladaView = (props: any) => (
       >
         Bench Move to Fixed GK
       </button>
+      <button
+        data-testid="trigger-remove-player"
+        onClick={() =>
+          props.onRemovePlayerFromPelada?.({
+            id: "11",
+            user: { id: "2", name: "Player 2" },
+          })
+        }
+      >
+        Remove Player
+      </button>
     </div>
   </div>
 );
@@ -1013,6 +1024,43 @@ describe("PeladaDetailPage", () => {
     expect(api.post).toHaveBeenCalledWith("/api/peladas/1/attendance/batch", {
       player_ids: ["99"],
       status: "confirmed",
+    });
+  });
+
+  it("handles remove player confirmation and triggers removal API", async () => {
+    (api.post as Mock).mockResolvedValue({ status: "declined" });
+
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByTestId("trigger-remove-player")).toBeInTheDocument();
+    });
+
+    // 1. Click remove player trigger
+    await user.click(screen.getByTestId("trigger-remove-player"));
+
+    // 2. Confirmation dialog should be open
+    await waitFor(() => {
+      expect(
+        screen.getByText("peladas.teams.remove_player_confirm_title"),
+      ).toBeInTheDocument();
+    });
+
+    // 3. Confirm removal
+    const confirmBtn = screen.getByRole("button", { name: "common.remove" });
+    await user.click(confirmBtn);
+
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledWith("/api/peladas/1/attendance", {
+        status: "declined",
+        player_id: "11",
+      });
+    });
+
+    // Dialog closes
+    await waitFor(() => {
+      expect(
+        screen.queryByText("peladas.teams.remove_player_confirm_title"),
+      ).not.toBeInTheDocument();
     });
   });
 });
