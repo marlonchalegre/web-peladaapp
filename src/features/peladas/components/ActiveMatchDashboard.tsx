@@ -316,6 +316,22 @@ export default function ActiveMatchDashboard(props: Props) {
     );
   }, [matches, match.sequence]);
 
+  const currentMatch = useMemo(() => {
+    if (
+      (pelada?.status || "").toLowerCase() === "closed" ||
+      matches.length === 0
+    ) {
+      return null;
+    }
+    const running = matches.find((m) => m.status === "running");
+    if (running) return running;
+    return (
+      matches
+        .filter((m) => m.status === "scheduled")
+        .sort((a, b) => a.sequence - b.sequence)[0] || null
+    );
+  }, [matches, pelada?.status]);
+
   /* ---------- live standings (all teams) ---------- */
 
   const liveMatchTable = useMemo(() => {
@@ -2425,12 +2441,20 @@ export default function ActiveMatchDashboard(props: Props) {
           <List sx={{ px: 0 }}>
             {matches.map((m) => {
               const isSelected = match.id === m.id;
-              const status = m.status;
+              const isCurrent = currentMatch?.id === m.id;
+              const status =
+                m.status === "finished"
+                  ? "finished"
+                  : m.status === "running"
+                    ? "running"
+                    : isCurrent
+                      ? "next"
+                      : "scheduled";
 
               const statusColor =
                 status === "finished"
                   ? "success"
-                  : status === "running"
+                  : status === "running" || status === "next"
                     ? "primary"
                     : "default";
 

@@ -335,6 +335,31 @@ describe("ActiveMatchDashboard", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("shows next (atual) status in history drawer for current scheduled match and scheduled status for upcoming matches", async () => {
+    const user = userEvent.setup();
+    const matches: Match[] = [
+      { ...mockMatch, id: "1", sequence: 1, status: "scheduled" },
+      { ...mockMatch, id: "2", sequence: 2, status: "scheduled" },
+    ];
+    render(
+      <ThemeContextProvider>
+        <ActiveMatchDashboard
+          {...defaultProps}
+          match={matches[0]}
+          matches={matches}
+        />
+      </ThemeContextProvider>,
+    );
+
+    await user.click(screen.getAllByTestId("toggle-history-drawer")[0]);
+    expect(
+      screen.getByText(/peladas\.matches\.status\.next/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/peladas\.matches\.status\.scheduled/i),
+    ).toBeInTheDocument();
+  });
+
   describe("goal recording via GOL buttons", () => {
     const adminProps = {
       ...defaultProps,
