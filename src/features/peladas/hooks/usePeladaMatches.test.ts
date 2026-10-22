@@ -120,4 +120,41 @@ describe("usePeladaMatches", () => {
 
     expect(mockActions.startPeladaTimer).toHaveBeenCalled();
   });
+
+  it("should prevent duplicate proceedToNextMatch invocations and immediately dismiss finished match", async () => {
+    const { result } = renderHook(() => usePeladaMatches("p1"));
+
+    await act(async () => {
+      await result.current.endMatch("m1");
+    });
+    expect(result.current.justFinishedMatch?.id).toBe("m1");
+
+    let resolveTimer: () => void = () => {};
+    (mockActions.startMatchTimer as Mock).mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveTimer = resolve;
+        }),
+    );
+
+    // Call proceedToNextMatch the first time
+    act(() => {
+      result.current.proceedToNextMatch();
+    });
+
+    // Modal should close immediately
+    expect(result.current.justFinishedMatch).toBeUndefined();
+
+    // Second click while in flight should be ignored
+    act(() => {
+      result.current.proceedToNextMatch();
+    });
+
+    expect(mockActions.startMatchTimer).toHaveBeenCalledTimes(1);
+    expect(mockActions.startMatchTimer).toHaveBeenCalledWith("m2");
+
+    await act(async () => {
+      resolveTimer();
+    });
+  });
 });

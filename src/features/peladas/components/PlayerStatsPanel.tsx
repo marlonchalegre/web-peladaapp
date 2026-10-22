@@ -20,6 +20,7 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import { useTranslation } from "react-i18next";
 import { useMemo } from "react";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
+import { getInitials } from "../../../shared/utils/initials";
 
 export type PlayerStatRow = {
   playerId: string;
@@ -50,15 +51,16 @@ const HighlightCard = ({
   players: PlayerStatRow[];
   count: number;
   icon: React.ReactNode;
-  color: string;
+  color: "primary" | "info" | "secondary" | "warning" | "error" | "success";
 }) => (
-  <Box sx={{ flex: 1, minWidth: { xs: "100%", sm: "200px" } }}>
+  <Box sx={{ flex: 1, minWidth: { xs: "100%", sm: "140px" } }}>
     <Stack
       direction="row"
       spacing={1}
       sx={{
         alignItems: "center",
         mb: 1.5,
+        minWidth: 0,
       }}
     >
       <Box
@@ -71,17 +73,20 @@ const HighlightCard = ({
           borderRadius: 1,
           bgcolor: `${color}.light`,
           color: `${color}.main`,
+          flexShrink: 0,
         }}
       >
         {icon}
       </Box>
       <Typography
         variant="subtitle2"
+        noWrap
         sx={{
           fontWeight: "bold",
           color: "text.secondary",
           textTransform: "uppercase",
           letterSpacing: 1,
+          minWidth: 0,
         }}
       >
         {title}
@@ -94,7 +99,7 @@ const HighlightCard = ({
           key={p.playerId}
           elevation={0}
           sx={{
-            p: 1.5,
+            p: 1.25,
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -102,13 +107,17 @@ const HighlightCard = ({
             border: "1px solid",
             borderColor: "divider",
             borderRadius: 2,
+            minWidth: 0,
           }}
         >
           <Stack
             direction="row"
-            spacing={1.5}
+            spacing={1}
             sx={{
               alignItems: "center",
+              minWidth: 0,
+              flex: 1,
+              mr: 1,
             }}
           >
             <SecureAvatar
@@ -119,13 +128,16 @@ const HighlightCard = ({
                 height: 32,
                 fontSize: "0.875rem",
                 bgcolor: `${color}.main`,
+                flexShrink: 0,
               }}
-              fallbackText={p.name.substring(0, 2).toUpperCase()}
+              fallbackText={getInitials(p.name)}
             />
             <Typography
               variant="body2"
+              noWrap
               sx={{
                 fontWeight: "bold",
+                minWidth: 0,
               }}
             >
               {p.name}
@@ -136,6 +148,8 @@ const HighlightCard = ({
             color={`${color}.main`}
             sx={{
               fontWeight: "black",
+              flexShrink: 0,
+              lineHeight: 1,
             }}
           >
             {count}
@@ -164,13 +178,13 @@ function StatsHighlights({ stats }: { stats: PlayerStatRow[] }) {
   if (topScorers.length === 0 && topAssists.length === 0) return null;
 
   return (
-    <Box sx={{ p: 2.5, bgcolor: "action.hover" }}>
+    <Box sx={{ p: { xs: 1.5, sm: 2 }, bgcolor: "action.hover" }}>
       <Stack
         direction="row"
         spacing={1}
         sx={{
           alignItems: "center",
-          mb: 3,
+          mb: 2.5,
         }}
       >
         <TrendingUpIcon color="primary" />
@@ -183,7 +197,11 @@ function StatsHighlights({ stats }: { stats: PlayerStatRow[] }) {
           {t("peladas.dashboard.summary.highlights")}
         </Typography>
       </Stack>
-      <Stack direction={{ xs: "column", sm: "row" }} spacing={3}>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={{ xs: 2, sm: 1.5, md: 2 }}
+        sx={{ flexWrap: "wrap" }}
+      >
         {topScorers.length > 0 && (
           <HighlightCard
             title={t("common.goals")}
@@ -203,7 +221,7 @@ function StatsHighlights({ stats }: { stats: PlayerStatRow[] }) {
           />
         )}
       </Stack>
-      <Divider sx={{ mt: 3 }} />
+      <Divider sx={{ mt: 2.5 }} />
     </Box>
   );
 }

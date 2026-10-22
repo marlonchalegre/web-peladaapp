@@ -561,6 +561,7 @@ export default function MatchReportSummary({
                 variant="contained"
                 color="primary"
                 onClick={onProceedToNext}
+                disabled={closing}
                 endIcon={<ArrowForwardIcon />}
                 sx={{ borderRadius: 2, py: 1.5, fontWeight: "bold" }}
                 data-testid="summary-next-match-button"

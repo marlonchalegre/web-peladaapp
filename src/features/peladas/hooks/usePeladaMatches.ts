@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { usePeladaData } from "./usePeladaData";
 import { usePeladaStandings } from "./usePeladaStandings";
 import { useMatchActions } from "./useMatchActions";
@@ -41,6 +41,7 @@ export function usePeladaMatches(peladaId: string) {
   const [justFinishedMatchId, setJustFinishedMatchId] = useState<string | null>(
     null,
   );
+  const isProceedingRef = useRef(false);
 
   const handleEndMatch = async (matchId: string) => {
     await actions.executeEndMatch(matchId);
@@ -69,24 +70,33 @@ export function usePeladaMatches(peladaId: string) {
   };
 
   const proceedToNextMatch = async () => {
-    const nextMatch = matchesRef.current.find((m) => m.status === "scheduled");
-    if (nextMatch) {
-      setSelectedMatchId(nextMatch.id);
-
-      // Auto-start timers
-      try {
-        const startPromises: Promise<unknown>[] = [
-          actions.startMatchTimer(nextMatch.id),
-        ];
-        if (pelada?.timer_status !== "running") {
-          startPromises.push(actions.startPeladaTimer());
-        }
-        await Promise.all(startPromises);
-      } catch (err) {
-        console.error("Failed to auto-start timers:", err);
-      }
-    }
+    if (isProceedingRef.current) return;
+    isProceedingRef.current = true;
     setJustFinishedMatchId(null);
+
+    try {
+      const nextMatch = matchesRef.current.find(
+        (m) => m.status === "scheduled",
+      );
+      if (nextMatch) {
+        setSelectedMatchId(nextMatch.id);
+
+        // Auto-start timers
+        try {
+          const startPromises: Promise<unknown>[] = [
+            actions.startMatchTimer(nextMatch.id),
+          ];
+          if (pelada?.timer_status !== "running") {
+            startPromises.push(actions.startPeladaTimer());
+          }
+          await Promise.all(startPromises);
+        } catch (err) {
+          console.error("Failed to auto-start timers:", err);
+        }
+      }
+    } finally {
+      isProceedingRef.current = false;
+    }
   };
 
   // Auto-select match if nothing is selected:

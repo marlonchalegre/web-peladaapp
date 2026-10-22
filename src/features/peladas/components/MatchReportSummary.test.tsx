@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import MatchReportSummary from "./MatchReportSummary";
 import { ThemeProvider, createTheme } from "@mui/material";
@@ -137,7 +137,7 @@ describe("MatchReportSummary", () => {
     expect(screen.getByText("Match #5 is ready")).toBeInTheDocument();
   });
 
-  it("calls onProceedToNext when next button is clicked", () => {
+  it("calls onProceedToNext when next button is clicked", async () => {
     const nextMatch: Match = { ...mockMatch, id: "2", sequence: 5 };
     const onProceed = vi.fn();
 
@@ -159,8 +159,36 @@ describe("MatchReportSummary", () => {
     );
 
     const nextBtn = screen.getByText("peladas.dashboard.summary.go_to_next");
-    fireEvent.click(nextBtn);
+    await act(async () => {
+      fireEvent.click(nextBtn);
+    });
     expect(onProceed).toHaveBeenCalled();
+  });
+
+  it("disables next match button when closing is true", () => {
+    const nextMatch: Match = { ...mockMatch, id: "2", sequence: 5 };
+    const onProceed = vi.fn();
+
+    renderWithTheme(
+      <MatchReportSummary
+        open={true}
+        onClose={vi.fn()}
+        match={mockMatch}
+        homeTeamName="Time 4"
+        awayTeamName="Time 2"
+        events={mockEvents}
+        userIdToName={mockUserIdToName}
+        orgPlayerIdToUserId={mockOrgPlayerIdToUserId}
+        orgPlayerIdToTeamId={mockOrgPlayerIdToTeamId}
+        teamNameById={mockTeamNameById}
+        nextMatch={nextMatch}
+        onProceedToNext={onProceed}
+        closing={true}
+      />,
+    );
+
+    const nextBtn = screen.getByTestId("summary-next-match-button");
+    expect(nextBtn).toBeDisabled();
   });
 
   it("shows end pelada option and calls onClosePelada when clicked on the last match for admin", () => {

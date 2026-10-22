@@ -117,4 +117,43 @@ describe("PlayerStatsPanel", () => {
     fireEvent.click(sortButtons[1]);
     expect(onToggleSort).toHaveBeenCalledWith("assists");
   });
+
+  it("renders highlights cleanly for both scorers and assists without cutting off cards in compact/landscape layouts", () => {
+    const statsWithLongNames: PlayerStatRow[] = [
+      {
+        playerId: "p1",
+        userId: "u1",
+        name: "Felipe Bruce With Very Long Name That Might Overflow",
+        goals: 4,
+        assists: 1,
+        ownGoals: 0,
+        matchesPlayed: 4,
+      },
+      {
+        playerId: "p2",
+        userId: "u2",
+        name: "Igor Matos",
+        goals: 2,
+        assists: 3,
+        ownGoals: 0,
+        matchesPlayed: 4,
+      },
+    ];
+
+    renderComponent({ playerStats: statsWithLongNames, showHighlights: true });
+
+    // Scorer title and player name
+    expect(screen.getAllByText("common.goals").length).toBeGreaterThan(0);
+    const scorerNames = screen.getAllByText(
+      "Felipe Bruce With Very Long Name That Might Overflow",
+    );
+    expect(scorerNames.length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("4").length).toBeGreaterThan(0);
+
+    // Assists title and player name (which was previously cut off in tablet landscape)
+    expect(screen.getByText("common.assists")).toBeInTheDocument();
+    const assistNames = screen.getAllByText("Igor Matos");
+    expect(assistNames.length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("3").length).toBeGreaterThan(0);
+  });
 });

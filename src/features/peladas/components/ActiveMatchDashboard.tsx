@@ -1463,6 +1463,7 @@ export default function ActiveMatchDashboard(props: Props) {
               flexDirection: "column",
               gap: "16px",
               minHeight: 0,
+              minWidth: 0,
             }}
           >
             {(!activeTab || activeTab === 0) && (

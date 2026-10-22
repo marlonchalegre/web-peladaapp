@@ -156,11 +156,13 @@ vi.mock("../components/MatchReportSummary", () => ({
     match,
     onClose,
     onClosePelada,
+    onProceedToNext,
   }: {
     open: boolean;
     match?: { sequence?: number };
     onClose: () => void;
     onClosePelada?: () => void;
+    onProceedToNext?: () => void;
   }) =>
     open ? (
       <div data-testid="match-summary">
@@ -174,6 +176,14 @@ vi.mock("../components/MatchReportSummary", () => ({
             onClick={onClosePelada}
           >
             Close Pelada
+          </button>
+        )}
+        {onProceedToNext && (
+          <button
+            data-testid="summary-next-match-button"
+            onClick={onProceedToNext}
+          >
+            Next Match
           </button>
         )}
       </div>
@@ -730,6 +740,44 @@ describe("PeladaMatchesPage", () => {
       expect(screen.queryByTestId("match-summary")).not.toBeInTheDocument();
       expect(screen.getByTestId("standings-table")).toBeInTheDocument();
     });
+  });
+
+  it("closes MatchReportSummary immediately and proceeds to next match when next button is clicked", async () => {
+    (api.put as Mock).mockResolvedValue({
+      ...mockDashboardData.matches[1],
+      status: "finished",
+    });
+
+    await act(async () => {
+      renderPage();
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("active-match-dashboard")).toBeInTheDocument();
+    });
+
+    // End match to trigger summary modal
+    fireEvent.click(screen.getByTestId("select-match-11"));
+    fireEvent.click(screen.getByTestId("end-match-btn"));
+    const endConfirmBtn = screen.getAllByRole("button", {
+      name: "common.confirm",
+    })[0];
+    await act(async () => {
+      fireEvent.click(endConfirmBtn);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId("match-summary")).toBeInTheDocument();
+    });
+
+    // Click next match in summary
+    const nextMatchBtn = screen.getByTestId("summary-next-match-button");
+    await act(async () => {
+      fireEvent.click(nextMatchBtn);
+    });
+
+    // Summary must be dismissed immediately
+    expect(screen.queryByTestId("match-summary")).not.toBeInTheDocument();
   });
 
   it("populates edit event dropdowns correctly using lineupsByMatch when team_players_map is empty", async () => {

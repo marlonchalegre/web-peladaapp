@@ -36,13 +36,13 @@ function StandingsHighlights({ champion }: { champion: StandingRow }) {
   const { t } = useTranslation();
 
   return (
-    <Box sx={{ p: 2.5, bgcolor: "action.hover" }}>
+    <Box sx={{ p: { xs: 1.5, sm: 2 }, bgcolor: "action.hover" }}>
       <Stack
         direction="row"
         spacing={1}
         sx={{
           alignItems: "center",
-          mb: 3,
+          mb: 2.5,
         }}
       >
         <TrendingUpIcon color="primary" />
@@ -55,13 +55,14 @@ function StandingsHighlights({ champion }: { champion: StandingRow }) {
           {t("peladas.dashboard.summary.highlights")}
         </Typography>
       </Stack>
-      <Box sx={{ flex: 1, maxWidth: { xs: "100%", sm: "300px" } }}>
+      <Box sx={{ flex: 1, maxWidth: { xs: "100%", sm: "300px" }, minWidth: 0 }}>
         <Stack
           direction="row"
           spacing={1}
           sx={{
             alignItems: "center",
             mb: 1.5,
+            minWidth: 0,
           }}
         >
           <Box
@@ -74,17 +75,20 @@ function StandingsHighlights({ champion }: { champion: StandingRow }) {
               borderRadius: 1,
               bgcolor: "warning.light",
               color: "warning.main",
+              flexShrink: 0,
             }}
           >
             <EmojiEventsIcon fontSize="small" />
           </Box>
           <Typography
             variant="subtitle2"
+            noWrap
             sx={{
               fontWeight: "bold",
               color: "text.secondary",
               textTransform: "uppercase",
               letterSpacing: 1,
+              minWidth: 0,
             }}
           >
             {t("common.champion")}
@@ -94,7 +98,7 @@ function StandingsHighlights({ champion }: { champion: StandingRow }) {
         <Paper
           elevation={0}
           sx={{
-            p: 2,
+            p: 1.5,
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -103,28 +107,33 @@ function StandingsHighlights({ champion }: { champion: StandingRow }) {
             borderColor: "warning.main",
             borderRadius: 3,
             boxShadow: "0 4px 12px rgba(237, 108, 2, 0.1)",
+            minWidth: 0,
           }}
         >
           <Stack
             direction="row"
-            spacing={2}
+            spacing={1.5}
             sx={{
               alignItems: "center",
+              minWidth: 0,
+              flex: 1,
             }}
           >
             <Avatar
               sx={{
-                width: 40,
-                height: 40,
+                width: 38,
+                height: 38,
                 bgcolor: "warning.main",
                 fontWeight: "bold",
+                flexShrink: 0,
               }}
             >
-              <EmojiEventsIcon />
+              <EmojiEventsIcon fontSize="small" />
             </Avatar>
-            <Box>
+            <Box sx={{ minWidth: 0, flex: 1 }}>
               <Typography
                 variant="subtitle1"
+                noWrap
                 sx={{
                   fontWeight: "800",
                   lineHeight: 1.2,
@@ -135,6 +144,7 @@ function StandingsHighlights({ champion }: { champion: StandingRow }) {
               </Typography>
               <Typography
                 variant="caption"
+                noWrap
                 sx={{
                   color: "text.secondary",
                 }}
@@ -145,7 +155,7 @@ function StandingsHighlights({ champion }: { champion: StandingRow }) {
           </Stack>
         </Paper>
       </Box>
-      <Divider sx={{ mt: 3 }} />
+      <Divider sx={{ mt: 2.5 }} />
     </Box>
   );
 }
