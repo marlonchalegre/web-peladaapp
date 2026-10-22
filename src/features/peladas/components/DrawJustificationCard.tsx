@@ -1,3 +1,4 @@
+import { useMemo, type ReactNode } from "react";
 import { Box, Typography, Button, Chip } from "@mui/material";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import PsychologyIcon from "@mui/icons-material/Psychology";
@@ -23,6 +24,77 @@ export interface DrawJustificationCardProps {
   onOpenDialog?: () => void;
 }
 
+function MetricStat({
+  label,
+  value,
+  color = "text.primary",
+}: {
+  label: string;
+  value: string;
+  color?: string;
+}) {
+  return (
+    <Box>
+      <Typography
+        sx={{
+          fontFamily: "Archivo, sans-serif",
+          fontWeight: 700,
+          fontSize: "8.5px",
+          color: "text.secondary",
+          letterSpacing: ".08em",
+          textTransform: "uppercase",
+        }}
+      >
+        {label}
+      </Typography>
+      <Typography
+        sx={{
+          fontFamily: "'Archivo Narrow', Archivo, sans-serif",
+          fontWeight: 700,
+          fontSize: "16px",
+          color,
+        }}
+      >
+        {value}
+      </Typography>
+    </Box>
+  );
+}
+
+function JustificationBullet({
+  color = "primary.main",
+  children,
+}: {
+  color?: string;
+  children: ReactNode;
+}) {
+  return (
+    <Box sx={{ display: "flex", gap: 1.2 }}>
+      <Box
+        sx={{
+          width: 6,
+          height: 6,
+          borderRadius: "50%",
+          bgcolor: color,
+          flexShrink: 0,
+          mt: 0.6,
+        }}
+      />
+      <Typography
+        sx={{
+          fontFamily: "Archivo, sans-serif",
+          fontWeight: 600,
+          fontSize: "11.5px",
+          lineHeight: 1.4,
+          color: "text.secondary",
+        }}
+      >
+        {children}
+      </Typography>
+    </Box>
+  );
+}
+
 export default function DrawJustificationCard({
   justification,
   teamAverages = [],
@@ -33,51 +105,58 @@ export default function DrawJustificationCard({
 }: DrawJustificationCardProps) {
   const { t } = useTranslation();
   const hasAverages = teamAverages.length > 0;
-  const minAvg = hasAverages
-    ? formatDecimal(Math.min(...teamAverages.map((t) => t.avg)), 1)
-    : "—";
-  const maxAvg = hasAverages
-    ? formatDecimal(Math.max(...teamAverages.map((t) => t.avg)), 1)
-    : "—";
-  const diffAvg =
-    teamAverages.length > 1
-      ? formatDecimal(
-          Math.max(...teamAverages.map((t) => t.avg)) -
-            Math.min(...teamAverages.map((t) => t.avg)),
-          1,
-        )
-      : formatDecimal(0, 1);
+
+  const { minAvg, maxAvg, diffAvg } = useMemo(() => {
+    if (!hasAverages) {
+      return { minAvg: "—", maxAvg: "—", diffAvg: formatDecimal(0, 1) };
+    }
+    const avgs = teamAverages.map((item) => item.avg);
+    const min = Math.min(...avgs);
+    const max = Math.max(...avgs);
+    return {
+      minAvg: formatDecimal(min, 1),
+      maxAvg: formatDecimal(max, 1),
+      diffAvg: formatDecimal(teamAverages.length > 1 ? max - min : 0, 1),
+    };
+  }, [hasAverages, teamAverages]);
 
   const algorithm = justification?.algorithm;
   const isAi = algorithm === "gpt" || algorithm === "gemini";
 
-  const topChampionPair = justification?.teams
-    ?.flatMap((t) => t.champion_pairs || [])
-    .sort((a, b) => (b.titles_together || 0) - (a.titles_together || 0))[0];
+  const { topChampionPair, topAssistLink, topWinner, firstTimePair } = useMemo(
+    () => ({
+      topChampionPair: justification?.teams
+        ?.flatMap((team) => team.champion_pairs || [])
+        .sort((a, b) => (b.titles_together || 0) - (a.titles_together || 0))[0],
+      topAssistLink:
+        justification?.algorithm === "gpt"
+          ? (justification.teams as DrawTacticalTeam[])
+              .flatMap((team) => team.assist_links || [])
+              .sort((a, b) => (b.count || 0) - (a.count || 0))[0]
+          : undefined,
+      topWinner:
+        justification?.algorithm === "gemini"
+          ? (justification.teams as DrawChemistryTeam[])
+              .map((team) => team.top_winner)
+              .filter((w): w is { name: string; titles: number } =>
+                Boolean(w && w.name),
+              )
+              .sort((a, b) => (b.titles || 0) - (a.titles || 0))[0]
+          : undefined,
+      firstTimePair:
+        justification?.algorithm === "gemini"
+          ? (justification.teams as DrawChemistryTeam[]).flatMap(
+              (team) => team.new_pairs || [],
+            )[0]
+          : undefined,
+    }),
+    [justification],
+  );
 
-  const topAssistLink =
-    justification?.algorithm === "gpt"
-      ? (justification.teams as DrawTacticalTeam[])
-          .flatMap((t) => t.assist_links || [])
-          .sort((a, b) => (b.count || 0) - (a.count || 0))[0]
-      : undefined;
-
-  const topWinner =
-    justification?.algorithm === "gemini"
-      ? (justification.teams as DrawChemistryTeam[])
-          .map((t) => t.top_winner)
-          .filter((w): w is { name: string; titles: number } =>
-            Boolean(w && w.name),
-          )
-          .sort((a, b) => (b.titles || 0) - (a.titles || 0))[0]
-      : undefined;
-
-  const firstTimePair =
-    justification?.algorithm === "gemini"
-      ? (justification.teams as DrawChemistryTeam[]).flatMap(
-          (t) => t.new_pairs || [],
-        )[0]
-      : undefined;
+  const benchedNames = useMemo(
+    () => justification?.benched?.map((b) => b.name).join(", ") ?? "",
+    [justification?.benched],
+  );
 
   return (
     <Box
@@ -88,7 +167,8 @@ export default function DrawJustificationCard({
         borderRadius: "16px",
         p: 2,
         mt: 2,
-        boxShadow: "0 2px 4px rgba(0,0,0,0.03)",
+        boxShadow: (theme) =>
+          theme.customShadows?.subtle || "0 2px 4px rgba(0,0,0,0.03)",
       }}
     >
       <Box
@@ -150,9 +230,7 @@ export default function DrawJustificationCard({
             label={t("peladas.draw.justification.chip_gpt", "POR REGRAS · GPT")}
             sx={{
               bgcolor: (theme) =>
-                theme.palette.mode === "dark"
-                  ? "rgba(242, 161, 0, 0.15)"
-                  : theme.palette.gold?.light || "rgba(242, 161, 0, 0.15)",
+                theme.palette.gold?.subtleBg || "rgba(242, 161, 0, 0.15)",
               border: (theme) =>
                 `1px solid ${theme.palette.gold?.main || theme.palette.primary.main}`,
               fontFamily: "Archivo, sans-serif",
@@ -199,486 +277,159 @@ export default function DrawJustificationCard({
             borderColor: "divider",
           }}
         >
-          <Box>
-            <Typography
-              sx={{
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 700,
-                fontSize: "8.5px",
-                color: "text.secondary",
-                letterSpacing: ".08em",
-                textTransform: "uppercase",
-              }}
-            >
-              {t("peladas.draw.justification.squad_mean", "MÉDIA ELENCO")}
-            </Typography>
-            <Typography
-              sx={{
-                fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                fontWeight: 700,
-                fontSize: "16px",
-                color: "text.primary",
-              }}
-            >
-              {formatDecimal(justification.metrics.squad_mean)}
-            </Typography>
-          </Box>
-
-          <Box>
-            <Typography
-              sx={{
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 700,
-                fontSize: "8.5px",
-                color: "text.secondary",
-                letterSpacing: ".08em",
-                textTransform: "uppercase",
-              }}
-            >
-              {t("peladas.draw.justification.gap_overall", "GAP GERAL")}
-            </Typography>
-            <Typography
-              sx={{
-                fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                fontWeight: 700,
-                fontSize: "16px",
-                color: "primary.main",
-              }}
-            >
-              {justification.algorithm === "gpt"
+          <MetricStat
+            label={t("peladas.draw.justification.squad_mean", "MÉDIA ELENCO")}
+            value={formatDecimal(justification.metrics.squad_mean)}
+          />
+          <MetricStat
+            label={t("peladas.draw.justification.gap_overall", "GAP GERAL")}
+            value={
+              justification.algorithm === "gpt"
                 ? formatDecimal(justification.metrics.team_mean_gap, 3)
-                : formatDecimal(justification.metrics.overall_gap, 3)}
-            </Typography>
-          </Box>
-
+                : formatDecimal(justification.metrics.overall_gap, 3)
+            }
+            color="primary.main"
+          />
           {justification.algorithm === "gemini" && (
             <>
-              <Box>
-                <Typography
-                  sx={{
-                    fontFamily: "Archivo, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "8.5px",
-                    color: "text.secondary",
-                    letterSpacing: ".08em",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {t("peladas.draw.justification.gap_defense", "GAP DEFESA")}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "16px",
-                    color: "text.primary",
-                  }}
-                >
-                  {formatDecimal(justification.metrics.defense_gap, 3)}
-                </Typography>
-              </Box>
-              <Box>
-                <Typography
-                  sx={{
-                    fontFamily: "Archivo, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "8.5px",
-                    color: "text.secondary",
-                    letterSpacing: ".08em",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {t("peladas.draw.justification.gap_attack", "GAP ATAQUE")}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "16px",
-                    color: "text.primary",
-                  }}
-                >
-                  {formatDecimal(justification.metrics.offense_gap, 3)}
-                </Typography>
-              </Box>
+              <MetricStat
+                label={t(
+                  "peladas.draw.justification.gap_defense",
+                  "GAP DEFESA",
+                )}
+                value={formatDecimal(justification.metrics.defense_gap, 3)}
+              />
+              <MetricStat
+                label={t("peladas.draw.justification.gap_attack", "GAP ATAQUE")}
+                value={formatDecimal(justification.metrics.offense_gap, 3)}
+              />
             </>
           )}
-
           {justification.algorithm === "gpt" && (
-            <Box>
-              <Typography
-                sx={{
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: 700,
-                  fontSize: "8.5px",
-                  color: "text.secondary",
-                  letterSpacing: ".08em",
-                  textTransform: "uppercase",
-                }}
-              >
-                {t("peladas.draw.justification.gap_sector", "GAP SETORIAL")}
-              </Typography>
-              <Typography
-                sx={{
-                  fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                  fontWeight: 700,
-                  fontSize: "16px",
-                  color: "text.primary",
-                }}
-              >
-                {formatDecimal(justification.metrics.sector_gap, 3)}
-              </Typography>
-            </Box>
+            <MetricStat
+              label={t("peladas.draw.justification.gap_sector", "GAP SETORIAL")}
+              value={formatDecimal(justification.metrics.sector_gap, 3)}
+            />
           )}
         </Box>
       )}
 
       {/* Explanatory bullet points */}
       <Box sx={{ display: "flex", flexDirection: "column", gap: 1.2 }}>
-        {/* Balance */}
         {hasAverages && (
-          <Box sx={{ display: "flex", gap: 1.2 }}>
-            <Box
-              sx={{
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                bgcolor: "primary.main",
-                flexShrink: 0,
-                mt: 0.6,
-              }}
-            />
-            <Typography
-              sx={{
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 600,
-                fontSize: "11.5px",
-                lineHeight: 1.4,
-                color: "text.secondary",
-              }}
-            >
-              {t("peladas.draw.justification.team_avg_balance", {
-                min: minAvg,
-                max: maxAvg,
-                diff: diffAvg,
-                defaultValue: `Média por time entre ${minAvg} e ${maxAvg} — diferença de ${diffAvg}.`,
-              })}
-            </Typography>
-          </Box>
+          <JustificationBullet>
+            {t("peladas.draw.justification.team_avg_balance", {
+              min: minAvg,
+              max: maxAvg,
+              diff: diffAvg,
+              defaultValue: `Média por time entre ${minAvg} e ${maxAvg} — diferença de ${diffAvg}.`,
+            })}
+          </JustificationBullet>
         )}
 
-        {/* AI Tactical or Chemistry summary */}
         {justification && (
-          <Box sx={{ display: "flex", gap: 1.2 }}>
-            <Box
-              sx={{
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                bgcolor: "primary.main",
-                flexShrink: 0,
-                mt: 0.6,
-              }}
-            />
-            <Typography
-              sx={{
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 600,
-                fontSize: "11.5px",
-                lineHeight: 1.4,
-                color: "text.secondary",
-              }}
-            >
-              {justification.algorithm === "gpt"
-                ? t(
-                    "peladas.draw.justification.rule_summary_gpt",
-                    "Sorteio por regras e restrições: notas e posições equilibradas sem concentração técnica.",
-                  )
-                : t(
-                    "peladas.draw.justification.rule_summary_gemini",
-                    "Sorteio com equilíbrio tático: duplas campeãs separadas e entrosamento distribuído.",
-                  )}
-            </Typography>
-          </Box>
+          <JustificationBullet>
+            {justification.algorithm === "gpt"
+              ? t(
+                  "peladas.draw.justification.rule_summary_gpt",
+                  "Sorteio por regras e restrições: notas e posições equilibradas sem concentração técnica.",
+                )
+              : t(
+                  "peladas.draw.justification.rule_summary_gemini",
+                  "Sorteio com equilíbrio tático: duplas campeãs separadas e entrosamento distribuído.",
+                )}
+          </JustificationBullet>
         )}
 
-        {/* Tactical / Chemistry pairs evidence */}
         {topChampionPair ? (
-          <Box sx={{ display: "flex", gap: 1.2 }}>
-            <Box
-              sx={{
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                bgcolor: "primary.main",
-                flexShrink: 0,
-                mt: 0.6,
-              }}
-            />
-            <Typography
-              sx={{
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 600,
-                fontSize: "11.5px",
-                lineHeight: 1.4,
-                color: "text.secondary",
-              }}
-            >
-              {t("peladas.draw.justification.champion_pair_text", {
-                players: topChampionPair.players.join(" e "),
-                titles: topChampionPair.titles_together,
-                defaultValue: `Dupla campeã ${topChampionPair.players.join(" e ")} (${topChampionPair.titles_together} títulos juntos).`,
-              })}
-            </Typography>
-          </Box>
+          <JustificationBullet>
+            {t("peladas.draw.justification.champion_pair_text", {
+              players: topChampionPair.players.join(" e "),
+              titles: topChampionPair.titles_together,
+              defaultValue: `Dupla campeã ${topChampionPair.players.join(" e ")} (${topChampionPair.titles_together} títulos juntos).`,
+            })}
+          </JustificationBullet>
         ) : (
           justification?.teams &&
           justification.teams.some(
-            (t) => t.champion_pairs && t.champion_pairs.length > 0,
+            (team) => team.champion_pairs && team.champion_pairs.length > 0,
           ) && (
-            <Box sx={{ display: "flex", gap: 1.2 }}>
-              <Box
-                sx={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: "50%",
-                  bgcolor: "primary.main",
-                  flexShrink: 0,
-                  mt: 0.6,
-                }}
-              />
-              <Typography
-                sx={{
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: 600,
-                  fontSize: "11.5px",
-                  lineHeight: 1.4,
-                  color: "text.secondary",
-                }}
-              >
-                {t(
-                  "peladas.draw.justification.pairs_balanced",
-                  "Duplas frequentes e campeãs balanceadas entre os times para manter competitividade.",
-                )}
-              </Typography>
-            </Box>
+            <JustificationBullet>
+              {t(
+                "peladas.draw.justification.pairs_balanced",
+                "Duplas frequentes e campeãs balanceadas entre os times para manter competitividade.",
+              )}
+            </JustificationBullet>
           )
         )}
 
-        {/* Assist link evidence */}
         {topAssistLink && (
-          <Box sx={{ display: "flex", gap: 1.2 }}>
-            <Box
-              sx={{
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                bgcolor: "primary.main",
-                flexShrink: 0,
-                mt: 0.6,
-              }}
-            />
-            <Typography
-              sx={{
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 600,
-                fontSize: "11.5px",
-                lineHeight: 1.4,
-                color: "text.secondary",
-              }}
-            >
-              {t("peladas.draw.justification.assist_link_text", {
-                from: topAssistLink.from,
-                to: topAssistLink.to,
-                count: topAssistLink.count,
-                defaultValue: `Conexão: ${topAssistLink.from} → ${topAssistLink.to} (${topAssistLink.count} assistências).`,
-              })}
-            </Typography>
-          </Box>
+          <JustificationBullet>
+            {t("peladas.draw.justification.assist_link_text", {
+              from: topAssistLink.from,
+              to: topAssistLink.to,
+              count: topAssistLink.count,
+              defaultValue: `Conexão: ${topAssistLink.from} → ${topAssistLink.to} (${topAssistLink.count} assistências).`,
+            })}
+          </JustificationBullet>
         )}
 
-        {/* Top winner */}
         {topWinner && (
-          <Box sx={{ display: "flex", gap: 1.2 }}>
-            <Box
-              sx={{
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                bgcolor: "primary.main",
-                flexShrink: 0,
-                mt: 0.6,
-              }}
-            />
-            <Typography
-              sx={{
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 600,
-                fontSize: "11.5px",
-                lineHeight: 1.4,
-                color: "text.secondary",
-              }}
-            >
-              {t("peladas.draw.justification.top_winner_text", {
-                name: topWinner.name.trim(),
-                titles: topWinner.titles,
-                defaultValue: `Maior vencedor recente: ${topWinner.name.trim()} (${topWinner.titles} títulos).`,
-              })}
-            </Typography>
-          </Box>
+          <JustificationBullet>
+            {t("peladas.draw.justification.top_winner_text", {
+              name: topWinner.name.trim(),
+              titles: topWinner.titles,
+              defaultValue: `Maior vencedor recente: ${topWinner.name.trim()} (${topWinner.titles} títulos).`,
+            })}
+          </JustificationBullet>
         )}
 
-        {/* First time pair */}
         {firstTimePair && (
-          <Box sx={{ display: "flex", gap: 1.2 }}>
-            <Box
-              sx={{
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                bgcolor: "primary.main",
-                flexShrink: 0,
-                mt: 0.6,
-              }}
-            />
-            <Typography
-              sx={{
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 600,
-                fontSize: "11.5px",
-                lineHeight: 1.4,
-                color: "text.secondary",
-              }}
-            >
-              {t("peladas.draw.justification.first_time_pair_text", {
-                players: firstTimePair.players.join(" e "),
-                defaultValue: `Parceria inédita: ${firstTimePair.players.join(" e ")}.`,
-              })}
-            </Typography>
-          </Box>
+          <JustificationBullet>
+            {t("peladas.draw.justification.first_time_pair_text", {
+              players: firstTimePair.players.join(" e "),
+              defaultValue: `Parceria inédita: ${firstTimePair.players.join(" e ")}.`,
+            })}
+          </JustificationBullet>
         )}
 
-        {/* History moves */}
         {justification?.history?.moves &&
           justification.history.moves.length > 0 && (
-            <Box sx={{ display: "flex", gap: 1.2 }}>
-              <Box
-                sx={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: "50%",
-                  bgcolor: "primary.main",
-                  flexShrink: 0,
-                  mt: 0.6,
-                }}
-              />
-              <Typography
-                sx={{
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: 600,
-                  fontSize: "11.5px",
-                  lineHeight: 1.4,
-                  color: "text.secondary",
-                }}
-              >
-                {t("peladas.draw.justification.history_moves_text", {
-                  count: justification.history.moves.length,
-                  defaultValue: `${justification.history.moves.length} jogador(es) trocado(s) de time para evitar repetição de formações recentes.`,
-                })}
-              </Typography>
-            </Box>
+            <JustificationBullet>
+              {t("peladas.draw.justification.history_moves_text", {
+                count: justification.history.moves.length,
+                defaultValue: `${justification.history.moves.length} jogador(es) trocado(s) de time para evitar repetição de formações recentes.`,
+              })}
+            </JustificationBullet>
           )}
 
-        {/* Fixed Goalkeepers */}
         {homeGkName && awayGkName && (
-          <Box sx={{ display: "flex", gap: 1.2 }}>
-            <Box
-              sx={{
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                bgcolor: "primary.main",
-                flexShrink: 0,
-                mt: 0.6,
-              }}
-            />
-            <Typography
-              sx={{
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 600,
-                fontSize: "11.5px",
-                lineHeight: 1.4,
-                color: "text.secondary",
-              }}
-            >
-              {t("peladas.draw.justification.fixed_gk_text", {
-                home: homeGkName,
-                away: awayGkName,
-                defaultValue: `Goleiros fixos ${homeGkName} e ${awayGkName} divididos entre Time 1 e Time 2.`,
-              })}
-            </Typography>
-          </Box>
+          <JustificationBullet>
+            {t("peladas.draw.justification.fixed_gk_text", {
+              home: homeGkName,
+              away: awayGkName,
+              defaultValue: `Goleiros fixos ${homeGkName} e ${awayGkName} divididos entre Time 1 e Time 2.`,
+            })}
+          </JustificationBullet>
         )}
 
-        {/* Benched players */}
         {justification?.benched && justification.benched.length > 0 && (
-          <Box sx={{ display: "flex", gap: 1.2 }}>
-            <Box
-              sx={{
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                bgcolor: "secondary.main",
-                flexShrink: 0,
-                mt: 0.6,
-              }}
-            />
-            <Typography
-              sx={{
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 600,
-                fontSize: "11.5px",
-                lineHeight: 1.4,
-                color: "text.secondary",
-              }}
-            >
-              {t("peladas.draw.justification.benched_text", {
-                count: justification.benched.length,
-                names: justification.benched.map((b) => b.name).join(", "),
-                defaultValue: `${justification.benched.length} jogador(es) no banco aguardando vaga (${justification.benched.map((b) => b.name).join(", ")}).`,
-              })}
-            </Typography>
-          </Box>
+          <JustificationBullet color="secondary.main">
+            {t("peladas.draw.justification.benched_text", {
+              count: justification.benched.length,
+              names: benchedNames,
+              defaultValue: `${justification.benched.length} jogador(es) no banco aguardando vaga (${benchedNames}).`,
+            })}
+          </JustificationBullet>
         )}
 
-        {/* Incomplete teams */}
-        {teamAverages.some((t) => t.count < playersPerTeam) && (
-          <Box sx={{ display: "flex", gap: 1.2 }}>
-            <Box
-              sx={{
-                width: 6,
-                height: 6,
-                borderRadius: "50%",
-                bgcolor: "secondary.main",
-                flexShrink: 0,
-                mt: 0.6,
-              }}
-            />
-            <Typography
-              sx={{
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 600,
-                fontSize: "11.5px",
-                lineHeight: 1.4,
-                color: "text.secondary",
-              }}
-            >
-              {t(
-                "peladas.draw.justification.incomplete_teams",
-                "Há times incompletos: arraste jogadores do banco para preencher as vagas livres.",
-              )}
-            </Typography>
-          </Box>
+        {teamAverages.some((team) => team.count < playersPerTeam) && (
+          <JustificationBullet color="secondary.main">
+            {t(
+              "peladas.draw.justification.incomplete_teams",
+              "Há times incompletos: arraste jogadores do banco para preencher as vagas livres.",
+            )}
+          </JustificationBullet>
         )}
       </Box>
 

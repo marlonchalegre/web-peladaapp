@@ -10,6 +10,7 @@ import {
   Paper,
   Button,
   Snackbar,
+  alpha,
 } from "@mui/material";
 import PeopleIcon from "@mui/icons-material/People";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
@@ -77,19 +78,16 @@ export default function OrganizationManagementPage() {
   const rowsPerPage = parseInt(searchParams.get("limit") || "10", 10);
 
   const [isSendNotificationOpen, setIsSendNotificationOpen] = useState(false);
-  const [toastOpen, setToastOpen] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
-  const [toastSeverity, setToastSeverity] = useState<
-    "success" | "error" | "info"
-  >("success");
+  const [toast, setToast] = useState<{
+    message: string;
+    severity: "success" | "error" | "info";
+  } | null>(null);
 
   const showToast = (
     message: string,
     severity: "success" | "error" | "info" = "success",
   ) => {
-    setToastMessage(message);
-    setToastSeverity(severity);
-    setToastOpen(true);
+    setToast({ message, severity });
   };
 
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
@@ -178,19 +176,107 @@ export default function OrganizationManagementPage() {
     return admins.some((a) => a.user_id === user.id);
   }, [user, admins, org]);
 
+  const tabsConfig = useMemo(
+    () => [
+      {
+        value: "members",
+        icon: <PeopleIcon />,
+        label: t("organizations.management.sections.members"),
+        adminOnly: false,
+      },
+      {
+        value: "finance",
+        icon: <AttachMoneyIcon />,
+        label: t("organizations.management.sections.finance"),
+        adminOnly: true,
+      },
+      {
+        value: "substitutions",
+        icon: <SwapHorizIcon />,
+        label: t(
+          "organizations.management.sections.substitutions",
+          "Substitutions",
+        ),
+        adminOnly: false,
+      },
+      {
+        value: "waitlist",
+        icon: <FormatListNumberedIcon />,
+        label: t("organizations.management.sections.waitlist", "Waitlist"),
+        adminOnly: false,
+      },
+      {
+        value: "ratings",
+        icon: <StarIcon />,
+        label: t("organizations.detail.button.ratings"),
+        adminOnly: false,
+      },
+      {
+        value: "admins",
+        icon: <AdminPanelSettingsIcon />,
+        label: t("organizations.management.sections.admins"),
+        adminOnly: true,
+      },
+      {
+        value: "invitations",
+        icon: <MailIcon />,
+        label: t("organizations.management.sections.invitations"),
+        adminOnly: true,
+      },
+      {
+        value: "waha",
+        icon: <WhatsAppIcon />,
+        label: t("organizations.management.sections.waha"),
+        adminOnly: true,
+      },
+      {
+        value: "settings",
+        icon: <SettingsIcon />,
+        label: t("common.actions.manage"),
+        adminOnly: true,
+      },
+    ],
+    [t],
+  );
+
+  const visibleTabs = useMemo(
+    () => tabsConfig.filter((tab) => isAdmin || !tab.adminOnly),
+    [tabsConfig, isAdmin],
+  );
+
   const activeTab = useMemo(() => {
-    const adminOnlyTabs = [
-      "finance",
-      "admins",
-      "invitations",
-      "waha",
-      "settings",
-    ];
-    if (!isAdmin && adminOnlyTabs.includes(requestedTab)) {
+    const requestedConfig = tabsConfig.find(
+      (tab) => tab.value === requestedTab,
+    );
+    if (!isAdmin && requestedConfig?.adminOnly) {
       return "members";
     }
     return requestedTab;
-  }, [isAdmin, requestedTab]);
+  }, [isAdmin, requestedTab, tabsConfig]);
+
+  const excludeUserIds = useMemo(
+    () => new Set(players.map((p) => p.user_id)),
+    [players],
+  );
+
+  const renderPremiumLock = (
+    key: string,
+    defaults: {
+      title: string;
+      description: string;
+      benefits: [string, string, string];
+    },
+  ) => (
+    <PremiumFeatureLock
+      title={t(`common.premium.${key}_title`, defaults.title)}
+      description={t(`common.premium.${key}_description`, defaults.description)}
+      benefits={[
+        t(`common.premium.${key}_benefit1`, defaults.benefits[0]),
+        t(`common.premium.${key}_benefit2`, defaults.benefits[1]),
+        t(`common.premium.${key}_benefit3`, defaults.benefits[2]),
+      ]}
+    />
+  );
 
   const groupTab: GroupTabKey =
     activeTab === "finance"
@@ -295,145 +381,23 @@ export default function OrganizationManagementPage() {
               },
             }}
           >
-            <Tab
-              icon={<PeopleIcon />}
-              iconPosition="start"
-              label={
-                <Box
-                  component="span"
-                  sx={{ display: { xs: "none", sm: "inline" } }}
-                >
-                  {t("organizations.management.sections.members")}
-                </Box>
-              }
-              value="members"
-              data-testid="mgmt-tab-members"
-            />
-            {isAdmin && (
+            {visibleTabs.map((tab) => (
               <Tab
-                icon={<AttachMoneyIcon />}
+                key={tab.value}
+                icon={tab.icon}
                 iconPosition="start"
                 label={
                   <Box
                     component="span"
                     sx={{ display: { xs: "none", sm: "inline" } }}
                   >
-                    {t("organizations.management.sections.finance")}
+                    {tab.label}
                   </Box>
                 }
-                value="finance"
-                data-testid="mgmt-tab-finance"
+                value={tab.value}
+                data-testid={`mgmt-tab-${tab.value}`}
               />
-            )}
-            <Tab
-              icon={<SwapHorizIcon />}
-              iconPosition="start"
-              label={
-                <Box
-                  component="span"
-                  sx={{ display: { xs: "none", sm: "inline" } }}
-                >
-                  {t(
-                    "organizations.management.sections.substitutions",
-                    "Substitutions",
-                  )}
-                </Box>
-              }
-              value="substitutions"
-              data-testid="mgmt-tab-substitutions"
-            />
-            <Tab
-              icon={<FormatListNumberedIcon />}
-              iconPosition="start"
-              label={
-                <Box
-                  component="span"
-                  sx={{ display: { xs: "none", sm: "inline" } }}
-                >
-                  {t("organizations.management.sections.waitlist", "Waitlist")}
-                </Box>
-              }
-              value="waitlist"
-              data-testid="mgmt-tab-waitlist"
-            />
-            <Tab
-              icon={<StarIcon />}
-              iconPosition="start"
-              label={
-                <Box
-                  component="span"
-                  sx={{ display: { xs: "none", sm: "inline" } }}
-                >
-                  {t("organizations.detail.button.ratings")}
-                </Box>
-              }
-              value="ratings"
-              data-testid="mgmt-tab-ratings"
-            />
-            {isAdmin && (
-              <Tab
-                icon={<AdminPanelSettingsIcon />}
-                iconPosition="start"
-                label={
-                  <Box
-                    component="span"
-                    sx={{ display: { xs: "none", sm: "inline" } }}
-                  >
-                    {t("organizations.management.sections.admins")}
-                  </Box>
-                }
-                value="admins"
-                data-testid="mgmt-tab-admins"
-              />
-            )}
-            {isAdmin && (
-              <Tab
-                icon={<MailIcon />}
-                iconPosition="start"
-                label={
-                  <Box
-                    component="span"
-                    sx={{ display: { xs: "none", sm: "inline" } }}
-                  >
-                    {t("organizations.management.sections.invitations")}
-                  </Box>
-                }
-                value="invitations"
-                data-testid="mgmt-tab-invitations"
-              />
-            )}
-            {isAdmin && (
-              <Tab
-                icon={<WhatsAppIcon />}
-                iconPosition="start"
-                label={
-                  <Box
-                    component="span"
-                    sx={{ display: { xs: "none", sm: "inline" } }}
-                  >
-                    {t("organizations.management.sections.waha")}
-                  </Box>
-                }
-                value="waha"
-                data-testid="mgmt-tab-waha"
-              />
-            )}
-            {isAdmin && (
-              <Tab
-                icon={<SettingsIcon />}
-                iconPosition="start"
-                label={
-                  <Box
-                    component="span"
-                    sx={{ display: { xs: "none", sm: "inline" } }}
-                  >
-                    {t("common.actions.manage")}
-                  </Box>
-                }
-                value="settings"
-                data-testid="mgmt-tab-settings"
-              />
-            )}
+            ))}
           </Tabs>
         </Paper>
         <Box sx={{ mt: 2 }}>
@@ -461,30 +425,16 @@ export default function OrganizationManagementPage() {
             {featureFlags?.finance_control !== false ? (
               <FinanceSection orgId={orgId} isAdmin={isAdmin} />
             ) : (
-              <PremiumFeatureLock
-                title={t(
-                  "common.premium.finance_title",
-                  "Controle Financeiro Premium",
-                )}
-                description={t(
-                  "common.premium.finance_description",
+              renderPremiumLock("finance", {
+                title: "Controle Financeiro Premium",
+                description:
                   "Monitore o fluxo de caixa, pagamentos de mensalistas e diaristas, e controle a saúde financeira do seu grupo.",
-                )}
-                benefits={[
-                  t(
-                    "common.premium.finance_benefit1",
-                    "Fluxo de caixa completo de receitas e despesas",
-                  ),
-                  t(
-                    "common.premium.finance_benefit2",
-                    "Acompanhamento detalhado de pagamentos por jogador",
-                  ),
-                  t(
-                    "common.premium.finance_benefit3",
-                    "Histórico completo de transações da organização",
-                  ),
-                ]}
-              />
+                benefits: [
+                  "Fluxo de caixa completo de receitas e despesas",
+                  "Acompanhamento detalhado de pagamentos por jogador",
+                  "Histórico completo de transações da organização",
+                ],
+              })
             )}
           </TabPanel>
 
@@ -498,30 +448,16 @@ export default function OrganizationManagementPage() {
                 actionLoading={actionLoading}
               />
             ) : (
-              <PremiumFeatureLock
-                title={t(
-                  "common.premium.substitutions_title",
-                  "Substituições de Mensalistas",
-                )}
-                description={t(
-                  "common.premium.substitutions_description",
+              renderPremiumLock("substitutions", {
+                title: "Substituições de Mensalistas",
+                description:
                   "Gerencie o afastamento temporário ou definitivo de mensalistas e a substituição por diaristas de forma automática.",
-                )}
-                benefits={[
-                  t(
-                    "common.premium.substitutions_benefit1",
-                    "Substituições temporárias com data de término",
-                  ),
-                  t(
-                    "common.premium.substitutions_benefit2",
-                    "Substituições permanentes de membros",
-                  ),
-                  t(
-                    "common.premium.substitutions_benefit3",
-                    "Histórico de substituições realizadas",
-                  ),
-                ]}
-              />
+                benefits: [
+                  "Substituições temporárias com data de término",
+                  "Substituições permanentes de membros",
+                  "Histórico de substituições realizadas",
+                ],
+              })
             )}
           </TabPanel>
 
@@ -558,30 +494,16 @@ export default function OrganizationManagementPage() {
                 onUpdateSuccess={refreshPlayers}
               />
             ) : (
-              <PremiumFeatureLock
-                title={t(
-                  "common.premium.characteristics_title",
-                  "Avaliações e Características de Jogadores",
-                )}
-                description={t(
-                  "common.premium.characteristics_description",
+              renderPremiumLock("characteristics", {
+                title: "Avaliações e Características de Jogadores",
+                description:
                   "Defina os atributos técnicos e físicos de seus atletas para gerar gráficos de radar personalizados.",
-                )}
-                benefits={[
-                  t(
-                    "common.premium.characteristics_benefit1",
-                    "Gráficos de radar de habilidades de 6 eixos",
-                  ),
-                  t(
-                    "common.premium.characteristics_benefit2",
-                    "Atributos personalizados (Chute, Velocidade, Passe, etc.)",
-                  ),
-                  t(
-                    "common.premium.characteristics_benefit3",
-                    "Melhor balanceamento de times baseado em dados reais",
-                  ),
-                ]}
-              />
+                benefits: [
+                  "Gráficos de radar de habilidades de 6 eixos",
+                  "Atributos personalizados (Chute, Velocidade, Passe, etc.)",
+                  "Melhor balanceamento de times baseado em dados reais",
+                ],
+              })
             )}
           </TabPanel>
 
@@ -615,30 +537,16 @@ export default function OrganizationManagementPage() {
                 onUpdateSuccess={() => fetchData(true)}
               />
             ) : (
-              <PremiumFeatureLock
-                title={t(
-                  "common.premium.waha_title",
-                  "Comunicações Automatizadas via WhatsApp",
-                )}
-                description={t(
-                  "common.premium.waha_description",
+              renderPremiumLock("waha", {
+                title: "Comunicações Automatizadas via WhatsApp",
+                description:
                   "Integre sua organização com o WhatsApp para automatizar notificações de peladas, presenças e listas de espera.",
-                )}
-                benefits={[
-                  t(
-                    "common.premium.waha_benefit1",
-                    "Notificações automáticas de novos eventos",
-                  ),
-                  t(
-                    "common.premium.waha_benefit2",
-                    "Alertas de confirmação de presença",
-                  ),
-                  t(
-                    "common.premium.waha_benefit3",
-                    "Integração direta com o serviço WAHA API",
-                  ),
-                ]}
-              />
+                benefits: [
+                  "Notificações automáticas de novos eventos",
+                  "Alertas de confirmação de presença",
+                  "Integração direta com o serviço WAHA API",
+                ],
+              })
             )}
           </TabPanel>
 
@@ -654,9 +562,7 @@ export default function OrganizationManagementPage() {
                 <Box
                   sx={{
                     background: (theme) =>
-                      theme.palette.mode === "dark"
-                        ? "rgba(25, 25, 25, 0.45)"
-                        : "rgba(255, 255, 255, 0.45)",
+                      alpha(theme.palette.background.paper, 0.45),
                     backdropFilter: "blur(20px)",
                     borderRadius: "16px",
                     p: 3,
@@ -740,7 +646,7 @@ export default function OrganizationManagementPage() {
           }
           onAddSelected={() => handleAddPlayers()}
           onClose={() => setIsAddPlayersOpen(false)}
-          excludeUserIds={new Set(players.map((p) => p.user_id))}
+          excludeUserIds={excludeUserIds}
         />
         <InvitePlayerDialog
           open={isInviteOpen}
@@ -775,17 +681,17 @@ export default function OrganizationManagementPage() {
           showToast={showToast}
         />
         <Snackbar
-          open={toastOpen}
+          open={Boolean(toast)}
           autoHideDuration={4000}
-          onClose={() => setToastOpen(false)}
+          onClose={() => setToast(null)}
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         >
           <Alert
-            onClose={() => setToastOpen(false)}
-            severity={toastSeverity}
+            onClose={() => setToast(null)}
+            severity={toast?.severity || "success"}
             sx={{ width: "100%", borderRadius: "8px" }}
           >
-            {toastMessage}
+            {toast?.message}
           </Alert>
         </Snackbar>
       </Box>

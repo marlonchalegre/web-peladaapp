@@ -29,6 +29,37 @@ const endpoints = createApi(api);
 export type TeamWithPlayers = Team & {
   players: (Player & { user: User; is_goalkeeper?: boolean })[];
 };
+
+const drawJustificationStorageKey = (peladaId: string) =>
+  `pelada_draw_justification_${peladaId}`;
+
+function readDrawJustification(peladaId: string): DrawJustification | null {
+  if (typeof window === "undefined" || !peladaId) return null;
+  try {
+    const saved = sessionStorage.getItem(drawJustificationStorageKey(peladaId));
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeDrawJustification(
+  peladaId: string,
+  value: DrawJustification | null,
+) {
+  if (typeof window === "undefined" || !peladaId) return;
+  try {
+    const key = drawJustificationStorageKey(peladaId);
+    if (value) {
+      sessionStorage.setItem(key, JSON.stringify(value));
+    } else {
+      sessionStorage.removeItem(key);
+    }
+  } catch {
+    // ignore storage errors
+  }
+}
+
 export function usePeladaDetail(peladaId: string) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -38,38 +69,26 @@ export function usePeladaDetail(peladaId: string) {
 
   const [pelada, setPelada] = useState<Pelada | null>(null);
   const [teams, setTeams] = useState<TeamWithPlayers[]>([]);
-  const [teamPlayers, setTeamPlayers] = useState<
-    Record<string, (Player & { user: User; is_goalkeeper?: boolean })[]>
-  >({});
   const [availablePlayers, setAvailablePlayers] = useState<
     (Player & { user: User })[]
   >([]);
   const [error, setError] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
   const [drawJustification, setDrawJustification] =
-    useState<DrawJustification | null>(() => {
-      if (typeof window !== "undefined" && peladaId) {
-        try {
-          const saved = sessionStorage.getItem(
-            `pelada_draw_justification_${peladaId}`,
-          );
-          return saved ? JSON.parse(saved) : null;
-        } catch {
-          return null;
-        }
-      }
-      return null;
-    });
-  const dismissDrawJustification = () => {
-    setDrawJustification(null);
-    if (typeof window !== "undefined" && peladaId) {
-      try {
-        sessionStorage.removeItem(`pelada_draw_justification_${peladaId}`);
-      } catch {
-        // ignore
-      }
-    }
-  };
+    useState<DrawJustification | null>(() => readDrawJustification(peladaId));
+
+  const updateDrawJustification = useCallback(
+    (value: DrawJustification | null) => {
+      setDrawJustification(value);
+      writeDrawJustification(peladaId, value);
+    },
+    [peladaId],
+  );
+
+  const dismissDrawJustification = useCallback(() => {
+    updateDrawJustification(null);
+  }, [updateDrawJustification]);
+
   const [changingStatus, setChangingStatus] = useState(false);
   const [live, setLive] = useState("");
   const [votingInfo, setVotingInfo] = useState<VotingInfo | null>(null);
@@ -78,9 +97,19 @@ export function usePeladaDetail(peladaId: string) {
     [],
   );
 
-  // Dialog State
   const [startDialogOpen, setStartDialogOpen] = useState(false);
   const [matchesPerTeam, setMatchesPerTeam] = useState("2");
+
+  const teamPlayers = useMemo(() => {
+    const playersByTeam: Record<
+      string,
+      (Player & { user: User; is_goalkeeper?: boolean })[]
+    > = {};
+    for (const team of teams) {
+      playersByTeam[team.id] = team.players || [];
+    }
+    return playersByTeam;
+  }, [teams]);
 
   const fetchPeladaData = useCallback(async () => {
     if (!peladaId) return;
@@ -110,24 +139,15 @@ export function usePeladaDetail(peladaId: string) {
       }
 
       setPelada(data.pelada);
-      const dedupedTeams = (data.teams || []).map((t) => ({
-        ...t,
-        players: sortPlayersByPosition(distinctById(t.players)),
+      const dedupedTeams = (data.teams || []).map((team) => ({
+        ...team,
+        players: sortPlayersByPosition(distinctById(team.players)),
       }));
       setTeams(dedupedTeams);
       setAvailablePlayers(distinctById(data.available_players));
       setVotingInfo(data.voting_info);
       setPeladaTransactions(data.pelada_transactions || []);
       if (data.scores) setScores(data.scores);
-
-      const playersByTeam: Record<
-        string,
-        (Player & { user: User; is_goalkeeper?: boolean })[]
-      > = {};
-      for (const t of dedupedTeams) {
-        playersByTeam[t.id] = t.players || [];
-      }
-      setTeamPlayers(playersByTeam);
     } catch (error: unknown) {
       const message =
         error instanceof Error
@@ -158,7 +178,7 @@ export function usePeladaDetail(peladaId: string) {
         pelada?.away_fixed_goalkeeper_id,
       ].filter(Boolean) as string[],
     );
-  }, [pelada]);
+  }, [pelada?.home_fixed_goalkeeper_id, pelada?.away_fixed_goalkeeper_id]);
 
   const benchPlayers = useMemo(
     () =>
@@ -219,26 +239,46 @@ export function usePeladaDetail(peladaId: string) {
     }
   }
 
-  const withProcessingLock = async (
-    action: () => Promise<void>,
-    defaultErrorMessage?: string,
-  ) => {
-    if (isProcessingRef.current || processing) return;
-    isProcessingRef.current = true;
-    setProcessing(true);
-    try {
-      await action();
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : defaultErrorMessage ||
-            t("peladas.detail.error.action_failed", "Ação falhou");
-      setError(message);
-    } finally {
-      isProcessingRef.current = false;
-      setProcessing(false);
+  const withProcessingLock = useCallback(
+    async (action: () => Promise<void>, defaultErrorMessage?: string) => {
+      if (isProcessingRef.current || processing) return;
+      isProcessingRef.current = true;
+      setProcessing(true);
+      try {
+        await action();
+      } catch (error: unknown) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : defaultErrorMessage ||
+              t("peladas.detail.error.action_failed", "Ação falhou");
+        setError(message);
+      } finally {
+        isProcessingRef.current = false;
+        setProcessing(false);
+      }
+    },
+    [processing, t],
+  );
+
+  const detachPlayerFromSource = (
+    playerId: string,
+    sourceTeamId: string | null,
+  ): Promise<unknown> | null => {
+    if (sourceTeamId != null) {
+      return endpoints.removePlayerFromTeam(sourceTeamId, playerId);
     }
+    if (playerId === pelada?.home_fixed_goalkeeper_id) {
+      return api.put(`/api/peladas/${peladaId}`, {
+        home_fixed_goalkeeper_id: null,
+      });
+    }
+    if (playerId === pelada?.away_fixed_goalkeeper_id) {
+      return api.put(`/api/peladas/${peladaId}`, {
+        away_fixed_goalkeeper_id: null,
+      });
+    }
+    return null;
   };
 
   const dropToBench = async (e: DragEvent<HTMLElement>) => {
@@ -249,19 +289,8 @@ export function usePeladaDetail(peladaId: string) {
       if (!data) return;
       const { playerId, sourceTeamId } = data;
 
-      if (sourceTeamId != null) {
-        await endpoints.removePlayerFromTeam(sourceTeamId, playerId);
-      } else {
-        if (playerId === pelada?.home_fixed_goalkeeper_id) {
-          await api.put(`/api/peladas/${peladaId}`, {
-            home_fixed_goalkeeper_id: null,
-          });
-        } else if (playerId === pelada?.away_fixed_goalkeeper_id) {
-          await api.put(`/api/peladas/${peladaId}`, {
-            away_fixed_goalkeeper_id: null,
-          });
-        }
-      }
+      const detachPromise = detachPlayerFromSource(playerId, sourceTeamId);
+      if (detachPromise) await detachPromise;
       await fetchPeladaData();
       setLive(t("peladas.detail.live.moved_to_bench", { playerId }));
     }, t("peladas.detail.error.move_to_bench_failed"));
@@ -278,23 +307,13 @@ export function usePeladaDetail(peladaId: string) {
       if (!data || data.sourceTeamId === targetTeamId) return;
       const { playerId, sourceTeamId } = data;
 
-      if (sourceTeamId != null) {
-        await endpoints.removePlayerFromTeam(sourceTeamId, playerId);
-      } else {
-        if (playerId === pelada?.home_fixed_goalkeeper_id) {
-          await api.put(`/api/peladas/${peladaId}`, {
-            home_fixed_goalkeeper_id: null,
-          });
-        } else if (playerId === pelada?.away_fixed_goalkeeper_id) {
-          await api.put(`/api/peladas/${peladaId}`, {
-            away_fixed_goalkeeper_id: null,
-          });
-        }
-      }
+      const detachPromise = detachPlayerFromSource(playerId, sourceTeamId);
+      if (detachPromise) await detachPromise;
       await endpoints.addPlayerToTeam(targetTeamId, playerId, false);
       await fetchPeladaData();
       const tName =
-        teams.find((t) => t.id === targetTeamId)?.name || String(targetTeamId);
+        teams.find((team) => team.id === targetTeamId)?.name ||
+        String(targetTeamId);
       setLive(
         t("peladas.detail.live.moved_to_team", { playerId, teamName: tName }),
       );
@@ -354,41 +373,23 @@ export function usePeladaDetail(peladaId: string) {
   };
 
   const handleUpdatePlayersPerTeam = async (count: number) => {
-    if (processing || !peladaId) return;
-    setProcessing(true);
-    try {
+    if (!peladaId) return;
+    return withProcessingLock(async () => {
       await api.put(`/api/peladas/${peladaId}`, {
         players_per_team: count,
       });
       await fetchPeladaData();
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : t("peladas.detail.error.update_failed");
-      setError(message);
-    } finally {
-      setProcessing(false);
-    }
+    }, t("peladas.detail.error.update_failed"));
   };
 
   const handleUpdateNumTeams = async (count: number) => {
-    if (processing || !peladaId) return;
-    setProcessing(true);
-    try {
+    if (!peladaId) return;
+    return withProcessingLock(async () => {
       await api.put(`/api/peladas/${peladaId}`, {
         num_teams: count,
       });
       await fetchPeladaData();
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : t("peladas.detail.error.update_failed");
-      setError(message);
-    } finally {
-      setProcessing(false);
-    }
+    }, t("peladas.detail.error.update_failed"));
   };
 
   const handleRandomizeTeams = async (options: {
@@ -418,22 +419,7 @@ export function usePeladaDetail(peladaId: string) {
           use_history: options.useHistory,
         },
       );
-      const newJustification = response?.justification ?? null;
-      setDrawJustification(newJustification);
-      if (typeof window !== "undefined" && peladaId) {
-        try {
-          if (newJustification) {
-            sessionStorage.setItem(
-              `pelada_draw_justification_${peladaId}`,
-              JSON.stringify(newJustification),
-            );
-          } else {
-            sessionStorage.removeItem(`pelada_draw_justification_${peladaId}`);
-          }
-        } catch {
-          // ignore
-        }
-      }
+      updateDrawJustification(response?.justification ?? null);
       await fetchPeladaData();
     } catch (error: unknown) {
       const message =
@@ -441,14 +427,7 @@ export function usePeladaDetail(peladaId: string) {
           ? error.message
           : t("peladas.detail.error.randomize_failed");
       setError(message);
-      setDrawJustification(null);
-      if (typeof window !== "undefined" && peladaId) {
-        try {
-          sessionStorage.removeItem(`pelada_draw_justification_${peladaId}`);
-        } catch {
-          // ignore
-        }
-      }
+      updateDrawJustification(null);
     } finally {
       setProcessing(false);
     }
@@ -474,41 +453,21 @@ export function usePeladaDetail(peladaId: string) {
   };
 
   const handleCreateTeam = async (name: string) => {
-    setProcessing(true);
-    try {
+    return withProcessingLock(async () => {
       await endpoints.createTeam({ pelada_id: peladaId, name });
       await fetchPeladaData();
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : t("peladas.detail.error.create_team_failed");
-      setError(message);
-    } finally {
-      setProcessing(false);
-    }
+    }, t("peladas.detail.error.create_team_failed"));
   };
 
   const handleDeleteTeam = async (teamId: string) => {
-    setProcessing(true);
-    try {
+    return withProcessingLock(async () => {
       await endpoints.deleteTeam(teamId);
       await fetchPeladaData();
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : t("peladas.detail.error.delete_team_failed");
-      setError(message);
-    } finally {
-      setProcessing(false);
-    }
+    }, t("peladas.detail.error.delete_team_failed"));
   };
 
   const handleToggleFixedGoalkeepers = async (enabled: boolean) => {
-    if (processing) return;
-    setProcessing(true);
-    try {
+    return withProcessingLock(async () => {
       const payload: Partial<Pelada> = {
         fixed_goalkeepers: enabled,
       };
@@ -520,35 +479,17 @@ export function usePeladaDetail(peladaId: string) {
 
       await api.put(`/api/peladas/${peladaId}`, payload);
       await fetchPeladaData();
-    } catch (error: unknown) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : t("peladas.detail.error.update_failed");
-      setError(message);
-    } finally {
-      setProcessing(false);
-    }
+    }, t("peladas.detail.error.update_failed"));
   };
 
   const handleAddPlayersFromOrg = useCallback(
     async (playerIds: string[]) => {
-      if (processing) return;
-      setProcessing(true);
-      try {
+      return withProcessingLock(async () => {
         await endpoints.batchUpdateAttendance(peladaId, playerIds, "confirmed");
         await fetchPeladaData();
-      } catch (error: unknown) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : t("peladas.detail.error.update_failed");
-        setError(message);
-      } finally {
-        setProcessing(false);
-      }
+      }, t("peladas.detail.error.update_failed"));
     },
-    [processing, peladaId, fetchPeladaData, t],
+    [withProcessingLock, peladaId, fetchPeladaData, t],
   );
 
   const handleRemovePlayerFromPelada = useCallback(
@@ -604,11 +545,11 @@ export function usePeladaDetail(peladaId: string) {
     try {
       setProcessing(true);
       const existingTx = peladaTransactions.find(
-        (t) =>
-          t.player_id === playerId &&
-          t.type === "income" &&
-          t.category === "diarista_fee" &&
-          t.status === "paid",
+        (tx) =>
+          tx.player_id === playerId &&
+          tx.type === "income" &&
+          tx.category === "diarista_fee" &&
+          tx.status === "paid",
       );
 
       if (existingTx) {
@@ -642,22 +583,12 @@ export function usePeladaDetail(peladaId: string) {
       const removePromises: Promise<unknown>[] = [
         endpoints.removePlayerFromTeam(targetTeamId, playerToReplaceId),
       ];
-      if (sourceTeamId != null) {
-        removePromises.push(
-          endpoints.removePlayerFromTeam(sourceTeamId, incomingPlayerId),
-        );
-      } else if (incomingPlayerId === pelada?.home_fixed_goalkeeper_id) {
-        removePromises.push(
-          api.put(`/api/peladas/${peladaId}`, {
-            home_fixed_goalkeeper_id: null,
-          }),
-        );
-      } else if (incomingPlayerId === pelada?.away_fixed_goalkeeper_id) {
-        removePromises.push(
-          api.put(`/api/peladas/${peladaId}`, {
-            away_fixed_goalkeeper_id: null,
-          }),
-        );
+      const detachPromise = detachPlayerFromSource(
+        incomingPlayerId,
+        sourceTeamId,
+      );
+      if (detachPromise) {
+        removePromises.push(detachPromise);
       }
       await Promise.all(removePromises);
 
@@ -686,7 +617,12 @@ export function usePeladaDetail(peladaId: string) {
     if (pelada?.away_fixed_goalkeeper_id)
       ids.add(pelada.away_fixed_goalkeeper_id);
     return Array.from(ids);
-  }, [teamPlayers, availablePlayers, pelada]);
+  }, [
+    teamPlayers,
+    availablePlayers,
+    pelada?.home_fixed_goalkeeper_id,
+    pelada?.away_fixed_goalkeeper_id,
+  ]);
 
   return {
     pelada,

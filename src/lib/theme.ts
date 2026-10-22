@@ -24,7 +24,7 @@ declare module "@mui/material/styles" {
     home: Palette["primary"] & { subtleBg: string; subtleText: string };
     away: Palette["primary"] & { subtleBg: string; subtleText: string };
     pitch: Palette["primary"] & { subtle: string };
-    gold: Palette["primary"] & { subtleText: string };
+    gold: Palette["primary"] & { subtleBg: string; subtleText: string };
     brutalist: {
       border: string;
       borderThick: string;
@@ -118,7 +118,10 @@ declare module "@mui/material/styles" {
       subtleText?: string;
     };
     pitch?: PaletteOptions["primary"] & { subtle?: string };
-    gold?: PaletteOptions["primary"] & { subtleText?: string };
+    gold?: PaletteOptions["primary"] & {
+      subtleBg?: string;
+      subtleText?: string;
+    };
     brutalist?: {
       border?: string;
       borderThick?: string;
@@ -267,6 +270,7 @@ export const getTheme = (mode: PaletteMode) => {
         main: mode === "light" ? "#f2a100" : "#ffc107",
         dark: mode === "light" ? "#b27700" : "#c79100",
         light: mode === "light" ? "#fef3d6" : "#ffe082",
+        subtleBg: mode === "light" ? "#fef3d6" : "rgba(242, 161, 0, 0.15)",
         subtleText: mode === "light" ? "#8a5800" : "#ffe082",
         contrastText: mode === "light" ? "#17181a" : "#000000",
       },

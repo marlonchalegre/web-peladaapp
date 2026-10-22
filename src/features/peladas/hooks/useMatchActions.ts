@@ -18,6 +18,37 @@ import { isAssistForGoal } from "../utils/playerUtils";
 
 const endpoints = createApi(api);
 
+type TimerBearer = {
+  timer_status?: Pelada["timer_status"];
+  timer_started_at?: string | null;
+  timer_accumulated_ms?: number | null;
+};
+
+function computePausedTimer<T extends TimerBearer>(entity: T): T {
+  let newAccumulated = entity.timer_accumulated_ms || 0;
+  if (entity.timer_status === "running" && entity.timer_started_at) {
+    const diff = Date.now() - new Date(entity.timer_started_at).getTime();
+    if (diff > 0) {
+      newAccumulated += diff;
+    }
+  }
+  return {
+    ...entity,
+    timer_status: "paused" as T["timer_status"],
+    timer_started_at: null,
+    timer_accumulated_ms: newAccumulated,
+  };
+}
+
+function computeResetTimer<T extends TimerBearer>(entity: T): T {
+  return {
+    ...entity,
+    timer_status: "paused" as T["timer_status"],
+    timer_started_at: null,
+    timer_accumulated_ms: 0,
+  };
+}
+
 export interface MatchStateDelegates {
   matchesRef: React.MutableRefObject<Match[]>;
   setMatches: React.Dispatch<React.SetStateAction<Match[]>>;
@@ -52,10 +83,28 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
     setPelada,
   } = data;
 
+  const updateMatchInState = useCallback(
+    (matchId: string, updater: (m: Match) => Match, syncRef = true) => {
+      setMatches((prev: Match[]) =>
+        prev.map((m) => (m.id === matchId ? updater(m) : m)),
+      );
+      if (syncRef) {
+        matchesRef.current = matchesRef.current.map((m: Match) =>
+          m.id === matchId ? updater(m) : m,
+        );
+      }
+    },
+    [setMatches, matchesRef],
+  );
+
   const handleNetworkError = useCallback(
-    (error: unknown, actionType: string, payload: Record<string, unknown>) => {
+    (
+      error: unknown,
+      actionType: OfflineActionType,
+      payload: Record<string, unknown>,
+    ) => {
       if (isNetworkError(error)) {
-        enqueueAction(peladaId, actionType as OfflineActionType, payload);
+        enqueueAction(peladaId, actionType, payload);
         return true;
       }
       return false;
@@ -63,9 +112,60 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
     [peladaId],
   );
 
+  const runOfflineAction = useCallback(
+    async ({
+      actionType,
+      payload,
+      execute,
+      matchId,
+      fallbackError,
+      rethrow = false,
+      onFinally,
+    }: {
+      actionType: OfflineActionType;
+      payload: Record<string, unknown>;
+      execute: () => Promise<void>;
+      matchId?: string;
+      fallbackError?: string;
+      rethrow?: boolean;
+      onFinally?: () => void;
+    }) => {
+      if (matchId) {
+        setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
+      }
+
+      if (!navigator.onLine) {
+        enqueueAction(peladaId, actionType, payload);
+        if (matchId) {
+          setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
+        }
+        onFinally?.();
+        return;
+      }
+
+      try {
+        await execute();
+      } catch (error: unknown) {
+        if (!handleNetworkError(error, actionType, payload)) {
+          if (fallbackError !== undefined) {
+            setError(error instanceof Error ? error.message : fallbackError);
+          }
+          if (rethrow) {
+            throw error;
+          }
+        }
+      } finally {
+        if (matchId) {
+          setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
+        }
+        onFinally?.();
+      }
+    },
+    [peladaId, handleNetworkError, setError],
+  );
+
   const adjustScore = useCallback(
     async (matchId: string, team: "home" | "away", delta: 1 | -1 = 1) => {
-      // Use latest available match data from ref
       const match = matchesRef.current.find((m: Match) => m.id === matchId);
       if (!match) return;
 
@@ -92,243 +192,147 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
             ? "running"
             : "scheduled";
 
-      // Optimistic Update
-      setMatches((prev: Match[]) =>
-        prev.map((m) =>
-          m.id === matchId
-            ? {
-                ...m,
-                home_score: newHome,
-                away_score: newAway,
-                status: status === "scheduled" ? m.status : status,
-              }
-            : m,
-        ),
-      );
+      updateMatchInState(matchId, (m) => ({
+        ...m,
+        home_score: newHome,
+        away_score: newAway,
+        status: status === "scheduled" ? m.status : status,
+      }));
 
-      // Update ref immediately to allow rapid clicks to use updated data
-      matchesRef.current = matchesRef.current.map((m: Match) =>
-        m.id === matchId
-          ? {
-              ...m,
-              home_score: newHome,
-              away_score: newAway,
-              status: status === "scheduled" ? m.status : status,
-            }
-          : m,
-      );
-
-      setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
-
-      if (!navigator.onLine) {
-        enqueueAction(peladaId, "ADJUST_SCORE", {
-          matchId,
-          newHome,
-          newAway,
-          status,
-        });
-        setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
-        return;
-      }
-
-      try {
-        await endpoints.updateMatchScore(matchId, newHome, newAway, status);
-      } catch (error: unknown) {
-        if (
-          !handleNetworkError(error, "ADJUST_SCORE", {
-            matchId,
-            newHome,
-            newAway,
-            status,
-          })
-        ) {
-          setError(
-            error instanceof Error
-              ? error.message
-              : t("peladas.matches.error.update_score_failed"),
-          );
-          throw error;
-        }
-      } finally {
-        setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
-      }
+      await runOfflineAction({
+        actionType: "ADJUST_SCORE",
+        payload: { matchId, newHome, newAway, status },
+        matchId,
+        execute: async () => {
+          await endpoints.updateMatchScore(matchId, newHome, newAway, status);
+        },
+        fallbackError: t("peladas.matches.error.update_score_failed"),
+        rethrow: true,
+      });
     },
-    [peladaId, t, matchesRef, setMatches, setError, handleNetworkError],
+    [t, matchesRef, setError, updateMatchInState, runOfflineAction],
   );
 
-  const deleteEventAndRefresh = async (
-    matchId: string,
-    playerId: string,
-    type: MatchEventType,
-    eventId?: string,
-  ) => {
-    setMatchEvents((prev: MatchEvent[]) => {
-      let targetGoal: MatchEvent | undefined;
-      if (eventId) {
-        targetGoal = prev.find((e) => e.id === eventId);
-      } else {
-        for (let i = prev.length - 1; i >= 0; i--) {
-          const e = prev[i];
-          if (
-            e.match_id === matchId &&
-            e.player_id === playerId &&
-            e.event_type === type
-          ) {
-            targetGoal = e;
-            break;
+  const deleteEventAndRefresh = useCallback(
+    async (
+      matchId: string,
+      playerId: string,
+      type: MatchEventType,
+      eventId?: string,
+    ) => {
+      setMatchEvents((prev: MatchEvent[]) => {
+        let targetGoal: MatchEvent | undefined;
+        if (eventId) {
+          targetGoal = prev.find((e) => e.id === eventId);
+        } else {
+          for (let i = prev.length - 1; i >= 0; i--) {
+            const e = prev[i];
+            if (
+              e.match_id === matchId &&
+              e.player_id === playerId &&
+              e.event_type === type
+            ) {
+              targetGoal = e;
+              break;
+            }
           }
+        }
+
+        if (!targetGoal) {
+          return eventId ? prev.filter((e) => e.id !== eventId) : prev;
+        }
+
+        if (targetGoal.event_type === "goal") {
+          const matchingAssist = prev.find(
+            (e) =>
+              e.match_id === matchId &&
+              e.event_type === "assist" &&
+              isAssistForGoal(e, targetGoal),
+          );
+          return prev.filter(
+            (e) =>
+              e.id !== targetGoal.id &&
+              (!matchingAssist || e.id !== matchingAssist.id),
+          );
+        }
+
+        return prev.filter((e) => e.id !== targetGoal.id);
+      });
+
+      await runOfflineAction({
+        actionType: "DELETE_EVENT",
+        payload: { matchId, playerId, type, eventId },
+        matchId,
+        execute: async () => {
+          await endpoints.deleteMatchEvent(matchId, playerId, type, eventId);
+          await refreshData();
+        },
+        fallbackError: t("peladas.matches.error.record_event_failed"),
+        rethrow: true,
+      });
+    },
+    [setMatchEvents, runOfflineAction, refreshData, t],
+  );
+
+  const recordEvent = useCallback(
+    async (
+      matchId: string,
+      playerId: string,
+      type: MatchEventType,
+      sessionTimeMs?: number,
+      matchTimeMs?: number,
+      assistantId?: string,
+      teamId?: string,
+    ) => {
+      const nowIso = new Date().toISOString();
+      const newEvent = {
+        id: String(Date.now()),
+        match_id: matchId,
+        player_id: playerId,
+        event_type: type,
+        session_time_ms: sessionTimeMs,
+        match_time_ms: matchTimeMs,
+        created_at: nowIso,
+        team_id: teamId,
+      } as MatchEvent;
+      const optimisticEvents = [newEvent];
+      if (type === "goal" && assistantId) {
+        optimisticEvents.push({
+          id: String(Date.now() + 1),
+          match_id: matchId,
+          player_id: assistantId,
+          event_type: "assist",
+          session_time_ms: sessionTimeMs,
+          match_time_ms: matchTimeMs,
+          created_at: nowIso,
+          team_id: teamId,
+        } as MatchEvent);
+      }
+      setMatchEvents((prev: MatchEvent[]) => [...prev, ...optimisticEvents]);
+
+      if (type === "goal" || type === "own_goal") {
+        const match = matchesRef.current.find((m) => m.id === matchId);
+        if (match) {
+          const isHome = teamId ? teamId === match.home_team_id : true;
+          const isHomeGoal = type === "goal" ? isHome : !isHome;
+          const newHome = isHomeGoal
+            ? (match.home_score ?? 0) + 1
+            : (match.home_score ?? 0);
+          const newAway = !isHomeGoal
+            ? (match.away_score ?? 0) + 1
+            : (match.away_score ?? 0);
+          updateMatchInState(matchId, (m) => ({
+            ...m,
+            home_score: newHome,
+            away_score: newAway,
+            status: m.status === "scheduled" ? "running" : m.status,
+          }));
         }
       }
 
-      if (!targetGoal) {
-        return eventId ? prev.filter((e) => e.id !== eventId) : prev;
-      }
-
-      if (targetGoal.event_type === "goal") {
-        const matchingAssist = prev.find(
-          (e) =>
-            e.match_id === matchId &&
-            e.event_type === "assist" &&
-            isAssistForGoal(e, targetGoal),
-        );
-        return prev.filter(
-          (e) =>
-            e.id !== targetGoal.id &&
-            (!matchingAssist || e.id !== matchingAssist.id),
-        );
-      }
-
-      return prev.filter((e) => e.id !== targetGoal.id);
-    });
-
-    setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
-
-    if (!navigator.onLine) {
-      enqueueAction(peladaId, "DELETE_EVENT", {
-        matchId,
-        playerId,
-        type,
-        eventId,
-      });
-      setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
-      return;
-    }
-
-    try {
-      await endpoints.deleteMatchEvent(matchId, playerId, type, eventId);
-      await refreshData();
-    } catch (error: unknown) {
-      if (
-        !handleNetworkError(error, "DELETE_EVENT", {
-          matchId,
-          playerId,
-          type,
-          eventId,
-        })
-      ) {
-        setError(
-          (error instanceof Error
-            ? error.message
-            : t("peladas.matches.error.record_event_failed")) as string,
-        );
-        throw error;
-      }
-    } finally {
-      setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
-    }
-  };
-
-  const recordEvent = async (
-    matchId: string,
-    playerId: string,
-    type: MatchEventType,
-    sessionTimeMs?: number,
-    matchTimeMs?: number,
-    assistantId?: string,
-    teamId?: string,
-  ) => {
-    // Optimistic Update
-    const newEvent = {
-      id: String(Date.now()), // temporary id
-      match_id: matchId,
-      player_id: playerId,
-      event_type: type,
-      session_time_ms: sessionTimeMs,
-      match_time_ms: matchTimeMs,
-      created_at: new Date().toISOString(),
-      team_id: teamId,
-    } as MatchEvent;
-    const optimisticEvents = [newEvent];
-    if (type === "goal" && assistantId) {
-      optimisticEvents.push({
-        id: String(Date.now() + 1), // temporary id
-        match_id: matchId,
-        player_id: assistantId,
-        event_type: "assist",
-        session_time_ms: sessionTimeMs,
-        match_time_ms: matchTimeMs,
-        created_at: new Date().toISOString(),
-        team_id: teamId,
-      } as MatchEvent);
-    }
-    setMatchEvents((prev: MatchEvent[]) => [...prev, ...optimisticEvents]);
-
-    if (type === "goal" || type === "own_goal") {
-      const match = matchesRef.current.find((m) => m.id === matchId);
-      if (match) {
-        const isHome = teamId ? teamId === match.home_team_id : true;
-        const isHomeGoal = type === "goal" ? isHome : !isHome;
-        const newHome = isHomeGoal
-          ? (match.home_score ?? 0) + 1
-          : (match.home_score ?? 0);
-        const newAway = !isHomeGoal
-          ? (match.away_score ?? 0) + 1
-          : (match.away_score ?? 0);
-        const updated = matchesRef.current.map((m) =>
-          m.id === matchId
-            ? {
-                ...m,
-                home_score: newHome,
-                away_score: newAway,
-                status: m.status === "scheduled" ? "running" : m.status,
-              }
-            : m,
-        );
-        matchesRef.current = updated;
-        setMatches(updated);
-      }
-    }
-
-    setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
-
-    if (!navigator.onLine) {
-      enqueueAction(peladaId, "RECORD_EVENT", {
-        matchId,
-        playerId,
-        type,
-        sessionTimeMs,
-        matchTimeMs,
-        assistantId,
-        teamId,
-      });
-      setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
-      return;
-    }
-
-    try {
-      await endpoints.createMatchEvent(
-        matchId,
-        playerId,
-        type,
-        sessionTimeMs,
-        matchTimeMs,
-        assistantId,
-        teamId,
-      );
-      await refreshData();
-    } catch (error: unknown) {
-      if (
-        !handleNetworkError(error, "RECORD_EVENT", {
+      await runOfflineAction({
+        actionType: "RECORD_EVENT",
+        payload: {
           matchId,
           playerId,
           type,
@@ -336,19 +340,33 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
           matchTimeMs,
           assistantId,
           teamId,
-        })
-      ) {
-        setError(
-          (error instanceof Error
-            ? error.message
-            : t("peladas.matches.error.record_event_failed")) as string,
-        );
-        throw error;
-      }
-    } finally {
-      setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
-    }
-  };
+        },
+        matchId,
+        execute: async () => {
+          await endpoints.createMatchEvent(
+            matchId,
+            playerId,
+            type,
+            sessionTimeMs,
+            matchTimeMs,
+            assistantId,
+            teamId,
+          );
+          await refreshData();
+        },
+        fallbackError: t("peladas.matches.error.record_event_failed"),
+        rethrow: true,
+      });
+    },
+    [
+      setMatchEvents,
+      matchesRef,
+      updateMatchInState,
+      runOfflineAction,
+      refreshData,
+      t,
+    ],
+  );
 
   const updateEvent = useCallback(
     async (
@@ -357,224 +375,162 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
       playerId: string,
       assistantId?: string | null,
     ) => {
-      setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
-
-      if (!navigator.onLine) {
-        enqueueAction(peladaId, "UPDATE_EVENT", {
-          matchId,
-          eventId,
-          playerId,
-          assistantId,
-        });
-        setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
-        return;
-      }
-
-      try {
-        await endpoints.updateMatchEvent(
-          matchId,
-          eventId,
-          playerId,
-          assistantId,
-        );
-        await refreshData();
-      } catch (error: unknown) {
-        if (
-          !handleNetworkError(error, "UPDATE_EVENT", {
+      await runOfflineAction({
+        actionType: "UPDATE_EVENT",
+        payload: { matchId, eventId, playerId, assistantId },
+        matchId,
+        execute: async () => {
+          await endpoints.updateMatchEvent(
             matchId,
             eventId,
             playerId,
             assistantId,
-          })
-        ) {
-          setError(
-            (error instanceof Error
-              ? error.message
-              : t("peladas.matches.error.record_event_failed")) as string,
           );
-          throw error;
-        }
-      } finally {
-        setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
-      }
+          await refreshData();
+        },
+        fallbackError: t("peladas.matches.error.record_event_failed"),
+        rethrow: true,
+      });
     },
-    [peladaId, t, setError, handleNetworkError, refreshData],
+    [runOfflineAction, refreshData, t],
   );
 
-  const addPlayerToTeam = async (
-    matchId: string,
-    teamId: string,
-    playerId: string,
-  ) => {
-    // Optimistic Update
-    setLineupsByMatch((prev: Record<string, Record<string, TeamPlayer[]>>) => {
-      const matchLineup = prev[matchId] || {};
-      const teamLineup = matchLineup[teamId] || [];
-      return {
-        ...prev,
-        [matchId]: {
-          ...matchLineup,
-          [teamId]: [
-            ...teamLineup,
-            {
-              team_id: teamId,
-              player_id: playerId,
-              is_goalkeeper: false,
-            } as TeamPlayer,
-          ],
+  const addPlayerToTeam = useCallback(
+    async (matchId: string, teamId: string, playerId: string) => {
+      setLineupsByMatch(
+        (prev: Record<string, Record<string, TeamPlayer[]>>) => {
+          const matchLineup = prev[matchId] || {};
+          const teamLineup = matchLineup[teamId] || [];
+          return {
+            ...prev,
+            [matchId]: {
+              ...matchLineup,
+              [teamId]: [
+                ...teamLineup,
+                {
+                  team_id: teamId,
+                  player_id: playerId,
+                  is_goalkeeper: false,
+                } as TeamPlayer,
+              ],
+            },
+          };
         },
-      };
-    });
-
-    const payload = { matchId, teamId, playerId };
-    if (!navigator.onLine) {
-      enqueueAction(peladaId, "ADD_PLAYER_TO_TEAM", payload);
-      setSelectMenu(null);
-      return;
-    }
-
-    try {
-      await endpoints.addMatchLineupPlayer(matchId, teamId, playerId);
-      await refreshData();
-    } catch (error: unknown) {
-      if (!handleNetworkError(error, "ADD_PLAYER_TO_TEAM", payload)) {
-        setError(
-          error instanceof Error
-            ? error.message
-            : t("peladas.matches.error.add_player_failed"),
-        );
-      }
-    } finally {
-      setSelectMenu(null);
-    }
-  };
-
-  const replacePlayerOnMatchTeam = async (
-    matchId: string,
-    teamId: string,
-    outPlayerId: string,
-    inPlayerId: string,
-  ) => {
-    // Optimistic Update
-    setLineupsByMatch((prev: Record<string, Record<string, TeamPlayer[]>>) => {
-      const matchLineup = prev[matchId] || {};
-      const teamLineup = matchLineup[teamId] || [];
-      return {
-        ...prev,
-        [matchId]: {
-          ...matchLineup,
-          [teamId]: teamLineup.map((p: TeamPlayer) =>
-            p.player_id === outPlayerId ? { ...p, player_id: inPlayerId } : p,
-          ),
-        },
-      };
-    });
-
-    const payload = { matchId, teamId, outPlayerId, inPlayerId };
-    if (!navigator.onLine) {
-      enqueueAction(peladaId, "REPLACE_PLAYER", payload);
-      setSelectMenu(null);
-      return;
-    }
-
-    try {
-      await endpoints.replaceMatchLineupPlayer(
-        matchId,
-        teamId,
-        outPlayerId,
-        inPlayerId,
       );
-      await refreshData();
-    } catch (error: unknown) {
-      if (!handleNetworkError(error, "REPLACE_PLAYER", payload)) {
-        setError(
-          error instanceof Error
-            ? error.message
-            : t("peladas.matches.error.replace_player_failed"),
-        );
-      }
-    } finally {
-      setSelectMenu(null);
-    }
-  };
 
-  const executeClosePelada = async () => {
+      await runOfflineAction({
+        actionType: "ADD_PLAYER_TO_TEAM",
+        payload: { matchId, teamId, playerId },
+        execute: async () => {
+          await endpoints.addMatchLineupPlayer(matchId, teamId, playerId);
+          await refreshData();
+        },
+        fallbackError: t("peladas.matches.error.add_player_failed"),
+        onFinally: () => setSelectMenu(null),
+      });
+    },
+    [setLineupsByMatch, runOfflineAction, refreshData, t],
+  );
+
+  const replacePlayerOnMatchTeam = useCallback(
+    async (
+      matchId: string,
+      teamId: string,
+      outPlayerId: string,
+      inPlayerId: string,
+    ) => {
+      setLineupsByMatch(
+        (prev: Record<string, Record<string, TeamPlayer[]>>) => {
+          const matchLineup = prev[matchId] || {};
+          const teamLineup = matchLineup[teamId] || [];
+          return {
+            ...prev,
+            [matchId]: {
+              ...matchLineup,
+              [teamId]: teamLineup.map((p: TeamPlayer) =>
+                p.player_id === outPlayerId
+                  ? { ...p, player_id: inPlayerId }
+                  : p,
+              ),
+            },
+          };
+        },
+      );
+
+      await runOfflineAction({
+        actionType: "REPLACE_PLAYER",
+        payload: { matchId, teamId, outPlayerId, inPlayerId },
+        execute: async () => {
+          await endpoints.replaceMatchLineupPlayer(
+            matchId,
+            teamId,
+            outPlayerId,
+            inPlayerId,
+          );
+          await refreshData();
+        },
+        fallbackError: t("peladas.matches.error.replace_player_failed"),
+        onFinally: () => setSelectMenu(null),
+      });
+    },
+    [setLineupsByMatch, runOfflineAction, refreshData, t],
+  );
+
+  const executeClosePelada = useCallback(async () => {
     if (!peladaId) return;
     setClosing(true);
-    // Optimistic
     setPelada((prev: Pelada | null) =>
       prev ? { ...prev, status: "closed" as Pelada["status"] } : prev,
     );
 
-    if (!navigator.onLine) {
-      enqueueAction(peladaId, "CLOSE_PELADA", { peladaId });
-      setClosing(false);
-      return;
-    }
+    await runOfflineAction({
+      actionType: "CLOSE_PELADA",
+      payload: { peladaId },
+      execute: async () => {
+        await endpoints.closePelada(peladaId);
+        await refreshData();
+      },
+      fallbackError: t("peladas.matches.error.close_failed"),
+      onFinally: () => setClosing(false),
+    });
+  }, [peladaId, setPelada, runOfflineAction, refreshData, t]);
 
-    try {
-      await endpoints.closePelada(peladaId);
-      await refreshData();
-    } catch (error: unknown) {
-      if (!handleNetworkError(error, "CLOSE_PELADA", { peladaId })) {
-        setError(
-          error instanceof Error
-            ? error.message
-            : t("peladas.matches.error.close_failed"),
-        );
-      }
-    } finally {
-      setClosing(false);
-    }
-  };
+  const executeEndMatch = useCallback(
+    async (matchId: string) => {
+      const match = matchesRef.current.find((m: Match) => m.id === matchId);
+      if (!match) return;
 
-  const executeEndMatch = async (matchId: string) => {
-    const match = matchesRef.current.find((m: Match) => m.id === matchId);
-    if (!match) return;
-
-    // Optimistic
-    setMatches((prev: Match[]) =>
-      prev.map((m) =>
-        m.id === matchId ? { ...m, status: "finished" as Match["status"] } : m,
-      ),
-    );
-
-    setUpdatingScore((prev) => ({ ...prev, [matchId]: true }));
-
-    const payload = {
-      matchId,
-      homeScore: match.home_score,
-      awayScore: match.away_score,
-    };
-    if (!navigator.onLine) {
-      enqueueAction(peladaId, "END_MATCH", payload);
-      setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
-      return;
-    }
-
-    try {
-      if (match.timer_status === "running") {
-        await endpoints.pauseMatchTimer(matchId);
-      }
-      await endpoints.updateMatchScore(
+      updateMatchInState(
         matchId,
-        match.home_score ?? 0,
-        match.away_score ?? 0,
-        "finished",
+        (m) => ({ ...m, status: "finished" as Match["status"] }),
+        false,
       );
-      await refreshData();
-    } catch (error: unknown) {
-      if (!handleNetworkError(error, "END_MATCH", payload)) {
-        setError(
-          error instanceof Error
-            ? error.message
-            : t("peladas.matches.error.end_match_failed"),
-        );
-      }
-    } finally {
-      setUpdatingScore((prev) => ({ ...prev, [matchId]: false }));
-    }
-  };
+
+      await runOfflineAction({
+        actionType: "END_MATCH",
+        payload: {
+          matchId,
+          homeScore: match.home_score,
+          awayScore: match.away_score,
+        },
+        matchId,
+        execute: async () => {
+          if (match.timer_status === "running") {
+            await endpoints.pauseMatchTimer(matchId);
+          }
+          await endpoints.updateMatchScore(
+            matchId,
+            match.home_score ?? 0,
+            match.away_score ?? 0,
+            "finished",
+          );
+          await refreshData();
+        },
+        fallbackError: t("peladas.matches.error.end_match_failed"),
+      });
+    },
+    [matchesRef, updateMatchInState, runOfflineAction, refreshData, t],
+  );
 
   // Timer Actions
   const startPeladaTimer = useCallback(async () => {
@@ -588,172 +544,97 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
         : prev,
     );
 
-    if (!navigator.onLine) {
-      enqueueAction(peladaId, "START_PELADA_TIMER", { peladaId });
-      return;
-    }
-
-    try {
-      await endpoints.startPeladaTimer(peladaId);
-      await refreshData();
-    } catch (err) {
-      handleNetworkError(err, "START_PELADA_TIMER", { peladaId });
-    }
-  }, [peladaId, refreshData, setPelada, handleNetworkError]);
+    await runOfflineAction({
+      actionType: "START_PELADA_TIMER",
+      payload: { peladaId },
+      execute: async () => {
+        await endpoints.startPeladaTimer(peladaId);
+        await refreshData();
+      },
+    });
+  }, [peladaId, refreshData, setPelada, runOfflineAction]);
 
   const pausePeladaTimer = useCallback(async () => {
-    setPelada((prev: Pelada | null) => {
-      if (!prev) return null;
-      let newAccumulated = prev.timer_accumulated_ms || 0;
-      if (prev.timer_status === "running" && prev.timer_started_at) {
-        const diff = Date.now() - new Date(prev.timer_started_at).getTime();
-        if (diff > 0) {
-          newAccumulated += diff;
-        }
-      }
-      return {
-        ...prev,
-        timer_status: "paused" as Pelada["timer_status"],
-        timer_started_at: null,
-        timer_accumulated_ms: newAccumulated,
-      };
-    });
-
-    if (!navigator.onLine) {
-      enqueueAction(peladaId, "PAUSE_PELADA_TIMER", { peladaId });
-      return;
-    }
-
-    try {
-      await endpoints.pausePeladaTimer(peladaId);
-      await refreshData();
-    } catch (err) {
-      handleNetworkError(err, "PAUSE_PELADA_TIMER", { peladaId });
-    }
-  }, [peladaId, refreshData, setPelada, handleNetworkError]);
-
-  const resetPeladaTimer = useCallback(async () => {
     setPelada((prev: Pelada | null) =>
-      prev
-        ? {
-            ...prev,
-            timer_status: "paused" as Pelada["timer_status"],
-            timer_started_at: null,
-            timer_accumulated_ms: 0,
-          }
-        : prev,
+      prev ? computePausedTimer(prev) : null,
     );
 
-    if (!navigator.onLine) {
-      enqueueAction(peladaId, "RESET_PELADA_TIMER", { peladaId });
-      return;
-    }
+    await runOfflineAction({
+      actionType: "PAUSE_PELADA_TIMER",
+      payload: { peladaId },
+      execute: async () => {
+        await endpoints.pausePeladaTimer(peladaId);
+        await refreshData();
+      },
+    });
+  }, [peladaId, refreshData, setPelada, runOfflineAction]);
 
-    try {
-      await endpoints.resetPeladaTimer(peladaId);
-      await refreshData();
-    } catch (err) {
-      handleNetworkError(err, "RESET_PELADA_TIMER", { peladaId });
-    }
-  }, [peladaId, refreshData, setPelada, handleNetworkError]);
+  const resetPeladaTimer = useCallback(async () => {
+    setPelada((prev: Pelada | null) => (prev ? computeResetTimer(prev) : prev));
+
+    await runOfflineAction({
+      actionType: "RESET_PELADA_TIMER",
+      payload: { peladaId },
+      execute: async () => {
+        await endpoints.resetPeladaTimer(peladaId);
+        await refreshData();
+      },
+    });
+  }, [peladaId, refreshData, setPelada, runOfflineAction]);
 
   const startMatchTimer = useCallback(
     async (matchId: string) => {
-      const updateMatchState = (m: Match) => ({
+      const nowIso = new Date().toISOString();
+      updateMatchInState(matchId, (m) => ({
         ...m,
         status:
           m.status === "scheduled" ? ("running" as Match["status"]) : m.status,
         timer_status: "running" as Match["timer_status"],
-        timer_started_at: new Date().toISOString(),
+        timer_started_at: nowIso,
+      }));
+
+      await runOfflineAction({
+        actionType: "START_MATCH_TIMER",
+        payload: { matchId },
+        execute: async () => {
+          await endpoints.startMatchTimer(matchId);
+          await refreshData();
+        },
       });
-
-      setMatches((prev: Match[]) =>
-        prev.map((m) => (m.id === matchId ? updateMatchState(m) : m)),
-      );
-
-      matchesRef.current = matchesRef.current.map((m: Match) =>
-        m.id === matchId ? updateMatchState(m) : m,
-      );
-
-      if (!navigator.onLine) {
-        enqueueAction(peladaId, "START_MATCH_TIMER", { matchId });
-        return;
-      }
-
-      try {
-        await endpoints.startMatchTimer(matchId);
-        await refreshData();
-      } catch (err) {
-        handleNetworkError(err, "START_MATCH_TIMER", { matchId });
-      }
     },
-    [peladaId, refreshData, setMatches, matchesRef, handleNetworkError],
+    [refreshData, updateMatchInState, runOfflineAction],
   );
 
   const pauseMatchTimer = useCallback(
     async (matchId: string) => {
-      setMatches((prev: Match[]) =>
-        prev.map((m) => {
-          if (m.id !== matchId) return m;
-          let newAccumulated = m.timer_accumulated_ms || 0;
-          if (m.timer_status === "running" && m.timer_started_at) {
-            const diff = Date.now() - new Date(m.timer_started_at).getTime();
-            if (diff > 0) {
-              newAccumulated += diff;
-            }
-          }
-          return {
-            ...m,
-            timer_status: "paused" as Match["timer_status"],
-            timer_started_at: null,
-            timer_accumulated_ms: newAccumulated,
-          };
-        }),
-      );
+      updateMatchInState(matchId, computePausedTimer, false);
 
-      if (!navigator.onLine) {
-        enqueueAction(peladaId, "PAUSE_MATCH_TIMER", { matchId });
-        return;
-      }
-
-      try {
-        await endpoints.pauseMatchTimer(matchId);
-        await refreshData();
-      } catch (err) {
-        handleNetworkError(err, "PAUSE_MATCH_TIMER", { matchId });
-      }
+      await runOfflineAction({
+        actionType: "PAUSE_MATCH_TIMER",
+        payload: { matchId },
+        execute: async () => {
+          await endpoints.pauseMatchTimer(matchId);
+          await refreshData();
+        },
+      });
     },
-    [peladaId, refreshData, setMatches, handleNetworkError],
+    [refreshData, updateMatchInState, runOfflineAction],
   );
 
   const resetMatchTimer = useCallback(
     async (matchId: string) => {
-      setMatches((prev: Match[]) =>
-        prev.map((m) =>
-          m.id === matchId
-            ? {
-                ...m,
-                timer_status: "paused" as Match["timer_status"],
-                timer_started_at: null,
-                timer_accumulated_ms: 0,
-              }
-            : m,
-        ),
-      );
+      updateMatchInState(matchId, computeResetTimer, false);
 
-      if (!navigator.onLine) {
-        enqueueAction(peladaId, "RESET_MATCH_TIMER", { matchId });
-        return;
-      }
-
-      try {
-        await endpoints.resetMatchTimer(matchId);
-        await refreshData();
-      } catch (err) {
-        handleNetworkError(err, "RESET_MATCH_TIMER", { matchId });
-      }
+      await runOfflineAction({
+        actionType: "RESET_MATCH_TIMER",
+        payload: { matchId },
+        execute: async () => {
+          await endpoints.resetMatchTimer(matchId);
+          await refreshData();
+        },
+      });
     },
-    [peladaId, refreshData, setMatches, handleNetworkError],
+    [refreshData, updateMatchInState, runOfflineAction],
   );
 
   const generateSupportLineup = useCallback(async () => {
@@ -785,11 +666,7 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
           matchId,
           payload,
         );
-        const nextMatches = matchesRef.current.map((m) =>
-          m.id === matchId ? { ...m, ...updated } : m,
-        );
-        matchesRef.current = nextMatches;
-        setMatches(nextMatches);
+        updateMatchInState(matchId, (m) => ({ ...m, ...updated }));
       } catch (err: unknown) {
         setError(
           err instanceof Error
@@ -799,18 +676,14 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
         throw err;
       }
     },
-    [setMatches, matchesRef, setError],
+    [updateMatchInState, setError],
   );
 
   const rerollSupportLineup = useCallback(
     async (matchId: string) => {
       try {
         const updated = await endpoints.rerollMatchSupportLineup(matchId);
-        const nextMatches = matchesRef.current.map((m) =>
-          m.id === matchId ? { ...m, ...updated } : m,
-        );
-        matchesRef.current = nextMatches;
-        setMatches(nextMatches);
+        updateMatchInState(matchId, (m) => ({ ...m, ...updated }));
       } catch (err: unknown) {
         setError(
           err instanceof Error
@@ -820,7 +693,7 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
         throw err;
       }
     },
-    [setMatches, matchesRef, setError],
+    [updateMatchInState, setError],
   );
 
   const notifySupportLineup = useCallback(

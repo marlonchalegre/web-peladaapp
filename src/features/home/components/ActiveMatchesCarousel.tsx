@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { Pelada, AttendanceStatus } from "../../../shared/api/endpoints";
 import LocationDisplay from "../../../shared/components/LocationDisplay";
+import { getInitials } from "../../../shared/utils/initials";
 
 interface ActiveMatchesCarouselProps {
   peladas: Pelada[];
@@ -20,6 +21,31 @@ interface ActiveMatchesCarouselProps {
     status: AttendanceStatus,
   ) => Promise<void>;
 }
+
+const navButtonSx = {
+  width: 28,
+  height: 28,
+  borderRadius: "8px",
+  border: "1.5px solid",
+  borderColor: "divider",
+  bgcolor: "background.paper",
+  color: "text.primary",
+  p: 0,
+  "&:hover": {
+    bgcolor: "action.hover",
+  },
+} as const;
+
+const subActionButtonBaseSx = {
+  background: "none !important",
+  border: "none !important",
+  p: 0,
+  minWidth: "auto",
+  fontFamily: "Archivo, sans-serif",
+  fontSize: "12px",
+  textTransform: "none",
+  boxShadow: "none !important",
+} as const;
 
 export default function ActiveMatchesCarousel({
   peladas,
@@ -35,17 +61,55 @@ export default function ActiveMatchesCarousel({
     status: AttendanceStatus;
   } | null>(null);
 
-  // Filter for active/upcoming matches: status is not closed, or scheduled in the future/present
-  // Let's filter matches where action is likely needed or they are upcoming
-  const activePeladas = peladas.filter(
-    (pelada) =>
-      pelada.status === "attendance" ||
-      pelada.status === "voting" ||
-      pelada.status === "open" ||
-      pelada.status === "running",
+  const activePeladas = useMemo(
+    () =>
+      peladas.filter(
+        (pelada) =>
+          pelada.status === "attendance" ||
+          pelada.status === "voting" ||
+          pelada.status === "open" ||
+          pelada.status === "running",
+      ),
+    [peladas],
   );
 
-  if (activePeladas.length === 0) {
+  // The list can shrink under the current index between renders.
+  const safeIndex =
+    activePeladas.length > 0
+      ? Math.min(activeIndex, activePeladas.length - 1)
+      : 0;
+  const currentPelada = activePeladas[safeIndex];
+
+  const previewInitials = useMemo(
+    () =>
+      (currentPelada?.confirmed_preview ?? "")
+        .split("|")
+        .filter(Boolean)
+        .map((name) => getInitials(name)),
+    [currentPelada?.confirmed_preview],
+  );
+
+  const localeCode = t("common.locale_code", "pt-BR");
+  const { dayNumber, weekday, monthAndTime } = useMemo(() => {
+    if (!currentPelada?.scheduled_at) {
+      return { dayNumber: "--", weekday: "", monthAndTime: "" };
+    }
+    const dateObj = new Date(currentPelada.scheduled_at);
+    return {
+      dayNumber: dateObj.getDate(),
+      weekday: dateObj
+        .toLocaleDateString(localeCode, { weekday: "long" })
+        .toUpperCase(),
+      monthAndTime: `${dateObj.toLocaleDateString(localeCode, {
+        month: "long",
+      })} · ${dateObj.toLocaleTimeString(localeCode, {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}`,
+    };
+  }, [currentPelada?.scheduled_at, localeCode]);
+
+  if (activePeladas.length === 0 || !currentPelada) {
     return null;
   }
 
@@ -65,24 +129,8 @@ export default function ActiveMatchesCarousel({
     });
   };
 
-  // The list can shrink under the current index between renders.
-  const safeIndex = Math.min(activeIndex, activePeladas.length - 1);
-  const currentPelada = activePeladas[safeIndex];
-
   const confirmedCount = currentPelada.confirmed_count ?? 0;
   const maxPlayers = currentPelada.max_players ?? null;
-  const previewInitials = (currentPelada.confirmed_preview ?? "")
-    .split("|")
-    .filter(Boolean)
-    .map((name) =>
-      name
-        .split(" ")
-        .filter(Boolean)
-        .map((part) => part[0])
-        .slice(0, 2)
-        .join("")
-        .toUpperCase(),
-    );
   const remainingConfirmed = Math.max(
     0,
     confirmedCount - previewInitials.length,
@@ -151,26 +199,6 @@ export default function ActiveMatchesCarousel({
   };
 
   const actionDetails = getActionDetails(currentPelada.status || "open");
-  const dateObj = currentPelada.scheduled_at
-    ? new Date(currentPelada.scheduled_at)
-    : null;
-
-  const dayNumber = dateObj ? dateObj.getDate() : "--";
-  const weekday = dateObj
-    ? dateObj
-        .toLocaleDateString(t("common.locale_code", "pt-BR"), {
-          weekday: "long",
-        })
-        .toUpperCase()
-    : "";
-  const monthAndTime = dateObj
-    ? `${dateObj.toLocaleDateString(t("common.locale_code", "pt-BR"), {
-        month: "long",
-      })} · ${dateObj.toLocaleTimeString(t("common.locale_code", "pt-BR"), {
-        hour: "2-digit",
-        minute: "2-digit",
-      })}`
-    : "";
 
   return (
     <Box sx={{ mb: 4 }} data-testid="active-matches-carousel">
@@ -218,19 +246,7 @@ export default function ActiveMatchesCarousel({
               size="small"
               onClick={handlePrev}
               data-testid="carousel-prev-btn"
-              sx={{
-                width: 28,
-                height: 28,
-                borderRadius: "8px",
-                border: "1.5px solid",
-                borderColor: "divider",
-                bgcolor: "background.paper",
-                color: "text.primary",
-                p: 0,
-                "&:hover": {
-                  bgcolor: "action.hover",
-                },
-              }}
+              sx={navButtonSx}
             >
               <ChevronLeftIcon sx={{ fontSize: 18 }} />
             </IconButton>
@@ -256,19 +272,7 @@ export default function ActiveMatchesCarousel({
               size="small"
               onClick={handleNext}
               data-testid="carousel-next-btn"
-              sx={{
-                width: 28,
-                height: 28,
-                borderRadius: "8px",
-                border: "1.5px solid",
-                borderColor: "divider",
-                bgcolor: "background.paper",
-                color: "text.primary",
-                p: 0,
-                "&:hover": {
-                  bgcolor: "action.hover",
-                },
-              }}
+              sx={navButtonSx}
             >
               <ChevronRightIcon sx={{ fontSize: 18 }} />
             </IconButton>
@@ -281,11 +285,13 @@ export default function ActiveMatchesCarousel({
         sx={{
           bgcolor: "background.paper",
           border: (theme) =>
-            `2px solid ${theme.palette.mode === "dark" ? theme.palette.divider : theme.palette.grey[900]}`,
+            theme.palette.brutalist?.borderThick ||
+            `2px solid ${theme.palette.grey[900]}`,
           borderRadius: "18px",
           overflow: "hidden",
           boxShadow: (theme) =>
-            `5px 5px 0 ${theme.palette.mode === "dark" ? theme.palette.common.black : theme.palette.grey[900]}`,
+            theme.palette.brutalist?.shadow ||
+            `5px 5px 0 ${theme.palette.grey[900]}`,
           transition: "all 0.2s ease",
         }}
       >
@@ -350,7 +356,6 @@ export default function ActiveMatchesCarousel({
           </Typography>
         </Box>
 
-        {/* Card Content */}
         {/* Card Content: 3 horizontal sections on desktop (4a), vertical on mobile (2a) */}
         <Box
           sx={{
@@ -527,9 +532,8 @@ export default function ActiveMatchesCarousel({
                       height: 28,
                       borderRadius: "50%",
                       bgcolor: (theme) =>
-                        theme.palette.mode === "dark"
-                          ? theme.palette.divider
-                          : theme.palette.grey[900],
+                        theme.palette.brutalist?.cardHeaderBg ||
+                        theme.palette.grey[900],
                       border: (theme) =>
                         `2px solid ${theme.palette.background.paper}`,
                       display: "flex",
@@ -539,9 +543,8 @@ export default function ActiveMatchesCarousel({
                       fontWeight: 800,
                       fontSize: "9px",
                       color: (theme) =>
-                        theme.palette.mode === "dark"
-                          ? theme.palette.text.primary
-                          : theme.palette.grey[100],
+                        theme.palette.brutalist?.cardHeaderText ||
+                        theme.palette.grey[100],
                       ml: "-8px",
                     }}
                   >
@@ -693,17 +696,10 @@ export default function ActiveMatchesCarousel({
                       "Recusar Presença",
                     )}
                     sx={{
-                      background: "none !important",
-                      border: "none !important",
-                      p: 0,
-                      minWidth: "auto",
-                      fontFamily: "Archivo, sans-serif",
+                      ...subActionButtonBaseSx,
                       fontWeight: 600,
-                      fontSize: "12px",
                       color: isDeclined ? "secondary.main" : "text.secondary",
                       textDecoration: "underline",
-                      textTransform: "none",
-                      boxShadow: "none !important",
                       "&:hover": { color: "text.primary", background: "none" },
                     }}
                   >
@@ -723,16 +719,9 @@ export default function ActiveMatchesCarousel({
                       "Ver Lista de Presença",
                     )}
                     sx={{
-                      background: "none !important",
-                      border: "none !important",
-                      p: 0,
-                      minWidth: "auto",
-                      fontFamily: "Archivo, sans-serif",
+                      ...subActionButtonBaseSx,
                       fontWeight: 700,
-                      fontSize: "12px",
                       color: "primary.main",
-                      textTransform: "none",
-                      boxShadow: "none !important",
                       "&:hover": {
                         textDecoration: "underline",
                         background: "none",
@@ -758,16 +747,12 @@ export default function ActiveMatchesCarousel({
                   fontSize: "15px",
                   letterSpacing: "0.04em",
                   bgcolor: (theme) =>
-                    theme.palette.mode === "dark"
-                      ? theme.palette.divider
-                      : theme.palette.grey[900],
+                    theme.palette.brutalist?.cardHeaderBg ||
+                    theme.palette.grey[900],
                   color: "primary.contrastText",
                   boxShadow: (theme) => `0 3px 0 ${theme.palette.common.black}`,
                   "&:hover": {
-                    bgcolor: (theme) =>
-                      theme.palette.mode === "dark"
-                        ? theme.palette.action.hover
-                        : theme.palette.common.black,
+                    bgcolor: "common.black",
                   },
                 }}
               >

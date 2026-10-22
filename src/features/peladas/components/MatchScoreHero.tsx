@@ -43,6 +43,99 @@ interface MatchScoreHeroProps {
 
 const ordinal = (position: number) => `${position}º`;
 
+const mobileHeaderIconBtnSx = {
+  border: 0,
+  bgcolor: "rgba(255,255,255,0.12)",
+  color: "pitch.contrastText",
+  width: 34,
+  height: 34,
+  borderRadius: "10px",
+  p: 0,
+  "&:hover": { bgcolor: "rgba(255,255,255,0.22)" },
+} as const;
+
+function HeroTeamSide({
+  side,
+  teamName,
+  position,
+  subtitle,
+  isDesktop,
+}: {
+  side: "home" | "away";
+  teamName: string;
+  position: number;
+  subtitle: string;
+  isDesktop: boolean;
+}) {
+  const isHome = side === "home";
+  const badge = (
+    <Box
+      sx={{
+        fontFamily: "Archivo, sans-serif",
+        fontWeight: 700,
+        fontSize: "9.5px",
+        lineHeight: 1,
+        letterSpacing: "0.06em",
+        color: isDesktop ? `${side}.subtleText` : "pitch.main",
+        bgcolor: isDesktop ? `${side}.subtleBg` : `${side}.light`,
+        borderRadius: "5px",
+        px: "5px",
+        py: "3px",
+      }}
+    >
+      {ordinal(position)}
+    </Box>
+  );
+
+  return (
+    <Box
+      sx={{
+        textAlign: isHome ? "right" : "left",
+        minWidth: isDesktop ? 0 : undefined,
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: isHome ? "flex-end" : undefined,
+          gap: "7px",
+        }}
+      >
+        {isHome && badge}
+        <Typography
+          noWrap
+          data-testid={`hero-${side}-name`}
+          sx={{
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 900,
+            fontSize: isDesktop ? "17px" : "15px",
+            lineHeight: isDesktop ? 1.1 : 1.2,
+            letterSpacing: "0.04em",
+            color: isDesktop ? `${side}.main` : "pitch.contrastText",
+          }}
+        >
+          {teamName.toUpperCase()}
+        </Typography>
+        {!isHome && badge}
+      </Box>
+      <Typography
+        sx={{
+          fontFamily: "Archivo, sans-serif",
+          fontWeight: 700,
+          fontSize: "10px",
+          lineHeight: 1,
+          letterSpacing: isDesktop ? "0.12em" : "0.1em",
+          color: isDesktop ? "text.secondary" : `${side}.light`,
+          mt: "6px",
+        }}
+      >
+        {subtitle}
+      </Typography>
+    </Box>
+  );
+}
+
 export default function MatchScoreHero({
   match,
   pelada,
@@ -155,63 +248,13 @@ export default function MatchScoreHero({
             gap: "18px",
           }}
         >
-          {/* Time 1 - Right aligned */}
-          <Box sx={{ textAlign: "right", minWidth: 0 }}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-end",
-                gap: "7px",
-              }}
-            >
-              {homePosition && (
-                <Box
-                  sx={{
-                    fontFamily: "Archivo, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "9.5px",
-                    lineHeight: 1,
-                    letterSpacing: "0.06em",
-                    color: "home.subtleText",
-                    bgcolor: "home.subtleBg",
-                    borderRadius: "5px",
-                    px: "5px",
-                    py: "3px",
-                  }}
-                >
-                  {ordinal(homePosition)}
-                </Box>
-              )}
-              <Typography
-                noWrap
-                data-testid="hero-home-name"
-                sx={{
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: 900,
-                  fontSize: "17px",
-                  lineHeight: 1.1,
-                  letterSpacing: "0.04em",
-                  color: "home.main",
-                }}
-              >
-                {homeTeamName.toUpperCase()}
-              </Typography>
-            </Box>
-            <Typography
-              sx={{
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 700,
-                fontSize: "10px",
-                lineHeight: 1,
-                letterSpacing: "0.12em",
-                color: "text.secondary",
-                mt: "6px",
-              }}
-            >
-              {t("peladas.matches.team_orange")}
-            </Typography>
-          </Box>
+          <HeroTeamSide
+            side="home"
+            teamName={homeTeamName}
+            position={homePosition}
+            subtitle={t("peladas.matches.team_orange")}
+            isDesktop={true}
+          />
 
           {/* Center Scores & Timer */}
           <Stack
@@ -277,62 +320,13 @@ export default function MatchScoreHero({
             </Typography>
           </Stack>
 
-          {/* Time 2 - Left aligned */}
-          <Box sx={{ textAlign: "left", minWidth: 0 }}>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: "7px",
-              }}
-            >
-              <Typography
-                noWrap
-                data-testid="hero-away-name"
-                sx={{
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: 900,
-                  fontSize: "17px",
-                  lineHeight: 1.1,
-                  letterSpacing: "0.04em",
-                  color: "away.main",
-                }}
-              >
-                {awayTeamName.toUpperCase()}
-              </Typography>
-              {awayPosition && (
-                <Box
-                  sx={{
-                    fontFamily: "Archivo, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "9.5px",
-                    lineHeight: 1,
-                    letterSpacing: "0.06em",
-                    color: "away.subtleText",
-                    bgcolor: "away.subtleBg",
-                    borderRadius: "5px",
-                    px: "5px",
-                    py: "3px",
-                  }}
-                >
-                  {ordinal(awayPosition)}
-                </Box>
-              )}
-            </Box>
-            <Typography
-              sx={{
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 700,
-                fontSize: "10px",
-                lineHeight: 1,
-                letterSpacing: "0.12em",
-                color: "text.secondary",
-                mt: "6px",
-              }}
-            >
-              {t("peladas.matches.team_blue")}
-            </Typography>
-          </Box>
+          <HeroTeamSide
+            side="away"
+            teamName={awayTeamName}
+            position={awayPosition}
+            subtitle={t("peladas.matches.team_blue")}
+            isDesktop={true}
+          />
         </Box>
 
         {/* Action buttons inside card */}
@@ -520,16 +514,7 @@ export default function MatchScoreHero({
           onClick={onToggleHistory}
           data-testid="toggle-history-drawer"
           aria-label={t("peladas.dashboard.button.history")}
-          sx={{
-            border: 0,
-            bgcolor: "rgba(255,255,255,0.12)",
-            color: "pitch.contrastText",
-            width: 34,
-            height: 34,
-            borderRadius: "10px",
-            p: 0,
-            "&:hover": { bgcolor: "rgba(255,255,255,0.22)" },
-          }}
+          sx={mobileHeaderIconBtnSx}
         >
           <HistoryIcon sx={{ fontSize: 18 }} />
         </IconButton>
@@ -565,16 +550,7 @@ export default function MatchScoreHero({
           onClick={(e) => setMenuAnchor(e.currentTarget)}
           aria-label={t("peladas.dashboard.live_state.options")}
           data-testid="hero-options-button"
-          sx={{
-            border: 0,
-            bgcolor: "rgba(255,255,255,0.12)",
-            color: "pitch.contrastText",
-            width: 34,
-            height: 34,
-            borderRadius: "10px",
-            p: 0,
-            "&:hover": { bgcolor: "rgba(255,255,255,0.22)" },
-          }}
+          sx={mobileHeaderIconBtnSx}
         >
           <MoreHorizIcon sx={{ fontSize: 18 }} />
         </IconButton>
@@ -591,63 +567,13 @@ export default function MatchScoreHero({
           mt: "18px",
         }}
       >
-        {/* Time 1 */}
-        <Box sx={{ textAlign: "right" }}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-end",
-              gap: "7px",
-            }}
-          >
-            {homePosition && (
-              <Box
-                sx={{
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: 700,
-                  fontSize: "9.5px",
-                  lineHeight: 1,
-                  letterSpacing: "0.06em",
-                  color: "pitch.main",
-                  bgcolor: "home.light",
-                  borderRadius: "5px",
-                  px: "5px",
-                  py: "3px",
-                }}
-              >
-                {ordinal(homePosition)}
-              </Box>
-            )}
-            <Typography
-              noWrap
-              data-testid="hero-home-name"
-              sx={{
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 900,
-                fontSize: "15px",
-                lineHeight: 1.2,
-                letterSpacing: "0.04em",
-                color: "pitch.contrastText",
-              }}
-            >
-              {homeTeamName.toUpperCase()}
-            </Typography>
-          </Box>
-          <Typography
-            sx={{
-              fontFamily: "Archivo, sans-serif",
-              fontWeight: 700,
-              fontSize: "10px",
-              lineHeight: 1,
-              letterSpacing: "0.1em",
-              color: "home.light",
-              mt: "6px",
-            }}
-          >
-            {t("peladas.matches.team_orange")}
-          </Typography>
-        </Box>
+        <HeroTeamSide
+          side="home"
+          teamName={homeTeamName}
+          position={homePosition}
+          subtitle={t("peladas.matches.team_orange")}
+          isDesktop={false}
+        />
 
         {/* Center Scores */}
         <Box
@@ -694,62 +620,13 @@ export default function MatchScoreHero({
           </Typography>
         </Box>
 
-        {/* Time 2 */}
-        <Box sx={{ textAlign: "left" }}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              gap: "7px",
-            }}
-          >
-            <Typography
-              noWrap
-              data-testid="hero-away-name"
-              sx={{
-                fontFamily: "Archivo, sans-serif",
-                fontWeight: 900,
-                fontSize: "15px",
-                lineHeight: 1.2,
-                letterSpacing: "0.04em",
-                color: "pitch.contrastText",
-              }}
-            >
-              {awayTeamName.toUpperCase()}
-            </Typography>
-            {awayPosition && (
-              <Box
-                sx={{
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: 700,
-                  fontSize: "9.5px",
-                  lineHeight: 1,
-                  letterSpacing: "0.06em",
-                  color: "pitch.main",
-                  bgcolor: "away.light",
-                  borderRadius: "5px",
-                  px: "5px",
-                  py: "3px",
-                }}
-              >
-                {ordinal(awayPosition)}
-              </Box>
-            )}
-          </Box>
-          <Typography
-            sx={{
-              fontFamily: "Archivo, sans-serif",
-              fontWeight: 700,
-              fontSize: "10px",
-              lineHeight: 1,
-              letterSpacing: "0.1em",
-              color: "away.light",
-              mt: "6px",
-            }}
-          >
-            {t("peladas.matches.team_blue")}
-          </Typography>
-        </Box>
+        <HeroTeamSide
+          side="away"
+          teamName={awayTeamName}
+          position={awayPosition}
+          subtitle={t("peladas.matches.team_blue")}
+          isDesktop={false}
+        />
       </Box>
 
       {/* Clock & Controls row */}

@@ -33,6 +33,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { api } from "../../../shared/api/client";
 import {
   createApi,
+  type VoterStatusItem,
   type VotingInfo,
   type VotingStatus,
 } from "../../../shared/api/endpoints";
@@ -58,13 +59,6 @@ type PlayerVote = {
   own_goals: number;
   voting_enabled: boolean;
 };
-
-interface VoterStatusItem {
-  player_id: string;
-  user_id?: string;
-  avatar_filename?: string | null;
-  name: string;
-}
 
 function VoterListItem({
   voter,
@@ -108,6 +102,53 @@ function VoterListItem({
   );
 }
 
+function VoterStatusGroup({
+  title,
+  voters,
+  hasVoted,
+  emptyText,
+}: {
+  title: string;
+  voters: VoterStatusItem[];
+  hasVoted: boolean;
+  emptyText?: string;
+}) {
+  return (
+    <Box sx={{ mb: hasVoted ? 3 : 0 }}>
+      <Typography
+        variant="caption"
+        gutterBottom
+        sx={{
+          color: "text.secondary",
+          fontWeight: "bold",
+          display: "block",
+        }}
+      >
+        {title} ({voters.length})
+      </Typography>
+      <List dense>
+        {voters.map((v) => (
+          <VoterListItem key={v.player_id} voter={v} hasVoted={hasVoted} />
+        ))}
+        {voters.length === 0 && emptyText && (
+          <Typography variant="caption" sx={{ px: 1, py: 1 }}>
+            {emptyText}
+          </Typography>
+        )}
+      </List>
+    </Box>
+  );
+}
+
+const headerNavBtnSx = {
+  minWidth: { xs: "40px", sm: "auto" },
+  px: { xs: 0, sm: 2 },
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  textTransform: "none",
+} as const;
+
 export default function PeladaVotingPage() {
   const { t } = useTranslation();
   const { id } = useParams();
@@ -118,7 +159,6 @@ export default function PeladaVotingPage() {
   const [votingInfo, setVotingInfo] = useState<VotingInfo | null>(null);
   const [votingStatus, setVotingStatus] = useState<VotingStatus | null>(null);
   const [playerVotes, setPlayerVotes] = useState<PlayerVote[]>([]);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -127,6 +167,8 @@ export default function PeladaVotingPage() {
     playerId: string;
     name: string;
   } | null>(null);
+
+  const isAdmin = Boolean(votingInfo?.is_admin);
 
   useEffect(() => {
     if (!peladaId) return;
@@ -148,30 +190,28 @@ export default function PeladaVotingPage() {
 
         setVotingInfo(info);
         setVotingStatus(status);
-        setIsAdmin(info.is_admin || false);
 
         if (!info.can_vote && !info.is_admin) {
           setError(info.message || t("peladas.voting.error.cannot_vote"));
           return;
         }
 
-        const votes: PlayerVote[] = info.eligible_players.map((p) => {
-          const existingVote = info.current_votes?.find(
-            (v) => v.target_id === p.player_id,
-          );
-          return {
-            playerId: p.player_id,
-            userId: p.user_id,
-            avatarFilename: p.avatar_filename,
-            playerName: p.name,
-            position: p.position,
-            stars: existingVote ? existingVote.stars : null,
-            goals: p.goals ?? 0,
-            assists: p.assists ?? 0,
-            own_goals: p.own_goals ?? 0,
-            voting_enabled: p.voting_enabled ?? true,
-          };
-        });
+        const currentVotesByTarget = new Map(
+          info.current_votes?.map((v) => [v.target_id, v.stars]),
+        );
+
+        const votes: PlayerVote[] = info.eligible_players.map((p) => ({
+          playerId: p.player_id,
+          userId: p.user_id,
+          avatarFilename: p.avatar_filename,
+          playerName: p.name,
+          position: p.position,
+          stars: currentVotesByTarget.get(p.player_id) ?? null,
+          goals: p.goals ?? 0,
+          assists: p.assists ?? 0,
+          own_goals: p.own_goals ?? 0,
+          voting_enabled: p.voting_enabled ?? true,
+        }));
         setPlayerVotes(votes);
       } catch (error: unknown) {
         const message =
@@ -199,7 +239,6 @@ export default function PeladaVotingPage() {
       setError(null);
       await endpoints.updateVotingEnabled(peladaId, playerId, enabled);
 
-      // Update playerVotes state - keep in list but update voting_enabled and clear stars if disabled
       setPlayerVotes((prev) =>
         prev.map((pv) =>
           pv.playerId === playerId
@@ -235,9 +274,7 @@ export default function PeladaVotingPage() {
 
   const allVotesComplete =
     playerVotes.length > 0 &&
-    playerVotes
-      .filter((pv) => pv.voting_enabled)
-      .every((pv) => pv.stars !== null);
+    playerVotes.every((pv) => !pv.voting_enabled || pv.stars !== null);
 
   const handleSubmit = async () => {
     if (!allVotesComplete || !votingInfo?.voter_player_id) return;
@@ -349,14 +386,7 @@ export default function PeladaVotingPage() {
               component={RouterLink}
               to={`/peladas/${peladaId}/matches`}
               size="small"
-              sx={{
-                minWidth: { xs: "40px", sm: "auto" },
-                px: { xs: 0, sm: 2 },
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                textTransform: "none",
-              }}
+              sx={headerNavBtnSx}
             >
               <SportsSoccerIcon sx={{ mr: { xs: 0, sm: 1 } }} />
               <Box
@@ -372,14 +402,7 @@ export default function PeladaVotingPage() {
                 component={RouterLink}
                 to={`/peladas/${peladaId}/results`}
                 size="small"
-                sx={{
-                  minWidth: { xs: "40px", sm: "auto" },
-                  px: { xs: 0, sm: 2 },
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  textTransform: "none",
-                }}
+                sx={headerNavBtnSx}
               >
                 <AssessmentIcon sx={{ mr: { xs: 0, sm: 1 } }} />
                 <Box
@@ -433,7 +456,9 @@ export default function PeladaVotingPage() {
                         ? "background.paper"
                         : "action.hover",
                       transition: "all 0.3s ease",
-                      border: pv.voting_enabled ? undefined : "1px dashed grey",
+                      border: pv.voting_enabled
+                        ? undefined
+                        : (theme) => `1px dashed ${theme.palette.divider}`,
                     }}
                   >
                     <CardContent>
@@ -684,89 +709,40 @@ export default function PeladaVotingPage() {
               </Typography>
               <Divider sx={{ mb: 2 }} />
 
-              <Box sx={{ mb: 3 }}>
-                <Typography
-                  variant="caption"
-                  gutterBottom
-                  sx={{
-                    color: "text.secondary",
-                    fontWeight: "bold",
-                    display: "block",
-                  }}
-                >
-                  {t("peladas.voting.status.voted")} (
-                  {votersByStatus.voted.length})
-                </Typography>
-                <List dense>
-                  {votersByStatus.voted.map((v) => (
-                    <VoterListItem
-                      key={v.player_id}
-                      voter={v}
-                      hasVoted={true}
-                    />
-                  ))}
-                  {votersByStatus.voted.length === 0 && (
-                    <Typography variant="caption" sx={{ px: 1, py: 1 }}>
-                      {t("peladas.voting.status.none")}
-                    </Typography>
-                  )}
-                </List>
-              </Box>
+              <VoterStatusGroup
+                title={t("peladas.voting.status.voted")}
+                voters={votersByStatus.voted}
+                hasVoted={true}
+                emptyText={t("peladas.voting.status.none")}
+              />
 
-              <Box>
-                <Typography
-                  variant="caption"
-                  gutterBottom
-                  sx={{
-                    color: "text.secondary",
-                    fontWeight: "bold",
-                    display: "block",
-                  }}
-                >
-                  {t("peladas.voting.status.pending")} (
-                  {votersByStatus.pending.length})
-                </Typography>
-                <List dense>
-                  {votersByStatus.pending.map((v) => (
-                    <VoterListItem
-                      key={v.player_id}
-                      voter={v}
-                      hasVoted={false}
-                    />
-                  ))}
-                </List>
-              </Box>
+              <VoterStatusGroup
+                title={t("peladas.voting.status.pending")}
+                voters={votersByStatus.pending}
+                hasVoted={false}
+              />
             </Paper>
           </Grid>
         </Grid>
         <Snackbar
-          open={!!success}
+          open={Boolean(success || (error && votingInfo))}
           autoHideDuration={6000}
-          onClose={() => setSuccess(null)}
+          onClose={() => {
+            setSuccess(null);
+            setError(null);
+          }}
           anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         >
           <Alert
-            onClose={() => setSuccess(null)}
-            severity="success"
+            onClose={() => {
+              setSuccess(null);
+              setError(null);
+            }}
+            severity={error && votingInfo ? "error" : "success"}
             variant="filled"
             sx={{ width: "100%" }}
           >
-            {success}
-          </Alert>
-        </Snackbar>
-        <Snackbar
-          open={!!error && !!votingInfo}
-          autoHideDuration={6000}
-          onClose={() => setError(null)}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        >
-          <Alert
-            onClose={() => setError(null)}
-            severity="error"
-            variant="filled"
-            sx={{ width: "100%" }}
-          >
-            {error}
+            {error && votingInfo ? error : success}
           </Alert>
         </Snackbar>
         <Dialog

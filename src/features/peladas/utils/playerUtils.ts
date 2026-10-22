@@ -498,7 +498,8 @@ export function buildTimelinePlayerOptions({
   orgPlayerIdToPlayer: Record<string, Player>;
   orgPlayerIdToUserId: Record<string, string>;
   userIdToName: Record<string, string>;
-  t: (key: string, defaultValue?: any) => string;
+  t: ((key: string) => string) &
+    ((key: string, defaultValue: string) => string);
 }): {
   teamMembers: FormattedPlayerOption[];
   benchPlayers: FormattedPlayerOption[];
