@@ -16,6 +16,8 @@ import {
   distinctById,
   AVATAR_BG_COLORS,
   getPlayerAvatarProps,
+  getFixedGoalkeeperForTeam,
+  buildTimelinePlayerOptions,
 } from "./playerUtils";
 
 describe("playerUtils", () => {
@@ -610,6 +612,111 @@ describe("playerUtils", () => {
         filename: undefined,
         fallbackText: "G",
       });
+    });
+  });
+
+  describe("getFixedGoalkeeperForTeam", () => {
+    it("returns undefined when fixed_goalkeepers is false", () => {
+      expect(
+        getFixedGoalkeeperForTeam(
+          { fixed_goalkeepers: false, home_fixed_goalkeeper_id: "gk1" } as any,
+          "t1",
+          "t1",
+        ),
+      ).toBeUndefined();
+    });
+
+    it("returns home fixed goalkeeper for home team", () => {
+      expect(
+        getFixedGoalkeeperForTeam(
+          {
+            fixed_goalkeepers: true,
+            home_fixed_goalkeeper_id: "gk1",
+            away_fixed_goalkeeper_id: "gk2",
+          } as any,
+          "t1",
+          "t1",
+        ),
+      ).toBe("gk1");
+    });
+
+    it("returns away fixed goalkeeper for away team", () => {
+      expect(
+        getFixedGoalkeeperForTeam(
+          {
+            fixed_goalkeepers: true,
+            home_fixed_goalkeeper_id: "gk1",
+            away_fixed_goalkeeper_id: "gk2",
+          } as any,
+          "t2",
+          "t1",
+        ),
+      ).toBe("gk2");
+    });
+  });
+
+  describe("buildTimelinePlayerOptions", () => {
+    const mockMatch = {
+      id: "m1",
+      home_team_id: "t1",
+      away_team_id: "t2",
+    } as any;
+
+    const mockOrgPlayerIdToPlayer = {
+      p1: { id: "p1", user_name: "Alice", user_position: "striker" },
+      p2: { id: "p2", user_name: "Bob", user_position: "defender" },
+      p3: { id: "p3", user_name: "Charlie", user_position: "goalkeeper" },
+      p4: { id: "p4", user_name: "Dave", user_position: "striker" },
+      p5: { id: "p5", user_name: "Eve", user_position: "midfielder" },
+    } as any;
+
+    const mockOrgPlayerIdToUserId = {
+      p1: "u1",
+      p2: "u2",
+      p3: "u3",
+      p4: "u4",
+      p5: "u5",
+    };
+
+    const mockUserIdToName = {
+      u1: "Alice",
+      u2: "Bob",
+      u3: "Charlie",
+      u4: "Dave",
+      u5: "Eve",
+    };
+
+    it("separates active team members and bench candidates, excluding active opponents", () => {
+      const result = buildTimelinePlayerOptions({
+        match: mockMatch,
+        teamId: "t1",
+        lineupsByMatch: {
+          m1: {
+            t1: [{ player_id: "p1" }] as any,
+            t2: [{ player_id: "p4" }] as any, // Opponent, should be excluded
+          },
+        },
+        teamPlayers: {
+          t1: [{ player_id: "p1" }] as any,
+          t2: [{ player_id: "p4" }] as any,
+        },
+        attendance: [{ player_id: "p5" }] as any,
+        orgPlayerIdToPlayer: mockOrgPlayerIdToPlayer,
+        orgPlayerIdToUserId: mockOrgPlayerIdToUserId,
+        userIdToName: mockUserIdToName,
+        t: (k: string, def?: string) => def || k,
+      });
+
+      const teamIds = result.teamMembers.map((m) => m.id);
+      const benchIds = result.benchPlayers.map((b) => b.id);
+
+      expect(teamIds).toContain("p1");
+      expect(teamIds).not.toContain("p4");
+
+      expect(benchIds).toContain("p5");
+      expect(benchIds).toContain("p2");
+      expect(benchIds).not.toContain("p4"); // Opponent excluded
+      expect(benchIds).not.toContain("p1"); // Team member excluded from bench
     });
   });
 });

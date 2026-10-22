@@ -1,4 +1,11 @@
-import type { MatchEvent } from "../../../shared/api/endpoints";
+import type {
+  MatchEvent,
+  Match,
+  Player,
+  TeamPlayer,
+  Attendance,
+  Pelada,
+} from "../../../shared/api/endpoints";
 import { getInitials as getSharedInitials } from "../../../shared/utils/initials";
 
 export const POSITION_ORDER: Record<string, number> = {
@@ -428,4 +435,180 @@ export function getPaidPlayerIds(
     }
   }
   return ids;
+}
+
+export interface FormattedPlayerOption {
+  id: string;
+  userId?: string;
+  name: string;
+  avatarFilename?: string | null;
+  position?: string | null;
+  positionLabel?: string;
+  isGoalkeeper?: boolean;
+  group: "team" | "bench";
+}
+
+const POSITION_I18N_KEYS: Record<string, string> = {
+  goalkeeper: "common.positions.goalkeeper",
+  defender: "common.positions.defender",
+  midfielder: "common.positions.midfielder",
+  striker: "common.positions.striker",
+};
+
+/**
+ * Resolves the fixed goalkeeper ID for a specific team in a pelada match.
+ */
+export function getFixedGoalkeeperForTeam(
+  pelada: Pelada | null | undefined,
+  teamId: string,
+  homeTeamId: string,
+): string | undefined {
+  if (!pelada?.fixed_goalkeepers) return undefined;
+  const id =
+    teamId === homeTeamId
+      ? pelada.home_fixed_goalkeeper_id
+      : pelada.away_fixed_goalkeeper_id;
+  return id || undefined;
+}
+
+/**
+ * Builds and sorts candidate player options (team members vs bench candidates)
+ * for a match timeline event edit.
+ */
+export function buildTimelinePlayerOptions({
+  match,
+  pelada,
+  teamId,
+  eventPlayerId,
+  lineupsByMatch,
+  teamPlayers,
+  attendance,
+  orgPlayerIdToPlayer,
+  orgPlayerIdToUserId,
+  userIdToName,
+  t,
+}: {
+  match: Match;
+  pelada?: Pelada | null;
+  teamId: string;
+  eventPlayerId?: string;
+  lineupsByMatch: Record<string, Record<string, TeamPlayer[]>>;
+  teamPlayers: Record<string, TeamPlayer[]>;
+  attendance: Attendance[];
+  orgPlayerIdToPlayer: Record<string, Player>;
+  orgPlayerIdToUserId: Record<string, string>;
+  userIdToName: Record<string, string>;
+  t: (key: string, defaultValue?: any) => string;
+}): {
+  teamMembers: FormattedPlayerOption[];
+  benchPlayers: FormattedPlayerOption[];
+} {
+  const opponentTeamId =
+    teamId === match.home_team_id ? match.away_team_id : match.home_team_id;
+
+  const matchLineup = lineupsByMatch[match.id] || {};
+  const teamIds = new Set<string>();
+  const goalkeeperIds = new Set<string>();
+
+  (matchLineup[teamId] || teamPlayers[teamId] || []).forEach((p) => {
+    teamIds.add(p.player_id);
+    if (p.is_goalkeeper) {
+      goalkeeperIds.add(p.player_id);
+    }
+  });
+
+  const teamFixedGkId = getFixedGoalkeeperForTeam(
+    pelada,
+    teamId,
+    match.home_team_id,
+  );
+  if (teamFixedGkId) {
+    teamIds.add(teamFixedGkId);
+    goalkeeperIds.add(teamFixedGkId);
+  }
+
+  const opponentIds = new Set<string>();
+  (matchLineup[opponentTeamId] || teamPlayers[opponentTeamId] || []).forEach(
+    (p) => opponentIds.add(p.player_id),
+  );
+
+  const opponentFixedGkId = getFixedGoalkeeperForTeam(
+    pelada,
+    opponentTeamId,
+    match.home_team_id,
+  );
+  if (opponentFixedGkId) {
+    opponentIds.add(opponentFixedGkId);
+  }
+
+  const isBenchCandidate = (id: string) =>
+    !teamIds.has(id) && !opponentIds.has(id);
+  const benchIds = new Set<string>();
+
+  Object.entries(teamPlayers).forEach(([tid, list]) => {
+    if (tid !== teamId && tid !== opponentTeamId) {
+      list.forEach((p) => {
+        if (isBenchCandidate(p.player_id)) benchIds.add(p.player_id);
+      });
+    }
+  });
+
+  attendance.forEach((att) => {
+    const pid = getAttendancePlayerId(att);
+    if (pid && isBenchCandidate(pid)) benchIds.add(pid);
+  });
+
+  Object.keys(orgPlayerIdToPlayer).forEach((id) => {
+    if (isBenchCandidate(id)) benchIds.add(id);
+  });
+
+  if (eventPlayerId && !teamIds.has(eventPlayerId)) {
+    benchIds.add(eventPlayerId);
+  }
+
+  const buildOption = (
+    id: string,
+    group: "team" | "bench",
+  ): FormattedPlayerOption => {
+    const orgPlayer = orgPlayerIdToPlayer[id];
+    const userId = orgPlayer?.user_id || orgPlayerIdToUserId[id];
+    const name = resolvePlayerName(
+      id,
+      orgPlayerIdToPlayer,
+      orgPlayerIdToUserId,
+      userIdToName,
+    );
+    const rawPos = getPlayerPosition(orgPlayer);
+    const isGoalkeeper =
+      goalkeeperIds.has(id) || rawPos.toLowerCase() === "goalkeeper";
+    const positionLabel = isGoalkeeper
+      ? t("common.positions.goalkeeper").toUpperCase()
+      : rawPos
+        ? t(
+            POSITION_I18N_KEYS[rawPos.toLowerCase()] ||
+              `common.positions.${rawPos.toLowerCase()}`,
+            rawPos,
+          ).toUpperCase()
+        : "";
+
+    return {
+      id,
+      userId,
+      name,
+      avatarFilename: orgPlayer?.user_avatar_filename,
+      position: rawPos,
+      positionLabel,
+      isGoalkeeper,
+      group,
+    };
+  };
+
+  const teamList = sortPlayersByPosition(
+    Array.from(teamIds, (id) => buildOption(id, "team")),
+  );
+  const benchList = sortPlayersByPosition(
+    Array.from(benchIds, (id) => buildOption(id, "bench")),
+  );
+
+  return { teamMembers: teamList, benchPlayers: benchList };
 }
