@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Container,
   Typography,
@@ -31,13 +31,16 @@ import UserAttendanceStatus from "../components/UserAttendanceStatus";
 import AttendanceListDesktopView from "../components/AttendanceListDesktopView";
 import LocationDisplay from "../../../shared/components/LocationDisplay";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
-import { getInitials } from "../../../shared/utils/initials";
 import {
   isMensalista,
   formatMemberType as formatMemberTypeHelper,
   getPaidPlayerIds,
+  getPlayerAvatarProps,
 } from "../utils/playerUtils";
 import { copyToClipboard } from "../utils/exportUtils";
+import { useCopyFeedback } from "../../../shared/hooks/useCopyFeedback";
+
+const endpoints = createApi(api);
 
 export default function AttendanceListPage() {
   const { t } = useTranslation();
@@ -50,7 +53,6 @@ export default function AttendanceListPage() {
   const [isOrgAdmin, setIsOrgAdmin] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [showAllConfirmed, setShowAllConfirmed] = useState(false);
-  const [copiedList, setCopiedList] = useState(false);
   const [mobileTab, setMobileTab] = useState<
     "confirmed" | "declined" | "pending" | "waitlist"
   >("confirmed");
@@ -95,26 +97,33 @@ export default function AttendanceListPage() {
 
   useEffect(() => {
     if (pelada?.organization_id && user && !isAnyAdmin) {
-      const endpoints = createApi(api);
+      let cancelled = false;
       endpoints
         .listAdminsByOrganization(pelada.organization_id)
         .then((admins) => {
-          if (admins.some((a) => a.user_id === user.id)) {
+          if (!cancelled && admins.some((a) => a.user_id === user.id)) {
             setIsOrgAdmin(true);
           }
         })
         .catch((err) => console.error("Failed to check admin status", err));
+      return () => {
+        cancelled = true;
+      };
     }
   }, [pelada?.organization_id, user, isAnyAdmin]);
 
-  const copyTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  useEffect(() => {
-    return () => {
-      if (copyTimeoutRef.current) {
-        clearTimeout(copyTimeoutRef.current);
-      }
-    };
-  }, []);
+  const { copied: copiedList, triggerCopy: handleCopyList } = useCopyFeedback(
+    () => {
+      const text = confirmed
+        .map(
+          (p, idx) =>
+            `${idx + 1}. ${p.user?.name || "Jogador"} (${t(`common.member_types.${p.member_type || "diarista"}`)})`,
+        )
+        .join("\n");
+      return copyToClipboard(text);
+    },
+    2000,
+  );
 
   const paidPlayerIds = useMemo(
     () => getPaidPlayerIds(peladaTransactions),
@@ -192,21 +201,6 @@ export default function AttendanceListPage() {
 
   const locationStr = pelada.location ?? "";
   const maxPlayers = pelada.max_players ?? undefined;
-
-  const handleCopyList = async () => {
-    const text = confirmed
-      .map(
-        (p, idx) =>
-          `${idx + 1}. ${p.user?.name || "Jogador"} (${t(`common.member_types.${p.member_type || "diarista"}`)})`,
-      )
-      .join("\n");
-    const success = await copyToClipboard(text);
-    if (success) {
-      setCopiedList(true);
-      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
-      copyTimeoutRef.current = setTimeout(() => setCopiedList(false), 2000);
-    }
-  };
 
   const getPositionLabel = (pos?: string) => {
     if (!pos) return "Meio-campo";
@@ -750,7 +744,6 @@ export default function AttendanceListPage() {
               displayedList.map((p, idx) => {
                 const isCurrent = p.user_id === user?.id;
                 const pName = p.user?.name || "Jogador";
-                const pInitials = getInitials(pName);
                 const pos = getPositionLabel(p.user?.position);
                 const memberTag = formatMemberTypeHelper(p.member_type);
                 const playerIsMensalista = isMensalista(p.member_type);
@@ -792,11 +785,7 @@ export default function AttendanceListPage() {
                     </Typography>
 
                     <SecureAvatar
-                      userId={p.user_id}
-                      filename={
-                        p.user?.avatar_filename || p.user_avatar_filename
-                      }
-                      fallbackText={pInitials}
+                      {...getPlayerAvatarProps(p)}
                       sx={{
                         width: 30,
                         height: 30,

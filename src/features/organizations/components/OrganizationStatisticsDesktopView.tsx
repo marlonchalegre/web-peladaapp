@@ -20,6 +20,18 @@ import GroupTabsBar from "./GroupTabsBar";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import { getInitials } from "../../../shared/utils/initials";
 import { AVATAR_BG_COLORS } from "../../peladas/utils/playerUtils";
+import {
+  SeasonHighlightsCard,
+  StatsPodiumCard,
+  WeeklyPresenceChartCard,
+  YourSeasonSummaryCard,
+  type HighlightItem,
+} from "./OrganizationStatsWidgets";
+import {
+  computeWeeklyPresenceSummary,
+  sortStatsByMetric,
+  type MetricType,
+} from "../utils/organizationStatsUtils";
 
 interface OrganizationStatisticsDesktopViewProps {
   org: Organization;
@@ -36,8 +48,6 @@ interface OrganizationStatisticsDesktopViewProps {
   onOpenExport: () => void;
   weeklyPresence?: WeeklyPresence[];
 }
-
-type MetricType = "goals" | "assists" | "presence" | "titles" | "rating";
 
 export default function OrganizationStatisticsDesktopView({
   org,
@@ -71,9 +81,7 @@ export default function OrganizationStatisticsDesktopView({
         ? isDark
           ? "primary.main"
           : "text.primary"
-        : isDark
-          ? "background.paper"
-          : "background.paper",
+        : "background.paper",
       color: active
         ? isDark
           ? "text.primary"
@@ -94,49 +102,34 @@ export default function OrganizationStatisticsDesktopView({
 
   const avatarColors = AVATAR_BG_COLORS;
 
-  // Sort stats according to selected metric
-  const sortedByMetric = useMemo(() => {
-    const list = [...stats];
-    switch (activeMetric) {
-      case "goals":
-        return list.sort((a, b) => (b.goal || 0) - (a.goal || 0));
-      case "assists":
-        return list.sort((a, b) => (b.assist || 0) - (a.assist || 0));
-      case "presence":
-        return list.sort(
-          (a, b) => (b.peladas_played || 0) - (a.peladas_played || 0),
-        );
-      case "rating":
-        return list.sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0));
-      case "titles":
-        return list.sort((a, b) => (b.titles || 0) - (a.titles || 0));
-      default:
-        return list.sort((a, b) => (b.goal || 0) - (a.goal || 0));
-    }
-  }, [stats, activeMetric]);
+  const sortedByMetric = useMemo(
+    () => sortStatsByMetric(stats, activeMetric),
+    [stats, activeMetric],
+  );
 
   const displayedStats = showAll ? sortedByMetric : sortedByMetric.slice(0, 8);
 
-  // Top 3 for podium
   const first = sortedByMetric[0];
   const second = sortedByMetric[1];
   const third = sortedByMetric[2];
 
   const totalPeladasInSeason = stats[0]?.total_peladas ?? 0;
-  const presenceAvg =
-    totalPeladasInSeason > 0 && stats.length > 0
-      ? Math.round(
-          (stats.reduce(
-            (acc, s) => acc + (s.peladas_played || 0) / totalPeladasInSeason,
-            0,
-          ) /
-            stats.length) *
-            100,
-        )
-      : null;
+  const presenceAvg = useMemo(
+    () =>
+      totalPeladasInSeason > 0 && stats.length > 0
+        ? Math.round(
+            (stats.reduce(
+              (acc, s) => acc + (s.peladas_played || 0) / totalPeladasInSeason,
+              0,
+            ) /
+              stats.length) *
+              100,
+          )
+        : null,
+    [totalPeladasInSeason, stats],
+  );
 
-  // Season highlights derived from the real per-player stats.
-  const highlights = useMemo(() => {
+  const highlights: HighlightItem[] = useMemo(() => {
     return [
       {
         key: "top-scorer",
@@ -172,7 +165,14 @@ export default function OrganizationStatisticsDesktopView({
           `Nota média · ${(p.avg_rating || 0).toFixed(1)}`,
         eligible: (p: OrganizationPlayerStats) => (p.avg_rating || 0) > 0,
       },
-    ].filter((h) => h.item && h.eligible(h.item));
+    ]
+      .filter((h) => h.item && h.eligible(h.item))
+      .map((h) => ({
+        key: h.key,
+        player: h.item,
+        color: h.color,
+        label: h.item ? h.label(h.item) : "",
+      }));
   }, [stats, theme]);
 
   const myStat = currentUser
@@ -188,26 +188,10 @@ export default function OrganizationStatisticsDesktopView({
     );
   }, [stats, myStat, currentUser?.id]);
 
-  const presenceMax = Math.max(1, ...weeklyPresence.map((w) => w.confirmed));
-  const presenceWeeksAvg = weeklyPresence.length
-    ? Math.round(
-        weeklyPresence.reduce((acc, w) => acc + w.confirmed, 0) /
-          weeklyPresence.length,
-      )
-    : 0;
-  const worstWeek = weeklyPresence.reduce<WeeklyPresence | undefined>(
-    (min, w) => (!min || w.confirmed < min.confirmed ? w : min),
-    undefined,
+  const { presenceMax, presenceWeeksAvg, worstWeek } = useMemo(
+    () => computeWeeklyPresenceSummary(weeklyPresence),
+    [weeklyPresence],
   );
-  const monthLabel = (iso: string) =>
-    new Date(iso)
-      .toLocaleDateString("pt-BR", { month: "short" })
-      .replace(".", "");
-  const dayMonth = (iso: string) =>
-    new Date(iso).toLocaleDateString("pt-BR", {
-      day: "2-digit",
-      month: "2-digit",
-    });
 
   const getMetricValue = (item?: OrganizationPlayerStats) => {
     if (!item) return 0;
@@ -245,7 +229,7 @@ export default function OrganizationStatisticsDesktopView({
           pb: 5,
         }}
       >
-        {/* 2. Dark Header Banner (Desktop 4c) */}
+        {/* Dark Header Banner */}
         <Box
           sx={{
             bgcolor: isDark ? "action.hover" : "text.primary",
@@ -543,11 +527,10 @@ export default function OrganizationStatisticsDesktopView({
           </Box>
         </Box>
 
-        {/* 3. Two-column Layout */}
+        {/* Two-column Layout */}
         <Box sx={{ display: "flex", gap: 2.5, alignItems: "flex-start" }}>
           {/* Left Column: Metric Tabs + Podium + Table */}
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            {/* Metric Tabs */}
             <Box sx={{ display: "flex", gap: 0.9, flexWrap: "wrap", mb: 2 }}>
               <Box
                 component="button"
@@ -586,236 +569,16 @@ export default function OrganizationStatisticsDesktopView({
               </Box>
             </Box>
 
-            {/* Podium Card (Desktop 4c) */}
-            <Box
-              sx={{
-                bgcolor: "background.paper",
-                border: (th) =>
-                  th.palette.brutalist?.border ||
-                  `2px solid ${th.palette.divider}`,
-                borderRadius: "20px",
-                p: "20px",
-                boxShadow: (th) =>
-                  th.palette.brutalist?.shadow ||
-                  (isDark
-                    ? "0 4px 20px rgba(0,0,0,0.5)"
-                    : `6px 6px 0 ${th.palette.divider}`),
-                mb: 2,
-              }}
-            >
-              <Typography
-                sx={{
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: 700,
-                  fontSize: "9.5px",
-                  letterSpacing: ".18em",
-                  color: "text.secondary",
-                  textTransform: "uppercase",
-                }}
-              >
-                ARTILHARIA · TEMPORADA {year}
-              </Typography>
+            <StatsPodiumCard
+              title={`ARTILHARIA · TEMPORADA ${year}`}
+              first={first}
+              second={second}
+              third={third}
+              getDisplayValue={(p) => (p ? getMetricValue(p) : 0)}
+              variant="desktop"
+            />
 
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "flex-end",
-                  gap: 1.8,
-                  mt: 2,
-                }}
-              >
-                {/* 2nd Place */}
-                <Box sx={{ flex: 1, textAlign: "center" }}>
-                  <SecureAvatar
-                    userId={second?.user_id}
-                    filename={second?.avatar_filename}
-                    fallbackText={getInitials(second?.player_name || "")}
-                    sx={{
-                      width: 48,
-                      height: 48,
-                      bgcolor: AVATAR_BG_COLORS[4] || "secondary.light",
-                      mx: "auto",
-                      fontFamily: "Archivo, sans-serif",
-                      fontWeight: 800,
-                      fontSize: "14px",
-                      color: "text.primary",
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      bgcolor: "action.hover",
-                      borderRadius: "11px 11px 0 0",
-                      mt: 1.4,
-                      pt: 1.6,
-                      pb: 1.4,
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                        fontWeight: 700,
-                        fontSize: "28px",
-                        lineHeight: 1,
-                        color: "text.primary",
-                      }}
-                    >
-                      {second ? getMetricValue(second) : 0}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontFamily: "Archivo, sans-serif",
-                        fontWeight: 700,
-                        fontSize: "11px",
-                        color: "text.secondary",
-                        mt: 0.6,
-                      }}
-                    >
-                      {second?.player_name || ""}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontFamily: "Archivo, sans-serif",
-                        fontWeight: 800,
-                        fontSize: "13px",
-                        color: "text.secondary",
-                        mt: 1,
-                      }}
-                    >
-                      2º
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {/* 1st Place */}
-                <Box sx={{ flex: 1, textAlign: "center" }}>
-                  <SecureAvatar
-                    userId={first?.user_id}
-                    filename={first?.avatar_filename}
-                    fallbackText={getInitials(first?.player_name || "")}
-                    sx={{
-                      width: 58,
-                      height: 58,
-                      bgcolor: AVATAR_BG_COLORS[0] || "warning.light",
-                      border: (th) =>
-                        `3px solid ${th.palette.gold?.main || th.palette.primary.main}`,
-                      mx: "auto",
-                      fontFamily: "Archivo, sans-serif",
-                      fontWeight: 800,
-                      fontSize: "17px",
-                      color: "text.primary",
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      bgcolor: (th) =>
-                        th.palette.gold?.main || th.palette.primary.main,
-                      borderRadius: "11px 11px 0 0",
-                      mt: 1.4,
-                      pt: 2.2,
-                      pb: 1.8,
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                        fontWeight: 700,
-                        fontSize: "40px",
-                        lineHeight: 1,
-                        color: "primary.contrastText",
-                      }}
-                    >
-                      {first ? getMetricValue(first) : 0}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontFamily: "Archivo, sans-serif",
-                        fontWeight: 700,
-                        fontSize: "12px",
-                        color: "primary.contrastText",
-                        mt: 0.6,
-                      }}
-                    >
-                      {first?.player_name || ""}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontFamily: "Archivo, sans-serif",
-                        fontWeight: 800,
-                        fontSize: "14px",
-                        color: "primary.contrastText",
-                        mt: 1,
-                      }}
-                    >
-                      1º
-                    </Typography>
-                  </Box>
-                </Box>
-
-                {/* 3rd Place */}
-                <Box sx={{ flex: 1, textAlign: "center" }}>
-                  <SecureAvatar
-                    userId={third?.user_id}
-                    filename={third?.avatar_filename}
-                    fallbackText={getInitials(third?.player_name || "")}
-                    sx={{
-                      width: 48,
-                      height: 48,
-                      bgcolor: AVATAR_BG_COLORS[6] || "info.light",
-                      mx: "auto",
-                      fontFamily: "Archivo, sans-serif",
-                      fontWeight: 800,
-                      fontSize: "14px",
-                      color: "text.primary",
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      bgcolor: "action.hover",
-                      borderRadius: "11px 11px 0 0",
-                      mt: 1.4,
-                      pt: 1.4,
-                      pb: 1.2,
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                        fontWeight: 700,
-                        fontSize: "26px",
-                        lineHeight: 1,
-                        color: "text.primary",
-                      }}
-                    >
-                      {third ? getMetricValue(third) : 0}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontFamily: "Archivo, sans-serif",
-                        fontWeight: 700,
-                        fontSize: "11px",
-                        color: "text.secondary",
-                        mt: 0.6,
-                      }}
-                    >
-                      {third?.player_name || ""}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontFamily: "Archivo, sans-serif",
-                        fontWeight: 800,
-                        fontSize: "13px",
-                        color: "text.secondary",
-                        mt: 1,
-                      }}
-                    >
-                      3º
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
-            </Box>
-
-            {/* Full Ranking Table (Desktop 4c) */}
+            {/* Full Ranking Table */}
             <Box
               sx={{
                 bgcolor: "background.paper",
@@ -825,7 +588,6 @@ export default function OrganizationStatisticsDesktopView({
                 overflow: "hidden",
               }}
             >
-              {/* Header */}
               <Box
                 sx={{
                   display: "flex",
@@ -858,7 +620,6 @@ export default function OrganizationStatisticsDesktopView({
                 </Box>
               </Box>
 
-              {/* Rows */}
               {displayedStats.map((item, idx) => {
                 const isUser = item.player_id === currentUser?.id;
                 const pInitials = getInitials(item.player_name);
@@ -1034,7 +795,6 @@ export default function OrganizationStatisticsDesktopView({
                 );
               })}
 
-              {/* Footer */}
               {sortedByMetric.length > 8 && (
                 <Box
                   sx={{
@@ -1081,330 +841,22 @@ export default function OrganizationStatisticsDesktopView({
             </Box>
           </Box>
 
-          {/* Right Column (340px) */}
+          {/* Right Column */}
           <Box sx={{ width: 340, flexShrink: 0 }}>
-            {/* Card: Presença · 12 semanas */}
-            <Box
-              sx={{
-                bgcolor: "background.paper",
-                border: "1.5px solid",
-                borderColor: "divider",
-                borderRadius: "16px",
-                p: 2,
-              }}
-            >
-              <Typography
-                sx={{
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: 700,
-                  fontSize: "9.5px",
-                  letterSpacing: ".18em",
-                  color: "text.secondary",
-                }}
-              >
-                PRESENÇA · 12 SEMANAS
-              </Typography>
-
-              {/* 12 Week Bar Chart */}
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 0.6,
-                  alignItems: "flex-end",
-                  height: 90,
-                  mt: 2,
-                }}
-              >
-                {weeklyPresence.map((w, bIdx) => (
-                  <Box
-                    key={bIdx}
-                    sx={{
-                      flex: 1,
-                      height: `${Math.round((w.confirmed / presenceMax) * 100)}%`,
-                      bgcolor:
-                        w.confirmed < presenceWeeksAvg
-                          ? "secondary.main"
-                          : "primary.main",
-                      borderRadius: "3px",
-                    }}
-                  />
-                ))}
-              </Box>
-              {weeklyPresence.length > 0 && (
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    mt: 1.1,
-                    fontFamily: "Archivo, sans-serif",
-                    fontWeight: 600,
-                    fontSize: "10px",
-                    color: "text.secondary",
-                  }}
-                >
-                  <Box component="span">
-                    {monthLabel(weeklyPresence[0].week_start)}
-                  </Box>
-                  <Box component="span">
-                    {monthLabel(
-                      weeklyPresence[weeklyPresence.length - 1].week_start,
-                    )}
-                  </Box>
-                </Box>
-              )}
-              <Box
-                sx={{
-                  mt: 1.6,
-                  pt: 1.6,
-                  borderTop: "1.5px dashed",
-                  borderColor: "divider",
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: 600,
-                  fontSize: "11.5px",
-                  lineHeight: 1.45,
-                  color: "text.secondary",
-                }}
-              >
-                {weeklyPresence.length > 0 ? (
-                  <>
-                    Média de{" "}
-                    <Box component="strong" sx={{ color: "text.primary" }}>
-                      {presenceWeeksAvg} jogadores
-                    </Box>{" "}
-                    por pelada
-                    {worstWeek
-                      ? ` · pior semana em ${dayMonth(worstWeek.week_start)} com ${worstWeek.confirmed}`
-                      : ""}
-                  </>
-                ) : (
-                  "Sem dados de presença."
-                )}
-              </Box>
-            </Box>
-
-            {/* Card: Destaques da Temporada */}
-            <Box
-              sx={{
-                bgcolor: "background.paper",
-                border: "1.5px solid",
-                borderColor: "divider",
-                borderRadius: "16px",
-                overflow: "hidden",
-                mt: 1.8,
-              }}
-            >
-              <Box
-                sx={{
-                  p: "13px 16px",
-                  borderBottom: "1.5px solid",
-                  borderColor: "divider",
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: 700,
-                  fontSize: "9.5px",
-                  letterSpacing: ".16em",
-                  color: "text.secondary",
-                }}
-              >
-                DESTAQUES DA TEMPORADA
-              </Box>
-
-              {highlights.map((h, i) => (
-                <Box
-                  key={h.key}
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1.4,
-                    p: "13px 16px",
-                    borderBottom:
-                      i < highlights.length - 1 ? "1.5px solid" : "none",
-                    borderColor: "divider",
-                  }}
-                >
-                  <SecureAvatar
-                    userId={h.item?.user_id}
-                    filename={h.item?.avatar_filename}
-                    fallbackText={getInitials(h.item?.player_name)}
-                    sx={{
-                      width: 32,
-                      height: 32,
-                      bgcolor: h.color,
-                      fontFamily: "Archivo, sans-serif",
-                      fontWeight: 800,
-                      fontSize: "10px",
-                      color: "text.primary",
-                      flexShrink: 0,
-                    }}
-                  />
-                  <Box>
-                    <Typography
-                      sx={{
-                        fontFamily: "Archivo, sans-serif",
-                        fontWeight: 700,
-                        fontSize: "12.5px",
-                        color: "text.primary",
-                      }}
-                    >
-                      {h.item?.player_name || "—"}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontFamily: "Archivo, sans-serif",
-                        fontWeight: 600,
-                        fontSize: "11px",
-                        color: "text.secondary",
-                        mt: 0.3,
-                      }}
-                    >
-                      {h.item ? h.label(h.item) : ""}
-                    </Typography>
-                  </Box>
-                </Box>
-              ))}
-            </Box>
-
-            {/* Card: A Sua Temporada */}
+            <WeeklyPresenceChartCard
+              weeklyPresence={weeklyPresence}
+              presenceMax={presenceMax}
+              presenceWeeksAvg={presenceWeeksAvg}
+              worstWeek={worstWeek}
+              variant="desktop"
+            />
+            <SeasonHighlightsCard items={highlights} variant="desktop" />
             {myStat && (
-              <Box
-                sx={{
-                  bgcolor: isDark ? "action.hover" : "text.primary",
-                  border: isDark ? "1px solid rgba(255,255,255,0.12)" : "none",
-                  borderRadius: "16px",
-                  p: 2,
-                  mt: 1.8,
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontFamily: "Archivo, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "9.5px",
-                    letterSpacing: ".16em",
-                    color: isDark ? "text.secondary" : "background.default",
-                  }}
-                >
-                  A SUA TEMPORADA
-                </Typography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "flex-end",
-                    gap: 1.5,
-                    mt: 1.8,
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                      fontWeight: 700,
-                      fontSize: "40px",
-                      lineHeight: 0.9,
-                      color: (th) =>
-                        th.palette.gold?.main || th.palette.primary.main,
-                    }}
-                  >
-                    {myRank}º
-                  </Typography>
-                  <Typography
-                    sx={{
-                      pb: 0.5,
-                      fontFamily: "Archivo, sans-serif",
-                      fontWeight: 600,
-                      fontSize: "11.5px",
-                      lineHeight: 1.35,
-                      color: isDark ? "text.secondary" : "background.default",
-                    }}
-                  >
-                    em gols entre
-                    <br />
-                    {stats.length} jogadores
-                  </Typography>
-                </Box>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    gap: 2.8,
-                    mt: 2,
-                    pt: 1.8,
-                    borderTop: "1.5px solid",
-                    borderColor: isDark ? "divider" : "rgba(255,255,255,0.15)",
-                  }}
-                >
-                  <Box>
-                    <Typography
-                      sx={{
-                        fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                        fontWeight: 700,
-                        fontSize: "20px",
-                        color: isDark ? "text.primary" : "background.paper",
-                      }}
-                    >
-                      {myStat.peladas_played}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontFamily: "Archivo, sans-serif",
-                        fontWeight: 700,
-                        fontSize: "8.5px",
-                        letterSpacing: ".1em",
-                        color: isDark ? "text.secondary" : "background.default",
-                        mt: 0.5,
-                      }}
-                    >
-                      JOGOS
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography
-                      sx={{
-                        fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                        fontWeight: 700,
-                        fontSize: "20px",
-                        color: isDark ? "text.primary" : "background.paper",
-                      }}
-                    >
-                      {myStat.assist}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontFamily: "Archivo, sans-serif",
-                        fontWeight: 700,
-                        fontSize: "8.5px",
-                        letterSpacing: ".1em",
-                        color: isDark ? "text.secondary" : "background.default",
-                        mt: 0.5,
-                      }}
-                    >
-                      ASSIST.
-                    </Typography>
-                  </Box>
-                  <Box>
-                    <Typography
-                      sx={{
-                        fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                        fontWeight: 700,
-                        fontSize: "20px",
-                        color: isDark ? "text.primary" : "background.paper",
-                      }}
-                    >
-                      {(myStat.avg_rating || 0).toFixed(1).replace(".", ",")}
-                    </Typography>
-                    <Typography
-                      sx={{
-                        fontFamily: "Archivo, sans-serif",
-                        fontWeight: 700,
-                        fontSize: "8.5px",
-                        letterSpacing: ".1em",
-                        color: isDark ? "text.secondary" : "background.default",
-                        mt: 0.5,
-                      }}
-                    >
-                      NOTA
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
+              <YourSeasonSummaryCard
+                myStat={myStat}
+                myRank={myRank}
+                totalPlayers={stats.length}
+              />
             )}
           </Box>
         </Box>

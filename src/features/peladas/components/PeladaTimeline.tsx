@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import {
   Box,
   Typography,
@@ -21,27 +22,83 @@ import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDiss
 import ShieldIcon from "@mui/icons-material/Shield";
 import SentimentVerySatisfiedIcon from "@mui/icons-material/SentimentVerySatisfied";
 import { useTranslation } from "react-i18next";
-import type { MatchEvent, Match } from "../../../shared/api/endpoints";
+import type {
+  MatchEvent,
+  Match,
+  MatchEventType,
+} from "../../../shared/api/endpoints";
 import { formatMs } from "../../../shared/utils/timeUtils";
-import { getPlayerTeamInMatch, isAssistForGoal } from "../utils/playerUtils";
+import {
+  getPlayerTeamInMatch,
+  isAssistForGoal,
+  resolvePlayerName,
+} from "../utils/playerUtils";
+import { copyToClipboard } from "../utils/exportUtils";
 
 interface GroupedEvent {
   id: string;
   timeMs: number;
   matchTimeMs: number;
-  type:
-    | "goal"
-    | "own_goal"
-    | "assist"
-    | "drible"
-    | "chute"
-    | "falta"
-    | "furada"
-    | "defesa"
-    | "vish";
+  type: MatchEventType;
   goalEvent?: MatchEvent;
   assistEvent?: MatchEvent;
   standaloneEvent?: MatchEvent;
+}
+
+function groupMatchTimelineEvents(matchEvents: MatchEvent[]): GroupedEvent[] {
+  const goals = matchEvents.filter(
+    (e) => e.event_type === "goal" || e.event_type === "own_goal",
+  );
+  const assists = matchEvents.filter((e) => e.event_type === "assist");
+  const customEvents = matchEvents.filter(
+    (e) => !["goal", "own_goal", "assist"].includes(e.event_type),
+  );
+
+  const grouped: GroupedEvent[] = [];
+  const pairedAssistIds = new Set<string>();
+
+  goals.forEach((goal) => {
+    const matchingAssist = assists.find(
+      (a) => !pairedAssistIds.has(a.id!) && isAssistForGoal(a, goal),
+    );
+
+    if (matchingAssist) {
+      pairedAssistIds.add(matchingAssist.id!);
+    }
+
+    grouped.push({
+      id: goal.id!,
+      timeMs: goal.session_time_ms ?? 0,
+      matchTimeMs: goal.match_time_ms ?? 0,
+      type: goal.event_type,
+      goalEvent: goal,
+      assistEvent: matchingAssist,
+    });
+  });
+
+  assists.forEach((assist) => {
+    if (!pairedAssistIds.has(assist.id!)) {
+      grouped.push({
+        id: assist.id!,
+        timeMs: assist.session_time_ms ?? 0,
+        matchTimeMs: assist.match_time_ms ?? 0,
+        type: "assist",
+        standaloneEvent: assist,
+      });
+    }
+  });
+
+  customEvents.forEach((ev) => {
+    grouped.push({
+      id: ev.id!,
+      timeMs: ev.session_time_ms ?? 0,
+      matchTimeMs: ev.match_time_ms ?? 0,
+      type: ev.event_type,
+      standaloneEvent: ev,
+    });
+  });
+
+  return grouped.sort((a, b) => a.timeMs - b.timeMs);
 }
 
 interface PeladaTimelineProps {
@@ -343,10 +400,46 @@ export default function PeladaTimeline({
   const homeColor = theme.palette.home?.main || theme.palette.secondary.main;
   const awayColor = theme.palette.away?.main || theme.palette.primary.main;
 
-  const getPlayerName = (playerId: string) => {
-    const userId = orgPlayerIdToUserId[playerId];
-    return userIdToName[userId] || `Player ${playerId}`;
-  };
+  const getPlayerName = (playerId: string) =>
+    resolvePlayerName(
+      playerId,
+      undefined,
+      orgPlayerIdToUserId,
+      userIdToName,
+      `Player ${playerId}`,
+    );
+
+  const sortedFallbackEvents = useMemo(
+    () =>
+      [...events].sort((a, b) => {
+        if (a.session_time_ms && b.session_time_ms) {
+          return a.session_time_ms - b.session_time_ms;
+        }
+        if (a.id && b.id) {
+          return String(a.id).localeCompare(String(b.id));
+        }
+        return 0;
+      }),
+    [events],
+  );
+
+  const groupedByMatch = useMemo(() => {
+    if (!matches || matches.length === 0) return [];
+    const eventsByMatchId = new Map<string, MatchEvent[]>();
+    for (const ev of events) {
+      if (!ev.match_id) continue;
+      const list = eventsByMatchId.get(ev.match_id);
+      if (list) list.push(ev);
+      else eventsByMatchId.set(ev.match_id, [ev]);
+    }
+    return [...matches]
+      .sort((a, b) => a.sequence - b.sequence)
+      .map((match) => ({
+        match,
+        grouped: groupMatchTimelineEvents(eventsByMatchId.get(match.id) ?? []),
+      }))
+      .filter((entry) => entry.grouped.length > 0);
+  }, [matches, events]);
 
   const handleExportTimeline = async () => {
     const headers = [
@@ -364,17 +457,7 @@ export default function PeladaTimeline({
     const getEventTitle = (type: string) => t(`common.${type}`, type);
 
     if (!matches || matches.length === 0) {
-      const sortedEvents = [...events].sort((a, b) => {
-        if (a.session_time_ms && b.session_time_ms) {
-          return a.session_time_ms - b.session_time_ms;
-        }
-        if (a.id && b.id) {
-          return String(a.id).localeCompare(String(b.id));
-        }
-        return 0;
-      });
-
-      sortedEvents.forEach((event) => {
+      sortedFallbackEvents.forEach((event) => {
         const teamId = orgPlayerIdToTeamId
           ? orgPlayerIdToTeamId[event.player_id]
           : null;
@@ -390,68 +473,7 @@ export default function PeladaTimeline({
         ]);
       });
     } else {
-      const sortedMatches = [...matches].sort(
-        (a, b) => a.sequence - b.sequence,
-      );
-
-      sortedMatches.forEach((match) => {
-        const matchEvents = events.filter((e) => e.match_id === match.id);
-        if (matchEvents.length === 0) return;
-
-        const goals = matchEvents.filter(
-          (e) => e.event_type === "goal" || e.event_type === "own_goal",
-        );
-        const assists = matchEvents.filter((e) => e.event_type === "assist");
-        const customEvents = matchEvents.filter(
-          (e) => !["goal", "own_goal", "assist"].includes(e.event_type),
-        );
-
-        const grouped: GroupedEvent[] = [];
-        const pairedAssistIds = new Set<string>();
-
-        goals.forEach((goal) => {
-          const matchingAssist = assists.find(
-            (a) => !pairedAssistIds.has(a.id!) && isAssistForGoal(a, goal),
-          );
-
-          if (matchingAssist) {
-            pairedAssistIds.add(matchingAssist.id!);
-          }
-
-          grouped.push({
-            id: goal.id!,
-            timeMs: goal.session_time_ms ?? 0,
-            matchTimeMs: goal.match_time_ms ?? 0,
-            type: goal.event_type as "goal" | "own_goal",
-            goalEvent: goal,
-            assistEvent: matchingAssist,
-          });
-        });
-
-        assists.forEach((assist) => {
-          if (!pairedAssistIds.has(assist.id!)) {
-            grouped.push({
-              id: assist.id!,
-              timeMs: assist.session_time_ms ?? 0,
-              matchTimeMs: assist.match_time_ms ?? 0,
-              type: "assist",
-              standaloneEvent: assist,
-            });
-          }
-        });
-
-        customEvents.forEach((ev) => {
-          grouped.push({
-            id: ev.id!,
-            timeMs: ev.session_time_ms ?? 0,
-            matchTimeMs: ev.match_time_ms ?? 0,
-            type: ev.event_type as GroupedEvent["type"],
-            standaloneEvent: ev,
-          });
-        });
-
-        grouped.sort((a, b) => a.timeMs - b.timeMs);
-
+      groupedByMatch.forEach(({ match, grouped }) => {
         grouped.forEach((groupedEvent) => {
           const targetEvent =
             groupedEvent.goalEvent || groupedEvent.standaloneEvent;
@@ -493,11 +515,9 @@ export default function PeladaTimeline({
       ...rows.map((row) => row.join("\t")),
     ].join("\n");
 
-    try {
-      await navigator.clipboard.writeText(tsvContent);
+    const copied = await copyToClipboard(tsvContent);
+    if (copied) {
       alert(t("peladas.timeline.export_success"));
-    } catch (err) {
-      console.error("Failed to copy timeline table:", err);
     }
   };
 
@@ -594,22 +614,11 @@ export default function PeladaTimeline({
     );
   }
 
-  // Fallback for simple timeline rendering (e.g. during testing or if matches are not loaded)
   if (!matches || matches.length === 0) {
-    const sortedEvents = [...events].sort((a, b) => {
-      if (a.session_time_ms && b.session_time_ms) {
-        return a.session_time_ms - b.session_time_ms;
-      }
-      if (a.id && b.id) {
-        return String(a.id).localeCompare(String(b.id));
-      }
-      return 0;
-    });
-
     return (
       <Stack spacing={2} sx={{ p: 1 }} className="MuiTimeline-root">
         {exportButton}
-        {sortedEvents.map((event, index) => {
+        {sortedFallbackEvents.map((event, index) => {
           const isGoal =
             event.event_type === "goal" || event.event_type === "own_goal";
           return (
@@ -667,98 +676,10 @@ export default function PeladaTimeline({
     );
   }
 
-  // Sort matches by sequence
-  const sortedMatches = [...(matches || [])].sort(
-    (a, b) => a.sequence - b.sequence,
-  );
-
   return (
     <Box sx={{ py: 1 }} className="MuiTimeline-root">
       {exportButton}
-      {sortedMatches.map((match, matchIdx) => {
-        // Filter events for this match
-        const matchEvents = events.filter((e) => e.match_id === match.id);
-        if (matchEvents.length === 0) {
-          return null; // skip match if no events
-        }
-
-        // Separate goals, assists, and custom events
-        const goals = matchEvents.filter(
-          (e) => e.event_type === "goal" || e.event_type === "own_goal",
-        );
-        const assists = matchEvents.filter((e) => e.event_type === "assist");
-        const customEvents = matchEvents.filter(
-          (e) => !["goal", "own_goal", "assist"].includes(e.event_type),
-        );
-
-        const grouped: {
-          id: string;
-          timeMs: number;
-          matchTimeMs: number;
-          type:
-            | "goal"
-            | "own_goal"
-            | "assist"
-            | "drible"
-            | "chute"
-            | "falta"
-            | "furada"
-            | "defesa"
-            | "vish";
-          goalEvent?: MatchEvent;
-          assistEvent?: MatchEvent;
-          standaloneEvent?: MatchEvent;
-        }[] = [];
-
-        const pairedAssistIds = new Set<string>();
-
-        // Match goal and assist pairs
-        goals.forEach((goal) => {
-          const matchingAssist = assists.find(
-            (a) => !pairedAssistIds.has(a.id!) && isAssistForGoal(a, goal),
-          );
-
-          if (matchingAssist) {
-            pairedAssistIds.add(matchingAssist.id!);
-          }
-
-          grouped.push({
-            id: goal.id!,
-            timeMs: goal.session_time_ms ?? 0,
-            matchTimeMs: goal.match_time_ms ?? 0,
-            type: goal.event_type as "goal" | "own_goal",
-            goalEvent: goal,
-            assistEvent: matchingAssist,
-          });
-        });
-
-        // Add standalone assists (historical data support)
-        assists.forEach((assist) => {
-          if (!pairedAssistIds.has(assist.id!)) {
-            grouped.push({
-              id: assist.id!,
-              timeMs: assist.session_time_ms ?? 0,
-              matchTimeMs: assist.match_time_ms ?? 0,
-              type: "assist",
-              standaloneEvent: assist,
-            });
-          }
-        });
-
-        // Add custom match events (drible, chute, falta, furada, defesa, vish)
-        customEvents.forEach((ev) => {
-          grouped.push({
-            id: ev.id!,
-            timeMs: ev.session_time_ms ?? 0,
-            matchTimeMs: ev.match_time_ms ?? 0,
-            type: ev.event_type as GroupedEvent["type"],
-            standaloneEvent: ev,
-          });
-        });
-
-        // Sort match timeline events chronologically
-        grouped.sort((a, b) => a.timeMs - b.timeMs);
-
+      {groupedByMatch.map(({ match, grouped }, matchIdx) => {
         const homeName = teamNameById[match.home_team_id] || "Home";
         const awayName = teamNameById[match.away_team_id] || "Away";
 

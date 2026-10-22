@@ -20,8 +20,18 @@ import type {
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
 import { getInitials } from "../../../shared/utils/initials";
 import { AVATAR_BG_COLORS } from "../../peladas/utils/playerUtils";
-
-type MetricType = "goals" | "assists" | "presence" | "titles" | "rating";
+import {
+  SeasonHighlightsCard,
+  StatsPodiumCard,
+  WeeklyPresenceChartCard,
+  type HighlightItem,
+} from "./OrganizationStatsWidgets";
+import {
+  computeWeeklyPresenceSummary,
+  getMetricNumericValue,
+  sortStatsByMetric,
+  type MetricType,
+} from "../utils/organizationStatsUtils";
 
 interface OrganizationStatisticsMobileViewProps {
   org: Organization;
@@ -55,27 +65,6 @@ const PODIUM_TITLES: Record<MetricType, string> = {
   rating: "NOTA MÉDIA",
 };
 
-const getMetricValue = (
-  item: OrganizationPlayerStats | undefined,
-  metric: MetricType,
-): number => {
-  if (!item) return 0;
-  switch (metric) {
-    case "goals":
-      return item.goal || 0;
-    case "assists":
-      return item.assist || 0;
-    case "presence":
-      return item.peladas_played || 0;
-    case "titles":
-      return item.titles || 0;
-    case "rating":
-      return item.avg_rating || 0;
-    default:
-      return 0;
-  }
-};
-
 const formatMetricValue = (value: number, metric: MetricType) =>
   metric === "rating"
     ? value.toFixed(1).replace(".", ",")
@@ -95,17 +84,6 @@ const metricUnit = (metric: MetricType, value: number) => {
       return value === 1 ? "ponto" : "pontos";
   }
 };
-
-const monthLabel = (iso: string) =>
-  new Date(iso)
-    .toLocaleDateString("pt-BR", { month: "short" })
-    .replace(".", "");
-
-const dayMonth = (iso: string) =>
-  new Date(iso).toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-  });
 
 export default function OrganizationStatisticsMobileView({
   org,
@@ -129,25 +107,10 @@ export default function OrganizationStatisticsMobileView({
   const [showAll, setShowAll] = useState(false);
   const [yearAnchor, setYearAnchor] = useState<null | HTMLElement>(null);
 
-  const sortedByMetric = useMemo(() => {
-    const copy = [...stats];
-    switch (activeMetric) {
-      case "goals":
-        return copy.sort((a, b) => (b.goal || 0) - (a.goal || 0));
-      case "assists":
-        return copy.sort((a, b) => (b.assist || 0) - (a.assist || 0));
-      case "presence":
-        return copy.sort(
-          (a, b) => (b.peladas_played || 0) - (a.peladas_played || 0),
-        );
-      case "titles":
-        return copy.sort((a, b) => (b.titles || 0) - (a.titles || 0));
-      case "rating":
-        return copy.sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0));
-      default:
-        return copy;
-    }
-  }, [stats, activeMetric]);
+  const sortedByMetric = useMemo(
+    () => sortStatsByMetric(stats, activeMetric),
+    [stats, activeMetric],
+  );
 
   const first = sortedByMetric[0];
   const second = sortedByMetric[1];
@@ -173,27 +136,13 @@ export default function OrganizationStatisticsMobileView({
 
   const hiddenCount = Math.max(0, sortedByMetric.length - 7);
 
-  // Presence chart derived values
-  const presenceMax = Math.max(1, ...weeklyPresence.map((w) => w.confirmed));
-  const presenceWeeksAvg = weeklyPresence.length
-    ? Math.round(
-        weeklyPresence.reduce((acc, w) => acc + w.confirmed, 0) /
-          weeklyPresence.length,
-      )
-    : 0;
-  const worstWeek = weeklyPresence.reduce<WeeklyPresence | undefined>(
-    (min, w) => (!min || w.confirmed < min.confirmed ? w : min),
-    undefined,
+  const { presenceMax, presenceWeeksAvg, worstWeek } = useMemo(
+    () => computeWeeklyPresenceSummary(weeklyPresence),
+    [weeklyPresence],
   );
 
-  // Season highlights: one distinct player per category
-  const highlights = useMemo(() => {
-    const list: {
-      key: string;
-      player: OrganizationPlayerStats | undefined;
-      color: string;
-      label: string;
-    }[] = [];
+  const highlights: HighlightItem[] = useMemo(() => {
+    const list: HighlightItem[] = [];
     const used = new Set<string>();
 
     const pick = (
@@ -219,25 +168,25 @@ export default function OrganizationStatisticsMobileView({
       (a, b) => (b.peladas_played || 0) - (a.peladas_played || 0),
     );
 
-    const first = byTitles || byGames;
+    const firstHighlight = byTitles || byGames;
     const goldColor = theme.palette.gold?.main || theme.palette.primary.main;
-    if (first) {
-      used.add(first.player_id);
+    if (firstHighlight) {
+      used.add(firstHighlight.player_id);
       list.push(
         byTitles
           ? {
               key: "titles",
-              player: first,
+              player: firstHighlight,
               color: goldColor,
-              label: `Mais títulos · ${first.titles} noite${
-                first.titles === 1 ? "" : "s"
+              label: `Mais títulos · ${firstHighlight.titles} noite${
+                firstHighlight.titles === 1 ? "" : "s"
               }`,
             }
           : {
               key: "games",
-              player: first,
+              player: firstHighlight,
               color: goldColor,
-              label: `Mais jogos · ${first.peladas_played}`,
+              label: `Mais jogos · ${firstHighlight.peladas_played}`,
             },
       );
     }
@@ -250,24 +199,24 @@ export default function OrganizationStatisticsMobileView({
         s.peladas_played >= (s.total_peladas || totalPeladas),
       (a, b) => (b.peladas_played || 0) - (a.peladas_played || 0),
     );
-    const second = perfect || byGames;
-    if (second) {
-      used.add(second.player_id);
+    const secondHighlight = perfect || byGames;
+    if (secondHighlight) {
+      used.add(secondHighlight.player_id);
       list.push(
         perfect
           ? {
               key: "perfect",
-              player: second,
+              player: secondHighlight,
               color: AVATAR_BG_COLORS[1] || "primary.light",
-              label: `Presença perfeita · ${second.peladas_played} de ${
-                second.total_peladas || totalPeladas
+              label: `Presença perfeita · ${secondHighlight.peladas_played} de ${
+                secondHighlight.total_peladas || totalPeladas
               }`,
             }
           : {
               key: "games",
-              player: second,
+              player: secondHighlight,
               color: AVATAR_BG_COLORS[1] || "primary.light",
-              label: `Mais jogos · ${second.peladas_played}`,
+              label: `Mais jogos · ${secondHighlight.peladas_played}`,
             },
       );
     }
@@ -291,90 +240,6 @@ export default function OrganizationStatisticsMobileView({
 
     return list;
   }, [stats, totalPeladas, theme]);
-
-  const renderPodiumColumn = (
-    player: OrganizationPlayerStats | undefined,
-    position: 1 | 2 | 3,
-  ) => {
-    const isFirst = position === 1;
-    const bg =
-      position === 1
-        ? AVATAR_BG_COLORS[0] || "warning.light"
-        : position === 2
-          ? AVATAR_BG_COLORS[4] || "secondary.light"
-          : AVATAR_BG_COLORS[6] || "info.light";
-    const value = getMetricValue(player, activeMetric);
-
-    return (
-      <Box sx={{ flex: 1, textAlign: "center" }}>
-        <SecureAvatar
-          userId={player?.user_id}
-          filename={player?.avatar_filename}
-          fallbackText={getInitials(player?.player_name)}
-          sx={{
-            width: isFirst ? 48 : 40,
-            height: isFirst ? 48 : 40,
-            mx: "auto",
-            bgcolor: bg,
-            border: isFirst
-              ? (theme) =>
-                  `2.5px solid ${theme.palette.gold?.main || theme.palette.primary.main}`
-              : "none",
-            color: "text.primary",
-            font: isFirst
-              ? "800 14px Archivo,sans-serif"
-              : "800 12px Archivo,sans-serif",
-          }}
-        />
-        <Box
-          sx={{
-            bgcolor: isFirst
-              ? (theme) =>
-                  theme.palette.gold?.main || theme.palette.primary.main
-              : "action.hover",
-            borderRadius: "9px 9px 0 0",
-            mt: 1.1,
-            py: isFirst ? 1.6 : 1.1,
-          }}
-        >
-          <Typography
-            sx={{
-              font: isFirst
-                ? "700 30px/1 'Archivo Narrow',Archivo,sans-serif"
-                : "700 22px/1 'Archivo Narrow',Archivo,sans-serif",
-              color: isFirst ? "primary.contrastText" : "text.primary",
-            }}
-          >
-            {formatMetricValue(value, activeMetric)}
-          </Typography>
-          <Typography
-            noWrap
-            sx={{
-              font: isFirst
-                ? "700 9.5px/1.2 Archivo,sans-serif"
-                : "700 9px/1.2 Archivo,sans-serif",
-              color: isFirst ? "primary.contrastText" : "text.secondary",
-              mt: 0.5,
-              px: 0.5,
-            }}
-          >
-            {player?.player_name || "—"}
-          </Typography>
-          <Typography
-            sx={{
-              font: isFirst
-                ? "800 13px/1 Archivo,sans-serif"
-                : "800 12px/1 Archivo,sans-serif",
-              color: isFirst ? "primary.contrastText" : "text.secondary",
-              mt: 0.75,
-            }}
-          >
-            {position}º
-          </Typography>
-        </Box>
-      </Box>
-    );
-  };
 
   return (
     <Box sx={{ bgcolor: "background.default", minHeight: "100vh", pb: 3 }}>
@@ -693,43 +558,19 @@ export default function OrganizationStatisticsMobileView({
       {/* Podium */}
       {sortedByMetric.length > 0 && (
         <Box sx={{ px: 2.5, pt: 2 }}>
-          <Box
-            sx={{
-              bgcolor: "background.paper",
-              border: (theme) =>
-                theme.palette.brutalist?.border ||
-                `2px solid ${theme.palette.divider}`,
-              borderRadius: "18px",
-              p: 2,
-              boxShadow: (theme) =>
-                theme.palette.brutalist?.shadow ||
-                (theme.palette.mode === "dark"
-                  ? "0 4px 20px rgba(0,0,0,0.5)"
-                  : `5px 5px 0 ${theme.palette.divider}`),
-            }}
-          >
-            <Typography
-              sx={{
-                font: "700 9.5px/1 Archivo,sans-serif",
-                letterSpacing: ".18em",
-                color: "text.secondary",
-              }}
-            >
-              {PODIUM_TITLES[activeMetric]} · TEMPORADA {year}
-            </Typography>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "flex-end",
-                gap: 1.25,
-                mt: 1.75,
-              }}
-            >
-              {renderPodiumColumn(second, 2)}
-              {renderPodiumColumn(first, 1)}
-              {renderPodiumColumn(third, 3)}
-            </Box>
-          </Box>
+          <StatsPodiumCard
+            title={`${PODIUM_TITLES[activeMetric]} · TEMPORADA ${year}`}
+            first={first}
+            second={second}
+            third={third}
+            getDisplayValue={(p) =>
+              formatMetricValue(
+                getMetricNumericValue(p, activeMetric),
+                activeMetric,
+              )
+            }
+            variant="mobile"
+          />
         </Box>
       )}
 
@@ -776,16 +617,19 @@ export default function OrganizationStatisticsMobileView({
           }}
         >
           {displayedStats.map((item, idx) => {
-            const position = showAll ? idx + 4 : idx + 4;
             const me = isMe(item);
-            const value = getMetricValue(item, activeMetric);
+            const position =
+              !showAll && me && myIndex >= 7 ? myIndex + 1 : idx + 4;
+            const value = getMetricNumericValue(item, activeMetric);
             const games = item.peladas_played || 0;
             const perGame =
               games > 0 ? (value / games).toFixed(2).replace(".", ",") : "0,00";
             const gap =
               me && myIndex > 0
-                ? getMetricValue(sortedByMetric[myIndex - 1], activeMetric) -
-                  value
+                ? getMetricNumericValue(
+                    sortedByMetric[myIndex - 1],
+                    activeMetric,
+                  ) - value
                 : 0;
             const isLast = idx === displayedStats.length - 1;
             const avatarBg = me
@@ -924,173 +768,19 @@ export default function OrganizationStatisticsMobileView({
         >
           PRESENÇA DO GRUPO · 12 SEMANAS
         </Typography>
-        <Box
-          sx={{
-            bgcolor: "background.paper",
-            border: 1,
-            borderColor: "divider",
-            borderRadius: "16px",
-            p: 1.75,
-          }}
-        >
-          {weeklyPresence.length > 0 ? (
-            <>
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: "4px",
-                  alignItems: "flex-end",
-                  height: 64,
-                }}
-              >
-                {weeklyPresence.map((week) => (
-                  <Box
-                    key={week.week_start}
-                    sx={{
-                      flex: 1,
-                      height: `${Math.round(
-                        (week.confirmed / presenceMax) * 100,
-                      )}%`,
-                      bgcolor:
-                        week.confirmed < presenceWeeksAvg
-                          ? "secondary.main"
-                          : "primary.main",
-                      borderRadius: "3px",
-                    }}
-                  />
-                ))}
-              </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  mt: 1,
-                  font: "600 10px/1 Archivo,sans-serif",
-                  color: "text.secondary",
-                }}
-              >
-                <span>{monthLabel(weeklyPresence[0].week_start)}</span>
-                <span>
-                  {monthLabel(
-                    weeklyPresence[weeklyPresence.length - 1].week_start,
-                  )}
-                </span>
-              </Box>
-              <Typography
-                data-testid="presence-summary"
-                sx={{
-                  mt: 1.5,
-                  pt: 1.5,
-                  borderTop: 1,
-                  borderTopStyle: "dashed",
-                  borderColor: "divider",
-                  font: "600 11.5px/1.4 Archivo,sans-serif",
-                  color: "text.secondary",
-                }}
-              >
-                Média de{" "}
-                <Box
-                  component="strong"
-                  sx={{ color: "text.primary", fontWeight: 700 }}
-                >
-                  {presenceWeeksAvg} jogadores
-                </Box>{" "}
-                por pelada
-                {worstWeek
-                  ? ` · pior semana em ${dayMonth(
-                      worstWeek.week_start,
-                    )} com ${worstWeek.confirmed}`
-                  : ""}
-              </Typography>
-            </>
-          ) : (
-            <Typography
-              sx={{
-                font: "600 11.5px/1.4 Archivo,sans-serif",
-                color: "text.secondary",
-              }}
-            >
-              Sem dados de presença.
-            </Typography>
-          )}
-        </Box>
+        <WeeklyPresenceChartCard
+          weeklyPresence={weeklyPresence}
+          presenceMax={presenceMax}
+          presenceWeeksAvg={presenceWeeksAvg}
+          worstWeek={worstWeek}
+          variant="mobile"
+        />
       </Box>
 
       {/* Season highlights */}
       {highlights.length > 0 && (
         <Box sx={{ px: 2.5, pt: 2.5 }}>
-          <Box
-            sx={{
-              bgcolor: "background.paper",
-              border: 1,
-              borderColor: "divider",
-              borderRadius: "16px",
-              overflow: "hidden",
-            }}
-          >
-            <Typography
-              sx={{
-                p: "12px 14px",
-                borderBottom: 1,
-                borderColor: "divider",
-                font: "700 9.5px/1 Archivo,sans-serif",
-                letterSpacing: ".16em",
-                color: "text.secondary",
-              }}
-            >
-              DESTAQUES DA TEMPORADA
-            </Typography>
-            {highlights.map((highlight, idx) => (
-              <Box
-                key={highlight.key}
-                data-testid={`stats-highlight-${highlight.key}`}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1.4,
-                  p: "12px 14px",
-                  borderBottom:
-                    idx === highlights.length - 1
-                      ? "none"
-                      : (theme) => `1.5px solid ${theme.palette.divider}`,
-                }}
-              >
-                <SecureAvatar
-                  userId={highlight.player?.user_id}
-                  filename={highlight.player?.avatar_filename}
-                  fallbackText={getInitials(highlight.player?.player_name)}
-                  sx={{
-                    width: 30,
-                    height: 30,
-                    bgcolor: highlight.color,
-                    color: "text.primary",
-                    font: "800 10px Archivo,sans-serif",
-                    flexShrink: 0,
-                  }}
-                />
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography
-                    noWrap
-                    sx={{
-                      font: "700 12px/1.2 Archivo,sans-serif",
-                      color: "text.primary",
-                    }}
-                  >
-                    {highlight.player?.player_name || "—"}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      font: "600 10.5px/1.3 Archivo,sans-serif",
-                      color: "text.secondary",
-                      mt: 0.25,
-                    }}
-                  >
-                    {highlight.label}
-                  </Typography>
-                </Box>
-              </Box>
-            ))}
-          </Box>
+          <SeasonHighlightsCard items={highlights} variant="mobile" />
         </Box>
       )}
     </Box>

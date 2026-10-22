@@ -29,8 +29,6 @@ interface MatchScoreHeroProps {
   standings: StandingRow[];
   clockLabel: string;
   running: boolean;
-  homeOnFieldCount?: number;
-  awayOnFieldCount?: number;
   onToggleHistory: () => void;
   onToggleRun: () => void;
   onOpenResetConfirm: (type: "session" | "match") => void;

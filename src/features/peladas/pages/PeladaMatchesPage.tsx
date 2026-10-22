@@ -330,14 +330,18 @@ export default function PeladaMatchesPage() {
 
   useEffect(() => {
     if (pelada?.organization_id && user && !isAdmin) {
+      let cancelled = false;
       endpoints
         .listAdminsByOrganization(pelada.organization_id)
         .then((admins) => {
-          if (admins.some((a) => a.user_id === user.id)) {
+          if (!cancelled && admins.some((a) => a.user_id === user.id)) {
             setIsOrgAdmin(true);
           }
         })
         .catch((e) => console.error("Failed to check admin status", e));
+      return () => {
+        cancelled = true;
+      };
     }
   }, [pelada?.organization_id, user, isAdmin]);
 
@@ -452,6 +456,142 @@ export default function PeladaMatchesPage() {
     setResetConfirmOpen(null);
   };
 
+  const standingsContent = useMemo(
+    () => (
+      <Box>
+        <Grid container spacing={3}>
+          <Grid size={{ xs: 12, lg: 6 }}>
+            <StandingsPanel
+              standings={standings}
+              matches={matches}
+              showHighlights={isPeladaClosed}
+            />
+          </Grid>
+          <Grid size={{ xs: 12, lg: 6 }}>
+            <PlayerStatsPanel
+              playerStats={playerStats}
+              onToggleSort={togglePlayerSort}
+              showHighlights={isPeladaClosed}
+            />
+          </Grid>
+        </Grid>
+        {isAdmin && !isPeladaClosed && (
+          <Paper
+            sx={{
+              mt: 3,
+              p: 3,
+              borderRadius: 4,
+              textAlign: "center",
+            }}
+          >
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+                mb: 2,
+              }}
+            >
+              {t(
+                "peladas.matches.close_confirm_desc",
+                "Ao encerrar a pelada, todas as partidas serão finalizadas e a classificação será consolidada.",
+              )}
+            </Typography>
+            <Button
+              variant="contained"
+              color="error"
+              startIcon={<StopIcon />}
+              onClick={() => setClosePeladaConfirmOpen(true)}
+              disabled={closing}
+              data-testid="close-pelada-button"
+              sx={{ borderRadius: 2, px: 4 }}
+            >
+              {closing
+                ? t("common.sending")
+                : t("peladas.matches.button.close_pelada")}
+            </Button>
+          </Paper>
+        )}
+      </Box>
+    ),
+    [
+      standings,
+      matches,
+      isPeladaClosed,
+      playerStats,
+      togglePlayerSort,
+      isAdmin,
+      closing,
+      t,
+    ],
+  );
+
+  const timelineContent = useMemo(
+    () => (
+      <Box sx={{ p: { xs: 1, sm: 2 } }}>
+        <PeladaTimeline
+          events={matchEvents}
+          userIdToName={userIdToName}
+          orgPlayerIdToUserId={orgPlayerIdToUserId}
+          teamNameById={teamNameById}
+          matches={matches}
+          orgPlayerIdToTeamId={orgPlayerIdToTeamId}
+          lineupsByMatch={lineupsByMatch}
+          teamPlayers={teamPlayers}
+          isAdmin={isAdmin}
+          onEditClick={(event) => setEditEventDialogOpen(event)}
+          onDeleteClick={(event) => setDeleteEventConfirmOpen(event)}
+        />
+      </Box>
+    ),
+    [
+      matchEvents,
+      userIdToName,
+      orgPlayerIdToUserId,
+      teamNameById,
+      matches,
+      orgPlayerIdToTeamId,
+      lineupsByMatch,
+      teamPlayers,
+      isAdmin,
+    ],
+  );
+
+  const supportContent = useMemo(
+    () => (
+      <SupportLineupTab
+        matches={matches}
+        teams={teams}
+        teamPlayers={teamPlayers}
+        orgPlayerIdToUserId={orgPlayerIdToUserId}
+        userIdToName={userIdToName}
+        orgPlayerIdToPlayer={orgPlayerIdToPlayer}
+        attendance={attendance}
+        isAdmin={isAdmin}
+        onGenerateAll={generateSupportLineup}
+        onUpdateMatch={updateSupportLineup}
+        onRerollMatch={rerollSupportLineup}
+        onNotifyWhatsApp={
+          pelada?.organization_id ? handleNotifySupportLineup : undefined
+        }
+      />
+    ),
+    [
+      matches,
+      teams,
+      teamPlayers,
+      orgPlayerIdToUserId,
+      userIdToName,
+      orgPlayerIdToPlayer,
+      attendance,
+      isAdmin,
+      generateSupportLineup,
+      updateSupportLineup,
+      rerollSupportLineup,
+      pelada?.organization_id,
+      handleNotifySupportLineup,
+    ],
+  );
+
   if (error) return <Alert severity="error">{error}</Alert>;
   if (loading || !pelada)
     return <Loading message={t("peladas.matches.loading")} />;
@@ -469,100 +609,6 @@ export default function PeladaMatchesPage() {
     : "";
   const timeStr = scheduledDate ? scheduledDate.format("HH:mm") : "";
   const locationStr = pelada?.location || "";
-
-  const standingsContent = (
-    <Box>
-      <Grid container spacing={3}>
-        <Grid size={{ xs: 12, lg: 6 }}>
-          <StandingsPanel
-            standings={standings}
-            matches={matches}
-            showHighlights={isPeladaClosed}
-          />
-        </Grid>
-        <Grid size={{ xs: 12, lg: 6 }}>
-          <PlayerStatsPanel
-            playerStats={playerStats}
-            onToggleSort={togglePlayerSort}
-            showHighlights={isPeladaClosed}
-          />
-        </Grid>
-      </Grid>
-      {isAdmin && !isPeladaClosed && (
-        <Paper
-          sx={{
-            mt: 3,
-            p: 3,
-            borderRadius: 4,
-            textAlign: "center",
-          }}
-        >
-          <Typography
-            variant="body2"
-            sx={{
-              color: "text.secondary",
-              mb: 2,
-            }}
-          >
-            {t(
-              "peladas.matches.close_confirm_desc",
-              "Ao encerrar a pelada, todas as partidas serão finalizadas e a classificação será consolidada.",
-            )}
-          </Typography>
-          <Button
-            variant="contained"
-            color="error"
-            startIcon={<StopIcon />}
-            onClick={() => setClosePeladaConfirmOpen(true)}
-            disabled={closing}
-            data-testid="close-pelada-button"
-            sx={{ borderRadius: 2, px: 4 }}
-          >
-            {closing
-              ? t("common.sending")
-              : t("peladas.matches.button.close_pelada")}
-          </Button>
-        </Paper>
-      )}
-    </Box>
-  );
-
-  const timelineContent = (
-    <Box sx={{ p: { xs: 1, sm: 2 } }}>
-      <PeladaTimeline
-        events={matchEvents}
-        userIdToName={userIdToName}
-        orgPlayerIdToUserId={orgPlayerIdToUserId}
-        teamNameById={teamNameById}
-        matches={matches}
-        orgPlayerIdToTeamId={orgPlayerIdToTeamId}
-        lineupsByMatch={lineupsByMatch}
-        teamPlayers={teamPlayers}
-        isAdmin={isAdmin}
-        onEditClick={(event) => setEditEventDialogOpen(event)}
-        onDeleteClick={(event) => setDeleteEventConfirmOpen(event)}
-      />
-    </Box>
-  );
-
-  const supportContent = (
-    <SupportLineupTab
-      matches={matches}
-      teams={teams}
-      teamPlayers={teamPlayers}
-      orgPlayerIdToUserId={orgPlayerIdToUserId}
-      userIdToName={userIdToName}
-      orgPlayerIdToPlayer={orgPlayerIdToPlayer}
-      attendance={attendance}
-      isAdmin={isAdmin}
-      onGenerateAll={generateSupportLineup}
-      onUpdateMatch={updateSupportLineup}
-      onRerollMatch={rerollSupportLineup}
-      onNotifyWhatsApp={
-        pelada?.organization_id ? handleNotifySupportLineup : undefined
-      }
-    />
-  );
 
   return (
     <Box

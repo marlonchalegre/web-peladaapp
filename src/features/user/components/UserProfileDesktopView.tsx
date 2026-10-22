@@ -1,14 +1,20 @@
-import { useState } from "react";
-import { Box, Typography, Button, useTheme, alpha } from "@mui/material";
+import { useState, useMemo } from "react";
+import { Box, Typography, Button } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import type { User, UserProfileDashboard } from "../../../shared/api/endpoints";
 import {
   formatRating,
-  formatSkill,
   toRecentMatchRows,
+  buildProfileSkillRows,
+  calculateSkillAverage,
 } from "../utils/profileFormat";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
-import { UserGroupStatsGrid } from "./UserGroupStatsGrid";
+import {
+  ProfileGroupCardsList,
+  ProfilePresenceCard,
+  ProfileRecentMatchesCard,
+  ProfileSkillsCard,
+} from "./UserProfileWidgets";
 
 export interface UserProfileDesktopViewProps {
   user: User | null;
@@ -32,62 +38,38 @@ export default function UserProfileDesktopView({
   onEditClick,
 }: UserProfileDesktopViewProps) {
   const { t } = useTranslation();
-  const theme = useTheme();
   const [activeTab, setActiveTab] = useState<"overview" | "history">(
     "overview",
   );
 
   const summary = dashboard?.summary;
   const skills = dashboard?.skills;
-  const skillRows = [
-    {
-      label: t("user.characteristics.passing", "PASSE").toUpperCase(),
-      value: skills?.passing,
-    },
-    {
-      label: t("user.characteristics.ball_control", "DOMÍNIO").toUpperCase(),
-      value: skills?.ball_control,
-    },
-    {
-      label: t("user.characteristics.velocity", "VELOCIDADE").toUpperCase(),
-      value: skills?.velocity,
-    },
-    {
-      label: t("user.characteristics.shooting", "CHUTE").toUpperCase(),
-      value: skills?.shooting,
-    },
-    {
-      label: t("user.characteristics.dribbling", "DRIBLE").toUpperCase(),
-      value: skills?.dribbling,
-    },
-    {
-      label: t("user.characteristics.defending", "MARCAÇÃO").toUpperCase(),
-      value: skills?.defending,
-    },
-  ];
-  const skillValues = skillRows
-    .map((s) => s.value)
-    .filter((v): v is number => v != null);
-  const skillAverage = skillValues.length
-    ? skillValues.reduce((a, b) => a + b, 0) / skillValues.length
-    : null;
+  const { skillRows, skillAverage } = useMemo(() => {
+    const rows = buildProfileSkillRows(skills, t);
+    return {
+      skillRows: rows,
+      skillAverage: calculateSkillAverage(rows),
+    };
+  }, [skills, t]);
 
-  const streak = (() => {
+  const streak = useMemo(() => {
     let count = 0;
     for (const pelada of dashboard?.recent_peladas ?? []) {
       if (pelada.user) count += 1;
       else break;
     }
     return count;
-  })();
+  }, [dashboard?.recent_peladas]);
 
   const presenceWeeks = dashboard?.presence ?? [];
   const absentCount = presenceWeeks.filter(
     (week) => week.status === "absent",
   ).length;
-  const inactivePresenceColor = theme.palette.divider;
 
-  const recentMatches = toRecentMatchRows(dashboard?.recent_peladas, t);
+  const recentMatches = useMemo(
+    () => toRecentMatchRows(dashboard?.recent_peladas, t),
+    [dashboard?.recent_peladas, t],
+  );
 
   const displayName = name || user?.name || t("common.player", "Jogador");
   const displayUsername =
@@ -399,7 +381,6 @@ export default function UserProfileDesktopView({
             </Box>
           </Box>
 
-          {/* Edit Button */}
           <Button
             onClick={onEditClick}
             data-testid="edit-profile-button"
@@ -481,505 +462,33 @@ export default function UserProfileDesktopView({
             alignItems: "flex-start",
           }}
         >
-          {/* Left Column: Ficha de Habilidades + Últimas Peladas */}
+          {/* Left Column */}
           <Box sx={{ flex: 1.35, minWidth: 0 }}>
-            {/* Ficha de Habilidades Card (omitted when the player has no ratings) */}
-            {skillValues.length > 0 && (
-              <Box
-                sx={{
-                  bgcolor: "background.paper",
-                  border: (theme) =>
-                    `2px solid ${theme.palette.mode === "dark" ? theme.palette.divider : theme.palette.grey[900]}`,
-                  borderRadius: "20px",
-                  p: 2.5,
-                  boxShadow: (theme) =>
-                    `6px 6px 0 ${theme.palette.mode === "dark" ? theme.palette.common.black : theme.palette.grey[900]}`,
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "baseline",
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      fontFamily: "Archivo, sans-serif",
-                      fontWeight: 700,
-                      fontSize: "9.5px",
-                      letterSpacing: ".18em",
-                      color: "text.secondary",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    FICHA DE HABILIDADES
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontFamily: "Archivo, sans-serif",
-                      fontWeight: 700,
-                      fontSize: "11px",
-                      color: "text.secondary",
-                    }}
-                  >
-                    {skillAverage == null
-                      ? "sem avaliações"
-                      : `média ${formatSkill(skillAverage)} · ${skills?.ratings_count ?? 0} avaliações`}
-                  </Typography>
-                </Box>
-
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 1.4,
-                    mt: 2,
-                  }}
-                >
-                  {skillRows.map((skill) => {
-                    const pct =
-                      skill.value == null ? 0 : (skill.value / 5) * 100;
-                    return (
-                      <Box
-                        key={skill.label}
-                        sx={{ display: "flex", alignItems: "center", gap: 1.5 }}
-                      >
-                        <Typography
-                          sx={{
-                            width: 92,
-                            fontFamily: "Archivo, sans-serif",
-                            fontWeight: 700,
-                            fontSize: "11px",
-                            letterSpacing: ".04em",
-                            color: "text.primary",
-                          }}
-                        >
-                          {skill.label}
-                        </Typography>
-                        <Box
-                          sx={{
-                            flex: 1,
-                            height: 10,
-                            borderRadius: "5px",
-                            bgcolor: "divider",
-                            display: "flex",
-                            overflow: "hidden",
-                          }}
-                        >
-                          <Box
-                            sx={{
-                              width: `${pct}%`,
-                              bgcolor:
-                                (skill.value ?? 0) < 3
-                                  ? "secondary.main"
-                                  : "primary.main",
-                            }}
-                          />
-                        </Box>
-                        <Typography
-                          sx={{
-                            width: 26,
-                            textAlign: "right",
-                            fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                            fontWeight: 700,
-                            fontSize: "13px",
-                            color: "text.primary",
-                            lineHeight: 1,
-                          }}
-                        >
-                          {formatSkill(skill.value)}
-                        </Typography>
-                      </Box>
-                    );
-                  })}
-                </Box>
-
-                <Typography
-                  sx={{
-                    fontFamily: "Archivo, sans-serif",
-                    fontWeight: 600,
-                    fontSize: "11.5px",
-                    lineHeight: 1.45,
-                    color: "text.secondary",
-                    mt: 2,
-                    pt: 1.75,
-                    borderTop: (theme) =>
-                      `1.5px dashed ${theme.palette.divider}`,
-                  }}
-                >
-                  Notas dadas pelos companheiros depois das peladas.
-                </Typography>
-              </Box>
-            )}
-
-            {/* Últimas Peladas Card */}
-            <Box
-              sx={{
-                bgcolor: "background.paper",
-                border: "1.5px solid",
-                borderColor: "divider",
-                borderRadius: "16px",
-                overflow: "hidden",
-                mt: 2,
-              }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  p: "13px 16px",
-                  borderBottom: "1.5px solid",
-                  borderColor: "divider",
-                }}
-              >
-                <Typography
-                  sx={{
-                    fontFamily: "Archivo, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "9.5px",
-                    letterSpacing: ".16em",
-                    color: "text.secondary",
-                    textTransform: "uppercase",
-                  }}
-                >
-                  ÚLTIMAS PELADAS
-                </Typography>
-                <Typography
-                  sx={{
-                    fontFamily: "Archivo, sans-serif",
-                    fontWeight: 700,
-                    fontSize: "11px",
-                    color: "primary.main",
-                    cursor: "pointer",
-                  }}
-                >
-                  Histórico completo →
-                </Typography>
-              </Box>
-
-              {/* Match Rows */}
-              <Box sx={{ display: "flex", flexDirection: "column" }}>
-                {recentMatches.map((match, mIdx) => (
-                  <Box
-                    key={mIdx}
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1.75,
-                      p: "13px 16px",
-                      borderBottom:
-                        mIdx < recentMatches.length - 1
-                          ? (theme) => `1.5px solid ${theme.palette.divider}`
-                          : "none",
-                    }}
-                  >
-                    <Box sx={{ width: 70, flexShrink: 0 }}>
-                      <Typography
-                        sx={{
-                          fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                          fontWeight: 700,
-                          fontSize: "14px",
-                          color: "text.primary",
-                          lineHeight: 1,
-                        }}
-                      >
-                        {match.date}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontFamily: "Archivo, sans-serif",
-                          fontWeight: 600,
-                          fontSize: "10px",
-                          color: "text.secondary",
-                          mt: 0.5,
-                          lineHeight: 1,
-                        }}
-                      >
-                        {match.group}
-                      </Typography>
-                    </Box>
-
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <Typography
-                        sx={{
-                          fontFamily: "Archivo, sans-serif",
-                          fontWeight: 700,
-                          fontSize: "12px",
-                          lineHeight: 1.3,
-                          color: "text.primary",
-                        }}
-                      >
-                        {match.desc}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontFamily: "Archivo, sans-serif",
-                          fontWeight: 600,
-                          fontSize: "10.5px",
-                          lineHeight: 1.3,
-                          color: "text.secondary",
-                          mt: 0.3,
-                        }}
-                      >
-                        {match.sub}
-                      </Typography>
-                    </Box>
-
-                    {match.badge && (
-                      <Box
-                        sx={{
-                          fontFamily: "Archivo, sans-serif",
-                          fontWeight: 800,
-                          fontSize: "9px",
-                          letterSpacing: ".08em",
-                          color: "gold.contrastText",
-                          bgcolor: "gold.main",
-                          borderRadius: "6px",
-                          px: 0.9,
-                          py: 0.6,
-                          flexShrink: 0,
-                          lineHeight: 1,
-                        }}
-                      >
-                        {match.badge}
-                      </Box>
-                    )}
-
-                    <Typography
-                      sx={{
-                        width: 40,
-                        flexShrink: 0,
-                        textAlign: "right",
-                        fontFamily: "'Archivo Narrow', Archivo, sans-serif",
-                        fontWeight: 700,
-                        fontSize: "18px",
-                        lineHeight: 1,
-                        color: "text.primary",
-                      }}
-                    >
-                      {match.score}
-                    </Typography>
-                  </Box>
-                ))}
-              </Box>
-            </Box>
+            <ProfileSkillsCard
+              skillRows={skillRows}
+              skillAverage={skillAverage}
+              ratingsCount={skills?.ratings_count ?? 0}
+              variant="desktop"
+            />
+            <ProfileRecentMatchesCard
+              recentMatches={recentMatches}
+              variant="desktop"
+            />
           </Box>
 
-          {/* Right Column: Presença + Group stats + Pagamentos */}
+          {/* Right Column */}
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            {/* Presença · 12 Semanas Card */}
-            <Box
-              sx={{
-                bgcolor: "background.paper",
-                border: "1.5px solid",
-                borderColor: "divider",
-                borderRadius: "16px",
-                p: 2.25,
-              }}
-            >
-              <Typography
-                sx={{
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: 700,
-                  fontSize: "9.5px",
-                  letterSpacing: ".18em",
-                  color: "text.secondary",
-                  textTransform: "uppercase",
-                }}
-              >
-                PRESENÇA · 12 SEMANAS
-              </Typography>
+            <ProfilePresenceCard
+              presenceWeeks={presenceWeeks}
+              streak={streak}
+              absentCount={absentCount}
+              variant="desktop"
+            />
 
-              {/* 12 Bars */}
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 0.6,
-                  alignItems: "flex-end",
-                  mt: 2,
-                  height: 44,
-                }}
-              >
-                {presenceWeeks.map((week, idx) => {
-                  const color =
-                    week.status === "present"
-                      ? "primary.main"
-                      : week.status === "absent"
-                        ? "secondary.main"
-                        : inactivePresenceColor;
-                  return (
-                    <Box
-                      key={idx}
-                      sx={{
-                        flex: 1,
-                        height: week.status === "no_game" ? 18 : 44,
-                        borderRadius: "5px",
-                        bgcolor: color,
-                      }}
-                    />
-                  );
-                })}
-              </Box>
-
-              {/* Legend */}
-              <Box
-                sx={{ display: "flex", gap: 1.75, mt: 1.5, flexWrap: "wrap" }}
-              >
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
-                  <Box
-                    sx={{
-                      width: 9,
-                      height: 9,
-                      borderRadius: "2px",
-                      bgcolor: "primary.main",
-                    }}
-                  />
-                  <Typography
-                    sx={{
-                      fontFamily: "Archivo, sans-serif",
-                      fontWeight: 600,
-                      fontSize: "11px",
-                      color: "text.secondary",
-                    }}
-                  >
-                    presente
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
-                  <Box
-                    sx={{
-                      width: 9,
-                      height: 9,
-                      borderRadius: "2px",
-                      bgcolor: "secondary.main",
-                    }}
-                  />
-                  <Typography
-                    sx={{
-                      fontFamily: "Archivo, sans-serif",
-                      fontWeight: 600,
-                      fontSize: "11px",
-                      color: "text.secondary",
-                    }}
-                  >
-                    faltou
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
-                  <Box
-                    sx={{
-                      width: 9,
-                      height: 9,
-                      borderRadius: "2px",
-                      bgcolor: "divider",
-                    }}
-                  />
-                  <Typography
-                    sx={{
-                      fontFamily: "Archivo, sans-serif",
-                      fontWeight: 600,
-                      fontSize: "11px",
-                      color: "text.secondary",
-                    }}
-                  >
-                    sem jogo
-                  </Typography>
-                </Box>
-              </Box>
-
-              <Typography
-                sx={{
-                  fontFamily: "Archivo, sans-serif",
-                  fontWeight: 600,
-                  fontSize: "11.5px",
-                  lineHeight: 1.4,
-                  color: "text.secondary",
-                  mt: 1.6,
-                  pt: 1.5,
-                  borderTop: (theme) => `1.5px dashed ${theme.palette.divider}`,
-                }}
-              >
-                Maior sequência:{" "}
-                <Box
-                  component="strong"
-                  sx={{ color: "text.primary", fontWeight: 800 }}
-                >
-                  {streak} {streak === 1 ? "jogo" : "jogos"}
-                </Box>
-                {` · ${absentCount} ${absentCount === 1 ? "falta" : "faltas"} em ${presenceWeeks.length} semanas`}
-              </Typography>
-            </Box>
-
-            {/* Group Stats (per organization, real data) */}
-            {(dashboard?.groups ?? []).map((group) => (
-              <Box
-                key={group.organization_id}
-                sx={{
-                  border: "1.5px solid",
-                  borderColor: "divider",
-                  borderRadius: "16px",
-                  overflow: "hidden",
-                  bgcolor: "background.paper",
-                  mt: 1.75,
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 1,
-                    p: "11px 14px",
-                    bgcolor: (theme) =>
-                      alpha(
-                        theme.palette.primary.main,
-                        theme.palette.mode === "dark" ? 0.12 : 0.08,
-                      ),
-                    borderBottom: "1.5px solid",
-                    borderColor: "divider",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: 9,
-                      height: 9,
-                      borderRadius: "2px",
-                      bgcolor: "primary.main",
-                    }}
-                  />
-                  <Typography
-                    sx={{
-                      fontFamily: "Archivo, sans-serif",
-                      fontWeight: 800,
-                      fontSize: "11px",
-                      color: "text.primary",
-                    }}
-                  >
-                    {group.organization_name}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontFamily: "Archivo, sans-serif",
-                      fontWeight: 700,
-                      fontSize: "9.5px",
-                      letterSpacing: ".1em",
-                      color: "text.secondary",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    FUTEBOL
-                  </Typography>
-                </Box>
-
-                <UserGroupStatsGrid
-                  peladasPlayed={group.peladas_played}
-                  goals={group.goals}
-                  assists={group.assists}
-                  titles={group.titles}
-                />
-              </Box>
-            ))}
+            <ProfileGroupCardsList
+              groups={dashboard?.groups ?? []}
+              variant="desktop"
+            />
 
             {/* Pagamentos Dark Card */}
             <Box

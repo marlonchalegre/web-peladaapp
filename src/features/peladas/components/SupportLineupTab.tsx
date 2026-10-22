@@ -206,42 +206,84 @@ export default function SupportLineupTab({
     [orgPlayerIdToPlayer, orgPlayerIdToUserId, userIdToName],
   );
 
-  // Helper to get eligible resting players for a specific match
-  const getEligibleRestingPlayers = (match: Match) => {
-    const playingTeamIds = new Set([match.home_team_id, match.away_team_id]);
-    const restingTeams = teams.filter((t) => !playingTeamIds.has(t.id));
-    const restingTeamIds = new Set(restingTeams.map((t) => t.id));
+  const eligibleRestingByMatchId = useMemo(() => {
+    const map = new Map<
+      string,
+      Array<{
+        id: string;
+        name: string;
+        teamName: string;
+        dutyCount: number;
+      }>
+    >();
+    if (!isAdmin) return map;
 
-    const players: Array<{
-      id: string;
-      name: string;
-      teamName: string;
-      dutyCount: number;
-    }> = [];
+    const cacheByPair = new Map<
+      string,
+      Array<{
+        id: string;
+        name: string;
+        teamName: string;
+        dutyCount: number;
+      }>
+    >();
 
-    for (const [teamId, tPlayers] of Object.entries(teamPlayers)) {
-      if (restingTeamIds.has(teamId)) {
-        for (const p of tPlayers) {
-          if (
-            confirmedPlayerIds.size === 0 ||
-            confirmedPlayerIds.has(p.player_id)
-          ) {
-            players.push({
-              id: p.player_id,
-              name: getPlayerName(p.player_id),
-              teamName: teamNameById[teamId] || "",
-              dutyCount: dutyStats[p.player_id]?.total || 0,
-            });
+    for (const match of matches) {
+      const pairKey = `${match.home_team_id}:${match.away_team_id}`;
+      let list = cacheByPair.get(pairKey);
+      if (!list) {
+        const playingTeamIds = new Set([
+          match.home_team_id,
+          match.away_team_id,
+        ]);
+        const restingTeams = teams.filter((t) => !playingTeamIds.has(t.id));
+        const restingTeamIds = new Set(restingTeams.map((t) => t.id));
+
+        const players: Array<{
+          id: string;
+          name: string;
+          teamName: string;
+          dutyCount: number;
+        }> = [];
+
+        for (const [teamId, tPlayers] of Object.entries(teamPlayers)) {
+          if (restingTeamIds.has(teamId)) {
+            for (const p of tPlayers) {
+              if (
+                confirmedPlayerIds.size === 0 ||
+                confirmedPlayerIds.has(p.player_id)
+              ) {
+                players.push({
+                  id: p.player_id,
+                  name: getPlayerName(p.player_id),
+                  teamName: teamNameById[teamId] || "",
+                  dutyCount: dutyStats[p.player_id]?.total || 0,
+                });
+              }
+            }
           }
         }
+
+        list = players.sort((a, b) => {
+          if (a.dutyCount !== b.dutyCount) return a.dutyCount - b.dutyCount;
+          return a.name.localeCompare(b.name);
+        });
+        cacheByPair.set(pairKey, list);
       }
+      map.set(match.id, list);
     }
 
-    return players.sort((a, b) => {
-      if (a.dutyCount !== b.dutyCount) return a.dutyCount - b.dutyCount;
-      return a.name.localeCompare(b.name);
-    });
-  };
+    return map;
+  }, [
+    isAdmin,
+    matches,
+    teams,
+    teamPlayers,
+    confirmedPlayerIds,
+    getPlayerName,
+    teamNameById,
+    dutyStats,
+  ]);
 
   const handleRerollAll = async () => {
     try {
@@ -708,9 +750,7 @@ export default function SupportLineupTab({
             {matches.map((m) => {
               const homeName = teamNameById[m.home_team_id] || "Home";
               const awayName = teamNameById[m.away_team_id] || "Away";
-              const eligibleResting = isAdmin
-                ? getEligibleRestingPlayers(m)
-                : [];
+              const eligibleResting = eligibleRestingByMatchId.get(m.id) ?? [];
               const isLoading = loadingMatchId === m.id;
 
               const camUid = m.support_camera_player_id

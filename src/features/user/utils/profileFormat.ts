@@ -1,5 +1,52 @@
 import type { TFunction } from "i18next";
-import type { ProfileRecentPelada } from "../../../shared/api/endpoints";
+import type {
+  ProfileRecentPelada,
+  UserProfileDashboard,
+} from "../../../shared/api/endpoints";
+
+export interface ProfileSkillRow {
+  label: string;
+  value: number | null | undefined;
+}
+
+export function buildProfileSkillRows(
+  skills: UserProfileDashboard["skills"] | undefined,
+  t: TFunction,
+): ProfileSkillRow[] {
+  return [
+    {
+      label: t("user.characteristics.passing", "PASSE").toUpperCase(),
+      value: skills?.passing,
+    },
+    {
+      label: t("user.characteristics.ball_control", "DOMÍNIO").toUpperCase(),
+      value: skills?.ball_control,
+    },
+    {
+      label: t("user.characteristics.velocity", "VELOCIDADE").toUpperCase(),
+      value: skills?.velocity,
+    },
+    {
+      label: t("user.characteristics.shooting", "CHUTE").toUpperCase(),
+      value: skills?.shooting,
+    },
+    {
+      label: t("user.characteristics.dribbling", "DRIBLE").toUpperCase(),
+      value: skills?.dribbling,
+    },
+    {
+      label: t("user.characteristics.defending", "MARCAÇÃO").toUpperCase(),
+      value: skills?.defending,
+    },
+  ];
+}
+
+export function calculateSkillAverage(rows: ProfileSkillRow[]): number | null {
+  const values = rows.map((s) => s.value).filter((v): v is number => v != null);
+  return values.length
+    ? values.reduce((a, b) => a + b, 0) / values.length
+    : null;
+}
 
 export const formatRating = (value: number | null | undefined) =>
   value == null ? "—" : value.toFixed(1).replace(".", ",");

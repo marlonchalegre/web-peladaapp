@@ -14,7 +14,8 @@ import {
   isNetworkError,
   type OfflineActionType,
 } from "../utils/offlineQueue";
-import { isAssistForGoal } from "../utils/playerUtils";
+import { findMatchingAssistForGoal } from "../utils/playerUtils";
+import { calculateElapsedMs } from "./usePeladaTimer";
 
 const endpoints = createApi(api);
 
@@ -25,13 +26,11 @@ type TimerBearer = {
 };
 
 function computePausedTimer<T extends TimerBearer>(entity: T): T {
-  let newAccumulated = entity.timer_accumulated_ms || 0;
-  if (entity.timer_status === "running" && entity.timer_started_at) {
-    const diff = Date.now() - new Date(entity.timer_started_at).getTime();
-    if (diff > 0) {
-      newAccumulated += diff;
-    }
-  }
+  const newAccumulated = calculateElapsedMs(
+    entity.timer_started_at,
+    entity.timer_accumulated_ms,
+    entity.timer_status,
+  );
   return {
     ...entity,
     timer_status: "paused" as T["timer_status"],
@@ -85,12 +84,17 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
 
   const updateMatchInState = useCallback(
     (matchId: string, updater: (m: Match) => Match, syncRef = true) => {
+      let cachedUpdated: Match | undefined;
+      const getUpdated = (m: Match) => {
+        if (!cachedUpdated) cachedUpdated = updater(m);
+        return cachedUpdated;
+      };
       setMatches((prev: Match[]) =>
-        prev.map((m) => (m.id === matchId ? updater(m) : m)),
+        prev.map((m) => (m.id === matchId ? getUpdated(m) : m)),
       );
       if (syncRef) {
         matchesRef.current = matchesRef.current.map((m: Match) =>
-          m.id === matchId ? updater(m) : m,
+          m.id === matchId ? getUpdated(m) : m,
         );
       }
     },
@@ -243,12 +247,7 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
         }
 
         if (targetGoal.event_type === "goal") {
-          const matchingAssist = prev.find(
-            (e) =>
-              e.match_id === matchId &&
-              e.event_type === "assist" &&
-              isAssistForGoal(e, targetGoal),
-          );
+          const matchingAssist = findMatchingAssistForGoal(targetGoal, prev);
           return prev.filter(
             (e) =>
               e.id !== targetGoal.id &&
@@ -515,15 +514,17 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
         },
         matchId,
         execute: async () => {
-          if (match.timer_status === "running") {
-            await endpoints.pauseMatchTimer(matchId);
-          }
-          await endpoints.updateMatchScore(
-            matchId,
-            match.home_score ?? 0,
-            match.away_score ?? 0,
-            "finished",
-          );
+          await Promise.all([
+            ...(match.timer_status === "running"
+              ? [endpoints.pauseMatchTimer(matchId)]
+              : []),
+            endpoints.updateMatchScore(
+              matchId,
+              match.home_score ?? 0,
+              match.away_score ?? 0,
+              "finished",
+            ),
+          ]);
           await refreshData();
         },
         fallbackError: t("peladas.matches.error.end_match_failed"),
