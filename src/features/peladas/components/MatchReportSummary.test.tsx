@@ -76,6 +76,7 @@ describe("MatchReportSummary", () => {
     expect(screen.getByText("4 - 3")).toBeInTheDocument();
     expect(screen.getByText("Time 4")).toBeInTheDocument();
     expect(screen.getByText("Time 2")).toBeInTheDocument();
+    expect(screen.queryByTestId("EmojiEventsIcon")).not.toBeInTheDocument();
   });
 
   it("groups highlights correctly (x2 for double goals)", () => {

@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { vi, describe, it, expect, beforeAll } from "vitest";
-import ActiveMatchDashboard from "./ActiveMatchDashboard";
+import { vi, describe, it, expect, beforeAll, beforeEach } from "vitest";
+import ActiveMatchDashboard, {
+  MATCH_MIRROR_STORAGE_KEY,
+} from "./ActiveMatchDashboard";
 import type {
   Match,
   TeamPlayer,
@@ -604,7 +606,8 @@ describe("ActiveMatchDashboard", () => {
         </ThemeContextProvider>,
       );
 
-      const subBtn = screen.getAllByTestId("sub-button")[0];
+      const homeSection = screen.getByTestId("home-team-match-section");
+      const subBtn = within(homeSection).getAllByTestId("sub-button")[0];
       await user.click(subBtn);
 
       expect(setSelectMenu).toHaveBeenCalledWith({
@@ -628,8 +631,9 @@ describe("ActiveMatchDashboard", () => {
         </ThemeContextProvider>,
       );
 
-      // Find the add button in the empty slot
-      const emptySlot = screen.getAllByTestId("player-row-empty")[0];
+      const homeSection = screen.getByTestId("home-team-match-section");
+      const emptySlot =
+        within(homeSection).getAllByTestId("player-row-empty")[0];
       const addBtn = within(emptySlot).getByRole("button");
       await user.click(addBtn);
 
@@ -1017,6 +1021,116 @@ describe("ActiveMatchDashboard", () => {
 
       const tabButtonsBox = screen.getByTestId("tab-buttons");
       expect(tabButtonsBox).toHaveStyle({ marginTop: "12px" });
+    });
+  });
+
+  describe("team positioning and mirror toggle", () => {
+    const expectPrecedes = (first: HTMLElement, second: HTMLElement) => {
+      expect(
+        first.compareDocumentPosition(second) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    };
+
+    beforeEach(() => {
+      localStorage.clear();
+    });
+
+    it("renders home team on the left and away team on the right by default in desktop layout", () => {
+      mockDesktopMediaQuery();
+      render(
+        <ThemeContextProvider>
+          <ActiveMatchDashboard {...defaultProps} isAdmin={true} />
+        </ThemeContextProvider>,
+      );
+
+      expectPrecedes(
+        screen.getByTestId("hero-home-name"),
+        screen.getByTestId("hero-away-name"),
+      );
+      expectPrecedes(
+        screen.getByTestId("home-team-match-section"),
+        screen.getByTestId("away-team-match-section"),
+      );
+      expectPrecedes(
+        screen.getByTestId("goal-button-home"),
+        screen.getByTestId("goal-button-away"),
+      );
+    });
+
+    it("toggles mirror sides on clicking the mirror button and persists to localStorage", async () => {
+      const user = userEvent.setup();
+      mockDesktopMediaQuery();
+      render(
+        <ThemeContextProvider>
+          <ActiveMatchDashboard {...defaultProps} isAdmin={true} />
+        </ThemeContextProvider>,
+      );
+
+      const mirrorBtn = screen.getByTestId("toggle-mirror-sides");
+      expect(mirrorBtn).toBeInTheDocument();
+
+      await user.click(mirrorBtn);
+      expect(localStorage.getItem(MATCH_MIRROR_STORAGE_KEY)).toBe("true");
+
+      expectPrecedes(
+        screen.getByTestId("hero-away-name"),
+        screen.getByTestId("hero-home-name"),
+      );
+      expectPrecedes(
+        screen.getByTestId("away-team-match-section"),
+        screen.getByTestId("home-team-match-section"),
+      );
+      expectPrecedes(
+        screen.getByTestId("goal-button-away"),
+        screen.getByTestId("goal-button-home"),
+      );
+
+      await user.click(mirrorBtn);
+      expect(localStorage.getItem(MATCH_MIRROR_STORAGE_KEY)).toBe("false");
+
+      expectPrecedes(
+        screen.getByTestId("hero-home-name"),
+        screen.getByTestId("hero-away-name"),
+      );
+    });
+
+    it("loads mirrored state from localStorage when initially set", () => {
+      localStorage.setItem(MATCH_MIRROR_STORAGE_KEY, "true");
+      mockDesktopMediaQuery();
+      render(
+        <ThemeContextProvider>
+          <ActiveMatchDashboard {...defaultProps} isAdmin={true} />
+        </ThemeContextProvider>,
+      );
+
+      expectPrecedes(
+        screen.getByTestId("hero-away-name"),
+        screen.getByTestId("hero-home-name"),
+      );
+    });
+
+    it("toggles mirror sides in mobile layout", async () => {
+      const user = userEvent.setup();
+      mockMobileMediaQuery();
+      render(
+        <ThemeContextProvider>
+          <ActiveMatchDashboard {...defaultProps} isAdmin={true} />
+        </ThemeContextProvider>,
+      );
+
+      expectPrecedes(
+        screen.getByTestId("hero-home-name"),
+        screen.getByTestId("hero-away-name"),
+      );
+
+      const mirrorBtn = screen.getByTestId("toggle-mirror-sides");
+      await user.click(mirrorBtn);
+
+      expectPrecedes(
+        screen.getByTestId("hero-away-name"),
+        screen.getByTestId("hero-home-name"),
+      );
     });
   });
 });

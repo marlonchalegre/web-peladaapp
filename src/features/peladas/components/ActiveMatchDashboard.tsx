@@ -116,6 +116,8 @@ type Props = {
   supportComponent?: React.ReactNode;
 };
 
+export const MATCH_MIRROR_STORAGE_KEY = "pelada_match_mirror_sides";
+
 export default function ActiveMatchDashboard(props: Props) {
   const {
     match,
@@ -165,6 +167,29 @@ export default function ActiveMatchDashboard(props: Props) {
 
   const [goalSheet, setGoalSheet] = useState<GoalSheetState>(null);
   const [eventSheet, setEventSheet] = useState<EventSheetState>(null);
+
+  const [isMirrored, setIsMirrored] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(MATCH_MIRROR_STORAGE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  const handleToggleMirror = useCallback(() => {
+    setIsMirrored((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(MATCH_MIRROR_STORAGE_KEY, String(next));
+      } catch {
+        // ignore
+      }
+      return next;
+    });
+  }, []);
+
+  const leftSide = isMirrored ? "away" : "home";
+  const rightSide = isMirrored ? "home" : "away";
 
   const [isEditing, setIsEditing] = useState(false);
   const finishedMatch = (match.status || "").toLowerCase() === "finished";
@@ -339,7 +364,6 @@ export default function ActiveMatchDashboard(props: Props) {
               display: "flex",
               alignItems: "center",
               gap: "8px",
-              mt: side === "away" ? "16px" : 0,
               mb: "9px",
             }}
           >
@@ -393,6 +417,78 @@ export default function ActiveMatchDashboard(props: Props) {
     );
   };
 
+  const renderGoalButton = (side: "home" | "away", isMobile = false) => {
+    const isHome = side === "home";
+    const name = isHome ? homeTeamName : awayTeamName;
+    const color = isHome ? "home" : "away";
+
+    return (
+      <Button
+        key={side}
+        onClick={() => setGoalSheet({ side, step: "scorer" })}
+        data-testid={`goal-button-${side}`}
+        sx={{
+          flex: 1,
+          display: "flex",
+          flexDirection: isMobile ? "column" : "row",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: isMobile ? 0 : "12px",
+          border: 0,
+          borderRadius: "16px",
+          bgcolor: `${color}.main`,
+          color: `${color}.contrastText`,
+          py: isMobile ? "18px" : "17px",
+          pb: isMobile ? "20px" : "17px",
+          cursor: "pointer",
+          boxShadow: (theme) => `0 4px 0 ${theme.palette[color].dark}`,
+          "&:hover": { bgcolor: `${color}.dark` },
+          "&:active": {
+            transform: "translateY(3px)",
+            boxShadow: (theme) => `0 1px 0 ${theme.palette[color].dark}`,
+          },
+        }}
+      >
+        <Typography
+          component="span"
+          sx={{
+            fontFamily: "'Anton', sans-serif",
+            fontWeight: 400,
+            fontSize: isMobile ? "30px" : "26px",
+            lineHeight: 1,
+            letterSpacing: "0.04em",
+          }}
+        >
+          GOL
+        </Typography>
+        <Typography
+          component="span"
+          sx={{
+            fontFamily: "Archivo, sans-serif",
+            fontWeight: 800,
+            fontSize: isMobile ? "10px" : "11px",
+            lineHeight: 1,
+            letterSpacing: "0.14em",
+            color: `${color}.light`,
+            mt: isMobile ? "6px" : 0,
+          }}
+        >
+          {name.toUpperCase()}
+        </Typography>
+      </Button>
+    );
+  };
+
+  const getSideTeamName = (side: "home" | "away") =>
+    side === "home" ? homeTeamName : awayTeamName;
+  const getSideScore = (side: "home" | "away") =>
+    side === "home" ? match.home_score : match.away_score;
+
+  const bannerFirstTeam = getSideTeamName(leftSide);
+  const bannerFirstScore = getSideScore(leftSide);
+  const bannerSecondTeam = getSideTeamName(rightSide);
+  const bannerSecondScore = getSideScore(rightSide);
+
   const liveMatchBanner = (
     <Paper
       elevation={0}
@@ -432,8 +528,8 @@ export default function ActiveMatchDashboard(props: Props) {
           }}
         >
           {t("peladas.matches.current_match", "PARTIDA EM ANDAMENTO")}:{" "}
-          {homeTeamName} ({match.home_score}) × ({match.away_score}){" "}
-          {awayTeamName}
+          {bannerFirstTeam} ({bannerFirstScore}) × ({bannerSecondScore}){" "}
+          {bannerSecondTeam}
           {clockLabel ? ` · ${clockLabel}` : ""}
         </Typography>
       </Stack>
@@ -631,117 +727,14 @@ export default function ActiveMatchDashboard(props: Props) {
                   finished={isMatchFinished}
                   isEditing={isEditing}
                   onToggleEdit={() => setIsEditing(!isEditing)}
+                  isMirrored={isMirrored}
+                  onToggleMirror={handleToggleMirror}
                 />
 
                 {canRecord && (
                   <Box sx={{ display: "flex", gap: "14px", flexShrink: 0 }}>
-                    <Button
-                      onClick={() =>
-                        setGoalSheet({ side: "home", step: "scorer" })
-                      }
-                      data-testid="goal-button-home"
-                      sx={{
-                        flex: 1,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "12px",
-                        border: 0,
-                        borderRadius: "16px",
-                        bgcolor: "home.main",
-                        color: "home.contrastText",
-                        py: "17px",
-                        cursor: "pointer",
-                        boxShadow: (theme) =>
-                          `0 4px 0 ${theme.palette.home.dark}`,
-                        "&:hover": { bgcolor: "home.dark" },
-                        "&:active": {
-                          transform: "translateY(3px)",
-                          boxShadow: (theme) =>
-                            `0 1px 0 ${theme.palette.home.dark}`,
-                        },
-                      }}
-                    >
-                      <Typography
-                        component="span"
-                        sx={{
-                          fontFamily: "'Anton', sans-serif",
-                          fontWeight: 400,
-                          fontSize: "26px",
-                          lineHeight: 1,
-                          letterSpacing: "0.04em",
-                        }}
-                      >
-                        GOL
-                      </Typography>
-                      <Typography
-                        component="span"
-                        sx={{
-                          fontFamily: "Archivo, sans-serif",
-                          fontWeight: 800,
-                          fontSize: "11px",
-                          lineHeight: 1,
-                          letterSpacing: "0.14em",
-                          color: "home.light",
-                        }}
-                      >
-                        {homeTeamName.toUpperCase()}
-                      </Typography>
-                    </Button>
-
-                    <Button
-                      onClick={() =>
-                        setGoalSheet({ side: "away", step: "scorer" })
-                      }
-                      data-testid="goal-button-away"
-                      sx={{
-                        flex: 1,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "12px",
-                        border: 0,
-                        borderRadius: "16px",
-                        bgcolor: "away.main",
-                        color: "away.contrastText",
-                        py: "17px",
-                        cursor: "pointer",
-                        boxShadow: (theme) =>
-                          `0 4px 0 ${theme.palette.away.dark}`,
-                        "&:hover": { bgcolor: "away.dark" },
-                        "&:active": {
-                          transform: "translateY(3px)",
-                          boxShadow: (theme) =>
-                            `0 1px 0 ${theme.palette.away.dark}`,
-                        },
-                      }}
-                    >
-                      <Typography
-                        component="span"
-                        sx={{
-                          fontFamily: "'Anton', sans-serif",
-                          fontWeight: 400,
-                          fontSize: "26px",
-                          lineHeight: 1,
-                          letterSpacing: "0.04em",
-                        }}
-                      >
-                        GOL
-                      </Typography>
-                      <Typography
-                        component="span"
-                        sx={{
-                          fontFamily: "Archivo, sans-serif",
-                          fontWeight: 800,
-                          fontSize: "11px",
-                          lineHeight: 1,
-                          letterSpacing: "0.14em",
-                          color: "away.light",
-                        }}
-                      >
-                        {awayTeamName.toUpperCase()}
-                      </Typography>
-                    </Button>
+                    {renderGoalButton(leftSide, false)}
+                    {renderGoalButton(rightSide, false)}
 
                     <Button
                       onClick={() => setEventSheet({ step: "type" })}
@@ -811,8 +804,8 @@ export default function ActiveMatchDashboard(props: Props) {
                     minHeight: 0,
                   }}
                 >
-                  {teamSection("home")}
-                  {teamSection("away")}
+                  {teamSection(leftSide)}
+                  {teamSection(rightSide)}
                 </Box>
               </>
             )}
@@ -886,6 +879,8 @@ export default function ActiveMatchDashboard(props: Props) {
                 finished={isMatchFinished}
                 isEditing={isEditing}
                 onToggleEdit={() => setIsEditing(!isEditing)}
+                isMirrored={isMirrored}
+                onToggleMirror={handleToggleMirror}
               />
 
               <Box sx={{ p: "16px", pb: canRecord ? "190px" : "16px" }}>
@@ -946,8 +941,8 @@ export default function ActiveMatchDashboard(props: Props) {
                     </Typography>
                   </Box>
 
-                  {teamSection("home")}
-                  {teamSection("away")}
+                  {teamSection(leftSide)}
+                  <Box sx={{ mt: "16px" }}>{teamSection(rightSide)}</Box>
                 </Box>
 
                 {tabButtons(false)}
@@ -1005,117 +1000,8 @@ export default function ActiveMatchDashboard(props: Props) {
                       · DRIBLE, CHUTE, FALTA…
                     </Button>
                     <Box sx={{ display: "flex", gap: "10px" }}>
-                      <Button
-                        onClick={() =>
-                          setGoalSheet({ side: "home", step: "scorer" })
-                        }
-                        data-testid="goal-button-home"
-                        sx={{
-                          flex: 1,
-                          border: 0,
-                          borderRadius: "16px",
-                          bgcolor: "home.main",
-                          color: "home.contrastText",
-                          py: "18px",
-                          pb: "20px",
-                          cursor: "pointer",
-                          boxShadow: (theme) =>
-                            `0 4px 0 ${theme.palette.home.dark}`,
-                          "&:hover": { bgcolor: "home.dark" },
-                          "&:active": {
-                            transform: "translateY(3px)",
-                            boxShadow: (theme) =>
-                              `0 1px 0 ${theme.palette.home.dark}`,
-                          },
-                        }}
-                      >
-                        <Box sx={{ display: "block", textAlign: "center" }}>
-                          <Typography
-                            component="span"
-                            sx={{
-                              display: "block",
-                              fontFamily: "'Anton', sans-serif",
-                              fontWeight: 400,
-                              fontSize: "30px",
-                              lineHeight: 1,
-                              letterSpacing: "0.04em",
-                            }}
-                          >
-                            GOL
-                          </Typography>
-                          <Typography
-                            component="span"
-                            sx={{
-                              display: "block",
-                              fontFamily: "Archivo, sans-serif",
-                              fontWeight: 800,
-                              fontSize: "10px",
-                              lineHeight: 1,
-                              letterSpacing: "0.14em",
-                              color: "home.light",
-                              mt: "6px",
-                            }}
-                          >
-                            {homeTeamName.toUpperCase()}
-                          </Typography>
-                        </Box>
-                      </Button>
-
-                      <Button
-                        onClick={() =>
-                          setGoalSheet({ side: "away", step: "scorer" })
-                        }
-                        data-testid="goal-button-away"
-                        sx={{
-                          flex: 1,
-                          border: 0,
-                          borderRadius: "16px",
-                          bgcolor: "away.main",
-                          color: "away.contrastText",
-                          py: "18px",
-                          pb: "20px",
-                          cursor: "pointer",
-                          boxShadow: (theme) =>
-                            `0 4px 0 ${theme.palette.away.dark}`,
-                          "&:hover": { bgcolor: "away.dark" },
-                          "&:active": {
-                            transform: "translateY(3px)",
-                            boxShadow: (theme) =>
-                              `0 1px 0 ${theme.palette.away.dark}`,
-                          },
-                        }}
-                      >
-                        <Box sx={{ display: "block", textAlign: "center" }}>
-                          <Typography
-                            component="span"
-                            sx={{
-                              display: "block",
-                              fontFamily: "'Anton', sans-serif",
-                              fontWeight: 400,
-                              fontSize: "30px",
-                              lineHeight: 1,
-                              letterSpacing: "0.04em",
-                            }}
-                          >
-                            GOL
-                          </Typography>
-                          <Typography
-                            component="span"
-                            sx={{
-                              display: "block",
-                              fontFamily: "Archivo, sans-serif",
-                              fontWeight: 800,
-                              fontSize: "10px",
-                              lineHeight: 1,
-                              letterSpacing: "0.14em",
-                              color: "away.light",
-                              mt: "6px",
-                            }}
-                          >
-                            {awayTeamName.toUpperCase()}
-                          </Typography>
-                        </Box>
-                      </Button>
+                      {renderGoalButton(leftSide, true)}
+                      {renderGoalButton(rightSide, true)}
                     </Box>
                   </Box>
                 </Portal>

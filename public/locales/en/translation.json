@@ -1392,7 +1392,8 @@
         "end_match": "End Match",
         "edit_match": "Edit Match",
         "finish_editing": "Finish Editing",
-        "history": "History"
+        "history": "History",
+        "swap_sides": "Switch sides"
       },
       "status": {
         "finished": "MATCH FINISHED"

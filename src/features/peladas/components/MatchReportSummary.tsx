@@ -13,7 +13,6 @@ import {
 import Grid from "@mui/material/Grid";
 import CloseIcon from "@mui/icons-material/Close";
 import SportsSoccerIcon from "@mui/icons-material/SportsSoccer";
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import StopIcon from "@mui/icons-material/Stop";
 import { useTranslation } from "react-i18next";
@@ -145,8 +144,6 @@ export default function MatchReportSummary({
     : "";
 
   const isDraw = match.home_score === match.away_score;
-  const homeWinner = (match.home_score ?? 0) > (match.away_score ?? 0);
-  const awayWinner = (match.away_score ?? 0) > (match.home_score ?? 0);
 
   const renderHighlightItem = (h: GroupedEvent, align: "left" | "right") => {
     const icons = (
@@ -307,13 +304,9 @@ export default function MatchReportSummary({
             }}
           >
             <Box sx={{ textAlign: "center", flex: 1 }}>
-              <Typography
-                variant="subtitle1"
-                sx={{ fontWeight: "bold", mb: 1 }}
-              >
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
                 {homeTeamName}
               </Typography>
-              {homeWinner && <EmojiEventsIcon color="warning" />}
             </Box>
 
             <Box sx={{ textAlign: "center", px: 4 }}>
@@ -329,13 +322,9 @@ export default function MatchReportSummary({
             </Box>
 
             <Box sx={{ textAlign: "center", flex: 1 }}>
-              <Typography
-                variant="subtitle1"
-                sx={{ fontWeight: "bold", mb: 1 }}
-              >
+              <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
                 {awayTeamName}
               </Typography>
-              {awayWinner && <EmojiEventsIcon color="warning" />}
             </Box>
           </Paper>
 

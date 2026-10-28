@@ -1392,7 +1392,8 @@
         "end_match": "Encerrar Partida",
         "edit_match": "Editar Partida",
         "finish_editing": "Finalizar Edição",
-        "history": "Histórico"
+        "history": "Histórico",
+        "swap_sides": "Inverter lados"
       },
       "status": {
         "finished": "PARTIDA ENCERRADA"
