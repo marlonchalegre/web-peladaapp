@@ -16,6 +16,7 @@ import {
 } from "../utils/offlineQueue";
 import { findMatchingAssistForGoal } from "../utils/playerUtils";
 import { calculateElapsedMs } from "./usePeladaTimer";
+import { getSynchronizedNowIso } from "../../../shared/utils/timeUtils";
 
 const endpoints = createApi(api);
 
@@ -24,6 +25,17 @@ type TimerBearer = {
   timer_started_at?: string | null;
   timer_accumulated_ms?: number | null;
 };
+
+function computeRunningTimer<T extends TimerBearer>(
+  entity: T,
+  nowIso = getSynchronizedNowIso(),
+): T {
+  return {
+    ...entity,
+    timer_status: "running" as T["timer_status"],
+    timer_started_at: nowIso,
+  };
+}
 
 function computePausedTimer<T extends TimerBearer>(entity: T): T {
   const newAccumulated = calculateElapsedMs(
@@ -283,7 +295,7 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
       assistantId?: string,
       teamId?: string,
     ) => {
-      const nowIso = new Date().toISOString();
+      const nowIso = getSynchronizedNowIso();
       const newEvent = {
         id: String(Date.now()),
         match_id: matchId,
@@ -533,27 +545,54 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
     [matchesRef, updateMatchInState, runOfflineAction, refreshData, t],
   );
 
+  // Timer State Updaters
+  const applyPeladaTimerUpdate = useCallback(
+    (updatedPelada?: Pelada) => {
+      if (updatedPelada?.id) {
+        setPelada((prev) =>
+          prev
+            ? {
+                ...prev,
+                ...updatedPelada,
+                timer_started_at: updatedPelada.timer_started_at ?? null,
+              }
+            : updatedPelada,
+        );
+      } else {
+        return refreshData();
+      }
+    },
+    [refreshData, setPelada],
+  );
+
+  const applyMatchTimerUpdate = useCallback(
+    (matchId: string, updatedMatch?: Match) => {
+      if (updatedMatch?.id) {
+        updateMatchInState(matchId, (m) => ({
+          ...m,
+          ...updatedMatch,
+          timer_started_at: updatedMatch.timer_started_at ?? null,
+        }));
+      } else {
+        return refreshData();
+      }
+    },
+    [refreshData, updateMatchInState],
+  );
+
   // Timer Actions
   const startPeladaTimer = useCallback(async () => {
     setPelada((prev: Pelada | null) =>
-      prev
-        ? {
-            ...prev,
-            timer_status: "running" as Pelada["timer_status"],
-            timer_started_at: new Date().toISOString(),
-          }
-        : prev,
+      prev ? computeRunningTimer(prev) : prev,
     );
 
     await runOfflineAction({
       actionType: "START_PELADA_TIMER",
       payload: { peladaId },
-      execute: async () => {
-        await endpoints.startPeladaTimer(peladaId);
-        await refreshData();
-      },
+      execute: async () =>
+        applyPeladaTimerUpdate(await endpoints.startPeladaTimer(peladaId)),
     });
-  }, [peladaId, refreshData, setPelada, runOfflineAction]);
+  }, [peladaId, applyPeladaTimerUpdate, setPelada, runOfflineAction]);
 
   const pausePeladaTimer = useCallback(async () => {
     setPelada((prev: Pelada | null) =>
@@ -563,12 +602,10 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
     await runOfflineAction({
       actionType: "PAUSE_PELADA_TIMER",
       payload: { peladaId },
-      execute: async () => {
-        await endpoints.pausePeladaTimer(peladaId);
-        await refreshData();
-      },
+      execute: async () =>
+        applyPeladaTimerUpdate(await endpoints.pausePeladaTimer(peladaId)),
     });
-  }, [peladaId, refreshData, setPelada, runOfflineAction]);
+  }, [peladaId, applyPeladaTimerUpdate, setPelada, runOfflineAction]);
 
   const resetPeladaTimer = useCallback(async () => {
     setPelada((prev: Pelada | null) => (prev ? computeResetTimer(prev) : prev));
@@ -576,34 +613,31 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
     await runOfflineAction({
       actionType: "RESET_PELADA_TIMER",
       payload: { peladaId },
-      execute: async () => {
-        await endpoints.resetPeladaTimer(peladaId);
-        await refreshData();
-      },
+      execute: async () =>
+        applyPeladaTimerUpdate(await endpoints.resetPeladaTimer(peladaId)),
     });
-  }, [peladaId, refreshData, setPelada, runOfflineAction]);
+  }, [peladaId, applyPeladaTimerUpdate, setPelada, runOfflineAction]);
 
   const startMatchTimer = useCallback(
     async (matchId: string) => {
-      const nowIso = new Date().toISOString();
+      const nowIso = getSynchronizedNowIso();
       updateMatchInState(matchId, (m) => ({
-        ...m,
+        ...computeRunningTimer(m, nowIso),
         status:
           m.status === "scheduled" ? ("running" as Match["status"]) : m.status,
-        timer_status: "running" as Match["timer_status"],
-        timer_started_at: nowIso,
       }));
 
       await runOfflineAction({
         actionType: "START_MATCH_TIMER",
         payload: { matchId },
-        execute: async () => {
-          await endpoints.startMatchTimer(matchId);
-          await refreshData();
-        },
+        execute: async () =>
+          applyMatchTimerUpdate(
+            matchId,
+            await endpoints.startMatchTimer(matchId),
+          ),
       });
     },
-    [refreshData, updateMatchInState, runOfflineAction],
+    [applyMatchTimerUpdate, updateMatchInState, runOfflineAction],
   );
 
   const pauseMatchTimer = useCallback(
@@ -613,13 +647,14 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
       await runOfflineAction({
         actionType: "PAUSE_MATCH_TIMER",
         payload: { matchId },
-        execute: async () => {
-          await endpoints.pauseMatchTimer(matchId);
-          await refreshData();
-        },
+        execute: async () =>
+          applyMatchTimerUpdate(
+            matchId,
+            await endpoints.pauseMatchTimer(matchId),
+          ),
       });
     },
-    [refreshData, updateMatchInState, runOfflineAction],
+    [applyMatchTimerUpdate, updateMatchInState, runOfflineAction],
   );
 
   const resetMatchTimer = useCallback(
@@ -629,13 +664,14 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
       await runOfflineAction({
         actionType: "RESET_MATCH_TIMER",
         payload: { matchId },
-        execute: async () => {
-          await endpoints.resetMatchTimer(matchId);
-          await refreshData();
-        },
+        execute: async () =>
+          applyMatchTimerUpdate(
+            matchId,
+            await endpoints.resetMatchTimer(matchId),
+          ),
       });
     },
-    [refreshData, updateMatchInState, runOfflineAction],
+    [applyMatchTimerUpdate, updateMatchInState, runOfflineAction],
   );
 
   const generateSupportLineup = useCallback(async () => {

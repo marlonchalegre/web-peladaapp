@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api } from "../../../shared/api/client";
+import { syncServerTime } from "../../../shared/utils/timeUtils";
 import {
   createApi,
   type Match,
@@ -170,7 +171,11 @@ export function usePeladaData(
       };
 
       try {
+        const fetchStart = Date.now();
         const data = await endpoints.getPeladaDashboardData(peladaId);
+        if (data.server_time) {
+          syncServerTime(data.server_time, Date.now() - fetchStart);
+        }
         if (currentSeq !== fetchSeqRef.current) {
           return;
         }

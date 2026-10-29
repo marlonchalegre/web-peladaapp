@@ -303,6 +303,7 @@ export interface WeeklyPresence {
 export type MatchLineupEntry = TeamPlayer;
 export interface PeladaDashboardDataResponse {
   pelada: Pelada;
+  server_time?: string;
   matches: Match[];
   teams: Team[];
   users: User[];

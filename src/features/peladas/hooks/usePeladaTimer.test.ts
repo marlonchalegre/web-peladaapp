@@ -1,14 +1,20 @@
 import { renderHook, act } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { usePeladaTimer } from "./usePeladaTimer";
+import {
+  resetServerTimeOffsetForTesting,
+  syncServerTimeFromDateHeader,
+} from "../../../shared/utils/timeUtils";
 
 describe("usePeladaTimer", () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    resetServerTimeOffsetForTesting();
   });
 
   afterEach(() => {
     vi.useRealTimers();
+    resetServerTimeOffsetForTesting();
   });
 
   it("should calculate elapsed time when running", () => {
@@ -89,5 +95,33 @@ describe("usePeladaTimer", () => {
 
     expect(result.current.elapsedMs).toBe(0);
     expect(result.current.formattedTime).toBe("00:00:00");
+  });
+
+  it("regression: starts and ticks immediately when server clock is minutes ahead of client clock after sync", () => {
+    const clientBaseTime = 1000000;
+    vi.setSystemTime(clientBaseTime);
+
+    // Server is 3 minutes (180,000 ms) ahead of client device
+    const serverTime = clientBaseTime + 180000;
+    const startedAt = new Date(serverTime).toISOString();
+
+    // Client receives response from server with HTTP Date header
+    syncServerTimeFromDateHeader(new Date(serverTime).toUTCString(), 50);
+
+    const { result } = renderHook(() =>
+      usePeladaTimer(startedAt, 0, "running", false),
+    );
+
+    // Initial render should already have synchronized time
+    expect(result.current.elapsedMs).toBeGreaterThanOrEqual(0);
+
+    // Advance 1 second on client
+    act(() => {
+      vi.advanceTimersByTime(1000);
+      vi.setSystemTime(clientBaseTime + 1000);
+    });
+
+    expect(result.current.elapsedMs).toBeGreaterThanOrEqual(1000);
+    expect(result.current.formattedTime).toBe("00:00:01");
   });
 });

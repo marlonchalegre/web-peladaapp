@@ -1,3 +1,5 @@
+import { isServerTimeSynced, syncServerTime } from "../utils/timeUtils";
+
 export type ApiConfig = {
   baseUrl?: string;
 };
@@ -83,6 +85,7 @@ export class ApiClient {
   ): Promise<Response> {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeout);
+    const requestStart = Date.now();
 
     try {
       const response = await fetch(url, {
@@ -91,6 +94,14 @@ export class ApiClient {
         signal: controller.signal,
       });
       clearTimeout(id);
+
+      if (!isServerTimeSynced()) {
+        const dateHeader = response.headers.get("date");
+        if (dateHeader) {
+          syncServerTime(dateHeader, Date.now() - requestStart);
+        }
+      }
+
       return response;
     } catch (error: unknown) {
       clearTimeout(id);

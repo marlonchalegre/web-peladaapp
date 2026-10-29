@@ -1,20 +1,23 @@
 import { useState, useEffect, useMemo } from "react";
 import type { TimerStatus } from "../../../shared/api/endpoints";
+import { getSynchronizedNow } from "../../../shared/utils/timeUtils";
 
 export function calculateElapsedMs(
   startedAt: string | null | undefined,
   accumulatedMs: number | null | undefined,
   status: TimerStatus | null | undefined,
   isParentClosed: boolean = false,
-  now: number = Date.now(),
+  now: number = getSynchronizedNow(),
 ): number {
   const effectiveRunning = status === "running" && !isParentClosed;
   let elapsed = accumulatedMs || 0;
   if (effectiveRunning && startedAt && now > 0) {
     const startTime = new Date(startedAt).getTime();
-    const diff = now - startTime;
-    if (diff > 0) {
-      elapsed += diff;
+    if (!isNaN(startTime)) {
+      const diff = now - startTime;
+      if (diff > 0) {
+        elapsed += diff;
+      }
     }
   }
   return Math.max(0, elapsed);
@@ -30,27 +33,34 @@ export function usePeladaTimer(
   onReset?: () => Promise<void>,
 ) {
   const effectiveRunning = status === "running" && !isParentClosed;
-  const [now, setNow] = useState(() => (effectiveRunning ? Date.now() : 0));
+  const [now, setNow] = useState(() =>
+    effectiveRunning ? getSynchronizedNow() : 0,
+  );
 
   useEffect(() => {
     if (effectiveRunning) {
-      setNow(Date.now());
+      setNow(getSynchronizedNow());
       const interval = setInterval(() => {
-        setNow(Date.now());
+        setNow(getSynchronizedNow());
       }, 1000);
       return () => clearInterval(interval);
     }
   }, [effectiveRunning]);
 
   const elapsedMs = useMemo(() => {
+    const effectiveNow = effectiveRunning
+      ? now > 0
+        ? now
+        : getSynchronizedNow()
+      : 0;
     return calculateElapsedMs(
       startedAt,
       accumulatedMs,
       status,
       isParentClosed,
-      now,
+      effectiveNow,
     );
-  }, [startedAt, accumulatedMs, status, isParentClosed, now]);
+  }, [startedAt, accumulatedMs, status, isParentClosed, now, effectiveRunning]);
 
   const formatTime = (ms: number) => {
     const seconds = Math.floor((ms / 1000) % 60);
