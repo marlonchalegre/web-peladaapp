@@ -23,8 +23,7 @@ vi.mock("../../../app/providers/AuthContext", () => ({
 // Mock react-i18next
 const mockT = (key: string, arg2?: unknown, arg3?: unknown) => {
   const options = (typeof arg2 === "object" ? arg2 : arg3) as
-    | Record<string, string>
-    | undefined;
+    Record<string, string> | undefined;
   if (key === "admin.dialogs.reset_password.description") {
     return `Digite a nova senha para o usuário ${options?.name} (@${options?.username}).`;
   }

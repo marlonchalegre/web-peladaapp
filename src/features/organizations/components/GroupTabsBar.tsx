@@ -4,11 +4,7 @@ import { useTranslation } from "react-i18next";
 import type { OrganizationFeatureFlags } from "../../../shared/api/endpoints";
 
 export type GroupTabKey =
-  | "agenda"
-  | "roster"
-  | "statistics"
-  | "finance"
-  | "settings";
+  "agenda" | "roster" | "statistics" | "finance" | "settings";
 
 interface GroupTabsBarProps {
   orgId: string;

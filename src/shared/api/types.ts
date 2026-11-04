@@ -432,10 +432,7 @@ export interface FinanceSummary {
 }
 
 export type AttendanceStatus =
-  | "confirmed"
-  | "declined"
-  | "pending"
-  | "waitlist";
+  "confirmed" | "declined" | "pending" | "waitlist";
 export interface Attendance {
   id?: string;
   pelada_id?: string;
@@ -618,8 +615,7 @@ export interface DrawChemistryJustification extends DrawJustificationBase {
 }
 
 export type DrawJustification =
-  | DrawTacticalJustification
-  | DrawChemistryJustification;
+  DrawTacticalJustification | DrawChemistryJustification;
 
 export interface RandomizeTeamsResponse {
   success: boolean;

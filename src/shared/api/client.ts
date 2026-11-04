@@ -7,8 +7,7 @@ export type ApiConfig = {
 function getBaseUrl(): string {
   if (typeof window !== "undefined") return ""; // use vite proxy in dev
   const globalAny = globalThis as
-    | { process?: { env?: Record<string, string | undefined> } }
-    | undefined;
+    { process?: { env?: Record<string, string | undefined> } } | undefined;
   const fromNode = globalAny?.process?.env?.API_BASE_URL;
   return fromNode ?? "";
 }

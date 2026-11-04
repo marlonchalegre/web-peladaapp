@@ -3,11 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router-dom";
 
 export type PeladaTabKey =
-  | "attendance"
-  | "teams"
-  | "matches"
-  | "voting"
-  | "results";
+  "attendance" | "teams" | "matches" | "voting" | "results";
 
 export interface PeladaTabsBarProps {
   peladaId: string;

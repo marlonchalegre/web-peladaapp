@@ -61,9 +61,7 @@ const mockDashboard: UserProfileDashboard = {
   presence: Array.from({ length: 12 }, (_, i) => ({
     week_start: `2026-0${(i % 9) + 1}-01`,
     status: (i === 3 ? "absent" : i === 6 ? "no_game" : "present") as
-      | "present"
-      | "absent"
-      | "no_game",
+      "present" | "absent" | "no_game",
   })),
   recent_peladas: [
     {

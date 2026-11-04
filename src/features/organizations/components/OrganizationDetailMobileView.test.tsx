@@ -202,7 +202,11 @@ describe("OrganizationDetailMobileView", () => {
     expect(screen.getByText(/FUTEBOL · MENSALISTA/)).toBeInTheDocument();
     expect(screen.getByText("PRÓXIMA PELADA")).toBeInTheDocument();
     expect(screen.getByText("BORA PRO JOGO")).toBeInTheDocument();
-    expect(screen.getByText(/14/)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        (_content, node) => node?.textContent === "14 de 24 na lista",
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByText("PÓDIO DA TEMPORADA")).toBeInTheDocument();
     expect(screen.getByText("ARTILHEIRO")).toBeInTheDocument();
     expect(screen.getByText("GARÇOM")).toBeInTheDocument();
