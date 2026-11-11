@@ -169,6 +169,35 @@ describe("PeladaVotingResultsPage Restricted Access", () => {
     expect(screen.getByText("common.positions.unknown")).toBeInTheDocument();
     expect(screen.getByText("common.positions.striker")).toBeInTheDocument();
     expect(screen.getByText("common.positions.goalkeeper")).toBeInTheDocument();
+
+    // Voter transparency should NOT be visible for non-admins
+    expect(
+      screen.queryByText("peladas.voting.results.voter_transparency"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("renders voter transparency for admins", async () => {
+    const adminResults = {
+      mvp: [],
+      striker: [],
+      garcom: [],
+      total_voted: 1,
+      total_eligible: 1,
+      is_admin: true,
+      voters: [{ player_id: "p1", name: "Player A", has_voted: true }],
+      organization_id: "org1",
+      organization_name: "Org Name",
+    };
+
+    vi.mocked(api.get).mockResolvedValueOnce(adminResults);
+
+    renderWithProviders();
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("peladas.voting.results.voter_transparency"),
+      ).toBeInTheDocument();
+    });
   });
 
   it("handles restricted view navigation links when organization details load successfully", async () => {

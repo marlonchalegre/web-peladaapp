@@ -362,6 +362,7 @@ export interface VotingResults {
   voters: VoterStatusItem[];
   total_eligible: number;
   total_voted: number;
+  is_admin?: boolean;
   organization_id?: string;
   organization_name?: string;
 }

@@ -476,8 +476,9 @@ export default function PeladaVotingResultsPage() {
             {/* Full Ranking Table */}
             <FullRankingTable mvp={displayResults!.mvp} />
 
-            {/* Voter Transparency */}
-            <VoterTransparency voters={displayResults!.voters} />
+            {Boolean(
+              displayResults?.is_admin && displayResults.voters?.length,
+            ) && <VoterTransparency voters={displayResults!.voters} />}
           </Grid>
         </Box>
       </Container>

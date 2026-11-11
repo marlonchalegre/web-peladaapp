@@ -1331,7 +1331,7 @@
       "info": {
         "already_voted": "Você já votou nesta pelada. Você pode alterar seus votos até o fim do período de votação.",
         "already_voted_view_change": "Você já votou. Você pode ver seus votos abaixo e alterá-los até o fim do período de votação.",
-        "instructions": "Vote em todos os jogadores que participaram da pelada (exceto você mesmo). O voto é obrigatório para todos os jogadores listados. Use de 1 a 5 estrelas.",
+        "instructions": "Vote em todos os jogadores do seu time (exceto você mesmo). O voto é obrigatório para todos os jogadores listados. Use de 1 a 5 estrelas.",
         "admin_instructions": "Como administrador, você pode habilitar ou desabilitar a votação para os jogadores que participaram desta pelada."
       },
       "button": {
@@ -1345,7 +1345,9 @@
         "title": "Status da Votação",
         "voted": "Já votaram",
         "pending": "Aguardando",
-        "none": "Ninguém votou ainda"
+        "none": "Ninguém votou ainda",
+        "votes_count": "{{voted}} de {{total}} votos registrados",
+        "confidential_hint": "Por questões de privacidade, a lista de quem já votou é visível apenas para administradores."
       },
       "results": {
         "title": "Resultados da Votação",

@@ -23,6 +23,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  LinearProgress,
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import PendingIcon from "@mui/icons-material/Pending";
@@ -338,6 +339,15 @@ export default function PeladaVotingPage() {
       </Container>
     );
   }
+
+  const votingProgress = votingStatus?.total_eligible
+    ? Math.min(
+        100,
+        Math.round(
+          ((votingStatus.total_voted ?? 0) / votingStatus.total_eligible) * 100,
+        ),
+      )
+    : 0;
 
   return (
     <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
@@ -709,18 +719,46 @@ export default function PeladaVotingPage() {
               </Typography>
               <Divider sx={{ mb: 2 }} />
 
-              <VoterStatusGroup
-                title={t("peladas.voting.status.voted")}
-                voters={votersByStatus.voted}
-                hasVoted={true}
-                emptyText={t("peladas.voting.status.none")}
-              />
+              {isAdmin ? (
+                <>
+                  <VoterStatusGroup
+                    title={t("peladas.voting.status.voted")}
+                    voters={votersByStatus.voted}
+                    hasVoted={true}
+                    emptyText={t("peladas.voting.status.none")}
+                  />
 
-              <VoterStatusGroup
-                title={t("peladas.voting.status.pending")}
-                voters={votersByStatus.pending}
-                hasVoted={false}
-              />
+                  <VoterStatusGroup
+                    title={t("peladas.voting.status.pending")}
+                    voters={votersByStatus.pending}
+                    hasVoted={false}
+                  />
+                </>
+              ) : (
+                <Box>
+                  <Typography
+                    variant="body2"
+                    sx={{ fontWeight: "bold", mb: 1 }}
+                  >
+                    {t("peladas.voting.status.votes_count", {
+                      voted: votingStatus?.total_voted ?? 0,
+                      total: votingStatus?.total_eligible ?? 0,
+                    })}
+                  </Typography>
+                  <LinearProgress
+                    variant="determinate"
+                    value={votingProgress}
+                    sx={{ height: 8, borderRadius: 4, mb: 2 }}
+                  />
+                  <Typography
+                    variant="caption"
+                    component="p"
+                    sx={{ color: "text.secondary" }}
+                  >
+                    {t("peladas.voting.status.confidential_hint")}
+                  </Typography>
+                </Box>
+              )}
             </Paper>
           </Grid>
         </Grid>

@@ -262,7 +262,8 @@ describe("PeladaVotingPage", () => {
     });
   });
 
-  it("renders voting status sidebar", async () => {
+  it("renders voting status sidebar for admin", async () => {
+    const adminInfo = { ...mockVotingInfo, is_admin: true };
     const status = {
       voters: [
         { player_id: "11", name: "Voter 11", has_voted: true },
@@ -271,7 +272,7 @@ describe("PeladaVotingPage", () => {
       total_eligible: 2,
       total_voted: 1,
     };
-    setupMocks(mockVotingInfo, status);
+    setupMocks(adminInfo, status);
 
     render(
       <MemoryRouter initialEntries={["/peladas/1/voting"]}>
@@ -289,6 +290,34 @@ describe("PeladaVotingPage", () => {
       ).toBeInTheDocument();
       expect(
         screen.getByText("peladas.voting.status.pending (1)"),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("renders confidential voting status sidebar for non-admin without disclosing voters", async () => {
+    const status = {
+      voters: [],
+      total_eligible: 2,
+      total_voted: 1,
+    };
+    setupMocks(mockVotingInfo, status);
+
+    render(
+      <MemoryRouter initialEntries={["/peladas/1/voting"]}>
+        <Routes>
+          <Route path="/peladas/:id/voting" element={<PeladaVotingPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByText("Voter 11")).not.toBeInTheDocument();
+      expect(screen.queryByText("Voter 12")).not.toBeInTheDocument();
+      expect(
+        screen.getByText("peladas.voting.status.votes_count"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("peladas.voting.status.confidential_hint"),
       ).toBeInTheDocument();
     });
   });
@@ -331,6 +360,7 @@ describe("PeladaVotingPage", () => {
   it("renders player avatars in the voting cards and status sidebar", async () => {
     const infoWithAvatars = {
       ...mockVotingInfo,
+      is_admin: true,
       eligible_players: [
         {
           player_id: "11",
