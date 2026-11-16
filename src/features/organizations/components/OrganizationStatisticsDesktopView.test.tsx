@@ -7,7 +7,7 @@ import {
   cleanup,
 } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { ThemeProvider } from "@mui/material";
+import { ThemeProvider, type PaletteMode } from "@mui/material";
 import { getTheme } from "../../../lib/theme";
 import type { ComponentProps } from "react";
 import OrganizationStatisticsDesktopView from "./OrganizationStatisticsDesktopView";
@@ -102,11 +102,16 @@ describe("OrganizationStatisticsDesktopView", () => {
     weeklyPresence,
   };
 
-  const renderView = (props: Partial<ViewProps> = {}) =>
+  const renderView = (
+    props: Partial<ViewProps> = {},
+    mode: PaletteMode = "light",
+  ) =>
     render(
-      <MemoryRouter>
-        <OrganizationStatisticsDesktopView {...defaultProps} {...props} />
-      </MemoryRouter>,
+      <ThemeProvider theme={getTheme(mode)}>
+        <MemoryRouter>
+          <OrganizationStatisticsDesktopView {...defaultProps} {...props} />
+        </MemoryRouter>
+      </ThemeProvider>,
     );
 
   beforeEach(() => {
@@ -158,16 +163,19 @@ describe("OrganizationStatisticsDesktopView", () => {
   });
 
   it("renders correctly in dark mode without throwing errors", () => {
-    const darkTheme = getTheme("dark");
-    const { container } = render(
-      <ThemeProvider theme={darkTheme}>
-        <MemoryRouter>
-          <OrganizationStatisticsDesktopView {...defaultProps} />
-        </MemoryRouter>
-      </ThemeProvider>,
-    );
+    const { container } = renderView({}, "dark");
 
     expect(screen.getByText("Estatísticas da temporada")).toBeInTheDocument();
     expect(container).toBeInTheDocument();
+  });
+
+  it("renders admin import and export buttons with readable contrast against dark header banner in light mode", () => {
+    renderView({ isAdmin: true }, "light");
+
+    const importBtn = screen.getByTestId("import-stats-button");
+    const exportBtn = screen.getByTestId("export-stats-button");
+
+    expect(window.getComputedStyle(importBtn).color).toBe("rgb(255, 255, 255)");
+    expect(window.getComputedStyle(exportBtn).color).toBe("rgb(255, 255, 255)");
   });
 });

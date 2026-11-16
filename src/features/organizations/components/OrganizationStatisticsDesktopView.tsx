@@ -49,6 +49,23 @@ interface OrganizationStatisticsDesktopViewProps {
   weeklyPresence?: WeeklyPresence[];
 }
 
+const HEADER_ACTION_BUTTON_SX = {
+  borderColor: "rgba(255,255,255,0.3)",
+  color: "inherit",
+  fontFamily: "Archivo, sans-serif",
+  fontWeight: 800,
+  fontSize: "11px",
+  letterSpacing: ".06em",
+  borderRadius: "10px",
+  py: 0.8,
+  px: 1.5,
+  textTransform: "uppercase",
+  "&:hover": {
+    borderColor: "currentColor",
+    bgcolor: "action.hover",
+  },
+} as const;
+
 export default function OrganizationStatisticsDesktopView({
   org,
   stats,
@@ -233,6 +250,7 @@ export default function OrganizationStatisticsDesktopView({
         <Box
           sx={{
             bgcolor: isDark ? "action.hover" : "text.primary",
+            color: theme.palette.brutalist?.cardHeaderText || "common.white",
             border: isDark ? "1px solid rgba(255,255,255,0.12)" : "none",
             borderRadius: "18px",
             p: "24px 26px",
@@ -267,7 +285,7 @@ export default function OrganizationStatisticsDesktopView({
                   fontFamily: "Archivo, sans-serif",
                   fontWeight: 800,
                   fontSize: "26px",
-                  color: isDark ? "text.primary" : "background.paper",
+                  color: "inherit",
                   mt: 0.8,
                 }}
               >
@@ -287,22 +305,7 @@ export default function OrganizationStatisticsDesktopView({
                     startIcon={<FileUploadIcon sx={{ fontSize: 16 }} />}
                     onClick={onOpenImport}
                     data-testid="import-stats-button"
-                    sx={{
-                      borderColor: "divider",
-                      color: "inherit",
-                      fontFamily: "Archivo, sans-serif",
-                      fontWeight: 800,
-                      fontSize: "11px",
-                      letterSpacing: ".06em",
-                      borderRadius: "10px",
-                      py: 0.8,
-                      px: 1.5,
-                      textTransform: "uppercase",
-                      "&:hover": {
-                        borderColor: "text.primary",
-                        bgcolor: "action.hover",
-                      },
-                    }}
+                    sx={HEADER_ACTION_BUTTON_SX}
                   >
                     {t("common.import", "Importar")}
                   </Button>
@@ -312,22 +315,7 @@ export default function OrganizationStatisticsDesktopView({
                     startIcon={<FileDownloadIcon sx={{ fontSize: 16 }} />}
                     onClick={onOpenExport}
                     data-testid="export-stats-button"
-                    sx={{
-                      borderColor: "divider",
-                      color: "inherit",
-                      fontFamily: "Archivo, sans-serif",
-                      fontWeight: 800,
-                      fontSize: "11px",
-                      letterSpacing: ".06em",
-                      borderRadius: "10px",
-                      py: 0.8,
-                      px: 1.5,
-                      textTransform: "uppercase",
-                      "&:hover": {
-                        borderColor: "text.primary",
-                        bgcolor: "action.hover",
-                      },
-                    }}
+                    sx={HEADER_ACTION_BUTTON_SX}
                   >
                     {t("common.export", "Exportar")}
                   </Button>
@@ -347,14 +335,14 @@ export default function OrganizationStatisticsDesktopView({
                   fontWeight: 800,
                   fontSize: "11px",
                   letterSpacing: ".06em",
-                  color: isDark ? "text.primary" : "background.paper",
+                  color: "inherit",
                   bgcolor: "transparent",
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
                   gap: 0.6,
                   "&:hover": {
-                    borderColor: isDark ? "text.primary" : "background.paper",
+                    borderColor: "currentColor",
                     bgcolor: "action.hover",
                   },
                 }}
