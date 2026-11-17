@@ -178,6 +178,50 @@ export function getPlayerTeamInMatch(
   return null;
 }
 
+export function comparePlayersByArrival(
+  a: {
+    arrival_order?: number | null;
+    attendance_updated_at?: string;
+    user?: { name?: string };
+  },
+  b: {
+    arrival_order?: number | null;
+    attendance_updated_at?: string;
+    user?: { name?: string };
+  },
+): number {
+  const aoA = a.arrival_order ?? 999999;
+  const aoB = b.arrival_order ?? 999999;
+  if (aoA !== aoB) return aoA - aoB;
+  const uaA = a.attendance_updated_at || "";
+  const uaB = b.attendance_updated_at || "";
+  if (uaA && uaB && uaA !== uaB) return uaA.localeCompare(uaB);
+  return (a.user?.name || "").localeCompare(b.user?.name || "");
+}
+
+export const ARRIVAL_DRAW_ALGORITHMS = [
+  {
+    id: "arrival_fifo",
+    nameKey: "peladas.detail.draw.algorithm.arrival_fifo.name",
+    defaultName: "Ordem de Chegada",
+    tagKey: "peladas.detail.draw.algorithm.arrival_fifo.tag",
+    defaultTag: "Chegada",
+    descKey: "peladas.detail.draw.algorithm.arrival_fifo.description",
+    defaultDesc:
+      "Forma os times na ordem em que os jogadores chegaram (ou confirmaram). Os extras ficam de próximo.",
+  },
+  {
+    id: "arrival_first_balanced",
+    nameKey: "peladas.detail.draw.algorithm.arrival_first_balanced.name",
+    defaultName: "Chegada + Equilíbrio",
+    tagKey: "peladas.detail.draw.algorithm.arrival_first_balanced.tag",
+    defaultTag: "1º Jogo",
+    descKey: "peladas.detail.draw.algorithm.arrival_first_balanced.description",
+    defaultDesc:
+      "Os primeiros que chegam jogam o 1º jogo equilibrados entre Time 1 e Time 2; o restante segue a fila.",
+  },
+] as const;
+
 /**
  * Checks whether an event is the assist associated with a given goal.
  * Matches by parent_event_id or identical session and match timestamps.

@@ -20,7 +20,9 @@ import type {
   PeladaFormatConfig,
   KnockoutTiebreaker,
   WinnerStaysOnDrawRule,
-} from "../../../shared/api/endpoints";
+  WinnerStaysOnRotationMode,
+  CompleteTeamRule,
+} from "../../../shared/api/types";
 
 interface PeladaFormatOption {
   id: PeladaFormat;
@@ -61,7 +63,7 @@ const PELADA_FORMAT_OPTIONS: PeladaFormatOption[] = [
   },
   {
     id: "winner_stays_on",
-    minTeams: 3,
+    minTeams: 2,
     titleKey: "peladas.formats.winner_stays_on.title",
     defaultTitle: "Quem Ganha Fica / Rei da Quadra",
     descKey: "peladas.formats.winner_stays_on.desc",
@@ -114,6 +116,10 @@ export default function PeladaFormatSelector({
   const drawRule: WinnerStaysOnDrawRule =
     formatConfig.draw_rule || "challenger_stays";
   const maxConsecutiveWins = formatConfig.max_consecutive_wins ?? 0;
+  const rotationMode: WinnerStaysOnRotationMode =
+    formatConfig.rotation_mode || "team_queue";
+  const completeTeamRule: CompleteTeamRule =
+    formatConfig.complete_team_rule || "least_played";
 
   return (
     <Box data-testid="pelada-format-selector">
@@ -463,6 +469,88 @@ export default function PeladaFormatSelector({
                     {t(
                       "peladas.formats.wso.limit_3",
                       "3 jogos seguidos (depois reveza)",
+                    )}
+                  </MenuItem>
+                </Select>
+              </FormControl>
+              <FormControl fullWidth size="small">
+                <InputLabel id="wso-rotation-mode-label">
+                  {t(
+                    "peladas.formats.wso.rotation_mode_label",
+                    "Modo de fila / rodízio",
+                  )}
+                </InputLabel>
+                <Select
+                  labelId="wso-rotation-mode-label"
+                  value={rotationMode}
+                  label={t(
+                    "peladas.formats.wso.rotation_mode_label",
+                    "Modo de fila / rodízio",
+                  )}
+                  data-testid="wso-rotation-mode-select"
+                  disabled={disabled}
+                  onChange={(e) =>
+                    onFormatConfigChange({
+                      ...formatConfig,
+                      rotation_mode: e.target
+                        .value as WinnerStaysOnRotationMode,
+                    })
+                  }
+                >
+                  <MenuItem value="team_queue">
+                    {t(
+                      "peladas.formats.wso.team_queue",
+                      "Times Fixos + Completar se Faltar",
+                    )}
+                  </MenuItem>
+                  <MenuItem value="player_queue">
+                    {t(
+                      "peladas.formats.wso.player_queue",
+                      "Fila de Próximo Misturado (Banco + Quem Saiu)",
+                    )}
+                  </MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth size="small">
+                <InputLabel id="wso-complete-rule-label">
+                  {t(
+                    "peladas.formats.wso.complete_rule_label",
+                    "Como completar o time (quando faltar jogador)",
+                  )}
+                </InputLabel>
+                <Select
+                  labelId="wso-complete-rule-label"
+                  value={completeTeamRule}
+                  label={t(
+                    "peladas.formats.wso.complete_rule_label",
+                    "Como completar o time (quando faltar jogador)",
+                  )}
+                  data-testid="wso-complete-rule-select"
+                  disabled={disabled}
+                  onChange={(e) =>
+                    onFormatConfigChange({
+                      ...formatConfig,
+                      complete_team_rule: e.target.value as CompleteTeamRule,
+                    })
+                  }
+                >
+                  <MenuItem value="least_played">
+                    {t(
+                      "peladas.formats.wso.least_played",
+                      "Mais descansados / Menos jogos seguidos",
+                    )}
+                  </MenuItem>
+                  <MenuItem value="balanced">
+                    {t(
+                      "peladas.formats.wso.balanced",
+                      "Equilibrar por Nota e Posição",
+                    )}
+                  </MenuItem>
+                  <MenuItem value="random">
+                    {t(
+                      "peladas.formats.wso.random",
+                      "Sorteio entre os que saíram",
                     )}
                   </MenuItem>
                 </Select>

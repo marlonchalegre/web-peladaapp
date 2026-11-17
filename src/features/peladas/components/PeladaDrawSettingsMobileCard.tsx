@@ -10,6 +10,8 @@ import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { useTranslation } from "react-i18next";
 import type { DrawAlgorithm, Pelada } from "../../../shared/api/endpoints";
+import { ARRIVAL_DRAW_ALGORITHMS } from "../utils/playerUtils";
+import { DrawSecondaryActions } from "./DrawAlgorithmShared";
 
 export interface MobileDrawSettingsCardProps {
   pelada: Pelada;
@@ -25,6 +27,8 @@ export interface MobileDrawSettingsCardProps {
   onUpdatePlayersPerTeam?: (num: number) => void;
   onToggleFixedGk: (val: boolean) => void;
   onExecuteDraw: () => void;
+  onOpenArrivalOrder?: () => void;
+  onOpenCaptainDraft?: () => void;
 }
 
 export function MobileDrawSettingsCard({
@@ -41,6 +45,8 @@ export function MobileDrawSettingsCard({
   onUpdatePlayersPerTeam,
   onToggleFixedGk,
   onExecuteDraw,
+  onOpenArrivalOrder,
+  onOpenCaptainDraft,
 }: MobileDrawSettingsCardProps) {
   const { t } = useTranslation();
 
@@ -360,6 +366,84 @@ export function MobileDrawSettingsCard({
               )}
             </Typography>
           </Box>
+
+          {ARRIVAL_DRAW_ALGORITHMS.map((item) => {
+            const selected = selectedAlgorithm === item.id;
+            return (
+              <Box
+                key={item.id}
+                onClick={() => setSelectedAlgorithm(item.id)}
+                data-testid={`mobile-algo-${item.id}`}
+                sx={{
+                  border: selected
+                    ? (theme) => `2px solid ${theme.palette.primary.main}`
+                    : "1.5px solid",
+                  borderColor: selected ? "primary.main" : "divider",
+                  bgcolor: (theme) =>
+                    selected
+                      ? theme.palette.status?.paid?.bg || "action.hover"
+                      : "background.paper",
+                  borderRadius: "12px",
+                  p: 1.5,
+                  cursor: "pointer",
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
+                  <Box
+                    sx={{
+                      width: 16,
+                      height: 16,
+                      borderRadius: "50%",
+                      border: selected
+                        ? (theme) => `5px solid ${theme.palette.primary.main}`
+                        : "2px solid",
+                      borderColor: selected ? "primary.main" : "divider",
+                      bgcolor: "background.paper",
+                    }}
+                  />
+                  <Typography
+                    sx={{
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: selected ? 800 : 700,
+                      fontSize: "12.5px",
+                      color: "text.primary",
+                      flex: 1,
+                    }}
+                  >
+                    {t(item.nameKey, item.defaultName)}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 800,
+                      fontSize: "8.5px",
+                      letterSpacing: ".08em",
+                      color: "text.secondary",
+                      border: "1.5px solid",
+                      borderColor: "divider",
+                      borderRadius: "5px",
+                      px: 0.6,
+                      py: 0.25,
+                    }}
+                  >
+                    {t(item.tagKey, item.defaultTag)}
+                  </Typography>
+                </Box>
+                <Typography
+                  sx={{
+                    fontFamily: "Archivo, sans-serif",
+                    fontWeight: 600,
+                    fontSize: "11px",
+                    color: "text.secondary",
+                    mt: 0.75,
+                    pl: 3.2,
+                  }}
+                >
+                  {t(item.descKey, item.defaultDesc)}
+                </Typography>
+              </Box>
+            );
+          })}
         </Box>
 
         {/* Formato do sorteio: número de times e jogadores por time */}
@@ -661,6 +745,13 @@ export function MobileDrawSettingsCard({
             t("peladas.teams.draw_button", "SORTEAR")
           )}
         </Button>
+
+        <DrawSecondaryActions
+          processing={processing}
+          onOpenArrivalOrder={onOpenArrivalOrder}
+          onOpenCaptainDraft={onOpenCaptainDraft}
+          borderRadius="10px"
+        />
       </Box>
     </Box>
   );

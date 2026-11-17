@@ -17,6 +17,8 @@ import {
 import ShuffleIcon from "@mui/icons-material/Shuffle";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import RuleIcon from "@mui/icons-material/Rule";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import BalanceIcon from "@mui/icons-material/Balance";
 import HistoryIcon from "@mui/icons-material/History";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
@@ -40,6 +42,8 @@ const ALGORITHM_ICONS: Record<DrawAlgorithm, SvgIconComponent> = {
   classic: ShuffleIcon,
   gemini: AutoAwesomeIcon,
   gpt: RuleIcon,
+  arrival_fifo: AccessTimeIcon,
+  arrival_first_balanced: BalanceIcon,
 };
 
 export default function RandomizeTeamsDialog({
@@ -53,8 +57,8 @@ export default function RandomizeTeamsDialog({
   const [algorithm, setAlgorithm] = useState<DrawAlgorithm>("classic");
   const [useHistory, setUseHistory] = useState(true);
 
-  // The classic count has no historical signals to switch on.
-  const supportsHistory = algorithm !== "classic";
+  // Only AI algorithms (Gemini/GPT) use historical chemistry/stats.
+  const supportsHistory = algorithm === "gemini" || algorithm === "gpt";
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">

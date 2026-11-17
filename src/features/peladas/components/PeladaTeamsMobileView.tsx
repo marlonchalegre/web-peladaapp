@@ -75,6 +75,8 @@ export interface PeladaTeamsMobileViewProps {
   onReversePayment?: (playerId: string) => void;
   onAddPlayersClick?: () => void;
   onRemovePlayerFromPelada?: (player: PlayerWithUser) => void;
+  onOpenArrivalOrder?: () => void;
+  onOpenCaptainDraft?: () => void;
 }
 
 export default function PeladaTeamsMobileView({
@@ -105,6 +107,8 @@ export default function PeladaTeamsMobileView({
   onReversePayment,
   onAddPlayersClick,
   onRemovePlayerFromPelada,
+  onOpenArrivalOrder,
+  onOpenCaptainDraft,
 }: PeladaTeamsMobileViewProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -473,6 +477,8 @@ export default function PeladaTeamsMobileView({
           onUpdatePlayersPerTeam={onUpdatePlayersPerTeam}
           onToggleFixedGk={onToggleFixedGk}
           onExecuteDraw={handleExecuteDraw}
+          onOpenArrivalOrder={onOpenArrivalOrder}
+          onOpenCaptainDraft={onOpenCaptainDraft}
         />
       )}
 

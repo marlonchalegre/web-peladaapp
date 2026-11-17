@@ -7,7 +7,11 @@ import { useTranslation } from "react-i18next";
 import type { DrawAlgorithm, Pelada } from "../../../shared/api/endpoints";
 import type { PlayerWithUser } from "./TeamsSection";
 import { SecureAvatar } from "../../../shared/components/SecureAvatar";
-import { getPlayerAvatarProps } from "../utils/playerUtils";
+import {
+  ARRIVAL_DRAW_ALGORITHMS,
+  getPlayerAvatarProps,
+} from "../utils/playerUtils";
+import { DrawSecondaryActions } from "./DrawAlgorithmShared";
 
 interface FixedGkSlotProps {
   side: "home" | "away";
@@ -157,6 +161,8 @@ type DesktopDrawSettingsCardProps = {
   dropToFixedGk: (e: DragEvent<HTMLElement>, side: "home" | "away") => void;
   removeFixedGk: (side: "home" | "away") => void;
   onRandomizeClick: () => void;
+  onOpenArrivalOrder?: () => void;
+  onOpenCaptainDraft?: () => void;
 };
 
 export function DesktopDrawSettingsCard({
@@ -178,6 +184,8 @@ export function DesktopDrawSettingsCard({
   dropToFixedGk,
   removeFixedGk,
   onRandomizeClick,
+  onOpenArrivalOrder,
+  onOpenCaptainDraft,
 }: DesktopDrawSettingsCardProps) {
   const { t } = useTranslation();
 
@@ -502,6 +510,87 @@ export function DesktopDrawSettingsCard({
               )}
             </Typography>
           </Box>
+
+          {ARRIVAL_DRAW_ALGORITHMS.map((item) => {
+            const selected = algorithm === item.id;
+            return (
+              <Box
+                key={item.id}
+                onClick={() => setAlgorithm(item.id)}
+                data-testid={`algo-${item.id}`}
+                sx={{
+                  border: selected
+                    ? (theme) => `2px solid ${theme.palette.primary.main}`
+                    : "1.5px solid",
+                  borderColor: selected ? "primary.main" : "divider",
+                  bgcolor: (theme) =>
+                    selected
+                      ? theme.palette.status?.paid?.bg || "action.hover"
+                      : "background.paper",
+                  borderRadius: "14px",
+                  p: 1.5,
+                  cursor: "pointer",
+                  transition: "all 0.15s ease",
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1.25 }}>
+                  <Box
+                    sx={{
+                      width: 16,
+                      height: 16,
+                      borderRadius: "50%",
+                      border: selected
+                        ? (theme) => `5px solid ${theme.palette.primary.main}`
+                        : "2px solid",
+                      borderColor: selected ? "primary.main" : "divider",
+                      bgcolor: "background.paper",
+                      flexShrink: 0,
+                    }}
+                  />
+                  <Typography
+                    sx={{
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: selected ? 800 : 700,
+                      fontSize: "12.5px",
+                      color: "text.primary",
+                      flex: 1,
+                    }}
+                  >
+                    {t(item.nameKey, item.defaultName)}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontFamily: "Archivo, sans-serif",
+                      fontWeight: 800,
+                      fontSize: "8.5px",
+                      letterSpacing: ".08em",
+                      color: "text.secondary",
+                      border: "1.5px solid",
+                      borderColor: "divider",
+                      borderRadius: "5px",
+                      px: 0.6,
+                      py: 0.3,
+                    }}
+                  >
+                    {t(item.tagKey, item.defaultTag)}
+                  </Typography>
+                </Box>
+                <Typography
+                  sx={{
+                    fontFamily: "Archivo, sans-serif",
+                    fontWeight: 600,
+                    fontSize: "11px",
+                    lineHeight: 1.4,
+                    color: "text.secondary",
+                    mt: 1,
+                    pl: 3.25,
+                  }}
+                >
+                  {t(item.descKey, item.defaultDesc)}
+                </Typography>
+              </Box>
+            );
+          })}
         </Box>
 
         {isAdmin && (
@@ -813,6 +902,14 @@ export function DesktopDrawSettingsCard({
         >
           {t("peladas.teams.draw_button", "SORTEAR")}
         </Button>
+
+        {isAdmin && (
+          <DrawSecondaryActions
+            processing={processing}
+            onOpenArrivalOrder={onOpenArrivalOrder}
+            onOpenCaptainDraft={onOpenCaptainDraft}
+          />
+        )}
       </Box>
     </Box>
   );

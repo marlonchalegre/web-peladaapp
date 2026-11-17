@@ -25,6 +25,8 @@ import StartPeladaDialog from "../components/StartPeladaDialog";
 import SwapPlayerDialog from "../components/SwapPlayerDialog";
 import PrettyConfirmDialog from "../../../shared/components/PrettyConfirmDialog";
 import AddPlayersFromOrgDialog from "../components/AddPlayersFromOrgDialog";
+import ArrivalOrderDialog from "../components/ArrivalOrderDialog";
+import CaptainDraftDialog from "../components/CaptainDraftDialog";
 import { generateExportText, copyToClipboard } from "../utils/exportUtils";
 
 export default function PeladaDetailPage() {
@@ -77,13 +79,42 @@ export default function PeladaDetailPage() {
     peladaTransactions,
     handleAddPlayersFromOrg,
     handleRemovePlayerFromPelada,
+    handleSaveArrivalOrder: saveArrivalOrder,
+    handleConfirmCaptainDraft: confirmCaptainDraft,
     allPlayerIdsInPelada,
   } = usePeladaDetail(peladaId);
 
   const [justificationDialogOpen, setJustificationDialogOpen] = useState(false);
   const [addPlayersDialogOpen, setAddPlayersDialogOpen] = useState(false);
+  const [arrivalOrderOpen, setArrivalOrderOpen] = useState(false);
+  const [captainDraftOpen, setCaptainDraftOpen] = useState(false);
   const [playerToRemove, setPlayerToRemove] = useState<PlayerWithUser | null>(
     null,
+  );
+
+  const allConfirmedPlayers = useMemo(() => {
+    const map = new Map<string, PlayerWithUser>();
+    Object.values(teamPlayers)
+      .flat()
+      .forEach((p) => map.set(p.id, p));
+    benchPlayers.forEach((p) => map.set(p.id, p));
+    return Array.from(map.values());
+  }, [teamPlayers, benchPlayers]);
+
+  const handleSaveArrivalOrder = useCallback(
+    async (orderedPlayerIds: string[], runDrawAfter?: boolean) => {
+      await saveArrivalOrder(orderedPlayerIds, runDrawAfter);
+      setArrivalOrderOpen(false);
+    },
+    [saveArrivalOrder],
+  );
+
+  const handleConfirmCaptainDraft = useCallback(
+    async (draftedTeams: Record<string, string[]>) => {
+      await confirmCaptainDraft(draftedTeams);
+      setCaptainDraftOpen(false);
+    },
+    [confirmCaptainDraft],
   );
 
   const handleRequestRemovePlayer = useCallback((player: PlayerWithUser) => {
@@ -357,6 +388,8 @@ export default function PeladaDetailPage() {
           onReversePayment={onReverseClick}
           onAddPlayersClick={handleOpenAddPlayers}
           onRemovePlayerFromPelada={handleRequestRemovePlayer}
+          onOpenArrivalOrder={() => setArrivalOrderOpen(true)}
+          onOpenCaptainDraft={() => setCaptainDraftOpen(true)}
         />
       ) : (
         <PeladaTeamsMobileView
@@ -392,6 +425,8 @@ export default function PeladaDetailPage() {
           onReversePayment={onReverseClick}
           onAddPlayersClick={handleOpenAddPlayers}
           onRemovePlayerFromPelada={handleRequestRemovePlayer}
+          onOpenArrivalOrder={() => setArrivalOrderOpen(true)}
+          onOpenCaptainDraft={() => setCaptainDraftOpen(true)}
         />
       )}
 
@@ -401,6 +436,26 @@ export default function PeladaDetailPage() {
           setJustificationDialogOpen(false);
         }}
         justification={drawJustification}
+      />
+
+      <ArrivalOrderDialog
+        open={arrivalOrderOpen}
+        onClose={() => setArrivalOrderOpen(false)}
+        players={allConfirmedPlayers}
+        numTeams={pelada.num_teams || teams.length || 2}
+        playersPerTeam={pelada.players_per_team || 5}
+        processing={processing}
+        onSaveOrder={handleSaveArrivalOrder}
+      />
+
+      <CaptainDraftDialog
+        open={captainDraftOpen}
+        onClose={() => setCaptainDraftOpen(false)}
+        teams={teams}
+        players={allConfirmedPlayers}
+        playersPerTeam={pelada.players_per_team || 5}
+        processing={processing}
+        onConfirmDraft={handleConfirmCaptainDraft}
       />
 
       <StartPeladaDialog

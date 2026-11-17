@@ -646,6 +646,57 @@ export function usePeladaDetail(peladaId: string) {
     }, "Swap failed");
   };
 
+  const handleSaveArrivalOrder = useCallback(
+    async (orderedPlayerIds: string[], runDrawAfter?: boolean) => {
+      if (!peladaId) return;
+      await withProcessingLock(
+        async () => {
+          await endpoints.updateArrivalOrder(peladaId, orderedPlayerIds);
+          if (runDrawAfter) {
+            const playersPerTeam = pelada?.players_per_team || 5;
+            const numTeams = pelada?.num_teams || teams.length || 2;
+            const res = await api.post<RandomizeTeamsResponse>(
+              `/api/peladas/${peladaId}/teams/randomize`,
+              {
+                player_ids: orderedPlayerIds,
+                players_per_team: playersPerTeam,
+                num_teams: numTeams,
+                algorithm: "arrival_fifo",
+                use_history: false,
+              },
+            );
+            updateDrawJustification(res?.justification ?? null);
+          }
+          await fetchPeladaData();
+        },
+        t("peladas.detail.error.action_failed", "Ação falhou"),
+      );
+    },
+    [
+      peladaId,
+      pelada?.players_per_team,
+      pelada?.num_teams,
+      teams.length,
+      withProcessingLock,
+      fetchPeladaData,
+      t,
+    ],
+  );
+
+  const handleConfirmCaptainDraft = useCallback(
+    async (draftedTeams: Record<string, string[]>) => {
+      if (!peladaId) return;
+      await withProcessingLock(
+        async () => {
+          await endpoints.replacePeladaTeamsPlayers(peladaId, draftedTeams);
+          await fetchPeladaData();
+        },
+        t("peladas.detail.error.action_failed", "Ação falhou"),
+      );
+    },
+    [peladaId, withProcessingLock, fetchPeladaData, t],
+  );
+
   const allPlayerIdsInPelada = useMemo(() => {
     const ids = new Set<string>();
     Object.values(teamPlayers)
@@ -708,6 +759,8 @@ export function usePeladaDetail(peladaId: string) {
     handleRemovePlayerFromPelada,
     handleMarkPaid,
     handleReversePayment,
+    handleSaveArrivalOrder,
+    handleConfirmCaptainDraft,
     allPlayerIdsInPelada,
     fetchPeladaData,
   };

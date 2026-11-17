@@ -537,15 +537,20 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
             ...(match.timer_status === "running"
               ? [endpoints.pauseMatchTimer(matchId)]
               : []),
-            endpoints.updateMatchScore(
-              matchId,
-              match.home_score ?? 0,
-              match.away_score ?? 0,
-              "finished",
-              winnerTeamId !== undefined
-                ? { winner_team_id: winnerTeamId }
-                : undefined,
-            ),
+            winnerTeamId !== undefined
+              ? endpoints.updateMatchScore(
+                  matchId,
+                  match.home_score ?? 0,
+                  match.away_score ?? 0,
+                  "finished",
+                  { winner_team_id: winnerTeamId },
+                )
+              : endpoints.updateMatchScore(
+                  matchId,
+                  match.home_score ?? 0,
+                  match.away_score ?? 0,
+                  "finished",
+                ),
           ]);
           await refreshData();
         },

@@ -75,6 +75,8 @@ export interface PeladaTeamsDesktopViewProps {
   onReversePayment?: (playerId: string) => void;
   onAddPlayersClick?: () => void;
   onRemovePlayerFromPelada?: (player: PlayerWithUser) => void;
+  onOpenArrivalOrder?: () => void;
+  onOpenCaptainDraft?: () => void;
 }
 
 const VEST_KEYS = [
@@ -117,6 +119,8 @@ export default function PeladaTeamsDesktopView({
   currentUser,
   onAddPlayersClick,
   onRemovePlayerFromPelada,
+  onOpenArrivalOrder,
+  onOpenCaptainDraft,
 }: PeladaTeamsDesktopViewProps) {
   const { t } = useTranslation();
   const [algorithm, setAlgorithm] = useState<DrawAlgorithm>("classic");
@@ -469,6 +473,8 @@ export default function PeladaTeamsDesktopView({
               dropToFixedGk={dropToFixedGk}
               removeFixedGk={removeFixedGk}
               onRandomizeClick={handleRandomizeClick}
+              onOpenArrivalOrder={onOpenArrivalOrder}
+              onOpenCaptainDraft={onOpenCaptainDraft}
             />
 
             {/* Por Que Ficou Assim Card */}

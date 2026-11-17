@@ -81,6 +81,8 @@ export interface Player {
   dribbling?: number;
   defending?: number;
   user_email?: string;
+  arrival_order?: number | null;
+  attendance_updated_at?: string;
 }
 export interface MonthlyPlayerSubstitution {
   id: string;
@@ -134,6 +136,8 @@ export type PeladaFormat =
 export type KnockoutTiebreaker = "best_campaign" | "penalties";
 export type WinnerStaysOnDrawRule =
   "challenger_stays" | "defender_stays" | "both_leave";
+export type WinnerStaysOnRotationMode = "team_queue" | "player_queue";
+export type CompleteTeamRule = "least_played" | "balanced" | "random";
 
 export interface PeladaFormatConfig {
   matches_per_team?: number;
@@ -141,6 +145,8 @@ export interface PeladaFormatConfig {
   include_third_place?: boolean;
   draw_rule?: WinnerStaysOnDrawRule;
   max_consecutive_wins?: number;
+  rotation_mode?: WinnerStaysOnRotationMode;
+  complete_team_rule?: CompleteTeamRule;
 }
 
 export type MatchStage =
@@ -151,6 +157,8 @@ export const DEFAULT_PELADA_FORMAT_CONFIG: PeladaFormatConfig = {
   include_third_place: false,
   draw_rule: "challenger_stays",
   max_consecutive_wins: 0,
+  rotation_mode: "team_queue",
+  complete_team_rule: "least_played",
 };
 
 export interface Pelada {
@@ -513,7 +521,13 @@ export interface PeladaFullDetailsResponse {
  * - `gemini`: cost-driven chemistry draw.
  * - `gpt`: constraint-first tactical draw.
  */
-export const DRAW_ALGORITHMS = ["classic", "gemini", "gpt"] as const;
+export const DRAW_ALGORITHMS = [
+  "classic",
+  "gemini",
+  "gpt",
+  "arrival_fifo",
+  "arrival_first_balanced",
+] as const;
 
 export type DrawAlgorithm = (typeof DRAW_ALGORITHMS)[number];
 

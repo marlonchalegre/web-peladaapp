@@ -306,6 +306,15 @@ export function createApi(client: ApiClient) {
           enabled,
         },
       ),
+    updateArrivalOrder: (id: string, playerIds: string[]) =>
+      client.post<{ updated: number }>(
+        `/api/peladas/${id}/attendance/arrival-order`,
+        { player_ids: playerIds },
+      ),
+    replacePeladaTeamsPlayers: (id: string, teams: Record<string, string[]>) =>
+      client.put<{ assigned: number }>(`/api/peladas/${id}/teams/players`, {
+        teams,
+      }),
 
     startPeladaTimer: (id: string) =>
       client.post<Pelada>(`/api/peladas/${id}/timer/start`, {}),

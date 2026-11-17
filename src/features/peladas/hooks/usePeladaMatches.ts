@@ -47,7 +47,11 @@ export function usePeladaMatches(peladaId: string) {
     matchId: string,
     winnerTeamId?: string | null,
   ) => {
-    await actions.executeEndMatch(matchId, winnerTeamId);
+    if (winnerTeamId !== undefined) {
+      await actions.executeEndMatch(matchId, winnerTeamId);
+    } else {
+      await actions.executeEndMatch(matchId);
+    }
     setJustFinishedMatchId(matchId);
 
     // If no more matches are scheduled or running, stop all timers
