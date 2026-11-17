@@ -54,6 +54,10 @@ export default function PeladaDetailPage() {
     setStartDialogOpen,
     matchesPerTeam,
     setMatchesPerTeam,
+    format,
+    setFormat,
+    formatConfig,
+    setFormatConfig,
     onDragStartPlayer,
     dropToBench,
     dropToTeam,
@@ -405,6 +409,11 @@ export default function PeladaDetailPage() {
         onMatchesChange={setMatchesPerTeam}
         onClose={() => setStartDialogOpen(false)}
         onConfirm={handleBeginPelada}
+        teamCount={teams.length}
+        format={format}
+        formatConfig={formatConfig}
+        onFormatChange={setFormat}
+        onFormatConfigChange={setFormatConfig}
       />
 
       <PrettyConfirmDialog

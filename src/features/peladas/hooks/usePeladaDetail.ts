@@ -12,6 +12,8 @@ import { api } from "../../../shared/api/client";
 import {
   createApi,
   type Pelada,
+  type PeladaFormat,
+  type PeladaFormatConfig,
   type Team,
   type Player,
   type VotingInfo,
@@ -21,6 +23,7 @@ import {
   type DrawJustification,
   type RandomizeTeamsResponse,
 } from "../../../shared/api/endpoints";
+import { DEFAULT_PELADA_FORMAT_CONFIG } from "../../../shared/api/types";
 import { useAuth } from "../../../app/providers/AuthContext";
 import { distinctById, sortPlayersByPosition } from "../utils/playerUtils";
 
@@ -99,6 +102,10 @@ export function usePeladaDetail(peladaId: string) {
 
   const [startDialogOpen, setStartDialogOpen] = useState(false);
   const [matchesPerTeam, setMatchesPerTeam] = useState("2");
+  const [format, setFormat] = useState<PeladaFormat>("round_robin");
+  const [formatConfig, setFormatConfig] = useState<PeladaFormatConfig>(
+    DEFAULT_PELADA_FORMAT_CONFIG,
+  );
 
   const teamPlayers = useMemo(() => {
     const playersByTeam: Record<
@@ -139,6 +146,18 @@ export function usePeladaDetail(peladaId: string) {
       }
 
       setPelada(data.pelada);
+      if (data.pelada.format) {
+        setFormat(data.pelada.format as PeladaFormat);
+      }
+      if (data.pelada.format_config) {
+        setFormatConfig((prev) => ({
+          ...prev,
+          ...data.pelada.format_config,
+        }));
+        if (data.pelada.format_config.matches_per_team) {
+          setMatchesPerTeam(String(data.pelada.format_config.matches_per_team));
+        }
+      }
       const dedupedTeams = (data.teams || []).map((team) => ({
         ...team,
         players: sortPlayersByPosition(distinctById(team.players)),
@@ -438,7 +457,28 @@ export function usePeladaDetail(peladaId: string) {
     setChangingStatus(true);
     try {
       const matches = parseInt(matchesPerTeam, 10);
-      await endpoints.beginPelada(peladaId, isNaN(matches) ? 0 : matches);
+      const effectiveMatches = isNaN(matches) ? 0 : matches;
+      const hasCustomFormat =
+        Boolean(pelada?.format && pelada.format !== "round_robin") ||
+        format !== "round_robin" ||
+        Boolean(formatConfig.include_third_place) ||
+        (formatConfig.knockout_tiebreaker &&
+          formatConfig.knockout_tiebreaker !== "best_campaign") ||
+        (formatConfig.draw_rule &&
+          formatConfig.draw_rule !== "challenger_stays") ||
+        Boolean(formatConfig.max_consecutive_wins);
+
+      if (hasCustomFormat) {
+        await endpoints.beginPelada(peladaId, effectiveMatches, {
+          format,
+          format_config: {
+            ...formatConfig,
+            matches_per_team: effectiveMatches || 2,
+          },
+        });
+      } else {
+        await endpoints.beginPelada(peladaId, effectiveMatches);
+      }
       navigate(`/peladas/${peladaId}/matches`);
     } catch (error: unknown) {
       const message =
@@ -643,6 +683,10 @@ export function usePeladaDetail(peladaId: string) {
     setStartDialogOpen,
     matchesPerTeam,
     setMatchesPerTeam,
+    format,
+    setFormat,
+    formatConfig,
+    setFormatConfig,
     onDragStartPlayer,
     dropToBench,
     dropToTeam,

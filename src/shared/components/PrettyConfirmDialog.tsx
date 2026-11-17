@@ -18,6 +18,7 @@ interface PrettyConfirmDialogProps {
   onClose: () => void;
   severity?: "primary" | "error" | "warning";
   loading?: boolean;
+  children?: React.ReactNode;
 }
 
 export default function PrettyConfirmDialog({
@@ -30,6 +31,7 @@ export default function PrettyConfirmDialog({
   onClose,
   severity = "primary",
   loading = false,
+  children,
 }: PrettyConfirmDialogProps) {
   const { t } = useTranslation();
 
@@ -38,6 +40,7 @@ export default function PrettyConfirmDialog({
       <DialogTitle sx={{ fontWeight: "bold" }}>{title}</DialogTitle>
       <DialogContent>
         <DialogContentText>{description}</DialogContentText>
+        {children}
       </DialogContent>
       <DialogActions sx={{ p: 2, pt: 0 }}>
         <Button

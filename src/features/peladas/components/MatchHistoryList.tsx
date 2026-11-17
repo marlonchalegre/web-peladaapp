@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import type { Match } from "../../../shared/api/endpoints";
+import { getMatchStageLabel } from "../utils/standingsUtils";
 
 interface MatchHistoryListProps {
   matches: Match[];
@@ -73,6 +74,9 @@ export default function MatchHistoryList({
                       sequence: m.sequence,
                       teamName: teamNameById[m.home_team_id] || "Time",
                     })}
+                    {m.stage && m.stage !== "regular"
+                      ? ` • ${getMatchStageLabel(t, m.stage) || m.stage}`
+                      : ""}
                   </Typography>
                   <Stack
                     direction="row"

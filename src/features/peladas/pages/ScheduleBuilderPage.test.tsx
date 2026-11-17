@@ -261,4 +261,51 @@ describe("ScheduleBuilderPage", () => {
       expect(screen.getAllByDisplayValue("10").length).toBe(2);
     });
   });
+
+  it("allows selecting championship formats when enough teams exist and shows bracket preview", async () => {
+    const fourTeamsDetails = {
+      pelada: { id: "1", organization_id: "101", status: "open" },
+      teams: [
+        { id: "10", name: "Time A" },
+        { id: "11", name: "Time B" },
+        { id: "12", name: "Time C" },
+        { id: "13", name: "Time D" },
+      ],
+    };
+
+    (api.get as Mock).mockImplementation((path: string) => {
+      if (path === "/api/peladas/1/full-details")
+        return Promise.resolve(fourTeamsDetails);
+      if (path.includes("/schedule/preview"))
+        return Promise.resolve(mockPreview);
+      return Promise.reject(new Error(`Not found: ${path}`));
+    });
+
+    render(
+      <MemoryRouter initialEntries={["/peladas/1/build-schedule"]}>
+        <Routes>
+          <Route
+            path="/peladas/:id/build-schedule"
+            element={<ScheduleBuilderPage />}
+          />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("format-option-championship_semis_final"),
+      ).toBeInTheDocument();
+    });
+
+    fireEvent.click(
+      screen.getByTestId("format-option-championship_semis_final"),
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByTestId("championship-bracket-preview"),
+      ).toBeInTheDocument();
+    });
+  });
 });

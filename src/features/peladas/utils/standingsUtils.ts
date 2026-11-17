@@ -1,3 +1,4 @@
+import type { TFunction } from "i18next";
 import type { Match } from "../../../shared/api/endpoints";
 
 export type StandingRow = {
@@ -26,6 +27,40 @@ export function isAbsoluteTie(a: StandingRow, b: StandingRow): boolean {
   );
 }
 
+export function isKnockoutStage(stage?: string | null): boolean {
+  const st = (stage || "regular").toLowerCase();
+  return st !== "regular" && st !== "group";
+}
+
+export function getMatchWinnerTeamId(match: Match): string | null {
+  if ((match.status || "").toLowerCase() !== "finished") return null;
+  const hs = match.home_score ?? 0;
+  const as = match.away_score ?? 0;
+  if (hs > as) return match.home_team_id;
+  if (as > hs) return match.away_team_id;
+  return match.winner_team_id || match.home_team_id;
+}
+
+export function getMatchStageLabel(
+  t: TFunction,
+  stage?: string | null,
+): string | null {
+  switch ((stage || "regular").toLowerCase()) {
+    case "group":
+      return t("peladas.stages.group", "Fase de Grupos");
+    case "semifinal_1":
+      return t("peladas.stages.semifinal_1", "Semifinal 1");
+    case "semifinal_2":
+      return t("peladas.stages.semifinal_2", "Semifinal 2");
+    case "third_place":
+      return t("peladas.stages.third_place", "3º Lugar");
+    case "final":
+      return t("peladas.stages.final", "GRANDE FINAL 🏆");
+    default:
+      return null;
+  }
+}
+
 /**
  * Calculates whether a team has mathematically secured 1st place (champion).
  *
@@ -42,6 +77,26 @@ export function getMathematicalChampion(
 ): StandingRow | null {
   if (!standings || standings.length === 0) return null;
   const first = standings[0];
+
+  if (matches && matches.length > 0) {
+    const finalMatch = matches.find(
+      (m) =>
+        (m.stage || "").toLowerCase() === "final" &&
+        (m.status || "").toLowerCase() === "finished",
+    );
+    if (finalMatch) {
+      const winnerId = getMatchWinnerTeamId(finalMatch);
+      const winnerStanding = standings.find((s) => s.teamId === winnerId);
+      if (winnerStanding) return winnerStanding;
+    }
+
+    const hasKnockoutStage = matches.some(
+      (m) => (m.stage || "regular").toLowerCase() !== "regular",
+    );
+    if (hasKnockoutStage) {
+      return null;
+    }
+  }
 
   if (first.wins === 0 && first.draws === 0) return null;
   if (standings.length === 1) return first;

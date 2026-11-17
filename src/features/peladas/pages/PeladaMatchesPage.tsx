@@ -29,6 +29,7 @@ import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import { usePeladaMatches } from "../hooks/usePeladaMatches";
 import StandingsPanel from "../components/StandingsPanel";
+import { isKnockoutStage } from "../utils/standingsUtils";
 import PlayerStatsPanel from "../components/PlayerStatsPanel";
 import PeladaTimeline from "../components/PeladaTimeline";
 import EditTimelineEventDialog from "../components/EditTimelineEventDialog";
@@ -207,6 +208,9 @@ export default function PeladaMatchesPage() {
   const [endMatchConfirmOpen, setEndMatchConfirmOpen] = useState<string | null>(
     null,
   );
+  const [tiebreakerWinnerId, setTiebreakerWinnerId] = useState<string | null>(
+    null,
+  );
   const [closePeladaConfirmOpen, setClosePeladaConfirmOpen] = useState(false);
   const [shareMenuAnchor, setShareMenuAnchor] = useState<null | HTMLElement>(
     null,
@@ -294,6 +298,17 @@ export default function PeladaMatchesPage() {
     if (!editEventDialogOpen) return null;
     return matches.find((m) => m.id === editEventDialogOpen.match_id) || null;
   }, [editEventDialogOpen, matches]);
+
+  const endingMatch = useMemo(() => {
+    if (!endMatchConfirmOpen) return null;
+    return matches.find((item) => item.id === endMatchConfirmOpen) || null;
+  }, [endMatchConfirmOpen, matches]);
+
+  const isEndingMatchKnockoutDraw = Boolean(
+    endingMatch &&
+    isKnockoutStage(endingMatch.stage) &&
+    (endingMatch.home_score ?? 0) === (endingMatch.away_score ?? 0),
+  );
 
   const handleSaveEditEvent = async (
     scorerId: string,
@@ -1316,7 +1331,10 @@ export default function PeladaMatchesPage() {
               addPlayerToTeam={(teamId, playerId) =>
                 addPlayerToTeam(selectedMatch!.id, teamId, playerId)
               }
-              onEndMatch={() => setEndMatchConfirmOpen(selectedMatch!.id)}
+              onEndMatch={() => {
+                setTiebreakerWinnerId(selectedMatch!.home_team_id);
+                setEndMatchConfirmOpen(selectedMatch!.id);
+              }}
               matches={matches}
               onSelectMatch={setSelectedMatchId}
               teamNameById={teamNameById}
@@ -1480,10 +1498,72 @@ export default function PeladaMatchesPage() {
         open={Boolean(endMatchConfirmOpen)}
         title={t("common.confirm")}
         description={t("peladas.matches.confirm_end_match")}
-        onConfirm={() => endMatchConfirmOpen && endMatch(endMatchConfirmOpen)}
+        onConfirm={() => {
+          if (!endMatchConfirmOpen) return;
+          endMatch(
+            endMatchConfirmOpen,
+            isEndingMatchKnockoutDraw && endingMatch
+              ? tiebreakerWinnerId || endingMatch.home_team_id
+              : undefined,
+          );
+        }}
         onClose={() => setEndMatchConfirmOpen(null)}
         severity="error"
-      />
+      >
+        {isEndingMatchKnockoutDraw && endingMatch && (
+          <Box
+            data-testid="knockout-tiebreaker-selector"
+            sx={{
+              mt: 2,
+              p: 1.5,
+              borderRadius: 2,
+              bgcolor: "action.hover",
+              border: "1px solid",
+              borderColor: "divider",
+            }}
+          >
+            <Typography
+              variant="caption"
+              sx={{ fontWeight: 700, display: "block", mb: 1 }}
+            >
+              {t(
+                "peladas.matches.knockout_tiebreaker_prompt",
+                "Empate no Mata-Mata! Selecione o vencedor (Melhor Campanha ou Pênaltis):",
+              )}
+            </Typography>
+            <Stack direction="row" spacing={1}>
+              <Button
+                size="small"
+                fullWidth
+                variant={
+                  (tiebreakerWinnerId || endingMatch.home_team_id) ===
+                  endingMatch.home_team_id
+                    ? "contained"
+                    : "outlined"
+                }
+                onClick={() => setTiebreakerWinnerId(endingMatch.home_team_id)}
+                data-testid="tiebreaker-winner-home"
+              >
+                {teamNameById[endingMatch.home_team_id] || "Time 1"} (1ª Opção)
+              </Button>
+              <Button
+                size="small"
+                fullWidth
+                variant={
+                  (tiebreakerWinnerId || endingMatch.home_team_id) ===
+                  endingMatch.away_team_id
+                    ? "contained"
+                    : "outlined"
+                }
+                onClick={() => setTiebreakerWinnerId(endingMatch.away_team_id)}
+                data-testid="tiebreaker-winner-away"
+              >
+                {teamNameById[endingMatch.away_team_id] || "Time 2"}
+              </Button>
+            </Stack>
+          </Box>
+        )}
+      </PrettyConfirmDialog>
       <PrettyConfirmDialog
         open={closePeladaConfirmOpen}
         title={t("common.confirm")}

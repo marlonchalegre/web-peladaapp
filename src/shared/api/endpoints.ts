@@ -19,6 +19,8 @@ import type {
   OrganizationPlayerStats,
   Pelada,
   PeladaDashboardDataResponse,
+  PeladaFormat,
+  PeladaFormatConfig,
   PeladaFullDetailsResponse,
   PeladaHistoryEntry,
   Player,
@@ -246,12 +248,32 @@ export function createApi(client: ApiClient) {
       ),
     createPelada: (payload: Partial<Pelada>) =>
       client.post<Pelada>("/api/peladas", payload),
+    updatePelada: (id: string, payload: Partial<Pelada>) =>
+      client.put<Pelada>(`/api/peladas/${id}`, payload),
     deletePelada: (id: string) => client.delete(`/api/peladas/${id}`),
-    beginPelada: (id: string, matchesPerTeam?: number) =>
-      client.post<{ matches_created: number }>(
+    beginPelada: (
+      id: string,
+      matchesPerTeam?: number,
+      options?: {
+        format?: PeladaFormat | string;
+        format_config?: PeladaFormatConfig;
+      },
+    ) => {
+      const payload: Record<string, unknown> = {};
+      if (matchesPerTeam !== undefined) {
+        payload.matches_per_team = matchesPerTeam;
+      }
+      if (options?.format) {
+        payload.format = options.format;
+      }
+      if (options?.format_config) {
+        payload.format_config = options.format_config;
+      }
+      return client.post<{ matches_created: number }>(
         `/api/peladas/${id}/begin`,
-        matchesPerTeam ? { matches_per_team: matchesPerTeam } : undefined,
-      ),
+        Object.keys(payload).length > 0 ? payload : undefined,
+      );
+    },
     closePelada: (id: string) =>
       client.post<Pelada>(`/api/peladas/${id}/close`),
     getPeladaFullDetails: (id: string) =>
@@ -293,23 +315,39 @@ export function createApi(client: ApiClient) {
       client.post<Pelada>(`/api/peladas/${id}/timer/reset`, {}),
 
     // Schedule
-    getSchedulePreview: (id: string, matchesPerTeam: number) =>
+    getSchedulePreview: (
+      id: string,
+      matchesPerTeam: number,
+      format?: PeladaFormat | string,
+    ) =>
       client.get<{
-        matches: { home: string; away: string }[];
-        template_matches?: { home: string; away: string }[];
-        random_matches?: { home: string; away: string }[];
+        matches: { home: string; away: string; stage?: string }[];
+        template_matches?: { home: string; away: string; stage?: string }[];
+        random_matches?: { home: string; away: string; stage?: string }[];
         is_from_format: boolean;
       }>(`/api/peladas/${id}/schedule/preview`, {
         matches_per_team: matchesPerTeam,
+        ...(format ? { format } : {}),
       }),
-    saveSchedulePlan: (id: string, matches: { home: string; away: string }[]) =>
+    saveSchedulePlan: (
+      id: string,
+      matches: { home: string; away: string; stage?: string }[],
+      options?: {
+        format?: PeladaFormat | string;
+        format_config?: PeladaFormatConfig;
+      },
+    ) =>
       client.post<{ status: string }>(`/api/peladas/${id}/schedule`, {
         matches,
+        ...(options?.format ? { format: options.format } : {}),
+        ...(options?.format_config
+          ? { format_config: options.format_config }
+          : {}),
       }),
     getSchedulePlan: (id: string) =>
-      client.get<{ home: string; away: string; sequence: number }[]>(
-        `/api/peladas/${id}/schedule`,
-      ),
+      client.get<
+        { home: string; away: string; sequence: number; stage?: string }[]
+      >(`/api/peladas/${id}/schedule`),
 
     // Teams
     createTeam: (payload: { pelada_id: string; name: string }) =>
@@ -335,11 +373,25 @@ export function createApi(client: ApiClient) {
       home: number,
       away: number,
       status?: string,
+      options?: {
+        winner_team_id?: string | null;
+        home_team_id?: string;
+        away_team_id?: string;
+      },
     ) =>
       client.put(`/api/matches/${id}/score`, {
         home_score: home,
         away_score: away,
         status,
+        ...(options?.winner_team_id !== undefined
+          ? { winner_team_id: options.winner_team_id }
+          : {}),
+        ...(options?.home_team_id
+          ? { home_team_id: options.home_team_id }
+          : {}),
+        ...(options?.away_team_id
+          ? { away_team_id: options.away_team_id }
+          : {}),
       }),
     startMatchTimer: (id: string) =>
       client.post<Match>(`/api/matches/${id}/timer/start`, {}),

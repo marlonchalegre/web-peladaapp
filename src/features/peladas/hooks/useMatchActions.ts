@@ -507,13 +507,19 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
   }, [peladaId, setPelada, runOfflineAction, refreshData, t]);
 
   const executeEndMatch = useCallback(
-    async (matchId: string) => {
+    async (matchId: string, winnerTeamId?: string | null) => {
       const match = matchesRef.current.find((m: Match) => m.id === matchId);
       if (!match) return;
 
       updateMatchInState(
         matchId,
-        (m) => ({ ...m, status: "finished" as Match["status"] }),
+        (m) => ({
+          ...m,
+          status: "finished" as Match["status"],
+          ...(winnerTeamId !== undefined
+            ? { winner_team_id: winnerTeamId }
+            : {}),
+        }),
         false,
       );
 
@@ -523,6 +529,7 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
           matchId,
           homeScore: match.home_score,
           awayScore: match.away_score,
+          winnerTeamId,
         },
         matchId,
         execute: async () => {
@@ -535,6 +542,9 @@ export function useMatchActions(peladaId: string, data: MatchStateDelegates) {
               match.home_score ?? 0,
               match.away_score ?? 0,
               "finished",
+              winnerTeamId !== undefined
+                ? { winner_team_id: winnerTeamId }
+                : undefined,
             ),
           ]);
           await refreshData();

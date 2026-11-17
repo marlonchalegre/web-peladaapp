@@ -19,10 +19,10 @@ import {
   Select,
   MenuItem as MuiMenuItem,
   FormControl,
-  InputLabel,
   Card,
   CardContent,
   Tooltip,
+  Chip,
 } from "@mui/material";
 
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
@@ -32,18 +32,27 @@ import SaveIcon from "@mui/icons-material/Save";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import HistoryIcon from "@mui/icons-material/History";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import { useTranslation } from "react-i18next";
 import { Loading } from "../../../shared/components/Loading";
 import BreadcrumbNav from "../../../shared/components/BreadcrumbNav";
 import PeladaTabsBar from "../components/PeladaTabsBar";
+import PeladaFormatSelector from "../components/PeladaFormatSelector";
 import { api } from "../../../shared/api/client";
-import { createApi, type Team } from "../../../shared/api/endpoints";
+import {
+  createApi,
+  type Team,
+  type PeladaFormat,
+  type PeladaFormatConfig,
+} from "../../../shared/api/endpoints";
+import { DEFAULT_PELADA_FORMAT_CONFIG } from "../../../shared/api/types";
 
 const endpoints = createApi(api);
 
 interface PlannedMatch {
   home: string;
   away: string;
+  stage?: string;
 }
 
 export default function ScheduleBuilderPage() {
@@ -58,6 +67,10 @@ export default function ScheduleBuilderPage() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [matches, setMatches] = useState<PlannedMatch[]>([]);
   const [matchesPerTeam, setMatchesPerTeam] = useState<number>(2);
+  const [format, setFormat] = useState<PeladaFormat>("round_robin");
+  const [formatConfig, setFormatConfig] = useState<PeladaFormatConfig>(
+    DEFAULT_PELADA_FORMAT_CONFIG,
+  );
   const [organizationId, setOrganizationId] = useState<string | null>(null);
 
   const fetchInitialData = useCallback(async () => {
@@ -67,22 +80,32 @@ export default function ScheduleBuilderPage() {
       setTeams(data.teams);
       setOrganizationId(data.pelada.organization_id);
 
-      const currentMatchesPerTeam = 2;
+      const savedFormat = (data.pelada.format as PeladaFormat) || "round_robin";
+      setFormat(savedFormat);
+      const savedConfig = data.pelada.format_config || {};
+      setFormatConfig((prev) => ({ ...prev, ...savedConfig }));
+
+      const currentMatchesPerTeam = savedConfig.matches_per_team || 2;
       setMatchesPerTeam(currentMatchesPerTeam);
 
       if (data.teams.length >= 2) {
         if (data.pelada.has_schedule_plan) {
           const plan = await endpoints.getSchedulePlan(peladaId);
           setMatches(plan);
-          const calculated = Math.round((plan.length * 2) / data.teams.length);
-          if (Number.isFinite(calculated) && calculated >= 1) {
-            setMatchesPerTeam(calculated);
+          if (!savedConfig.matches_per_team) {
+            const calculated = Math.round(
+              (plan.length * 2) / data.teams.length,
+            );
+            if (Number.isFinite(calculated) && calculated >= 1) {
+              setMatchesPerTeam(calculated);
+            }
           }
         } else {
           // Fetch algorithmic default
           const preview = await endpoints.getSchedulePreview(
             peladaId,
             currentMatchesPerTeam,
+            savedFormat,
           );
           setMatches(preview.matches);
         }
@@ -102,11 +125,16 @@ export default function ScheduleBuilderPage() {
     fetchInitialData();
   }, [fetchInitialData]);
 
-  const handleFetchOptions = async (newVal?: number) => {
+  const handleFetchOptions = async (
+    newVal?: number,
+    newFormat?: PeladaFormat,
+  ) => {
     const val = newVal ?? matchesPerTeam;
+    const fmt = newFormat ?? format;
+    if (teams.length < 2) return;
     try {
       setLoading(true);
-      const preview = await endpoints.getSchedulePreview(peladaId, val);
+      const preview = await endpoints.getSchedulePreview(peladaId, val, fmt);
       setMatches(preview.matches);
     } catch (err: unknown) {
       const message =
@@ -119,23 +147,13 @@ export default function ScheduleBuilderPage() {
     }
   };
 
-  const handleResetToDefault = async () => {
-    try {
-      setLoading(true);
-      const preview = await endpoints.getSchedulePreview(
-        peladaId,
-        matchesPerTeam,
-      );
-      setMatches(preview.matches);
-    } catch (err: unknown) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : t("peladas.detail.schedule.error.preview_failed");
-      setError(message);
-    } finally {
-      setLoading(false);
-    }
+  const handleFormatChange = (newFormat: PeladaFormat) => {
+    setFormat(newFormat);
+    handleFetchOptions(matchesPerTeam, newFormat);
+  };
+
+  const handleResetToDefault = () => {
+    handleFetchOptions(matchesPerTeam, format);
   };
 
   const handleMoveUp = (index: number) => {
@@ -159,7 +177,7 @@ export default function ScheduleBuilderPage() {
   const handleSwap = (index: number) => {
     const newMatches = [...matches];
     const m = newMatches[index];
-    newMatches[index] = { home: m.away, away: m.home };
+    newMatches[index] = { ...m, home: m.away, away: m.home };
     setMatches(newMatches);
   };
 
@@ -175,7 +193,14 @@ export default function ScheduleBuilderPage() {
 
   const handleAddMatch = () => {
     if (teams.length < 2) return;
-    setMatches([...matches, { home: teams[0].id, away: teams[1].id }]);
+    const defaultStage =
+      format === "championship_final" || format === "championship_semis_final"
+        ? "group"
+        : "regular";
+    setMatches([
+      ...matches,
+      { home: teams[0].id, away: teams[1].id, stage: defaultStage },
+    ]);
   };
 
   const handleRemoveMatch = (index: number) => {
@@ -192,7 +217,13 @@ export default function ScheduleBuilderPage() {
 
     try {
       setSaving(true);
-      await endpoints.saveSchedulePlan(peladaId, matches);
+      await endpoints.saveSchedulePlan(peladaId, matches, {
+        format,
+        format_config: {
+          ...formatConfig,
+          matches_per_team: matchesPerTeam,
+        },
+      });
       navigate(`/peladas/${peladaId}`);
     } catch (err: unknown) {
       const message =
@@ -271,41 +302,32 @@ export default function ScheduleBuilderPage() {
           sx={{
             mb: 4,
             borderRadius: 3,
-            boxShadow: "0 4px 20px rgba(0,0,0,0.05)",
+            boxShadow: (theme) => theme.customShadows?.card,
           }}
         >
           <CardContent sx={{ p: 3 }}>
+            <PeladaFormatSelector
+              teamCount={teams.length}
+              format={format}
+              formatConfig={formatConfig}
+              matchesPerTeam={matchesPerTeam}
+              onFormatChange={handleFormatChange}
+              onFormatConfigChange={setFormatConfig}
+              onMatchesPerTeamChange={(val) => {
+                setMatchesPerTeam(val);
+                handleFetchOptions(val, format);
+              }}
+              disabled={loading || teams.length < 2}
+            />
+
             <Stack
               direction={{ xs: "column", sm: "row" }}
-              spacing={3}
+              spacing={2}
               sx={{
+                mt: 2.5,
                 alignItems: { xs: "stretch", sm: "center" },
               }}
             >
-              <FormControl sx={{ minWidth: 200 }} size="small">
-                <InputLabel id="matches-per-team-label">
-                  {t("peladas.detail.schedule.matches_per_team_label")}
-                </InputLabel>
-                <Select
-                  labelId="matches-per-team-label"
-                  value={matchesPerTeam}
-                  label={t("peladas.detail.schedule.matches_per_team_label")}
-                  data-testid="matches-per-team-select"
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    setMatchesPerTeam(val);
-                    handleFetchOptions(val);
-                  }}
-                  disabled={loading || teams.length < 2}
-                >
-                  {[1, 2, 3, 4, 5, 6].map((v) => (
-                    <MuiMenuItem key={v} value={v}>
-                      {t("peladas.detail.schedule.match_count", { count: v })}
-                    </MuiMenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
               <Button
                 variant="contained"
                 color="primary"
@@ -319,17 +341,19 @@ export default function ScheduleBuilderPage() {
 
               <Box sx={{ flexGrow: 1 }} />
 
-              <Button
-                variant="outlined"
-                color="primary"
-                startIcon={<AddIcon />}
-                onClick={handleAddMatch}
-                disabled={loading || teams.length < 2}
-                data-testid="add-match-button"
-                sx={{ borderRadius: 2, fontWeight: "bold" }}
-              >
-                {t("peladas.detail.schedule.button.add_match")}
-              </Button>
+              {format !== "winner_stays_on" && (
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  startIcon={<AddIcon />}
+                  onClick={handleAddMatch}
+                  disabled={loading || teams.length < 2}
+                  data-testid="add-match-button"
+                  sx={{ borderRadius: 2, fontWeight: "bold" }}
+                >
+                  {t("peladas.detail.schedule.button.add_match")}
+                </Button>
+              )}
             </Stack>
           </CardContent>
         </Card>
@@ -347,7 +371,18 @@ export default function ScheduleBuilderPage() {
               fontWeight: "bold",
             }}
           >
-            {t("peladas.detail.schedule.planned_matches")}
+            {format === "winner_stays_on"
+              ? t(
+                  "peladas.formats.wso.opening_match_title",
+                  "Partida de Abertura (Quem Ganha Fica)",
+                )
+              : format === "championship_final" ||
+                  format === "championship_semis_final"
+                ? t(
+                    "peladas.formats.championship.group_stage_title",
+                    "1ª Fase — Partidas Classificatórias",
+                  )
+                : t("peladas.detail.schedule.planned_matches")}
           </Typography>
         </Box>
         <TableContainer
@@ -529,6 +564,148 @@ export default function ScheduleBuilderPage() {
             </TableBody>
           </Table>
         </TableContainer>
+
+        {/* Knockout / Queue Preview Cards */}
+        {(format === "championship_final" ||
+          format === "championship_semis_final") && (
+          <Paper
+            variant="outlined"
+            data-testid="championship-bracket-preview"
+            sx={{
+              mt: 3,
+              p: 2.5,
+              borderRadius: 3,
+              bgcolor: "action.hover",
+            }}
+          >
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{ alignItems: "center", mb: 1.5 }}
+            >
+              <EmojiEventsIcon color="warning" fontSize="small" />
+              <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
+                {t(
+                  "peladas.formats.championship.knockout_preview_title",
+                  "Fase Final (Gerada automaticamente após a 1ª Fase)",
+                )}
+              </Typography>
+            </Stack>
+            <Stack spacing={1}>
+              {format === "championship_semis_final" && (
+                <>
+                  <Stack
+                    direction="row"
+                    spacing={1.5}
+                    sx={{ alignItems: "center" }}
+                  >
+                    <Chip
+                      size="small"
+                      label={t("peladas.stages.semifinal_1", "Semifinal 1")}
+                      color="primary"
+                      variant="outlined"
+                    />
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      1º Colocado vs 4º Colocado
+                    </Typography>
+                  </Stack>
+                  <Stack
+                    direction="row"
+                    spacing={1.5}
+                    sx={{ alignItems: "center" }}
+                  >
+                    <Chip
+                      size="small"
+                      label={t("peladas.stages.semifinal_2", "Semifinal 2")}
+                      color="primary"
+                      variant="outlined"
+                    />
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                      2º Colocado vs 3º Colocado
+                    </Typography>
+                  </Stack>
+                  {formatConfig.include_third_place && (
+                    <Stack
+                      direction="row"
+                      spacing={1.5}
+                      sx={{ alignItems: "center" }}
+                    >
+                      <Chip
+                        size="small"
+                        label={t(
+                          "peladas.stages.third_place",
+                          "Disputa de 3º Lugar",
+                        )}
+                        variant="outlined"
+                      />
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        Perdedor SF1 vs Perdedor SF2
+                      </Typography>
+                    </Stack>
+                  )}
+                </>
+              )}
+              <Stack
+                direction="row"
+                spacing={1.5}
+                sx={{ alignItems: "center" }}
+              >
+                <Chip
+                  size="small"
+                  label={t("peladas.stages.final", "GRANDE FINAL 🏆")}
+                  color="warning"
+                />
+                <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                  {format === "championship_semis_final"
+                    ? "Vencedor SF1 vs Vencedor SF2"
+                    : "1º Colocado vs 2º Colocado"}
+                </Typography>
+              </Stack>
+            </Stack>
+          </Paper>
+        )}
+
+        {format === "winner_stays_on" && teams.length > 2 && (
+          <Paper
+            variant="outlined"
+            data-testid="winner-stays-on-queue-preview"
+            sx={{
+              mt: 3,
+              p: 2.5,
+              borderRadius: 3,
+              bgcolor: "action.hover",
+            }}
+          >
+            <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 1 }}>
+              {t(
+                "peladas.formats.wso.initial_queue_title",
+                "Fila de Espera Inicial (Próximos Desafiantes)",
+              )}
+            </Typography>
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{ flexWrap: "wrap", gap: 1 }}
+            >
+              {teams
+                .filter(
+                  (team) =>
+                    !matches[0] ||
+                    (team.id !== matches[0].home &&
+                      team.id !== matches[0].away),
+                )
+                .map((team, idx) => (
+                  <Chip
+                    key={team.id}
+                    label={`${idx + 1}º na fila: ${team.name}`}
+                    variant="outlined"
+                    color="primary"
+                  />
+                ))}
+            </Stack>
+          </Paper>
+        )}
+
         <Box sx={{ mt: 4, display: "flex", justifyContent: "flex-end" }}>
           <Button
             variant="contained"
@@ -544,7 +721,7 @@ export default function ScheduleBuilderPage() {
               py: 1.5,
               fontWeight: "bold",
               fontSize: "1.1rem",
-              boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
+              boxShadow: (theme) => theme.customShadows?.card,
             }}
           >
             {saving

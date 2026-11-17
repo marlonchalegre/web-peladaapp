@@ -87,6 +87,8 @@ export function usePeladaStandings(
         name: t.name,
       };
     for (const m of matches) {
+      const stage = (m.stage || "regular").toLowerCase();
+      if (stage !== "regular" && stage !== "group") continue;
       const hs = m.home_score ?? 0;
       const as = m.away_score ?? 0;
       if (!(m.home_team_id in table) || !(m.away_team_id in table)) continue;

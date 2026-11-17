@@ -12,15 +12,20 @@ import {
   Avatar,
   Divider,
   Tooltip,
+  Chip,
 } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import { useMemo } from "react";
 import type { Match } from "../../../shared/api/endpoints";
 import {
   getStandingPoints,
   getMathematicalChampion,
+  getMatchStageLabel,
+  getMatchWinnerTeamId,
+  isKnockoutStage,
   type StandingRow,
 } from "../utils/standingsUtils";
 
@@ -171,10 +176,133 @@ export default function StandingsPanel({
     [standings, matches],
   );
 
+  const teamNameMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const s of standings) {
+      map[s.teamId] = s.name;
+    }
+    return map;
+  }, [standings]);
+
+  const knockoutMatches = useMemo(() => {
+    if (!matches) return [];
+    return matches.filter((m) => isKnockoutStage(m.stage));
+  }, [matches]);
+
   return (
     <Paper variant="outlined" sx={{ mb: 2, overflow: "hidden" }}>
       {showHighlights && champion && (
         <StandingsHighlights champion={champion} />
+      )}
+      {knockoutMatches.length > 0 && (
+        <Box
+          data-testid="standings-knockout-bracket"
+          sx={{
+            p: 2,
+            bgcolor: "background.default",
+            borderBottom: 1,
+            borderColor: "divider",
+          }}
+        >
+          <Stack
+            direction="row"
+            spacing={1}
+            sx={{ alignItems: "center", mb: 1.5 }}
+          >
+            <AccountTreeIcon color="primary" fontSize="small" />
+            <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+              {t(
+                "peladas.panel.standings.knockout_title",
+                "FASE FINAL / MATA-MATA",
+              )}
+            </Typography>
+          </Stack>
+          <Stack spacing={1}>
+            {knockoutMatches.map((km) => {
+              const homeName =
+                teamNameMap[km.home_team_id] ||
+                t("peladas.matches.team_fallback", { id: km.home_team_id });
+              const awayName =
+                teamNameMap[km.away_team_id] ||
+                t("peladas.matches.team_fallback", { id: km.away_team_id });
+              const hs = km.home_score ?? 0;
+              const as = km.away_score ?? 0;
+              const winnerId = getMatchWinnerTeamId(km);
+
+              return (
+                <Paper
+                  key={km.id}
+                  variant="outlined"
+                  sx={{
+                    p: 1.25,
+                    borderRadius: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 1.5,
+                  }}
+                >
+                  <Chip
+                    size="small"
+                    color={
+                      (km.stage || "").toLowerCase() === "final"
+                        ? "warning"
+                        : "primary"
+                    }
+                    label={getMatchStageLabel(t, km.stage) || km.stage}
+                    sx={{ fontWeight: 700, fontSize: "10.5px" }}
+                  />
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    sx={{
+                      alignItems: "center",
+                      flex: 1,
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: winnerId === km.home_team_id ? 800 : 500,
+                        color:
+                          winnerId === km.home_team_id
+                            ? "primary.main"
+                            : "text.primary",
+                      }}
+                    >
+                      {homeName}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: 800,
+                        px: 1,
+                        py: 0.25,
+                        borderRadius: 1,
+                        bgcolor: "action.hover",
+                      }}
+                    >
+                      {hs} x {as}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        fontWeight: winnerId === km.away_team_id ? 800 : 500,
+                        color:
+                          winnerId === km.away_team_id
+                            ? "primary.main"
+                            : "text.primary",
+                      }}
+                    >
+                      {awayName}
+                    </Typography>
+                  </Stack>
+                </Paper>
+              );
+            })}
+          </Stack>
+        </Box>
       )}
       <Box
         sx={{

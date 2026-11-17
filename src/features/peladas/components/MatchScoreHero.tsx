@@ -19,7 +19,7 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import HistoryIcon from "@mui/icons-material/History";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import type { Match, Pelada } from "../../../shared/api/endpoints";
-import type { StandingRow } from "../utils/standingsUtils";
+import { getMatchStageLabel, type StandingRow } from "../utils/standingsUtils";
 import { useTranslation } from "react-i18next";
 
 interface MatchScoreHeroProps {
@@ -224,6 +224,11 @@ export default function MatchScoreHero({
     m: totalMatches,
   });
 
+  const stageLabel = useMemo(
+    () => getMatchStageLabel(t, match.stage),
+    [match.stage, t],
+  );
+
   const optionsMenu = (
     <Menu
       anchorEl={menuAnchor}
@@ -319,6 +324,24 @@ export default function MatchScoreHero({
             </Typography>
 
             <Box sx={{ textAlign: "center" }}>
+              {stageLabel && (
+                <Chip
+                  size="small"
+                  color={
+                    (match.stage || "").toLowerCase() === "final"
+                      ? "warning"
+                      : "primary"
+                  }
+                  label={stageLabel}
+                  data-testid="match-stage-badge"
+                  sx={{
+                    mb: 0.75,
+                    height: 20,
+                    fontSize: "10px",
+                    fontWeight: 800,
+                  }}
+                />
+              )}
               <Typography
                 data-testid="match-timer-text"
                 sx={{
@@ -630,6 +653,7 @@ export default function MatchScoreHero({
             }}
           >
             {matchLabel.toUpperCase()}
+            {stageLabel ? ` • ${stageLabel.toUpperCase()}` : ""}
           </Typography>
         </Box>
         <IconButton

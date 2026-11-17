@@ -125,6 +125,34 @@ export interface OrganizationAdmin {
 
 export type TimerStatus = "stopped" | "running" | "paused";
 
+export type PeladaFormat =
+  | "round_robin"
+  | "championship_final"
+  | "championship_semis_final"
+  | "winner_stays_on";
+
+export type KnockoutTiebreaker = "best_campaign" | "penalties";
+export type WinnerStaysOnDrawRule =
+  "challenger_stays" | "defender_stays" | "both_leave";
+
+export interface PeladaFormatConfig {
+  matches_per_team?: number;
+  knockout_tiebreaker?: KnockoutTiebreaker;
+  include_third_place?: boolean;
+  draw_rule?: WinnerStaysOnDrawRule;
+  max_consecutive_wins?: number;
+}
+
+export type MatchStage =
+  "regular" | "group" | "semifinal_1" | "semifinal_2" | "third_place" | "final";
+
+export const DEFAULT_PELADA_FORMAT_CONFIG: PeladaFormatConfig = {
+  knockout_tiebreaker: "best_campaign",
+  include_third_place: false,
+  draw_rule: "challenger_stays",
+  max_consecutive_wins: 0,
+};
+
 export interface Pelada {
   id: string;
   organization_id: string;
@@ -150,6 +178,8 @@ export interface Pelada {
   timer_accumulated_ms?: number | null;
   timer_status?: TimerStatus | null;
   user_attendance_status?: AttendanceStatus | null;
+  format?: PeladaFormat | null;
+  format_config?: PeladaFormatConfig | null;
 }
 
 export interface PeladaHistoryUserLine {
@@ -250,6 +280,8 @@ export interface Match {
   timer_status?: TimerStatus | null;
   support_camera_player_id?: string | null;
   support_stats_player_id?: string | null;
+  stage?: MatchStage | null;
+  winner_team_id?: string | null;
 }
 export type MatchEventType =
   | "assist"

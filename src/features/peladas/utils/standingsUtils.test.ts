@@ -535,5 +535,66 @@ describe("standingsUtils", () => {
       expect(champ).not.toBeNull();
       expect(champ?.teamId).toBe("t1");
     });
+
+    it("returns the Final match winner in championship formats even if another team had more group points", () => {
+      const standings: StandingRow[] = [
+        {
+          teamId: "t1",
+          name: "Team 1",
+          wins: 2,
+          draws: 0,
+          losses: 0,
+          goalsFor: 4,
+          goalsAgainst: 0,
+          goalDifference: 4,
+          points: 6,
+        },
+        {
+          teamId: "t2",
+          name: "Team 2",
+          wins: 1,
+          draws: 0,
+          losses: 1,
+          goalsFor: 2,
+          goalsAgainst: 2,
+          goalDifference: 0,
+          points: 3,
+        },
+      ];
+
+      const groupOnlyMatches: Match[] = [
+        {
+          id: "g1",
+          home_team_id: "t1",
+          away_team_id: "t2",
+          home_score: 2,
+          away_score: 0,
+          status: "finished",
+          stage: "group",
+        } as Match,
+      ];
+
+      // While only in group stage of a championship, no champion is crowned yet
+      expect(getMathematicalChampion(standings, groupOnlyMatches)).toBeNull();
+
+      // Once the Final is finished and Team 2 wins (or wins on penalties via winner_team_id)
+      const withFinalMatches: Match[] = [
+        ...groupOnlyMatches,
+        {
+          id: "f1",
+          home_team_id: "t1",
+          away_team_id: "t2",
+          home_score: 1,
+          away_score: 1,
+          status: "finished",
+          stage: "final",
+          winner_team_id: "t2",
+        } as Match,
+      ];
+
+      expect(getMathematicalChampion(standings, withFinalMatches)?.teamId).toBe(
+        "t2",
+      );
+    });
   });
 });

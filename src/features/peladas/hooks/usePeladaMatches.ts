@@ -43,8 +43,11 @@ export function usePeladaMatches(peladaId: string) {
   );
   const isProceedingRef = useRef(false);
 
-  const handleEndMatch = async (matchId: string) => {
-    await actions.executeEndMatch(matchId);
+  const handleEndMatch = async (
+    matchId: string,
+    winnerTeamId?: string | null,
+  ) => {
+    await actions.executeEndMatch(matchId, winnerTeamId);
     setJustFinishedMatchId(matchId);
 
     // If no more matches are scheduled or running, stop all timers
