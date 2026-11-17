@@ -274,6 +274,19 @@ export interface TeamPlayer {
   player_id: string;
   is_goalkeeper?: boolean;
 }
+export interface ChallengerCandidate {
+  player_id: string;
+  consecutive_games: number;
+  total_games: number;
+  eligible_by_fairness: boolean;
+}
+export interface ChallengerCompletionContext {
+  needed: number;
+  away_team_id: string;
+  bench_player_ids: string[];
+  selected_player_ids: string[];
+  candidates: ChallengerCandidate[];
+}
 export interface Match {
   id: string;
   pelada_id: string;

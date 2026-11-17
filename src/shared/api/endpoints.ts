@@ -3,6 +3,7 @@ import type {
   AttendanceStatus,
   BatchVotePayload,
   BatchVoteResponse,
+  ChallengerCompletionContext,
   FinanceSummary,
   GeoLocationSuggestion,
   Match,
@@ -466,6 +467,18 @@ export function createApi(client: ApiClient) {
         out_player_id: outPlayerId,
         in_player_id: inPlayerId,
       }),
+    getChallengerCandidates: (matchId: string) =>
+      client.get<ChallengerCompletionContext>(
+        `/api/matches/${matchId}/challenger-candidates`,
+      ),
+    updateChallengerLineup: (
+      matchId: string,
+      payload: { player_ids: string[] },
+    ) =>
+      client.put<ChallengerCompletionContext>(
+        `/api/matches/${matchId}/challenger-lineup`,
+        payload,
+      ),
 
     // Support Lineup
     generatePeladaSupportLineup: (peladaId: string) =>

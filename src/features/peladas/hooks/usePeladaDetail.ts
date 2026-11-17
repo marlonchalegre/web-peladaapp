@@ -411,13 +411,43 @@ export function usePeladaDetail(peladaId: string) {
     }, t("peladas.detail.error.update_failed"));
   };
 
+  const clearError = useCallback(() => setError(null), []);
+
+  const executeRandomizeTeams = useCallback(
+    async (
+      playerIds: string[],
+      algorithm: DrawAlgorithm,
+      useHistory: boolean,
+    ) => {
+      if (!peladaId) return;
+      const playersPerTeam = pelada?.players_per_team || 5;
+      const numTeams = pelada?.num_teams || teams.length || 2;
+      const response = await api.post<RandomizeTeamsResponse>(
+        `/api/peladas/${peladaId}/teams/randomize`,
+        {
+          player_ids: playerIds,
+          players_per_team: playersPerTeam,
+          num_teams: numTeams,
+          algorithm,
+          use_history: useHistory,
+        },
+      );
+      updateDrawJustification(response?.justification ?? null);
+    },
+    [
+      peladaId,
+      pelada?.players_per_team,
+      pelada?.num_teams,
+      teams.length,
+      updateDrawJustification,
+    ],
+  );
+
   const handleRandomizeTeams = async (options: {
     algorithm: DrawAlgorithm;
     useHistory: boolean;
   }) => {
     if (!peladaId || processing) return;
-    const playersPerTeam = pelada?.players_per_team || 5;
-    const numTeams = pelada?.num_teams || teams.length || 2;
     setProcessing(true);
     try {
       const teamPlayerIds = Object.values(teamPlayers)
@@ -426,19 +456,11 @@ export function usePeladaDetail(peladaId: string) {
       const benchPlayerIds = benchPlayers.map((p) => p.id);
       const allPlayerIds = [...benchPlayerIds, ...teamPlayerIds];
 
-      // Only used for peladas assembled by hand: the draw prefers the
-      // confirmed attendance it reads server-side.
-      const response = await api.post<RandomizeTeamsResponse>(
-        `/api/peladas/${peladaId}/teams/randomize`,
-        {
-          player_ids: allPlayerIds,
-          players_per_team: playersPerTeam,
-          num_teams: numTeams,
-          algorithm: options.algorithm,
-          use_history: options.useHistory,
-        },
+      await executeRandomizeTeams(
+        allPlayerIds,
+        options.algorithm,
+        options.useHistory,
       );
-      updateDrawJustification(response?.justification ?? null);
       await fetchPeladaData();
     } catch (error: unknown) {
       const message =
@@ -653,34 +675,18 @@ export function usePeladaDetail(peladaId: string) {
         async () => {
           await endpoints.updateArrivalOrder(peladaId, orderedPlayerIds);
           if (runDrawAfter) {
-            const playersPerTeam = pelada?.players_per_team || 5;
-            const numTeams = pelada?.num_teams || teams.length || 2;
-            const res = await api.post<RandomizeTeamsResponse>(
-              `/api/peladas/${peladaId}/teams/randomize`,
-              {
-                player_ids: orderedPlayerIds,
-                players_per_team: playersPerTeam,
-                num_teams: numTeams,
-                algorithm: "arrival_fifo",
-                use_history: false,
-              },
+            await executeRandomizeTeams(
+              orderedPlayerIds,
+              "arrival_fifo",
+              false,
             );
-            updateDrawJustification(res?.justification ?? null);
           }
           await fetchPeladaData();
         },
         t("peladas.detail.error.action_failed", "Ação falhou"),
       );
     },
-    [
-      peladaId,
-      pelada?.players_per_team,
-      pelada?.num_teams,
-      teams.length,
-      withProcessingLock,
-      fetchPeladaData,
-      t,
-    ],
+    [peladaId, withProcessingLock, executeRandomizeTeams, fetchPeladaData, t],
   );
 
   const handleConfirmCaptainDraft = useCallback(
@@ -763,5 +769,6 @@ export function usePeladaDetail(peladaId: string) {
     handleConfirmCaptainDraft,
     allPlayerIdsInPelada,
     fetchPeladaData,
+    clearError,
   };
 }

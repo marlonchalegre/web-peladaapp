@@ -1779,6 +1779,14 @@
         "title": "Sorteio de Times Justo",
         "description": "Chega de panelinhas! Sorteie times equilibrados de verdade com base nas posições e notas dos jogadores, mantendo os goleiros fixados."
       },
+      "team_formation": {
+        "title": "Ordem de Chegada e Tira-Time",
+        "description": "Monte times pela ordem de chegada no check-in (puro ou equilibrado) ou faça um Snake Draft interativo com capitães."
+      },
+      "pelada_formats": {
+        "title": "Modelos de Pelada e Mata-Mata",
+        "description": "Jogue por pontos corridos, campeonato com Semifinais e Final automáticas no chaveamento ou Quem Ganha Fica com rodízio inteligente."
+      },
       "ils_scheduling": {
         "title": "Gerador de Partidas",
         "description": "Monte a tabela de jogos e o rodízio na hora para manter a bola rolando de forma justa e diminuir o tempo de espera no banco de reservas."
@@ -1807,8 +1815,6 @@
       "match_day": "Lista de Presença",
       "teams": "Times Equilibrados",
       "mvp_vote": "Craque do Jogo (MVP)",
-      "attendance_phase": "Fase de Presença",
-      "no_fifo_bias": "Sem viés de confirmação (FIFO): Ordenado por Posição (GK > DF > MF > ST) e Nome.",
       "confirmed": "Confirmado",
       "waitlist": "Lista de Espera",
       "gk_locked": "GK (Fixo)",

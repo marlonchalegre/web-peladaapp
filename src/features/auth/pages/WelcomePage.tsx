@@ -21,10 +21,20 @@ import {
   AttachMoney as FinanceIcon,
   CalendarMonth as ScheduleIcon,
   Radar as RadarIcon,
+  AccessTime as AccessTimeIcon,
 } from "@mui/icons-material";
 import { useNavigate, Navigate } from "react-router-dom";
+import type { Theme } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "../../../app/providers/AuthContext";
+
+const mockCardSx = (theme: Theme) => ({
+  p: 2.5,
+  borderRadius: "16px",
+  border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+  bgcolor: "background.paper",
+  boxShadow: theme.customShadows.card,
+});
 
 /**
  * Mock UI for Match Attendance demonstrating position-based sorting & waitlist rules
@@ -58,151 +68,109 @@ function MockMatchAttendance() {
     <Paper
       elevation={0}
       sx={{
-        p: 2.5,
-        borderRadius: 4,
-        border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-        bgcolor: "background.paper",
+        ...mockCardSx(theme),
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        boxShadow: `0 8px 32px ${alpha(theme.palette.common.black, 0.08)}`,
       }}
     >
-      <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 1,
-          }}
-        >
-          <Typography
-            variant="subtitle2"
-            sx={{ fontWeight: 800, color: "primary.main", letterSpacing: 0.5 }}
-          >
-            {t("welcome.mock.match_day", "Game Roster")}
-          </Typography>
-          <Chip
-            label={t("welcome.mock.attendance_phase", "Attendance Phase")}
-            size="small"
-            variant="outlined"
-            color="primary"
-            sx={{ fontSize: "0.65rem", height: 18, fontWeight: 700 }}
-          />
-        </Box>
+      <Typography
+        variant="subtitle2"
+        sx={{
+          fontWeight: 800,
+          color: "primary.main",
+          letterSpacing: 0.5,
+          mb: 1.5,
+        }}
+      >
+        {t("welcome.mock.match_day", "Game Roster")}
+      </Typography>
 
-        <Typography
-          variant="caption"
-          sx={{
-            color: "text.secondary",
-            display: "block",
-            mb: 2,
-            fontSize: "0.72rem",
-            lineHeight: 1.3,
-          }}
-        >
-          {t(
-            "welcome.mock.no_fifo_bias",
-            "No FIFO bias: Sorted by Position (GK > DF > MF > ST) & Name.",
-          )}
-        </Typography>
-
-        <Stack
-          spacing={1.2}
-          sx={{ flexGrow: 1, justifyContent: "space-between", mt: 1 }}
-        >
-          {players.map((p, i) => {
-            const pos = positionConfig[p.pos as keyof typeof positionConfig];
-            return (
-              <Box
-                key={i}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  p: 1,
-                  bgcolor:
-                    p.status === "confirmed"
-                      ? alpha(theme.palette.success.main, 0.05)
-                      : alpha(theme.palette.warning.main, 0.05),
-                  borderRadius: 2.5,
-                  border: `1px solid ${alpha(theme.palette.divider, 0.04)}`,
-                }}
-              >
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  sx={{ alignItems: "center" }}
+      <Stack spacing={1.2} sx={{ mt: 0.5 }}>
+        {players.map((p, i) => {
+          const pos = positionConfig[p.pos as keyof typeof positionConfig];
+          return (
+            <Box
+              key={i}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                p: 1,
+                bgcolor:
+                  p.status === "confirmed"
+                    ? alpha(theme.palette.success.main, 0.05)
+                    : alpha(theme.palette.warning.main, 0.05),
+                borderRadius: "10px",
+                border: `1px solid ${alpha(theme.palette.divider, 0.04)}`,
+              }}
+            >
+              <Stack direction="row" spacing={1} sx={{ alignItems: "center" }}>
+                <Avatar
+                  sx={{
+                    width: 26,
+                    height: 26,
+                    fontSize: "0.68rem",
+                    fontWeight: "bold",
+                    bgcolor: pos.color,
+                    color: "primary.contrastText",
+                    boxShadow: `0 2px 4px ${alpha(pos.color, 0.3)}`,
+                  }}
                 >
-                  <Avatar
+                  {pos.label}
+                </Avatar>
+                <Box>
+                  <Typography
+                    variant="body2"
                     sx={{
-                      width: 26,
-                      height: 26,
-                      fontSize: "0.68rem",
-                      fontWeight: "bold",
-                      bgcolor: pos.color,
-                      color: "primary.contrastText",
-                      boxShadow: `0 2px 4px ${alpha(pos.color, 0.3)}`,
+                      fontWeight: 700,
+                      fontSize: "0.82rem",
+                      color: "text.primary",
                     }}
                   >
-                    {pos.label}
-                  </Avatar>
-                  <Box>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        fontWeight: 700,
-                        fontSize: "0.82rem",
-                        color: "text.primary",
-                      }}
-                    >
-                      {p.name}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: "text.secondary",
-                        display: "block",
-                        fontSize: "0.62rem",
-                        mt: -0.2,
-                      }}
-                    >
-                      {p.type === "Mensalista"
-                        ? t("common.member_types.mensalista", "Mensalista")
-                        : p.type === "Diarista"
-                          ? t("common.member_types.diarista", "Diarista")
-                          : t("common.member_types.convidado", "Guest")}
-                    </Typography>
-                  </Box>
-                </Stack>
-                <Chip
-                  label={
+                    {p.name}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "text.secondary",
+                      display: "block",
+                      fontSize: "0.62rem",
+                      mt: -0.2,
+                    }}
+                  >
+                    {p.type === "Mensalista"
+                      ? t("common.member_types.mensalista", "Mensalista")
+                      : p.type === "Diarista"
+                        ? t("common.member_types.diarista", "Diarista")
+                        : t("common.member_types.convidado", "Guest")}
+                  </Typography>
+                </Box>
+              </Stack>
+              <Chip
+                label={
+                  p.status === "confirmed"
+                    ? t("welcome.mock.confirmed", "Confirmed")
+                    : t("welcome.mock.waitlist", "Waitlist")
+                }
+                size="small"
+                sx={{
+                  height: 20,
+                  fontSize: "0.68rem",
+                  fontWeight: 700,
+                  bgcolor:
                     p.status === "confirmed"
-                      ? t("welcome.mock.confirmed", "Confirmed")
-                      : t("welcome.mock.waitlist", "Waitlist")
-                  }
-                  size="small"
-                  sx={{
-                    height: 20,
-                    fontSize: "0.68rem",
-                    fontWeight: 700,
-                    bgcolor:
-                      p.status === "confirmed"
-                        ? alpha(theme.palette.success.main, 0.08)
-                        : alpha(theme.palette.warning.main, 0.08),
-                    color:
-                      p.status === "confirmed"
-                        ? "success.main"
-                        : "warning.main",
-                    border: `1px solid ${p.status === "confirmed" ? alpha(theme.palette.success.main, 0.15) : alpha(theme.palette.warning.main, 0.15)}`,
-                  }}
-                />
-              </Box>
-            );
-          })}
-        </Stack>
-      </Box>
+                      ? alpha(theme.palette.success.main, 0.08)
+                      : alpha(theme.palette.warning.main, 0.08),
+                  color:
+                    p.status === "confirmed" ? "success.main" : "warning.main",
+                  border: `1px solid ${p.status === "confirmed" ? alpha(theme.palette.success.main, 0.15) : alpha(theme.palette.warning.main, 0.15)}`,
+                }}
+              />
+            </Box>
+          );
+        })}
+      </Stack>
     </Paper>
   );
 }
@@ -215,16 +183,7 @@ function MockTeams() {
   const theme = useTheme();
 
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        p: 2.5,
-        borderRadius: 4,
-        border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-        bgcolor: "background.paper",
-        boxShadow: `0 8px 32px ${alpha(theme.palette.common.black, 0.08)}`,
-      }}
-    >
+    <Paper elevation={0} sx={mockCardSx(theme)}>
       <Box
         sx={{
           display: "flex",
@@ -265,7 +224,7 @@ function MockTeams() {
               p: 1.2,
               bgcolor: alpha(theme.palette.primary.main, 0.03),
               border: `1px solid ${alpha(theme.palette.primary.main, 0.08)}`,
-              borderRadius: 3,
+              borderRadius: "10px",
               width: "100%",
               display: "flex",
               flexDirection: "column",
@@ -409,7 +368,7 @@ function MockTeams() {
               p: 1.2,
               bgcolor: alpha(theme.palette.secondary.main, 0.03),
               border: `1px solid ${alpha(theme.palette.secondary.main, 0.08)}`,
-              borderRadius: 3,
+              borderRadius: "10px",
               width: "100%",
               display: "flex",
               flexDirection: "column",
@@ -560,16 +519,7 @@ function MockVoting() {
   const theme = useTheme();
 
   return (
-    <Paper
-      elevation={0}
-      sx={{
-        p: 2.5,
-        borderRadius: 4,
-        border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
-        bgcolor: "background.paper",
-        boxShadow: `0 8px 32px ${alpha(theme.palette.common.black, 0.08)}`,
-      }}
-    >
+    <Paper elevation={0} sx={mockCardSx(theme)}>
       <Box
         sx={{
           display: "flex",
@@ -604,7 +554,7 @@ function MockVoting() {
       </Typography>
 
       <Stack spacing={1} sx={{ alignItems: "center", py: 0.5 }}>
-        <Box sx={{ position: "relative" }}>
+        <Box sx={{ position: "relative", mb: 0.75 }}>
           <Avatar
             sx={{
               bgcolor: "primary.dark",
@@ -628,7 +578,7 @@ function MockVoting() {
               fontWeight: 900,
               px: 1,
               py: 0.25,
-              borderRadius: 1,
+              borderRadius: "6px",
               lineHeight: 1,
               whiteSpace: "nowrap",
               boxShadow: `0 2px 4px ${alpha(theme.palette.warning.main, 0.4)}`,
@@ -724,6 +674,30 @@ export default function WelcomePage() {
       description: t(
         "welcome.features.bucket_shuffle.description",
         "No more stacked teams! Automatically draw teams balanced by player skill and position, ensuring goalkeepers are locked to each side.",
+      ),
+    },
+    {
+      key: "team_formation",
+      icon: <AccessTimeIcon fontSize="large" />,
+      title: t(
+        "welcome.features.team_formation.title",
+        "Arrival Order & Captain Draft",
+      ),
+      description: t(
+        "welcome.features.team_formation.description",
+        "Form teams by check-in arrival order (FIFO or skill-balanced) or run an interactive Snake Draft with team captains.",
+      ),
+    },
+    {
+      key: "pelada_formats",
+      icon: <TrophyIcon fontSize="large" />,
+      title: t(
+        "welcome.features.pelada_formats.title",
+        "Pelada Formats & Brackets",
+      ),
+      description: t(
+        "welcome.features.pelada_formats.description",
+        "Choose Round Robin, Championship with automatic Semifinals & Final brackets, or Winner Stays On with smart bench rotation.",
       ),
     },
     {
@@ -883,7 +857,7 @@ export default function WelcomePage() {
                     sx={{
                       px: { xs: 4, sm: 5 },
                       py: 1.8,
-                      borderRadius: 3,
+                      borderRadius: "10px",
                       fontWeight: 800,
                       fontSize: "0.95rem",
                       boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.25)}`,
@@ -903,7 +877,7 @@ export default function WelcomePage() {
                     sx={{
                       px: { xs: 4, sm: 5 },
                       py: 1.8,
-                      borderRadius: 3,
+                      borderRadius: "10px",
                       fontWeight: 800,
                       fontSize: "0.95rem",
                       borderWidth: 2,
@@ -922,7 +896,7 @@ export default function WelcomePage() {
 
             {/* Right Mock Visuals Column */}
             <Grid size={{ xs: 12, md: 6, lg: 7 }}>
-              <Grid container spacing={2}>
+              <Grid container spacing={2} sx={{ alignItems: "center" }}>
                 <Grid size={{ xs: 12, sm: 6, md: 12, lg: 6 }}>
                   <MockMatchAttendance />
                 </Grid>
@@ -958,12 +932,6 @@ export default function WelcomePage() {
               alignItems: "center",
             }}
           >
-            <Chip
-              label={t("welcome.sections.features.badge", "SYSTEM FEATURES")}
-              size="small"
-              color="primary"
-              sx={{ fontWeight: 800, px: 1, letterSpacing: 1 }}
-            />
             <Typography
               variant="h4"
               component="h2"
@@ -996,7 +964,7 @@ export default function WelcomePage() {
                   sx={{
                     p: 4,
                     height: "100%",
-                    borderRadius: 5,
+                    borderRadius: "16px",
                     border: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
                     bgcolor: "background.default",
                     transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",

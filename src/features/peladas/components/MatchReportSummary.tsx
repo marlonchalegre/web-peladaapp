@@ -35,6 +35,7 @@ interface MatchReportSummaryProps {
   teamNameById: Record<string, string>;
   nextMatch?: Match | null;
   onProceedToNext?: () => void;
+  onCompleteChallenger?: () => void;
   onClosePelada?: () => void;
   isPeladaClosed?: boolean;
   isAdmin?: boolean;
@@ -67,6 +68,7 @@ export default function MatchReportSummary({
   teamNameById,
   nextMatch,
   onProceedToNext,
+  onCompleteChallenger,
   onClosePelada,
   isPeladaClosed = false,
   isAdmin = false,
@@ -479,6 +481,20 @@ export default function MatchReportSummary({
                   seq: nextMatch.sequence,
                 })}
               </Typography>
+              {isAdmin && onCompleteChallenger && (
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={onCompleteChallenger}
+                  data-testid="summary-complete-challenger-button"
+                  sx={{ mt: 1.5, display: "flex", mx: "auto" }}
+                >
+                  {t(
+                    "peladas.matches.challenger.open_button",
+                    "Escolher / Sortear Quem Fica",
+                  )}
+                </Button>
+              )}
             </Box>
           ) : !isPeladaClosed ? (
             <Box

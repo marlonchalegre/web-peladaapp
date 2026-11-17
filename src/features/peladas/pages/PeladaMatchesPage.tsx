@@ -23,6 +23,7 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import ShareIcon from "@mui/icons-material/Share";
 import ActiveMatchDashboard from "../components/ActiveMatchDashboard";
 import MatchReportSummary from "../components/MatchReportSummary";
+import { CompleteChallengerDialog } from "../components/CompleteChallengerDialog";
 import SupportLineupTab from "../components/SupportLineupTab";
 import PeladaTabsBar from "../components/PeladaTabsBar";
 import { useTranslation } from "react-i18next";
@@ -224,6 +225,16 @@ export default function PeladaMatchesPage() {
     setShareMenuAnchor(null);
   };
 
+  const [completeChallengerOpen, setCompleteChallengerOpen] = useState(false);
+  const handleCloseCompleteChallenger = useCallback(
+    () => setCompleteChallengerOpen(false),
+    [],
+  );
+  const handleOpenCompleteChallenger = useCallback(
+    () => setCompleteChallengerOpen(true),
+    [],
+  );
+
   const {
     loading,
     error,
@@ -278,6 +289,17 @@ export default function PeladaMatchesPage() {
     rerollSupportLineup,
     notifySupportLineup,
   } = usePeladaMatches(peladaId);
+
+  const orgPlayerNameById = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(orgPlayerIdToUserId).map(([pid, uid]) => [
+          pid,
+          userIdToName[uid] || pid,
+        ]),
+      ),
+    [orgPlayerIdToUserId, userIdToName],
+  );
 
   const isAdmin = useMemo(() => {
     return !!(
@@ -1469,10 +1491,31 @@ export default function PeladaMatchesPage() {
           teamNameById={teamNameById}
           nextMatch={nextScheduledMatch}
           onProceedToNext={proceedToNextMatch}
+          onCompleteChallenger={
+            isAdmin &&
+            pelada?.format === "winner_stays_on" &&
+            nextScheduledMatch
+              ? handleOpenCompleteChallenger
+              : undefined
+          }
           onClosePelada={() => setClosePeladaConfirmOpen(true)}
           isPeladaClosed={isPeladaClosed}
           isAdmin={isAdmin}
           closing={closing}
+        />
+      )}
+      {completeChallengerOpen && (
+        <CompleteChallengerDialog
+          open={completeChallengerOpen}
+          matchId={nextScheduledMatch?.id || null}
+          teamName={
+            nextScheduledMatch
+              ? teamNameById[nextScheduledMatch.away_team_id] || ""
+              : ""
+          }
+          playerNameById={orgPlayerNameById}
+          onClose={handleCloseCompleteChallenger}
+          onSaved={refreshStats}
         />
       )}
       {/* Pretty Confirm Dialogs */}

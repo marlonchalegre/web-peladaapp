@@ -82,6 +82,7 @@ export default function PeladaDetailPage() {
     handleSaveArrivalOrder: saveArrivalOrder,
     handleConfirmCaptainDraft: confirmCaptainDraft,
     allPlayerIdsInPelada,
+    clearError,
   } = usePeladaDetail(peladaId);
 
   const [justificationDialogOpen, setJustificationDialogOpen] = useState(false);
@@ -321,7 +322,7 @@ export default function PeladaDetailPage() {
     }
   }, [pelada?.organization_id, user, isAdmin]);
 
-  if (error)
+  if (error && !pelada)
     return (
       <Container sx={{ mt: 4, px: { xs: 1, sm: 2 } }} disableGutters>
         <Alert severity="error">{error}</Alert>
@@ -352,6 +353,14 @@ export default function PeladaDetailPage() {
       >
         {live}
       </div>
+
+      {error && (
+        <Container sx={{ mt: 2, px: { xs: 1, sm: 2 } }} disableGutters>
+          <Alert severity="error" onClose={clearError}>
+            {error}
+          </Alert>
+        </Container>
+      )}
 
       {isDesktop ? (
         <PeladaTeamsDesktopView

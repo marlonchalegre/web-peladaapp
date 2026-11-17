@@ -1779,6 +1779,14 @@
         "title": "Fair & Balanced Teams",
         "description": "No more stacked teams! Automatically draw teams balanced by player skill and position, ensuring goalkeepers are locked to each side."
       },
+      "team_formation": {
+        "title": "Arrival Order & Captain Draft",
+        "description": "Form teams by check-in arrival order (FIFO or skill-balanced) or run an interactive Snake Draft with team captains."
+      },
+      "pelada_formats": {
+        "title": "Pelada Formats & Brackets",
+        "description": "Choose Round Robin, Championship with automatic Semifinals & Final brackets, or Winner Stays On with smart bench rotation."
+      },
       "ils_scheduling": {
         "title": "Match Schedule Generator",
         "description": "Generate match fixture schedules instantly to keep the games flowing, balance match-ups, and minimize waiting time on the bench."
@@ -1807,8 +1815,6 @@
       "match_day": "Game Roster",
       "teams": "Balanced Teams",
       "mvp_vote": "MVP Peer Voting",
-      "attendance_phase": "Attendance Phase",
-      "no_fifo_bias": "No FIFO bias: Sorted by Position (GK > DF > MF > ST) & Name.",
       "confirmed": "Confirmed",
       "waitlist": "Waitlist",
       "gk_locked": "GK (Locked)",
